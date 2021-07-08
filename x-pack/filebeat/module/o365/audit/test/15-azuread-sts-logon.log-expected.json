@@ -13,8 +13,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -28,12 +28,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -91,7 +91,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -113,8 +112,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -128,12 +127,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -191,7 +190,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -213,8 +211,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -228,12 +226,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -291,7 +289,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -313,8 +310,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -328,12 +325,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -391,7 +388,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -413,8 +409,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -428,12 +424,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -491,7 +487,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -513,8 +508,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -528,12 +523,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -591,7 +586,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -613,8 +607,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -628,12 +622,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -691,7 +685,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -713,8 +706,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -728,12 +721,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -791,7 +784,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -813,8 +805,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -828,12 +820,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -891,7 +883,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -913,8 +904,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -928,12 +919,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -991,7 +982,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1013,8 +1003,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1028,12 +1018,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1091,7 +1081,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1113,8 +1102,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1128,12 +1117,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1191,7 +1180,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1213,8 +1201,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1228,12 +1216,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1291,7 +1279,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1313,8 +1300,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1328,12 +1315,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1391,7 +1378,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1413,8 +1399,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1428,12 +1414,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1488,7 +1474,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1510,8 +1495,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1525,12 +1510,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1588,7 +1573,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1610,8 +1594,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1625,12 +1609,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1688,7 +1672,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1710,8 +1693,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1725,12 +1708,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1785,7 +1768,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1807,8 +1789,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1822,12 +1804,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1885,7 +1867,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -1907,8 +1888,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1922,12 +1903,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -1985,7 +1966,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2007,8 +1987,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2022,12 +2002,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2085,7 +2065,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2107,8 +2086,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2122,12 +2101,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2185,7 +2164,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2207,8 +2185,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2222,12 +2200,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2285,7 +2263,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2307,8 +2284,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2322,12 +2299,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2385,7 +2362,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2407,8 +2383,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2422,12 +2398,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2485,7 +2461,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2507,8 +2482,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2522,12 +2497,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2585,7 +2560,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2607,8 +2581,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2622,12 +2596,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2685,7 +2659,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2707,8 +2680,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2722,12 +2695,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2785,7 +2758,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2807,8 +2779,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2822,12 +2794,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2885,7 +2857,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -2907,8 +2878,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2922,12 +2893,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -2984,7 +2955,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3006,8 +2976,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3021,12 +2991,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3085,7 +3055,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3107,8 +3076,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3171,7 +3140,6 @@
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3193,8 +3161,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3208,12 +3176,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3271,7 +3239,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3293,8 +3260,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3357,7 +3324,6 @@
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3379,8 +3345,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3394,12 +3360,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3458,7 +3424,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3480,8 +3445,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3544,7 +3509,6 @@
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3566,8 +3530,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3581,12 +3545,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3645,7 +3609,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3667,8 +3630,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3682,12 +3645,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3745,7 +3708,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3767,8 +3729,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3782,12 +3744,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3845,7 +3807,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3867,8 +3828,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3931,7 +3892,6 @@
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -3953,8 +3913,8 @@
         "event.outcome": "failure",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_failure"
+            "authentication_failure",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -3968,12 +3928,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4032,7 +3992,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4054,8 +4013,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4069,12 +4028,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4129,7 +4088,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4151,8 +4109,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4166,12 +4124,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4229,7 +4187,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4251,8 +4208,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4266,12 +4223,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4329,7 +4286,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4351,8 +4307,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4415,7 +4371,6 @@
         ],
         "user.id": "Unknown",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4437,8 +4392,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4452,12 +4407,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4515,7 +4470,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4537,8 +4491,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4552,12 +4506,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4615,7 +4569,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4637,8 +4590,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4652,12 +4605,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4715,7 +4668,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4737,8 +4689,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4752,12 +4704,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4815,7 +4767,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4837,8 +4788,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4852,12 +4803,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4915,7 +4866,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -4937,8 +4887,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -4952,12 +4902,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5015,7 +4965,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5037,8 +4986,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5052,12 +5001,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5115,7 +5064,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5137,8 +5085,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5152,12 +5100,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5215,7 +5163,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5237,8 +5184,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5252,12 +5199,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5315,7 +5262,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5337,8 +5283,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5352,12 +5298,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5415,7 +5361,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5437,8 +5382,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5452,12 +5397,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5515,7 +5460,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5537,8 +5481,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5552,12 +5496,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5615,7 +5559,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5637,8 +5580,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5652,12 +5595,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5715,7 +5658,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5737,8 +5679,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5752,12 +5694,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5812,7 +5754,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5834,8 +5775,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5849,12 +5790,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5912,7 +5853,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -5934,8 +5874,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -5949,12 +5889,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6012,7 +5952,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6034,8 +5973,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6049,12 +5988,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6112,7 +6051,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6134,8 +6072,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6149,12 +6087,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6212,7 +6150,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6234,8 +6171,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6249,12 +6186,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6312,7 +6249,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6334,8 +6270,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6349,12 +6285,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6412,7 +6348,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6434,8 +6369,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6449,12 +6384,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6512,7 +6447,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6534,8 +6468,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6549,12 +6483,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6612,7 +6546,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6634,8 +6567,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6649,12 +6582,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6712,7 +6645,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",
@@ -6734,8 +6666,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "start",
-            "authentication_success"
+            "authentication_success",
+            "start"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6749,12 +6681,12 @@
                 "Type": 0
             },
             {
-                "ID": "asr@testsiem.onmicrosoft.com",
-                "Type": 5
-            },
-            {
                 "ID": "1003200096971F55",
                 "Type": 3
+            },
+            {
+                "ID": "asr@testsiem.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -6812,7 +6744,6 @@
         "user.id": "asr@testsiem.onmicrosoft.com",
         "user.name": "asr",
         "user_agent.device.name": "Mac",
-        "user_agent.device.type": "Desktop",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
         "user_agent.os.full": "Mac OS X 10.14",

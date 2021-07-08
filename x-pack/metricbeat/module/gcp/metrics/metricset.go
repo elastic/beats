@@ -286,11 +286,11 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 	}
 
 	hostFieldTable := map[string]string{
-		"instance.cpu.utilization.value":                "host.cpu.pct",
-		"instance.network.sent_bytes_count.value":       "host.network.in.bytes",
-		"instance.network.received_bytes_count.value":   "host.network.out.bytes",
-		"instance.network.sent_packets_count.value":     "host.network.in.packets",
-		"instance.network.received_packets_count.value": "host.network.out.packets",
+		"instance.cpu.utilization.value":                "host.cpu.usage",
+		"instance.network.sent_bytes_count.value":       "host.network.ingress.bytes",
+		"instance.network.received_bytes_count.value":   "host.network.egress.bytes",
+		"instance.network.sent_packets_count.value":     "host.network.ingress.packets",
+		"instance.network.received_packets_count.value": "host.network.egress.packets",
 		"instance.disk.read_bytes_count.value":          "host.disk.read.bytes",
 		"instance.disk.write_bytes_count.value":         "host.disk.write.bytes",
 	}

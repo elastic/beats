@@ -4,10 +4,39 @@
     Enrich stats
   release: ga
   fields:
+    - name: executing_policy
+      type: group
+      fields:
+        - name: name
+          type: keyword
+        - name: task
+          type: group
+          fields:
+          - name: id
+            type: long
+          - name: task
+            type: keyword
+          - name: action
+            type: keyword
+          - name: cancellable
+            type: boolean
+          - name: parent_task_id
+            type: keyword
+          - name: time
+            type: group
+            fields:
+              - name: start.ms
+                type: long
+              - name: running.nano
+                type: long
     - name: queue.size
       type: long
       description: >
         Number of search requests in the queue.
+    - name: executed_searches.total
+      type: long
+      description: >
+        Number of search requests that enrich processors have executed since node startup.
     - name: remote_requests
       type: group
       fields:
@@ -19,7 +48,3 @@
           type: long
           description: >
             Number of outstanding remote requests executed since node startup.
-    - name: executed_searches.total
-      type: long
-      description: >
-        Number of search requests that enrich processors have executed since node startup.

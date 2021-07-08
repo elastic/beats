@@ -22,13 +22,14 @@
         "event.outcome": "failure",
         "event.type": [
             "connection",
-            "protocol",
-            "error"
+            "error",
+            "protocol"
         ],
         "fileset.name": "sip",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:t8Jl0amIXPHemzxKgsLjtkB+ewo=",
+        "network.direction": "outbound",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
@@ -42,7 +43,10 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "newyork.voip.ms",
         "url.full": "sip:newyork.voip.ms:5060",
+        "url.port": 5060,
+        "url.scheme": "sip",
         "zeek.session_id": "CPRLCB4eWHdjP852Bk",
         "zeek.sip.call_id": "8694cd7e-976e4fc3-d76f6e38@172.16.133.19",
         "zeek.sip.request.body_length": 0,
@@ -97,11 +101,12 @@
         "input.type": "log",
         "log.offset": 805,
         "network.community_id": "1:U/Makwsc8lm6pVKLfRMzoNTI++0=",
+        "network.direction": "external",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
-            "200.57.7.204",
-            "200.57.7.195"
+            "200.57.7.195",
+            "200.57.7.204"
         ],
         "service.type": "zeek",
         "source.address": "200.57.7.204",
@@ -120,7 +125,11 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "bestel.com",
         "url.full": "sip:francisco@bestel.com:55060",
+        "url.port": 55060,
+        "url.scheme": "sip",
+        "url.username": "francisco",
         "zeek.session_id": "ComJz236lSOcuOmix3",
         "zeek.sip.call_id": "12013223@200.57.7.195",
         "zeek.sip.request.body_length": 229,
@@ -134,8 +143,8 @@
         "zeek.sip.response.from": "<sip:200.57.7.195:55061;user=phone>",
         "zeek.sip.response.path": [
             "SIP/2.0/UDP 200.57.7.195",
-            "SIP/2.0/UDP 200.57.7.195:55061",
             "SIP/2.0/UDP 200.57.7.195",
+            "SIP/2.0/UDP 200.57.7.195:55061",
             "SIP/2.0/UDP 200.57.7.195:55061"
         ],
         "zeek.sip.response.to": "\"francisco@bestel.com\" <sip:francisco@bestel.com:55060>;tag=298852044",
@@ -178,11 +187,12 @@
         "input.type": "log",
         "log.offset": 1654,
         "network.community_id": "1:0hvHF/bh5wFKg7nfRXxsno4F198=",
+        "network.direction": "external",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
-            "200.57.7.205",
-            "200.57.7.195"
+            "200.57.7.195",
+            "200.57.7.205"
         ],
         "service.type": "zeek",
         "source.address": "200.57.7.205",
@@ -201,7 +211,9 @@
         "tags": [
             "zeek.sip"
         ],
+        "url.domain": "Verso.com",
         "url.full": "sip:Verso.com",
+        "url.scheme": "sip",
         "zeek.session_id": "CJZDWgixtwqXctWEg",
         "zeek.sip.call_id": "46E1C3CB36304F84A020CF6DD3F96461@Verso.com",
         "zeek.sip.request.body_length": 0,

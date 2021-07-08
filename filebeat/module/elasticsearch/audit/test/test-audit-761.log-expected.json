@@ -18,8 +18,8 @@
         "elasticsearch.audit.request.name": "MultiGetShardRequest",
         "elasticsearch.audit.user.realm": "native1",
         "elasticsearch.audit.user.roles": [
-            "logstash_admin",
-            "cluster_monitor"
+            "cluster_monitor",
+            "logstash_admin"
         ],
         "elasticsearch.node.id": "vvj136QVQ2Ci2aXmrhyi3Q",
         "event.action": "access_granted",

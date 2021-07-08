@@ -20,13 +20,16 @@
 package node
 
 import (
+	"encoding/json"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
+
 	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/module/logstash"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -38,11 +41,312 @@ func TestEventMapping(t *testing.T) {
 		input, err := ioutil.ReadFile(f)
 		require.NoError(t, err)
 
-		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
+		var data map[string]interface{}
+		err = json.Unmarshal(input, &data)
+		require.NoError(t, err)
 
+		event := mb.Event{}
+		err = commonFieldsMapping(&event, data)
 		require.NoError(t, err, f)
-		require.True(t, len(reporter.GetEvents()) >= 1, f)
-		require.Equal(t, 0, len(reporter.GetErrors()), f)
+	}
+}
+
+func TestMakeClusterToPipelinesMap(t *testing.T) {
+	tests := map[string]struct {
+		pipelines           []logstash.PipelineState
+		overrideClusterUUID string
+		expectedMap         map[string][]logstash.PipelineState
+	}{
+		"no_vertex_cluster_id": {
+			pipelines: []logstash.PipelineState{
+				{
+					ID: "test_pipeline",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id": "vertex_1",
+								},
+								{
+									"id": "vertex_2",
+								},
+								{
+									"id": "vertex_3",
+								},
+							},
+						},
+					},
+				},
+			},
+			overrideClusterUUID: "prod_cluster_id",
+			expectedMap: map[string][]logstash.PipelineState{
+				"prod_cluster_id": {
+					{
+						ID: "test_pipeline",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id": "vertex_1",
+									},
+									{
+										"id": "vertex_2",
+									},
+									{
+										"id": "vertex_3",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"one_vertex_cluster_id": {
+			pipelines: []logstash.PipelineState{
+				{
+					ID: "test_pipeline",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id":           "vertex_1",
+									"cluster_uuid": "es_1",
+								},
+								{
+									"id": "vertex_2",
+								},
+								{
+									"id": "vertex_3",
+								},
+							},
+						},
+					},
+				},
+			},
+			overrideClusterUUID: "prod_cluster_id",
+			expectedMap: map[string][]logstash.PipelineState{
+				"prod_cluster_id": {
+					{
+						ID: "test_pipeline",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id":           "vertex_1",
+										"cluster_uuid": "es_1",
+									},
+									{
+										"id": "vertex_2",
+									},
+									{
+										"id": "vertex_3",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"two_pipelines": {
+			pipelines: []logstash.PipelineState{
+				{
+					ID: "test_pipeline_1",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id":           "vertex_1_1",
+									"cluster_uuid": "es_1",
+								},
+								{
+									"id": "vertex_1_2",
+								},
+								{
+									"id": "vertex_1_3",
+								},
+							},
+						},
+					},
+				},
+				{
+					ID: "test_pipeline_2",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id": "vertex_2_1",
+								},
+								{
+									"id": "vertex_2_2",
+								},
+								{
+									"id": "vertex_2_3",
+								},
+							},
+						},
+					},
+				},
+			},
+			overrideClusterUUID: "prod_cluster_id",
+			expectedMap: map[string][]logstash.PipelineState{
+				"prod_cluster_id": {
+					{
+						ID: "test_pipeline_1",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id":           "vertex_1_1",
+										"cluster_uuid": "es_1",
+									},
+									{
+										"id": "vertex_1_2",
+									},
+									{
+										"id": "vertex_1_3",
+									},
+								},
+							},
+						},
+					},
+					{
+						ID: "test_pipeline_2",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id": "vertex_2_1",
+									},
+									{
+										"id": "vertex_2_2",
+									},
+									{
+										"id": "vertex_2_3",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		"no_override_cluster_id": {
+			pipelines: []logstash.PipelineState{
+				{
+					ID: "test_pipeline_1",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id":           "vertex_1_1",
+									"cluster_uuid": "es_1",
+								},
+								{
+									"id":           "vertex_1_2",
+									"cluster_uuid": "es_2",
+								},
+								{
+									"id": "vertex_1_3",
+								},
+							},
+						},
+					},
+				},
+				{
+					ID: "test_pipeline_2",
+					Graph: &logstash.GraphContainer{
+						Graph: &logstash.Graph{
+							Vertices: []map[string]interface{}{
+								{
+									"id": "vertex_2_1",
+								},
+								{
+									"id": "vertex_2_2",
+								},
+								{
+									"id": "vertex_2_3",
+								},
+							},
+						},
+					},
+				},
+			},
+			overrideClusterUUID: "",
+			expectedMap: map[string][]logstash.PipelineState{
+				"es_1": {
+					{
+						ID: "test_pipeline_1",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id":           "vertex_1_1",
+										"cluster_uuid": "es_1",
+									},
+									{
+										"id":           "vertex_1_2",
+										"cluster_uuid": "es_2",
+									},
+									{
+										"id": "vertex_1_3",
+									},
+								},
+							},
+						},
+					},
+				},
+				"es_2": {
+					{
+						ID: "test_pipeline_1",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id":           "vertex_1_1",
+										"cluster_uuid": "es_1",
+									},
+									{
+										"id":           "vertex_1_2",
+										"cluster_uuid": "es_2",
+									},
+									{
+										"id": "vertex_1_3",
+									},
+								},
+							},
+						},
+					},
+				},
+				"": {
+					{
+						ID: "test_pipeline_2",
+						Graph: &logstash.GraphContainer{
+							Graph: &logstash.Graph{
+								Vertices: []map[string]interface{}{
+									{
+										"id": "vertex_2_1",
+									},
+									{
+										"id": "vertex_2_2",
+									},
+									{
+										"id": "vertex_2_3",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			actualMap := makeClusterToPipelinesMap(test.pipelines, test.overrideClusterUUID)
+			require.Equal(t, test.expectedMap, actualMap)
+		})
 	}
 }

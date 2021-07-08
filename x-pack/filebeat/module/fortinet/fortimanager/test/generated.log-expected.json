@@ -22,6 +22,7 @@
         "observer.egress.interface.name": "enp0s3068",
         "observer.ingress.interface.name": "eth5722",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olab",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -90,17 +91,18 @@
         "observer.egress.interface.name": "enp0s2581",
         "observer.ingress.interface.name": "enp0s208",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tur",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.410",
         "related.hosts": [
+            "aer445.host",
             "mvolu",
-            "pisciv",
-            "aer445.host"
+            "pisciv"
         ],
         "related.ip": [
-            "10.62.4.246",
-            "10.171.204.166"
+            "10.171.204.166",
+            "10.62.4.246"
         ],
         "related.user": [
             "oluptas"
@@ -155,8 +157,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "roinBCS",
         "url.original": "https://www.example.net/orisn/cca.htm?ofdeF=metcons#roinBCS",
-        "url.query": "taspe",
+        "url.path": "/orisn/cca.htm",
+        "url.query": [
+            "ofdeF=metcons",
+            "taspe"
+        ],
+        "url.scheme": "https",
         "user.name": "oluptas"
     },
     {
@@ -182,14 +192,15 @@
         "observer.egress.interface.name": "enp0s3491",
         "observer.ingress.interface.name": "eth4496",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olorema",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ccaecat"
         ],
         "related.ip": [
-            "10.200.188.142",
             "10.15.159.80",
+            "10.200.188.142",
             "10.94.103.117"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -249,14 +260,15 @@
         "observer.egress.interface.name": "eth3391",
         "observer.ingress.interface.name": "eth3676",
         "observer.product": "FortiManager",
+        "observer.serial_number": "emq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "lorem"
         ],
         "related.ip": [
-            "10.27.88.95",
             "10.131.233.27",
+            "10.27.88.95",
             "10.50.112.141"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -318,17 +330,18 @@
         "observer.egress.interface.name": "eth6096",
         "observer.ingress.interface.name": "lo1567",
         "observer.product": "FortiManager",
+        "observer.serial_number": "atuse",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5670",
         "related.hosts": [
-            "roinBCSe",
             "ntutl",
-            "olo7148.mail.home"
+            "olo7148.mail.home",
+            "roinBCSe"
         ],
         "related.ip": [
-            "10.87.212.179",
-            "10.157.213.15"
+            "10.157.213.15",
+            "10.87.212.179"
         ],
         "related.user": [
             "rveli"
@@ -383,8 +396,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "gif",
+        "url.fragment": "saute",
         "url.original": "https://api.example.com/iumto/aboreetd.gif?dun=enim#saute",
-        "url.query": "nsect",
+        "url.path": "/iumto/aboreetd.gif",
+        "url.query": [
+            "dun=enim",
+            "nsect"
+        ],
+        "url.scheme": "https",
         "user.name": "rveli"
     },
     {
@@ -411,13 +432,14 @@
         "observer.egress.interface.name": "lo1120",
         "observer.ingress.interface.name": "enp0s33",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ivelits",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.152",
         "related.hosts": [
+            "agna7678.internal.host",
             "onse",
-            "orain",
-            "agna7678.internal.host"
+            "orain"
         ],
         "related.ip": [
             "10.114.150.67",
@@ -431,8 +453,8 @@
         "rsa.investigations.event_vcat": "mwr",
         "rsa.misc.OS": "imaven",
         "rsa.misc.action": [
-            "uines",
-            "accept"
+            "accept",
+            "uines"
         ],
         "rsa.misc.category": "uidolo",
         "rsa.misc.client": "emips",
@@ -476,8 +498,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "txt",
+        "url.fragment": "picia",
         "url.original": "https://www.example.net/tasuntex/sunt.txt?ume=incidi#picia",
-        "url.query": "nsec",
+        "url.path": "/tasuntex/sunt.txt",
+        "url.query": [
+            "nsec",
+            "ume=incidi"
+        ],
+        "url.scheme": "https",
         "user.name": "aperia"
     },
     {
@@ -504,17 +534,18 @@
         "observer.egress.interface.name": "enp0s1462",
         "observer.ingress.interface.name": "lo2857",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remagn",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4059",
         "related.hosts": [
-            "utla",
+            "equep5085.mail.domain",
             "tatn",
-            "equep5085.mail.domain"
+            "utla"
         ],
         "related.ip": [
-            "10.95.64.124",
-            "10.195.36.51"
+            "10.195.36.51",
+            "10.95.64.124"
         ],
         "related.user": [
             "nnum"
@@ -569,8 +600,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "html",
+        "url.fragment": "tlabore",
         "url.original": "https://www.example.org/inesci/serror.html?mqu=apariat#tlabore",
-        "url.query": "nsectet",
+        "url.path": "/inesci/serror.html",
+        "url.query": [
+            "mqu=apariat",
+            "nsectet"
+        ],
+        "url.scheme": "https",
         "user.name": "nnum"
     },
     {
@@ -596,15 +635,16 @@
         "observer.egress.interface.name": "lo821",
         "observer.ingress.interface.name": "eth2591",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ctetura",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "labore"
         ],
         "related.ip": [
+            "10.114.16.155",
             "10.176.216.90",
-            "10.186.85.3",
-            "10.114.16.155"
+            "10.186.85.3"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -664,13 +704,14 @@
         "observer.egress.interface.name": "lo1616",
         "observer.ingress.interface.name": "eth6448",
         "observer.product": "FortiManager",
+        "observer.serial_number": "stlabo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3917",
         "related.hosts": [
-            "sperna",
+            "eturadi6608.mail.host",
             "gnido",
-            "eturadi6608.mail.host"
+            "sperna"
         ],
         "related.ip": [
             "10.23.62.94",
@@ -729,8 +770,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "htm",
+        "url.fragment": "issus",
         "url.original": "https://api.example.com/nimid/itatione.htm?umwr=oluptate#issus",
-        "url.query": "atem",
+        "url.path": "/nimid/itatione.htm",
+        "url.query": [
+            "atem",
+            "umwr=oluptate"
+        ],
+        "url.scheme": "https",
         "user.name": "non"
     },
     {
@@ -757,17 +806,18 @@
         "observer.egress.interface.name": "lo4901",
         "observer.ingress.interface.name": "eth4502",
         "observer.product": "FortiManager",
+        "observer.serial_number": "adip",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2580",
         "related.hosts": [
             "ecte",
-            "tani",
-            "ipsumdol4488.api.localdomain"
+            "ipsumdol4488.api.localdomain",
+            "tani"
         ],
         "related.ip": [
-            "10.28.76.42",
-            "10.106.31.86"
+            "10.106.31.86",
+            "10.28.76.42"
         ],
         "related.user": [
             "cons"
@@ -822,8 +872,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "htm",
+        "url.fragment": "pora",
         "url.original": "https://example.com/tetu/stru.htm?tlabore=Exc#pora",
-        "url.query": "atno",
+        "url.path": "/tetu/stru.htm",
+        "url.query": [
+            "atno",
+            "tlabore=Exc"
+        ],
+        "url.scheme": "https",
         "user.name": "cons"
     },
     {
@@ -849,14 +907,15 @@
         "observer.egress.interface.name": "lo7114",
         "observer.ingress.interface.name": "lo4249",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tquov",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "diconseq"
         ],
         "related.ip": [
-            "10.238.164.74",
             "10.106.162.153",
+            "10.238.164.74",
             "10.58.214.16"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -916,15 +975,16 @@
         "observer.egress.interface.name": "lo2438",
         "observer.ingress.interface.name": "enp0s4046",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tse",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "tenimad"
         ],
         "related.ip": [
-            "10.225.141.20",
             "10.110.31.190",
-            "10.217.150.196"
+            "10.217.150.196",
+            "10.225.141.20"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -984,13 +1044,14 @@
         "observer.egress.interface.name": "lo4367",
         "observer.ingress.interface.name": "eth651",
         "observer.product": "FortiManager",
+        "observer.serial_number": "eFi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3319",
         "related.hosts": [
-            "mestq",
             "amc",
-            "cusant4946.www.domain"
+            "cusant4946.www.domain",
+            "mestq"
         ],
         "related.ip": [
             "10.137.56.173",
@@ -1004,8 +1065,8 @@
         "rsa.investigations.event_vcat": "xer",
         "rsa.misc.OS": "fugi",
         "rsa.misc.action": [
-            "umdolo",
-            "deny"
+            "deny",
+            "umdolo"
         ],
         "rsa.misc.category": "conseq",
         "rsa.misc.client": "cusant",
@@ -1049,8 +1110,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "htm",
+        "url.fragment": "isnisi",
         "url.original": "https://api.example.com/isnostr/umqu.htm?emquia=inesci#isnisi",
-        "url.query": "uptate",
+        "url.path": "/isnostr/umqu.htm",
+        "url.query": [
+            "emquia=inesci",
+            "uptate"
+        ],
+        "url.scheme": "https",
         "user.name": "proide"
     },
     {
@@ -1076,6 +1145,7 @@
         "observer.egress.interface.name": "lo5047",
         "observer.ingress.interface.name": "eth267",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nBCSedut",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1144,13 +1214,14 @@
         "observer.egress.interface.name": "eth4392",
         "observer.ingress.interface.name": "eth5968",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ate",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.225",
         "related.hosts": [
-            "tvolu",
+            "ccaeca5504.internal.example",
             "equaturv",
-            "ccaeca5504.internal.example"
+            "tvolu"
         ],
         "related.ip": [
             "10.149.13.76",
@@ -1164,8 +1235,8 @@
         "rsa.investigations.event_vcat": "psumqu",
         "rsa.misc.OS": "oraincid",
         "rsa.misc.action": [
-            "ritt",
-            "deny"
+            "deny",
+            "ritt"
         ],
         "rsa.misc.category": "idunt",
         "rsa.misc.client": "siu",
@@ -1209,8 +1280,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "txt",
+        "url.fragment": "urerepr",
         "url.original": "https://example.org/tiaec/rumwrit.txt?oconsequ=edquiac#urerepr",
-        "url.query": "iaeco",
+        "url.path": "/tiaec/rumwrit.txt",
+        "url.query": [
+            "iaeco",
+            "oconsequ=edquiac"
+        ],
+        "url.scheme": "https",
         "user.name": "tetur"
     },
     {
@@ -1236,6 +1315,7 @@
         "observer.egress.interface.name": "enp0s3449",
         "observer.ingress.interface.name": "lo1208",
         "observer.product": "FortiManager",
+        "observer.serial_number": "atisund",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1303,15 +1383,16 @@
         "observer.egress.interface.name": "enp0s2700",
         "observer.ingress.interface.name": "lo3642",
         "observer.product": "FortiManager",
+        "observer.serial_number": "item",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "tla"
         ],
         "related.ip": [
+            "10.241.132.176",
             "10.245.187.229",
-            "10.67.132.242",
-            "10.241.132.176"
+            "10.67.132.242"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -1371,17 +1452,18 @@
         "observer.egress.interface.name": "lo7672",
         "observer.ingress.interface.name": "eth4185",
         "observer.product": "FortiManager",
+        "observer.serial_number": "siuta",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1847",
         "related.hosts": [
             "cingel",
-            "uii",
-            "tore7088.www.invalid"
+            "tore7088.www.invalid",
+            "uii"
         ],
         "related.ip": [
-            "10.212.214.4",
-            "10.199.47.220"
+            "10.199.47.220",
+            "10.212.214.4"
         ],
         "related.user": [
             "atv"
@@ -1436,8 +1518,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "itlab",
         "url.original": "https://mail.example.org/ptassita/its.gif?risnis=uov#itlab",
-        "url.query": "hil",
+        "url.path": "/ptassita/its.gif",
+        "url.query": [
+            "hil",
+            "risnis=uov"
+        ],
+        "url.scheme": "https",
         "user.name": "atv"
     },
     {
@@ -1464,13 +1554,14 @@
         "observer.egress.interface.name": "eth3862",
         "observer.ingress.interface.name": "enp0s3071",
         "observer.product": "FortiManager",
+        "observer.serial_number": "hitec",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.760",
         "related.hosts": [
             "dolorsit",
-            "rcit",
-            "mve1890.internal.home"
+            "mve1890.internal.home",
+            "rcit"
         ],
         "related.ip": [
             "10.234.165.130",
@@ -1484,8 +1575,8 @@
         "rsa.investigations.event_vcat": "metcons",
         "rsa.misc.OS": "ehende",
         "rsa.misc.action": [
-            "umf",
-            "deny"
+            "deny",
+            "umf"
         ],
         "rsa.misc.category": "emUte",
         "rsa.misc.client": "archite",
@@ -1529,8 +1620,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "htm",
+        "url.fragment": "toditaut",
         "url.original": "https://www.example.org/redol/gnaa.htm?aliquamq=dtempori#toditaut",
-        "url.query": "quames",
+        "url.path": "/redol/gnaa.htm",
+        "url.query": [
+            "aliquamq=dtempori",
+            "quames"
+        ],
+        "url.scheme": "https",
         "user.name": "orese"
     },
     {
@@ -1557,13 +1656,14 @@
         "observer.egress.interface.name": "lo1586",
         "observer.ingress.interface.name": "eth7713",
         "observer.product": "FortiManager",
+        "observer.serial_number": "utaliqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4450",
         "related.hosts": [
             "billoi",
-            "saquaea",
-            "eturad6143.www.home"
+            "eturad6143.www.home",
+            "saquaea"
         ],
         "related.ip": [
             "10.128.46.70",
@@ -1577,8 +1677,8 @@
         "rsa.investigations.event_vcat": "boNem",
         "rsa.misc.OS": "ntium",
         "rsa.misc.action": [
-            "block",
-            "acommodi"
+            "acommodi",
+            "block"
         ],
         "rsa.misc.category": "inrepreh",
         "rsa.misc.client": "moles",
@@ -1622,8 +1722,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "jpg",
+        "url.fragment": "offici",
         "url.original": "https://example.net/aparia/tatnon.jpg?rever=ore#offici",
-        "url.query": "essecill",
+        "url.path": "/aparia/tatnon.jpg",
+        "url.query": [
+            "essecill",
+            "rever=ore"
+        ],
+        "url.scheme": "https",
         "user.name": "enim"
     },
     {
@@ -1650,6 +1758,7 @@
         "observer.egress.interface.name": "eth1247",
         "observer.ingress.interface.name": "lo154",
         "observer.product": "FortiManager",
+        "observer.serial_number": "vol",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7544",
@@ -1715,8 +1824,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "equamnih",
         "url.original": "https://www.example.com/tali/BCS.txt?iqu=niamqu#equamnih",
-        "url.query": "quiineav",
+        "url.path": "/tali/BCS.txt",
+        "url.query": [
+            "iqu=niamqu",
+            "quiineav"
+        ],
+        "url.scheme": "https",
         "user.name": "inculp"
     },
     {
@@ -1743,6 +1860,7 @@
         "observer.egress.interface.name": "lo3057",
         "observer.ingress.interface.name": "lo653",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remips",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1710",
@@ -1763,8 +1881,8 @@
         "rsa.investigations.event_vcat": "ess",
         "rsa.misc.OS": "equatDu",
         "rsa.misc.action": [
-            "emullamc",
-            "cancel"
+            "cancel",
+            "emullamc"
         ],
         "rsa.misc.category": "niamquis",
         "rsa.misc.client": "tutlabo",
@@ -1808,8 +1926,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "htm",
+        "url.fragment": "mexer",
         "url.original": "https://www.example.com/iame/orroquis.htm?tiumd=ntmoll#mexer",
-        "url.query": "tec",
+        "url.path": "/iame/orroquis.htm",
+        "url.query": [
+            "tec",
+            "tiumd=ntmoll"
+        ],
+        "url.scheme": "https",
         "user.name": "olorem"
     },
     {
@@ -1836,13 +1962,14 @@
         "observer.egress.interface.name": "lo3472",
         "observer.ingress.interface.name": "eth2940",
         "observer.product": "FortiManager",
+        "observer.serial_number": "cor",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5380",
         "related.hosts": [
-            "uei",
             "onse",
-            "reseosqu1629.mail.lan"
+            "reseosqu1629.mail.lan",
+            "uei"
         ],
         "related.ip": [
             "10.106.85.174",
@@ -1901,8 +2028,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "mnisi",
         "url.original": "https://www.example.net/iame/laudanti.htm?stquido=rsitvolu#mnisi",
-        "url.query": "serror",
+        "url.path": "/iame/laudanti.htm",
+        "url.query": [
+            "serror",
+            "stquido=rsitvolu"
+        ],
+        "url.scheme": "https",
         "user.name": "lmo"
     },
     {
@@ -1929,6 +2064,7 @@
         "observer.egress.interface.name": "lo3706",
         "observer.ingress.interface.name": "lo7416",
         "observer.product": "FortiManager",
+        "observer.serial_number": "min",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1998,17 +2134,18 @@
         "observer.egress.interface.name": "enp0s3903",
         "observer.ingress.interface.name": "eth5767",
         "observer.product": "FortiManager",
+        "observer.serial_number": "eddoei",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2208",
         "related.hosts": [
-            "lamcola",
             "duntut",
+            "lamcola",
             "tasnul4179.internal.host"
         ],
         "related.ip": [
-            "10.53.168.187",
-            "10.141.156.217"
+            "10.141.156.217",
+            "10.53.168.187"
         ],
         "related.user": [
             "amqu"
@@ -2018,8 +2155,8 @@
         "rsa.investigations.event_vcat": "illumq",
         "rsa.misc.OS": "idata",
         "rsa.misc.action": [
-            "emacc",
-            "block"
+            "block",
+            "emacc"
         ],
         "rsa.misc.category": "ueporro",
         "rsa.misc.client": "veli",
@@ -2063,8 +2200,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.org",
+        "url.extension": "jpg",
+        "url.fragment": "rQuisaut",
         "url.original": "https://www.example.org/ess/quiad.jpg?ten=litanim#rQuisaut",
-        "url.query": "emp",
+        "url.path": "/ess/quiad.jpg",
+        "url.query": [
+            "emp",
+            "ten=litanim"
+        ],
+        "url.scheme": "https",
         "user.name": "amqu"
     },
     {
@@ -2092,13 +2237,14 @@
         "observer.egress.interface.name": "enp0s1732",
         "observer.ingress.interface.name": "lo2990",
         "observer.product": "FortiManager",
+        "observer.serial_number": "itametco",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3402",
         "related.hosts": [
-            "tur",
+            "bore5546.www.local",
             "imavenia",
-            "bore5546.www.local"
+            "tur"
         ],
         "related.ip": [
             "10.189.82.19",
@@ -2112,8 +2258,8 @@
         "rsa.investigations.event_vcat": "eturadip",
         "rsa.misc.OS": "turadip",
         "rsa.misc.action": [
-            "odoc",
-            "accept"
+            "accept",
+            "odoc"
         ],
         "rsa.misc.category": "volup",
         "rsa.misc.client": "tur",
@@ -2157,8 +2303,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "txt",
+        "url.fragment": "Finibus",
         "url.original": "https://example.com/xeac/llitanim.txt?oreverit=scip#Finibus",
-        "url.query": "atura",
+        "url.path": "/xeac/llitanim.txt",
+        "url.query": [
+            "atura",
+            "oreverit=scip"
+        ],
+        "url.scheme": "https",
         "user.name": "iconsequ"
     },
     {
@@ -2185,17 +2339,18 @@
         "observer.egress.interface.name": "enp0s3067",
         "observer.ingress.interface.name": "enp0s4064",
         "observer.product": "FortiManager",
+        "observer.serial_number": "oluptat",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.91",
         "related.hosts": [
-            "amquisno",
             "Dui",
-            "Utenima260.mail.invalid"
+            "Utenima260.mail.invalid",
+            "amquisno"
         ],
         "related.ip": [
-            "10.181.183.104",
-            "10.151.170.207"
+            "10.151.170.207",
+            "10.181.183.104"
         ],
         "related.user": [
             "iosamni"
@@ -2205,8 +2360,8 @@
         "rsa.investigations.event_vcat": "eturadip",
         "rsa.misc.OS": "onsecte",
         "rsa.misc.action": [
-            "cancel",
-            "amni"
+            "amni",
+            "cancel"
         ],
         "rsa.misc.category": "umdolore",
         "rsa.misc.client": "modoc",
@@ -2250,8 +2405,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "gif",
+        "url.fragment": "iameaque",
         "url.original": "https://api.example.org/orio/gna.gif?aaliquaU=olu#iameaque",
-        "url.query": "tatio",
+        "url.path": "/orio/gna.gif",
+        "url.query": [
+            "aaliquaU=olu",
+            "tatio"
+        ],
+        "url.scheme": "https",
         "user.name": "iosamni"
     },
     {
@@ -2278,6 +2441,7 @@
         "observer.egress.interface.name": "enp0s5908",
         "observer.ingress.interface.name": "eth62",
         "observer.product": "FortiManager",
+        "observer.serial_number": "Duisa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7278",
@@ -2287,8 +2451,8 @@
             "uido2046.mail.lan"
         ],
         "related.ip": [
-            "10.70.7.23",
-            "10.130.240.11"
+            "10.130.240.11",
+            "10.70.7.23"
         ],
         "related.user": [
             "eavolup"
@@ -2343,8 +2507,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "txt",
+        "url.fragment": "umtota",
         "url.original": "https://mail.example.org/nimadmin/lumqui.txt?iquip=tinculpa#umtota",
-        "url.query": "iuta",
+        "url.path": "/nimadmin/lumqui.txt",
+        "url.query": [
+            "iquip=tinculpa",
+            "iuta"
+        ],
+        "url.scheme": "https",
         "user.name": "eavolup"
     },
     {
@@ -2370,15 +2542,16 @@
         "observer.egress.interface.name": "lo6533",
         "observer.ingress.interface.name": "enp0s6659",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mexercit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "uio"
         ],
         "related.ip": [
-            "10.37.161.101",
+            "10.111.182.212",
             "10.17.209.252",
-            "10.111.182.212"
+            "10.37.161.101"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2437,6 +2610,7 @@
         "observer.egress.interface.name": "enp0s5873",
         "observer.ingress.interface.name": "enp0s7649",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nesci",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2505,13 +2679,14 @@
         "observer.egress.interface.name": "eth1576",
         "observer.ingress.interface.name": "lo6539",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nturmag",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5978",
         "related.hosts": [
+            "con6049.internal.lan",
             "porissu",
-            "tuser",
-            "con6049.internal.lan"
+            "tuser"
         ],
         "related.ip": [
             "10.48.25.200",
@@ -2525,8 +2700,8 @@
         "rsa.investigations.event_vcat": "enimad",
         "rsa.misc.OS": "olor",
         "rsa.misc.action": [
-            "nse",
-            "accept"
+            "accept",
+            "nse"
         ],
         "rsa.misc.category": "conseq",
         "rsa.misc.client": "mmo",
@@ -2570,8 +2745,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "quisn",
         "url.original": "https://internal.example.com/temse/caecat.jpg?emeu=tatemac#quisn",
-        "url.query": "mveniam",
+        "url.path": "/temse/caecat.jpg",
+        "url.query": [
+            "emeu=tatemac",
+            "mveniam"
+        ],
+        "url.scheme": "https",
         "user.name": "usanti"
     },
     {
@@ -2597,6 +2780,7 @@
         "observer.egress.interface.name": "enp0s7799",
         "observer.ingress.interface.name": "eth6814",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mexer",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2664,15 +2848,16 @@
         "observer.egress.interface.name": "eth1882",
         "observer.ingress.interface.name": "lo497",
         "observer.product": "FortiManager",
+        "observer.serial_number": "unt",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ons"
         ],
         "related.ip": [
-            "10.36.99.207",
             "10.166.142.198",
-            "10.225.37.73"
+            "10.225.37.73",
+            "10.36.99.207"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2731,6 +2916,7 @@
         "observer.egress.interface.name": "eth1188",
         "observer.ingress.interface.name": "lo4891",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nost",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2798,15 +2984,16 @@
         "observer.egress.interface.name": "lo1800",
         "observer.ingress.interface.name": "lo3230",
         "observer.product": "FortiManager",
+        "observer.serial_number": "teturad",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "iutal"
         ],
         "related.ip": [
+            "10.156.208.5",
             "10.163.36.101",
-            "10.6.242.108",
-            "10.156.208.5"
+            "10.6.242.108"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -2866,6 +3053,7 @@
         "observer.egress.interface.name": "lo4581",
         "observer.ingress.interface.name": "eth4543",
         "observer.product": "FortiManager",
+        "observer.serial_number": "conseq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4713",
@@ -2931,8 +3119,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "htm",
+        "url.fragment": "isni",
         "url.original": "https://www5.example.com/elit/sam.htm?nevolu=unt#isni",
-        "url.query": "onoru",
+        "url.path": "/elit/sam.htm",
+        "url.query": [
+            "nevolu=unt",
+            "onoru"
+        ],
+        "url.scheme": "https",
         "user.name": "estiaec"
     },
     {
@@ -2959,17 +3155,18 @@
         "observer.egress.interface.name": "enp0s7442",
         "observer.ingress.interface.name": "enp0s2282",
         "observer.product": "FortiManager",
+        "observer.serial_number": "umiurer",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4481",
         "related.hosts": [
-            "trudex",
+            "itaspe3216.localdomain",
             "naaliq",
-            "itaspe3216.localdomain"
+            "trudex"
         ],
         "related.ip": [
-            "10.94.177.125",
-            "10.116.82.108"
+            "10.116.82.108",
+            "10.94.177.125"
         ],
         "related.user": [
             "ecatc"
@@ -3024,8 +3221,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "iadeseru",
         "url.original": "https://example.org/porro/issu.htm?inculpa=ruredol#iadeseru",
-        "url.query": "olorsit",
+        "url.path": "/porro/issu.htm",
+        "url.query": [
+            "inculpa=ruredol",
+            "olorsit"
+        ],
+        "url.scheme": "https",
         "user.name": "ecatc"
     },
     {
@@ -3053,17 +3258,18 @@
         "observer.egress.interface.name": "enp0s4580",
         "observer.ingress.interface.name": "enp0s4429",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uredol",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4442",
         "related.hosts": [
-            "uae",
             "fugi",
-            "mea6298.api.example"
+            "mea6298.api.example",
+            "uae"
         ],
         "related.ip": [
-            "10.115.121.243",
-            "10.113.152.241"
+            "10.113.152.241",
+            "10.115.121.243"
         ],
         "related.user": [
             "norumetM"
@@ -3118,8 +3324,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "suntexpl",
         "url.original": "https://mail.example.org/uamquaer/texplica.gif?sequa=lorum#suntexpl",
-        "url.query": "udexerci",
+        "url.path": "/uamquaer/texplica.gif",
+        "url.query": [
+            "sequa=lorum",
+            "udexerci"
+        ],
+        "url.scheme": "https",
         "user.name": "norumetM"
     },
     {
@@ -3146,17 +3360,18 @@
         "observer.egress.interface.name": "enp0s6960",
         "observer.ingress.interface.name": "enp0s7206",
         "observer.product": "FortiManager",
+        "observer.serial_number": "xeaco",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3804",
         "related.hosts": [
             "atcupi",
-            "nder",
-            "iqu7510.internal.corp"
+            "iqu7510.internal.corp",
+            "nder"
         ],
         "related.ip": [
-            "10.49.82.45",
-            "10.179.153.97"
+            "10.179.153.97",
+            "10.49.82.45"
         ],
         "related.user": [
             "dictasun"
@@ -3211,8 +3426,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "gif",
+        "url.fragment": "rsit",
         "url.original": "https://www5.example.org/aqu/utemvele.gif?serrorsi=tsedquia#rsit",
-        "url.query": "nihilmol",
+        "url.path": "/aqu/utemvele.gif",
+        "url.query": [
+            "nihilmol",
+            "serrorsi=tsedquia"
+        ],
+        "url.scheme": "https",
         "user.name": "dictasun"
     },
     {
@@ -3238,15 +3461,16 @@
         "observer.egress.interface.name": "eth855",
         "observer.ingress.interface.name": "eth3784",
         "observer.product": "FortiManager",
+        "observer.serial_number": "saute",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "lors"
         ],
         "related.ip": [
-            "10.99.55.115",
+            "10.205.83.138",
             "10.98.52.184",
-            "10.205.83.138"
+            "10.99.55.115"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3305,6 +3529,7 @@
         "observer.egress.interface.name": "lo2402",
         "observer.ingress.interface.name": "lo6750",
         "observer.product": "FortiManager",
+        "observer.serial_number": "metMa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3361,6 +3586,7 @@
         "log.level": "low",
         "log.offset": 45638,
         "observer.product": "FortiManager",
+        "observer.serial_number": "roinBCS",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3420,17 +3646,18 @@
         "observer.egress.interface.name": "enp0s5799",
         "observer.ingress.interface.name": "eth1805",
         "observer.product": "FortiManager",
+        "observer.serial_number": "enim",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.7318",
         "related.hosts": [
-            "umdol",
+            "deFinibu3940.internal.lan",
             "ptat",
-            "deFinibu3940.internal.lan"
+            "umdol"
         ],
         "related.ip": [
-            "10.22.248.52",
-            "10.124.71.88"
+            "10.124.71.88",
+            "10.22.248.52"
         ],
         "related.user": [
             "tcons"
@@ -3440,8 +3667,8 @@
         "rsa.investigations.event_vcat": "uiratio",
         "rsa.misc.OS": "xce",
         "rsa.misc.action": [
-            "cons",
-            "cancel"
+            "cancel",
+            "cons"
         ],
         "rsa.misc.category": "ciun",
         "rsa.misc.client": "amquisn",
@@ -3485,8 +3712,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "txt",
+        "url.fragment": "adeserun",
         "url.original": "https://www5.example.com/etcon/chit.txt?erspici=itinvolu#adeserun",
-        "url.query": "tinvolu",
+        "url.path": "/etcon/chit.txt",
+        "url.query": [
+            "erspici=itinvolu",
+            "tinvolu"
+        ],
+        "url.scheme": "https",
         "user.name": "tcons"
     },
     {
@@ -3513,17 +3748,18 @@
         "observer.egress.interface.name": "enp0s4999",
         "observer.ingress.interface.name": "lo1719",
         "observer.product": "FortiManager",
+        "observer.serial_number": "quipex",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4895",
         "related.hosts": [
-            "ipexeac",
             "ficiade",
+            "ipexeac",
             "tatiset4191.localdomain"
         ],
         "related.ip": [
-            "10.26.58.20",
-            "10.185.37.176"
+            "10.185.37.176",
+            "10.26.58.20"
         ],
         "related.user": [
             "eumiure"
@@ -3533,8 +3769,8 @@
         "rsa.investigations.event_vcat": "iae",
         "rsa.misc.OS": "evelite",
         "rsa.misc.action": [
-            "essequam",
-            "block"
+            "block",
+            "essequam"
         ],
         "rsa.misc.category": "tmollita",
         "rsa.misc.client": "uiinea",
@@ -3578,8 +3814,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.org",
+        "url.extension": "txt",
+        "url.fragment": "nseq",
         "url.original": "https://api.example.org/fug/liquid.txt?ptate=lloi#nseq",
-        "url.query": "undeo",
+        "url.path": "/fug/liquid.txt",
+        "url.query": [
+            "ptate=lloi",
+            "undeo"
+        ],
+        "url.scheme": "https",
         "user.name": "eumiure"
     },
     {
@@ -3605,15 +3849,16 @@
         "observer.egress.interface.name": "enp0s7861",
         "observer.ingress.interface.name": "enp0s7374",
         "observer.product": "FortiManager",
+        "observer.serial_number": "boreetdo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "teni"
         ],
         "related.ip": [
-            "10.250.231.196",
             "10.14.145.107",
-            "10.200.12.126"
+            "10.200.12.126",
+            "10.250.231.196"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3672,15 +3917,16 @@
         "observer.egress.interface.name": "enp0s1294",
         "observer.ingress.interface.name": "lo2867",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tiumd",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "atuse"
         ],
         "related.ip": [
+            "10.103.36.192",
             "10.21.203.112",
-            "10.225.34.176",
-            "10.103.36.192"
+            "10.225.34.176"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3739,15 +3985,16 @@
         "observer.egress.interface.name": "enp0s6143",
         "observer.ingress.interface.name": "eth575",
         "observer.product": "FortiManager",
+        "observer.serial_number": "periam",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "usantiu"
         ],
         "related.ip": [
+            "10.118.111.183",
             "10.140.59.161",
-            "10.5.67.140",
-            "10.118.111.183"
+            "10.5.67.140"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -3807,17 +4054,18 @@
         "observer.egress.interface.name": "enp0s4446",
         "observer.ingress.interface.name": "lo259",
         "observer.product": "FortiManager",
+        "observer.serial_number": "amq",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4493",
         "related.hosts": [
             "labor",
-            "veleumiu",
-            "nimadmi4084.api.home"
+            "nimadmi4084.api.home",
+            "veleumiu"
         ],
         "related.ip": [
-            "10.7.70.169",
-            "10.28.212.191"
+            "10.28.212.191",
+            "10.7.70.169"
         ],
         "related.user": [
             "itsed"
@@ -3872,8 +4120,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.net",
+        "url.extension": "html",
+        "url.fragment": "litess",
         "url.original": "https://example.net/aturQui/tquii.html?uiac=squ#litess",
-        "url.query": "Loremip",
+        "url.path": "/aturQui/tquii.html",
+        "url.query": [
+            "Loremip",
+            "uiac=squ"
+        ],
+        "url.scheme": "https",
         "user.name": "itsed"
     },
     {
@@ -3900,13 +4156,14 @@
         "observer.egress.interface.name": "enp0s20",
         "observer.ingress.interface.name": "lo7727",
         "observer.product": "FortiManager",
+        "observer.serial_number": "aliqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6506",
         "related.hosts": [
             "ecillum",
-            "sedqui",
-            "reprehe3525.www5.example"
+            "reprehe3525.www5.example",
+            "sedqui"
         ],
         "related.ip": [
             "10.143.144.52",
@@ -3920,8 +4177,8 @@
         "rsa.investigations.event_vcat": "uep",
         "rsa.misc.OS": "iatisund",
         "rsa.misc.action": [
-            "nvo",
-            "block"
+            "block",
+            "nvo"
         ],
         "rsa.misc.category": "tenima",
         "rsa.misc.client": "iuntNe",
@@ -3965,8 +4222,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "htm",
+        "url.fragment": "aturvel",
         "url.original": "https://mail.example.org/mvele/teveli.htm?Nequepor=luptate#aturvel",
-        "url.query": "lab",
+        "url.path": "/mvele/teveli.htm",
+        "url.query": [
+            "Nequepor=luptate",
+            "lab"
+        ],
+        "url.scheme": "https",
         "user.name": "rporis"
     },
     {
@@ -3992,14 +4257,15 @@
         "observer.egress.interface.name": "lo7156",
         "observer.ingress.interface.name": "enp0s6940",
         "observer.product": "FortiManager",
+        "observer.serial_number": "onproid",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "sitv"
         ],
         "related.ip": [
-            "10.22.149.132",
             "10.217.145.137",
+            "10.22.149.132",
             "10.251.183.113"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -4059,15 +4325,16 @@
         "observer.egress.interface.name": "enp0s3868",
         "observer.ingress.interface.name": "lo6718",
         "observer.product": "FortiManager",
+        "observer.serial_number": "imadm",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "nisi"
         ],
         "related.ip": [
-            "10.51.60.203",
             "10.183.16.252",
-            "10.203.66.175"
+            "10.203.66.175",
+            "10.51.60.203"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4127,6 +4394,7 @@
         "observer.egress.interface.name": "enp0s2918",
         "observer.ingress.interface.name": "enp0s2674",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tati",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.409",
@@ -4136,8 +4404,8 @@
             "ursint411.www.lan"
         ],
         "related.ip": [
-            "10.61.200.105",
-            "10.157.14.165"
+            "10.157.14.165",
+            "10.61.200.105"
         ],
         "related.user": [
             "nimadmi"
@@ -4147,8 +4415,8 @@
         "rsa.investigations.event_vcat": "nisiuta",
         "rsa.misc.OS": "olu",
         "rsa.misc.action": [
-            "tquov",
-            "accept"
+            "accept",
+            "tquov"
         ],
         "rsa.misc.category": "quatD",
         "rsa.misc.client": "acomm",
@@ -4192,8 +4460,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "jpg",
+        "url.fragment": "etc",
         "url.original": "https://example.org/tem/iadeseru.jpg?olorsita=odoco#etc",
-        "url.query": "natu",
+        "url.path": "/tem/iadeseru.jpg",
+        "url.query": [
+            "natu",
+            "olorsita=odoco"
+        ],
+        "url.scheme": "https",
         "user.name": "nimadmi"
     },
     {
@@ -4220,17 +4496,18 @@
         "observer.egress.interface.name": "enp0s1238",
         "observer.ingress.interface.name": "lo4523",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ecatcu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5475",
         "related.hosts": [
             "antium",
-            "rcita",
-            "ididunt7607.mail.localhost"
+            "ididunt7607.mail.localhost",
+            "rcita"
         ],
         "related.ip": [
-            "10.242.178.15",
-            "10.217.111.77"
+            "10.217.111.77",
+            "10.242.178.15"
         ],
         "related.user": [
             "nimadmin"
@@ -4285,8 +4562,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "gif",
+        "url.fragment": "tobe",
         "url.original": "https://mail.example.net/epteurs/usmodtem.gif?itvo=asi#tobe",
-        "url.query": "equepor",
+        "url.path": "/epteurs/usmodtem.gif",
+        "url.query": [
+            "equepor",
+            "itvo=asi"
+        ],
+        "url.scheme": "https",
         "user.name": "nimadmin"
     },
     {
@@ -4313,13 +4598,14 @@
         "observer.egress.interface.name": "eth7500",
         "observer.ingress.interface.name": "eth2121",
         "observer.product": "FortiManager",
+        "observer.serial_number": "henderi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.142",
         "related.hosts": [
-            "rsita",
+            "mco2906.domain",
             "ommodoco",
-            "mco2906.domain"
+            "rsita"
         ],
         "related.ip": [
             "10.199.119.251",
@@ -4378,8 +4664,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "eav",
         "url.original": "https://www.example.com/iadolo/cidu.txt?aliquide=redolori#eav",
-        "url.query": "tiu",
+        "url.path": "/iadolo/cidu.txt",
+        "url.query": [
+            "aliquide=redolori",
+            "tiu"
+        ],
+        "url.scheme": "https",
         "user.name": "msequin"
     },
     {
@@ -4406,13 +4700,14 @@
         "observer.egress.interface.name": "eth2068",
         "observer.ingress.interface.name": "eth6552",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ius",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1789",
         "related.hosts": [
             "dol",
-            "ono",
-            "ntex5135.corp"
+            "ntex5135.corp",
+            "ono"
         ],
         "related.ip": [
             "10.234.171.117",
@@ -4471,8 +4766,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "boreetd",
         "url.original": "https://internal.example.com/isc/umdol.jpg?atn=sectet#boreetd",
-        "url.query": "odic",
+        "url.path": "/isc/umdol.jpg",
+        "url.query": [
+            "atn=sectet",
+            "odic"
+        ],
+        "url.scheme": "https",
         "user.name": "tat"
     },
     {
@@ -4499,6 +4802,7 @@
         "observer.egress.interface.name": "lo5084",
         "observer.ingress.interface.name": "enp0s7638",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uunturm",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -4506,8 +4810,8 @@
         ],
         "related.ip": [
             "10.107.168.208",
-            "10.34.41.75",
-            "10.249.16.201"
+            "10.249.16.201",
+            "10.34.41.75"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4567,6 +4871,7 @@
         "observer.egress.interface.name": "enp0s4144",
         "observer.ingress.interface.name": "enp0s1897",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ctas",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6905",
@@ -4632,8 +4937,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.com",
+        "url.extension": "txt",
+        "url.fragment": "ptat",
         "url.original": "https://www.example.com/imadm/ugiat.txt?Nequepor=nisiu#ptat",
-        "url.query": "stiaec",
+        "url.path": "/imadm/ugiat.txt",
+        "url.query": [
+            "Nequepor=nisiu",
+            "stiaec"
+        ],
+        "url.scheme": "https",
         "user.name": "ommodoc"
     },
     {
@@ -4660,6 +4973,7 @@
         "observer.egress.interface.name": "enp0s390",
         "observer.ingress.interface.name": "enp0s3638",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olab",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1353",
@@ -4669,8 +4983,8 @@
             "ulamc767.internal.lan"
         ],
         "related.ip": [
-            "10.47.191.95",
-            "10.112.155.228"
+            "10.112.155.228",
+            "10.47.191.95"
         ],
         "related.user": [
             "aed"
@@ -4680,8 +4994,8 @@
         "rsa.investigations.event_vcat": "eiusm",
         "rsa.misc.OS": "emag",
         "rsa.misc.action": [
-            "velillu",
-            "deny"
+            "deny",
+            "velillu"
         ],
         "rsa.misc.category": "litseddo",
         "rsa.misc.client": "aturE",
@@ -4725,8 +5039,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.net",
+        "url.extension": "jpg",
+        "url.fragment": "sed",
         "url.original": "https://mail.example.net/ionemu/nul.jpg?volupt=ori#sed",
-        "url.query": "radipi",
+        "url.path": "/ionemu/nul.jpg",
+        "url.query": [
+            "radipi",
+            "volupt=ori"
+        ],
+        "url.scheme": "https",
         "user.name": "aed"
     },
     {
@@ -4752,15 +5074,16 @@
         "observer.egress.interface.name": "enp0s4444",
         "observer.ingress.interface.name": "lo5821",
         "observer.product": "FortiManager",
+        "observer.serial_number": "BCSedut",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "metco"
         ],
         "related.ip": [
+            "10.103.169.94",
             "10.140.137.17",
-            "10.62.241.218",
-            "10.103.169.94"
+            "10.62.241.218"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -4819,6 +5142,7 @@
         "observer.egress.interface.name": "eth1592",
         "observer.ingress.interface.name": "lo1752",
         "observer.product": "FortiManager",
+        "observer.serial_number": "amre",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -4887,17 +5211,18 @@
         "observer.egress.interface.name": "lo299",
         "observer.ingress.interface.name": "eth5742",
         "observer.product": "FortiManager",
+        "observer.serial_number": "dolorsit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4261",
         "related.hosts": [
-            "ipsum",
             "dutp",
+            "ipsum",
             "spici5547.internal.test"
         ],
         "related.ip": [
-            "10.216.49.112",
-            "10.112.242.68"
+            "10.112.242.68",
+            "10.216.49.112"
         ],
         "related.user": [
             "urmag"
@@ -4907,8 +5232,8 @@
         "rsa.investigations.event_vcat": "animi",
         "rsa.misc.OS": "tisunde",
         "rsa.misc.action": [
-            "cancel",
-            "aut"
+            "aut",
+            "cancel"
         ],
         "rsa.misc.category": "lamcorpo",
         "rsa.misc.client": "com",
@@ -4952,8 +5277,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "html",
+        "url.fragment": "henderi",
         "url.original": "https://mail.example.org/asuntex/uovolup.html?amali=uiav#henderi",
-        "url.query": "eriti",
+        "url.path": "/asuntex/uovolup.html",
+        "url.query": [
+            "amali=uiav",
+            "eriti"
+        ],
+        "url.scheme": "https",
         "user.name": "urmag"
     },
     {
@@ -4980,6 +5313,7 @@
         "observer.egress.interface.name": "lo2390",
         "observer.ingress.interface.name": "enp0s1531",
         "observer.product": "FortiManager",
+        "observer.serial_number": "nderit",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.491",
@@ -5045,8 +5379,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "dminimve",
         "url.original": "https://example.org/mnisiut/porinci.htm?norum=emUten#dminimve",
-        "url.query": "texplica",
+        "url.path": "/mnisiut/porinci.htm",
+        "url.query": [
+            "norum=emUten",
+            "texplica"
+        ],
+        "url.scheme": "https",
         "user.name": "lpaquiof"
     },
     {
@@ -5072,6 +5414,7 @@
         "observer.egress.interface.name": "lo7502",
         "observer.ingress.interface.name": "eth4741",
         "observer.product": "FortiManager",
+        "observer.serial_number": "vel",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5139,15 +5482,16 @@
         "observer.egress.interface.name": "lo3385",
         "observer.ingress.interface.name": "lo1640",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tot",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "llumdo"
         ],
         "related.ip": [
-            "10.242.119.111",
+            "10.188.131.18",
             "10.239.231.168",
-            "10.188.131.18"
+            "10.242.119.111"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5207,6 +5551,7 @@
         "observer.egress.interface.name": "lo105",
         "observer.ingress.interface.name": "eth2707",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tdolorem",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.979",
@@ -5227,8 +5572,8 @@
         "rsa.investigations.event_vcat": "amnihil",
         "rsa.misc.OS": "tten",
         "rsa.misc.action": [
-            "inea",
-            "accept"
+            "accept",
+            "inea"
         ],
         "rsa.misc.category": "quam",
         "rsa.misc.client": "oreseo",
@@ -5272,8 +5617,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "gif",
+        "url.fragment": "rai",
         "url.original": "https://api.example.net/nsec/smo.gif?etq=trumexe#rai",
-        "url.query": "ipsu",
+        "url.path": "/nsec/smo.gif",
+        "url.query": [
+            "etq=trumexe",
+            "ipsu"
+        ],
+        "url.scheme": "https",
         "user.name": "ainci"
     },
     {
@@ -5288,6 +5641,7 @@
         "log.level": "high",
         "log.offset": 71594,
         "observer.product": "FortiManager",
+        "observer.serial_number": "henderi",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5347,17 +5701,18 @@
         "observer.egress.interface.name": "lo6200",
         "observer.ingress.interface.name": "lo5820",
         "observer.product": "FortiManager",
+        "observer.serial_number": "oremquel",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4342",
         "related.hosts": [
             "onsequ",
-            "ten",
-            "riaturE1644.www5.example"
+            "riaturE1644.www5.example",
+            "ten"
         ],
         "related.ip": [
-            "10.215.144.167",
-            "10.162.114.52"
+            "10.162.114.52",
+            "10.215.144.167"
         ],
         "related.user": [
             "erspici"
@@ -5412,8 +5767,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "upta",
         "url.original": "https://internal.example.com/dolo/exeacom.txt?tlab=eufugiat#upta",
-        "url.query": "Lor",
+        "url.path": "/dolo/exeacom.txt",
+        "url.query": [
+            "Lor",
+            "tlab=eufugiat"
+        ],
+        "url.scheme": "https",
         "user.name": "erspici"
     },
     {
@@ -5440,17 +5803,18 @@
         "observer.egress.interface.name": "enp0s7520",
         "observer.ingress.interface.name": "enp0s4931",
         "observer.product": "FortiManager",
+        "observer.serial_number": "remagna",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6452",
         "related.hosts": [
-            "tem",
             "cons",
-            "mdolo7008.api.corp"
+            "mdolo7008.api.corp",
+            "tem"
         ],
         "related.ip": [
-            "10.78.75.82",
-            "10.162.128.87"
+            "10.162.128.87",
+            "10.78.75.82"
         ],
         "related.user": [
             "Sedutp"
@@ -5460,8 +5824,8 @@
         "rsa.investigations.event_vcat": "adol",
         "rsa.misc.OS": "ita",
         "rsa.misc.action": [
-            "uptat",
-            "accept"
+            "accept",
+            "uptat"
         ],
         "rsa.misc.category": "uidexea",
         "rsa.misc.client": "orpori",
@@ -5505,8 +5869,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "txt",
+        "url.fragment": "utod",
         "url.original": "https://www5.example.org/orumet/aliqu.txt?tion=sun#utod",
-        "url.query": "con",
+        "url.path": "/orumet/aliqu.txt",
+        "url.query": [
+            "con",
+            "tion=sun"
+        ],
+        "url.scheme": "https",
         "user.name": "Sedutp"
     },
     {
@@ -5532,6 +5904,7 @@
         "observer.egress.interface.name": "lo1813",
         "observer.ingress.interface.name": "eth725",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ittenbyC",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5539,8 +5912,8 @@
         ],
         "related.ip": [
             "10.137.36.151",
-            "10.75.198.93",
-            "10.51.106.43"
+            "10.51.106.43",
+            "10.75.198.93"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -5599,6 +5972,7 @@
         "observer.egress.interface.name": "lo1291",
         "observer.ingress.interface.name": "eth1273",
         "observer.product": "FortiManager",
+        "observer.serial_number": "xcepte",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -5667,17 +6041,18 @@
         "observer.egress.interface.name": "lo1570",
         "observer.ingress.interface.name": "eth4425",
         "observer.product": "FortiManager",
+        "observer.serial_number": "olorinr",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.5718",
         "related.hosts": [
+            "itse5466.api.example",
             "ptatem",
-            "quirat",
-            "itse5466.api.example"
+            "quirat"
         ],
         "related.ip": [
-            "10.26.4.3",
-            "10.217.209.221"
+            "10.217.209.221",
+            "10.26.4.3"
         ],
         "related.user": [
             "ciduntut"
@@ -5732,8 +6107,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "gif",
+        "url.fragment": "iscin",
         "url.original": "https://internal.example.com/nonnumqu/isciveli.gif?wri=aute#iscin",
-        "url.query": "eca",
+        "url.path": "/nonnumqu/isciveli.gif",
+        "url.query": [
+            "eca",
+            "wri=aute"
+        ],
+        "url.scheme": "https",
         "user.name": "ciduntut"
     },
     {
@@ -5760,17 +6143,18 @@
         "observer.egress.interface.name": "enp0s1526",
         "observer.ingress.interface.name": "enp0s6255",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uipexea",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.6603",
         "related.hosts": [
-            "ssuscipi",
+            "dquiac6194.api.lan",
             "eac",
-            "dquiac6194.api.lan"
+            "ssuscipi"
         ],
         "related.ip": [
-            "10.241.140.241",
-            "10.180.162.174"
+            "10.180.162.174",
+            "10.241.140.241"
         ],
         "related.user": [
             "nulapar"
@@ -5825,8 +6209,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.org",
+        "url.extension": "html",
+        "url.fragment": "upta",
         "url.original": "https://www5.example.org/utlabo/scip.html?voluptas=inv#upta",
-        "url.query": "atnu",
+        "url.path": "/utlabo/scip.html",
+        "url.query": [
+            "atnu",
+            "voluptas=inv"
+        ],
+        "url.scheme": "https",
         "user.name": "nulapar"
     },
     {
@@ -5853,13 +6245,14 @@
         "observer.egress.interface.name": "lo368",
         "observer.ingress.interface.name": "lo2279",
         "observer.product": "FortiManager",
+        "observer.serial_number": "tempora",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2052",
         "related.hosts": [
+            "amco1592.mail.host",
             "asp",
-            "dat",
-            "amco1592.mail.host"
+            "dat"
         ],
         "related.ip": [
             "10.110.99.222",
@@ -5873,8 +6266,8 @@
         "rsa.investigations.event_vcat": "atvolupt",
         "rsa.misc.OS": "riosam",
         "rsa.misc.action": [
-            "ssitasp",
-            "deny"
+            "deny",
+            "ssitasp"
         ],
         "rsa.misc.category": "enimadmi",
         "rsa.misc.client": "uatDui",
@@ -5918,8 +6311,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.com",
+        "url.extension": "txt",
+        "url.fragment": "obeata",
         "url.original": "https://internal.example.com/ssusci/snostrud.txt?dolo=siutaliq#obeata",
-        "url.query": "ptat",
+        "url.path": "/ssusci/snostrud.txt",
+        "url.query": [
+            "dolo=siutaliq",
+            "ptat"
+        ],
+        "url.scheme": "https",
         "user.name": "moenimi"
     },
     {
@@ -5946,17 +6347,18 @@
         "observer.egress.interface.name": "enp0s7388",
         "observer.ingress.interface.name": "eth4604",
         "observer.product": "FortiManager",
+        "observer.serial_number": "avolup",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2691",
         "related.hosts": [
+            "dicta7226.mail.example",
             "orroqu",
-            "ratio",
-            "dicta7226.mail.example"
+            "ratio"
         ],
         "related.ip": [
-            "10.53.50.77",
-            "10.4.244.115"
+            "10.4.244.115",
+            "10.53.50.77"
         ],
         "related.user": [
             "idolo"
@@ -6011,8 +6413,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "ptasn",
         "url.original": "https://api.example.com/temporai/umw.jpg?mveniamq=litsed#ptasn",
-        "url.query": "lore",
+        "url.path": "/temporai/umw.jpg",
+        "url.query": [
+            "lore",
+            "mveniamq=litsed"
+        ],
+        "url.scheme": "https",
         "user.name": "idolo"
     },
     {
@@ -6038,6 +6448,7 @@
         "observer.egress.interface.name": "enp0s454",
         "observer.ingress.interface.name": "lo4518",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ori",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6106,13 +6517,14 @@
         "observer.egress.interface.name": "eth5820",
         "observer.ingress.interface.name": "lo568",
         "observer.product": "FortiManager",
+        "observer.serial_number": "onn",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.3052",
         "related.hosts": [
+            "pidatatn2627.www.localdomain",
             "tenima",
-            "xeacom",
-            "pidatatn2627.www.localdomain"
+            "xeacom"
         ],
         "related.ip": [
             "10.208.231.15",
@@ -6126,8 +6538,8 @@
         "rsa.investigations.event_vcat": "lauda",
         "rsa.misc.OS": "enatuser",
         "rsa.misc.action": [
-            "rios",
-            "accept"
+            "accept",
+            "rios"
         ],
         "rsa.misc.category": "aUte",
         "rsa.misc.client": "iusm",
@@ -6171,8 +6583,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "mail.example.org",
+        "url.extension": "gif",
+        "url.fragment": "umiurere",
         "url.original": "https://mail.example.org/ngelit/dipiscin.gif?serro=ctet#umiurere",
-        "url.query": "diconseq",
+        "url.path": "/ngelit/dipiscin.gif",
+        "url.query": [
+            "diconseq",
+            "serro=ctet"
+        ],
+        "url.scheme": "https",
         "user.name": "riatur"
     },
     {
@@ -6198,15 +6618,16 @@
         "observer.egress.interface.name": "lo5835",
         "observer.ingress.interface.name": "lo7680",
         "observer.product": "FortiManager",
+        "observer.serial_number": "iusmodte",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "nimides"
         ],
         "related.ip": [
-            "10.53.251.202",
+            "10.123.59.69",
             "10.226.255.3",
-            "10.123.59.69"
+            "10.53.251.202"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6265,15 +6686,16 @@
         "observer.egress.interface.name": "enp0s2353",
         "observer.ingress.interface.name": "eth2546",
         "observer.product": "FortiManager",
+        "observer.serial_number": "sitametc",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "edut"
         ],
         "related.ip": [
-            "10.3.85.176",
             "10.212.56.26",
-            "10.29.141.252"
+            "10.29.141.252",
+            "10.3.85.176"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6333,17 +6755,18 @@
         "observer.egress.interface.name": "eth7640",
         "observer.ingress.interface.name": "lo3023",
         "observer.product": "FortiManager",
+        "observer.serial_number": "maccusan",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.95",
         "related.hosts": [
             "Utenimad",
-            "inculp",
-            "emveleu4029.api.local"
+            "emveleu4029.api.local",
+            "inculp"
         ],
         "related.ip": [
-            "10.236.175.163",
-            "10.126.11.186"
+            "10.126.11.186",
+            "10.236.175.163"
         ],
         "related.user": [
             "udantiu"
@@ -6353,8 +6776,8 @@
         "rsa.investigations.event_vcat": "ill",
         "rsa.misc.OS": "eabill",
         "rsa.misc.action": [
-            "cancel",
-            "atemqui"
+            "atemqui",
+            "cancel"
         ],
         "rsa.misc.category": "idatatno",
         "rsa.misc.client": "res",
@@ -6398,8 +6821,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "internal.example.net",
+        "url.extension": "htm",
+        "url.fragment": "lestia",
         "url.original": "https://internal.example.net/inc/riaturEx.htm?mnihilm=itinvo#lestia",
-        "url.query": "icaboN",
+        "url.path": "/inc/riaturEx.htm",
+        "url.query": [
+            "icaboN",
+            "mnihilm=itinvo"
+        ],
+        "url.scheme": "https",
         "user.name": "udantiu"
     },
     {
@@ -6425,6 +6856,7 @@
         "observer.egress.interface.name": "lo5438",
         "observer.ingress.interface.name": "lo1917",
         "observer.product": "FortiManager",
+        "observer.serial_number": "itatio",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6432,8 +6864,8 @@
         ],
         "related.ip": [
             "10.11.150.136",
-            "10.83.98.220",
-            "10.171.60.173"
+            "10.171.60.173",
+            "10.83.98.220"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6492,6 +6924,7 @@
         "observer.egress.interface.name": "lo5287",
         "observer.ingress.interface.name": "enp0s11",
         "observer.product": "FortiManager",
+        "observer.serial_number": "lorsita",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -6559,15 +6992,16 @@
         "observer.egress.interface.name": "lo2445",
         "observer.ingress.interface.name": "enp0s1885",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uptasnul",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ptate"
         ],
         "related.ip": [
+            "10.119.248.36",
             "10.187.107.47",
-            "10.84.200.121",
-            "10.119.248.36"
+            "10.84.200.121"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6626,15 +7060,16 @@
         "observer.egress.interface.name": "eth6468",
         "observer.ingress.interface.name": "eth1833",
         "observer.product": "FortiManager",
+        "observer.serial_number": "mquae",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "tasu"
         ],
         "related.ip": [
-            "10.30.239.222",
             "10.135.213.17",
-            "10.167.128.229"
+            "10.167.128.229",
+            "10.30.239.222"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6694,17 +7129,18 @@
         "observer.egress.interface.name": "enp0s7218",
         "observer.ingress.interface.name": "lo1215",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ant",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1028",
         "related.hosts": [
-            "orem",
             "edi",
+            "orem",
             "rspic5637.api.local"
         ],
         "related.ip": [
-            "10.169.133.219",
-            "10.115.166.48"
+            "10.115.166.48",
+            "10.169.133.219"
         ],
         "related.user": [
             "emq"
@@ -6714,8 +7150,8 @@
         "rsa.investigations.event_vcat": "iumdol",
         "rsa.misc.OS": "min",
         "rsa.misc.action": [
-            "eleumiur",
-            "block"
+            "block",
+            "eleumiur"
         ],
         "rsa.misc.category": "ero",
         "rsa.misc.client": "gia",
@@ -6759,8 +7195,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.net",
+        "url.extension": "txt",
+        "url.fragment": "rExce",
         "url.original": "https://api.example.net/ita/esse.txt?amquis=iatquovo#rExce",
-        "url.query": "ididun",
+        "url.path": "/ita/esse.txt",
+        "url.query": [
+            "amquis=iatquovo",
+            "ididun"
+        ],
+        "url.scheme": "https",
         "user.name": "emq"
     },
     {
@@ -6787,12 +7231,13 @@
         "observer.egress.interface.name": "eth2435",
         "observer.ingress.interface.name": "lo3887",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ulapari",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4195",
         "related.hosts": [
-            "aconse",
             "Except",
+            "aconse",
             "rror3870.www5.local"
         ],
         "related.ip": [
@@ -6807,8 +7252,8 @@
         "rsa.investigations.event_vcat": "ntexp",
         "rsa.misc.OS": "aconseq",
         "rsa.misc.action": [
-            "oluptate",
-            "block"
+            "block",
+            "oluptate"
         ],
         "rsa.misc.category": "edqu",
         "rsa.misc.client": "ites",
@@ -6852,8 +7297,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.net",
+        "url.extension": "txt",
+        "url.fragment": "rat",
         "url.original": "https://www5.example.net/culpa/isun.txt?cola=tura#rat",
-        "url.query": "orumwrit",
+        "url.path": "/culpa/isun.txt",
+        "url.query": [
+            "cola=tura",
+            "orumwrit"
+        ],
+        "url.scheme": "https",
         "user.name": "caecatcu"
     },
     {
@@ -6879,15 +7332,16 @@
         "observer.egress.interface.name": "lo4266",
         "observer.ingress.interface.name": "eth297",
         "observer.product": "FortiManager",
+        "observer.serial_number": "exercita",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "emaperi"
         ],
         "related.ip": [
-            "10.53.82.96",
+            "10.224.212.88",
             "10.35.240.70",
-            "10.224.212.88"
+            "10.53.82.96"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -6946,15 +7400,16 @@
         "observer.egress.interface.name": "eth5315",
         "observer.ingress.interface.name": "enp0s5429",
         "observer.product": "FortiManager",
+        "observer.serial_number": "trud",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "oeius"
         ],
         "related.ip": [
+            "10.186.253.240",
             "10.233.128.7",
-            "10.66.149.234",
-            "10.186.253.240"
+            "10.66.149.234"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7013,15 +7468,16 @@
         "observer.egress.interface.name": "enp0s7159",
         "observer.ingress.interface.name": "enp0s4820",
         "observer.product": "FortiManager",
+        "observer.serial_number": "iad",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "irat"
         ],
         "related.ip": [
+            "10.173.140.201",
             "10.227.133.134",
-            "10.46.11.114",
-            "10.173.140.201"
+            "10.46.11.114"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7080,6 +7536,7 @@
         "observer.egress.interface.name": "eth614",
         "observer.ingress.interface.name": "eth4759",
         "observer.product": "FortiManager",
+        "observer.serial_number": "isnos",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -7148,6 +7605,7 @@
         "observer.egress.interface.name": "enp0s5497",
         "observer.ingress.interface.name": "enp0s2181",
         "observer.product": "FortiManager",
+        "observer.serial_number": "msequine",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2682",
@@ -7157,8 +7615,8 @@
             "velill3821.mail.invalid"
         ],
         "related.ip": [
-            "10.97.254.192",
-            "10.124.34.251"
+            "10.124.34.251",
+            "10.97.254.192"
         ],
         "related.user": [
             "epor"
@@ -7168,8 +7626,8 @@
         "rsa.investigations.event_vcat": "lica",
         "rsa.misc.OS": "taedi",
         "rsa.misc.action": [
-            "imide",
-            "deny"
+            "deny",
+            "imide"
         ],
         "rsa.misc.category": "iurere",
         "rsa.misc.client": "ollitan",
@@ -7213,8 +7671,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.com",
+        "url.extension": "gif",
+        "url.fragment": "aborios",
         "url.original": "https://example.com/loremag/mqu.gif?bore=lapari#aborios",
-        "url.query": "sequa",
+        "url.path": "/loremag/mqu.gif",
+        "url.query": [
+            "bore=lapari",
+            "sequa"
+        ],
+        "url.scheme": "https",
         "user.name": "epor"
     },
     {
@@ -7240,15 +7706,16 @@
         "observer.egress.interface.name": "lo6072",
         "observer.ingress.interface.name": "eth434",
         "observer.product": "FortiManager",
+        "observer.serial_number": "bori",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "ineavol"
         ],
         "related.ip": [
-            "10.9.41.221",
             "10.204.98.238",
-            "10.81.58.91"
+            "10.81.58.91",
+            "10.9.41.221"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7296,11 +7763,12 @@
         "log.level": "high",
         "log.offset": 97381,
         "observer.product": "FortiManager",
+        "observer.serial_number": "tena",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
-            "xplicabo4308.www.example",
-            "unti"
+            "unti",
+            "xplicabo4308.www.example"
         ],
         "related.user": [
             "tiono"
@@ -7354,15 +7822,16 @@
         "observer.egress.interface.name": "enp0s1127",
         "observer.ingress.interface.name": "enp0s2388",
         "observer.product": "FortiManager",
+        "observer.serial_number": "alorumw",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "uipex"
         ],
         "related.ip": [
+            "10.212.208.70",
             "10.35.84.125",
-            "10.37.120.29",
-            "10.212.208.70"
+            "10.37.120.29"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7421,6 +7890,7 @@
         "observer.egress.interface.name": "eth4236",
         "observer.ingress.interface.name": "enp0s5828",
         "observer.product": "FortiManager",
+        "observer.serial_number": "elaudan",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -7488,14 +7958,15 @@
         "observer.egress.interface.name": "enp0s2100",
         "observer.ingress.interface.name": "lo7358",
         "observer.product": "FortiManager",
+        "observer.serial_number": "rittenby",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "gni"
         ],
         "related.ip": [
-            "10.204.27.48",
             "10.163.236.253",
+            "10.204.27.48",
             "10.41.61.88"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
@@ -7555,15 +8026,16 @@
         "observer.egress.interface.name": "lo7861",
         "observer.ingress.interface.name": "lo3071",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ipsa",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "related.hosts": [
             "dents"
         ],
         "related.ip": [
+            "10.185.44.26",
             "10.246.81.164",
-            "10.53.110.111",
-            "10.185.44.26"
+            "10.53.110.111"
         ],
         "rsa.internal.messageid": "generic_fortinetmgr_1",
         "rsa.misc.action": [
@@ -7624,17 +8096,18 @@
         "observer.egress.interface.name": "eth1762",
         "observer.ingress.interface.name": "enp0s1127",
         "observer.product": "FortiManager",
+        "observer.serial_number": "uamqu",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.802",
         "related.hosts": [
-            "proid",
+            "cupida6106.www5.local",
             "lam",
-            "cupida6106.www5.local"
+            "proid"
         ],
         "related.ip": [
-            "10.146.77.206",
-            "10.109.172.90"
+            "10.109.172.90",
+            "10.146.77.206"
         ],
         "related.user": [
             "aquaeab"
@@ -7689,8 +8162,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "api.example.com",
+        "url.extension": "jpg",
+        "url.fragment": "ido",
         "url.original": "https://api.example.com/aco/empo.jpg?iumdol=iusm#ido",
-        "url.query": "ipsamv",
+        "url.path": "/aco/empo.jpg",
+        "url.query": [
+            "ipsamv",
+            "iumdol=iusm"
+        ],
+        "url.scheme": "https",
         "user.name": "aquaeab"
     },
     {
@@ -7717,6 +8198,7 @@
         "observer.egress.interface.name": "enp0s1149",
         "observer.ingress.interface.name": "eth5256",
         "observer.product": "FortiManager",
+        "observer.serial_number": "riamea",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.2314",
@@ -7782,8 +8264,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "example.org",
+        "url.extension": "htm",
+        "url.fragment": "ect",
         "url.original": "https://example.org/uidolor/turve.htm?temporai=uasiarch#ect",
-        "url.query": "quatDui",
+        "url.path": "/uidolor/turve.htm",
+        "url.query": [
+            "quatDui",
+            "temporai=uasiarch"
+        ],
+        "url.scheme": "https",
         "user.name": "maperia"
     },
     {
@@ -7810,13 +8300,14 @@
         "observer.egress.interface.name": "enp0s5751",
         "observer.ingress.interface.name": "lo3094",
         "observer.product": "FortiManager",
+        "observer.serial_number": "reetdo",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.4674",
         "related.hosts": [
             "ita",
-            "oremeu",
-            "luptat2613.internal.localhost"
+            "luptat2613.internal.localhost",
+            "oremeu"
         ],
         "related.ip": [
             "10.139.144.75",
@@ -7830,8 +8321,8 @@
         "rsa.investigations.event_vcat": "tfug",
         "rsa.misc.OS": "imipsam",
         "rsa.misc.action": [
-            "utodi",
-            "block"
+            "block",
+            "utodi"
         ],
         "rsa.misc.category": "cid",
         "rsa.misc.client": "mquaerat",
@@ -7875,8 +8366,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www.example.net",
+        "url.extension": "htm",
+        "url.fragment": "odtempo",
         "url.original": "https://www.example.net/Maloru/lapariat.htm?tlabori=rehender#odtempo",
-        "url.query": "isiutali",
+        "url.path": "/Maloru/lapariat.htm",
+        "url.query": [
+            "isiutali",
+            "tlabori=rehender"
+        ],
+        "url.scheme": "https",
         "user.name": "modo"
     },
     {
@@ -7903,6 +8402,7 @@
         "observer.egress.interface.name": "enp0s6106",
         "observer.ingress.interface.name": "lo5632",
         "observer.product": "FortiManager",
+        "observer.serial_number": "ameius",
         "observer.type": "Configuration",
         "observer.vendor": "Fortinet",
         "observer.version": "1.1386",
@@ -7923,8 +8423,8 @@
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.OS": "rumw",
         "rsa.misc.action": [
-            "tali",
-            "block"
+            "block",
+            "tali"
         ],
         "rsa.misc.category": "itsedq",
         "rsa.misc.client": "esciu",
@@ -7968,8 +8468,16 @@
             "fortinet.fortimanager",
             "forwarded"
         ],
+        "url.domain": "www5.example.com",
+        "url.extension": "html",
+        "url.fragment": "one",
         "url.original": "https://www5.example.com/xea/ssecill.html?quianonn=quun#one",
-        "url.query": "tasper",
+        "url.path": "/xea/ssecill.html",
+        "url.query": [
+            "quianonn=quun",
+            "tasper"
+        ],
+        "url.scheme": "https",
         "user.name": "dolo"
     }
 ]

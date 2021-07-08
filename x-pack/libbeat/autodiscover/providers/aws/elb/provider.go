@@ -63,8 +63,6 @@ func AutodiscoverBuilder(
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
-		// set default region to make initial aws api call
-		awsCfg.Region = "us-west-1"
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
 

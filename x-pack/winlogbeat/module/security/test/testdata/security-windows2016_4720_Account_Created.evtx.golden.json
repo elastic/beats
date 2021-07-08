@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4720,
+      "code": "4720",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -74,7 +74,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],
@@ -101,7 +101,7 @@
       "category": [
         "iam"
       ],
-      "code": 4720,
+      "code": "4720",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -169,7 +169,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],

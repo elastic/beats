@@ -12,8 +12,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -40,16 +40,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.36",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.36"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.36",
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 17805,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -65,8 +65,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -90,16 +90,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.198",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.198"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.198",
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 47091,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -115,8 +115,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -143,16 +143,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.201",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.201"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.201",
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59319,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -168,8 +168,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -196,16 +196,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.246",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.246"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.246",
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 44181,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -221,8 +221,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -249,16 +249,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "203.0.113.208",
-            "172.16.54.114"
+            "172.16.54.114",
+            "203.0.113.208"
         ],
         "service.type": "iptables",
         "source.ip": "203.0.113.208",
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 64358,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -274,8 +274,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -299,16 +299,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.160",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.160"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.160",
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 58830,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -324,8 +324,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -352,16 +352,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.115",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.115"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.115",
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 51985,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -377,8 +377,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -405,16 +405,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.167",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.167"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.167",
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 4099,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -430,8 +430,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -455,16 +455,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.19",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.19"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.19",
         "source.mac": "90:10:9e:ec:2c:71",
         "source.port": 59287,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -480,8 +480,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -505,16 +505,16 @@
         "network.type": "ipv4",
         "observer.name": "example-host",
         "related.ip": [
-            "198.51.100.68",
-            "172.16.54.114"
+            "172.16.54.114",
+            "198.51.100.68"
         ],
         "service.type": "iptables",
         "source.ip": "198.51.100.68",
         "source.mac": "90:10:76:e0:e2:d5",
         "source.port": 53296,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

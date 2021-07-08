@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4634,
+      "code": "4634",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -40,7 +40,7 @@
         "TargetUserName": "audittest",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-1000"
       },
-      "event_id": 4634,
+      "event_id": "4634",
       "keywords": [
         "Audit Success"
       ],
@@ -68,7 +68,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4634,
+      "code": "4634",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -102,7 +102,7 @@
         "TargetUserName": "Administrator",
         "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
       },
-      "event_id": 4634,
+      "event_id": "4634",
       "keywords": [
         "Audit Success"
       ],

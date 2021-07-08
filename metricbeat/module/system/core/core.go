@@ -15,17 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build darwin freebsd linux openbsd windows
+// +build darwin freebsd linux openbsd windows aix
 
 package core
 
 import (
-	"strings"
-
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cpu"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
@@ -39,8 +36,8 @@ func init() {
 // MetricSet for fetching system core metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	config Config
-	cores  *cpu.CoresMonitor
+	opts  metrics.MetricOpts
+	cores *metrics.Monitor
 }
 
 // New returns a new core MetricSet.
@@ -50,53 +47,36 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	opts, err := config.Validate()
+	if err != nil {
+		return nil, errors.Wrap(err, "error validating config")
+	}
+
 	if config.CPUTicks != nil && *config.CPUTicks {
 		config.Metrics = append(config.Metrics, "ticks")
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		config:        config,
-		cores:         new(cpu.CoresMonitor),
+		opts:          opts,
+		cores:         metrics.New(""),
 	}, nil
 }
 
 // Fetch fetches CPU core metrics from the OS.
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	samples, err := m.cores.Sample()
+	samples, err := m.cores.FetchCores()
 	if err != nil {
 		return errors.Wrap(err, "failed to sample CPU core times")
 
 	}
 
 	for id, sample := range samples {
-		event := common.MapStr{"id": id}
-
-		for _, metric := range m.config.Metrics {
-			switch strings.ToLower(metric) {
-			case percentages:
-				// Use NormalizedPercentages here because per core metrics range on [0, 100%].
-				pct := sample.Percentages()
-				event.Put("user.pct", pct.User)
-				event.Put("system.pct", pct.System)
-				event.Put("idle.pct", pct.Idle)
-				event.Put("iowait.pct", pct.IOWait)
-				event.Put("irq.pct", pct.IRQ)
-				event.Put("nice.pct", pct.Nice)
-				event.Put("softirq.pct", pct.SoftIRQ)
-				event.Put("steal.pct", pct.Steal)
-			case ticks:
-				ticks := sample.Ticks()
-				event.Put("user.ticks", ticks.User)
-				event.Put("system.ticks", ticks.System)
-				event.Put("idle.ticks", ticks.Idle)
-				event.Put("iowait.ticks", ticks.IOWait)
-				event.Put("irq.ticks", ticks.IRQ)
-				event.Put("nice.ticks", ticks.Nice)
-				event.Put("softirq.ticks", ticks.SoftIRQ)
-				event.Put("steal.ticks", ticks.Steal)
-			}
+		event, err := sample.Format(m.opts)
+		if err != nil {
+			return errors.Wrap(err, "error formatting core data")
 		}
+		event.Put("id", id)
 
 		isOpen := report.Event(mb.Event{
 			MetricSetFields: event,

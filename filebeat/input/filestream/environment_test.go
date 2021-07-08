@@ -345,6 +345,43 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 	return messages
 }
 
+func (e *inputTestingEnvironment) requireEventContents(nr int, key, value string) {
+	events := make([]beat.Event, 0)
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			events = append(events, evt)
+		}
+	}
+
+	selectedEvent := events[nr]
+	v, err := selectedEvent.Fields.GetValue(key)
+	if err != nil {
+		e.t.Fatalf("cannot find key %s in event %+v", key, selectedEvent)
+	}
+
+	val, ok := v.(string)
+	if !ok {
+		e.t.Fatalf("value is not string %+v", v)
+	}
+	require.Equal(e.t, value, val)
+}
+
+func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
+	tm, err := time.Parse("2006-01-02T15:04:05.999", ts)
+	if err != nil {
+		e.t.Fatal(err)
+	}
+	events := make([]beat.Event, 0)
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			events = append(events, evt)
+		}
+	}
+
+	selectedEvent := events[nr]
+	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
+}
+
 type testInputStore struct {
 	registry *statestore.Registry
 }

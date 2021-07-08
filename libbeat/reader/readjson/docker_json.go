@@ -87,6 +87,33 @@ func New(r reader.Reader, stream string, partial bool, format string, CRIFlags b
 	return &reader
 }
 
+func NewContainerParser(r reader.Reader, config *ContainerJSONConfig) *DockerJSONReader {
+	reader := DockerJSONReader{
+		stream:   config.Stream.String(),
+		partial:  true,
+		reader:   r,
+		criflags: true,
+		logger:   logp.NewLogger("parser_container"),
+	}
+
+	switch config.Format {
+	case Docker, JSONFile:
+		reader.parseLine = reader.parseDockerJSONLog
+	case CRI:
+		reader.parseLine = reader.parseCRILog
+	default:
+		reader.parseLine = reader.parseAuto
+	}
+
+	if runtime.GOOS == "windows" {
+		reader.stripNewLine = stripNewLineWin
+	} else {
+		reader.stripNewLine = stripNewLine
+	}
+
+	return &reader
+}
+
 // parseCRILog parses logs in CRI log format.
 // CRI log format example :
 // 2017-09-12T22:32:21.212861448Z stdout 2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache

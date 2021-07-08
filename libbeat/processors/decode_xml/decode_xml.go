@@ -18,6 +18,7 @@
 package decode_xml
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -25,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -35,8 +37,7 @@ import (
 type decodeXML struct {
 	decodeXMLConfig
 
-	decode decoder
-	log    *logp.Logger
+	log *logp.Logger
 }
 
 var (
@@ -56,10 +57,9 @@ func init() {
 				"field", "target_field",
 				"overwrite_keys", "document_id",
 				"to_lower", "ignore_missing",
-				"ignore_failure", "schema",
+				"ignore_failure",
 			)))
-	jsprocessor.RegisterPlugin(procName, New)
-	registerDecoders()
+	jsprocessor.RegisterPlugin("DecodeXML", New)
 }
 
 // New constructs a new decode_xml processor.
@@ -83,7 +83,6 @@ func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
 
 	return &decodeXML{
 		decodeXMLConfig: config,
-		decode:          newDecoder(config),
 		log:             logp.NewLogger(logName),
 	}, nil
 }
@@ -135,7 +134,22 @@ func (x *decodeXML) run(event *beat.Event) error {
 	if id != "" {
 		event.SetID(id)
 	}
+
 	return nil
+}
+
+func (x *decodeXML) decode(p []byte) (common.MapStr, error) {
+	dec := xml.NewDecoder(bytes.NewReader(p))
+	if x.ToLower {
+		dec.LowercaseKeys()
+	}
+
+	out, err := dec.Decode()
+	if err != nil {
+		return nil, err
+	}
+
+	return common.MapStr(out), nil
 }
 
 func (x *decodeXML) String() string {

@@ -1865,8 +1865,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.hosts": [
-            "oremagna3521.mail.home",
-            "aveni"
+            "aveni",
+            "oremagna3521.mail.home"
         ],
         "related.ip": [
             "10.29.155.171"
@@ -3159,8 +3159,8 @@
         "observer.type": "Anti-Virus",
         "observer.vendor": "Barracuda",
         "related.ip": [
-            "10.178.30.158",
-            "10.1.6.115"
+            "10.1.6.115",
+            "10.178.30.158"
         ],
         "rsa.internal.messageid": "outbound/smtp",
         "rsa.investigations.event_cat": 1901000000,

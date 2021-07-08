@@ -1,0 +1,46 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/SQS
+        resource_type: sqs
+        statistic: ["Average"]
+        name:
+          - ApproximateAgeOfOldestMessage
+          - ApproximateNumberOfMessagesDelayed
+          - ApproximateNumberOfMessagesNotVisible
+          - ApproximateNumberOfMessagesVisible
+          - NumberOfMessagesDeleted
+          - NumberOfMessagesReceived
+          - NumberOfMessagesSent
+          - NumberOfEmptyReceives
+          - SentMessageSize
+processors:
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "aws.sqs.metrics.ApproximateAgeOfOldestMessage.avg"
+          to: "aws.sqs.oldest_message_age.sec"
+        - from: "aws.sqs.metrics.ApproximateNumberOfMessagesDelayed.avg"
+          to: "aws.sqs.messages.delayed"
+        - from: "aws.sqs.metrics.ApproximateNumberOfMessagesNotVisible.avg"
+          to: "aws.sqs.messages.not_visible"
+        - from: "aws.sqs.metrics.ApproximateNumberOfMessagesVisible.avg"
+          to: "aws.sqs.messages.visible"
+        - from: "aws.sqs.metrics.NumberOfMessagesDeleted.avg"
+          to: "aws.sqs.messages.deleted"
+        - from: "aws.sqs.metrics.NumberOfMessagesReceived.avg"
+          to: "aws.sqs.messages.received"
+        - from: "aws.sqs.metrics.NumberOfMessagesSent.avg"
+          to: "aws.sqs.messages.sent"
+        - from: "aws.sqs.metrics.NumberOfEmptyReceives.avg"
+          to: "aws.sqs.empty_receives"
+        - from: "aws.sqs.metrics.SentMessageSize.avg"
+          to: "aws.sqs.sent_message_size.bytes"
+
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.sqs.metrics"

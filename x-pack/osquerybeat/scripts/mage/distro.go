@@ -23,21 +23,27 @@ import (
 
 // FetchOsqueryDistros fetches Osquery official distros as a part of the build
 func FetchOsqueryDistros() error {
-	osnames := osNames(devtools.Platforms)
-	log.Printf("Fetch Osquery distros for %v", osnames)
+	osArchs := osArchs(devtools.Platforms)
+	log.Printf("Fetch Osquery distros for %v", osArchs)
 
-	for _, osname := range osnames {
-		spec, err := distro.GetSpec(osname)
+	for _, osarch := range osArchs {
+		spec, err := distro.GetSpec(osarch)
+		if err != nil {
+			if errors.Is(err, distro.ErrUnsupportedOS) {
+				log.Printf("The build spec %v is not supported, continue", spec)
+				continue
+			} else {
+				return err
+			}
+		}
+		log.Print("Found spec:", spec)
+
+		fetched, err := checkCacheAndFetch(osarch, spec)
 		if err != nil {
 			return err
 		}
 
-		fetched, err := checkCacheAndFetch(osname, spec)
-		if err != nil {
-			return err
-		}
-
-		ifp := spec.DistroFilepath(distro.DataInstallDir)
+		ifp := spec.DistroFilepath(distro.GetDataInstallDir(osarch))
 		installFileExists, eerr := fileutil.FileExists(ifp)
 		if eerr != nil {
 			log.Printf("Failed to check if %s exists, %v", ifp, err)
@@ -50,7 +56,7 @@ func FetchOsqueryDistros() error {
 		// So for Mac OS and Winderz the whole distro package is included and extracted
 		// on the first run on the platform for now.
 		if fetched || !installFileExists {
-			err = extractOrCopy(osname, spec)
+			err = extractOrCopy(osarch, spec)
 			if err != nil {
 				return err
 			}
@@ -59,32 +65,34 @@ func FetchOsqueryDistros() error {
 	return nil
 }
 
-func osNames(platforms devtools.BuildPlatformList) []string {
-	mp := make(map[string]struct{})
+func osArchs(platforms devtools.BuildPlatformList) []distro.OSArch {
+	mp := make(map[distro.OSArch]struct{})
 
 	for _, platform := range platforms {
+		var arch string
 		name := platform.Name
 		if idx := strings.Index(name, "/"); idx != -1 {
+			arch = name[idx+1:]
 			name = name[:idx]
 		}
-		mp[name] = struct{}{}
+		mp[distro.OSArch{OS: name, Arch: arch}] = struct{}{}
 	}
 
-	res := make([]string, 0, len(mp))
+	res := make([]distro.OSArch, 0, len(mp))
 	for name := range mp {
 		res = append(res, name)
 	}
 	return res
 }
 
-func checkCacheAndFetch(osname string, spec distro.Spec) (fetched bool, err error) {
+func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, err error) {
 	dir := distro.DataCacheDir
 	if err = os.MkdirAll(dir, 0750); err != nil {
 		return false, fmt.Errorf("failed to create dir %v, %w", dir, err)
 	}
 
 	var fileHash string
-	url := spec.URL(osname)
+	url := spec.URL(osarch.OS)
 	fp := spec.DistroFilepath(dir)
 	specHash := spec.SHA256Hash
 
@@ -128,8 +136,8 @@ func checkCacheAndFetch(osname string, spec distro.Spec) (fetched bool, err erro
 	return false, errors.New("osquery distro hash mismatch")
 }
 
-func extractOrCopy(osname string, spec distro.Spec) error {
-	dir := distro.DataInstallDir
+func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
+	dir := distro.GetDataInstallDir(osarch)
 	if err := os.MkdirAll(dir, 0750); err != nil {
 		return fmt.Errorf("failed to create dir %v, %w", dir, err)
 	}

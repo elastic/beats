@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.core",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "core"
+        "name": "core",
+        "period": 10000
     },
     "service": {
         "type": "system"
@@ -19,36 +16,39 @@
         "core": {
             "id": 0,
             "idle": {
-                "pct": 0.84,
-                "ticks": 69564411
+                "pct": 0.9638,
+                "ticks": 240932600
             },
             "iowait": {
                 "pct": 0,
-                "ticks": 419844
+                "ticks": 10534
             },
             "irq": {
-                "pct": 0,
-                "ticks": 0
+                "pct": 0.002,
+                "ticks": 379774
             },
             "nice": {
-                "pct": 0,
-                "ticks": 45632
+                "pct": 0.002,
+                "ticks": 70354
             },
             "softirq": {
-                "pct": 0,
-                "ticks": 189966
+                "pct": 0.002,
+                "ticks": 498856
             },
             "steal": {
                 "pct": 0,
                 "ticks": 0
             },
             "system": {
-                "pct": 0.08,
-                "ticks": 6211665
+                "pct": 0.0201,
+                "ticks": 4072735
+            },
+            "total": {
+                "pct": 0.0362
             },
             "user": {
-                "pct": 0.08,
-                "ticks": 18833962
+                "pct": 0.0101,
+                "ticks": 7020807
             }
         }
     }

@@ -23,6 +23,7 @@ type Monitor interface {
 	Cleanup(spec program.Spec, pipelineID string) error
 	Reload(cfg *config.Config) error
 	IsMonitoringEnabled() bool
+	MonitoringNamespace() string
 	WatchLogs() bool
 	WatchMetrics() bool
 	Close()

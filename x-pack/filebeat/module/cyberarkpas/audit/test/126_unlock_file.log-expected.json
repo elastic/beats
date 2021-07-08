@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2021-03-10T18:33:34.000Z",
+        "cyberarkpas.audit.action": "Unlock File",
+        "cyberarkpas.audit.desc": "Unlock File",
+        "cyberarkpas.audit.file": "Root\\PVConfiguration.xml",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-10T18:33:34Z",
+        "cyberarkpas.audit.issuer": "Administrator",
+        "cyberarkpas.audit.message": "Unlock File",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PVWAConfig",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 10 10:33:34",
+        "event.action": "unlock file",
+        "event.code": "126",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\PVConfiguration.xml",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

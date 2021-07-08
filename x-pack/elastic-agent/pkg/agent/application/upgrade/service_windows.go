@@ -61,8 +61,8 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	return int(status.ProcessId), nil
 }
 
-func invokeCmd() *exec.Cmd {
-	homeExePath := filepath.Join(paths.Home(), agentName)
+func invokeCmd(topPath string) *exec.Cmd {
+	homeExePath := filepath.Join(topPath, agentName)
 
 	cmd := exec.Command(homeExePath, watcherSubcommand,
 		"--path.config", paths.Config(),

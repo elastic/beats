@@ -102,6 +102,10 @@ rules:
   - events
   - pods
   verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["extensions"]
   resources:
   - replicasets
@@ -144,7 +148,8 @@ roleRef:
 [float]
 === Compatibility
 
-The Kubernetes module is tested with Kubernetes 1.13.x, 1.14.x, 1.15.x, 1.16.x, 1.17.x, and 1.18.x
+The Kubernetes module is tested with the following versions of Kubernetes:
+1.14.x, 1.17.x, 1.18.x, 1.19.x, 1.20.x, 1.21.x
 
 [float]
 === Dashboard
@@ -216,6 +221,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -308,6 +314,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>
 
+* <<metricbeat-metricset-kubernetes-state_job,state_job>>
+
 * <<metricbeat-metricset-kubernetes-state_node,state_node>>
 
 * <<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>
@@ -351,6 +359,8 @@ include::kubernetes/state_cronjob.asciidoc[]
 include::kubernetes/state_daemonset.asciidoc[]
 
 include::kubernetes/state_deployment.asciidoc[]
+
+include::kubernetes/state_job.asciidoc[]
 
 include::kubernetes/state_node.asciidoc[]
 

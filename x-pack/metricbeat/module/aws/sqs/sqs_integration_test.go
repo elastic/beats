@@ -10,11 +10,11 @@ package sqs
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
-
 	"github.com/stretchr/testify/assert"
 
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
@@ -33,8 +33,6 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

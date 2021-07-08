@@ -80,7 +80,6 @@
         "url.domain": "localhost:8000",
         "url.path": "/service/1",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.54.0",
         "user_agent.version": "7.54.0"
@@ -130,7 +129,6 @@
         "url.domain": "192.168.99.107:30901",
         "url.path": "/elastic",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.59.0",
         "user_agent.version": "7.59.0"
@@ -177,8 +175,8 @@
         "message": "[2019-04-11T00:51:07.980Z] \"GET /elastic/ HTTP/1.1\" 301 - 0 0 41 39 \"172.17.0.3\" \"curl/7.59.0\" \"078d1daa-b786-4d6d-85a5-7e4366adaa19\" \"www.elastic.co\" \"151.101.66.217:80\"",
         "network.protocol": "http",
         "related.ip": [
-            "172.17.0.3",
-            "151.101.66.217"
+            "151.101.66.217",
+            "172.17.0.3"
         ],
         "service.type": "envoyproxy",
         "source.address": "172.17.0.3",
@@ -189,7 +187,6 @@
         "url.domain": "www.elastic.co",
         "url.path": "/elastic/",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "curl",
         "user_agent.original": "curl/7.59.0",
         "user_agent.version": "7.59.0"

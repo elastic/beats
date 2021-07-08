@@ -48,13 +48,12 @@
         "rsa.web.fqdn": "<hostname>",
         "service.type": "zscaler",
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.original": "<url>",
         "user.name": "<username>",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "<user_agent>"
     }

@@ -40,14 +40,14 @@ type diskQueueBatch struct {
 
 func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
 	if consumer.closed {
-		return nil, fmt.Errorf("Tried to read from a closed disk queue consumer")
+		return nil, fmt.Errorf("tried to read from a closed disk queue consumer")
 	}
 
 	// Read at least one frame. This is guaranteed to eventually
 	// succeed unless the queue is closed.
 	frame, ok := <-consumer.queue.readerLoop.output
 	if !ok {
-		return nil, fmt.Errorf("Tried to read from a closed disk queue")
+		return nil, fmt.Errorf("tried to read from a closed disk queue")
 	}
 	frames := []*readFrame{frame}
 eventLoop:

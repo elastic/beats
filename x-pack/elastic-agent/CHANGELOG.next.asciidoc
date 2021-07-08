@@ -9,6 +9,9 @@
 
 - Docker container is not run as root by default. {pull}21213[21213]
 - Read Fleet connection information from `fleet.*` instead of `fleet.kibana.*`. {pull}24713[24713]
+- Beats build for 32Bit Windows or Linux system will refuse to run on a 64bit system. {pull}25186[25186]
+- Remove the `--kibana-url` from `install` and `enroll` command. {pull}25529[25529]
+- Default to port 80 and 443 for Kibana and Fleet Server connections. {pull}25723[25723]
 
 ==== Bugfixes
 - Fix rename *ConfigChange to *PolicyChange to align on changes in the UI. {pull}20779[20779]
@@ -49,6 +52,28 @@
 - Add support for filestream input. {pull}24820[24820]
 - Add check for URL set when cert and cert key. {pull}24904[24904]
 - Fix install command for Fleet Server bootstrap, remove need for --enrollment-token when using --fleet-server {pull}24981[24981]
+- Respect host configuration for exposed processes endpoint {pull}25114[25114]
+- Set --inscure in container when FLEET_SERVER_ENABLE and FLEET_INSECURE set {pull}25137[25137]
+- Fixed: limit for retries to Kibana configurable {issue}25063[25063]
+- Fix issue with status and inspect inside of container {pull}25204[25204]
+- Remove FLEET_SERVER_POLICY_NAME env variable as it was not used {pull}25149[25149]
+- Reduce log level for listener cleanup to debug {pull}25274
+- Passing in policy id to container command works {pull}25352[25352]
+- Reduce log level for listener cleanup to debug {pull}25274[25274]
+- Delay the restart of application when a status report of failure is given {pull}25339[25339]
+- Don't log when upgrade capability doesn't apply {pull}25386[25386]
+- Fixed issue when unversioned home is set and invoked watcher failing with ENOENT {issue}25371[25371]
+- Fixed Elastic Agent: expecting Dict and received *transpiler.Key for '0' {issue}24453[24453]
+- Fix AckBatch to do nothing when no actions passed {pull}25562[25562]
+- Add error log entry when listener creation fails {issue}23483[23482]
+- Handle case where policy doesn't contain Fleet connection information {pull}25707[25707]
+- Fix fleet-server.yml spec to not overwrite existing keys {pull}25741[25741]
+- Agent sends wrong log level to Endpoint {issue}25583[25583]
+- Fix startup with failing configuration {pull}26057[26057]
+- Change timestamp in elatic-agent-json.log to use UTC {issue}25391[25391]
+- Fix add support for Logstash output. {pull}24305[24305]
+- Do not log Elasticsearch configuration for monitoring output when running with debug. {pull}26583[26583]
+- Fix issue where proxy enrollment options broke enrollment command. {pull}26749[26749]
 
 ==== New features
 
@@ -87,3 +112,12 @@
 - Add status subcommand {pull}24856[24856]
 - Add leader_election provider for k8s {pull}24267[24267]
 - Add --fleet-server-service-token and FLEET_SERVER_SERVICE_TOKEN options {pull}25083[25083]
+- Keep http and logging config during enroll {pull}25132[25132]
+- Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]
+- Use `filestream` input for internal log collection. {pull}25660[25660]
+- Enable agent to send custom headers to kibana/ES {pull}26275[26275]
+- Set `agent.id` to the Fleet Agent ID in events published from inputs backed by Beats. {issue}21121[21121] {pull}26394[26394] {pull}26548[26548]
+- Add proxy support to artifact downloader and communication with fleet server. {pull}25219[25219]
+- Add proxy support to enroll command. {pull}26514[26514]
+- Enable configuring monitoring namespace {issue}26439[26439]
+- Communicate with Fleet Server over HTTP2. {pull}26474[26474]

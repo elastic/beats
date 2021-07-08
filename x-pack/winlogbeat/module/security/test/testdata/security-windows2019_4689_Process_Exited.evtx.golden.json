@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 4689,
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -45,7 +45,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],
@@ -72,7 +72,7 @@
       "category": [
         "process"
       ],
-      "code": 4689,
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -111,7 +111,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],
@@ -138,7 +138,7 @@
       "category": [
         "process"
       ],
-      "code": 4689,
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -177,7 +177,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],

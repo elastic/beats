@@ -68,11 +68,10 @@ class Test(WriteReadTest):
         wineventlog - Read unknown event ID
         """
         msg = "Unknown event ID"
-        event_id = 1111
-        self.write_event_log(msg, eventID=event_id)
+        self.write_event_log(msg, eventID=1111)
         evts = self.read_events()
         self.assertTrue(len(evts), 1)
-        self.assert_common_fields(evts[0], eventID=event_id, extra={
+        self.assert_common_fields(evts[0], eventID="1111", extra={
             "winlog.keywords": ["Classic"],
             "winlog.opcode": "Info",
         })
@@ -199,10 +198,10 @@ class Test(WriteReadTest):
             ]
         }, expected_events=4)
         self.assertTrue(len(evts), 4)
-        self.assertEqual(evts[0]["winlog.event_id"], 50)
-        self.assertEqual(evts[1]["winlog.event_id"], 100)
-        self.assertEqual(evts[2]["winlog.event_id"], 175)
-        self.assertEqual(evts[3]["winlog.event_id"], 200)
+        self.assertEqual(evts[0]["winlog.event_id"], "50")
+        self.assertEqual(evts[1]["winlog.event_id"], "100")
+        self.assertEqual(evts[2]["winlog.event_id"], "175")
+        self.assertEqual(evts[3]["winlog.event_id"], "200")
 
     def test_query_level_single(self):
         """
@@ -270,8 +269,8 @@ class Test(WriteReadTest):
             ]
         })
         self.assertTrue(len(evts), 1)
-        self.assertEqual(evts[0]["winlog.event_id"], 10)
-        self.assertEqual(evts[0]["event.code"], 10)
+        self.assertEqual(evts[0]["winlog.event_id"], "10")
+        self.assertEqual(evts[0]["event.code"], "10")
 
     def test_query_provider(self):
         """

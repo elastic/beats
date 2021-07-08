@@ -48,6 +48,11 @@ func newStatusCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 }
 
 func statusCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
+	err := tryContainerLoadPaths()
+	if err != nil {
+		return err
+	}
+
 	output, _ := cmd.Flags().GetString("output")
 	outputFunc, ok := outputs[output]
 	if !ok {

@@ -26,8 +26,8 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "cloudtrail",
         "input.type": "log",
@@ -46,7 +46,6 @@
         "user.name": "Alice",
         "user.target.name": "Bob",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "signin.amazonaws.com"
     }

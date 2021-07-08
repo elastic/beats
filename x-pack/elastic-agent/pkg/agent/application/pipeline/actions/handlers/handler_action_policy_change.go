@@ -84,7 +84,7 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	}
 
 	h.log.Debugf("handlerPolicyChange: emit configuration for action %+v", a)
-	err = h.handleKibanaHosts(ctx, c)
+	err = h.handleFleetServerHosts(ctx, c)
 	if err != nil {
 		return err
 	}
@@ -95,9 +95,17 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	return acker.Ack(ctx, action)
 }
 
-func (h *PolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
-	// do not update kibana host from policy; no setters provided with local Fleet Server
+func (h *PolicyChange) handleFleetServerHosts(ctx context.Context, c *config.Config) (err error) {
+	// do not update fleet-server host from policy; no setters provided with local Fleet Server
 	if len(h.setters) == 0 {
+		return nil
+	}
+	data, err := c.ToMapStr()
+	if err != nil {
+		return errors.New(err, "could not convert the configuration from the policy", errors.TypeConfig)
+	}
+	if _, ok := data["fleet"]; !ok {
+		// no fleet information in the configuration (skip checking client)
 		return nil
 	}
 
@@ -184,9 +192,12 @@ func fleetToReader(agentInfo *info.AgentInfo, cfg *configuration.Configuration) 
 	configToStore := map[string]interface{}{
 		"fleet": cfg.Fleet,
 		"agent": map[string]interface{}{
-			"id": agentInfo.AgentID(),
+			"id":              agentInfo.AgentID(),
+			"logging.level":   cfg.Settings.LoggingConfig.Level,
+			"monitoring.http": cfg.Settings.MonitoringConfig.HTTP,
 		},
 	}
+
 	data, err := yaml.Marshal(configToStore)
 	if err != nil {
 		return nil, err

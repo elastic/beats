@@ -94,9 +94,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	enroll := true
 	askEnroll := true
 	url, _ := cmd.Flags().GetString("url")
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
-	}
 	token, _ := cmd.Flags().GetString("enrollment-token")
 	if url != "" && token != "" {
 		askEnroll = false

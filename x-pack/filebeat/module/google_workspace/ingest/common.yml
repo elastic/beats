@@ -1,5 +1,9 @@
 description: Pipeline for parsing google_workspace logs
 processors:
+  - uri_parts:
+      field: url.full
+      ignore_failure: true
+      if: ctx?.url?.full != null
   - geoip:
       field: source.ip
       target_field: source.geo

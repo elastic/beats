@@ -13,18 +13,19 @@
         "event.kind": "event",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "connection"
+            "connection",
+            "info"
         ],
         "fileset.name": "ntlm",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:zxnXAE/Cme5fQhh6sJLs7GItc08=",
+        "network.direction": "internal",
         "network.protocol": "ntlm",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.10.50",
-            "192.168.10.31"
+            "192.168.10.31",
+            "192.168.10.50"
         ],
         "related.user": [
             "JeffV"

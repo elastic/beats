@@ -43,32 +43,30 @@ var (
 	}
 )
 
-// publisherMetadataStore stores metadata from a publisher.
-type publisherMetadataStore struct {
+// PublisherMetadataStore stores metadata from a publisher.
+type PublisherMetadataStore struct {
 	Metadata *PublisherMetadata // Handle to the publisher metadata. May be nil.
-	Keywords map[int64]string   // Keyword bit mask to keyword name.
-	Opcodes  map[uint8]string   // Opcode value to name.
-	Levels   map[uint8]string   // Level value to name.
-	Tasks    map[uint16]string  // Task value to name.
+
+	winevent.WinMeta
 
 	// Event ID to event metadata (message and event data param names).
-	Events map[uint16]*eventMetadata
+	Events map[uint16]*EventMetadata
 	// Event ID to map of fingerprints to event metadata. The fingerprint value
 	// is hash of the event data parameters count and types.
-	EventFingerprints map[uint16]map[uint64]*eventMetadata
+	EventFingerprints map[uint16]map[uint64]*EventMetadata
 
 	mutex sync.RWMutex
 	log   *logp.Logger
 }
 
-func newPublisherMetadataStore(session EvtHandle, provider string, log *logp.Logger) (*publisherMetadataStore, error) {
+func NewPublisherMetadataStore(session EvtHandle, provider string, log *logp.Logger) (*PublisherMetadataStore, error) {
 	md, err := NewPublisherMetadata(session, provider)
 	if err != nil {
 		return nil, err
 	}
-	store := &publisherMetadataStore{
+	store := &PublisherMetadataStore{
 		Metadata:          md,
-		EventFingerprints: map[uint16]map[uint64]*eventMetadata{},
+		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
 		log:               log.With("publisher", provider),
 	}
 
@@ -88,21 +86,23 @@ func newPublisherMetadataStore(session EvtHandle, provider string, log *logp.Log
 	return store, nil
 }
 
-// newEmptyPublisherMetadataStore creates an empty metadata store for cases
+// NewEmptyPublisherMetadataStore creates an empty metadata store for cases
 // where no local publisher metadata exists.
-func newEmptyPublisherMetadataStore(provider string, log *logp.Logger) *publisherMetadataStore {
-	return &publisherMetadataStore{
-		Keywords:          map[int64]string{},
-		Opcodes:           map[uint8]string{},
-		Levels:            map[uint8]string{},
-		Tasks:             map[uint16]string{},
-		Events:            map[uint16]*eventMetadata{},
-		EventFingerprints: map[uint16]map[uint64]*eventMetadata{},
+func NewEmptyPublisherMetadataStore(provider string, log *logp.Logger) *PublisherMetadataStore {
+	return &PublisherMetadataStore{
+		WinMeta: winevent.WinMeta{
+			Keywords: map[int64]string{},
+			Opcodes:  map[uint8]string{},
+			Levels:   map[uint8]string{},
+			Tasks:    map[uint16]string{},
+		},
+		Events:            map[uint16]*EventMetadata{},
+		EventFingerprints: map[uint16]map[uint64]*EventMetadata{},
 		log:               log.With("publisher", provider, "empty", true),
 	}
 }
 
-func (s *publisherMetadataStore) initKeywords() error {
+func (s *PublisherMetadataStore) initKeywords() error {
 	keywords, err := s.Metadata.Keywords()
 	if err != nil {
 		return err
@@ -119,7 +119,7 @@ func (s *publisherMetadataStore) initKeywords() error {
 	return nil
 }
 
-func (s *publisherMetadataStore) initOpcodes() error {
+func (s *PublisherMetadataStore) initOpcodes() error {
 	opcodes, err := s.Metadata.Opcodes()
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func (s *publisherMetadataStore) initOpcodes() error {
 	return nil
 }
 
-func (s *publisherMetadataStore) initLevels() error {
+func (s *PublisherMetadataStore) initLevels() error {
 	levels, err := s.Metadata.Levels()
 	if err != nil {
 		return err
@@ -152,7 +152,7 @@ func (s *publisherMetadataStore) initLevels() error {
 	return nil
 }
 
-func (s *publisherMetadataStore) initTasks() error {
+func (s *PublisherMetadataStore) initTasks() error {
 	tasks, err := s.Metadata.Tasks()
 	if err != nil {
 		return err
@@ -168,14 +168,14 @@ func (s *publisherMetadataStore) initTasks() error {
 	return nil
 }
 
-func (s *publisherMetadataStore) initEvents() error {
+func (s *PublisherMetadataStore) initEvents() error {
 	itr, err := s.Metadata.EventMetadataIterator()
 	if err != nil {
 		return err
 	}
 	defer itr.Close()
 
-	s.Events = map[uint16]*eventMetadata{}
+	s.Events = map[uint16]*EventMetadata{}
 	for itr.Next() {
 		evt, err := newEventMetadataFromPublisherMetadata(itr, s.Metadata)
 		if err != nil {
@@ -188,7 +188,7 @@ func (s *publisherMetadataStore) initEvents() error {
 	return itr.Err()
 }
 
-func (s *publisherMetadataStore) getEventMetadata(eventID uint16, eventDataFingerprint uint64, eventHandle EvtHandle) *eventMetadata {
+func (s *PublisherMetadataStore) getEventMetadata(eventID uint16, eventDataFingerprint uint64, eventHandle EvtHandle) *EventMetadata {
 	// Use a read lock to get a cached value.
 	s.mutex.RLock()
 	fingerprints, found := s.EventFingerprints[eventID]
@@ -207,7 +207,7 @@ func (s *publisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 
 	fingerprints, found = s.EventFingerprints[eventID]
 	if !found {
-		fingerprints = map[uint64]*eventMetadata{}
+		fingerprints = map[uint64]*EventMetadata{}
 		s.EventFingerprints[eventID] = fingerprints
 	}
 
@@ -268,7 +268,7 @@ func (s *publisherMetadataStore) getEventMetadata(eventID uint16, eventDataFinge
 	return em
 }
 
-func (s *publisherMetadataStore) Close() error {
+func (s *PublisherMetadataStore) Close() error {
 	if s.Metadata != nil {
 		s.mutex.Lock()
 		defer s.mutex.Unlock()
@@ -278,7 +278,7 @@ func (s *publisherMetadataStore) Close() error {
 	return nil
 }
 
-type eventMetadata struct {
+type EventMetadata struct {
 	EventID     uint16             // Event ID.
 	Version     uint8              // Event format version.
 	MsgStatic   string             // Used when the message has no parameters.
@@ -288,7 +288,7 @@ type eventMetadata struct {
 
 // newEventMetadataFromEventHandle collects metadata about an event type using
 // the handle of an event.
-func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle EvtHandle) (*eventMetadata, error) {
+func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle EvtHandle) (*EventMetadata, error) {
 	xml, err := getEventXML(publisher, eventHandle)
 	if err != nil {
 		return nil, err
@@ -301,7 +301,7 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 		return nil, errors.Wrap(err, "failed to unmarshal XML")
 	}
 
-	em := &eventMetadata{
+	em := &EventMetadata{
 		EventID: uint16(event.EventIdentifier.ID),
 		Version: uint8(event.Version),
 	}
@@ -335,8 +335,8 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 
 // newEventMetadataFromPublisherMetadata collects metadata about an event type
 // using the publisher metadata.
-func newEventMetadataFromPublisherMetadata(itr *EventMetadataIterator, publisher *PublisherMetadata) (*eventMetadata, error) {
-	em := &eventMetadata{}
+func newEventMetadataFromPublisherMetadata(itr *EventMetadataIterator, publisher *PublisherMetadata) (*EventMetadata, error) {
+	em := &EventMetadata{}
 	err := multierr.Combine(
 		em.initEventID(itr),
 		em.initVersion(itr),
@@ -349,7 +349,7 @@ func newEventMetadataFromPublisherMetadata(itr *EventMetadataIterator, publisher
 	return em, nil
 }
 
-func (em *eventMetadata) initEventID(itr *EventMetadataIterator) error {
+func (em *EventMetadata) initEventID(itr *EventMetadataIterator) error {
 	id, err := itr.EventID()
 	if err != nil {
 		return err
@@ -359,7 +359,7 @@ func (em *eventMetadata) initEventID(itr *EventMetadataIterator) error {
 	return nil
 }
 
-func (em *eventMetadata) initVersion(itr *EventMetadataIterator) error {
+func (em *EventMetadata) initVersion(itr *EventMetadataIterator) error {
 	version, err := itr.Version()
 	if err != nil {
 		return err
@@ -368,7 +368,7 @@ func (em *eventMetadata) initVersion(itr *EventMetadataIterator) error {
 	return nil
 }
 
-func (em *eventMetadata) initEventDataTemplate(itr *EventMetadataIterator) error {
+func (em *EventMetadata) initEventDataTemplate(itr *EventMetadataIterator) error {
 	xml, err := itr.Template()
 	if err != nil {
 		return err
@@ -391,7 +391,7 @@ func (em *eventMetadata) initEventDataTemplate(itr *EventMetadataIterator) error
 	return nil
 }
 
-func (em *eventMetadata) initEventMessage(itr *EventMetadataIterator, publisher *PublisherMetadata) error {
+func (em *EventMetadata) initEventMessage(itr *EventMetadataIterator, publisher *PublisherMetadata) error {
 	messageID, err := itr.MessageID()
 	if err != nil {
 		return err
@@ -405,7 +405,7 @@ func (em *eventMetadata) initEventMessage(itr *EventMetadataIterator, publisher 
 	return em.setMessage(msg)
 }
 
-func (em *eventMetadata) setMessage(msg string) error {
+func (em *EventMetadata) setMessage(msg string) error {
 	msg = sys.RemoveWindowsLineEndings(msg)
 	tmplID := strconv.Itoa(int(em.EventID))
 
@@ -424,7 +424,7 @@ func (em *eventMetadata) setMessage(msg string) error {
 	return nil
 }
 
-func (em *eventMetadata) equal(other *eventMetadata) bool {
+func (em *EventMetadata) equal(other *EventMetadata) bool {
 	if em == other {
 		return true
 	}

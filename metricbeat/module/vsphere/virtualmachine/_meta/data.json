@@ -1,14 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "vsphere.virtualmachine",
+        "duration": 115000,
+        "module": "vsphere"
     },
     "metricset": {
-        "host": "http://127.0.0.1:35887/sdk",
-        "module": "vsphere",
         "name": "virtualmachine",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "http://127.0.0.1:37231/sdk",
+        "type": "vsphere"
     },
     "vsphere": {
         "virtualmachine": {
@@ -17,8 +20,8 @@
                     "mhz": 0
                 }
             },
-            "host.id": "ha-host",
             "host.hostname": "localhost.localdomain",
+            "host.id": "ha-host",
             "memory": {
                 "free": {
                     "guest": {
@@ -39,7 +42,11 @@
                     }
                 }
             },
-            "name": "ha-host_VM1"
+            "name": "ha-host_VM0",
+            "network_names": [
+                "VM Network"
+            ],
+            "os": "otherGuest"
         }
     }
 }

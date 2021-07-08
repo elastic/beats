@@ -28,7 +28,6 @@ func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "pending_tasks", New,
 		mb.WithHostParser(elasticsearch.HostParser),
 		mb.DefaultMetricSet(),
-		mb.WithNamespace("elasticsearch.pending_tasks"),
 	)
 }
 

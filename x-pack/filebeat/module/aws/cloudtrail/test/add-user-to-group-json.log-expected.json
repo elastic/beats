@@ -23,8 +23,8 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "cloudtrail",
         "group.name": "admin",
@@ -44,7 +44,6 @@
         "user.name": "Alice",
         "user.target.name": "Bob",
         "user_agent.device.name": "Other",
-        "user_agent.device.type": "Other",
         "user_agent.name": "Other",
         "user_agent.original": "AWSConsole"
     }

@@ -58,6 +58,7 @@ class Test(metricbeat.BaseTest):
         """
         elasticsearch metricset tests
         """
+
         self.check_skip(metricset)
 
         if metricset == "ml_job":
@@ -92,7 +93,6 @@ class Test(metricbeat.BaseTest):
                 "index_recovery",
                 "index_summary",
                 "ml_job",
-                "node_stats",
                 "shard"
             ],
             "hosts": self.get_hosts(),
@@ -135,23 +135,10 @@ class Test(metricbeat.BaseTest):
             }
         }])
         proc = self.start_beat()
-        self.wait_log_contains('"type": "cluster_stats"')
+        self.wait_log_contains('"dataset": "elasticsearch.cluster.stats"')
 
-        # self.wait_until(lambda: self.output_has_message('"type":"cluster_stats"'))
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
-
-        docs = self.read_output_json()
-        for doc in docs:
-            t = doc["type"]
-            if t != "cluster_stats":
-                continue
-            license = doc["license"]
-            issue_date = license["issue_date_in_millis"]
-            self.assertIsNot(type(issue_date), float)
-
-            self.assertNotIn("expiry_date_in_millis", license)
-            self.assertNotIn("max_resource_units", license)
 
     def create_ml_job(self):
         # Check if an ml job already exists

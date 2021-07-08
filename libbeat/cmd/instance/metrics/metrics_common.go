@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report/log"
+	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 var (
@@ -59,4 +60,5 @@ func reportInfo(_ monitoring.Mode, V monitoring.Visitor) {
 	})
 
 	monitoring.ReportString(V, "ephemeral_id", ephemeralID.String())
+	monitoring.ReportString(V, "version", version.GetDefaultVersion())
 }

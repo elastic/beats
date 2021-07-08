@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -23,6 +24,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
 
 // MockS3Client struct is used for unit tests.
@@ -237,23 +241,43 @@ func TestNewS3BucketReader(t *testing.T) {
 
 	resp, err := req.Send(ctx)
 	assert.NoError(t, err)
-	reader := bufio.NewReader(resp.Body)
+	bodyReader := bufio.NewReader(resp.Body)
 	defer resp.Body.Close()
 
+	encFactory, ok := encoding.FindEncoding("plain")
+	if !ok {
+		t.Fatalf("unable to find 'plain' encoding")
+	}
+
+	enc, err := encFactory(bodyReader)
+	if err != nil {
+		t.Fatalf("failed to initialize encoding: %v", err)
+	}
+
+	var r reader.Reader
+	r, err = readfile.NewEncodeReader(ioutil.NopCloser(bodyReader), readfile.Config{
+		Codec:      enc,
+		BufferSize: 4096,
+		Terminator: readfile.LineFeed,
+	})
+	if err != nil {
+		t.Fatalf("Failed to initialize line reader: %v", err)
+	}
+
+	r = readfile.NewStripNewline(r, readfile.LineFeed)
+
 	for i := 0; i < 3; i++ {
+		msg, err := r.Next()
 		switch i {
 		case 0:
-			log, err := readStringAndTrimDelimiter(reader)
 			assert.NoError(t, err)
-			assert.Equal(t, s3LogString1Trimmed, log)
+			assert.Equal(t, s3LogString1Trimmed, string(msg.Content))
 		case 1:
-			log, err := readStringAndTrimDelimiter(reader)
 			assert.NoError(t, err)
-			assert.Equal(t, s3LogString2Trimmed, log)
+			assert.Equal(t, s3LogString2Trimmed, string(msg.Content))
 		case 2:
-			log, err := readStringAndTrimDelimiter(reader)
 			assert.Error(t, io.EOF, err)
-			assert.Equal(t, "", log)
+			assert.Equal(t, "", string(msg.Content))
 		}
 	}
 }
@@ -465,4 +489,19 @@ func TestTrimLogDelimiter(t *testing.T) {
 			assert.Equal(t, c.expectedLog, log)
 		})
 	}
+}
+
+func TestS3Metadata(t *testing.T) {
+	resp := &s3.GetObjectResponse{
+		GetObjectOutput: &s3.GetObjectOutput{
+			ContentEncoding: awssdk.String("gzip"),
+			Metadata: map[string]string{
+				"Owner": "foo",
+			},
+			LastModified: awssdk.Time(time.Now()),
+		},
+	}
+
+	meta := s3Metadata(resp, "Content-Encoding", "x-amz-meta-owner", "last-modified")
+	assert.Len(t, meta, 3)
 }

@@ -5,7 +5,7 @@
       "category": [
         "process"
       ],
-      "code": 7,
+      "code": "7",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -71,7 +71,7 @@
         "SignatureStatus": "Valid",
         "Signed": "true"
       },
-      "event_id": 7,
+      "event_id": "7",
       "process": {
         "pid": 1676,
         "thread": {

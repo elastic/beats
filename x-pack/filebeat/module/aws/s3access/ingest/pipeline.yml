@@ -34,18 +34,19 @@ processors:
       field: aws.s3access.request_uri
       ignore_failure: true
       patterns:
-        - '%{NOTSPACE:http.request.method} %{NOTSPACE:url.original} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
+        - '%{NOTSPACE:http.request.method} %{NOTSPACE:_temp_.uri_orig} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
 
-  #
-  # Best-effort parse of url.original in the form /path?query"
-  #
   - grok:
-      field: url.original
+      field: aws.s3access.host_header
       ignore_failure: true
       patterns:
-        - '^%{ABS_PATH:url.path}(?:\?%{DATA:url.query})?$'
-      pattern_definitions:
-        ABS_PATH: '/[^?]*'
+        - '(s3[a-z-]*).%{NOTSPACE:cloud.region}.%{WORD}.%{WORD}'
+      if: ctx.aws?.s3access?.host_header != null
+
+  - uri_parts:
+      field: _temp_.uri_orig
+      ignore_failure: true
+      if: ctx?._temp_?.uri_orig != null
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
@@ -187,6 +188,31 @@ processors:
   - remove:
       field: _temp_
       ignore_missing: true
+
+  - script:
+      lang: painless
+      description: This script processor iterates over the whole document to remove fields with null values.
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+          map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 
 on_failure:
   - set:

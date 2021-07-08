@@ -19,11 +19,11 @@
         "mysqlenterprise.audit.connection_id": 0,
         "mysqlenterprise.audit.id": 0,
         "process.args": [
-            "/usr/local/mysql/bin/mysqld",
-            "--loose-audit-log-format=JSON",
             "--log-error=log.err",
+            "--loose-audit-log-format=JSON",
             "--pid-file=mysqld.pid",
-            "--port=3306"
+            "--port=3306",
+            "/usr/local/mysql/bin/mysqld"
         ],
         "process.args_count": 5,
         "process.command_line": "/usr/local/mysql/bin/mysqld --loose-audit-log-format=JSON --log-error=log.err --pid-file=mysqld.pid --port=3306",
@@ -440,8 +440,8 @@
         "event.type": [
             "access",
             "connection",
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "input.type": "log",
@@ -459,8 +459,8 @@
             "localhost"
         ],
         "related.user": [
-            "root",
-            "audit_test_user"
+            "audit_test_user",
+            "root"
         ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
@@ -488,8 +488,8 @@
         "event.type": [
             "access",
             "connection",
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "input.type": "log",
@@ -507,8 +507,8 @@
             "localhost"
         ],
         "related.user": [
-            "root",
-            "audit_test_user2"
+            "audit_test_user2",
+            "root"
         ],
         "server.user.name": "root",
         "service.type": "mysqlenterprise",
@@ -1354,8 +1354,8 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "input.type": "log",
@@ -1445,8 +1445,8 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "deletion"
+            "deletion",
+            "user"
         ],
         "fileset.name": "audit",
         "input.type": "log",

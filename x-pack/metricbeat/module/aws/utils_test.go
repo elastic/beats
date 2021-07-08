@@ -113,10 +113,17 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
-	return resourcegroupstaggingapi.GetResourcesRequest{
+	op := &awssdk.Operation{
+		Name:       "GetResources",
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+		Paginator:  nil,
+	}
+	firstPageResult := resourcegroupstaggingapi.GetResourcesRequest{
 		Request: &awssdk.Request{
+			Operation: op,
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-				PaginationToken: awssdk.String(""),
+				PaginationToken: awssdk.String("PaginationToken"),
 				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
 					{
 						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
@@ -148,6 +155,29 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 			},
 			HTTPRequest: httpReq,
 		},
+		Input: input,
+		Copy:  m.GetResourcesRequest,
+	}
+
+	// aws resourcegroupstaggingapi default pagination size is 50, if resource amount is a
+	// multiple of 50, then last request has an empty result.
+	lastPageWithEmptyResult := resourcegroupstaggingapi.GetResourcesRequest{
+		Request: &awssdk.Request{
+			Data: &resourcegroupstaggingapi.GetResourcesOutput{
+				PaginationToken:        awssdk.String(""),
+				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{},
+			},
+			HTTPRequest: httpReq,
+			Operation:   op,
+		},
+		Input: input,
+		Copy:  m.GetResourcesRequest,
+	}
+
+	if input.PaginationToken == nil {
+		return firstPageResult
+	} else {
+		return lastPageWithEmptyResult
 	}
 }
 

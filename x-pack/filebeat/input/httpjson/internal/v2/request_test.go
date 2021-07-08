@@ -58,7 +58,7 @@ func TestCtxAfterDoRequest(t *testing.T) {
 
 	log := logp.NewLogger("")
 	ctx := context.Background()
-	client, err := newHTTPClient(ctx, config, nil, log)
+	client, err := newHTTPClient(ctx, config, log)
 	assert.NoError(t, err)
 
 	requestFactory := newRequestFactory(config.Request, nil, log)
@@ -110,10 +110,9 @@ func TestCtxAfterDoRequest(t *testing.T) {
 		trCtx.cursorMap(),
 	)
 
-	// this does not change
 	assert.EqualValues(
 		t,
-		&common.MapStr{"@timestamp": "2002-10-02T15:00:00Z", "foo": "bar"},
+		&common.MapStr{"@timestamp": "2002-10-02T15:00:01Z", "foo": "bar"},
 		trCtx.firstEventClone(),
 	)
 

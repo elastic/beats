@@ -11,8 +11,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "audit",
         "group.name": "SIEMTest",
@@ -50,8 +50,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -63,14 +63,9 @@
         "o365.audit.ItemName": "SIEMTest",
         "o365.audit.Members": [
             {
-                "DisplayName": "David",
+                "DisplayName": "Alice",
                 "Role": 1,
-                "UPN": "david@testsiem.onmicrosoft.com"
-            },
-            {
-                "DisplayName": "Chuck",
-                "Role": 1,
-                "UPN": "chuck@testsiem.onmicrosoft.com"
+                "UPN": "alice@testsiem.onmicrosoft.com"
             },
             {
                 "DisplayName": "Bob",
@@ -78,9 +73,14 @@
                 "UPN": "bob@testsiem.onmicrosoft.com"
             },
             {
-                "DisplayName": "Alice",
+                "DisplayName": "Chuck",
                 "Role": 1,
-                "UPN": "alice@testsiem.onmicrosoft.com"
+                "UPN": "chuck@testsiem.onmicrosoft.com"
+            },
+            {
+                "DisplayName": "David",
+                "Role": 1,
+                "UPN": "david@testsiem.onmicrosoft.com"
             }
         ],
         "o365.audit.Operation": "MemberAdded",
@@ -95,11 +95,11 @@
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "related.user": [
-            "david@testsiem.onmicrosoft.com",
-            "chuck@testsiem.onmicrosoft.com",
-            "bob@testsiem.onmicrosoft.com",
             "alice@testsiem.onmicrosoft.com",
-            "asr"
+            "asr",
+            "bob@testsiem.onmicrosoft.com",
+            "chuck@testsiem.onmicrosoft.com",
+            "david@testsiem.onmicrosoft.com"
         ],
         "service.type": "o365",
         "tags": [
@@ -122,8 +122,8 @@
         "event.outcome": "success",
         "event.provider": "MicrosoftTeams",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "audit",
         "host.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
@@ -152,8 +152,8 @@
         "o365.audit.Workload": "MicrosoftTeams",
         "organization.id": "b86ab9d4-fcf1-4b11-8a06-7a8f91b47fbd",
         "related.user": [
-            "asr@testsiem.onmicrosoft.com",
-            "asr"
+            "asr",
+            "asr@testsiem.onmicrosoft.com"
         ],
         "service.type": "o365",
         "tags": [

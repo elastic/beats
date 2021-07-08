@@ -16,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -53,7 +54,7 @@ func newInput(config config) (*s3Input, error) {
 func (in *s3Input) Name() string { return inputName }
 
 func (in *s3Input) Test(ctx v2.TestContext) error {
-	_, err := awscommon.GetAWSCredentials(in.config.AwsConfig)
+	_, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
 	if err != nil {
 		return fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
@@ -66,6 +67,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		return err
 	}
 
+	defer collector.metrics.Close()
 	defer collector.publisher.Close()
 	collector.run()
 
@@ -87,7 +89,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		return nil, err
 	}
 
-	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AwsConfig.Endpoint)
+	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if err != nil {
 		err := fmt.Errorf("getRegionFromQueueURL failed: %w", err)
 		log.Error(err)
@@ -96,7 +98,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		log = log.With("region", regionName)
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(in.config.AwsConfig)
+	awsConfig, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
@@ -107,21 +109,23 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	log.Infof("aws api timeout is set to %v", in.config.APITimeout)
 
 	s3Servicename := "s3"
-	if in.config.FipsEnabled {
+	if in.config.FIPSEnabled {
 		s3Servicename = "s3-fips"
 	}
 
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
-	log.Debug("s3 input config endpoint = ", in.config.AwsConfig.Endpoint)
+	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	return &s3Collector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
 		config:            &in.config,
 		publisher:         client,
 		visibilityTimeout: visibilityTimeout,
-		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "sqs", regionName, awsConfig)),
-		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, s3Servicename, regionName, awsConfig)),
+		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, "sqs", regionName, awsConfig)),
+		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, regionName, awsConfig)),
+		metrics:           newInputMetrics(metricRegistry, ctx.ID),
 	}, nil
 }
 

@@ -26,7 +26,7 @@ const (
 	// args: pipeline name, application name
 	agentMbEndpointFileFormatWin = `npipe:///elastic-agent`
 	// agentMbEndpointHTTP is used with cloud and exposes metrics on http endpoint
-	agentMbEndpointHTTP = "http://localhost:%d"
+	agentMbEndpointHTTP = "http://%s:%d"
 )
 
 // MonitoringEndpoint is an endpoint where process is exposing its metrics.
@@ -60,7 +60,7 @@ func getLoggingFile(spec program.Spec, operatingSystem, installPath, pipelineID 
 // AgentMonitoringEndpoint returns endpoint with exposed metrics for agent.
 func AgentMonitoringEndpoint(operatingSystem string, cfg *monitoringConfig.MonitoringHTTPConfig) string {
 	if cfg != nil && cfg.Enabled {
-		return fmt.Sprintf(agentMbEndpointHTTP, cfg.Port)
+		return fmt.Sprintf(agentMbEndpointHTTP, cfg.Host, cfg.Port)
 	}
 
 	if operatingSystem == "windows" {

@@ -132,6 +132,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25805")
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 

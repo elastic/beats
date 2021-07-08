@@ -135,7 +135,7 @@ class WriteReadTest(BaseTest):
 
         return event_logs
 
-    def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
+    def assert_common_fields(self, evt, msg=None, eventID="10", sid=None,
                              level="information", extra=None):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()

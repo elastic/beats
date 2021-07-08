@@ -2,7 +2,7 @@
   {
     "@timestamp": "2021-02-25T15:04:48.592Z",
     "event": {
-      "code": 24,
+      "code": "24",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -44,7 +44,7 @@
         "ClientInfo": "user: DESKTOP-I9CQVAQ\\luks",
         "Session": "1"
       },
-      "event_id": 24,
+      "event_id": "24",
       "process": {
         "pid": 3800,
         "thread": {

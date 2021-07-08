@@ -348,6 +348,121 @@ filebeat.modules:
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
 
+- module: aws
+  fargate:
+    enabled: false
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # The duration that the received messages are hidden from ReceiveMessage request
+    # Default to be 300s
+    #var.visibility_timeout: 300s
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # ARN of the log group to collect logs from
+    #var.log_group_arn: arn:aws:logs:us-east-1:123456789012:log-group:test:*
+
+    # Name of the log group to collect logs from
+    #var.log_group_name: /ecs/test-log-group
+
+    # Region that the specified log group belongs to
+    #var.region_name: us-east-1
+
+    # A list of strings of log streams names that Filebeat collect log events from
+    #var.log_streams: ["/ecs/test-log-group/test-log-stream"]
+
+    # A string to filter the results to include only log events from log streams that have names starting with this prefix
+    #var.log_stream_prefix: /ecs/test-log-group/
+
+    # Specify if Filebeat should read log files from the beginning or from the end
+    # Default start_position is beginning
+    #var.start_position: beginning
+
+    # How often Filebeat checks for new log events from the specified log group
+    # Default scan_frequency is 1 minute
+    #var.scan_frequency: 1m
+
+    # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
+    # Default api_sleep is 200 ms
+    #var.api_sleep: 200ms
+
+#----------------------------- AWS Fargate Module -----------------------------
+- module: awsfargate
+  log:
+    enabled: false
+
+    # Filename of AWS credential file
+    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
+    # "%UserProfile%\.aws\credentials" is used on Windows
+    #var.shared_credential_file: /etc/filebeat/aws_credentials
+
+    # Profile name for aws credential
+    # If not set the default profile is used
+    #var.credential_profile_name: fb-aws
+
+    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
+    #var.access_key_id: access_key_id
+    #var.secret_access_key: secret_access_key
+    #var.session_token: session_token
+
+    # Maximum duration before AWS API request will be interrupted
+    # Default to be 120s
+    #var.api_timeout: 120s
+
+    # Custom endpoint used to access AWS APIs
+    #var.endpoint: amazonaws.com
+
+    # AWS IAM Role to assume
+    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # ARN of the log group to collect logs from
+    #var.log_group_arn: arn:aws:logs:us-east-1:123456789012:log-group:test:*
+
+    # Name of the log group to collect logs from
+    #var.log_group_name: /ecs/test-log-group
+
+    # Region that the specified log group belongs to
+    #var.region_name: us-east-1
+
+    # A list of strings of log streams names that Filebeat collect log events from
+    #var.log_streams: ["/ecs/test-log-group/test-log-stream"]
+
+    # A string to filter the results to include only log events from log streams that have names starting with this prefix
+    #var.log_stream_prefix: /ecs/test-log-group/
+
+    # Specify if Filebeat should read log files from the beginning or from the end
+    # Default start_position is beginning
+    #var.start_position: beginning
+
+    # How often Filebeat checks for new log events from the specified log group
+    # Default scan_frequency is 1 minute
+    #var.scan_frequency: 1m
+
+    # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
+    # Default api_sleep is 200 ms
+    #var.api_sleep: 200ms
+
 #-------------------------------- Azure Module --------------------------------
 - module: azure
   # All logs
@@ -654,6 +769,8 @@ filebeat.modules:
     #var.paths:
 
 #------------------------------ Cyber-Ark Module ------------------------------
+# The cyberark module is deprecated and will be removed in future releases.
+# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
 - module: cyberark
   corepas:
     enabled: true
@@ -673,6 +790,32 @@ filebeat.modules:
     # "local" (default) for system timezone.
     # "+02:00" for GMT+02:00
     # var.tz_offset: local
+
+#----------------------------- CyberArk PAS Module -----------------------------
+- module: cyberarkpas
+  audit:
+    enabled: true
+
+    # Set which input to use between tcp (default), udp, or file.
+    #
+    # var.input: tcp
+
+    # var.syslog_host: localhost
+    # var.syslog_port: 9301
+
+    # With tcp input, set the optional tls configuration:
+    #var.ssl:
+    #  enabled: true
+    #  certificate: /path/to/cert.pem
+    #  key: /path/to/privatekey.pem
+    #  key_passphrase: 'password for my key'
+
+    # Uncoment to keep the original syslog event under event.original.
+    # var.preserve_original_event: true
+
+    # Set paths for the log files when file input is used.
+    # var.paths:
+
 
 #---------------------------- CylanceProtect Module ----------------------------
 - module: cylance
@@ -1394,6 +1537,8 @@ filebeat.modules:
     # var.tz_offset: local
 
 #--------------------------------- MISP Module ---------------------------------
+# Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
+
 - module: misp
   threat:
     enabled: true
@@ -1616,7 +1761,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # Should only be used together with file input
-    # var.paths: /home/user/oracleauditlogs/*.aud
+    #var.paths: ["/home/user/oracleauditlogs/*.aud"]
 
 #------------------------------- Osquery Module -------------------------------
 - module: osquery
@@ -2014,6 +2159,18 @@ filebeat.modules:
     # The interval to poll the API for updates.
     var.interval: 10m
 
+  malwarebazaar:
+    enabled: true
+
+    # Input used for ingesting threat intel data.
+    var.input: httpjson
+
+    # The URL used for Threat Intel API calls.
+    var.url: https://mb-api.abuse.ch/api/v1/
+
+    # The interval to poll the API for updates.
+    var.interval: 10m
+
   misp:
     enabled: true
 
@@ -2033,7 +2190,7 @@ filebeat.modules:
     # Optional filters that can be applied to the API for filtering out results. This should support the majority of fields in a MISP context.
     # For examples please reference the filebeat module documentation.
     #var.filters:
-    #  - threat_level: [4, 5] 
+    #  - threat_level: [4, 5]
     #  - to_ids: true
 
     # How far back to look once the beat starts up for the first time, the value has to be in hours. Each request afterwards will filter on any event newer
@@ -2069,7 +2226,7 @@ filebeat.modules:
 
     # The interval to poll the API for updates
     var.interval: 5m
-  
+
   anomali:
     enabled: true
 
@@ -2092,6 +2249,63 @@ filebeat.modules:
     # The interval to poll the API for updates
     var.interval: 5m
 
+  anomalithreatstream:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: http_endpoint
+
+    # Address to bind to in order to receive HTTP requests
+    # from the Integrator SDK. Use 0.0.0.0 to bind to all
+    # existing interfaces.
+    var.listen_address: localhost
+
+    # Port to use to receive HTTP requests from the
+    # Integrator SDK.
+    var.listen_port: 8080
+
+    # Secret key to authenticate requests from the SDK.
+    var.secret: '<Add your secret here>'
+
+    # Uncomment the following and set the absolute paths
+    # to the server SSL certificate and private key to
+    # enable HTTPS secure connections.
+    #
+    # var.ssl_certificate: path/to/server_ssl_cert.pem
+    # var.ssl_key: path/to/ssl_key.pem
+
+  recordedfuture:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The interval to poll the API for updates
+    var.interval: 5m
+
+    # How far back in time to start fetching intelligence when run for the
+    # first time. Value must be in hours. Default: 168h (1 week).
+    var.first_interval: 168h
+
+    # The URL used for Threat Intel API calls.
+    # Must include the `limit` parameter and at least `entity` and `timestamps` fields.
+    # See the Connect API Explorer for a list of possible parameters.
+    #
+    # For `ip` entities:
+    var.url: "https://api.recordedfuture.com/v2/ip/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `domain` entities:
+    # var.url: "https://api.recordedfuture.com/v2/domain/search?limit=200&fields=entity,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `hash` entities:
+    # var.url: "https://api.recordedfuture.com/v2/hash/search?limit=200&fields=entity,fileHashes,timestamps,risk,intelCard,location&metadata=false"
+
+    # For `url` entities:
+    # var.url: "https://api.recordedfuture.com/v2/url/search?limit=200&fields=entity,timestamps,risk&metadata=false"
+
+    # Set your API Token.
+    var.api_token: "<RF_TOKEN>"
+
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:
@@ -2104,6 +2318,7 @@ filebeat.modules:
 
     # Set paths for the log files when file input is used.
     # var.paths:
+    #   - /var/log/tomcat/*.log
 
     # Toggle output of non-ECS fields (default true).
     # var.rsa_fields: true
@@ -2212,6 +2427,23 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+#------------------------------ ZooKeeper Module ------------------------------
+- module: zookeeper
+  # All logs
+  audit:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+  # All logs
+  log:
+    enabled: true
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #--------------------------------- Zoom Module ---------------------------------
 - module: zoom
   webhook:
@@ -2269,7 +2501,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input. Experimental.
+# * filestream: Improved version of log input
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -2539,12 +2771,26 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
+
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
 
   ### State options
 
@@ -2577,6 +2823,11 @@ filebeat.inputs:
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
+
+  # Ignore files that have not been updated since the selected event.
+  # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
+  # Available options: since_first_start, since_last_start.
+  #ignore_inactive: ""
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -2725,10 +2976,10 @@ filebeat.inputs:
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
-# Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
   #enabled: false
+  #format: rfc3164
   #protocol.udp:
     # The host and port to receive the new event
     #host: "localhost:9000"
@@ -2736,9 +2987,10 @@ filebeat.inputs:
     # Maximum size of the message received over UDP
     #max_message_size: 10KiB
 
-# Accept RFC3164 formatted syslog event via TCP.
+# Accept RFC5424 formatted syslog event via TCP.
 #- type: syslog
   #enabled: false
+  #format: rfc5424
 
   #protocol.tcp:
     # The host and port to receive the new event
@@ -2871,6 +3123,66 @@ filebeat.inputs:
   # The duration (in seconds) that the received messages are hidden from subsequent
   # retrieve requests after being retrieved by a ReceiveMessage request.
   #visibility_timeout: 300
+
+  # List of S3 object metadata keys to include in events.
+  #include_s3_metadata: []
+
+#------------------------------ AWS CloudWatch input --------------------------------
+# Beta: Config options for AWS CloudWatch input
+#- type: aws-cloudwatch
+  #enabled: false
+
+  # AWS Credentials
+  # If access_key_id and secret_access_key are configured, then use them to make api calls.
+  # If not, aws-cloudwatch input will load default AWS config or load with given profile name.
+  #access_key_id: '${AWS_ACCESS_KEY_ID:""}'
+  #secret_access_key: '${AWS_SECRET_ACCESS_KEY:""}'
+  #session_token: '${AWS_SESSION_TOKEN:"”}'
+  #credential_profile_name: test-aws-s3-input
+
+  # ARN of the log group to collect logs from
+  #log_group_arn: "arn:aws:logs:us-east-1:428152502467:log-group:test:*"
+
+  # Name of the log group to collect logs from.
+  # Note: region_name is required when log_group_name is given.
+  #log_group_name: test
+
+  # The prefix for a group of log group names.
+  # Note: `region_name` is required when `log_group_name_prefix` is given.
+  # `log_group_name` and `log_group_name_prefix` cannot be given at the same time.
+  #log_group_name_prefix: /aws/
+
+  # Region that the specified log group or log group prefix belongs to.
+  #region_name: us-east-1
+
+  # A list of strings of log streams names that Filebeat collect log events from.
+  #log_streams:
+  # - log_stream_name
+
+  # A string to filter the results to include only log events from log streams
+  # that have names starting with this prefix.
+  #log_stream_prefix: test
+
+  # `start_position` allows user to specify if this input should read log files
+  # from the `beginning` or from the `end`.
+  # `beginning`: reads from the beginning of the log group (default).
+  # `end`: read only new messages from current time minus `scan_frequency` going forward.
+  #start_position: beginning
+
+  # This config parameter sets how often Filebeat checks for new log events from the
+  # specified log group. Default `scan_frequency` is 1 minute, which means Filebeat
+  # will sleep for 1 minute before querying for new logs again.
+  #scan_frequency: 1m
+
+  # The maximum duration of AWS API can take. If it exceeds the timeout, AWS API
+  # will be interrupted.
+  # The default AWS API timeout for a message is 120 seconds.
+  # The minimum is 0 seconds.
+  #api_timeout: 120s
+
+  # This is used to sleep between AWS `FilterLogEvents` API calls inside the same
+  # collection period.
+  #api_sleep: 200ms
 
 # =========================== Filebeat autodiscover ============================
 
@@ -3413,6 +3725,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -3671,10 +3984,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -3752,6 +4061,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -4255,6 +4568,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. filebeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

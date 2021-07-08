@@ -11,6 +11,8 @@ changes, but there are breaking changes between major versions (e.g. 6.x to
 
 See the following topics for a description of breaking changes:
 
+* <<breaking-changes-7.13>>
+
 * <<breaking-changes-7.12>>
 
 * <<breaking-changes-7.11>>
@@ -37,6 +39,7 @@ See the following topics for a description of breaking changes:
 
 * <<breaking-changes-7.0>>
 
+include::breaking-7.13.asciidoc[]
 
 include::breaking-7.12.asciidoc[]
 

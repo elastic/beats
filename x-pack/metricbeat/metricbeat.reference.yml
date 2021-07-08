@@ -158,6 +158,13 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:3000"]
 
+#------------------------------- Airflow Module -------------------------------
+- module: airflow
+  host: "localhost"
+  port: "8126"
+  #ttl: "30s"
+  metricsets: [ 'statsd' ]
+
 #-------------------------------- Apache Module --------------------------------
 - module: apache
   metricsets: ["status"]
@@ -460,6 +467,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -862,6 +870,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -1350,6 +1359,18 @@ metricbeat.modules:
   port: "8125"
   enabled: false
   #ttl: "30s"
+
+#----------------------------- SyncGateway Module -----------------------------
+- module: syncgateway
+  metricsets:
+    - db
+#    - memory
+#    - replication
+#    - resources
+  period: 10s
+
+  # SyncGateway hosts
+  hosts: ["127.0.0.1:4985"]
 
 #-------------------------------- Tomcat Module --------------------------------
 - module: tomcat
@@ -1892,6 +1913,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -2150,10 +2172,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -2231,6 +2249,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -2734,6 +2756,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. metricbeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

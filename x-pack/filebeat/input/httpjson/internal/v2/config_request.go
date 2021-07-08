@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 type retryConfig struct {
@@ -76,26 +76,18 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 type requestConfig struct {
-	URL                    *urlConfig        `config:"url" validate:"required"`
-	Method                 string            `config:"method" validate:"required"`
-	Body                   *common.MapStr    `config:"body"`
-	EncodeAs               string            `config:"encode_as"`
-	Timeout                *time.Duration    `config:"timeout"`
-	SSL                    *tlscommon.Config `config:"ssl"`
-	Retry                  retryConfig       `config:"retry"`
-	RedirectForwardHeaders bool              `config:"redirect.forward_headers"`
-	RedirectHeadersBanList []string          `config:"redirect.headers_ban_list"`
-	RedirectMaxRedirects   int               `config:"redirect.max_redirects"`
-	RateLimit              *rateLimitConfig  `config:"rate_limit"`
-	Transforms             transformsConfig  `config:"transforms"`
-	ProxyURL               *urlConfig        `config:"proxy_url"`
-}
+	URL                    *urlConfig       `config:"url" validate:"required"`
+	Method                 string           `config:"method" validate:"required"`
+	Body                   *common.MapStr   `config:"body"`
+	EncodeAs               string           `config:"encode_as"`
+	Retry                  retryConfig      `config:"retry"`
+	RedirectForwardHeaders bool             `config:"redirect.forward_headers"`
+	RedirectHeadersBanList []string         `config:"redirect.headers_ban_list"`
+	RedirectMaxRedirects   int              `config:"redirect.max_redirects"`
+	RateLimit              *rateLimitConfig `config:"rate_limit"`
+	Transforms             transformsConfig `config:"transforms"`
 
-func (c requestConfig) getTimeout() time.Duration {
-	if c.Timeout == nil {
-		return 0
-	}
-	return *c.Timeout
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 func (c *requestConfig) Validate() error {
@@ -108,10 +100,6 @@ func (c *requestConfig) Validate() error {
 		}
 	default:
 		return fmt.Errorf("unsupported method %q", c.Method)
-	}
-
-	if c.Timeout != nil && *c.Timeout <= 0 {
-		return errors.New("timeout must be greater than 0")
 	}
 
 	if _, err := newBasicTransformsFromConfig(c.Transforms, requestNamespace, nil); err != nil {

@@ -19,6 +19,10 @@ processors:
     field: zoom.object
     target_field: zoom.phone
     ignore_missing: true
+- uri_parts:
+    field: zoom.phone.download_url
+    ignore_failure: true
+    if: ctx?.zoom?.phone?.download_url != null
 - rename:
     field: zoom.phone.download_url
     target_field: url.full

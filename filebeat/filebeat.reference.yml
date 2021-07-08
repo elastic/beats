@@ -418,7 +418,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input. Experimental.
+# * filestream: Improved version of log input
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -688,12 +688,26 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
+
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
 
   ### State options
 
@@ -726,6 +740,11 @@ filebeat.inputs:
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
+
+  # Ignore files that have not been updated since the selected event.
+  # ignore_inactive is disabled by default, so no files are ignored by setting it to "".
+  # Available options: since_first_start, since_last_start.
+  #ignore_inactive: ""
 
   # Defines the buffer size every harvester uses when fetching the file
   #harvester_buffer_size: 16384
@@ -874,10 +893,10 @@ filebeat.inputs:
   #ssl.client_authentication: "required"
 
 #------------------------------ Syslog input --------------------------------
-# Experimental: Config options for the Syslog input
 # Accept RFC3164 formatted syslog event via UDP.
 #- type: syslog
   #enabled: false
+  #format: rfc3164
   #protocol.udp:
     # The host and port to receive the new event
     #host: "localhost:9000"
@@ -885,9 +904,10 @@ filebeat.inputs:
     # Maximum size of the message received over UDP
     #max_message_size: 10KiB
 
-# Accept RFC3164 formatted syslog event via TCP.
+# Accept RFC5424 formatted syslog event via TCP.
 #- type: syslog
   #enabled: false
+  #format: rfc5424
 
   #protocol.tcp:
     # The host and port to receive the new event
@@ -1486,6 +1506,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1744,10 +1765,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1825,6 +1842,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -2328,6 +2349,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. filebeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

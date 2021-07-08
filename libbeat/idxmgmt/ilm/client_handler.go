@@ -191,19 +191,18 @@ func (h *ESClientHandler) CreateAlias(alias Alias) error {
 	}
 
 	// Note: actual aliases are accessible via the index
-	status, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body)
-	if status == 400 {
-		// HasAlias fails if there is an index with the same name, that is
-		// what we want to check here.
-		_, err := h.HasAlias(alias.Name)
-		if err != nil {
+	if _, res, err := h.client.Request("PUT", "/"+firstIndex, "", nil, body); err != nil {
+		// Creating the index may fail for multiple reasons, e.g. because
+		// the index exists, or because the write alias exists and points
+		// to another index.
+		if ok, err := h.HasAlias(alias.Name); err != nil {
+			// HasAlias fails if there is an index with the same name.
 			return err
+		} else if ok {
+			return errOf(ErrAliasAlreadyExists)
 		}
-		return errOf(ErrAliasAlreadyExists)
-	} else if err != nil {
 		return wrapErrf(err, ErrAliasCreateFailed, "failed to create alias: %s", res)
 	}
-
 	return nil
 }
 

@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4770,
+      "code": "4770",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -22,6 +22,7 @@
       "level": "information"
     },
     "related": {
+      "ip": "::1",
       "user": "DC_TEST2K12$"
     },
     "source": {
@@ -49,7 +50,7 @@
           "Name-canonicalize"
         ]
       },
-      "event_id": 4770,
+      "event_id": "4770",
       "keywords": [
         "Audit Success"
       ],
