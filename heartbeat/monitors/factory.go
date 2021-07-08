@@ -120,6 +120,10 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		fields := clientCfg.Processing.Fields.Clone()
 		fields.Put("event.dataset", dataset)
 
+		if settings.DataStream != nil {
+			fields.Put("data_stream", settings.DataStream)
+		}
+
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {
 			meta.Put("pipeline", settings.Pipeline)
