@@ -62,7 +62,6 @@ type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
 	client beat.Client
-	osqCli *osqdcli.Client
 
 	log *logp.Logger
 
@@ -152,76 +151,46 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		return err
 	}
 
-	// Start osqueryd
 	g, ctx := errgroup.WithContext(ctx)
-	g.Go(func() error {
-		err := osq.Run(ctx)
-		if err != nil {
-			bt.log.Errorf("Failed to run osqueryd: %v", err)
+	var inputCh chan []config.InputConfig
+
+	startOsqueryIfNotStarted := func() {
+		// Start only once
+		if inputCh == nil {
+			inputCh = make(chan []config.InputConfig, 1)
+			g.Go(func() error {
+				err := bt.runOsquery(ctx, b, osq, inputCh)
+				if err != nil {
+					bt.log.Errorf("Failed to run osqueryd: %v", err)
+				}
+				return err
+			})
 		}
-		return err
-	})
-
-	// Connect publisher
-	processors, err := bt.reconnectPublisher(b, bt.config.Inputs)
-	if err != nil {
-		return err
 	}
 
-	// Create a cache for queries types resolution
-	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
-	if err != nil {
-		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
-		return err
+	// Start osquery only if config has inputs, otherwise it will be started on the first configuration sent from the agent
+	// This way we don't need to persist the configuration for configuration plugin, because osquery is not running until
+	// we have the first valid configuration
+	if len(bt.config.Inputs) > 0 {
+		startOsqueryIfNotStarted()
+		inputCh <- bt.config.Inputs
 	}
-
-	// Create osqueryd client
-	cli := osqdcli.New(socketPath,
-		osqdcli.WithLogger(bt.log),
-		osqdcli.WithTimeout(osqueryTimeout),
-		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
-	)
-
-	// Connect to osqueryd
-	err = cli.Connect(ctx)
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
-
-	bt.osqCli = cli
-
-	// Create osquery configuration plugin that loads a persisted configuration from the disk
-	configPlugin := NewConfigPlugin(bt.log, osq.DataPath())
-	// Resize cache
-	cache.Resize(configPlugin.Count())
-
-	// Create osquery logger plugin
-	loggerPlugin := NewLoggerPlugin(bt.log, func(res SnapshotResult) {
-		bt.handleSnapshotResult(ctx, configPlugin, res)
-	})
-
-	// Start osquery extensions for logger and configuration
-	g.Go(func() error {
-		return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
-	})
-
-	// Register action handler
-	ah := bt.registerActionHandler(b)
-	defer bt.unregisterActionHandler(b, ah)
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
 
-	// Set initial queries from beats config if defined
-	queryConfigs := inputsToQueryConfigs(bt.config.Inputs)
-	if len(queryConfigs) > 0 {
-		configPlugin.Set(queryConfigs)
-		cache.Resize(configPlugin.Count())
-	}
-
 	// Run main loop
 	g.Go(func() error {
+		// Set initial queries from beats config if defined
+		var processors *processors.Processors
+		if len(bt.config.Inputs) > 0 {
+			// Connect publisher
+			processors, err = bt.reconnectPublisher(b, bt.config.Inputs)
+			if err != nil {
+				return err
+			}
+		}
+
 		for {
 			select {
 			case <-ctx.Done():
@@ -237,14 +206,83 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 						return err
 					}
 				}
-				queryConfigs = inputsToQueryConfigs(inputConfigs)
-				configPlugin.Set(queryConfigs)
-				cache.Resize(configPlugin.Count())
+				startOsqueryIfNotStarted()
+				inputCh <- inputConfigs
 			}
 		}
 	})
 
 	// Wait for clean exit
+	return g.Wait()
+}
+
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, inputCh <-chan []config.InputConfig) error {
+	socketPath := osq.SocketPath()
+
+	// Create a cache for queries types resolution
+	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
+	if err != nil {
+		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
+		return err
+	}
+
+	// Start osqueryd
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		err := osq.Run(ctx)
+		if err != nil {
+			bt.log.Errorf("Failed to run osqueryd: %v", err)
+		}
+		return err
+	})
+
+	// Create osqueryd client
+	cli := osqdcli.New(socketPath,
+		osqdcli.WithLogger(bt.log),
+		osqdcli.WithTimeout(osqueryTimeout),
+		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
+	)
+
+	// Create osquery configuration plugin that loads a persisted configuration from the disk
+	configPlugin := NewConfigPlugin(bt.log)
+	// Resize cache
+	cache.Resize(configPlugin.Count())
+
+	// Create osquery logger plugin
+	loggerPlugin := NewLoggerPlugin(bt.log, func(res SnapshotResult) {
+		bt.handleSnapshotResult(ctx, cli, configPlugin, res)
+	})
+
+	// Run extensions
+	g.Go(func() error {
+		return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
+	})
+
+	// Run main loop
+	g.Go(func() error {
+		// Connect to osqueryd
+		err = cli.Connect(ctx)
+		if err != nil {
+			return err
+		}
+		defer cli.Close()
+
+		// Register action handler
+		ah := bt.registerActionHandler(b, cli)
+		defer bt.unregisterActionHandler(b, ah)
+
+		// Process input
+		for {
+			select {
+			case <-ctx.Done():
+				bt.log.Info("context cancelled, exiting")
+				return ctx.Err()
+			case inputConfigs := <-inputCh:
+				configPlugin.Set(inputConfigs)
+				cache.Resize(configPlugin.Count())
+			}
+		}
+	})
 	return g.Wait()
 }
 
@@ -279,14 +317,14 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, configPlugin *ConfigPlugin, res SnapshotResult) {
+func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
 	sql, ok := configPlugin.ResolveName(res.Name)
 	if !ok {
 		bt.log.Errorf("failed to resolve query name: %s", res.Name)
 		return
 	}
 
-	hits, err := bt.osqCli.ResolveResult(ctx, sql, res.Hits)
+	hits, err := cli.ResolveResult(ctx, sql, res.Hits)
 	if err != nil {
 		bt.log.Errorf("failed to resolve query types: %s", res.Name)
 		return
@@ -294,24 +332,6 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, configPlugin *C
 	_ = hits
 	responseID := uuid.Must(uuid.NewV4()).String()
 	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, nil)
-}
-
-func inputsToQueryConfigs(inputs []config.InputConfig) []QueryConfig {
-	var queryConfigs []QueryConfig
-
-	for _, input := range inputs {
-		for _, s := range input.Streams {
-			queryConfigs = append(queryConfigs, QueryConfig{
-				Name:     s.ID,
-				Query:    s.Query,
-				Interval: s.Interval,
-				Platform: s.Platform,
-				Version:  s.Version,
-			})
-		}
-	}
-
-	return queryConfigs
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -371,14 +391,16 @@ func (bt *osquerybeat) Stop() {
 	bt.close()
 }
 
-func (bt *osquerybeat) registerActionHandler(b *beat.Beat) *actionHandler {
+func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client) *actionHandler {
 	if b.Manager == nil {
 		return nil
 	}
 
 	ah := &actionHandler{
+		log:       bt.log,
 		inputType: osqueryInputType,
 		bt:        bt,
+		cli:       cli,
 	}
 	b.Manager.RegisterAction(ah)
 	return ah
@@ -388,28 +410,6 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	if b.Manager != nil && ah != nil {
 		b.Manager.UnregisterAction(ah)
 	}
-}
-
-func (bt *osquerybeat) executeQuery(ctx context.Context, index, id, query, responseID string, req map[string]interface{}) error {
-
-	bt.log.Debugf("Execute query: %s", query)
-
-	start := time.Now()
-
-	hits, err := bt.osqCli.Query(ctx, query)
-
-	if err != nil {
-		bt.log.Errorf("Failed to execute query, err: %v", err)
-		return err
-	}
-
-	bt.log.Debugf("Completed query in: %v", time.Since(start))
-
-	if err != nil {
-		return err
-	}
-	bt.publishEvents(index, id, responseID, hits, req["data"])
-	return nil
 }
 
 func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, reqData interface{}) {
