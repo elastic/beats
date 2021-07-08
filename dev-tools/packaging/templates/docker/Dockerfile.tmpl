@@ -4,6 +4,11 @@
 
 FROM {{ .from }}
 
+RUN yum -y update \
+  && yum clean all \
+  && rm -rf /var/cache/yum
+  # See https://access.redhat.com/discussions/3195102 for why rm is needed
+
 LABEL \
   org.label-schema.schema-version="1.0" \
   org.label-schema.vendor="{{ .BeatVendor }}" \
