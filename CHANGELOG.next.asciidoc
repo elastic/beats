@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove id_field_data {pull}25239[25239]
 - Removed beats central management {pull}25696[25696], {issue}23908[23908]
 - MacOSX minimum supported version set to 10.14 {issue}24193{24193}
+- Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 
 *Auditbeat*
 
