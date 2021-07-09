@@ -30,6 +30,7 @@ type StreamConfig struct {
 }
 
 type InputConfig struct {
+	Name       string                  `config:"name"`
 	Type       string                  `config:"type"`
 	Streams    []StreamConfig          `config:"streams"`
 	Processors processors.PluginConfig `config:"processors"`

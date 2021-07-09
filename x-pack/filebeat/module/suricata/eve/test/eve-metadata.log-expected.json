@@ -15,11 +15,14 @@
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
         "event.module": "suricata",
-        "event.original": "{\"timestamp\":\"2021-01-27T01:28:11.488362+0100\",\"flow_id\":1805461738637437,\"in_iface\":\"enp6s0\",\"event_type\":\"alert\",\"src_ip\":\"52.222.141.99\",\"src_port\":80,\"dest_ip\":\"10.31.64.240\",\"dest_port\":47592,\"proto\":\"TCP\",\"ether\":{\"src_mac\":\"00:03:2d:3f:e5:63\",\"dest_mac\":\"00:1b:17:00:01:18\"},\"alert\":{\"action\":\"allowed\",\"gid\":1,\"signature_id\":2100498,\"rev\":7,\"signature\":\"GPL ATTACK_RESPONSE id check returned root\",\"category\":\"Potentially Bad Traffic\",\"severity\":2,\"metadata\":{\"created_at\":[\"2010_09_23\"],\"updated_at\":[\"2010_09_23\"]}},\"http\":{\"hostname\":\"testmynids.org\",\"url\":\"/uid/index.html\",\"http_user_agent\":\"curl/7.58.0\",\"http_content_type\":\"text/html\",\"http_method\":\"GET\",\"protocol\":\"HTTP/1.1\",\"status\":200,\"length\":39},\"app_proto\":\"http\",\"flow\":{\"pkts_toserver\":6,\"pkts_toclient\":5,\"bytes_toserver\":496,\"bytes_toclient\":876,\"start\":\"2021-01-22T23:28:38.673917+0100\"}}",
+        "event.original": "{\"timestamp\":\"2021-01-27T01:28:11.488362+0100\",\"flow_id\":1805461738637437,\"in_iface\":\"enp6s0\",\"event_type\":\"alert\",\"src_ip\":\"52.222.141.99\",\"src_port\":80,\"dest_ip\":\"10.31.64.240\",\"dest_port\":47592,\"proto\":\"TCP\",\"ether\":{\"src_mac\":\"00:03:2d:3f:e5:63\",\"dest_mac\":\"00:1b:17:00:01:18\"},\"alert\":{\"action\":\"allowed\",\"gid\":1,\"signature_id\":2100498,\"rev\":7,\"signature\":\"GPL ATTACK_RESPONSE id check returned root\",\"category\":\"Potentially Bad Traffic\",\"severity\":2,\"metadata\":{\"protocols\":[\"tcp\",\"smtp\"],\"mitre_attack\":[\"t1190\"],\"cvss_v2_temporal\":[\"7.9\"],\"cve\":[\"2019-91325\"],\"cvss_v3_temporal\":[\"7.1\"],\"attack_target\":[\"smtp-server\",\"server\"],\"cvss_v2_base\":[\"8.1\"],\"rule_source\":[\"acme-rule-factory\"],\"priority\":[\"medium\"],\"filename\":[\"exploit.rules\"],\"updated_at\":[\"2019-06-11\"],\"capec_id\":[\"248\"],\"created_at\":[\"2019-06-01\"],\"hostile\":[\"src_ip\"],\"cvss_v3_base\":[\"7.3\"],\"cwe_id\":[\"20\"]}},\"http\":{\"hostname\":\"testmynids.org\",\"url\":\"/uid/index.html\",\"http_user_agent\":\"curl/7.58.0\",\"http_content_type\":\"text/html\",\"http_method\":\"GET\",\"protocol\":\"HTTP/1.1\",\"status\":200,\"length\":39},\"app_proto\":\"http\",\"flow\":{\"pkts_toserver\":6,\"pkts_toclient\":5,\"bytes_toserver\":496,\"bytes_toclient\":876,\"start\":\"2021-01-22T23:28:38.673917+0100\"}}",
         "event.severity": 2,
         "event.start": "2021-01-22T22:28:38.673Z",
         "event.type": [
             "allowed"
+        ],
+        "file.name": [
+            "exploit.rules"
         ],
         "fileset.name": "eve",
         "http.request.method": "GET",
@@ -59,13 +62,51 @@
         "source.mac": "00:03:2d:3f:e5:63",
         "source.packets": 6,
         "source.port": 80,
+        "suricata.eve.alert.attack_target": [
+            "server",
+            "smtp-server"
+        ],
+        "suricata.eve.alert.capec_id": [
+            "248"
+        ],
         "suricata.eve.alert.category": "Potentially Bad Traffic",
-        "suricata.eve.alert.created_at": "2010-09-23T00:00:00.000Z",
+        "suricata.eve.alert.created_at": "2019-06-01T00:00:00.000Z",
+        "suricata.eve.alert.cve": [
+            "2019-91325"
+        ],
+        "suricata.eve.alert.cvss_v2_base": [
+            "8.1"
+        ],
+        "suricata.eve.alert.cvss_v2_temporal": [
+            "7.9"
+        ],
+        "suricata.eve.alert.cvss_v3_base": [
+            "7.3"
+        ],
+        "suricata.eve.alert.cvss_v3_temporal": [
+            "7.1"
+        ],
+        "suricata.eve.alert.cwe_id": [
+            "20"
+        ],
         "suricata.eve.alert.gid": 1,
+        "suricata.eve.alert.hostile": [
+            "src_ip"
+        ],
+        "suricata.eve.alert.priority": [
+            "medium"
+        ],
+        "suricata.eve.alert.protocols": [
+            "smtp",
+            "tcp"
+        ],
         "suricata.eve.alert.rev": 7,
+        "suricata.eve.alert.rule_source": [
+            "acme-rule-factory"
+        ],
         "suricata.eve.alert.signature": "GPL ATTACK_RESPONSE id check returned root",
         "suricata.eve.alert.signature_id": 2100498,
-        "suricata.eve.alert.updated_at": "2010-09-23T00:00:00.000Z",
+        "suricata.eve.alert.updated_at": "2019-06-11T00:00:00.000Z",
         "suricata.eve.event_type": "alert",
         "suricata.eve.flow_id": "1805461738637437",
         "suricata.eve.http.http_content_type": "text/html",
@@ -73,6 +114,9 @@
         "suricata.eve.in_iface": "enp6s0",
         "tags": [
             "suricata"
+        ],
+        "threat.tactic.id": [
+            "t1190"
         ],
         "url.domain": "testmynids.org",
         "url.extension": "html",

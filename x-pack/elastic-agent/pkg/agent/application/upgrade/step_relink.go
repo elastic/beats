@@ -21,22 +21,37 @@ func ChangeSymlink(ctx context.Context, targetHash string) error {
 	// create symlink to elastic-agent-{hash}
 	hashedDir := fmt.Sprintf("%s-%s", agentName, targetHash)
 
-	agentPrevName := agentName + ".prev"
 	symlinkPath := filepath.Join(paths.Top(), agentName)
 	newPath := filepath.Join(paths.Top(), "data", hashedDir, agentName)
 
 	// handle windows suffixes
 	if runtime.GOOS == "windows" {
-		agentPrevName = agentName + ".exe.prev"
 		symlinkPath += ".exe"
 		newPath += ".exe"
 	}
 
-	prevNewPath := filepath.Join(paths.Top(), agentPrevName)
+	prevNewPath := prevSymlinkPath()
+
+	// remove symlink to avoid upgrade failures
+	if err := os.Remove(prevNewPath); !os.IsNotExist(err) {
+		return err
+	}
+
 	if err := os.Symlink(newPath, prevNewPath); err != nil {
 		return errors.New(err, errors.TypeFilesystem, "failed to update agent symlink")
 	}
 
 	// safely rotate
 	return file.SafeFileRotate(symlinkPath, prevNewPath)
+}
+
+func prevSymlinkPath() string {
+	agentPrevName := agentName + ".prev"
+
+	// handle windows suffixes
+	if runtime.GOOS == "windows" {
+		agentPrevName = agentName + ".exe.prev"
+	}
+
+	return filepath.Join(paths.Top(), agentPrevName)
 }

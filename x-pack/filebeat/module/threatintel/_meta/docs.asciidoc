@@ -604,15 +604,22 @@ image::./images/filebeat-threatintel-alienvault-otx.png[]
 Overview of the information provided by the AlienVault OTX feed.
 
 [role="screenshot"]
-image::./images/filebeat-threatintel-anomali-limo.png[]
+image::./images/filebeat-threatintel-anomali.png[]
 
 [float]
-Overview of the information provided by the Anomali Limo feed.
+Overview of the information provided by the Anomali Limo and
+Anomali ThreatStream feeds.
 
 [role="screenshot"]
 image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-recordedfuture.png[]
+
+[float]
+Overview of the information provided by the Recorded Future feed.
 
 :modulename!:

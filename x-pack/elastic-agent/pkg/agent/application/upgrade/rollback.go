@@ -73,6 +73,9 @@ func Cleanup(currentHash string, removeMarker bool) error {
 		return err
 	}
 
+	// remove symlink to avoid upgrade failures, ignore error
+	_ = os.Remove(prevSymlinkPath())
+
 	dirPrefix := fmt.Sprintf("%s-", agentName)
 	currentDir := fmt.Sprintf("%s-%s", agentName, currentHash)
 	for _, dir := range subdirs {

@@ -9,12 +9,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
 
 type actionHandler struct {
+	log       *logp.Logger
 	inputType string
 	bt        *osquerybeat
+	cli       *osqdcli.Client
 }
 
 func (a *actionHandler) Name() string {
@@ -70,5 +74,27 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 	if err != nil {
 		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.bt.executeQuery(ctx, config.DefaultStreamIndex, ad.ID, ad.Query, "", req)
+	return a.executeQuery(ctx, config.DefaultStreamIndex, ad.ID, ad.Query, "", req)
+}
+
+func (a *actionHandler) executeQuery(ctx context.Context, index, id, query, responseID string, req map[string]interface{}) error {
+
+	a.log.Debugf("Execute query: %s", query)
+
+	start := time.Now()
+
+	hits, err := a.cli.Query(ctx, query)
+
+	if err != nil {
+		a.log.Errorf("Failed to execute query, err: %v", err)
+		return err
+	}
+
+	a.log.Debugf("Completed query in: %v", time.Since(start))
+
+	if err != nil {
+		return err
+	}
+	a.bt.publishEvents(index, id, responseID, hits, req["data"])
+	return nil
 }
