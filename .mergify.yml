@@ -28,7 +28,7 @@ pull_request_rules:
   - name: backport patches to 7.13 branch
     conditions:
       - merged
-      - label=backport-v7.13.0
+      - label=backport-v7.14.0
     actions:
       backport:
         assignees:
@@ -151,3 +151,16 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: backport patches to 7.13 branch
+    conditions:
+      - merged
+      - label=backport-v7.13.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.13"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
