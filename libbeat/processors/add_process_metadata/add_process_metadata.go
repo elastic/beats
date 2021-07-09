@@ -188,7 +188,7 @@ func pidToInt(value interface{}) (pid int, err error) {
 	case string:
 		pid, err = strconv.Atoi(v)
 		if err != nil {
-			return 0, errors.Wrapf(err, "error converting string to integer")
+			return 0, errors.Wrap(err, "error converting string to integer")
 		}
 	case int:
 		pid = v
