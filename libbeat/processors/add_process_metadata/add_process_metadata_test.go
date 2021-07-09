@@ -964,6 +964,11 @@ func TestPIDToInt(t *testing.T) {
 			pid:  uintptr(0),
 			fail: false,
 		},
+		{
+			name: "boolean",
+			pid:  false,
+			fail: true,
+		},
 	} {
 		t.Run(test.name, func(t *testing.T) {
 			_, err := pidToInt(test.pid)

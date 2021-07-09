@@ -203,7 +203,7 @@ func pidToInt(value interface{}) (pid int, err error) {
 			return 0, errors.Errorf("integer out of range: %d", pidu64)
 		}
 	default:
-		return 0, errors.Errorf("not an integer or string")
+		return 0, errors.Errorf("not an integer or string, but %T", v)
 	}
 	return pid, nil
 }
