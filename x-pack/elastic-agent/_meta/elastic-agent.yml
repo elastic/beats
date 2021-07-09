@@ -102,6 +102,8 @@ inputs:
 #   logs: false
 #   # enables metrics monitoring
 #   metrics: false
+#   # running processes will emit metrics into logs
+#   log_metrics: true
 #   # exposes agent metrics using http, by default sockets and named pipes are used
 #   http:
 #       # enables http endpoint
