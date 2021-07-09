@@ -11,7 +11,7 @@
         Fields from the threatintel Filebeat module.
       fields:
         - name: indicator.first_seen
-          type: keyword
+          type: date
           description: >
             The date and time when intelligence source first reported sighting this indicator.
         - name: indicator.last_seen
