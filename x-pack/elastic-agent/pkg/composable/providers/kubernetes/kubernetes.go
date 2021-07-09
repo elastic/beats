@@ -23,6 +23,8 @@ const (
 	ContainerPriority = 1
 	// NodePriority is the priority that node mappings are added to the provider.
 	NodePriority = 0
+	// ServicePriority is the priority that service mappings are added to the provider.
+	ServicePriority = 0
 )
 
 func init() {
@@ -95,7 +97,11 @@ func (p *dynamicProvider) newWatcher(comm composable.DynamicProviderComm, client
 		}
 		return watcher, nil
 	case "service":
-		return nil, nil
+		watcher, err := NewServiceWatcher(comm, p.config, p.logger, client)
+		if err != nil {
+			return nil, err
+		}
+		return watcher, nil
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", p.config.Resource)
 	}

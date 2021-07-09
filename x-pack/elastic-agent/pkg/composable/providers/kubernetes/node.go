@@ -25,9 +25,9 @@ type node struct {
 	comm           composable.DynamicProviderComm
 }
 
-// NewNodeWatcher creates a watcher that can discover and process pod objects
+// NewNodeWatcher creates a watcher that can discover and process node objects
 func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
-	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
 		IsUpdated:    isUpdated,
