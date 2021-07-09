@@ -42,7 +42,9 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig("localhost:9102"))
+	service := compose.EnsureUpWithTimeout(t, 120, "couchbase")
+
+	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
