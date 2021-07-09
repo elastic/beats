@@ -208,6 +208,56 @@
 
       - name: signature_id
         type: long
+      - name: protocols
+        type: keyword
+      - name: attack_target
+        type: keyword
+      - name: capec_id
+        type: keyword
+      - name: cwe_id
+        type: keyword
+      - name: malware
+        type: keyword
+      - name: cve
+        type: keyword
+      - name: cvss_v2_base
+        type: keyword
+      - name: cvss_v2_temporal
+        type: keyword
+      - name: cvss_v3_base
+        type: keyword
+      - name: cvss_v3_temporal
+        type: keyword
+      - name: priority
+        type: keyword
+      - name: hostile
+        type: keyword
+      - name: infected
+        type: keyword
+      - name: created_at
+        type: date
+      - name: updated_at
+        type: date
+      - name: classtype
+        type: keyword
+      - name: rule_source
+        type: keyword
+      - name: sid
+        type: keyword
+      - name: affected_product
+        type: keyword
+      - name: deployment
+        type: keyword
+      - name: former_category
+        type: keyword
+      - name: mitre_tool_id
+        type: keyword
+      - name: performance_impact
+        type: keyword
+      - name: signature_severity
+        type: keyword
+      - name: tag
+        type: keyword
 
     - name: ssh
       type: group
