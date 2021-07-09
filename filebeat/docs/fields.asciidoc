@@ -151942,7 +151942,7 @@ Fields from the threatintel Filebeat module.
 The date and time when intelligence source first reported sighting this indicator.
 
 
-type: keyword
+type: date
 
 --
 
