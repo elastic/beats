@@ -418,7 +418,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": false,
 			},
-			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': not an integer or string"),
+			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': not an integer or string, but bool"),
 		},
 		{
 			description: "process not found",
