@@ -1,3 +1,7 @@
+// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
+// or more contributor license agreements. Licensed under the Elastic License;
+// you may not use this file except in compliance with the Elastic License.
+
 package kubernetes
 
 import (
@@ -8,8 +12,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
 type pod struct {
@@ -18,7 +22,7 @@ type pod struct {
 	comm           composable.DynamicProviderComm
 }
 
-// NewPodEventer creates an eventer that can discover and process pod objects
+// NewPodWatcher creates a watcher that can discover and process pod objects
 func NewPodWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout: cfg.SyncPeriod,

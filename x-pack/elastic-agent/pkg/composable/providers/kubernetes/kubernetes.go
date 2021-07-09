@@ -21,6 +21,8 @@ const (
 	PodPriority = 0
 	// ContainerPriority is the priority that container mappings are added to the provider.
 	ContainerPriority = 1
+	// NodePriority is the priority that node mappings are added to the provider.
+	NodePriority = 0
 )
 
 func init() {
@@ -64,8 +66,6 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 		p.config.Node = ""
 	}
 
-
-
 	watcher, err := p.newWatcher(comm, client)
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher")
@@ -89,7 +89,11 @@ func (p *dynamicProvider) newWatcher(comm composable.DynamicProviderComm, client
 		}
 		return watcher, nil
 	case "node":
-		return nil, nil
+		watcher, err := NewNodeWatcher(comm, p.config, p.logger, client)
+		if err != nil {
+			return nil, err
+		}
+		return watcher, nil
 	case "service":
 		return nil, nil
 	default:

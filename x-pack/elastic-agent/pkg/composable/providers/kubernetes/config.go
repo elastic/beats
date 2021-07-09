@@ -8,8 +8,9 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Config for kubernetes provider
@@ -22,7 +23,7 @@ type Config struct {
 	Node string `config:"node"`
 
 	// Scope of the provider (cluster or node)
-	Scope string `config:"scope"`
+	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
 }
 
