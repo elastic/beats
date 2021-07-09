@@ -105,6 +105,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Rename `network.direction` values in crowdstrike/falcon to `ingress`/`egress`. {pull}23041[23041]
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
+- threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 
 *Heartbeat*
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
