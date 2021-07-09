@@ -1,0 +1,69 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "couchbase": {
+        "index": {
+            "avg_item_size": 35,
+            "avg_scan_latency": {
+                "ns": 0
+            },
+            "cache": {
+                "hits": 0,
+                "misses": 0
+            },
+            "data_size": {
+                "bytes": 420780
+            },
+            "disk_size": {
+                "bytes": 454830
+            },
+            "docs": {
+                "indexed": 0,
+                "pending": 0,
+                "queued": 0
+            },
+            "frag": {
+                "pct": 57
+            },
+            "items": {
+                "count": 7303
+            },
+            "items_flushed": {
+                "count": 0
+            },
+            "memory_used": {
+                "bytes": 7092
+            },
+            "name": "beer-sample:beer_primary",
+            "requests": {
+                "count": 0,
+                "pending": {
+                    "count": 0
+                }
+            },
+            "resident": {
+                "pct": 0
+            },
+            "scan": {
+                "errors": {
+                    "count": 0
+                },
+                "timeouts": {
+                    "count": 0
+                }
+            }
+        }
+    },
+    "event": {
+        "dataset": "couchbase.index",
+        "duration": 115000,
+        "module": "couchbase"
+    },
+    "metricset": {
+        "name": "index",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:9102",
+        "type": "couchbase"
+    }
+}

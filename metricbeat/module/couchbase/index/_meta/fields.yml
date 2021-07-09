@@ -1,0 +1,65 @@
+- name: index
+  type: group
+  description: >
+    Couchbase index metrics.
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: Name of the index as returned by Couchbase REST API in format "keyspace:index_name"
+    - name: avg_item_size
+      type: long
+    - name: avg_scan_latency.ns
+      description: Average time to serve a scan request in nanoseconds.
+      type: long
+    - name: cache.hits
+      type: long
+      description: Accesses to this index data from RAM.
+    - name: cache.misses
+      type: long
+      description: Accesses to this index data from disk.
+    - name: data_size.bytes
+      type: long
+      description: The size of indexable data that is maintained for the index or partition.
+    - name: disk_size.bytes
+      description: Total disk file size consumed by the index or partition.
+      type: long
+    - name: frag.pct
+      type: long
+      description: Percentage fragmentation of the index.
+    - name: items.count
+      type: long
+      description: The number of items currently indexed.
+    - name: memory_used.bytes
+      type: long
+      description: Amount of memory used by the Index service on this node.
+    - name: docs
+      type: group
+      fields:
+      - name: indexed
+        type: long
+        description: Number of documents indexed by the indexer since last startup.
+      - name: pending
+        type: long
+        description: Number of documents pending to be indexed.
+      - name: queued
+        type: long
+        description: Number of documents queued to be indexed.
+    - name: items_flushed.count
+      type: long
+      description: Number of items flushed from memory to disk storage.
+    - name: requests.pending.count
+      type: long
+      description: Number of requests received but not yet served by the indexer.
+    - name: requests.count
+      type: long
+      description: Number of requests served by the indexer since last startup.
+    - name: scan.timeouts.count
+      type: long
+      description: Number of requests that timed out, either waiting for snapshots or during scan in progress.
+    - name: scan.errors.count
+      type: long
+      description: Number of requests that failed due to errors other than timeout.
+    - name: resident.pct
+      type: long
+      description: Percentage of the data held in memory.

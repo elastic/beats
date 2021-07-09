@@ -47,6 +47,7 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/bucket"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/cluster"
+	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/index"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchbase/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchdb"
 	_ "github.com/elastic/beats/v7/metricbeat/module/couchdb/server"

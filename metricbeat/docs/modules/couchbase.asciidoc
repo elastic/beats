@@ -50,11 +50,15 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-couchbase-cluster,cluster>>
 
+* <<metricbeat-metricset-couchbase-index,index>>
+
 * <<metricbeat-metricset-couchbase-node,node>>
 
 include::couchbase/bucket.asciidoc[]
 
 include::couchbase/cluster.asciidoc[]
+
+include::couchbase/index.asciidoc[]
 
 include::couchbase/node.asciidoc[]
 

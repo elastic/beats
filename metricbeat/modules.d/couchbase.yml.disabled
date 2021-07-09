@@ -10,3 +10,11 @@
   hosts: ["localhost:8091"]
   #username: "user"
   #password: "secret"
+
+- module: couchbase
+  metricsets:
+    - index
+  period: 10s
+  hosts: ["localhost:9102"]
+  #username: "user"
+  #password: "secret"
