@@ -77,27 +77,27 @@ func (s *service) emitRunning(service *kubernetes.Service) {
 	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, mapping, processors)
 }
 
-func (n *service) emitStopped(service *kubernetes.Service) {
-	n.comm.Remove(string(service.GetUID()))
+func (s *service) emitStopped(service *kubernetes.Service) {
+	s.comm.Remove(string(service.GetUID()))
 }
 
 // OnAdd ensures processing of service objects that are newly created
-func (n *service) OnAdd(obj interface{}) {
-	n.logger.Debugf("Watcher Service add: %+v", obj)
-	n.emitRunning(obj.(*kubernetes.Service))
+func (s *service) OnAdd(obj interface{}) {
+	s.logger.Debugf("Watcher Service add: %+v", obj)
+	s.emitRunning(obj.(*kubernetes.Service))
 }
 
 // OnUpdate ensures processing of service objects that are updated
-func (n *service) OnUpdate(obj interface{}) {
+func (s *service) OnUpdate(obj interface{}) {
 	service := obj.(*kubernetes.Service)
 	// Once service is in terminated state, mark it for deletion
 	if service.GetObjectMeta().GetDeletionTimestamp() != nil {
-		n.logger.Debugf("Watcher Service update (terminating): %+v", obj)
-		time.AfterFunc(n.cleanupTimeout, func() { n.emitStopped(service) })
+		s.logger.Debugf("Watcher Service update (terminating): %+v", obj)
+		time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
 	} else {
-		n.logger.Debugf("Watcher Node update: %+v", obj)
-		n.emitStopped(service)
-		n.emitRunning(service)
+		s.logger.Debugf("Watcher Node update: %+v", obj)
+		s.emitStopped(service)
+		s.emitRunning(service)
 	}
 }
 
