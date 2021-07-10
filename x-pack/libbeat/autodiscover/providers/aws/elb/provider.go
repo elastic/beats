@@ -60,6 +60,7 @@ func AutodiscoverBuilder(
 		SessionToken:    config.AWSConfig.SessionToken,
 		ProfileName:     config.AWSConfig.ProfileName,
 	})
+	awsCfg = awscommon.EnrichAWSConfigWithProxy(config.AWSConfig, awsCfg)
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
@@ -85,6 +86,7 @@ func AutodiscoverBuilder(
 		if err != nil {
 			logp.Err("error loading AWS config for aws_elb autodiscover provider: %s", err)
 		}
+		awsCfg = awscommon.EnrichAWSConfigWithProxy(config.AWSConfig, awsCfg)
 		awsCfg.Region = region
 		clients = append(clients, elasticloadbalancingv2.New(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, "elasticloadbalancing", region, awsCfg)))

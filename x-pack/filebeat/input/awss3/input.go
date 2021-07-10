@@ -102,6 +102,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	if err != nil {
 		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
 	}
+	awsConfig = awscommon.EnrichAWSConfigWithProxy(in.config.AWSConfig, awsConfig)
 	awsConfig.Region = regionName
 
 	visibilityTimeout := int64(in.config.VisibilityTimeout.Seconds())
