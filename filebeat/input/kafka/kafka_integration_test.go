@@ -227,17 +227,19 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	select {
-	case event := <-events:
-		text, err := event.Fields.GetValue("message")
-		if err != nil {
-			t.Fatal(err)
+	for i := 0; i < 2; i++ {
+		select {
+		case event := <-events:
+			text, err := event.Fields.GetValue("message")
+			if err != nil {
+				t.Fatal(err)
+			}
+			msgs := []string{"{\"val\":\"val1\"}", "{\"val\":\"val2\"}"}
+			assert.Contains(t, msgs, text)
+			checkMatchingHeaders(t, event, message.headers)
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
 		}
-		msgs := []string{"{\"val\":\"val1\"}", "{\"val\":\"val2\"}"}
-		assert.Contains(t, msgs, text)
-		checkMatchingHeaders(t, event, message.headers)
-	case <-timeout:
-		t.Fatal("timeout waiting for incoming events")
 	}
 
 	// Close the done channel and make sure the beat shuts down in a reasonable
@@ -374,17 +376,19 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	input.Run()
 
 	timeout := time.After(30 * time.Second)
-	select {
-	case event := <-events:
-		text, err := event.Fields.GetValue("val")
-		if err != nil {
-			t.Fatal(err)
+	for i := 0; i < 2; i++ {
+		select {
+		case event := <-events:
+			text, err := event.Fields.GetValue("val")
+			if err != nil {
+				t.Fatal(err)
+			}
+			msgs := []string{"val1", "val2"}
+			assert.Contains(t, msgs, text)
+			checkMatchingHeaders(t, event, message.headers)
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
 		}
-		msgs := []string{"val1", "val2"}
-		assert.Contains(t, msgs, text)
-		checkMatchingHeaders(t, event, message.headers)
-	case <-timeout:
-		t.Fatal("timeout waiting for incoming events")
 	}
 
 	// Close the done channel and make sure the beat shuts down in a reasonable
