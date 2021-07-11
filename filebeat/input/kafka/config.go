@@ -53,6 +53,7 @@ type kafkaInputConfig struct {
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
+	PayloadType              string            `config:"payload_type"`
 }
 
 type kafkaFetch struct {
@@ -127,6 +128,7 @@ func defaultConfig() kafkaInputConfig {
 			MaxRetries:   4,
 			RetryBackoff: 2 * time.Second,
 		},
+		PayloadType: "string",
 	}
 }
 
@@ -142,6 +144,10 @@ func (c *kafkaInputConfig) Validate() error {
 
 	if c.Username != "" && c.Password == "" {
 		return fmt.Errorf("password must be set when username is configured")
+	}
+
+	if !stringInSlice(c.PayloadType, []string{"string", "json"}) {
+		return fmt.Errorf("invalid value for payload_type: %s, supported values are: string, json", c.PayloadType)
 	}
 	return nil
 }
@@ -271,4 +277,13 @@ func (is *isolationLevel) Unpack(value string) error {
 	}
 	*is = isolationLevel
 	return nil
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }

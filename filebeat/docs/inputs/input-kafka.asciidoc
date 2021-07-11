@@ -168,6 +168,10 @@ Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
 
+===== `payload_type`
+
+This configures how the input will handle the payload. Defaults to `"string"` which puts the payload into message field. Other option `json` will attempt to parse the payload and merge the structure with the top level of the event.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
 

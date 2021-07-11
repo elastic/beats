@@ -256,6 +256,153 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	}
 }
 
+func TestInputWithJsonPayload(t *testing.T) {
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
+	context := input.Context{
+		Done:     make(chan struct{}),
+		BeatDone: make(chan struct{}),
+	}
+
+	// Send test message to the topic for the input to read.
+	message := testMessage{
+		message: "{\"val\":\"val1\"}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":        getTestKafkaHost(),
+		"topics":       []string{testTopic},
+		"group_id":     "filebeat",
+		"wait_close":   0,
+		"payload_type": "json",
+	})
+
+	// Route input events through our capturer instead of sending through ES.
+	events := make(chan beat.Event, 100)
+	defer close(events)
+	capturer := NewEventCapturer(events)
+	defer capturer.Close()
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+		return channel.SubOutlet(capturer), nil
+	})
+
+	input, err := NewInput(config, connector, context)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Run the input and wait for finalization
+	input.Run()
+
+	timeout := time.After(30 * time.Second)
+	select {
+	case event := <-events:
+		text, err := event.Fields.GetValue("val")
+		if err != nil {
+			t.Fatal(err)
+		}
+		msgs := []string{"val1"}
+		assert.Contains(t, msgs, text)
+		checkMatchingHeaders(t, event, message.headers)
+	case <-timeout:
+		t.Fatal("timeout waiting for incoming events")
+	}
+
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	close(context.Done)
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
+	context := input.Context{
+		Done:     make(chan struct{}),
+		BeatDone: make(chan struct{}),
+	}
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":                        getTestKafkaHost(),
+		"topics":                       []string{testTopic},
+		"group_id":                     "filebeat",
+		"wait_close":                   0,
+		"expand_event_list_from_field": "records",
+		"payload_type":                 "json",
+	})
+
+	// Route input events through our capturer instead of sending through ES.
+	events := make(chan beat.Event, 100)
+	defer close(events)
+	capturer := NewEventCapturer(events)
+	defer capturer.Close()
+	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+		return channel.SubOutlet(capturer), nil
+	})
+
+	input, err := NewInput(config, connector, context)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Run the input and wait for finalization
+	input.Run()
+
+	timeout := time.After(30 * time.Second)
+	select {
+	case event := <-events:
+		text, err := event.Fields.GetValue("val")
+		if err != nil {
+			t.Fatal(err)
+		}
+		msgs := []string{"val1", "val2"}
+		assert.Contains(t, msgs, text)
+		checkMatchingHeaders(t, event, message.headers)
+	case <-timeout:
+		t.Fatal("timeout waiting for incoming events")
+	}
+
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	close(context.Done)
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
 func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
 	var msg *testMessage
 	for _, m := range msgs {
