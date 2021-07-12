@@ -16,6 +16,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
+type podData struct {
+	pod        *kubernetes.Pod
+	mapping    map[string]interface{}
+	processors []map[string]interface{}
+}
 type pod struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
@@ -38,29 +43,11 @@ func NewPodWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *log
 }
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
-	mapping := map[string]interface{}{
-		"namespace": pod.GetNamespace(),
-		"pod": map[string]interface{}{
-			"uid":    string(pod.GetUID()),
-			"name":   pod.GetName(),
-			"labels": pod.GetLabels(),
-			"ip":     pod.Status.PodIP,
-		},
-	}
-
-	processors := []map[string]interface{}{
-		{
-			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes",
-			},
-		},
-	}
-
+	data := generatePodData(pod)
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
 	// get Pod metadata (not specific to any container)
-	p.comm.AddOrUpdate(string(pod.GetUID()), PodPriority, mapping, processors)
+	p.comm.AddOrUpdate(string(data.pod.GetUID()), PodPriority, data.mapping, data.processors)
 
 	// Emit all containers in the pod
 	p.emitContainers(pod, pod.Spec.Containers, pod.Status.ContainerStatuses)
@@ -168,4 +155,28 @@ func (p *pod) OnDelete(obj interface{}) {
 	p.logger.Debugf("pod delete: %+v", obj)
 	pod := obj.(*kubernetes.Pod)
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
+}
+
+func generatePodData(pod *kubernetes.Pod) podData {
+	mapping := map[string]interface{}{
+		"namespace": pod.GetNamespace(),
+		"pod": map[string]interface{}{
+			"uid":    string(pod.GetUID()),
+			"name":   pod.GetName(),
+			"labels": pod.GetLabels(),
+			"ip":     pod.Status.PodIP,
+		},
+	}
+	return podData{
+		pod:     pod,
+		mapping: mapping,
+		processors: []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"fields": mapping,
+					"target": "kubernetes",
+				},
+			},
+		},
+	}
 }
