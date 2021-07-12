@@ -55,7 +55,7 @@ func (s *service) emitRunning(service *kubernetes.Service) {
 	}
 
 	mapping := map[string]interface{}{
-		"node": map[string]interface{}{
+		"service": map[string]interface{}{
 			"uid":         string(service.GetUID()),
 			"name":        service.GetName(),
 			"labels":      service.GetLabels(),
@@ -73,7 +73,7 @@ func (s *service) emitRunning(service *kubernetes.Service) {
 		},
 	}
 
-	// Emit the node
+	// Emit the service
 	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, mapping, processors)
 }
 
