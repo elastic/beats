@@ -243,6 +243,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Omit full index template from errors that occur while loading the template. {pull}25743[25743]
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 - Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
+- Fix `add_process_metadata` processor complaining about valid pid fields not being valid integers. {pull}26829[26829] {issue}26830[26830]
 
 *Auditbeat*
 
