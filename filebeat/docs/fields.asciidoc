@@ -150472,6 +150472,181 @@ type: long
 
 --
 
+*`suricata.eve.alert.protocols`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.attack_target`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.capec_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cwe_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.malware`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cve`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v2_base`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v2_temporal`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v3_base`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v3_temporal`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.priority`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.hostile`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.infected`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.created_at`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.alert.updated_at`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.alert.classtype`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.rule_source`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.sid`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.affected_product`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.deployment`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.former_category`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.mitre_tool_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.performance_impact`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.signature_severity`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.tag`*::
++
+--
+type: keyword
+
+--
+
 
 
 *`suricata.eve.ssh.client.proto_version`*::
@@ -151942,7 +152117,7 @@ Fields from the threatintel Filebeat module.
 The date and time when intelligence source first reported sighting this indicator.
 
 
-type: keyword
+type: date
 
 --
 

@@ -18,6 +18,7 @@
 package fileset
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -30,9 +31,9 @@ import (
 // processorCompatibility defines a processor's minimum version requirements or
 // a transformation to make it compatible.
 type processorCompatibility struct {
-	checkVersion func(esVersion *common.Version) bool                                            // Version check returns true if this check applies.
-	procType     string                                                                          // Elasticsearch Ingest Node processor type.
-	adaptConfig  func(processor map[string]interface{}, log *logp.Logger) (drop bool, err error) // Adapt the configuration to make it compatible.
+	checkVersion func(esVersion *common.Version) bool                           // Version check returns true if this check applies.
+	procType     string                                                         // Elasticsearch Ingest Node processor type.
+	adaptConfig  func(processor Processor, log *logp.Logger) (Processor, error) // Adapt the configuration to make it compatible.
 }
 
 var processorCompatibilityChecks = []processorCompatibility{
@@ -70,9 +71,9 @@ var processorCompatibilityChecks = []processorCompatibility{
 			return esVersion.LessThan(common.MustNewVersion("7.0.0")) &&
 				!esVersion.LessThan(common.MustNewVersion("6.7.0"))
 		},
-		adaptConfig: func(config map[string]interface{}, _ *logp.Logger) (bool, error) {
-			config["ecs"] = true
-			return false, nil
+		adaptConfig: func(processor Processor, _ *logp.Logger) (Processor, error) {
+			processor.Set("ecs", true)
+			return processor, nil
 		},
 	},
 	{
@@ -80,88 +81,247 @@ var processorCompatibilityChecks = []processorCompatibility{
 		checkVersion: func(esVersion *common.Version) bool {
 			return esVersion.LessThan(common.MustNewVersion("6.7.0"))
 		},
-		adaptConfig: func(config map[string]interface{}, _ *logp.Logger) (bool, error) {
-			return false, errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
+		adaptConfig: func(_ Processor, _ *logp.Logger) (Processor, error) {
+			return Processor{}, errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
 		},
 	},
+	{
+		procType: "convert",
+		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		},
+		adaptConfig: replaceConvertIP,
+	},
+	{
+		procType: "network_direction",
+		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		},
+		adaptConfig: deleteProcessor,
+	},
+	{
+		procType: "registered_domain",
+		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		},
+		adaptConfig: deleteProcessor,
+	},
+}
+
+// Processor represents and Ingest Node processor definition.
+type Processor struct {
+	name   string
+	config map[string]interface{}
+}
+
+// NewProcessor returns the representation of an Ingest Node processor
+// for the given configuration.
+func NewProcessor(raw interface{}) (p Processor, err error) {
+	rawAsMap, ok := raw.(map[string]interface{})
+	if !ok {
+		return p, fmt.Errorf("processor is not an object, got %T", raw)
+	}
+
+	var keys []string
+	for k := range rawAsMap {
+		keys = append(keys, k)
+	}
+	if len(keys) != 1 {
+		return p, fmt.Errorf("processor doesn't have exactly 1 key, got %d: %v", len(keys), keys)
+	}
+	p.name = keys[0]
+	if p.config, ok = rawAsMap[p.name].(map[string]interface{}); !ok {
+		return p, fmt.Errorf("processor config is not an object, got %T", rawAsMap[p.name])
+	}
+	return p, nil
+}
+
+// Name of the processor.
+func (p *Processor) Name() string {
+	return p.name
+}
+
+// IsNil returns a boolean indicating if the processor is the zero value.
+func (p *Processor) IsNil() bool {
+	return p.name == ""
+}
+
+// Config returns the processor configuration as a map.
+func (p *Processor) Config() map[string]interface{} {
+	return p.config
+}
+
+// GetBool returns a boolean flag from the processor's configuration.
+func (p *Processor) GetBool(key string) (value, ok bool) {
+	value, ok = p.config[key].(bool)
+	return
+}
+
+// GetString returns a string flag from the processor's configuration.
+func (p *Processor) GetString(key string) (value string, ok bool) {
+	value, ok = p.config[key].(string)
+	return
+}
+
+// GetList returns an array from the processor's configuration.
+func (p *Processor) GetList(key string) (value []interface{}, ok bool) {
+	value, ok = p.config[key].([]interface{})
+	return
+}
+
+// Set a flag in the processor's configuration.
+func (p *Processor) Set(key string, value interface{}) {
+	p.config[key] = value
+}
+
+// Get a flag from the processor's configuration.
+func (p *Processor) Get(key string) (value interface{}, ok bool) {
+	value, ok = p.config[key]
+	return
+}
+
+// Delete a configuration flag.
+func (p *Processor) Delete(key string) {
+	delete(p.config, key)
+}
+
+// ToMap returns the representation for the processor as a map.
+func (p *Processor) ToMap() map[string]interface{} {
+	return map[string]interface{}{
+		p.name: p.config,
+	}
+}
+
+// String returns a string representation for the processor.
+func (p *Processor) String() string {
+	b, err := json.Marshal(p.ToMap())
+	if err != nil {
+		return fmt.Sprintf("/* encoding error: %v */", err)
+	}
+	return string(b)
 }
 
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
 // and adapts them for version of Elasticsearch used. Adapt can mean modifying
 // processor options or removing the processor.
-func adaptPipelineForCompatibility(esVersion common.Version, pipelineID string, content map[string]interface{}, log *logp.Logger) error {
-	p, ok := content["processors"]
+func adaptPipelineForCompatibility(esVersion common.Version, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
+	log = log.With("pipeline_id", pipelineID)
+	// Adapt the main processors in the pipeline.
+	if err = adaptProcessorsForCompatibility(esVersion, content, "processors", false, log); err != nil {
+		return err
+	}
+	// Adapt any `on_failure` processors in the pipeline.
+	return adaptProcessorsForCompatibility(esVersion, content, "on_failure", true, log)
+}
+
+func adaptProcessorsForCompatibility(esVersion common.Version, content map[string]interface{}, section string, ignoreMissingsection bool, log *logp.Logger) (err error) {
+	p, ok := content[section]
 	if !ok {
-		return errors.New("'processors' is missing from the pipeline definition")
+		if ignoreMissingsection {
+			return nil
+		}
+		return fmt.Errorf("'%s' is missing from the pipeline definition", section)
 	}
 
 	processors, ok := p.([]interface{})
 	if !ok {
-		return fmt.Errorf("'processors' in pipeline '%s' expected to be a list, found %T", pipelineID, p)
+		return fmt.Errorf("'%s' expected to be a list, found %T", section, p)
 	}
 
 	var filteredProcs []interface{}
+	log = log.With("processors_section", section)
 
 nextProcessor:
 	for i, obj := range processors {
-		processor, ok := obj.(map[string]interface{})
-		if !ok {
-			return fmt.Errorf("processor at index %d is not an object, got %T", i, obj)
+		processor, err := NewProcessor(obj)
+		if err != nil {
+			return errors.Wrapf(err, "cannot parse processor in section '%s' index %d body=%+v", section, i, obj)
 		}
 
-		for _, proc := range processorCompatibilityChecks {
-			configIfc, found := processor[proc.procType]
-			if !found {
-				continue
+		// Adapt any on_failure processors for this processor.
+		prevOnFailure, _ := processor.GetList("on_failure")
+		if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "on_failure", true,
+			log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
+			return errors.Wrapf(err, "cannot parse on_failure for processor in section '%s' index %d body=%+v", section, i, obj)
+		}
+		if onFailure, _ := processor.GetList("on_failure"); len(prevOnFailure) > 0 && len(onFailure) == 0 {
+			processor.Delete("on_failure")
+		}
+
+		// Adapt inner processor in case of foreach.
+		if inner, found := processor.Get("processor"); found && processor.Name() == "foreach" {
+			processor.Set("processor", []interface{}{inner})
+			if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "processor", false,
+				log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
+				return errors.Wrapf(err, "cannot parse inner processor for foreach in section '%s' index %d", section, i)
 			}
-			config, ok := configIfc.(map[string]interface{})
-			if !ok {
-				return fmt.Errorf("processor config at index %d is not an object, got %T", i, obj)
+			newList, _ := processor.GetList("processor")
+			switch len(newList) {
+			case 0:
+				// compatibility has removed the inner processor of a foreach processor,
+				// must also remove the foreach processor itself.
+				continue nextProcessor
+			case 1:
+				// replace existing processor with possibly modified one.
+				processor.Set("processor", newList[0])
+			default:
+				// This is actually not possible as compatibility checks
+				// can't inject extra processors.
+				return fmt.Errorf("parsing inner processor for foreach in section '%s' index %d results in more than one processor, which is unsupported by foreach", section, i)
+			}
+		}
+
+		// Run compatibility checks on the processor.
+		for _, proc := range processorCompatibilityChecks {
+			if processor.Name() != proc.procType {
+				continue
 			}
 
 			if !proc.checkVersion(&esVersion) {
 				continue
 			}
 
-			drop, err := proc.adaptConfig(config, log.With("processor_type", proc.procType, "processor_index", i))
+			processor, err = proc.adaptConfig(processor, log.With("processor_type", proc.procType, "processor_index", i))
 			if err != nil {
 				return fmt.Errorf("failed to adapt %q processor at index %d: %w", proc.procType, i, err)
 			}
-			if drop {
+			if processor.IsNil() {
 				continue nextProcessor
 			}
 		}
 
-		filteredProcs = append(filteredProcs, processors[i])
+		filteredProcs = append(filteredProcs, processor.ToMap())
 	}
 
-	content["processors"] = filteredProcs
+	content[section] = filteredProcs
 	return nil
 }
 
 // deleteProcessor returns true to indicate that the processor should be deleted
 // in order to adapt the pipeline for backwards compatibility to Elasticsearch.
-func deleteProcessor(_ map[string]interface{}, _ *logp.Logger) (bool, error) { return true, nil }
+func deleteProcessor(_ Processor, _ *logp.Logger) (Processor, error) {
+	return Processor{}, nil
+}
 
 // replaceSetIgnoreEmptyValue replaces ignore_empty_value option with an if
 // statement so ES less than 7.9 will work.
-func replaceSetIgnoreEmptyValue(config map[string]interface{}, log *logp.Logger) (bool, error) {
-	_, ok := config["ignore_empty_value"].(bool)
+func replaceSetIgnoreEmptyValue(processor Processor, log *logp.Logger) (Processor, error) {
+	_, ok := processor.GetBool("ignore_empty_value")
 	if !ok {
-		return false, nil
+		return processor, nil
 	}
 
 	log.Debug("Removing unsupported 'ignore_empty_value' from set processor.")
-	delete(config, "ignore_empty_value")
+	processor.Delete("ignore_empty_value")
 
-	_, ok = config["if"].(string)
+	_, ok = processor.GetString("if")
 	if ok {
 		// assume if check is sufficient
-		return false, nil
+		return processor, nil
 	}
-	val, ok := config["value"].(string)
+	val, ok := processor.GetString("value")
 	if !ok {
-		return false, nil
+		return processor, nil
 	}
 
 	newIf := strings.TrimLeft(val, "{ ")
@@ -169,39 +329,39 @@ func replaceSetIgnoreEmptyValue(config map[string]interface{}, log *logp.Logger)
 	newIf = strings.ReplaceAll(newIf, ".", "?.")
 	newIf = "ctx?." + newIf + " != null"
 
-	log.Debug("Adding if %s to replace 'ignore_empty_value' in set processor.", newIf)
-	config["if"] = newIf
-	return false, nil
+	log.Debugf("Adding if %s to replace 'ignore_empty_value' in set processor.", newIf)
+	processor.Set("if", newIf)
+	return processor, nil
 }
 
 // replaceAppendAllowDuplicates replaces allow_duplicates option with an if statement
 // so ES less than 7.10 will work.
-func replaceAppendAllowDuplicates(config map[string]interface{}, log *logp.Logger) (bool, error) {
-	allow, ok := config["allow_duplicates"].(bool)
+func replaceAppendAllowDuplicates(processor Processor, log *logp.Logger) (Processor, error) {
+	allow, ok := processor.GetBool("allow_duplicates")
 	if !ok {
-		return false, nil
+		return processor, nil
 	}
 
 	log.Debug("Removing unsupported 'allow_duplicates' from append processor.")
-	delete(config, "allow_duplicates")
+	processor.Delete("allow_duplicates")
 
 	if allow {
 		// It was set to true, nothing else to do after removing the option.
-		return false, nil
+		return processor, nil
 	}
 
-	currIf, _ := config["if"].(string)
+	currIf, _ := processor.GetString("if")
 	if strings.Contains(strings.ToLower(currIf), "contains") {
 		// If it has a contains statement, we assume it is checking for duplicates already.
-		return false, nil
+		return processor, nil
 	}
-	field, ok := config["field"].(string)
+	field, ok := processor.GetString("field")
 	if !ok {
-		return false, nil
+		return processor, nil
 	}
-	val, ok := config["value"].(string)
+	val, ok := processor.GetString("value")
 	if !ok {
-		return false, nil
+		return processor, nil
 	}
 
 	field = strings.ReplaceAll(field, ".", "?.")
@@ -217,8 +377,34 @@ func replaceAppendAllowDuplicates(config map[string]interface{}, log *logp.Logge
 
 	newIf := fmt.Sprintf("%s && ((ctx?.%s instanceof List && !ctx?.%s.contains(ctx?.%s)) || ctx?.%s != ctx?.%s)", currIf, field, field, val, field, val)
 
-	log.Debug("Adding if %s to replace 'allow_duplicates: false' in append processor.", newIf)
-	config["if"] = newIf
+	log.Debugf("Adding if %s to replace 'allow_duplicates: false' in append processor.", newIf)
+	processor.Set("if", newIf)
 
-	return false, nil
+	return processor, nil
+}
+
+// replaceConvertIP replaces convert processors with type: ip with a grok expression that uses
+// the IP pattern.
+func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) {
+	if wantedType, _ := processor.GetString("type"); wantedType != "ip" {
+		return processor, nil
+	}
+	log.Debug("processor input=", processor.String())
+	processor.Delete("type")
+	var srcIf, dstIf interface{}
+	var found bool
+	if srcIf, found = processor.Get("field"); !found {
+		return Processor{}, errors.New("field option is required for convert processor")
+	}
+	if dstIf, found = processor.Get("target_field"); found {
+		processor.Delete("target_field")
+	} else {
+		dstIf = srcIf
+	}
+	processor.Set("patterns", []string{
+		fmt.Sprintf("^%%{IP:%s}$", dstIf),
+	})
+	processor.name = "grok"
+	log.Debug("processor output=", processor.String())
+	return processor, nil
 }

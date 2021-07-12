@@ -26,7 +26,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    timeout(time: 4, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -283,7 +283,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  withNode(labels: args.label, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -298,9 +298,9 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+    withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
-        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+        withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.11.1", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
             withBeatsEnv(archive: false, withModule: false) {
               retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
@@ -353,7 +353,11 @@ def packagingLinux(Map args = [:]) {
                 'linux/amd64',
                 'linux/386',
                 'linux/arm64',
-                'linux/armv7',
+                // armv7 packaging isn't working, and we don't currently
+                // need it for release. Do not re-enable it without
+                // confirming it is fixed, you will break the packaging
+                // pipeline!
+                //'linux/armv7',
                 // The platforms above are disabled temporarly as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
                 //'linux/ppc64le',
@@ -551,14 +555,23 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  def enableRetry = args.get('enableRetry', false)
+  withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
-          cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          if (enableRetry) {
+            // Retry the same command to bypass any kind of flakiness.
+            // Downside: genuine failures will be repeated.
+            retry(3) {
+              cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+            }
+          } else {
+            cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
+          }
         }
         // TODO:
         // Packaging should happen only after the e2e?
@@ -586,18 +599,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
+  def path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
   if(isUnix()) {
-    if (isArm() && is64arm()) {
-      // TODO: nodeOS() should support ARM
-      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.linux.arm64"
-      gox_flags = '-arch arm'
-    } else {
-      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
-      gox_flags = '-arch amd64'
-    }
-    path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
+    gox_flags = (isArm() && is64arm()) ? '-arch arm' : '-arch amd64'
+    path = "${env.WORKSPACE}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
     testResults = '**/build/TEST*.xml'
@@ -605,12 +611,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
   } else {
     // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
     def mingwArch = is32() ? '32' : '64'
-    def goArch = is32() ? '386' : 'amd64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     userProfile="${env.WORKSPACE}"
-    goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
@@ -629,7 +633,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
   withEnv([
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
     "GOX_FLAGS=${gox_flags}",
     "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
@@ -646,28 +649,32 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
     }
-    dir("${env.BASE_DIR}") {
-      installTools(args)
-      // Skip to upload the generated files by default.
-      def upload = false
-      try {
-        // Add more stability when dependencies are not accessible temporarily
-        // See https://github.com/elastic/beats/issues/21609
-        // retry/try/catch approach reports errors, let's avoid it to keep the
-        // notifications cleaner.
-        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
-          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+    withMageEnv(version: "${env.GO_VERSION}"){
+      dir("${env.BASE_DIR}") {
+        // Go/Mage installation is not anymore configured with env variables and installed
+        // with installTools but delegated to the parent closure withMageEnv.
+        installTools(args)
+        // Skip to upload the generated files by default.
+        def upload = false
+        try {
+          // Add more stability when dependencies are not accessible temporarily
+          // See https://github.com/elastic/beats/issues/21609
+          // retry/try/catch approach reports errors, let's avoid it to keep the
+          // notifications cleaner.
+          if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+            cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+          }
+          body()
+        } catch(err) {
+          // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+          upload = true
+          error("Error '${err.toString()}'")
+        } finally {
+          if (archive) {
+            archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          }
+          tearDown()
         }
-        body()
-      } catch(err) {
-        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
-        upload = true
-        error("Error '${err.toString()}'")
-      } finally {
-        if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
-        }
-        tearDown()
       }
     }
   }
@@ -697,12 +704,16 @@ def tearDown() {
 */
 def fixPermissions(location) {
   if(isUnix()) {
-    sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
-      set +x
-      echo "Cleaning up ${location}"
-      source ./dev-tools/common.bash
-      docker_setup
-      script/fix_permissions.sh ${location}""", returnStatus: true)
+    catchError(message: 'There were some failures when fixing the permissions', buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+      timeout(5) {
+        sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+          set +x
+          echo "Cleaning up ${location}"
+          source ./dev-tools/common.bash
+          docker_setup
+          script/fix_permissions.sh ${location}""", returnStatus: true)
+      }
+    }
   }
 }
 
@@ -713,7 +724,7 @@ def fixPermissions(location) {
 def installTools(args) {
   def stepHeader = "${args.id?.trim() ? args.id : env.STAGE_NAME}"
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Python/Docker/Terraform", script: '.ci/scripts/install-tools.sh') }
     // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
     // See https://github.com/elastic/beats/issues/17787.
     sh(label: 'check git config', script: '''
@@ -722,7 +733,7 @@ def installTools(args) {
         git config --global user.name "beatsmachine"
       fi''')
   } else {
-    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Python", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
@@ -744,6 +755,9 @@ def getCommonModuleInTheChangeSet(String directory) {
   def exclude = "^(${directoryExclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
   dir("${env.BASE_DIR}") {
     module = getGitMatchingGroup(pattern: pattern, exclude: exclude)
+    if(!fileExists("${directory}/module/${module}")) {
+      module = ''
+    }
   }
   return module
 }
@@ -1017,11 +1031,35 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      //
+      // What's the retry policy for fighting the flakiness:
+      //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
+      //   2) All the remaining stages will retry the command within the same worker/workspace if any failure
+      //
+      // NOTE: stage: lint uses target function while cloud and k8sTest use a different function
+      //
+      def enableRetry = (args.content.get('stage', 'enabled').toLowerCase().equals('lint') ||
+                         args?.content?.containsKey('packaging-arm') ||
+                         args?.content?.containsKey('packaging-linux')) ? false : true
       if(args?.content?.containsKey('make')) {
-        steps.target(context: args.context, command: args.content.make, directory: args.project, label: args.label, withModule: withModule, isMage: false, id: args.id)
+        steps.target(context: args.context,
+                     command: args.content.make,
+                     directory: args.project,
+                     label: args.label,
+                     withModule: withModule,
+                     isMage: false,
+                     id: args.id,
+                     enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('mage')) {
-        steps.target(context: args.context, command: args.content.mage, directory: args.project, label: args.label, withModule: withModule, isMage: true, id: args.id)
+        steps.target(context: args.context,
+                     command: args.content.mage,
+                     directory: args.project,
+                     label: args.label,
+                     withModule: withModule,
+                     isMage: true,
+                     id: args.id,
+                     enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('packaging-arm')) {
         steps.packagingArm(context: args.context,
@@ -1032,7 +1070,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                            id: args.id,
                            e2e: args.content.get('e2e'),
                            package: true,
-                           dockerArch: 'arm64')
+                           dockerArch: 'arm64',
+                           enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('packaging-linux')) {
         steps.packagingLinux(context: args.context,
@@ -1043,7 +1082,8 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                              id: args.id,
                              e2e: args.content.get('e2e'),
                              package: true,
-                             dockerArch: 'amd64')
+                             dockerArch: 'amd64',
+                             enableRetry: enableRetry)
       }
       if(args?.content?.containsKey('k8sTest')) {
         steps.k8sTest(context: args.context, versions: args.content.k8sTest.split(','), label: args.label, id: args.id)

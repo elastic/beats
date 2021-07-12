@@ -84,7 +84,7 @@ processors:
     if: ctx?.threatintel?.indicator?.type == 'url'
 - set:
     field: threatintel.indicator.url.full
-    copy_from: threatintel.indicator.url.original
+    value: '{{{threatintel.indicator.url.original}}}'
     ignore_empty_value: true
 - rename:
     field: _tmp.threatvalue
@@ -131,6 +131,7 @@ processors:
     field:
     - threatintel.anomali.created
     - message
+    - _tmp
     ignore_missing: true
 on_failure:
 - set:

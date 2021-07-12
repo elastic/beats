@@ -87,7 +87,7 @@ processors:
     if: ctx?.threatintel?.indicator?.type == 'url'
 - set:
     field: threatintel.indicator.url.full
-    copy_from: threatintel.indicator.url.original
+    value: '{{{threatintel.indicator.url.original}}}'
     ignore_empty_value: true
     if: "ctx?.threatintel?.otx?.type == 'URL'"
 
