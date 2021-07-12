@@ -15,7 +15,7 @@ pull_request_rules:
   - name: backport patches to 7.x branch
     conditions:
       - merged
-      - label=backport-v7.14.0
+      - label=backport-v7.15.0
     actions:
       backport:
         assignees:
@@ -103,6 +103,51 @@ pull_request_rules:
       - and:
         - label=automation
         - head~=^update-go-version
-        - files~=^.go-version$
+        - files~=^\.go-version$
+    actions:
+      delete_head_branch:
+  - name: backport patches to 7.14 branch
+    conditions:
+      - merged
+      - label=backport-v7.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.14"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: automatic approval for mergify pull requests with changes in bump-rules
+    conditions:
+      - author=mergify[bot]
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
+    conditions:
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+    actions:
+      merge:
+        method: squash
+        strict: smart+fasttrack
+  - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^add-backport-next.*
+        - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:

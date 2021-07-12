@@ -39,6 +39,14 @@ stages:
         mage: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
+    module-compat-7.11:
+      mage: >-                 ## Run module integration tests under ES 7.11 to ensure ingest pipeline compatibility.
+        STACK_ENVIRONMENT=7.11
+        TESTING_FILEBEAT_SKIP_DIFF=1
+        PYTEST_ADDOPTS='-k test_modules'
+        mage pythonIntegTest
+      withModule: true
+      stage: mandatory
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

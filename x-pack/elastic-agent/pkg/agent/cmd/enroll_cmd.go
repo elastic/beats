@@ -200,6 +200,15 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 	// will communicate to the internal fleet server on localhost only.
 	// Connection setup should disable proxies in that case.
 	localFleetServer := c.options.FleetServer.ConnStr != ""
+	if localFleetServer {
+		token, err := c.fleetServerBootstrap(ctx)
+		if err != nil {
+			return err
+		}
+		if c.options.EnrollAPIKey == "" && token != "" {
+			c.options.EnrollAPIKey = token
+		}
+	}
 
 	c.remoteConfig, err = c.options.remoteConfig()
 	if err != nil {
@@ -208,19 +217,10 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
-
 	if localFleetServer {
 		// Ensure that the agent does not use a proxy configuration
 		// when connecting to the local fleet server.
 		c.remoteConfig.Transport.Proxy.Disable = true
-
-		token, err := c.fleetServerBootstrap(ctx)
-		if err != nil {
-			return err
-		}
-		if c.options.EnrollAPIKey == "" && token != "" {
-			c.options.EnrollAPIKey = token
-		}
 	}
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
@@ -402,6 +402,7 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
+	c.log.Infof("Starting enrollment to URL: %s", c.client.URI())
 	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
@@ -419,7 +420,7 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[
 			break
 		}
 		backExp.Wait()
-		c.log.Info("Retrying to enroll...")
+		c.log.Infof("Retrying enrollment to URL: %s", c.client.URI())
 		err = c.enroll(ctx, persistentConfig)
 	}
 
