@@ -23,6 +23,12 @@ type service struct {
 	comm           composable.DynamicProviderComm
 }
 
+type serviceData struct {
+	service    *kubernetes.Service
+	mapping    map[string]interface{}
+	processors []map[string]interface{}
+}
+
 // NewServiceWatcher creates a watcher that can discover and process service objects
 func NewServiceWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
@@ -39,42 +45,10 @@ func NewServiceWatcher(comm composable.DynamicProviderComm, cfg *Config, logger 
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
-	host := service.Spec.ClusterIP
-
-	// If a service doesn't have an IP then dont monitor it
-	if host == "" {
-		return
-	}
-
-	//TODO: add metadata here too ie -> meta := s.metagen.Generate(service)
-
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
-	for k, v := range service.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
-	}
-
-	mapping := map[string]interface{}{
-		"service": map[string]interface{}{
-			"uid":         string(service.GetUID()),
-			"name":        service.GetName(),
-			"labels":      service.GetLabels(),
-			"annotations": annotations,
-			"ip":          host,
-		},
-	}
-
-	processors := []map[string]interface{}{
-		{
-			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes",
-			},
-		},
-	}
+	data := generateServiceData(service)
 
 	// Emit the service
-	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, mapping, processors)
+	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, data.mapping, data.processors)
 }
 
 func (s *service) emitStopped(service *kubernetes.Service) {
@@ -106,4 +80,45 @@ func (s *service) OnDelete(obj interface{}) {
 	s.logger.Debugf("Watcher Service delete: %+v", obj)
 	service := obj.(*kubernetes.Service)
 	time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
+}
+
+func generateServiceData(service *kubernetes.Service) *serviceData {
+	host := service.Spec.ClusterIP
+
+	// If a service doesn't have an IP then dont monitor it
+	if host == "" {
+		return nil
+	}
+
+	//TODO: add metadata here too ie -> meta := s.metagen.Generate(service)
+
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range service.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+
+	mapping := map[string]interface{}{
+		"service": map[string]interface{}{
+			"uid":         string(service.GetUID()),
+			"name":        service.GetName(),
+			"labels":      service.GetLabels(),
+			"annotations": annotations,
+			"ip":          host,
+		},
+	}
+
+	processors := []map[string]interface{}{
+		{
+			"add_fields": map[string]interface{}{
+				"fields": mapping,
+				"target": "kubernetes",
+			},
+		},
+	}
+	return &serviceData{
+		service:    service,
+		mapping:    mapping,
+		processors: processors,
+	}
 }

@@ -18,12 +18,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 )
 
-func TestGenerateNodeData(t *testing.T) {
+func TestGenerateServiceData(t *testing.T) {
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
-	node := &kubernetes.Node{
-		ObjectMeta: kubernetes.ObjectMeta{
-			Name: "testnode",
-			UID:  types.UID(uid),
+	service := &kubernetes.Service{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testsvc",
+			UID:       types.UID(uid),
+			Namespace: "testns",
 			Labels: map[string]string{
 				"foo": "bar",
 			},
@@ -32,26 +33,29 @@ func TestGenerateNodeData(t *testing.T) {
 			},
 		},
 		TypeMeta: metav1.TypeMeta{
-			Kind:       "Node",
+			Kind:       "Service",
 			APIVersion: "v1",
 		},
-		Status: v1.NodeStatus{
-			Conditions: []v1.NodeCondition{{Type: v1.NodeReady, Status: v1.ConditionTrue}},
-			Addresses:  []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+		Spec: v1.ServiceSpec{
+			ClusterIP: "1.2.3.4",
+			Selector: map[string]string{
+				"app":   "istiod",
+				"istio": "pilot",
+			},
 		},
 	}
 
-	data := generateNodeData(node)
+	data := generateServiceData(service)
 
 	mapping := map[string]interface{}{
-		"node": map[string]interface{}{
-			"uid":    string(node.GetUID()),
-			"name":   node.GetName(),
-			"labels": node.GetLabels(),
+		"service": map[string]interface{}{
+			"uid":    string(service.GetUID()),
+			"name":   service.GetName(),
+			"labels": service.GetLabels(),
 			"annotations": common.MapStr{
 				"baz": "ban",
 			},
-			"ip": "node1",
+			"ip": service.Spec.ClusterIP,
 		},
 	}
 
@@ -64,7 +68,7 @@ func TestGenerateNodeData(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, node, data.node)
+	assert.Equal(t, service, data.service)
 	assert.Equal(t, mapping, data.mapping)
 	assert.Equal(t, processors, data.processors)
 }

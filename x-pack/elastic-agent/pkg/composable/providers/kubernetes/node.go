@@ -19,15 +19,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
-type nodeData struct {
-	node       *kubernetes.Node
-	mapping    map[string]interface{}
-	processors []map[string]interface{}
-}
 type node struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
+}
+
+type nodeData struct {
+	node       *kubernetes.Node
+	mapping    map[string]interface{}
+	processors []map[string]interface{}
 }
 
 // NewNodeWatcher creates a watcher that can discover and process node objects
@@ -47,7 +48,7 @@ func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *lo
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
-	data := generateData(node)
+	data := generateNodeData(node)
 	if data == nil {
 		return
 	}
@@ -154,7 +155,7 @@ func isNodeReady(node *kubernetes.Node) bool {
 	return false
 }
 
-func generateData(node *kubernetes.Node) *nodeData {
+func generateNodeData(node *kubernetes.Node) *nodeData {
 	host := getAddress(node)
 
 	// If a node doesn't have an IP then dont monitor it

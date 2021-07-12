@@ -16,15 +16,16 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
-type podData struct {
-	pod        *kubernetes.Pod
-	mapping    map[string]interface{}
-	processors []map[string]interface{}
-}
 type pod struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
+}
+
+type podData struct {
+	pod        *kubernetes.Pod
+	mapping    map[string]interface{}
+	processors []map[string]interface{}
 }
 
 // NewPodWatcher creates a watcher that can discover and process pod objects
