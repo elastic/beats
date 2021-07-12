@@ -181,7 +181,7 @@ func _EvtNextEventMetadata(enumerator EvtHandle, flags uint32) (handle EvtHandle
 	return
 }
 
-func _EvtNextPublisherId(enumerator EvtHandle, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) {
+func _EvtNextPublisherId(enumerator EvtHandle, bufferSize uint32, buffer *uint16, bufferUsed *uint32) (err error) {
 	r1, _, e1 := syscall.Syscall6(procEvtNextPublisherId.Addr(), 4, uintptr(enumerator), uintptr(bufferSize), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(bufferUsed)), 0, 0)
 	if r1 == 0 {
 		err = errnoErr(e1)

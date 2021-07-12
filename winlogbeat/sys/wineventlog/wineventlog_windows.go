@@ -431,7 +431,7 @@ func Publishers() ([]string, error) {
 	var (
 		publishers []string
 		bufferUsed uint32
-		buffer     = make([]byte, 1024)
+		buffer     = make([]uint16, 1024)
 	)
 
 loop:
@@ -441,18 +441,14 @@ loop:
 			case ERROR_NO_MORE_ITEMS:
 				break loop
 			case ERROR_INSUFFICIENT_BUFFER:
-				buffer = make([]byte, 2*bufferUsed)
+				buffer = make([]uint16, bufferUsed)
 				continue loop
 			default:
 				return nil, fmt.Errorf("failed in EvtNextPublisherId: %w", err)
 			}
 		}
 
-		provider, err := sys.UTF16BytesToString(buffer)
-		if err != nil {
-			return nil, err
-		}
-
+		provider := windows.UTF16ToString(buffer)
 		publishers = append(publishers, provider)
 	}
 

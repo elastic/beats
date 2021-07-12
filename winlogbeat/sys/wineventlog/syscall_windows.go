@@ -662,4 +662,4 @@ func EvtClearLog(session EvtHandle, channelPath string, targetFilePath string) e
 //sys   _EvtGetObjectArrayProperty(objectArray EvtObjectArrayPropertyHandle, propertyID EvtPublisherMetadataPropertyID, arrayIndex uint32, flags uint32, bufferSize uint32, evtVariant *EvtVariant, bufferUsed *uint32) (err error) = wevtapi.EvtGetObjectArrayProperty
 //sys   _EvtGetObjectArraySize(objectArray EvtObjectArrayPropertyHandle, arraySize *uint32) (err error) = wevtapi.EvtGetObjectArraySize
 //sys   _EvtOpenPublisherEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenPublisherEnum
-//sys   _EvtNextPublisherId(enumerator EvtHandle, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtNextPublisherId
+//sys   _EvtNextPublisherId(enumerator EvtHandle, bufferSize uint32, buffer *uint16, bufferUsed *uint32) (err error) = wevtapi.EvtNextPublisherId
