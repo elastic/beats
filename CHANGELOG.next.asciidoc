@@ -405,6 +405,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Change `event.code` and `winlog.event_id` from int to keyword. {pull}25176[25176]
 - Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
+- Fix an issue with message template caching in the `wineventlog-experimental` API implementation. {pull}26826[26826]
 
 *Functionbeat*
 
