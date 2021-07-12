@@ -1910,8 +1910,13 @@ var security = (function () {
         if (targetUserId) {
             if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
             else evt.Put("user.id", targetUserId);
+        } else {
+            targetUserId = evt.Get("winlog.event_data.TargetSid");
+            if (targetUserId) {
+                if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
+                else evt.Put("user.id", targetUserId);
+            }
         }
-
         var targetUserName = evt.Get("winlog.event_data.TargetUserName");
         if (targetUserName) {
             if (/.@*/.test(targetUserName)) {
@@ -1930,6 +1935,49 @@ var security = (function () {
         }
     }
 
+    var copyTargetUserToEffective = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetUserSid", to: "user.effective.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.effective.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.effective.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.effective.name', user);
+                }
+                evt.AppendTo('related.user', user);
+            }
+        })
+        .Build();
+
+    var copyTargetUserToTarget = new processor.Chain()
+        .Convert({
+            fields: [
+                {from: "winlog.event_data.TargetSid", to: "user.target.id"},
+                {from: "winlog.event_data.TargetUserName", to: "user.target.name"},
+                {from: "winlog.event_data.TargetDomainName", to: "user.target.domain"},
+            ],
+            ignore_missing: true,
+        })
+        .Add(function(evt) {
+            var user = evt.Get("winlog.event_data.TargetUserName");
+            if (user) {
+                if (/.@*/.test(user)) {
+                    user = user.split('@')[0];
+                    evt.Put('user.target.name', user);
+                }
+                evt.AppendTo('related.user', user);
+            }
+        })
+        .Build();
+
+
     var copyMemberToUser = function(evt) {
         var member = evt.Get("winlog.event_data.MemberName");
         if (!member) {
@@ -1940,6 +1988,11 @@ var security = (function () {
 
         evt.AppendTo("related.user", userName);
         evt.Put("user.target.name", userName);
+
+        var domainName = member.split(',')[3];
+        if (domainName) {
+            evt.Put("user.target.domain", domainName.replace('DC=', '').replace('dc=', ''));
+        }
     }
 
     var copyTargetUserToGroup = new processor.Chain()
@@ -2130,10 +2183,11 @@ var security = (function () {
 
     // Handles both 4648
     var event4648 = new processor.Chain()
-        .Add(copyTargetUser)
+        .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
+        .Add(copyTargetUserToEffective)
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.SubjectUserName");
             if (user) {
@@ -2173,16 +2227,8 @@ var security = (function () {
         .Add(copySubjectUser)
         .Add(copySubjectUserLogonId)
         .Add(renameNewProcessFields)
+        .Add(copyTargetUserToEffective)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            if (user) {
-                var res = /^-$/.test(user);
-                    if (!res) {
-                        evt.AppendTo('related.user', user);
-                    }
-            }
-        })
         .Build();
 
     var event4689 = new processor.Chain()
@@ -2206,10 +2252,7 @@ var security = (function () {
         .Add(renameCommonAuthFields)
         .Add(addUACDescription)
         .Add(addEventFields)
-        .Add(function(evt) {
-            var user = evt.Get("winlog.event_data.TargetUserName");
-            evt.AppendTo('related.user', user);
-        })
+        .Add(copyTargetUserToTarget)
         .Build();
 
     var userRenamed = new processor.Chain()
@@ -2221,6 +2264,13 @@ var security = (function () {
             evt.AppendTo('related.user', userNew);
             var userOld = evt.Get("winlog.event_data.OldTargetUserName");
             evt.AppendTo('related.user', userOld);
+            if (userOld) {
+                evt.Put('user.target.name', userOld);
+                evt.Put('user.target.domain', domain);
+            }
+            if (userNew) {
+                evt.Put('user.changes.name', userNew);
+            }
         })
         .Build();
 
@@ -2359,6 +2409,7 @@ var security = (function () {
         .Add(copySubjectUserLogonId)
         .Add(renameCommonAuthFields)
         .Add(addEventFields)
+        .Add(copyTargetUserToTarget)
         .Add(function(evt) {
             var oldSd = evt.Get("winlog.event_data.OldSd");
             var newSd = evt.Get("winlog.event_data.NewSd");
