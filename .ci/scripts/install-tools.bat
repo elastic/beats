@@ -9,53 +9,6 @@ where /q curl
 IF ERRORLEVEL 1 (
  choco install curl -y --no-progress --skipdownloadcache
 )
-<<<<<<< HEAD
-mkdir %WORKSPACE%\bin
-
-IF EXIST "%PROGRAMFILES(X86)%" (
-    REM Force the gvm installation.
-    SET GVM_BIN=gvm.exe
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe
-    IF ERRORLEVEL 1 (
-        REM gvm installation has failed.
-        del bin\gvm.exe /s /f /q
-        exit /b 1
-    )
-) ELSE (
-    REM Windows 7 workers got a broken gvm installation.
-    curl -L -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-386.exe
-    IF ERRORLEVEL 1 (
-        REM gvm installation has failed.
-        del bin\gvm.exe /s /f /q
-        exit /b 1
-    )
-)
-
-SET GVM_BIN=gvm.exe
-WHERE /q %GVM_BIN%
-%GVM_BIN% version
-
-REM Install the given go version
-%GVM_BIN% --debug install %GO_VERSION%
-
-REM Configure the given go version
-FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
-
-go env
-IF ERRORLEVEL 1 (
-    REM go is not configured correctly.
-    rmdir %WORKSPACE%\.gvm /s /q
-    exit /b 1
-)
-
-go get github.com/magefile/mage
-where mage
-mage -version
-IF ERRORLEVEL 1 (
-    exit /b 1
-)
-=======
->>>>>>> 6cf5639dc (CI: use withMageEnv (#26723))
 
 REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
 SET PREVIOUS_USERPROFILE=%USERPROFILE%
