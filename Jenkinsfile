@@ -678,7 +678,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
         error("Error '${err.toString()}'")
       } finally {
         if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          archiveTestOutput(directory: directory, testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
         }
         tearDown()
       }
@@ -773,6 +773,8 @@ def getCommonModuleInTheChangeSet(String directory) {
 * to bypass some issues when working with big repositories.
 */
 def archiveTestOutput(Map args = [:]) {
+  def directory = args.get('directory', '')
+
   catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
     if (isUnix()) {
       fixPermissions("${WORKSPACE}")
@@ -796,13 +798,20 @@ def archiveTestOutput(Map args = [:]) {
     }
     if (args.upload) {
       catchError(buildResult: 'SUCCESS', message: 'Failed to archive the build test results', stageResult: 'SUCCESS') {
-        def folder = cmd(label: 'Find system-tests', returnStdout: true, script: 'python .ci/scripts/search_system_tests.py').trim()
-        log(level: 'INFO', text: "system-tests='${folder}'. If no empty then let's create a tarball")
-        if (folder.trim()) {
-          // TODO: nodeOS() should support ARM
-          def os_suffix = isArm() ? 'linux' : nodeOS()
-          def name = folder.replaceAll('/', '-').replaceAll('\\\\', '-').replaceAll('build', '').replaceAll('^-', '') + '-' + os_suffix
-          tarAndUploadArtifacts(file: "${name}.tgz", location: folder)
+        withMageEnv(version: "${env.GO_VERSION}"){
+          dir(directory){
+            cmd(label: "Archive system tests files", script: 'mage packageSystemTests')
+          }
+        }
+        def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
+        dir("${BASE_DIR}"){
+          cmd(label: "List files to upload", script: "ls -l ${fileName}")
+          googleStorageUploadExt(
+            bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
+            credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+            pattern: "${fileName}",
+            sharedPublicly: true
+          )
         }
       }
     }
