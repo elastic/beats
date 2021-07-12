@@ -19,6 +19,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
 )
 
+type nodeData struct {
+	node       *kubernetes.Node
+	mapping    map[string]interface{}
+	processors []map[string]interface{}
+}
 type node struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
@@ -42,47 +47,13 @@ func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *lo
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
-	host := getAddress(node)
-
-	// If a node doesn't have an IP then dont monitor it
-	if host == "" {
+	data := generateData(node)
+	if data == nil {
 		return
-	}
-
-	// If the node is not in ready state then dont monitor it
-	if !isNodeReady(node) {
-		return
-	}
-
-	//TODO: add metadata here too ie -> meta := n.metagen.Generate(node)
-
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
-	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
-	}
-
-	mapping := map[string]interface{}{
-		"node": map[string]interface{}{
-			"uid":         string(node.GetUID()),
-			"name":        node.GetName(),
-			"labels":      node.GetLabels(),
-			"annotations": annotations,
-			"ip":          host,
-		},
-	}
-
-	processors := []map[string]interface{}{
-		{
-			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes",
-			},
-		},
 	}
 
 	// Emit the node
-	n.comm.AddOrUpdate(string(node.GetUID()), NodePriority, mapping, processors)
+	n.comm.AddOrUpdate(string(node.GetUID()), NodePriority, data.mapping, data.processors)
 }
 
 func (n *node) emitStopped(node *kubernetes.Node) {
@@ -181,4 +152,50 @@ func isNodeReady(node *kubernetes.Node) bool {
 		}
 	}
 	return false
+}
+
+func generateData(node *kubernetes.Node) *nodeData {
+	host := getAddress(node)
+
+	// If a node doesn't have an IP then dont monitor it
+	if host == "" {
+		return nil
+	}
+
+	// If the node is not in ready state then dont monitor it
+	if !isNodeReady(node) {
+		return nil
+	}
+
+	//TODO: add metadata here too ie -> meta := n.metagen.Generate(node)
+
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range node.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+
+	mapping := map[string]interface{}{
+		"node": map[string]interface{}{
+			"uid":         string(node.GetUID()),
+			"name":        node.GetName(),
+			"labels":      node.GetLabels(),
+			"annotations": annotations,
+			"ip":          host,
+		},
+	}
+
+	processors := []map[string]interface{}{
+		{
+			"add_fields": map[string]interface{}{
+				"fields": mapping,
+				"target": "kubernetes",
+			},
+		},
+	}
+	return &nodeData{
+		node:       node,
+		mapping:    mapping,
+		processors: processors,
+	}
 }
