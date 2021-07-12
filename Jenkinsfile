@@ -599,18 +599,11 @@ def withBeatsEnv(Map args = [:], Closure body) {
   def withModule = args.get('withModule', false)
   def directory = args.get('directory', '')
 
-  def goRoot, path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
+  def path, magefile, pythonEnv, testResults, artifacts, gox_flags, userProfile
 
   if(isUnix()) {
-    if (isArm() && is64arm()) {
-      // TODO: nodeOS() should support ARM
-      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.linux.arm64"
-      gox_flags = '-arch arm'
-    } else {
-      goRoot = "${env.WORKSPACE}/.gvm/versions/go${GO_VERSION}.${nodeOS()}.amd64"
-      gox_flags = '-arch amd64'
-    }
-    path = "${env.WORKSPACE}/bin:${goRoot}/bin:${env.PATH}"
+    gox_flags = (isArm() && is64arm()) ? '-arch arm' : '-arch amd64'
+    path = "${env.WORKSPACE}/bin:${env.PATH}"
     magefile = "${WORKSPACE}/.magefile"
     pythonEnv = "${WORKSPACE}/python-env"
     testResults = '**/build/TEST*.xml'
@@ -618,12 +611,10 @@ def withBeatsEnv(Map args = [:], Closure body) {
   } else {
     // NOTE: to support Windows 7 32 bits the arch in the mingw and go context paths is required.
     def mingwArch = is32() ? '32' : '64'
-    def goArch = is32() ? '386' : 'amd64'
     def chocoPath = 'C:\\ProgramData\\chocolatey\\bin'
     def chocoPython3Path = 'C:\\Python38;C:\\Python38\\Scripts'
     userProfile="${env.WORKSPACE}"
-    goRoot = "${userProfile}\\.gvm\\versions\\go${GO_VERSION}.windows.${goArch}"
-    path = "${env.WORKSPACE}\\bin;${goRoot}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
+    path = "${env.WORKSPACE}\\bin;${chocoPath};${chocoPython3Path};C:\\tools\\mingw${mingwArch}\\bin;${env.PATH}"
     magefile = "${env.WORKSPACE}\\.magefile"
     testResults = "**\\build\\TEST*.xml"
     artifacts = "**\\build\\TEST*.out"
@@ -642,7 +633,6 @@ def withBeatsEnv(Map args = [:], Closure body) {
   withEnv([
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
-    "GOROOT=${goRoot}",
     "GOX_FLAGS=${gox_flags}",
     "HOME=${env.WORKSPACE}",
     "MAGEFILE_CACHE=${magefile}",
@@ -659,28 +649,32 @@ def withBeatsEnv(Map args = [:], Closure body) {
       dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
     }
-    dir("${env.BASE_DIR}") {
-      installTools(args)
-      // Skip to upload the generated files by default.
-      def upload = false
-      try {
-        // Add more stability when dependencies are not accessible temporarily
-        // See https://github.com/elastic/beats/issues/21609
-        // retry/try/catch approach reports errors, let's avoid it to keep the
-        // notifications cleaner.
-        if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
-          cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+    withMageEnv(version: "${env.GO_VERSION}"){
+      dir("${env.BASE_DIR}") {
+        // Go/Mage installation is not anymore configured with env variables and installed
+        // with installTools but delegated to the parent closure withMageEnv.
+        installTools(args)
+        // Skip to upload the generated files by default.
+        def upload = false
+        try {
+          // Add more stability when dependencies are not accessible temporarily
+          // See https://github.com/elastic/beats/issues/21609
+          // retry/try/catch approach reports errors, let's avoid it to keep the
+          // notifications cleaner.
+          if (cmd(label: 'Download modules to local cache', script: 'go mod download', returnStatus: true) > 0) {
+            cmd(label: 'Download modules to local cache - retry', script: 'go mod download', returnStatus: true)
+          }
+          body()
+        } catch(err) {
+          // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
+          upload = true
+          error("Error '${err.toString()}'")
+        } finally {
+          if (archive) {
+            archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+          }
+          tearDown()
         }
-        body()
-      } catch(err) {
-        // Upload the generated files ONLY if the step failed. This will avoid any overhead with Google Storage
-        upload = true
-        error("Error '${err.toString()}'")
-      } finally {
-        if (archive) {
-          archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
-        }
-        tearDown()
       }
     }
   }
@@ -730,7 +724,7 @@ def fixPermissions(location) {
 def installTools(args) {
   def stepHeader = "${args.id?.trim() ? args.id : env.STAGE_NAME}"
   if(isUnix()) {
-    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Go/Mage/Python/Docker/Terraform ${GO_VERSION}", script: '.ci/scripts/install-tools.sh') }
+    retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "${stepHeader} - Install Python/Docker/Terraform", script: '.ci/scripts/install-tools.sh') }
     // TODO (2020-04-07): This is a work-around to fix the Beat generator tests.
     // See https://github.com/elastic/beats/issues/17787.
     sh(label: 'check git config', script: '''
@@ -739,7 +733,7 @@ def installTools(args) {
         git config --global user.name "beatsmachine"
       fi''')
   } else {
-    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Go/Mage/Python ${GO_VERSION}", script: ".ci/scripts/install-tools.bat") }
+    retryWithSleep(retries: 3, seconds: 5, backoff: true){ bat(label: "${stepHeader} - Install Python", script: ".ci/scripts/install-tools.bat") }
   }
 }
 
