@@ -8,6 +8,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
+
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -159,13 +162,22 @@ func (p *pod) OnDelete(obj interface{}) {
 }
 
 func generatePodData(pod *kubernetes.Pod) podData {
+	//TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
+
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": map[string]interface{}{
-			"uid":    string(pod.GetUID()),
-			"name":   pod.GetName(),
-			"labels": pod.GetLabels(),
-			"ip":     pod.Status.PodIP,
+			"uid":         string(pod.GetUID()),
+			"name":        pod.GetName(),
+			"labels":      pod.GetLabels(),
+			"annotations": annotations,
+			"ip":          pod.Status.PodIP,
 		},
 	}
 	return podData{

@@ -7,6 +7,8 @@ package kubernetes
 import (
 	"testing"
 
+	"github.com/elastic/beats/v7/libbeat/common"
+
 	"github.com/stretchr/testify/assert"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,7 +49,10 @@ func TestGeneratePodData(t *testing.T) {
 			"uid":    string(pod.GetUID()),
 			"name":   pod.GetName(),
 			"labels": pod.GetLabels(),
-			"ip":     pod.Status.PodIP,
+			"annotations": common.MapStr{
+				"app": "production",
+			},
+			"ip": pod.Status.PodIP,
 		},
 	}
 	processors := []map[string]interface{}{
