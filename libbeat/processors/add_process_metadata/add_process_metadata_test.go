@@ -18,9 +18,11 @@
 package add_process_metadata
 
 import (
+	"math"
 	"os"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -403,7 +405,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": "a",
 			},
-			err: errors.New("error applying add_process_metadata processor: cannot convert string field 'ppid' to an integer: strconv.Atoi: parsing \"a\": invalid syntax"),
+			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': error converting string to integer: strconv.Atoi: parsing \"a\": invalid syntax"),
 		},
 		{
 			description: "bad PID field type",
@@ -416,7 +418,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": false,
 			},
-			err: errors.New("error applying add_process_metadata processor: cannot parse field 'ppid' (not an integer or string)"),
+			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': not an integer or string, but bool"),
 		},
 		{
 			description: "process not found",
@@ -823,4 +825,158 @@ func TestBadProcess(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.NotNil(t, result.Fields)
 	assert.Equal(t, ev.Fields, result.Fields)
+}
+
+func TestPIDToInt(t *testing.T) {
+	const intIs64bit = unsafe.Sizeof(int(0)) == unsafe.Sizeof(int64(0))
+	for _, test := range []struct {
+		name string
+		pid  interface{}
+		fail bool
+	}{
+		{
+			name: "numeric string",
+			pid:  "1234",
+		},
+		{
+			name: "numeric string ignore octal",
+			pid:  "008",
+		},
+		{
+			name: "numeric string invalid hex",
+			pid:  "0x10",
+			fail: true,
+		},
+		{
+			name: "non-numeric string",
+			pid:  "abcd",
+			fail: true,
+		},
+		{
+			name: "int",
+			pid:  0,
+		},
+		{
+			name: "int min",
+			pid:  math.MaxInt32,
+		},
+		{
+			name: "int max",
+			pid:  math.MaxInt32,
+		},
+		{
+			name: "uint min",
+			pid:  uint(0),
+		},
+		{
+			name: "uint max",
+			pid:  uint(math.MaxUint32),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int8",
+			pid:  int8(0),
+		},
+		{
+			name: "int8 min",
+			pid:  int8(math.MinInt8),
+		},
+		{
+			name: "int8 max",
+			pid:  int8(math.MaxInt8),
+		},
+		{
+			name: "uint8 min",
+			pid:  uint8(0),
+		},
+		{
+			name: "uint8 max",
+			pid:  uint8(math.MaxUint8),
+		},
+		{
+			name: "int16",
+			pid:  int16(0),
+		},
+		{
+			name: "int16 min",
+			pid:  int16(math.MinInt16),
+		},
+		{
+			name: "int16 max",
+			pid:  int16(math.MaxInt16),
+		},
+		{
+			name: "uint16 min",
+			pid:  uint16(0),
+		},
+		{
+			name: "uint16 max",
+			pid:  uint16(math.MaxUint16),
+		},
+		{
+			name: "int32",
+			pid:  int32(0),
+		},
+		{
+			name: "int32 min",
+			pid:  int32(math.MinInt32),
+		},
+		{
+			name: "int32 max",
+			pid:  int32(math.MaxInt32),
+		},
+		{
+			name: "uint32 min",
+			pid:  uint32(0),
+		},
+		{
+			name: "uint32 max",
+			pid:  uint32(math.MaxUint32),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int64",
+			pid:  int64(0),
+			fail: false,
+		},
+		{
+			name: "int64 min",
+			pid:  int64(math.MinInt64),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int64 max",
+			pid:  int64(math.MaxInt64),
+			fail: !intIs64bit,
+		},
+		{
+			name: "uint64 min",
+			pid:  uint64(0),
+			fail: false,
+		},
+		{
+			name: "uint64 max",
+			pid:  uint64(math.MaxUint64),
+			fail: true,
+		},
+		{
+			name: "uintptr",
+			pid:  uintptr(0),
+			fail: false,
+		},
+		{
+			name: "boolean",
+			pid:  false,
+			fail: true,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := pidToInt(test.pid)
+			if test.fail {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
