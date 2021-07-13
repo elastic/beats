@@ -1,0 +1,57 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "syncgateway.resources",
+        "duration": 115000,
+        "module": "syncgateway"
+    },
+    "metricset": {
+        "name": "resources",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:37571",
+        "type": "syncgateway"
+    },
+    "syncgateway": {
+        "resources": {
+            "admin_net_bytes": {
+                "recv": 186313933,
+                "sent": 67278955
+            },
+            "error_count": 0,
+            "go_memstats": {
+                "heap": {
+                    "alloc": 143386592,
+                    "idle": 81616896,
+                    "inuse": 250585088,
+                    "released": 26927104
+                },
+                "pause": {
+                    "ns": 88693194
+                },
+                "stack": {
+                    "inuse": 3342336,
+                    "sys": 3342336
+                },
+                "sys": 357708024
+            },
+            "goroutines_high_watermark": 311,
+            "num_goroutines": 308,
+            "process": {
+                "cpu_percent_utilization": 0,
+                "memory_resident": 335306752
+            },
+            "pub_net": {
+                "recv": {
+                    "bytes": 186313933
+                },
+                "sent": {
+                    "bytes": 67278955
+                }
+            },
+            "system_memory_total": 33291907072,
+            "warn_count": 6
+        }
+    }
+}

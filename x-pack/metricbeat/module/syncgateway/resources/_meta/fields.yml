@@ -1,0 +1,71 @@
+- name: resources
+  type: group
+  description: >
+    SyncGateway global resource utilization
+  release: beta
+  fields:
+    - name: error_count
+      type: long
+    - name: goroutines_high_watermark
+      type: long
+    - name: num_goroutines
+      type: long
+    - name: process
+      type: group
+      fields:
+        - name: cpu_percent_utilization
+          type: long
+        - name: memory_resident
+          type: long
+    - name: pub_net
+      type: group
+      fields:
+        - name: recv
+          type: group
+          fields:
+            - name: bytes
+              type: long
+        - name: sent
+          type: group
+          fields:
+            - name: bytes
+              type: long
+    - name: admin_net_bytes
+      type: group
+      fields:
+        - name: recv
+          type: long
+        - name: sent
+          type: long
+    - name: go_memstats
+      type: group
+      fields:
+        - name: heap
+          type: group
+          fields:
+            - name: alloc
+              type: long
+            - name: idle
+              type: long
+            - name: inuse
+              type: long
+            - name: released
+              type: long
+        - name: pause
+          type: group
+          fields:
+            - name: ns
+              type: long
+        - name: stack
+          type: group
+          fields:
+            - name: inuse
+              type: long
+            - name: sys
+              type: long
+        - name: sys
+          type: long
+    - name: system_memory_total
+      type: long
+    - name: warn_count
+      type: long

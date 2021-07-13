@@ -1,0 +1,64 @@
+- name: memory
+  type: group
+  description: >
+    SyncGateway memory metrics. It dumps a large amount of information about the memory heap and garbage collector
+  release: beta
+  fields:
+    - name: BuckHashSys
+      type: double
+    - name: Mallocs
+      type: double
+    - name: PauseTotalNs
+      type: double
+    - name: TotalAlloc
+      type: double
+    - name: Alloc
+      type: double
+    - name: GCSys
+      type: double
+    - name: LastGC
+      type: double
+    - name: MSpanSys
+      type: double
+    - name: GCCPUFraction
+      type: double
+    - name: HeapReleased
+      type: double
+    - name: HeapSys
+      type: double
+    - name: DebugGC
+      type: long
+    - name: HeapIdle
+      type: double
+    - name: Lookups
+      type: double
+    - name: HeapObjects
+      type: double
+    - name: MSpanInuse
+      type: double
+    - name: NumForcedGC
+      type: double
+    - name: OtherSys
+      type: double
+    - name: Frees
+      type: double
+    - name: NextGC
+      type: double
+    - name: StackInuse
+      type: double
+    - name: Sys
+      type: double
+    - name: NumGC
+      type: double
+    - name: EnableGC
+      type: long
+    - name: HeapAlloc
+      type: double
+    - name: MCacheInuse
+      type: double
+    - name: MCacheSys
+      type: double
+    - name: HeapInuse
+      type: double
+    - name: StackSys
+      type: double

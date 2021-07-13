@@ -1,0 +1,10 @@
+- key: syncgateway
+  title: "SyncGateway"
+  description: SyncGateway metrics
+  release: beta
+  fields:
+    - name: syncgateway
+      type: group
+      description: >
+        `syncgateway` contains the information and statistics from SyncGateway.
+      fields:

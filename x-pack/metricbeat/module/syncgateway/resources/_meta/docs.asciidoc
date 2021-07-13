@@ -1,0 +1,1 @@
+SyncGateway `resources` metriset contains about the global resource utilization of the SyncGateway instance.

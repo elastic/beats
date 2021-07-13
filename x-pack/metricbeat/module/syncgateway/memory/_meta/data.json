@@ -1,0 +1,49 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "syncgateway.memory",
+        "duration": 115000,
+        "module": "syncgateway"
+    },
+    "metricset": {
+        "name": "memory",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:39195",
+        "type": "syncgateway"
+    },
+    "syncgateway": {
+        "memory": {
+            "Alloc": 159398816,
+            "BuckHashSys": 1759627,
+            "DebugGC": false,
+            "EnableGC": true,
+            "Frees": 55790048,
+            "GCCPUFraction": 0.008328526565497294,
+            "GCSys": 13555712,
+            "HeapAlloc": 159398816,
+            "HeapIdle": 67780608,
+            "HeapInuse": 264388608,
+            "HeapObjects": 1877567,
+            "HeapReleased": 26927104,
+            "HeapSys": 332169216,
+            "LastGC": 1620310398040906500,
+            "Lookups": 0,
+            "MCacheInuse": 20832,
+            "MCacheSys": 32768,
+            "MSpanInuse": 4030632,
+            "MSpanSys": 4358144,
+            "Mallocs": 57667615,
+            "NextGC": 265304208,
+            "NumForcedGC": 0,
+            "NumGC": 51,
+            "OtherSys": 2457453,
+            "PauseTotalNs": 88693194,
+            "StackInuse": 3375104,
+            "StackSys": 3375104,
+            "Sys": 357708024,
+            "TotalAlloc": 2719416432
+        }
+    }
+}

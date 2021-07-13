@@ -1,0 +1,57 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-syncgateway]]
+[role="xpack"]
+== SyncGateway module
+
+beta[]
+
+Sync Gateway is the synchronization server in a Couchbase for Mobile and Edge deployment. This metricset allows to monitor a Sync Gateway instance by using its REST API.
+
+Sync Gateway access `[host]:[port]/_expvar` on Sync Gateway nodes to fetch metrics data, ensure that the URL is accessible from the host where Metricbeat is running.
+
+
+[float]
+=== Example configuration
+
+The SyncGateway module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: syncgateway
+  metricsets:
+    - db
+#    - memory
+#    - replication
+#    - resources
+  period: 10s
+
+  # SyncGateway hosts
+  hosts: ["127.0.0.1:4985"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-syncgateway-db,db>>
+
+* <<metricbeat-metricset-syncgateway-memory,memory>>
+
+* <<metricbeat-metricset-syncgateway-replication,replication>>
+
+* <<metricbeat-metricset-syncgateway-resources,resources>>
+
+include::syncgateway/db.asciidoc[]
+
+include::syncgateway/memory.asciidoc[]
+
+include::syncgateway/replication.asciidoc[]
+
+include::syncgateway/resources.asciidoc[]
+
