@@ -93,6 +93,7 @@ func TestNewTransformsFromConfig(t *testing.T) {
 			expectedTransforms: transforms{
 				&set{
 					targetInfo: targetInfo{Name: "foo", Type: "body"},
+					valueType:  valueTypeString,
 				},
 			},
 		},

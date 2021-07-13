@@ -22,7 +22,7 @@ func registerResponseTransforms() {
 }
 
 type response struct {
-	page   int
+	page   int64
 	url    url.URL
 	header http.Header
 	body   interface{}
