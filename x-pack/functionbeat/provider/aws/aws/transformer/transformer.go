@@ -10,12 +10,17 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"io"
+	"io/ioutil"
 	"time"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 )
 
 // Centralize anything related to ECS into a common file.
@@ -209,4 +214,48 @@ func SQS(request events.SQSEvent) []beat.Event {
 		}
 	}
 	return events
+}
+
+func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
+	var evts []beat.Event
+	svc := s3.New(session.New())
+	for _, record := range request.Records {
+		result, err := svc.GetObject(&s3.GetObjectInput{
+      Bucket: aws.String(record.S3.Bucket.Name),
+      Key:    aws.String(record.S3.Object.Key),
+    })
+
+		if err != nil {
+			fmt.Println("Got error calling GetObject:")
+			fmt.Println(err.Error())
+			return nil, err
+		}
+
+		defer result.Body.Close()
+		obj, err := ioutil.ReadAll(result.Body)
+		if err != nil {
+        fmt.Println(err)
+				return nil, err
+    }
+
+		s3evt := beat.Event{
+			Timestamp: time.Now(),
+			Fields: common.MapStr{
+				"event": common.MapStr{
+					"kind": "event",
+				},
+				"cloud": common.MapStr{
+					"provider": "aws",
+					"region":   record.AWSRegion,
+				},
+				"message":          fmt.Sprintf("%s", obj),
+				"event_source":     record.EventSource,
+				"bucket_name":      record.S3.Bucket.Name,
+				"bucket_key":       record.S3.Object.Key,
+				"aws_region":       record.AWSRegion,
+			},
+		}
+		evts = append(evts, s3evt)
+	}
+	return evts, nil
 }
