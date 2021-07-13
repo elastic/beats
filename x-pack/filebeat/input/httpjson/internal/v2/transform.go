@@ -5,9 +5,11 @@
 package v2
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -245,4 +247,42 @@ func newBasicTransformsFromConfig(config transformsConfig, namespace string, log
 	}
 
 	return rts, nil
+}
+
+type valueType string
+
+const (
+	valueTypeString valueType = "string"
+	valueTypeJSON   valueType = "json"
+	valueTypeInt    valueType = "int"
+)
+
+func newValueType(s string) (valueType, error) {
+	vt := valueType(s)
+	if vt == "" {
+		return valueTypeString, nil
+	}
+	switch vt {
+	case valueTypeString, valueTypeJSON, valueTypeInt:
+		return vt, nil
+	default:
+		return "", fmt.Errorf("invalid value_type: %s", s)
+	}
+}
+
+func (vt valueType) convertToType(v string) (interface{}, error) {
+	switch vt {
+	case valueTypeString:
+		return v, nil
+	case valueTypeInt:
+		return strconv.ParseInt(v, 10, 64)
+	case valueTypeJSON:
+		var o interface{}
+		if err := json.Unmarshal([]byte(v), &o); err != nil {
+			return nil, err
+		}
+		return o, nil
+	default:
+		return nil, fmt.Errorf("can't convert to unknown value_type: %s", vt)
+	}
 }

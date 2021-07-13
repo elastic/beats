@@ -108,3 +108,15 @@ func TestChannels(t *testing.T) {
 		}
 	}
 }
+
+func TestPublishers(t *testing.T) {
+	publishers, err := Publishers()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.NotEmpty(t, publishers)
+	for _, p := range publishers {
+		t.Log(p)
+	}
+}
