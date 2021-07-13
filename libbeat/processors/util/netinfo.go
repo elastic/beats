@@ -19,6 +19,7 @@ package util
 
 import (
 	"net"
+	"sort"
 
 	"github.com/joeshaw/multierror"
 )
@@ -63,5 +64,25 @@ func GetNetInfo() (ipList []string, hwList []string, err error) {
 		}
 	}
 
-	return ipList, hwList, errs.Err()
+	return ipList, unique(hwList), errs.Err()
+}
+
+// unique returns addrs lexically sorted and with repeated elements
+// omitted.
+func unique(addrs []string) []string {
+	if len(addrs) < 2 {
+		return addrs
+	}
+	sort.Strings(addrs)
+	curr := 0
+	for i, addr := range addrs {
+		if addr == addrs[curr] {
+			continue
+		}
+		curr++
+		if curr < i {
+			addrs[curr], addrs[i] = addrs[i], ""
+		}
+	}
+	return addrs[:curr+1]
 }
