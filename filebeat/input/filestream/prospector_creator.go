@@ -24,7 +24,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/reader/readjson"
 )
 
 const (
@@ -107,21 +106,5 @@ func newProspector(config config) (loginp.Prospector, error) {
 }
 
 func getIdentifierSuffix(config config) string {
-	if config.Reader.Parsers == (parsers.Config{}) {
-		return ""
-	}
-
-	for _, ns := range config.Reader.Parsers {
-		if ns.Name() == "container" {
-			var c readjson.ContainerJSONConfig
-			err := ns.Config().Unpack(&c)
-			if err != nil {
-				return ""
-			}
-			if c.Stream != readjson.All {
-				return c.Stream.String()
-			}
-		}
-	}
-	return ""
+	return config.Reader.Parsers.Suffix
 }
