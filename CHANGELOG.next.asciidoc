@@ -398,6 +398,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Elasticsearch compatibility for modules that use the `network_direction` processor. {issue}26629[26629] {pull}26676[26676]
 - Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
 - Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
+- Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
 
 *Heartbeat*
 
