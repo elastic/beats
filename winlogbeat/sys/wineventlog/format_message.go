@@ -45,7 +45,7 @@ func getMessageString(metadata *PublisherMetadata, eventHandle EvtHandle, messag
 	var flags EvtFormatMessageFlag
 	if eventHandle > 0 {
 		flags = EvtFormatMessageEvent
-	} else if messageID > 0 {
+	} else {
 		flags = EvtFormatMessageId
 	}
 

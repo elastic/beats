@@ -10462,6 +10462,21 @@ type: keyword
 
 --
 
+[float]
+=== duration
+
+Duration required to complete the step.
+
+
+*`synthetics.step.duration.us`*::
++
+--
+Duration in microseconds
+
+type: integer
+
+--
+
 
 *`synthetics.journey.name`*::
 +
@@ -10534,94 +10549,131 @@ type: keyword
 --
 
 
+[float]
+=== experience
 
-*`synthetics.browser.experience.name`*::
-+
---
-type: keyword
-
---
-
-*`synthetics.browser.experience.type`*::
-+
---
-denotes the 'mark' event
+Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
 
 
-type: text
 
---
+[float]
+=== fcp
 
-*`synthetics.browser.experience.start`*::
-+
---
-offset of time relative to journey start in milliseconds
+duration of First contentful paint metric
 
 
-type: long
-
---
-
-
-*`synthetics.browser.user_timing.name`*::
-+
---
-type: keyword
-
---
-
-*`synthetics.browser.user_timing.type`*::
-+
---
-could be one of mark or measure event types.
-
-
-type: text
-
---
-
-*`synthetics.browser.user_timing.start`*::
-+
---
-offset of time relative to journey start in milliseconds
-
-
-type: long
-
---
-
-*`synthetics.browser.user_timing.end`*::
-+
---
-offset of time relative to journey start in milliseconds
-
-
-type: long
-
---
-
-
-*`synthetics.browser.layout_shift.name`*::
-+
---
-type: keyword
-
---
-
-*`synthetics.browser.layout_shift.score`*::
+*`synthetics.browser.experience.fcp.us`*::
 +
 --
 type: integer
 
 --
 
-*`synthetics.browser.layout_shift.exists`*::
+[float]
+=== lcp
+
+duration of Largest contentful paint metric
+
+
+*`synthetics.browser.experience.lcp.us`*::
 +
 --
-flag that indicates if there was any layout shift events present on the page.
+type: integer
+
+--
+
+[float]
+=== dcl
+
+duration of Document content loaded end event
 
 
-type: boolean
+*`synthetics.browser.experience.dcl.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== load
+
+duration of Load end event
+
+
+*`synthetics.browser.experience.load.duration`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.experience.cls`*::
++
+--
+culumative layout shift score across all frames
+
+type: integer
+
+--
+
+[float]
+=== relative_trace
+
+trace event with timing information that are realtive to journey timings in microseconds
+
+
+
+*`synthetics.browser.relative_trace.name`*::
++
+--
+name of the trace event
+
+type: keyword
+
+--
+
+*`synthetics.browser.relative_trace.type`*::
++
+--
+could be one of mark or measure event types
+
+type: text
+
+--
+
+[float]
+=== start
+
+monotonically increasing trace start time in microseconds
+
+
+*`synthetics.browser.relative_trace.start.us`*::
++
+--
+type: long
+
+--
+
+[float]
+=== duration
+
+duration of the trace event in microseconds.
+
+
+*`synthetics.browser.relative_trace.duration.us`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.relative_trace.score`*::
++
+--
+weighted score of the layout shift event
+
+type: integer
 
 --
 

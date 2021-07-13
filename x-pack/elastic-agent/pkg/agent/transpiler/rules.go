@@ -19,6 +19,7 @@ type AgentInfo interface {
 	AgentID() string
 	Version() string
 	Snapshot() bool
+	Headers() map[string]string
 }
 
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
@@ -90,6 +91,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "fix_stream"
 		case *InsertDefaultsRule:
 			name = "insert_defaults"
+		case *InjectHeadersRule:
+			name = "inject_headers"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -175,6 +178,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &FixStreamRule{}
 		case "insert_defaults":
 			r = &InsertDefaultsRule{}
+		case "inject_headers":
+			r = &InjectHeadersRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -770,7 +775,7 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			return errors.New("InjectAgentInfoRule: processors is not a list")
 		}
 
-		// elastic.agent
+		// elastic_agent
 		processorMap := &Dict{value: make([]Node, 0)}
 		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
 		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
@@ -779,6 +784,15 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
 		}}})
 		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+
+		// agent.id
+		processorMap = &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+		}}})
+		addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
 	}
 
@@ -1503,6 +1517,70 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 		Selectors: selectors,
 		Path:      path,
 	}
+}
+
+// InjectHeadersRule injects headers into output.
+type InjectHeadersRule struct{}
+
+// Apply injects headers into output.
+func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject headers into configuration")
+		}
+	}()
+
+	headers := agentInfo.Headers()
+	if len(headers) == 0 {
+		return nil
+	}
+
+	outputsNode, found := Lookup(ast, "outputs")
+	if !found {
+		return nil
+	}
+
+	elasticsearchNode, found := outputsNode.Find("elasticsearch")
+	if found {
+		headersNode, found := elasticsearchNode.Find("headers")
+		if found {
+			headersDict, ok := headersNode.Value().(*Dict)
+			if !ok {
+				return errors.New("headers not a dictionary")
+			}
+
+			for k, v := range headers {
+				headersDict.value = append(headersDict.value, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+		} else {
+			nodes := make([]Node, 0, len(headers))
+			for k, v := range headers {
+				nodes = append(nodes, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+			headersDict := NewDict(nodes)
+			elasticsearchDict, ok := elasticsearchNode.Value().(*Dict)
+			if !ok {
+				return errors.New("elasticsearch output is not a dictionary")
+			}
+			elasticsearchDict.value = append(elasticsearchDict.value, &Key{
+				name:  "headers",
+				value: headersDict,
+			})
+		}
+	}
+
+	return nil
+}
+
+// InjectHeaders creates a InjectHeadersRule
+func InjectHeaders() *InjectHeadersRule {
+	return &InjectHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.

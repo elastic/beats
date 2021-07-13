@@ -13,6 +13,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
@@ -21,6 +22,10 @@ func TestConfig(t *testing.T) {
 	makeConfig := func() config {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
+		cfg := common.MustNewConfigFrom("")
+		c := parser.Config{}
+		err := c.Unpack(cfg)
+		assert.Nil(t, err)
 		return config{
 			QueueURL:            queueURL,
 			APITimeout:          120 * time.Second,
@@ -31,6 +36,7 @@ func TestConfig(t *testing.T) {
 				BufferSize:     16 * humanize.KiByte,
 				MaxBytes:       10 * humanize.MiByte,
 				LineTerminator: readfile.AutoLineTerminator,
+				Parsers:        c,
 			},
 		}
 	}

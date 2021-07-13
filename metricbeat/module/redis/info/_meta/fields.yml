@@ -58,11 +58,11 @@
         - name: used.sys_children
           type: scaled_float
           description: >
-            User CPU consumed by the Redis server.
+            System CPU consumed by the background processes.
         - name: used.user
           type: scaled_float
           description: >
-            System CPU consumed by the background processes.
+            User CPU consumed by the Redis server.
         - name: used.user_children
           type: scaled_float
           description: >

@@ -92,7 +92,7 @@ func TestTimeout(t *testing.T) {
 	defer ts.Close()
 
 	cfg := defaultConfig()
-	cfg.Timeout = 1 * time.Millisecond
+	cfg.Transport.Timeout = 1 * time.Millisecond
 	hostData := mb.HostData{
 		URI:          ts.URL,
 		SanitizedURI: ts.URL,

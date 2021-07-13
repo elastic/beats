@@ -27,6 +27,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -331,7 +332,7 @@ func TestGenerateHints(t *testing.T) {
 	}
 }
 
-func TestEmitEvent(t *testing.T) {
+func TestPod_EmitEvent(t *testing.T) {
 	name := "filebeat"
 	namespace := "default"
 	podIP := "127.0.0.1"
@@ -1898,6 +1899,7 @@ func TestEmitEvent(t *testing.T) {
 		},
 	}
 
+	client := k8sfake.NewSimpleClientset()
 	for _, test := range tests {
 		t.Run(test.Message, func(t *testing.T) {
 			mapper, err := template.NewConfigMapper(nil, nil, nil)
@@ -1905,7 +1907,7 @@ func TestEmitEvent(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, nil, nil, nil)
+			metaGen := metadata.NewPodMetadataGenerator(common.NewConfig(), nil, client, nil, nil)
 			p := &Provider{
 				config:    defaultConfig(),
 				bus:       bus.New(logp.NewLogger("bus"), "test"),
