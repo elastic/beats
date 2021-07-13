@@ -49,7 +49,7 @@ var (
 	}
 )
 
-type identifierFactory func(c *common.Config) (fileIdentifier, error)
+type identifierFactory func(*common.Config) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource

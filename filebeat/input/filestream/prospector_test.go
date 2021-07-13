@@ -545,7 +545,7 @@ type renamedPathIdentifier struct {
 func (p *renamedPathIdentifier) Supports(_ identifierFeature) bool { return true }
 
 func mustPathIdentifier(renamed bool) fileIdentifier {
-	pathIdentifier, err := newPathIdentifier(nil, "")
+	pathIdentifier, err := newPathIdentifier(nil)
 	if err != nil {
 		panic(err)
 	}

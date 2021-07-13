@@ -93,13 +93,14 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 }
 
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	osstate := file.GetOSState(e.Info)
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                i.name + identitySep + file.GetOSState(e.Info).String() + "-" + i.markerContents(),
+		name:                i.name + identitySep + osstate.String() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
 	}
 }
