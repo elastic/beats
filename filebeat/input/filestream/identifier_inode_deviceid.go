@@ -35,14 +35,13 @@ import (
 type inodeMarkerIdentifier struct {
 	log        *logp.Logger
 	name       string
-	suffix     string
 	markerPath string
 
 	markerFileLastModifitaion time.Time
 	markerTxt                 string
 }
 
-func newINodeMarkerIdentifier(cfg *common.Config, suffix string) (fileIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
 	var config struct {
 		MarkerPath string `config:"path" validate:"required"`
 	}
@@ -62,7 +61,6 @@ func newINodeMarkerIdentifier(cfg *common.Config, suffix string) (fileIdentifier
 	return &inodeMarkerIdentifier{
 		log:                       logp.NewLogger("inode_marker_identifier_" + filepath.Base(config.MarkerPath)),
 		name:                      inodeMarkerName,
-		suffix:                    suffix,
 		markerPath:                config.MarkerPath,
 		markerFileLastModifitaion: fi.ModTime(),
 		markerTxt:                 string(markerContent),
@@ -95,17 +93,13 @@ func (i *inodeMarkerIdentifier) markerContents() string {
 }
 
 func (i *inodeMarkerIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	name := i.name + identitySep + file.GetOSState(e.Info).String() + "-" + i.markerContents()
-	if i.suffix != "" {
-		name += name + "-" + i.suffix
-	}
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                name,
+		name:                i.name + identitySep + file.GetOSState(e.Info).String() + "-" + i.markerContents(),
 		identifierGenerator: i.name,
 	}
 }

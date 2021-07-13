@@ -49,7 +49,7 @@ var (
 	}
 )
 
-type identifierFactory func(c *common.Config, suffix string) (fileIdentifier, error)
+type identifierFactory func(c *common.Config) (fileIdentifier, error)
 
 type fileIdentifier interface {
 	GetSource(loginp.FSEvent) fileSource
@@ -78,7 +78,11 @@ func (f fileSource) Name() string {
 // newFileIdentifier creates a new state identifier for a log input.
 func newFileIdentifier(ns *common.ConfigNamespace, suffix string) (fileIdentifier, error) {
 	if ns == nil {
-		return newINodeDeviceIdentifier(nil, suffix)
+		i, err := newINodeDeviceIdentifier(nil)
+		if err != nil {
+			return nil, err
+		}
+		return withSuffix(i, suffix), nil
 	}
 
 	identifierType := ns.Name()
@@ -87,33 +91,31 @@ func newFileIdentifier(ns *common.ConfigNamespace, suffix string) (fileIdentifie
 		return nil, fmt.Errorf("no such file_identity generator: %s", identifierType)
 	}
 
-	return f(ns.Config(), suffix)
+	i, err := f(ns.Config())
+	if err != nil {
+		return nil, err
+	}
+	return withSuffix(i, suffix), nil
 }
 
 type inodeDeviceIdentifier struct {
-	name   string
-	suffix string
+	name string
 }
 
-func newINodeDeviceIdentifier(_ *common.Config, suffix string) (fileIdentifier, error) {
+func newINodeDeviceIdentifier(_ *common.Config) (fileIdentifier, error) {
 	return &inodeDeviceIdentifier{
-		name:   nativeName,
-		suffix: suffix,
+		name: nativeName,
 	}, nil
 }
 
 func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
-	name := i.name + identitySep + file.GetOSState(e.Info).String()
-	if i.suffix != "" {
-		name += "-" + i.suffix
-	}
 	return fileSource{
 		info:                e.Info,
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		name:                name,
+		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
 		identifierGenerator: i.name,
 	}
 }
@@ -132,14 +134,12 @@ func (i *inodeDeviceIdentifier) Supports(f identifierFeature) bool {
 }
 
 type pathIdentifier struct {
-	name   string
-	suffix string
+	name string
 }
 
-func newPathIdentifier(_ *common.Config, suffix string) (fileIdentifier, error) {
+func newPathIdentifier(_ *common.Config) (fileIdentifier, error) {
 	return &pathIdentifier{
-		name:   pathName,
-		suffix: suffix,
+		name: pathName,
 	}, nil
 }
 
@@ -147,10 +147,6 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 	path := e.NewPath
 	if e.Op == loginp.OpDelete {
 		path = e.OldPath
-	}
-	name := p.name + identitySep + path
-	if p.suffix != "" {
-		name += "-" + p.suffix
 	}
 	return fileSource{
 		info:                e.Info,
@@ -169,6 +165,32 @@ func (p *pathIdentifier) Name() string {
 
 func (p *pathIdentifier) Supports(f identifierFeature) bool {
 	return false
+}
+
+type suffixIdentifier struct {
+	i      fileIdentifier
+	suffix string
+}
+
+func withSuffix(inner fileIdentifier, suffix string) fileIdentifier {
+	if suffix == "" {
+		return inner
+	}
+	return &suffixIdentifier{i: inner, suffix: suffix}
+}
+
+func (s *suffixIdentifier) GetSource(e loginp.FSEvent) fileSource {
+	fs := s.i.GetSource(e)
+	fs.name += "-" + s.suffix
+	return fs
+}
+
+func (s *suffixIdentifier) Name() string {
+	return s.i.Name()
+}
+
+func (s *suffixIdentifier) Supports(f identifierFeature) bool {
+	return s.i.Supports(f)
 }
 
 // mockIdentifier is used for testing
