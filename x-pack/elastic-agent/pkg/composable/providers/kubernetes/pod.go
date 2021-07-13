@@ -25,8 +25,8 @@ type pod struct {
 	comm           composable.DynamicProviderComm
 }
 
-type podData struct {
-	pod        *kubernetes.Pod
+type providerData struct {
+	uid        string
 	mapping    map[string]interface{}
 	processors []map[string]interface{}
 }
@@ -52,7 +52,7 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
 	// get Pod metadata (not specific to any container)
-	p.comm.AddOrUpdate(string(data.pod.GetUID()), PodPriority, data.mapping, data.processors)
+	p.comm.AddOrUpdate(data.uid, PodPriority, data.mapping, data.processors)
 
 	// Emit all containers in the pod
 	p.emitContainers(pod, pod.Spec.Containers, pod.Status.ContainerStatuses)
@@ -62,54 +62,19 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 }
 
 func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Container, containerstatuses []kubernetes.PodContainerStatus) {
-	// Collect all runtimes from status information.
-	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
-	for _, c := range containerstatuses {
-		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
-	}
 
-	for _, c := range containers {
-		// If it doesn't have an ID, container doesn't exist in
-		// the runtime, emit only an event if we are stopping, so
-		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.Name]
-		if cid == "" {
-			continue
+	providerDataChan := make(chan providerData)
+	done := make(chan bool, 1)
+	go generateContainerData(pod, containers, containerstatuses, providerDataChan, done)
+
+	for {
+		select {
+		case data := <-providerDataChan:
+			// Emit the container
+			p.comm.AddOrUpdate(data.uid, ContainerPriority, data.mapping, data.processors)
+		case <-done:
+			return
 		}
-
-		// ID is the combination of pod UID + container name
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
-
-		mapping := map[string]interface{}{
-			"namespace": pod.GetNamespace(),
-			"pod": map[string]interface{}{
-				"uid":    string(pod.GetUID()),
-				"name":   pod.GetName(),
-				"labels": pod.GetLabels(),
-				"ip":     pod.Status.PodIP,
-			},
-			"container": map[string]interface{}{
-				"id":      cid,
-				"name":    c.Name,
-				"image":   c.Image,
-				"runtime": runtimes[c.Name],
-			},
-		}
-
-		processors := []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"fields": mapping,
-					"target": "kubernetes",
-				},
-			},
-		}
-
-		// Emit the container
-		p.comm.AddOrUpdate(eventID, ContainerPriority, mapping, processors)
 	}
 }
 
@@ -162,7 +127,7 @@ func (p *pod) OnDelete(obj interface{}) {
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
 }
 
-func generatePodData(pod *kubernetes.Pod) podData {
+func generatePodData(pod *kubernetes.Pod) providerData {
 	//TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
@@ -181,8 +146,8 @@ func generatePodData(pod *kubernetes.Pod) podData {
 			"ip":          pod.Status.PodIP,
 		},
 	}
-	return podData{
-		pod:     pod,
+	return providerData{
+		uid:     string(pod.GetUID()),
 		mapping: mapping,
 		processors: []map[string]interface{}{
 			{
@@ -193,4 +158,65 @@ func generatePodData(pod *kubernetes.Pod) podData {
 			},
 		},
 	}
+}
+
+func generateContainerData(
+	pod *kubernetes.Pod,
+	containers []kubernetes.Container,
+	containerstatuses []kubernetes.PodContainerStatus,
+	dataChan chan providerData,
+	done chan bool) {
+	//TODO: add metadata here too ie -> meta := s.metagen.Generate()
+
+	containerIDs := map[string]string{}
+	runtimes := map[string]string{}
+	for _, c := range containerstatuses {
+		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
+		containerIDs[c.Name] = cid
+		runtimes[c.Name] = runtime
+	}
+
+	for _, c := range containers {
+		// If it doesn't have an ID, container doesn't exist in
+		// the runtime, emit only an event if we are stopping, so
+		// we are sure of cleaning up configurations.
+		cid := containerIDs[c.Name]
+		if cid == "" {
+			continue
+		}
+
+		// ID is the combination of pod UID + container name
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
+
+		mapping := map[string]interface{}{
+			"namespace": pod.GetNamespace(),
+			"pod": map[string]interface{}{
+				"uid":    string(pod.GetUID()),
+				"name":   pod.GetName(),
+				"labels": pod.GetLabels(),
+				"ip":     pod.Status.PodIP,
+			},
+			"container": map[string]interface{}{
+				"id":      cid,
+				"name":    c.Name,
+				"image":   c.Image,
+				"runtime": runtimes[c.Name],
+			},
+		}
+
+		processors := []map[string]interface{}{
+			{
+				"add_fields": map[string]interface{}{
+					"fields": mapping,
+					"target": "kubernetes",
+				},
+			},
+		}
+		dataChan <- providerData{
+			uid:        eventID,
+			mapping:    mapping,
+			processors: processors,
+		}
+	}
+	done <- true
 }
