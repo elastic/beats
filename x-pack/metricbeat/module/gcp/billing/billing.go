@@ -205,25 +205,11 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, tableMeta tableMeta, month string, costType string) ([]mb.Event, error) {
 	var events []mb.Event
-	query := fmt.Sprintf(`
-			SELECT
-				invoice.month,
-				project.id,
-				project.name,
-				billing_account_id,
-				cost_type,
-			  (SUM(CAST(cost * 1000000 AS int64))
-				+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
-				AS total_exact
-			FROM %s
-			WHERE project.id IS NOT NULL
-			AND invoice.month = '%s'
-			AND cost_type = '%s'
-			GROUP BY 1, 2, 3, 4, 5
-			ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableMeta.tableFullID, month, costType)
+
+	query := generateQuery(tableMeta.tableFullID, month, costType)
+	m.logger.Debug("bigquery query = ", query)
 
 	q := client.Query(query)
-	m.logger.Debug("bigquery query = ", query)
 
 	// Location must match that of the dataset(s) referenced in the query.
 	q.Location = tableMeta.location
@@ -307,4 +293,26 @@ func generateEventID(currentDate string, rowItems []bigquery.Value) string {
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:20]
+}
+
+// generateQuery returns the query to be used by the BigQuery client to retrieve monthly
+// cost types breakdown.
+func generateQuery(tableName, month, costType string) string {
+	query := fmt.Sprintf(`
+SELECT
+	invoice.month,
+	project.id,
+	project.name,
+	billing_account_id,
+	cost_type,
+	(SUM(CAST(cost * 1000000 AS int64))
+	+ SUM(IFNULL((SELECT SUM(CAST(c.amount * 1000000 as int64)) FROM UNNEST(credits) c), 0))) / 1000000
+	AS total_exact
+FROM %s
+WHERE project.id IS NOT NULL
+AND invoice.month = '%s'
+AND cost_type = '%s'
+GROUP BY 1, 2, 3, 4, 5
+ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableName, month, costType)
+	return query
 }
