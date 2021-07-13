@@ -20,6 +20,7 @@ type appendConfig struct {
 	Value               *valueTpl `config:"value"`
 	Default             *valueTpl `config:"default"`
 	FailOnTemplateError bool      `config:"fail_on_template_error"`
+	ValueType           string    `config:"value_type"`
 }
 
 type appendt struct {
@@ -28,8 +29,9 @@ type appendt struct {
 	value               *valueTpl
 	defaultValue        *valueTpl
 	failOnTemplateError bool
+	valueType           valueType
 
-	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
+	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
 }
 
 func (appendt) transformName() string { return appendName }
@@ -101,12 +103,18 @@ func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 		return appendt{}, err
 	}
 
+	vt, err := newValueType(c.ValueType)
+	if err != nil {
+		return appendt{}, err
+	}
+
 	return appendt{
 		log:                 log,
 		targetInfo:          ti,
 		value:               c.Value,
 		defaultValue:        c.Default,
 		failOnTemplateError: c.FailOnTemplateError,
+		valueType:           vt,
 	}, nil
 }
 
@@ -115,22 +123,30 @@ func (append *appendt) run(ctx *transformContext, tr transformable) (transformab
 	if err != nil && append.failOnTemplateError {
 		return transformable{}, err
 	}
-	if err := append.runFunc(ctx, tr, append.targetInfo.Name, value); err != nil {
+	if value == "" {
+		return tr, nil
+	}
+	converted, err := append.valueType.convertToType(value)
+	if err != nil {
+		return transformable{}, fmt.Errorf("can't convert template value to %s: %w", append.valueType, err)
+	}
+	if err := append.runFunc(ctx, tr, append.targetInfo.Name, converted); err != nil {
 		return transformable{}, err
 	}
 	return tr, nil
 }
 
-func appendToCommonMap(m common.MapStr, key, val string) error {
-	if val == "" {
-		return nil
-	}
+func appendToCommonMap(m common.MapStr, key string, val interface{}) error {
 	var value interface{}
+	strVal, isString := val.(string)
 	if found, _ := m.HasKey(key); found {
 		prev, _ := m.GetValue(key)
 		switch t := prev.(type) {
 		case []string:
-			value = append(t, val)
+			if !isString {
+				return fmt.Errorf("can't append a %T value to a string list", val)
+			}
+			value = append(t, strVal)
 		case []interface{}:
 			value = append(t, val)
 		default:
@@ -146,25 +162,27 @@ func appendToCommonMap(m common.MapStr, key, val string) error {
 	return nil
 }
 
-func appendBody(ctx *transformContext, transformable transformable, key, value string) error {
+func appendBody(ctx *transformContext, transformable transformable, key string, value interface{}) error {
 	return appendToCommonMap(transformable.body(), key, value)
 }
 
-func appendHeader(ctx *transformContext, transformable transformable, key, value string) error {
-	if value == "" {
-		return nil
+func appendHeader(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+	v, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("headers can only contain string values, but got: %T", value)
 	}
-	transformable.header().Add(key, value)
+	transformable.header().Add(key, v)
 	return nil
 }
 
-func appendURLParams(ctx *transformContext, transformable transformable, key, value string) error {
-	if value == "" {
-		return nil
+func appendURLParams(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+	v, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("URL params can only contain string values, but got: %T", value)
 	}
 	url := transformable.url()
 	q := url.Query()
-	q.Add(key, value)
+	q.Add(key, v)
 	url.RawQuery = q.Encode()
 	transformable.setURL(url)
 	return nil

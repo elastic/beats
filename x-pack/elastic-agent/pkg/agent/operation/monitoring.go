@@ -265,6 +265,14 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 					},
 				},
 				{
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
+						},
+					},
+				},
+				{
 					"drop_fields": map[string]interface{}{
 						"fields": []string{
 							"ecs.version", //coming from logger, already added by libbeat
@@ -320,6 +328,14 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 						},
 					},
 					{
+						"add_fields": map[string]interface{}{
+							"target": "agent",
+							"fields": map[string]interface{}{
+								"id": o.agentInfo.AgentID(),
+							},
+						},
+					},
+					{
 						"drop_fields": map[string]interface{}{
 							"fields": []string{
 								"ecs.version", //coming from logger, already added by libbeat
@@ -339,19 +355,7 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		"output": map[string]interface{}{
 			outputType: output,
 		},
-		"processors": []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"target": "agent",
-					"fields": map[string]interface{}{
-						"id": o.agentInfo.AgentID(),
-					},
-				},
-			},
-		},
 	}
-
-	o.logger.Debugf("monitoring configuration generated for filebeat: %v", result)
 
 	return result, true
 }
@@ -400,6 +404,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 						},
 					},
 				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
+						},
+					},
+				},
 			},
 		}, map[string]interface{}{
 			"module":     "http",
@@ -436,6 +448,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 							"version":  o.agentInfo.Version(),
 							"snapshot": o.agentInfo.Snapshot(),
 							"process":  name,
+						},
+					},
+				},
+				{
+					"add_fields": map[string]interface{}{
+						"target": "agent",
+						"fields": map[string]interface{}{
+							"id": o.agentInfo.AgentID(),
 						},
 					},
 				},
@@ -523,6 +543,14 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 				},
 			},
 			{
+				"add_fields": map[string]interface{}{
+					"target": "agent",
+					"fields": map[string]interface{}{
+						"id": o.agentInfo.AgentID(),
+					},
+				},
+			},
+			{
 				"copy_fields": map[string]interface{}{
 					"fields": []map[string]interface{}{
 						// I should be able to see the CPU Usage on the running machine. Am using too much CPU?
@@ -573,19 +601,7 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 		"output": map[string]interface{}{
 			outputType: output,
 		},
-		"processors": []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"target": "agent",
-					"fields": map[string]interface{}{
-						"id": o.agentInfo.AgentID(),
-					},
-				},
-			},
-		},
 	}
-
-	o.logger.Debugf("monitoring configuration generated for metricbeat: %v", result)
 
 	return result, true
 }
