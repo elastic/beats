@@ -27,9 +27,9 @@ import (
 // SQSConfig is the configuration for the S3 event type.
 type S3Config struct {
 	Triggers     []*S3TriggerConfig `config:"triggers"`
-	Description  string              `config:"description"`
-	Name         string              `config:"name" validate:"nonzero,required"`
-	LambdaConfig *LambdaConfig       `config:",inline"`
+	Description  string             `config:"description"`
+	Name         string             `config:"name" validate:"nonzero,required"`
+	LambdaConfig *LambdaConfig      `config:",inline"`
 }
 
 // S3TriggerConfig configuration for the current trigger.

@@ -60,11 +60,11 @@ func generateS3Event() events.S3Event {
 	return events.S3Event{
 		Records: []events.S3EventRecord{
 			events.S3EventRecord{
-				AWSRegion:      "us-east-1",
-				EventName:      "createObject",
-				EventSource:    "aws:s3",
+				AWSRegion:   "us-east-1",
+				EventName:   "createObject",
+				EventSource: "aws:s3",
 				S3: events.S3Entity{
-					SchemaVersion: "v1",
+					SchemaVersion:   "v1",
 					ConfigurationID: "abc123",
 					Bucket: events.S3Bucket{
 						Name: "test-bucket",
