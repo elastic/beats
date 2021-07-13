@@ -34,9 +34,10 @@ type podData struct {
 // NewPodWatcher creates a watcher that can discover and process pod objects
 func NewPodWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
-		SyncTimeout: cfg.SyncPeriod,
-		Node:        cfg.Node,
-		//Namespace:   p.config.Namespace,
+		SyncTimeout:  cfg.SyncPeriod,
+		Node:         cfg.Node,
+		Namespace:    cfg.Namespace,
+		HonorReSyncs: true,
 	}, nil)
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
