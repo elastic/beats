@@ -283,7 +283,7 @@ type EventMetadata struct {
 	Version     uint8              // Event format version.
 	MsgStatic   string             // Used when the message has no parameters.
 	MsgTemplate *template.Template `json:"-"` // Template that expects an array of values as its data.
-	EventData   []eventData        // Names of parameters from XML template.
+	EventData   []EventData        // Names of parameters from XML template.
 }
 
 // newEventMetadataFromEventHandle collects metadata about an event type using
@@ -307,11 +307,11 @@ func newEventMetadataFromEventHandle(publisher *PublisherMetadata, eventHandle E
 	}
 	if len(event.EventData.Pairs) > 0 {
 		for _, pair := range event.EventData.Pairs {
-			em.EventData = append(em.EventData, eventData{Name: pair.Key})
+			em.EventData = append(em.EventData, EventData{Name: pair.Key})
 		}
 	} else {
 		for _, pair := range event.UserData.Pairs {
-			em.EventData = append(em.EventData, eventData{Name: pair.Key})
+			em.EventData = append(em.EventData, EventData{Name: pair.Key})
 		}
 	}
 
@@ -396,10 +396,15 @@ func (em *EventMetadata) initEventMessage(itr *EventMetadataIterator, publisher 
 	if err != nil {
 		return err
 	}
+	// If the event definition does not specify a message, the value is –1.
+	if int32(messageID) == -1 {
+		return nil
+	}
 
 	msg, err := getMessageString(publisher, NilHandle, messageID, templateInserts.Slice())
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to get message string using message "+
+			"ID %v for for event ID %v", messageID, em.EventID)
 	}
 
 	return em.setMessage(msg)
@@ -409,9 +414,12 @@ func (em *EventMetadata) setMessage(msg string) error {
 	msg = sys.RemoveWindowsLineEndings(msg)
 	tmplID := strconv.Itoa(int(em.EventID))
 
-	tmpl, err := template.New(tmplID).Funcs(eventMessageTemplateFuncs).Parse(msg)
+	tmpl, err := template.New(tmplID).
+		Delims(leftTemplateDelim, rightTemplateDelim).
+		Funcs(eventMessageTemplateFuncs).Parse(msg)
 	if err != nil {
-		return err
+		return errors.Wrapf(err, "failed to parse message template for "+
+			"event ID %v (template='%v')", em.EventID, msg)
 	}
 
 	// One node means there were no parameters so this will optimize that case
@@ -432,7 +440,7 @@ func (em *EventMetadata) equal(other *EventMetadata) bool {
 		return false
 	}
 
-	eventDataNamesEqual := func(a, b []eventData) bool {
+	eventDataNamesEqual := func(a, b []EventData) bool {
 		if len(a) != len(b) {
 			return false
 		}
