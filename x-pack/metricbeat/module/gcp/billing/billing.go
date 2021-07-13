@@ -298,6 +298,11 @@ func generateEventID(currentDate string, rowItems []bigquery.Value) string {
 // generateQuery returns the query to be used by the BigQuery client to retrieve monthly
 // cost types breakdown.
 func generateQuery(tableName, month, costType string) string {
+	// The table name is user provided, so it may contains special characters.
+	// In order to allow any character in the table identifier, use the Quoted identifier format.
+	// See https://github.com/elastic/beats/issues/26855
+	// NOTE: is not possible to escape backtics (`) in a multiline string
+	escapedTableName := fmt.Sprintf("`%s`", tableName)
 	query := fmt.Sprintf(`
 SELECT
 	invoice.month,
@@ -313,6 +318,6 @@ WHERE project.id IS NOT NULL
 AND invoice.month = '%s'
 AND cost_type = '%s'
 GROUP BY 1, 2, 3, 4, 5
-ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, tableName, month, costType)
+ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC;`, escapedTableName, month, costType)
 	return query
 }

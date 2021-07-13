@@ -25,6 +25,8 @@ func TestGenerateQuery(t *testing.T) {
 	query := generateQuery("my-table", "jan", "cost")
 	log.Println(query)
 
+	// verify that table name quoting is in effect
+	assert.Contains(t, query, "`my-table`")
 	// verify the group by is preserved
 	assert.Contains(t, query, "GROUP BY 1, 2, 3, 4, 5")
 	// verify the order by is preserved
