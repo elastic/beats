@@ -201,6 +201,11 @@ VERSION=${env.VERSION}-SNAPSHOT""")
                           slackComment: true, slackNotify: (isBranch() || isTag()),
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }
+      // Add description to help with the ES queries.
+      script {
+        def numberOfRepeats = rerunStages?.collect { k, v -> return k }?.size
+        currentBuild.description = "Stage retries: ${numberOfRepeats} | ${currentBuild.description}"
+      }
     }
   }
 }
