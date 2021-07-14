@@ -754,6 +754,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve memory usage of line reader of `log` and `filestream` input. {pull}27782[27782]
 - Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
 
+- Update Cisco ASA/FTD ingest pipeline grok/dissect patterns for multiple message IDs. {issue}26869[26869] {pull}26879[26879]
 
 *Heartbeat*
 
