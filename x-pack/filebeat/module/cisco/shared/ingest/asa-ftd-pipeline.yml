@@ -268,7 +268,7 @@ processors:
       field: "message"
       description: "106023"
       patterns:
-      - ^%{NOTSPACE:event.outcome} %{NOTSPACE:network.transport} src %{NOTSPACE:_temp_.cisco.source_interface}:%{IPORHOST:source.address}(/%{POSINT:source.port})?\s*(%{GREEDYDATA:_temp_.cisco.source_username} )?dst %{NOTSPACE:_temp_.cisco.destination_interface}:%{IPORHOST:destination.address}(/%{POSINT:destination.port})?%{DATA}by access.group "%{NOTSPACE:_temp_.cisco.list_id}"
+      - ^%{NOTSPACE:event.outcome} ((protocol %{POSINT:network.iana_number})|%{NOTSPACE:network.transport}) src %{NOTSPACE:_temp_.cisco.source_interface}:%{IPORHOST:source.address}(/%{POSINT:source.port})?\s*(%{GREEDYDATA:_temp_.cisco.source_username} )?dst %{NOTSPACE:_temp_.cisco.destination_interface}:%{IPORHOST:destination.address}(/%{POSINT:destination.port})?%{DATA}by access-group "%{NOTSPACE:_temp_.cisco.list_id}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '106027'"
       field: "message"
@@ -366,7 +366,7 @@ processors:
       field: "message"
       description: "304001"
       patterns:
-      - "%{IP:source.address} %{DATA} (%{NOTSPACE}@)?%{IP:destination.address}:%{GREEDYDATA:url.original}"
+      - "%{IP:source.address}(\\((%{DATA:source.user.domain}\\\\)?%{USERNAME:source.user.name}\\))? %{DATA} (%{NOTSPACE}@)?%{IP:destination.address}:%{GREEDYDATA:url.original}"
   - set:
       if: "ctx._temp_.cisco.message_id == '304001'"
       field: "event.outcome"
@@ -651,8 +651,8 @@ processors:
       field: "message"
       description: "722051"
       patterns:
-              - "Group <%{NOTSPACE:_temp_.cisco.webvpn.group_name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> IPv4 Address <%{IP:_temp_.cisco.assigned_ip}> %{GREEDYDATA}"
-              - "Group %{NOTSPACE:_temp_.cisco.webvpn.group_name} User %{NOTSPACE:source.user.name} IP %{IP:source.address} IPv4 Address %{IP:_temp_.cisco.assigned_ip} %{GREEDYDATA}"
+        - "Group <%{NOTSPACE:_temp_.cisco.webvpn.group_name}> User <%{NOTSPACE:source.user.name}> IP <%{IP:source.address}> IPv4 Address <%{IP:_temp_.cisco.assigned_ip}> %{GREEDYDATA}"
+        - "Group %{NOTSPACE:_temp_.cisco.webvpn.group_name} User %{NOTSPACE:source.user.name} IP %{IP:source.address} IPv4 Address %{IP:_temp_.cisco.assigned_ip} %{GREEDYDATA}"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '733100'"
       field: "message"
@@ -667,7 +667,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '805001'"
       field: "message"
       description: "805001"
-      pattern: "Offloaded %{network.transport} for connection %{_temp_.cisco.connection_id} from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})"
+      pattern: "Offloaded %{network.transport} Flow for connection %{_temp_.cisco.connection_id} from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} (%{_temp_.natsrcip}/%{_temp_.cisco.mapped_source_port}) to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} (%{_temp_.natdstip}/%{_temp_.cisco.mapped_destination_port})"
   - dissect:
       if: "ctx._temp_.cisco.message_id == '805002'"
       field: "message"
@@ -1428,50 +1428,62 @@ processors:
       field: "source.port"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "destination.port"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "source.bytes"
       type: long
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "destination.bytes"
       type: long
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "network.bytes"
       type: long
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "source.packets"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "destination.packets"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "_temp_.cisco.mapped_source_port"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "_temp_.cisco.mapped_destination_port"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "_temp_.cisco.icmp_code"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "_temp_.cisco.icmp_type"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   - convert:
       field: "network.iana_number"
       type: integer
       ignore_failure: true
+      ignore_missing: true
   #
   # Assign ECS .ip fields from .address is a valid IP address is found,
   # otherwise set .domain field.
@@ -1899,6 +1911,11 @@ processors:
       value: "{{source.domain}}"
       if: ctx.source?.domain != null && ctx.source?.domain != ''
       allow_duplicates: false
+  - append:
+      field: related.hosts
+      value: "{{source.user.domain}}"
+      if: ctx.source?.user?.domain != null && ctx.source?.user?.domain != ''
+      allow_duplicates: false
   - script:
       lang: painless
       description: This script processor iterates over the whole document to remove fields with null values.
@@ -1923,6 +1940,9 @@ processors:
           }
         }
         handleMap(ctx);
+  - community_id:
+      ignore_missing: true
+      ignore_failure: true
 on_failure:
   # Copy any fields under _temp_.cisco to its final destination. Those can help
   # with diagnosing the failure.

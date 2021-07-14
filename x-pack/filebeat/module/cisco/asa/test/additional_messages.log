@@ -83,3 +83,4 @@ Apr 27 2020 02:03:03 dev01: %ASA-6-713904: All IPSec SA proposals found unaccept
 Apr 27 2020 02:03:03 dev01: %ASA-6-713903: IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713902: Group = 100.60.140.10, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713901: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 2020 02:03:03 dev01: %ASA-4-106023: Deny protocol 47 src outside:100.66.124.24 dst inside:172.31.98.44 by access-group "inbound"
