@@ -23,11 +23,16 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
+
+	"math/rand"
+
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -108,7 +113,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	}
 
 	// Get the values.
-	values, err := re.query.GetFormattedCounterValues()
+	values, err := re.getValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
@@ -122,6 +127,46 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	}
 	re.executed = true
 	return events, nil
+}
+
+func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
+	var interval uint32 = 10
+	var val map[string][]pdh.CounterValue
+	rand.Seed(time.Now().UnixNano())
+	title := windows.StringToUTF16Ptr(randSeq(10))
+	event, err := windows.CreateEvent(nil, 0, 0, title)
+	if err != nil {
+		return nil, err
+	}
+	err = re.query.CollectDataEx(interval, event)
+	if err != nil {
+		return nil, err
+	}
+	waitfor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	if err != nil {
+		return nil, err
+	}
+	if waitfor == windows.WAIT_OBJECT_0 {
+		val, err = re.query.GetFormattedCounterValues()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if waitfor == windows.WAIT_FAILED {
+		_ = "fff"
+	}
+
+	err = windows.CloseHandle(event)
+	return val, err
+}
+
+func randSeq(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // Close will close the PDH query for now.

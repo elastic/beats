@@ -26,6 +26,8 @@ import (
 	"syscall"
 	"unsafe"
 
+	"golang.org/x/sys/windows"
+
 	"github.com/pkg/errors"
 )
 
@@ -110,7 +112,16 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
 	paths, err := q.ExpandWildCardPath(counterPath)
 	if err == nil {
-		return paths, err
+		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
+		// A call is trigegred again
+		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == counterPath {
+			paths, err = q.ExpandWildCardPath(counterPath)
+			if err == nil {
+				return paths, err
+			}
+		} else {
+			return paths, err
+		}
 	}
 	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
 	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
@@ -158,6 +169,18 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 	return nil
 }
 
+// RemoveAllCounters will remove all counter handles for the paths configured
+func (q *Query) RemoveAllCounters() error {
+	for counterPath, cnt := range q.Counters {
+		err := PdhRemoveCounter(cnt.handle)
+		if err != nil {
+			return err
+		}
+		delete(q.Counters, counterPath)
+	}
+	return nil
+}
+
 func matchCounter(counterPath string, counterList []string) bool {
 	for _, cn := range counterList {
 		if cn == counterPath {
@@ -170,6 +193,11 @@ func matchCounter(counterPath string, counterList []string) bool {
 // CollectData collects the value for all counters in the query.
 func (q *Query) CollectData() error {
 	return PdhCollectQueryData(q.Handle)
+}
+
+// CollectData collects the value for all counters in the query.
+func (q *Query) CollectDataEx(interval uint32, event windows.Handle) error {
+	return PdhCollectQueryDataEx(q.Handle, interval, event)
 }
 
 // GetFormattedCounterValues returns an array of formatted values for a query.
@@ -218,6 +246,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		if err == PDH_MORE_DATA {
 			expdPaths, err = PdhExpandCounterPath(utfPath)
 		}
+		expdPaths, err = PdhExpandCounterPath(utfPath)
 	}
 	if err != nil {
 		return nil, err
