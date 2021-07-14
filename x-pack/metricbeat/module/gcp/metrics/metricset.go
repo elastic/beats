@@ -226,13 +226,25 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 		Name: "projects/" + m.config.ProjectID,
 	}
 
+	m.Logger().Debugf("metrics config %+v", m.MetricsConfig)
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
-			it := client.ListMetricDescriptors(ctx, req)
+			m.Logger().Debugf("list metric descriptors: %s", mt)
 
+			// NOTE: prefixes <service>.googleapis.com/ to all metrics name
+			// this does not work if metrics are gathered from endpoints that required a different prefix, like gke
+			// metrics that require kubernetes.io/ prefix
+			// FIXME: make prefix explicit in the manifest file
+			// TODO: ask @jsoriano how to implement this
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
+			m.Logger().Debugf("ListMetricDescriptors req: %+v", req)
+
+			it := client.ListMetricDescriptors(ctx, req)
 			for {
 				out, err := it.Next()
+				m.Logger().Debugf("%s", out)
+				m.Logger().Debugf("%s", err)
+
 				if out == nil {
 					m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
 				}
