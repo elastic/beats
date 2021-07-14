@@ -108,7 +108,7 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 			}
 			if config.Stream != readjson.All {
 				if suffix != "" {
-					return fmt.Errorf("only one stream selection is allowed")
+					return nil, fmt.Errorf("only one stream selection is allowed")
 				}
 				suffix = config.Stream.String()
 			}
