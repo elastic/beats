@@ -233,6 +233,10 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 			for {
 				out, err := it.Next()
+				if out == nil {
+					m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
+				}
+
 				if err != nil && err != iterator.Done {
 					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
 					m.Logger().Error(err)
