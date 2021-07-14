@@ -5,6 +5,7 @@ input:
   defaults:
     metrics:
     - service: gke
+      metric_prefix: kubernetes.io/
       metric_types:
       - "container/cpu/core_usage_time"
       - "container/cpu/limit_cores"

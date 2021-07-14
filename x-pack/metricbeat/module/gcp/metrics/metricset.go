@@ -51,9 +51,11 @@ type MetricSet struct {
 
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
-	ServiceName string   `config:"service"  validate:"required"`
-	MetricTypes []string `config:"metric_types" validate:"required"`
-	Aligner     string   `config:"aligner"`
+	ServiceName string `config:"service"  validate:"required"`
+	// MetricPrefix allows to specify the prefix string for MetricTypes
+	MetricPrefix string   `config:"metric_prefix"`
+	MetricTypes  []string `config:"metric_types" validate:"required"`
+	Aligner      string   `config:"aligner"`
 }
 
 type metricMeta struct {
@@ -228,22 +230,26 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	m.Logger().Debugf("metrics config %+v", m.MetricsConfig)
 	for _, sdc := range m.MetricsConfig {
+		// Stackdriver requires metrics to be prefixed with a common prefix.
+		// This prefix changes based on the services the metrics belongs to.
+		metricPrefix := sdc.MetricPrefix
+		// NOTE: fallback to Google Cloud prefix for backward compatibility
+		// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
+		// List: https://cloud.google.com/monitoring/api/metrics_gcp
+		if metricPrefix == "" {
+			metricPrefix = sdc.ServiceName + ".googleapis.com/"
+		}
+
 		for _, mt := range sdc.MetricTypes {
 			m.Logger().Debugf("list metric descriptors: %s", mt)
 
-			// NOTE: prefixes <service>.googleapis.com/ to all metrics name
-			// this does not work if metrics are gathered from endpoints that required a different prefix, like gke
-			// metrics that require kubernetes.io/ prefix
-			// FIXME: make prefix explicit in the manifest file
-			// TODO: ask @jsoriano how to implement this
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
+			metricFilter := fmt.Sprintf("metric.type = starts_with(\"%s%s\")", metricPrefix, mt)
+			req.Filter = metricFilter
 			m.Logger().Debugf("ListMetricDescriptors req: %+v", req)
 
 			it := client.ListMetricDescriptors(ctx, req)
 			for {
 				out, err := it.Next()
-				m.Logger().Debugf("%s", out)
-				m.Logger().Debugf("%s", err)
 
 				if out == nil {
 					m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
