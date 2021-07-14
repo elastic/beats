@@ -14,13 +14,13 @@
       - name: limit_cores.value
         type: double
         description: CPU cores limit of the container. Sampled every 60 seconds.
-      - name: limit_utilization.value
+      - name: limit_utilization.pct
         type: double
         description: The fraction of the CPU limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
       - name: request_cores.value
         type: double
         description: Number of CPU cores requested by the container. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-      - name: request_utilization.value
+      - name: request_utilization.pct
         type: double
         description: The fraction of the requested CPU that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
     - name: ephemeral_storage
@@ -41,7 +41,7 @@
       - name: limit.bytes
         type: long
         description: Memory limit of the container in bytes. Sampled every 60 seconds.
-      - name: limit_utilization.value
+      - name: limit_utilization.pct
         type: double
         description: The fraction of the memory limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
       - name: page_fault.count
@@ -50,7 +50,7 @@
       - name: request.bytes
         type: long
         description: Memory request of the container in bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-      - name: request_utilization.value
+      - name: request_utilization.pct
         type: double
         description: The fraction of the requested memory that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
       - name: used.bytes
@@ -71,7 +71,7 @@
       - name: allocatable_cores.value
         type: double
         description: Number of allocatable CPU cores on the node. Sampled every 60 seconds.
-      - name: allocatable_utilization.value
+      - name: allocatable_utilization.pct
         type: double
         description: The fraction of the allocatable CPU that is currently in use on the instance. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
       - name: core_usage_time.value
@@ -104,7 +104,7 @@
       - name: allocatable.bytes
         type: long
         description: Cumulative memory bytes used by the node. Sampled every 60 seconds.
-      - name: allocatable_utilization.value
+      - name: allocatable_utilization.pct
         type: double
         description: The fraction of the allocatable memory that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed allocatable memory bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
       - name: total.bytes
@@ -164,6 +164,6 @@
       - name: used.bytes
         type: long
         description: Number of disk bytes used by the pod. Sampled every 60 seconds.
-      - name: utilization.value
+      - name: utilization.pct
         type: double
         description: The fraction of the volume that is currently being used by the instance. This value cannot be greater than 1 as usage cannot exceed the total available volume space. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
