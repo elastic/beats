@@ -7,6 +7,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -51,9 +52,27 @@ type MetricSet struct {
 
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
-	ServiceName string   `config:"service"  validate:"required"`
-	MetricTypes []string `config:"metric_types" validate:"required"`
-	Aligner     string   `config:"aligner"`
+	ServiceName string `config:"service"  validate:"required"`
+	// MetricPrefix allows to specify the prefix string for MetricTypes
+	// Stackdriver requires metrics to be prefixed with a common prefix.
+	// This prefix changes based on the services the metrics belongs to.
+	ServiceMetricPrefix string   `config:"service_metric_prefix"`
+	MetricTypes         []string `config:"metric_types" validate:"required"`
+	Aligner             string   `config:"aligner"`
+}
+
+func (mc metricsConfig) MetricPrefix() string {
+	// NOTE: fallback to Google Cloud prefix for backward compatibility
+	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
+	// List: https://cloud.google.com/monitoring/api/metrics_gcp
+	if mc.ServiceMetricPrefix == "" {
+		return mc.ServiceName + ".googleapis.com/"
+	}
+
+	if !strings.HasSuffix(mc.ServiceMetricPrefix, "/") {
+		mc.ServiceMetricPrefix += "/"
+	}
+	return mc.ServiceMetricPrefix
 }
 
 type metricMeta struct {
@@ -228,7 +247,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s%s")`, sdc.MetricPrefix(), mt)
 			it := client.ListMetricDescriptors(ctx, req)
 
 			for {
