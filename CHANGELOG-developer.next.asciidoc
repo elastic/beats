@@ -106,3 +106,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update Go version to 1.15.10. {pull}24606[24606]
 - Update Go version to 1.15.12. {pull}25629[25629]
 - Update Go version to 1.15.13. {pull}26212[26212] {issue}26182[26182]
+- Update Go version to 1.15.14. {pull}26845[26845]

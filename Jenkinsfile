@@ -26,7 +26,7 @@ pipeline {
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
-    timeout(time: 3, unit: 'HOURS')
+    timeout(time: 4, unit: 'HOURS')
     buildDiscarder(logRotator(numToKeepStr: '60', artifactNumToKeepStr: '20', daysToKeepStr: '30'))
     timestamps()
     ansiColor('xterm')
@@ -72,6 +72,11 @@ pipeline {
             retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
           }
         }
+        withMageEnv(version: "${env.GO_VERSION}"){
+          dir("${BASE_DIR}"){
+            setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+          }
+        }
       }
     }
     stage('Lint'){
@@ -84,15 +89,11 @@ pipeline {
           withGithubNotify(context: "Lint") {
             withBeatsEnv(archive: false, id: "lint") {
               dumpVariables()
-              setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
               whenTrue(env.ONLY_DOCS == 'true') {
                 cmd(label: "make check", script: "make check")
               }
               whenTrue(env.ONLY_DOCS == 'false') {
-                cmd(label: "make check-python", script: "make check-python")
-                cmd(label: "make check-go", script: "make check-go")
-                cmd(label: "make notice", script: "make notice")
-                cmd(label: "Check for changes", script: "make check-no-changes")
+                runLinting()
               }
             }
           }
@@ -115,28 +116,48 @@ pipeline {
         }
       }
       steps {
-        deleteDir()
-        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
-        dir("${BASE_DIR}"){
-          script {
-            def mapParallelTasks = [:]
-            def content = readYaml(file: 'Jenkinsfile.yml')
-            if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
-              error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
-            } else {
-              content['projects'].each { projectName ->
-                generateStages(project: projectName, changeset: content['changeset']).each { k,v ->
-                  mapParallelTasks["${k}"] = v
-                }
-              }
-              notifyBuildReason()
-              parallel(mapParallelTasks)
-            }
+        runBuildAndTest(filterStage: 'mandatory')
+      }
+    }
+    stage('Extended') {
+      options { skipDefaultCheckout() }
+      when {
+        // Always when running builds on branches/tags
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          not { changeRequest() }                           // If no PR
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
           }
+          expression { return params.runAllStages }         // If UI forced
         }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'extended')
       }
     }
     stage('Packaging') {
+      options { skipDefaultCheckout() }
+      when {
+        // Always when running builds on branches/tags
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          not { changeRequest() }                           // If no PR
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'packaging')
+      }
+    }
+    stage('Packaging-Pipeline') {
       agent none
       options { skipDefaultCheckout() }
       when {
@@ -173,6 +194,46 @@ VERSION=${env.VERSION}-SNAPSHOT""")
   }
 }
 
+def runLinting() {
+  def mapParallelTasks = [:]
+  def content = readYaml(file: 'Jenkinsfile.yml')
+  content['projects'].each { projectName ->
+    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'lint').each { k,v ->
+      mapParallelTasks["${k}"] = v
+    }
+  }
+  mapParallelTasks['default'] = {
+                                cmd(label: "make check-python", script: "make check-python")
+                                cmd(label: "make check-go", script: "make check-go")
+                                cmd(label: "make notice", script: "make notice")
+                                cmd(label: "Check for changes", script: "make check-no-changes")
+                              }
+
+  parallel(mapParallelTasks)
+}
+
+def runBuildAndTest(Map args = [:]) {
+  def filterStage = args.get('filterStage', 'mandatory')
+  deleteDir()
+  unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+  dir("${BASE_DIR}"){
+    def mapParallelTasks = [:]
+    def content = readYaml(file: 'Jenkinsfile.yml')
+    if (content?.disabled?.when?.labels && beatsWhen(project: 'top-level', content: content?.disabled?.when)) {
+      error 'Pull Request has been configured to be disabled when there is a skip-ci label match'
+    } else {
+      content['projects'].each { projectName ->
+        generateStages(project: projectName, changeset: content['changeset'], filterStage: filterStage).each { k,v ->
+          mapParallelTasks["${k}"] = v
+        }
+      }
+      notifyBuildReason()
+      parallel(mapParallelTasks)
+    }
+  }
+}
+
+
 /**
 * There are only two supported branches, master and 7.x
 */
@@ -198,13 +259,13 @@ def getBranchIndice(String compare) {
   return 'master'
 }
 
-
 /**
 * This method is the one used for running the parallel stages, therefore
 * its arguments are passed by the beatsStages step.
 */
 def generateStages(Map args = [:]) {
   def projectName = args.project
+  def filterStage = args.get('filterStage', 'all')
   def changeset = args.changeset
   def mapParallelStages = [:]
   def fileName = "${projectName}/Jenkinsfile.yml"
@@ -212,7 +273,7 @@ def generateStages(Map args = [:]) {
     def content = readYaml(file: fileName)
     // changesetFunction argument is only required for the top-level when, stage specific when don't need it since it's an aggregation.
     if (beatsWhen(project: projectName, content: content?.when, changeset: changeset, changesetFunction: new GetProjectDependencies(steps: this))) {
-      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: new RunCommand(steps: this))
+      mapParallelStages = beatsStages(project: projectName, content: content, changeset: changeset, function: new RunCommand(steps: this), filterStage: filterStage)
     }
   } else {
     log(level: 'WARN', text: "${fileName} file does not exist. Please review the top-level Jenkinsfile.yml")
@@ -221,7 +282,7 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  withNode(labels: args.label, forceWorkspace: true){
     startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
   withCloudTestEnv() {
@@ -236,7 +297,7 @@ def cloud(Map args = [:]) {
 def k8sTest(Map args = [:]) {
   def versions = args.versions
   versions.each{ v ->
-    withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+    withNode(labels: args.label, forceWorkspace: true){
       stage("${args.context} ${v}"){
         withEnv(["K8S_VERSION=${v}", "KIND_VERSION=v0.7.0", "KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
           withGithubNotify(context: "${args.context} ${v}") {
@@ -291,9 +352,13 @@ def packagingLinux(Map args = [:]) {
                 'linux/amd64',
                 'linux/386',
                 'linux/arm64',
+                // armv7 packaging isn't working, and we don't currently
+                // need it for release. Do not re-enable it without
+                // confirming it is fixed, you will break the packaging
+                // pipeline!
+                //'linux/armv7',
                 // The platforms above are disabled temporarly as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
-                //'linux/armv7',
                 //'linux/ppc64le',
                 //'linux/mips64',
                 //'linux/s390x',
@@ -458,6 +523,7 @@ def e2e(Map args = [:]) {
     def goVersionForE2E = readFile('.go-version').trim()
     withEnv(["GO_VERSION=${goVersionForE2E}",
               "BEATS_LOCAL_PATH=${env.WORKSPACE}/${env.BASE_DIR}",
+              "BEAT_VERSION=${env.VERSION}-SNAPSHOT",
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
@@ -488,7 +554,7 @@ def target(Map args = [:]) {
   def isE2E = args.e2e?.get('enabled', false)
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
-  withNode(labels: args.label, sleepMin: 30, sleepMax: 200, forceWorkspace: true){
+  withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
       withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
         dumpVariables()
@@ -634,12 +700,16 @@ def tearDown() {
 */
 def fixPermissions(location) {
   if(isUnix()) {
-    sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
-      set +x
-      echo "Cleaning up ${location}"
-      source ./dev-tools/common.bash
-      docker_setup
-      script/fix_permissions.sh ${location}""", returnStatus: true)
+    catchError(message: 'There were some failures when fixing the permissions', buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+      timeout(5) {
+        sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+          set +x
+          echo "Cleaning up ${location}"
+          source ./dev-tools/common.bash
+          docker_setup
+          script/fix_permissions.sh ${location}""", returnStatus: true)
+      }
+    }
   }
 }
 

@@ -110,7 +110,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add service resource in k8s cluster role. {pull}20546[20546]
 - [Metricbeat][Kubernetes] Change cluster_ip field from ip to keyword. {pull}20571[20571]
 - The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
-- Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss` as gauges (rather than counters). {pull}22877[22877]
+- Fix `add_process_metadata` processor complaining about valid pid fields not being valid integers. {pull}26829[26829] {issue}26830[26830]
 
 *Auditbeat*
 
@@ -120,7 +120,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
+- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
 
 *Filebeat*
 
@@ -168,9 +168,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix event.type for zeek/ssl and duplicate event.category for zeek/connection {pull}20696[20696]
 - Add json body check for sqs message. {pull}21727[21727]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
-- Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
-- o365: Avoid mapping exception for `Parameters` and `ExtendedProperties` fields of string type. {pull}26164[26164]
-- Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
+- Fix Elasticsearch compatibility for modules that use `type: ip` with `convert` processors. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `network_direction` processor. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
 
 *Heartbeat*
 
@@ -482,6 +482,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
 
 
 
