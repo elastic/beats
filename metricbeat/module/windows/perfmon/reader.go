@@ -151,11 +151,9 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 		if err != nil {
 			return nil, err
 		}
+	} else if waitfor == windows.WAIT_FAILED {
+		return nil, errors.New("WaitForSingleObject has failed")
 	}
-	if waitfor == windows.WAIT_FAILED {
-		_ = "fff"
-	}
-
 	err = windows.CloseHandle(event)
 	return val, err
 }
