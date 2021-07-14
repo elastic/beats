@@ -46,7 +46,7 @@ func securityDescriptor() (string, error) {
 		// running as SYSTEM, include Administrators group so Administrators can talk over
 		// the named pipe to the running Elastic Agent system process
 		// https://support.microsoft.com/en-us/help/243330/well-known-security-identifiers-in-windows-operating-systems
-		descriptor += "(A;;GA;;;S-1-5-32-544)"  // Administrators group
+		descriptor += "(A;;GA;;;S-1-5-32-544)" // Administrators group
 	}
 	return descriptor, nil
 }
