@@ -8,7 +8,7 @@
     - name: cpu
       type: group
       fields:
-      - name: core_usage_time.value
+      - name: core_usage_time.sec
         type: double
         description: Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
       - name: limit_cores.value
@@ -59,7 +59,7 @@
     - name: restart.count
       type: long
       description: Number of times the container has restarted. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-    - name: uptime.value
+    - name: uptime.sec
       type: double
       description: Time in seconds that the container has been running. Sampled every 60 seconds.
   - name: node
@@ -74,7 +74,7 @@
       - name: allocatable_utilization.pct
         type: double
         description: The fraction of the allocatable CPU that is currently in use on the instance. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
-      - name: core_usage_time.value
+      - name: core_usage_time.sec
         type: double
         description: Cumulative CPU usage on all cores used on the node in seconds. Sampled every 60 seconds.
       - name: total_cores.value
@@ -134,7 +134,7 @@
     - name: cpu
       type: group
       fields:
-      - name: core_usage_time.value
+      - name: core_usage_time.sec
         type: double
         description: Cumulative CPU usage on all cores used by the node level system daemon in seconds. Sampled every 60 seconds.
     - name: memory
