@@ -1,6 +1,7 @@
 - name: gke
   type: group
   release: beta
+  description: '`gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE'
   fields:
   - name: container
     type: group
