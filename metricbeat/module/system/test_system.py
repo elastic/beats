@@ -67,8 +67,11 @@ SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
+SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
+                              "actual.used.pct", "hugepages", "page_stats"]
+
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
-                        "actual.used.pct", "hugepages", "page_stats"]
+                                "actual.used.pct", "hugepages", "page_stats"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
@@ -384,7 +387,13 @@ class Test(metricbeat.BaseTest):
         if not re.match("(?i)linux", sys.platform) and not "page_stats" in memory:
             # Ensure presence of page_stats only in Linux
             memory["page_stats"] = None
-        self.assertCountEqual(self.de_dot(SYSTEM_MEMORY_FIELDS), memory.keys())
+
+        if sys.platform.startswith("linux"):
+            self.assertCountEqual(self.de_dot(
+                SYSTEM_MEMORY_FIELDS_LINUX), memory.keys())
+        else:
+            self.assertCountEqual(self.de_dot(
+                SYSTEM_MEMORY_FIELDS), memory.keys())
 
         # Check that percentages are calculated.
         mem = memory

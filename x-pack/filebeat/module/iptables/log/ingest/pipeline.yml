@@ -8,10 +8,11 @@ processors:
     patterns:
     - '%{SYSLOGTIMESTAMP:iptables.raw_date}%{SPACE}%{IPTABLES_HOSTNAME}%{GREEDYDATA}\[%{UBIQUITI_LABEL}\]%{IPTABLES}%{SPACE}'
     - '%{SYSLOGTIMESTAMP:iptables.raw_date}%{SPACE}%{IPTABLES_ACTION}%{GREEDYDATA}%{IPTABLES}%{SPACE}'
+    - '%{SYSLOGTIMESTAMP:iptables.raw_date}%{SPACE}%{IPTABLES_HOSTNAME}%{SPACE}%{UDM_LOGS}%{IPTABLES_IP_PAYLOAD}'
     - '%{GREEDYDATA}\[%{UBIQUITI_LABEL}\]%{IPTABLES}%{SPACE}'
     - '%{GREEDYDATA}%{IPTABLES}%{SPACE}'
     pattern_definitions:
-      IPTABLES_HOSTNAME: '%{HOSTNAME:observer.name}%{SPACE}kernel:'
+      IPTABLES_HOSTNAME: '%{HOSTNAME:observer.name}%{SPACE}(%{NOTSPACE}%{SPACE})?kernel:'
       IPTABLES_ACTION: '(:?%{WORD:event.action}:|%{IPTABLES_HOSTNAME}%{SPACE}iptables%{SPACE}%{WORD:event.action}|%{IPTABLES_HOSTNAME})'
       UNSIGNED_INT: '[0-9]+'
       ETHTYPE: (?:[A-Fa-f0-9]{2}):(?:[A-Fa-f0-9]{2})
@@ -49,6 +50,7 @@ processors:
       UBIQUITI_FIELD: '[^-\]]*'
       UBIQUITI_RULESET_NAME: '[^\]]*'
       UBIQUITI_LABEL: '%{UBIQUITI_RULESET_NAME:iptables.ubiquiti.rule_set}-%{UBIQUITI_FIELD:iptables.ubiquiti.rule_number}-%{UBIQUITI_FIELD:event.action}'
+      UDM_LOGS: '(%{UNSIGNED_INT}%{SPACE})?(TTL|TL|L)=(%{UNSIGNED_INT:iptables.ttl:int})%{SPACE}(ID=(%{UNSIGNED_INT:iptables.id:int})%{SPACE})?(DF%{SPACE})?'
 - rename:
     field: message
     target_field: log.original

@@ -23,6 +23,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:DW/lSsosl8gZ8pqO9kKMm7cZheQ=",
+        "network.direction": "internal",
         "network.protocol": "kerberos",
         "network.transport": "tcp",
         "related.ip": [

@@ -128,7 +128,7 @@ func (op *updateOp) Execute(n uint) {
 	resource.stateMutex.Lock()
 	defer resource.stateMutex.Unlock()
 
-	if resource.lockedVersion != op.resource.version {
+	if resource.lockedVersion != op.resource.version || resource.isDeleted() {
 		return
 	}
 

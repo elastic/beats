@@ -21,6 +21,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:jEXbR2FqHyMgLJgyYyFQN3yxbpc=",
+        "network.direction": "internal",
         "network.protocol": "modbus",
         "network.transport": "tcp",
         "related.ip": [

@@ -64,6 +64,7 @@ type fileSource struct {
 	newPath   string
 	oldPath   string
 	truncated bool
+	archived  bool
 
 	name                string
 	identifierGenerator string
@@ -105,6 +106,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
+		archived:            e.Op == loginp.OpArchived,
 		name:                i.name + identitySep + file.GetOSState(e.Info).String(),
 		identifierGenerator: i.name,
 	}
@@ -143,6 +145,7 @@ func (p *pathIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		newPath:             e.NewPath,
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
+		archived:            e.Op == loginp.OpArchived,
 		name:                p.name + identitySep + path,
 		identifierGenerator: p.name,
 	}

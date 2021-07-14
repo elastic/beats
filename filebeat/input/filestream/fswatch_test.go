@@ -129,69 +129,69 @@ func TestFileWatchNewDeleteModified(t *testing.T) {
 		"one new file": {
 			prevFiles: map[string]os.FileInfo{},
 			nextFiles: map[string]os.FileInfo{
-				"new_path": testFileInfo{"new_path", 5, oldTs},
+				"new_path": testFileInfo{"new_path", 5, oldTs, nil},
 			},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "new_path", Info: testFileInfo{"new_path", 5, oldTs}},
+				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "new_path", Info: testFileInfo{"new_path", 5, oldTs, nil}},
 			},
 		},
 		"one deleted file": {
 			prevFiles: map[string]os.FileInfo{
-				"old_path": testFileInfo{"old_path", 5, oldTs},
+				"old_path": testFileInfo{"old_path", 5, oldTs, nil},
 			},
 			nextFiles: map[string]os.FileInfo{},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "old_path", NewPath: "", Info: testFileInfo{"old_path", 5, oldTs}},
+				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "old_path", NewPath: "", Info: testFileInfo{"old_path", 5, oldTs, nil}},
 			},
 		},
 		"one modified file": {
 			prevFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 5, oldTs},
+				"path": testFileInfo{"path", 5, oldTs, nil},
 			},
 			nextFiles: map[string]os.FileInfo{
-				"path": testFileInfo{"path", 10, newTs},
+				"path": testFileInfo{"path", 10, newTs, nil},
 			},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 10, newTs}},
+				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path", NewPath: "path", Info: testFileInfo{"path", 10, newTs, nil}},
 			},
 		},
 		"two modified files": {
 			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs},
-				"path2": testFileInfo{"path2", 5, oldTs},
+				"path1": testFileInfo{"path1", 5, oldTs, nil},
+				"path2": testFileInfo{"path2", 5, oldTs, nil},
 			},
 			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs},
-				"path2": testFileInfo{"path2", 10, newTs},
+				"path1": testFileInfo{"path1", 10, newTs, nil},
+				"path2": testFileInfo{"path2", 10, newTs, nil},
 			},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs}},
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path2", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs}},
+				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
+				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path2", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
 			},
 		},
 		"one modified file, one new file": {
 			prevFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 5, oldTs},
+				"path1": testFileInfo{"path1", 5, oldTs, nil},
 			},
 			nextFiles: map[string]os.FileInfo{
-				"path1": testFileInfo{"path1", 10, newTs},
-				"path2": testFileInfo{"path2", 10, newTs},
+				"path1": testFileInfo{"path1", 10, newTs, nil},
+				"path2": testFileInfo{"path2", 10, newTs, nil},
 			},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs}},
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs}},
+				loginp.FSEvent{Op: loginp.OpWrite, OldPath: "path1", NewPath: "path1", Info: testFileInfo{"path1", 10, newTs, nil}},
+				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path2", Info: testFileInfo{"path2", 10, newTs, nil}},
 			},
 		},
 		"one new file, one deleted file": {
 			prevFiles: map[string]os.FileInfo{
-				"path_deleted": testFileInfo{"path_deleted", 5, oldTs},
+				"path_deleted": testFileInfo{"path_deleted", 5, oldTs, nil},
 			},
 			nextFiles: map[string]os.FileInfo{
-				"path_new": testFileInfo{"path_new", 10, newTs},
+				"path_new": testFileInfo{"path_new", 10, newTs, nil},
 			},
 			expectedEvents: []loginp.FSEvent{
-				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "path_deleted", NewPath: "", Info: testFileInfo{"path_deleted", 5, oldTs}},
-				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path_new", Info: testFileInfo{"path_new", 10, newTs}},
+				loginp.FSEvent{Op: loginp.OpDelete, OldPath: "path_deleted", NewPath: "", Info: testFileInfo{"path_deleted", 5, oldTs, nil}},
+				loginp.FSEvent{Op: loginp.OpCreate, OldPath: "", NewPath: "path_new", Info: testFileInfo{"path_new", 10, newTs, nil}},
 			},
 		},
 	}
@@ -232,6 +232,7 @@ type testFileInfo struct {
 	path string
 	size int64
 	time time.Time
+	sys  interface{}
 }
 
 func (t testFileInfo) Name() string       { return t.path }
@@ -239,7 +240,7 @@ func (t testFileInfo) Size() int64        { return t.size }
 func (t testFileInfo) Mode() os.FileMode  { return 0 }
 func (t testFileInfo) ModTime() time.Time { return t.time }
 func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return nil }
+func (t testFileInfo) Sys() interface{}   { return t.sys }
 
 func mustDuration(durStr string) time.Duration {
 	dur, err := time.ParseDuration(durStr)

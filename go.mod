@@ -60,7 +60,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
-	github.com/elastic/ecs v1.8.0
+	github.com/elastic/ecs v1.10.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210308165121-7dd05ee2b5a5
 	github.com/elastic/go-concert v0.1.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
@@ -69,11 +69,11 @@ require (
 	github.com/elastic/go-lumber v0.1.0
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.1.0
-	github.com/elastic/go-structform v0.0.8
+	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-sysinfo v1.7.0
 	github.com/elastic/go-txfile v0.0.7
 	github.com/elastic/go-ucfg v0.8.3
-	github.com/elastic/go-windows v1.0.1 // indirect
+	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.1
 	github.com/fatih/color v1.9.0
 	github.com/fsnotify/fsevents v0.1.1
@@ -164,12 +164,12 @@ require (
 	go.uber.org/atomic v1.5.0
 	go.uber.org/multierr v1.3.0
 	go.uber.org/zap v1.14.0
-	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
 	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20210308170721-88b6017d0656
+	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
 	golang.org/x/text v0.3.5
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.0.0-20200731060945-b5fad4ed8dd6

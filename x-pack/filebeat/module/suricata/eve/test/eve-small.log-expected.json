@@ -18,6 +18,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:NLm1MbaBR6humQxEQI2Ai7h/XiI=",
+        "network.direction": "internal",
         "network.protocol": "ssh",
         "network.transport": "tcp",
         "related.ip": [
@@ -66,6 +67,7 @@
         "message": "Potential Corporate Privacy Violation",
         "network.bytes": 1136,
         "network.community_id": "1:BWtsS+4pk477zAwfzve3Nm+x1Ms=",
+        "network.direction": "internal",
         "network.packets": 7,
         "network.protocol": "tls",
         "network.transport": "tcp",
@@ -128,6 +130,7 @@
         "input.type": "log",
         "log.offset": 985,
         "network.community_id": "1:gjMiDGtS5SVvdwzjjQdAKGBrDA4=",
+        "network.direction": "internal",
         "network.protocol": "http",
         "network.transport": "tcp",
         "related.hosts": [
@@ -184,6 +187,7 @@
         "input.type": "log",
         "log.offset": 1507,
         "network.community_id": "1:XhhAO/Twj86+bD+1fV8FnpLIEDs=",
+        "network.direction": "internal",
         "network.protocol": "http",
         "network.transport": "tcp",
         "related.hosts": [
@@ -257,6 +261,7 @@
         "input.type": "log",
         "log.offset": 2347,
         "network.community_id": "1:pC3b0nBNCU4LxSue53drHp4b4cs=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -443,6 +448,7 @@
         "input.type": "log",
         "log.offset": 4683,
         "network.community_id": "1:u67AuA4ybOaspT7mp9OZ3jWvnKw=",
+        "network.direction": "outbound",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "related.hash": [
@@ -517,6 +523,7 @@
         "log.offset": 5308,
         "network.bytes": 110,
         "network.community_id": "1:fNUIKjMfx/xaM1gOO3eaVAeWLZA=",
+        "network.direction": "external",
         "network.packets": 1,
         "network.transport": "udp",
         "related.ip": [
@@ -563,6 +570,7 @@
         "input.type": "log",
         "log.offset": 5796,
         "network.community_id": "1:Y8m38aDR9cy/emlD86XGhosniqY=",
+        "network.direction": "internal",
         "network.protocol": "http",
         "network.transport": "tcp",
         "related.hosts": [
@@ -613,6 +621,7 @@
         "input.type": "log",
         "log.offset": 6267,
         "network.community_id": "1:SKXuhLNyv4gfe01gqILs5v+qx40=",
+        "network.direction": "internal",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "related.hash": [
@@ -684,6 +693,7 @@
         "input.type": "log",
         "log.offset": 6958,
         "network.community_id": "1:UHWPAQmxXu8t7EWZzPx9jl6b6TM=",
+        "network.direction": "internal",
         "network.protocol": "http",
         "network.transport": "tcp",
         "related.hosts": [
@@ -736,6 +746,7 @@
         "input.type": "log",
         "log.offset": 7401,
         "network.community_id": "1:0dSnqQKCiJXvy6HxZlV+50/b68k=",
+        "network.direction": "internal",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "related.ip": [

@@ -16,6 +16,7 @@ type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	LogGroupARN               string              `config:"log_group_arn"`
 	LogGroupName              string              `config:"log_group_name"`
+	LogGroupNamePrefix        string              `config:"log_group_name_prefix"`
 	RegionName                string              `config:"region_name"`
 	LogStreams                []string            `config:"log_streams"`
 	LogStreamPrefix           string              `config:"log_stream_prefix"`
@@ -44,13 +45,17 @@ func (c *config) Validate() error {
 			"either 'beginning' or 'end'")
 	}
 
-	if c.LogGroupARN == "" && c.LogGroupName == "" {
-		return errors.New("log_group_arn and log_group_name config parameter" +
-			"cannot be both empty")
+	if c.LogGroupARN == "" && c.LogGroupName == "" && c.LogGroupNamePrefix == "" {
+		return errors.New("log_group_arn, log_group_name and log_group_name_prefix config parameter" +
+			"cannot all be empty")
 	}
 
-	if c.LogGroupName != "" && c.RegionName == "" {
-		return errors.New("region_name is required when log_group_name " +
+	if c.LogGroupName != "" && c.LogGroupNamePrefix != "" {
+		return errors.New("log_group_name and log_group_name_prefix cannot be given at the same time")
+	}
+
+	if (c.LogGroupName != "" || c.LogGroupNamePrefix != "") && c.RegionName == "" {
+		return errors.New("region_name is required when log_group_name or log_group_name_prefix " +
 			"config parameter is given")
 	}
 	return nil
