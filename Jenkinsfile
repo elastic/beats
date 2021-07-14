@@ -195,16 +195,16 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       // Report rerun status
       writeJSON(file: 'rerun.json', json: rerunStages)
       archiveArtifacts(artifacts: 'rerun.json')
+      script {
+        log(level: 'INFO', text: 'Set description with the number of stage retries to help with the ES queries.')
+        def numberOfRepeats = rerunStages?.collect { k, v -> return k }?.size
+        currentBuild.description = "Stage retries: ${numberOfRepeats}"
+      }
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
-      }
-      // Add description to help with the ES queries.
-      script {
-        def numberOfRepeats = rerunStages?.collect { k, v -> return k }?.size
-        currentBuild.description = "Stage retries: ${numberOfRepeats} | ${currentBuild.description}"
       }
     }
   }
