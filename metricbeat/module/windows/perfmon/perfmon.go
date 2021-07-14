@@ -36,7 +36,7 @@ func init() {
 
 type MetricSet struct {
 	mb.BaseMetricSet
-	reader *ReaderAlt
+	reader *Reader
 	log    *logp.Logger
 }
 
@@ -46,7 +46,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	reader, err := NewReaderAlt(config)
+	reader, err := NewReader(config)
 	if err != nil {
 		return nil, errors.Wrap(err, "initialization of reader failed")
 	}
