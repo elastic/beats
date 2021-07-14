@@ -63,7 +63,6 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if len(m.reader.query.Counters) == 0 {
 		m.log.Error("no counter paths were found")
 	}
-
 	// refresh performance counter list
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).

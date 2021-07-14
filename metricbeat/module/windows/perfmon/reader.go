@@ -130,7 +130,6 @@ func (re *Reader) Read() ([]mb.Event, error) {
 }
 
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
-	var interval uint32 = 10
 	var val map[string][]pdh.CounterValue
 	rand.Seed(time.Now().UnixNano())
 	title := windows.StringToUTF16Ptr(randSeq(10))
@@ -138,22 +137,26 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = re.query.CollectDataEx(interval, event)
+	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
 	if err != nil {
 		return nil, err
 	}
-	waitfor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
 	if err != nil {
 		return nil, err
 	}
-	if waitfor == windows.WAIT_OBJECT_0 {
+	switch waitFor {
+	case windows.WAIT_OBJECT_0:
 		val, err = re.query.GetFormattedCounterValues()
 		if err != nil {
 			return nil, err
 		}
-	} else if waitfor == windows.WAIT_FAILED {
+	case windows.WAIT_FAILED:
 		return nil, errors.New("WaitForSingleObject has failed")
+	default:
+		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
 	}
+
 	err = windows.CloseHandle(event)
 	return val, err
 }

@@ -169,18 +169,6 @@ func (q *Query) RemoveUnusedCounters(counters []string) error {
 	return nil
 }
 
-// RemoveAllCounters will remove all counter handles for the paths configured
-func (q *Query) RemoveAllCounters() error {
-	for counterPath, cnt := range q.Counters {
-		err := PdhRemoveCounter(cnt.handle)
-		if err != nil {
-			return err
-		}
-		delete(q.Counters, counterPath)
-	}
-	return nil
-}
-
 func matchCounter(counterPath string, counterList []string) bool {
 	for _, cn := range counterList {
 		if cn == counterPath {
