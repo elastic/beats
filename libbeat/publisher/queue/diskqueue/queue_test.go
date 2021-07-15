@@ -19,9 +19,9 @@ package diskqueue
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"math/rand"
+	"os"
 	"testing"
 	"time"
 
@@ -31,6 +31,11 @@ import (
 )
 
 var seed int64
+
+type testQueue struct {
+	*diskQueue
+	teardown func()
+}
 
 func init() {
 	flag.Int64Var(&seed, "seed", time.Now().UnixNano(), "test random seed")
@@ -68,11 +73,6 @@ func TestProduceConsumer(t *testing.T) {
 	}
 
 	t.Run("direct", testWith(makeTestQueue()))
-	//t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
-}
-
-func TestProducerCancelRemovesEvents(t *testing.T) {
-	queuetest.TestProducerCancelRemovesEvents(t, makeTestQueue())
 }
 
 func makeTestQueue() queuetest.QueueFactory {
@@ -81,11 +81,20 @@ func makeTestQueue() queuetest.QueueFactory {
 		if err != nil {
 			t.Fatal(err)
 		}
-		//defer os.RemoveAll(dir)
 		settings := DefaultSettings()
 		settings.Path = dir
-		fmt.Printf("Creating disk queue at path %v\n", dir)
 		queue, _ := NewQueue(logp.L(), settings)
-		return queue
+		return testQueue{
+			diskQueue: queue,
+			teardown: func() {
+				os.RemoveAll(dir)
+			},
+		}
 	}
+}
+
+func (t testQueue) Close() error {
+	err := t.diskQueue.Close()
+	t.teardown()
+	return err
 }
