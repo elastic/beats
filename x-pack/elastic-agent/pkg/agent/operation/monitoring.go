@@ -488,6 +488,11 @@ func (o *Operator) getMonitoringMetricbeatConfig(outputType string, output inter
 								"from": "http.agent.beat.cgroup",
 								"to":   "system.process.cgroup",
 							},
+							// apm specific metrics
+							{
+								"from": "http.agent.apm-server",
+								"to":   "apm-server",
+							},
 						},
 						"ignore_missing": true,
 					},
