@@ -38,12 +38,12 @@ func init() {
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet
+// MetricSet type defines all fields of the MetricSet.
 type MetricSet struct {
 	*vsphere.MetricSet
 }
 
-// NewMetricSet create a new instance of the MetricSet
+// New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms, err := vsphere.NewMetricSet(base)
 	if err != nil {

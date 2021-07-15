@@ -29,14 +29,14 @@ var HostParser = parse.URLHostParserBuilder{
 	DefaultPath:   "/sdk",
 }.Build()
 
-// MetricSet type defines all fields of the MetricSet
+// MetricSet type defines all fields of the MetricSet.
 type MetricSet struct {
 	mb.BaseMetricSet
 	Insecure bool
 	HostURL  *url.URL
 }
 
-// NewMetricSet create a new instance of the MetricSet
+// NewMetricSet creates a new instance of the MetricSet.
 func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 	config := struct {
 		Insecure bool `config:"insecure"`
