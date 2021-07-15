@@ -4202,5 +4202,141 @@
             "cisco-asa",
             "forwarded"
         ]
+    },
+    {
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "106023",
+        "cisco.asa.rule_name": "OUTSIDE_in",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "destination.address": "fe00:afa0::1",
+        "destination.ip": "fe00:afa0::1",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106023,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-106023: Deny icmp src OUTSIDE:2a05:d016:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group \"OUTSIDE_in\"",
+        "event.outcome": "failure",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12341,
+        "network.community_id": "1:VA3lwFPBuRus2kxMs1BexFp+gp4=",
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+            "fe00:afa0::1"
+        ],
+        "service.type": "cisco",
+        "source.address": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+        "source.as.number": 16509,
+        "source.as.organization.name": "Amazon.com, Inc.",
+        "source.geo.city_name": "Stockholm",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 59.3333,
+        "source.geo.location.lon": 18.05,
+        "source.geo.region_iso_code": "SE-AB",
+        "source.geo.region_name": "Stockholm",
+        "source.ip": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.connection_id": "123364823",
+        "cisco.asa.destination_interface": "identity",
+        "cisco.asa.message_id": "302016",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "destination.address": "85.0.0.1",
+        "destination.as.number": 3303,
+        "destination.as.organization.name": "Bluewin",
+        "destination.geo.city_name": "Kolliken",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
+        "destination.geo.location.lat": 47.3388,
+        "destination.geo.location.lon": 8.0264,
+        "destination.geo.region_iso_code": "CH-AG",
+        "destination.geo.region_name": "Aargau",
+        "destination.ip": "85.0.0.1",
+        "destination.port": 500,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302016,
+        "event.dataset": "cisco.asa",
+        "event.duration": 332660000000000,
+        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-302016: Teardown UDP connection 123364823 for OUTSIDE:82.0.0.1/500 to identity:85.0.0.1/500 duration 92:24:20 bytes 4671944",
+        "event.severity": 4,
+        "event.start": "2020-04-23T07:38:43.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12518,
+        "network.bytes": 4671944,
+        "network.community_id": "1:rwM9yFUsWh6N2utKviU7S94dS9U=",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "identity",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "82.0.0.1",
+            "85.0.0.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "82.0.0.1",
+        "source.as.number": 5089,
+        "source.as.organization.name": "Virgin Media Limited",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.4964,
+        "source.geo.location.lon": -0.1224,
+        "source.ip": "82.0.0.1",
+        "source.port": 500,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
     }
 ]
