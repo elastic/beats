@@ -1,11 +1,9 @@
 package diskqueue
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"sync"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -50,88 +48,74 @@ func TestAddFrames(t *testing.T) {
 		},
 		stateFile)
 
-	wrapper := wrapACKChan(dqa.segmentACKChan)
-	defer wrapper.close()
-
 	dqa.nextFrameID = 100
-	segment0 := &queueSegment{
+	segment3 := &queueSegment{
 		id:           3,
-		firstFrameID: 100,
+		firstFrameID: 50,
 	}
-	segment1 := &queueSegment{
+	segment4 := &queueSegment{
 		id:           4,
-		firstFrameID: 125,
+		firstFrameID: 102,
 	}
-	frame0 := &readFrame{
-		segment:     segment0,
+	segment5 := &queueSegment{
+		id:           5,
+		firstFrameID: 103,
+	}
+	frame100 := &readFrame{
+		segment:     segment3,
 		id:          100,
 		bytesOnDisk: 500,
 	}
-	frame1 := &readFrame{
-		segment:     segment1,
+	frame101 := &readFrame{
+		segment:     segment4,
 		id:          101,
 		bytesOnDisk: 300,
 	}
+	frame102 := &readFrame{
+		segment:     segment4,
+		id:          102,
+		bytesOnDisk: 100,
+	}
+	frame103 := &readFrame{
+		segment:     segment5,
+		id:          103,
+		bytesOnDisk: 200,
+	}
+
+	dqa.addFrames([]*readFrame{frame101, frame102})
 	if dqa.nextPosition.segmentID != 2 {
 		t.Fatal("expected segment ID 2")
 	}
-	dqa.addFrames([]*readFrame{frame1})
-	dqa.addFrames([]*readFrame{frame0})
-	if dqa.nextPosition.segmentID != 3 {
-		t.Fatal("expected segment ID 3")
+	dqa.assertNoACKedSegment(t)
+
+	dqa.addFrames([]*readFrame{frame100})
+	if dqa.nextPosition.segmentID != 4 {
+		t.Fatal("expected segment ID 4")
 	}
-	if !wrapper.matchesSegments([]segmentID{3}) {
-		t.Fatalf("")
+	dqa.assertACKedSegment(t, 3)
+
+	dqa.addFrames([]*readFrame{frame103})
+	if dqa.nextPosition.segmentID != 5 {
+		t.Fatalf("expected segment ID 5, got %v", dqa.nextPosition.segmentID)
 	}
-
-	//t.Fatal(fmt.Errorf("hello there"))
+	dqa.assertACKedSegment(t, 4)
 }
 
-// A wrapper that listens to diskQueueACKs.segmentACKChan on an auxiliary
-// goroutine so that addFrames can be tested without blocking.
-// Callers should call ackChanWrapper.close() during to terminate the
-// background goroutine and synchronize the data before checking test
-// results.
-type ackChanWrapper struct {
-	ch        chan segmentID
-	seen      map[segmentID]bool
-	seenCount int
-	wg        sync.WaitGroup
-}
-
-func wrapACKChan(ch chan segmentID) *ackChanWrapper {
-	wrapper := &ackChanWrapper{ch: ch, seen: make(map[segmentID]bool)}
-	wrapper.wg.Add(1)
-	go wrapper.run()
-	return wrapper
-}
-
-func (w *ackChanWrapper) run() {
-	defer w.wg.Done()
-	for seg := range w.ch {
-		fmt.Printf("saw segment %v\n", seg)
-		w.seen[seg] = true
-		w.seenCount++
+func (dqa *diskQueueACKs) assertNoACKedSegment(t *testing.T) {
+	select {
+	case seg := <-dqa.segmentACKChan:
+		t.Fatalf("expected no segment ACKs, got %v", seg)
+	default:
 	}
 }
 
-func (w *ackChanWrapper) close() {
-	close(w.ch)
-	w.wg.Wait()
-}
-
-func (w *ackChanWrapper) matchesSegments(segments []segmentID) bool {
-	if w.seenCount != len(segments) {
-		return false
-	}
-	for _, seg := range segments {
-		if !w.seen[seg] {
-			return false
+func (dqa *diskQueueACKs) assertACKedSegment(t *testing.T, seg segmentID) {
+	select {
+	case received := <-dqa.segmentACKChan:
+		if received != seg {
+			t.Fatalf("expected ACK up to segment %v, got %v", seg, received)
 		}
+	default:
+		t.Fatalf("expected ACK up to segment %v, got none", seg)
 	}
-	return true
 }
-
-/*func (w *ackChanWrapper) seenSegments() []segmentID {
-	return []segmentID{}
-}*/

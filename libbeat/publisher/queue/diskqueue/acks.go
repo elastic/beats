@@ -18,7 +18,6 @@
 package diskqueue
 
 import (
-	"fmt"
 	"os"
 	"sync"
 
@@ -96,9 +95,10 @@ type diskQueueACKs struct {
 	// corresponding segment ID.
 	segmentBoundaries map[frameID]*queueSegment
 
-	// When a segment has been completely acknowledged by a consumer, it sends
-	// the segment ID to this channel, where it is read by the core loop and
-	// scheduled for deletion.
+	// When a call to addFrames results in a segment being completely
+	// acknowledged by a consumer, the highest segment ID that has been
+	// completely acknowledged is sent to this channel, where the core loop
+	// reads it and scheduled all segments up to that point for deletion.
 	segmentACKChan chan segmentID
 
 	// An open writable file handle to the file that stores the queue position.
@@ -125,7 +125,7 @@ func newDiskQueueACKs(
 		nextPosition:      position,
 		frameSize:         make(map[frameID]uint64),
 		segmentBoundaries: make(map[frameID]*queueSegment),
-		segmentACKChan:    make(chan segmentID),
+		segmentACKChan:    make(chan segmentID, 1),
 		positionFile:      positionFile,
 		done:              make(chan struct{}),
 	}
@@ -134,13 +134,13 @@ func newDiskQueueACKs(
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	dqa.fakeLock.Lock()
 	dqa.addFramesPending++
-	fmt.Printf("begin (pending %v)\n", dqa.addFramesPending)
+	//fmt.Printf("begin (pending %v)\n", dqa.addFramesPending)
 	dqa.fakeLock.Unlock()
 	dqa.lock.Lock()
 	defer func() {
 		dqa.fakeLock.Lock()
 		dqa.addFramesPending--
-		fmt.Printf("end (pending %v)\n", dqa.addFramesPending)
+		//fmt.Printf("end (pending %v)\n", dqa.addFramesPending)
 		dqa.fakeLock.Unlock()
 	}()
 	defer dqa.lock.Unlock()
