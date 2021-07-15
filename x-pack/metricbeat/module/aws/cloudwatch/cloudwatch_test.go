@@ -1290,7 +1290,13 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
