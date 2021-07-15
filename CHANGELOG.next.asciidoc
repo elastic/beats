@@ -140,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
 - Added Airflow lightweight module {pull}26220[26220]
 - Add state_job metricset to Kubernetes module{pull}26479[26479]
+- Recover service.address field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 *Packetbeat*
 
