@@ -30,6 +30,7 @@ var maskList = MakeStringSet(
 	"host",
 	"hosts",
 	"authorization",
+	"proxy-authorization",
 )
 
 func applyLoggingMask(c interface{}) {
