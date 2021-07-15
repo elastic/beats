@@ -277,5 +277,5 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{queue: dq}
+	return &diskQueueConsumer{queue: dq, done: make(chan struct{})}
 }
