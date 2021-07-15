@@ -10,21 +10,21 @@
         "period": 10000
     },
     "service": {
-        "address": "http://127.0.0.1:51027/sdk",
+        "address": "127.0.0.1:33365",
         "type": "vsphere"
     },
     "vsphere": {
         "datastore": {
             "capacity": {
                 "free": {
-                    "bytes": 267958476800
+                    "bytes": 37120094208
                 },
                 "total": {
-                    "bytes": 484736266240
+                    "bytes": 74686664704
                 },
                 "used": {
-                    "bytes": 216777789440,
-                    "pct": 0.44720769733509097
+                    "bytes": 37566570496,
+                    "pct": 0.502988996026061
                 }
             },
             "fstype": "local",
