@@ -150119,15 +150119,6 @@ type: keyword
 
 --
 
-*`suricata.eve.fileinfo.filename`*::
-+
---
-type: alias
-
-alias to: file.path
-
---
-
 *`suricata.eve.fileinfo.tx_id`*::
 +
 --
@@ -150170,15 +150161,6 @@ type: keyword
 
 --
 
-*`suricata.eve.fileinfo.size`*::
-+
---
-type: alias
-
-alias to: file.size
-
---
-
 *`suricata.eve.icmp_type`*::
 +
 --
@@ -150186,46 +150168,10 @@ type: long
 
 --
 
-*`suricata.eve.dest_port`*::
-+
---
-type: alias
-
-alias to: destination.port
-
---
-
-*`suricata.eve.src_port`*::
-+
---
-type: alias
-
-alias to: source.port
-
---
-
-*`suricata.eve.proto`*::
-+
---
-type: alias
-
-alias to: network.transport
-
---
-
 *`suricata.eve.pcap_cnt`*::
 +
 --
 type: long
-
---
-
-*`suricata.eve.src_ip`*::
-+
---
-type: alias
-
-alias to: source.ip
 
 --
 
@@ -150301,15 +150247,6 @@ type: keyword
 
 --
 
-*`suricata.eve.dest_ip`*::
-+
---
-type: alias
-
-alias to: destination.ip
-
---
-
 *`suricata.eve.icmp_code`*::
 +
 --
@@ -150318,15 +150255,6 @@ type: long
 --
 
 
-*`suricata.eve.http.status`*::
-+
---
-type: alias
-
-alias to: http.response.status_code
-
---
-
 *`suricata.eve.http.redirect`*::
 +
 --
@@ -150334,64 +150262,10 @@ type: keyword
 
 --
 
-*`suricata.eve.http.http_user_agent`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
 *`suricata.eve.http.protocol`*::
 +
 --
 type: keyword
-
---
-
-*`suricata.eve.http.http_refer`*::
-+
---
-type: alias
-
-alias to: http.request.referrer
-
---
-
-*`suricata.eve.http.url`*::
-+
---
-type: alias
-
-alias to: url.original
-
---
-
-*`suricata.eve.http.hostname`*::
-+
---
-type: alias
-
-alias to: url.domain
-
---
-
-*`suricata.eve.http.length`*::
-+
---
-type: alias
-
-alias to: http.response.body.bytes
-
---
-
-*`suricata.eve.http.http_method`*::
-+
---
-type: alias
-
-alias to: http.request.method
 
 --
 
@@ -150426,15 +150300,6 @@ type: keyword
 
 --
 
-*`suricata.eve.alert.severity`*::
-+
---
-type: alias
-
-alias to: event.severity
-
---
-
 *`suricata.eve.alert.rev`*::
 +
 --
@@ -150453,15 +150318,6 @@ type: long
 +
 --
 type: keyword
-
---
-
-*`suricata.eve.alert.action`*::
-+
---
-type: alias
-
-alias to: event.outcome
 
 --
 
@@ -151611,33 +151467,6 @@ type: keyword
 --
 
 
-*`suricata.eve.flow.bytes_toclient`*::
-+
---
-type: alias
-
-alias to: destination.bytes
-
---
-
-*`suricata.eve.flow.start`*::
-+
---
-type: alias
-
-alias to: event.start
-
---
-
-*`suricata.eve.flow.pkts_toclient`*::
-+
---
-type: alias
-
-alias to: destination.packets
-
---
-
 *`suricata.eve.flow.age`*::
 +
 --
@@ -151652,15 +151481,6 @@ type: keyword
 
 --
 
-*`suricata.eve.flow.bytes_toserver`*::
-+
---
-type: alias
-
-alias to: source.bytes
-
---
-
 *`suricata.eve.flow.reason`*::
 +
 --
@@ -151668,28 +151488,10 @@ type: keyword
 
 --
 
-*`suricata.eve.flow.pkts_toserver`*::
-+
---
-type: alias
-
-alias to: source.packets
-
---
-
 *`suricata.eve.flow.alerted`*::
 +
 --
 type: boolean
-
---
-
-*`suricata.eve.app_proto`*::
-+
---
-type: alias
-
-alias to: network.protocol
 
 --
 
@@ -159584,15 +159386,6 @@ alias to: user_agent.original
 
 --
 
-
-*`traefik.access.user_agent.device`*::
-+
---
-type: alias
-
-alias to: user_agent.device.name
-
---
 
 *`traefik.access.user_agent.name`*::
 +
