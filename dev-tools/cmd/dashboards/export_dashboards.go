@@ -29,6 +29,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 )
@@ -64,14 +65,18 @@ func main() {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
+
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = kibanaTimeout
+
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
-		Protocol: u.Scheme,
-		Host:     u.Host,
-		Username: user,
-		Password: pass,
-		Path:     u.Path,
-		SpaceID:  *spaceID,
-		Timeout:  kibanaTimeout,
+		Protocol:  u.Scheme,
+		Host:      u.Host,
+		Username:  user,
+		Password:  pass,
+		Path:      u.Path,
+		SpaceID:   *spaceID,
+		Transport: transport,
 	})
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)

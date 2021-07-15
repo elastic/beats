@@ -158,6 +158,13 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:3000"]
 
+#------------------------------- Airflow Module -------------------------------
+- module: airflow
+  host: "localhost"
+  port: "8126"
+  #ttl: "30s"
+  metricsets: [ 'statsd' ]
+
 #-------------------------------- Apache Module --------------------------------
 - module: apache
   metricsets: ["status"]
@@ -863,6 +870,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
