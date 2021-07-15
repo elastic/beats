@@ -20,6 +20,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:42tg9bemt74qgrdvJOy2n5Veg4A=",
+        "network.direction": "internal",
         "network.protocol": "ssh",
         "network.transport": "tcp",
         "related.ip": [

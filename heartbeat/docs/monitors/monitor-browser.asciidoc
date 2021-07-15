@@ -115,4 +115,33 @@ Set this option to `true` to enable the normally disabled chromium sandbox. Defa
 [[monitor-browser-synthetics-args]]
 ==== `synthetics_args`
 
-Extra arguments to pass to the synthetics agent package. Takes a list of strings.
+Extra arguments to pass to the synthetics agent package. Takes a list of
+strings.
+
+[float]
+[[monitor-browser-screenshots]]
+==== `screenshots`
+
+Set this option to manage the screenshots captured by the synthetics agent.
+
+Under `screenshots`, specify one of these options:
+
+*`on`*:: capture screenshots for all steps in a journey (default)
+*`off`*:: do not capture any screenshots
+*`only-on-failure`*:: capture screenshots for all steps when a journey fails
+(any failing step marks the whole journey as failed)
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  screenshots: "on"
+  source:
+    local:
+      path: "/path/to/synthetics/journeys"
+-------------------------------------------------------------------------------
+

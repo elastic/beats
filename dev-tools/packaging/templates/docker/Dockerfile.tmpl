@@ -47,7 +47,7 @@ ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
     {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.synthetics \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
@@ -128,7 +128,7 @@ USER {{ .user }}
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=12.18.4
+ENV NODE_VERSION=12.22.3
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

@@ -72,6 +72,9 @@
 - Fix startup with failing configuration {pull}26057[26057]
 - Change timestamp in elatic-agent-json.log to use UTC {issue}25391[25391]
 - Fix add support for Logstash output. {pull}24305[24305]
+- Do not log Elasticsearch configuration for monitoring output when running with debug. {pull}26583[26583]
+- Fix issue where proxy enrollment options broke enrollment command. {pull}26749[26749]
+- Remove symlink.prev from previously failed upgrade {pull}26785[26785]
 
 ==== New features
 
@@ -114,4 +117,8 @@
 - Log output of container to $LOGS_PATH/elastic-agent-start.log when LOGS_PATH set {pull}25150[25150]
 - Use `filestream` input for internal log collection. {pull}25660[25660]
 - Enable agent to send custom headers to kibana/ES {pull}26275[26275]
-- Set `agent.id` to the Fleet Agent ID in events published from inputs backed by Beats. {issue}21121[21121] {pull}26394[26394]
+- Set `agent.id` to the Fleet Agent ID in events published from inputs backed by Beats. {issue}21121[21121] {pull}26394[26394] {pull}26548[26548]
+- Add proxy support to artifact downloader and communication with fleet server. {pull}25219[25219]
+- Add proxy support to enroll command. {pull}26514[26514]
+- Enable configuring monitoring namespace {issue}26439[26439]
+- Communicate with Fleet Server over HTTP2. {pull}26474[26474]

@@ -33,14 +33,17 @@ type FleetServerOutputConfig struct {
 
 // Elasticsearch is the configuration for elasticsearch.
 type Elasticsearch struct {
-	Protocol     string            `config:"protocol" yaml:"protocol"`
-	Hosts        []string          `config:"hosts" yaml:"hosts"`
-	Path         string            `config:"path" yaml:"path,omitempty"`
-	Username     string            `config:"username" yaml:"username,omitempty"`
-	Password     string            `config:"password" yaml:"password,omitempty"`
-	ServiceToken string            `config:"service_token" yaml:"service_token,omitempty"`
-	TLS          *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
-	Headers      map[string]string `config:"headers" yaml:"headers,omitempty"`
+	Protocol      string            `config:"protocol" yaml:"protocol"`
+	Hosts         []string          `config:"hosts" yaml:"hosts"`
+	Path          string            `config:"path" yaml:"path,omitempty"`
+	Username      string            `config:"username" yaml:"username,omitempty"`
+	Password      string            `config:"password" yaml:"password,omitempty"`
+	ServiceToken  string            `config:"service_token" yaml:"service_token,omitempty"`
+	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
+	Headers       map[string]string `config:"headers" yaml:"headers,omitempty"`
+	ProxyURL      string            `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	ProxyDisabled bool              `config:"proxy_disabled" yaml:"proxy_disabled"`
+	ProxyHeaders  map[string]string `config:"proxy_headers" yaml:"proxy_headers"`
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.

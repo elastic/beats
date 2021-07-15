@@ -19,6 +19,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:X15ey/8/tEH+tlelK6P+GfgwBPc=",
+        "network.direction": "internal",
         "network.protocol": "snmp",
         "network.transport": "udp",
         "related.ip": [
