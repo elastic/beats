@@ -197,8 +197,7 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts(artifacts: 'rerun.json')
       script {
         log(level: 'INFO', text: 'Set description with the number of stage retries to help with the ES queries.')
-        def numberOfRepeats = rerunStages?.collect { k, v -> return k }?.size
-        currentBuild.description = "Stage retries: ${numberOfRepeats}"
+        currentBuild.description = "Stage retries: ${rerunStages?.size()}"
       }
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
