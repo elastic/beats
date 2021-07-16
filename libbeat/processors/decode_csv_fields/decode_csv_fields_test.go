@@ -316,6 +316,238 @@ func TestDecodeCSVField(t *testing.T) {
 			},
 			fail: true,
 		},
+
+		"header given as string": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"string": "col1,col2,col3",
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"csv":     map[string]string{"col1": "17", "col2": "192.168.33.1", "col3": "8.8.8.8"},
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+		},
+
+		"header for each field given as string": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message1": "message1",
+					"message2": "message2",
+				},
+				"headers": common.MapStr{
+					"message1": common.MapStr{
+						"string": "col1,col2,col3",
+					},
+					"message2": common.MapStr{
+						"string": "col4,col5,col6",
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message1": "hello,world,!!!",
+					"message2": "good,morning,!!!",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message1": map[string]string{"col1": "hello", "col2": "world", "col3": "!!!"},
+					"message2": map[string]string{"col4": "good", "col5": "morning", "col6": "!!!"},
+				},
+			},
+		},
+
+		"header for one field given as string": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message1": "message1",
+					"message2": "message2",
+				},
+				"headers": common.MapStr{
+					"message2": common.MapStr{
+						"string": "col4,col5,col6",
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message1": "hello,world,!!!",
+					"message2": "good,morning,!!!",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message1": []string{"hello", "world", "!!!"},
+					"message2": map[string]string{"col4": "good", "col5": "morning", "col6": "!!!"},
+				},
+			},
+		},
+
+		"header given as string but have different separator": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"string": "col1;col2;col3",
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+			fail: true,
+		},
+
+		"header given as string but have different length": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"string": "col1,col2",
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": "17,192.168.33.1,8.8.8.8",
+				},
+			},
+			fail: true,
+		},
+
+		"header given in conf file": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "message",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"file": common.MapStr{
+							"path": "header_test",
+						},
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": map[string]string{"col1_1": "hello", "col1_2": "world"},
+				},
+			},
+		},
+
+		"header given in conf file and the file doesn't exits": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"file": common.MapStr{
+							"path": "file_dont_exists",
+						},
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			fail: true,
+		},
+
+		"header given in conf file with a offset": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"offset": 3,
+						"file": common.MapStr{
+							"path": "header_test",
+						},
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+					"csv":     map[string]string{"col3_1": "hello", "col3_2": "world"},
+				},
+			},
+		},
+
+		"header given in conf file with too large offset": {
+			config: common.MapStr{
+				"fields": common.MapStr{
+					"message": "csv",
+				},
+				"headers": common.MapStr{
+					"message": common.MapStr{
+						"offset": 5,
+						"file": common.MapStr{
+							"path": "header_test",
+						},
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			expected: beat.Event{
+				Fields: common.MapStr{
+					"message": "hello,world",
+				},
+			},
+			fail: true,
+		},
 	}
 
 	for title, tt := range tests {
@@ -352,5 +584,5 @@ func TestDecodeCSVField_String(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, "decode_csv_field={\"Fields\":{\"a\":\"csv.a\",\"b\":\"csv.b\"},\"IgnoreMissing\":true,\"TrimLeadingSpace\":false,\"OverwriteKeys\":false,\"FailOnError\":true,\"Separator\":\"#\"}", p.String())
+	assert.Equal(t, "decode_csv_field={\"Fields\":{\"a\":\"csv.a\",\"b\":\"csv.b\"},\"IgnoreMissing\":true,\"TrimLeadingSpace\":false,\"OverwriteKeys\":false,\"FailOnError\":true,\"Separator\":\"#\",\"Headers\":null}", p.String())
 }
