@@ -1,1 +1,25 @@
 `query` metricset allows for custom execution of metric related queries in MySQL
+
+
+[source,yaml]
+----
+- module: mysql
+  metricsets:
+    - query
+  period: 10s
+  namespace: "my_namespace"
+  queries:
+    - query: "SELECT * FROM performance_schema.global_status"
+      response_format: "variables"
+      query_namespace: "my_first_query_namespace"
+    - query: "SELECT * FROM mysql.innodb_table_stats"
+      response_format: "table"
+      query_namespace: "my_second_query_namespace"
+
+  # Host DSN should be defined as "user:pass@tcp(127.0.0.1:3306)/"
+  # or "unix(/var/lib/mysql/mysql.sock)/",
+  # or another DSN format supported by <https://github.com/Go-SQL-Driver/MySQL/>.
+  # The username and password can either be set in the DSN or using the username
+  # and password config options. Those specified in the DSN take precedence.
+  hosts: ["root:root@tcp(172.17.0.2:3306)/"]
+----
