@@ -493,6 +493,27 @@ supported_protocols: null
 			assert.NotNil(t, tlsC)
 		})
 
+		t.Run("multiple cas one will error", func(t *testing.T) {
+			// Create a dummy configuration and append the CA after.
+			cfg, err := load(`
+enabled: true
+verification_mode: null
+certificate: null
+key: null
+key_passphrase: null
+certificate_authorities:
+cipher_suites: null
+curve_types: null
+supported_protocols: null
+  `)
+
+			cfg.CAs = []string{f.Name(), "does-not-exist.crt"}
+			tlsC, err := LoadTLSConfig(cfg)
+			assert.NoError(t, err)
+
+			assert.NotNil(t, tlsC)
+		})
+
 		t.Run("mixed from disk and embed", func(t *testing.T) {
 			// Create a dummy configuration and append the CA after.
 			cfg, err := load(`

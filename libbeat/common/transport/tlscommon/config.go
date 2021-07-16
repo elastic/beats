@@ -68,7 +68,9 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 	logFail(err)
 
 	cas, errs := LoadCertificateAuthorities(config.CAs)
-	logFail(errs...)
+	if cas == nil || len(cas.Subjects()) == 0 {
+		logFail(errs...)
+	}
 
 	// fail, if any error occurred when loading certificate files
 	if err = fail.Err(); err != nil {
