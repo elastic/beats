@@ -20,7 +20,6 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -180,9 +179,6 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fromInstall, _ := cmd.Flags().GetBool("from-install")
-	if !fromInstall {
-		warn.PrintNotGA(streams.Out)
-	}
 
 	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
