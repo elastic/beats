@@ -104,6 +104,27 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) 
 	}
 
 	switch serviceName {
+	case gcp.ServiceGKE:
+		if r.config.Region != "" && r.config.Zone != "" {
+			r.logger.Warnf("when region %s and zone %s config parameter "+
+				"both are provided, only use region", r.config.Region, r.config.Zone)
+		}
+
+		region := r.config.Region
+		if region != "" {
+			if strings.HasSuffix(region, "*") {
+				region = strings.TrimSuffix(region, "*")
+			}
+			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, region)
+			break
+		}
+		zone := r.config.Zone
+		if zone != "" {
+			if strings.HasSuffix(zone, "*") {
+				zone = strings.TrimSuffix(zone, "*")
+			}
+			f = fmt.Sprintf("%s AND resource.label.location=starts_with(\"%s\")", f, zone)
+		}
 	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
 		return
 	case gcp.ServiceStorage:
