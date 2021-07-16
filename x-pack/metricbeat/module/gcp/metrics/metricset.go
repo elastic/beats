@@ -242,21 +242,17 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	m.Logger().Debugf("metrics config %+v", m.MetricsConfig)
 	for _, sdc := range m.MetricsConfig {
-
 		for _, mt := range sdc.MetricTypes {
 			m.Logger().Debugf("list metric descriptors: %s", mt)
 
-			metricFilter := fmt.Sprintf("metric.type = starts_with(\"%s%s\")", sdc.MetricPrefix(), mt)
+			fullMetricIdentifier := fmt.Sprintf("%s%s", sdc.MetricPrefix(), mt)
+			metricFilter := fmt.Sprintf(`metric.type = starts_with("%s")`, fullMetricIdentifier)
 			req.Filter = metricFilter
 			m.Logger().Debugf("ListMetricDescriptors req: %+v", req)
 
 			it := client.ListMetricDescriptors(ctx, req)
 			for {
 				out, err := it.Next()
-
-				if out == nil {
-					m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
-				}
 
 				if err != nil && err != iterator.Done {
 					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
@@ -271,6 +267,14 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 				if err == iterator.Done {
 					break
 				}
+
+			}
+
+			// NOTE: if a metric is not added to the metricsWithMeta map is not collected subsequently.
+			// Such a case is an error, as the configuration is explicitly requesting a metric that the beat
+			// is not able to collect, so we provide a logging statement for this behaviour.
+			if _, ok := metricsWithMeta[fullMetricIdentifier]; !ok {
+				m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
 			}
 		}
 	}
