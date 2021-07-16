@@ -402,6 +402,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
 - Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
 - Cisco asa/ftd: Fix reversed usage of observer ingress and egress interfaces. {pull}26265[26265]
+- Fix `aws.s3access` pipeline when remote IP is a `-`. {issue}26913[26913] {pull}26940[26940]
 
 *Heartbeat*
 

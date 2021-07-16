@@ -15,7 +15,7 @@ processors:
       patterns:
         - >-
           %{BASE16NUM:aws.s3access.bucket_owner} %{HOSTNAME:aws.s3access.bucket} \[%{HTTPDATE:_temp_.s3access_time}\]
-          %{IP:aws.s3access.remote_ip} (?:-|%{S3REQUESTER:aws.s3access.requester}) %{S3REQUESTID:aws.s3access.request_id}
+          (?:-|%{IP:aws.s3access.remote_ip}) (?:-|%{S3REQUESTER:aws.s3access.requester}) %{S3REQUESTID:aws.s3access.request_id}
           %{S3OPERATION:aws.s3access.operation} (?:-|%{S3KEY:aws.s3access.key}) (?:-|\"%{DATA:aws.s3access.request_uri}\")
           %{NUMBER:aws.s3access.http_status:long} (?:-|%{WORD:aws.s3access.error_code}) (?:-|%{NUMBER:aws.s3access.bytes_sent:long})
           (?:-|%{NUMBER:aws.s3access.object_size:long}) (?:-|%{NUMBER:aws.s3access.total_time:long}) (?:-|%{NUMBER:aws.s3access.turn_around_time:long})

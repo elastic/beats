@@ -417,5 +417,59 @@
         "tls.cipher": "ECDHE-RSA-AES128-SHA",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
+    },
+    {
+        "@timestamp": "2021-07-14T18:57:31.000Z",
+        "aws.s3access.authentication_type": "AuthHeader",
+        "aws.s3access.bucket": "flow-log-test",
+        "aws.s3access.bucket_owner": "67797214d75628047d9c76b18a78cded1a4b069b71f2a9d5a53649c38da8770b",
+        "aws.s3access.cipher_suite": "ECDHE-RSA-AES128-GCM-SHA256",
+        "aws.s3access.host_header": "flow-log-test.s3.us-gov-west-1.amazonaws.com",
+        "aws.s3access.host_id": "02SxwfXpO5UysN0GsKGa3uGDQ6E/W7+Hwo/luRH8p1VEexULoe66RCM+nja0dEq2JqLrtgjocvVRRkVt4=",
+        "aws.s3access.http_status": 200,
+        "aws.s3access.key": "AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-_20210713T1855Z_f12aa632.log.gz",
+        "aws.s3access.object_size": 773,
+        "aws.s3access.operation": "REST.PUT.OBJECT",
+        "aws.s3access.request_id": "MVGXZXEVN3IG9S24",
+        "aws.s3access.request_uri": "PUT /AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-0e7c13bf00cf15bfe_20210713T1855Z_f12aa632.log.gz HTTP/1.1",
+        "aws.s3access.requester": "svc:delivery.logs.amazonaws.com",
+        "aws.s3access.signature_version": "SigV4",
+        "aws.s3access.tls_version": "TLSv1.2",
+        "aws.s3access.total_time": 103,
+        "aws.s3access.turn_around_time": 13,
+        "client.user.id": "svc:delivery.logs.amazonaws.com",
+        "cloud.provider": "aws",
+        "cloud.region": "us-gov-west-1",
+        "event.action": "REST.PUT.OBJECT",
+        "event.category": "web",
+        "event.dataset": "aws.s3access",
+        "event.duration": 103000000,
+        "event.id": "MVGXZXEVN3IG9S24",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.original": "67797214d75628047d9c76b18a78cded1a4b069b71f2a9d5a53649c38da8770b flow-log-test [14/Jul/2021:18:57:31 +0000] - svc:delivery.logs.amazonaws.com MVGXZXEVN3IG9S24 REST.PUT.OBJECT AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-_20210713T1855Z_f12aa632.log.gz \"PUT /AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-0e7c13bf00cf15bfe_20210713T1855Z_f12aa632.log.gz HTTP/1.1\" 200 - - 773 103 13 \"-\" \"-\" - 02SxwfXpO5UysN0GsKGa3uGDQ6E/W7+Hwo/luRH8p1VEexULoe66RCM+nja0dEq2JqLrtgjocvVRRkVt4= SigV4 ECDHE-RSA-AES128-GCM-SHA256 AuthHeader flow-log-test.s3.us-gov-west-1.amazonaws.com TLSv1.2 -",
+        "event.outcome": "success",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "s3access",
+        "http.request.method": "PUT",
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 3700,
+        "related.user": [
+            "67797214d75628047d9c76b18a78cded1a4b069b71f2a9d5a53649c38da8770b"
+        ],
+        "service.type": "aws",
+        "tags": [
+            "forwarded"
+        ],
+        "tls.cipher": "ECDHE-RSA-AES128-GCM-SHA256",
+        "tls.version": "1.2",
+        "tls.version_protocol": "tls",
+        "url.extension": "gz",
+        "url.original": "/AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-0e7c13bf00cf15bfe_20210713T1855Z_f12aa632.log.gz",
+        "url.path": "/AWSLogs/000000000000/vpcflowlogs/us-gov-east-1/2021/07/13/000000000000_vpcflowlogs_us-gov-east-1_fl-0e7c13bf00cf15bfe_20210713T1855Z_f12aa632.log.gz"
     }
 ]
