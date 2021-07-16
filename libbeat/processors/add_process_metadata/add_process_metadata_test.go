@@ -50,6 +50,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "root",
+			userid:    "0",
 		},
 		3: {
 			name:  "systemd",
@@ -65,6 +67,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "user",
+			userid:    "1001",
 		},
 	}
 
@@ -136,6 +140,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "root",
+						"id":   "0",
+					},
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -217,6 +225,10 @@ func TestAddProcessMetadata(t *testing.T) {
 						"pid":        1,
 						"ppid":       0,
 						"start_time": startTime,
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
+						},
 					},
 					"container": common.MapStr{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -250,6 +262,10 @@ func TestAddProcessMetadata(t *testing.T) {
 							"TERM":       "linux",
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
+						},
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
 						},
 					},
 					"container": common.MapStr{
@@ -285,6 +301,10 @@ func TestAddProcessMetadata(t *testing.T) {
 							"TERM":       "linux",
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
+						},
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
 						},
 					},
 				},
@@ -474,6 +494,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "root",
+						"id":   "0",
+					},
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -593,6 +617,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "user",
+						"id":   "1001",
+					},
 				},
 			},
 		},
@@ -643,6 +671,26 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				},
+			},
+		},
+		{
+			description: "only user",
+			config: common.MapStr{
+				"match_pids":     []string{"ppid"},
+				"target":         "",
+				"include_fields": []string{"process.owner"},
+			},
+			event: common.MapStr{
+				"ppid": "1",
+			},
+			expected: common.MapStr{
+				"ppid": "1",
+				"process": common.MapStr{
+					"owner": common.MapStr{
+						"id":   "0",
+						"name": "root",
+					},
 				},
 			},
 		},
