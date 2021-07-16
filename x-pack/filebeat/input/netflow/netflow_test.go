@@ -16,9 +16,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/pcap"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"

@@ -29,8 +29,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 
+	"github.com/google/gopacket/layers"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsg/gopacket/layers"
 )
 
 // Test Constants
@@ -360,7 +360,7 @@ func makeCountGaps(
 		p protos.ProtocolData,
 	) (protos.ProtocolData, bool) {
 		if counter != nil {
-			(*counter)++
+			*counter++
 		}
 		if bytes != nil {
 			*bytes += n
@@ -381,7 +381,7 @@ func makeCollectPayload(
 		priv protos.ProtocolData,
 	) protos.ProtocolData {
 		if resetOnNil && priv == nil {
-			(*state) = nil
+			*state = nil
 		}
 		*state = append(*state, p.Payload...)
 		return *state

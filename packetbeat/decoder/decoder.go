@@ -27,8 +27,8 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
 
-	"github.com/tsg/gopacket"
-	"github.com/tsg/gopacket/layers"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 )
 
 var debugf = logp.MakeDebug("decoder")
@@ -41,6 +41,7 @@ type Decoder struct {
 	sll       layers.LinuxSLL
 	lo        layers.Loopback
 	eth       layers.Ethernet
+	pf        layers.PFLog
 	d1q       [2]layers.Dot1Q
 	ip4       [2]layers.IPv4
 	ip6       [2]layers.IPv6
@@ -118,6 +119,7 @@ func New(
 		&d.sll,             // LinuxSLL
 		&d.eth,             // Ethernet
 		&d.lo,              // loopback on OS X
+		&d.pf,              // pflog(4)
 		&d.stD1Q,           // VLAN
 		&d.stIP4, &d.stIP6, // IP
 		&d.icmp4, &d.icmp6, // ICMP
@@ -134,6 +136,9 @@ func New(
 	case layers.LinkTypeEthernet:
 		d.linkLayerDecoder = &d.eth
 		d.linkLayerType = layers.LayerTypeEthernet
+	case layers.LinkTypePFLog: // pflog(4)
+		d.linkLayerDecoder = &d.pf
+		d.linkLayerType = layers.LayerTypePFLog
 	case layers.LinkTypeNull: // loopback on OSx
 		d.linkLayerDecoder = &d.lo
 		d.linkLayerType = layers.LayerTypeLoopback

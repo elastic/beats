@@ -70,8 +70,6 @@ class Test(BaseTest):
         assert all([o["event.dataset"] == "icmp" for o in objs])
         assert all([o["event.category"] == ['network'] for o in objs])
         assert all([o["event.type"] == ["connection"] for o in objs])
-        assert all([o["source.bytes"] == 4 for o in objs])
-        assert all([o["destination.bytes"] == 4 for o in objs])
         assert all([("server.port" in o) == False for o in objs])
         assert all([("transport" in o) == False for o in objs])
 
@@ -82,10 +80,12 @@ class Test(BaseTest):
         assert obj["related.ip"] == ["10.0.0.1", "10.0.0.2"]
         assert obj["path"] == "10.0.0.2"
         assert obj["status"] == "OK"
-        assert obj["icmp.request.message"] == "EchoRequest(0)"
+        assert obj["source.bytes"] == 4
+        assert obj["destination.bytes"] == 4
+        assert obj["icmp.request.message"] == "EchoRequest"
         assert obj["icmp.request.type"] == 8
         assert obj["icmp.request.code"] == 0
-        assert obj["icmp.response.message"] == "EchoReply(0)"
+        assert obj["icmp.response.message"] == "EchoReply"
         assert obj["icmp.response.type"] == 0
         assert obj["icmp.response.code"] == 0
 
@@ -95,9 +95,14 @@ class Test(BaseTest):
         assert obj["client.ip"] == "::1"
         assert obj["path"] == "::2"
         assert obj["status"] == "OK"
-        assert obj["icmp.request.message"] == "EchoRequest(0)"
+        assert obj["icmp.request.message"] == "EchoRequest"
+        # source.bytes and destination.bytes will be 8 because of "Identifier" (2 bytes) and "Sequence Number" (2 bytes) by RFC 4443
+        # google/gopacket seems to include those in IPv6 version due to issues parsing NDP with 4 more bytes cut from Payload
+        # ref. https://github.com/google/gopacket/commit/a2ac8ef9759d3bdd5caf683b76e06dd9ae1fc9e8
+        assert obj["source.bytes"] == 8
+        assert obj["destination.bytes"] == 8
         assert obj["icmp.request.type"] == 128
         assert obj["icmp.request.code"] == 0
-        assert obj["icmp.response.message"] == "EchoReply(0)"
+        assert obj["icmp.response.message"] == "EchoReply"
         assert obj["icmp.response.type"] == 129
         assert obj["icmp.response.code"] == 0

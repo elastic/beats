@@ -22,14 +22,14 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/tsg/gopacket/pcap"
+	"github.com/google/gopacket/pcap"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 var deviceAnySupported = runtime.GOOS == "linux"
 
-// ListDevicesNames returns the list of adapters available for sniffing on
+// ListDeviceNames returns the list of adapters available for sniffing on
 // this computer. If the withDescription parameter is set to true, a human
 // readable version of the adapter name is added. If the withIP parameter
 // is set to true, IP address of the adapter is added.
