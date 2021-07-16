@@ -44,18 +44,18 @@ USER_KTAB=$LOCALSTATEDIR/$USER.keytab
 
 if [ -f $USER_KTAB ] && [ -z "$PASSWD" ]; then
   echo "Principal '${PRINC}@${REALM}' already exists. Re-copying keytab..."
-  sudo cp $USER_KTAB $KEYTAB_DIR/$USER.keytab
+  cp $USER_KTAB $KEYTAB_DIR/$USER.keytab
 else
   if [ -z "$PASSWD" ]; then
     echo "Provisioning '${PRINC}@${REALM}' principal and keytab..."
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -randkey $USER_PRIN"
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "ktadd -k $USER_KTAB $USER_PRIN"
-    sudo chmod 777 $USER_KTAB
-    sudo cp $USER_KTAB /usr/share/elasticsearch/config
-    sudo chown elasticsearch:elasticsearch /usr/share/elasticsearch/config/$USER.keytab
+    kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -randkey $USER_PRIN"
+    kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "ktadd -k $USER_KTAB $USER_PRIN"
+    chmod 777 $USER_KTAB
+    cp $USER_KTAB /usr/share/elasticsearch/config
+    chown elasticsearch:elasticsearch /usr/share/elasticsearch/config/$USER.keytab
   else
     echo "Provisioning '${PRINC}@${REALM}' principal with password..."
-    sudo kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -pw $PASSWD $PRINC"
+    kadmin -p $ADMIN_PRIN -kt $ADMIN_KTAB -q "addprinc -pw $PASSWD $PRINC"
   fi
 fi
 

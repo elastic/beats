@@ -47,12 +47,6 @@ touch $LOGDIR/kadmin.log
 touch $LOGDIR/krb5kdc.log
 touch $LOGDIR/krb5lib.log
 
-# Update package manager
-yum update -qqy
-
-# Install krb5 packages
-yum install -qqy krb5-{server,libs,workstation} sudo
-
 # Create kerberos database with stash file and garbage password
 kdb5_util create -s -r $REALM_NAME -P zyxwvutsrpqonmlk9876
 

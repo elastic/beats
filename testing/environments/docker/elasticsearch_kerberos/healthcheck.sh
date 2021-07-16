@@ -8,4 +8,3 @@ KRB5_CONFIG=/etc/krb5.conf \
 # check if beats user can connect
 echo testing | KRB5_CONFIG=/etc/krb5.conf kinit beats@ELASTIC
 klist
-curl --negotiate -u : -XGET http://elasticsearch_kerberos.elastic:9200/
