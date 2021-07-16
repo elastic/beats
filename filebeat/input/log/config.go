@@ -105,7 +105,7 @@ var ValidScanOrder = map[string]struct{}{
 	ScanOrderDesc: {},
 }
 
-// ValidScanOrder of valid scan orders
+// ValidScanSort is a map of valid scan sorts
 var ValidScanSort = map[string]struct{}{
 	ScanSortNone:     {},
 	ScanSortModtime:  {},
