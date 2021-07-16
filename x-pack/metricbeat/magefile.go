@@ -26,6 +26,8 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
 	// mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/manifesttool"
+	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	// mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
