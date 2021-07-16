@@ -20,6 +20,7 @@ package auditd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
@@ -29,9 +30,11 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/go-libaudit/v2"
@@ -237,12 +240,98 @@ func (ms *MetricSet) Run(reporter mb.PushReporterV2) {
 				case <-reporter.Done():
 					return
 				case msgs := <-out:
-					reporter.Event(buildMetricbeatEvent(msgs, ms.config))
+					reporter.Event(buildMetricbeatEvent(msgs, &ms.config))
 				}
 			}
 		}()
 	}
+
+	if ms.config.Reload.IsEnabled() {
+		ruleReloader := newRuleReloader(ms.config.RuleFiles, ms.config.Reload)
+
+		go ruleReloader.Run(ms, reporter)
+	}
+
 	wg.Wait()
+}
+
+type reloader struct {
+	reload Reload
+	paths  []string
+}
+
+func newRuleReloader(filePaths []string, reload Reload) *reloader {
+	var newPaths []string
+
+	for _, path := range filePaths {
+		if !filepath.IsAbs(path) {
+			path = paths.Resolve(paths.Config, path)
+		}
+		newPaths = append(newPaths, path)
+	}
+
+	return &reloader{
+		reload: reload,
+		paths:  newPaths,
+	}
+}
+
+// Run runs the reloader
+func (rl *reloader) Run(ms *MetricSet, reporter mb.PushReporterV2) {
+	ms.log.Info("audit_rule_files reload watcher started")
+	defer ms.log.Info("audit_rule_files reload watcher stopped")
+
+	var gws []*cfgfile.GlobWatcher
+	for _, path := range rl.paths {
+		gws = append(gws, cfgfile.NewGlobWatcher(path))
+	}
+
+	for {
+		select {
+		case <-reporter.Done():
+			return
+
+		case <-time.After(rl.reload.Period):
+			ms.log.Debug("Scanning for updated audit_rule_files")
+
+			var filesUpdated []string
+			ruleNum := 0
+			for _, gw := range gws {
+				files, updated, err := gw.Scan()
+
+				if err != nil {
+					// In most cases of error, updated == false, so will continue
+					// to next iteration below
+					ms.log.Errorw("Error fetching new Auditd Rule files", "error", err)
+				}
+
+				// no file changes
+				if !updated {
+					continue
+				}
+
+				filesUpdated = append(filesUpdated, files...)
+			}
+
+			// reload rules if any file updated
+			if filesUpdated != nil {
+				// Reload config objects
+				if err := ms.config.reloadRules(); err != nil {
+					reporter.Error(err)
+					ms.log.Errorw("Failure reload audit rules from rule file", "error", err)
+				}
+
+				// Add rules from config objects
+				if err := ms.addRules(reporter); err != nil {
+					reporter.Error(err)
+					ms.log.Errorw("Failure adding audit rules", "error", err)
+				}
+
+				ruleNum += len(ms.config.rules())
+				ms.log.Infof("Rule files reloaded: %v, number of rule reloaded: %v", filesUpdated, ruleNum)
+			}
+		}
+	}
 }
 
 func (ms *MetricSet) addRules(reporter mb.PushReporterV2) error {
@@ -508,7 +597,7 @@ func filterRecordType(typ auparse.AuditMessageType) bool {
 	return false
 }
 
-func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event {
+func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config *Config) mb.Event {
 	auditEvent, err := aucoalesce.CoalesceMessages(msgs)
 	if err != nil {
 		// Add messages on error so that it's possible to debug the problem.

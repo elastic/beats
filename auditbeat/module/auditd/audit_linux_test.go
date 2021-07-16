@@ -274,6 +274,58 @@ func TestMulticastClient(t *testing.T) {
 	assertHasBinCatExecve(t, events)
 }
 
+func TestRuleReload(t *testing.T) {
+	if !*audit {
+		t.Skip("-audit was not specified")
+	}
+
+	logp.TestingSetup()
+	FailIfAuditdIsRunning(t)
+
+	c := map[string]interface{}{
+		"module":      "auditd",
+		"socket_type": "unicast",
+		"reload": map[string]interface{}{
+			"period":  time.Second * 5,
+			"enabled": true,
+		},
+		"audit_rule_files": []string{
+			"/tmp/test.rules",
+		},
+	}
+
+	time.AfterFunc(time.Second, func() {
+		rule := fmt.Sprintf(`
+		   -a always,exit -F arch=b64 -F ppid=%d -S execve -k exec
+		`, os.Getpid())
+		err := ioutil.WriteFile("/tmp/test.rules", []byte(rule), 0644)
+		if err != nil {
+			t.Error(err)
+		}
+		logp.Info("writed rule file")
+	})
+
+	defer func() {
+		e := os.Remove("/tmp/test.rules")
+		if e != nil {
+			t.Error(e)
+		}
+	}()
+
+	time.AfterFunc(time.Second*7, func() {
+		exec.Command("cat", "/proc/self/status").Output()
+		logp.Info("run cat command")
+	})
+
+	logp.Info("start beat")
+	ms := mbtest.NewPushMetricSetV2(t, c)
+
+	events := mbtest.RunPushMetricSetV2(15*time.Second, 0, ms)
+	logp.Info("end beat")
+	assertNoErrors(t, events)
+	assertHasBinCatExecve(t, events)
+}
+
 func TestKernelVersion(t *testing.T) {
 	major, minor, full, err := kernelVersion()
 	if err != nil {
@@ -322,7 +374,7 @@ func buildSampleEvent(t testing.TB, lines []string, filename string) {
 		msgs = append(msgs, m)
 	}
 
-	e := buildMetricbeatEvent(msgs, defaultConfig)
+	e := buildMetricbeatEvent(msgs, &defaultConfig)
 	beatEvent := e.BeatEvent(moduleName, metricsetName, core.AddDatasetToEvent)
 	output, err := json.MarshalIndent(&beatEvent.Fields, "", "    ")
 	if err != nil {
