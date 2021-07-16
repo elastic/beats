@@ -71,3 +71,8 @@ Nov 16 2009 14:12:36: %ASA-5-304001: 10.5.111.32 Accessed URL 192.0.2.32:http://
 Nov 16 2009 14:12:37: %ASA-5-304002: Access denied URL http://www.example.net/images/favicon.ico SRC 10.69.6.39 DEST 192.0.0.19 on interface inside
 Jan 13 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)
 Jan 13 2021 19:12:37: %ASA-5-304001: USER001@192.168.0.1(LOCAL\USER001) Accessed URL 172.17.6.211:http://testingserver.com/somewebpage.html
+Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\USER001) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (USER001)
+Jan 13 2021 19:12:37: %ASA-5-302013: Built inbound TCP connection 195207391 for OUTSIDE:85.0.0.1/12312 (62.0.0.1/34534)(LOCAL\user@domain.tld) to OUTSIDE:81.0.0.1/443 (81.0.0.1/443) (user@domain.tld)
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\USER001) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER001) type 3 code 3
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(LOCAL\user@domain.tld) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (user@domain.tld) type 3 code 3
+Jan 13 2021 19:12:37: %ASA-5-302020: Built inbound ICMP connection for faddr 85.0.0.1/0(AD\USER002) gaddr 81.0.0.1/0 laddr 81.0.0.1/0 (USER002) type 3 code 3

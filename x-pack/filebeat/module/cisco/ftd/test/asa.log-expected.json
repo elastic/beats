@@ -4130,27 +4130,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8267,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1454 to outside:100.66.98.44/8267 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 12599,
+        "network.community_id": "1:Aj/XpM3jpqRdnliZ41V6x4P43+E=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4159,7 +4173,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1454,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4281,27 +4302,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8268,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1455 to outside:100.66.98.44/8268 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13115,
+        "network.community_id": "1:92e0i/+rET9QRb4OJPjo8ombnho=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4310,7 +4345,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1455,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4318,27 +4360,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8269,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1456 to outside:100.66.98.44/8269 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13285,
+        "network.community_id": "1:zO9YefYViVlpEmjk0y/xJ+kBVQM=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4347,7 +4403,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1456,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4355,27 +4418,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8270,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1457 to outside:100.66.98.44/8270 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13455,
+        "network.community_id": "1:04tYx55j9tCWtjlaXaCxE2U8b8M=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4384,7 +4461,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1457,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4392,27 +4476,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8271,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1458 to outside:100.66.98.44/8271 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13625,
+        "network.community_id": "1:1MUBdAvjCABqDQE9IfLWai42OhA=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4421,7 +4519,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1458,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4429,27 +4534,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8272,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1459 to outside:100.66.98.44/8272 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13795,
+        "network.community_id": "1:Q4mw5/UOrraSXyucLYyaom31Os4=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4458,7 +4577,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1459,
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -4466,27 +4592,41 @@
     },
     {
         "@timestamp": "2018-10-10T12:34:56.000-02:00",
+        "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "305012",
-        "event.action": "firewall-rule",
+        "cisco.ftd.source_interface": "inside",
+        "destination.address": "100.66.98.44",
+        "destination.ip": "100.66.98.44",
+        "destination.port": 8273,
+        "event.action": "flow-expiration",
         "event.category": [
             "network"
         ],
         "event.code": 305012,
         "event.dataset": "cisco.ftd",
+        "event.duration": 30000000000,
+        "event.end": "2018-10-10T12:34:56.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from inside:172.31.98.44/1460 to outside:100.66.98.44/8273 duration 0:00:30",
         "event.severity": 6,
+        "event.start": "2018-10-10T14:34:26.000Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info"
+            "connection",
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "localhost",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 13965,
+        "network.community_id": "1:4DSy4gkfywR/vYGwMX8ni9L8xNA=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "localhost",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -4495,7 +4635,14 @@
         "related.hosts": [
             "localhost"
         ],
+        "related.ip": [
+            "100.66.98.44",
+            "172.31.98.44"
+        ],
         "service.type": "cisco",
+        "source.address": "172.31.98.44",
+        "source.ip": "172.31.98.44",
+        "source.port": 1460,
         "tags": [
             "cisco-ftd",
             "forwarded"

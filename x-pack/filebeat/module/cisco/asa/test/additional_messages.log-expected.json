@@ -599,10 +599,9 @@
         ]
     },
     {
-        "cisco.asa.icmp_code": 0,
-        "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302021",
+        "cisco.asa.source_username": "type",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
         "event.action": "flow-expiration",
@@ -640,10 +639,14 @@
             "192.168.2.2",
             "8.8.8.8"
         ],
+        "related.user": [
+            "type"
+        ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
         "source.ip": "10.10.10.10",
         "source.nat.ip": "8.8.8.8",
+        "source.user.name": "type",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -954,7 +957,7 @@
     },
     {
         "cisco.asa.destination_interface": "out111",
-        "cisco.asa.message_id": "302012",
+        "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "fw111",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
@@ -963,13 +966,13 @@
         "event.category": [
             "network"
         ],
-        "event.code": 302012,
+        "event.code": 305012,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
         "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
+        "event.original": "%ASA-6-305012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
         "event.severity": 6,
         "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
@@ -4334,6 +4337,170 @@
         "source.geo.location.lon": -0.1224,
         "source.ip": "82.0.0.1",
         "source.port": 500,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "4",
+        "cisco.asa.burst.configured_rate": "8",
+        "cisco.asa.burst.cumulative_count": "19269",
+        "cisco.asa.burst.current_rate": "0",
+        "cisco.asa.burst.id": "rate-2",
+        "cisco.asa.burst.object": "Scanning",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [ Scanning] drop rate-2 exceeded. Current burst rate is 0 per second, max configured rate is 8; Current average rate is 5 per second, max configured rate is 4; Cumulative total count is 19269",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12677,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "6018",
+        "cisco.asa.burst.current_rate": "0",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "192.168.0.1",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [   192.168.0.1] drop rate-1 exceeded. Current burst rate is 0 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 6018",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12907,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "20",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "12466",
+        "cisco.asa.burst.current_rate": "8",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "Port-5432 5432",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [     Port-5432 5432] drop rate-1 exceeded. Current burst rate is 8 per second, max configured rate is 10; Current average rate is 20 per second, max configured rate is 5; Cumulative total count is 12466",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 13142,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "3054",
+        "cisco.asa.burst.current_rate": "63",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "RDP 3389",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [           RDP 3389] drop rate-1 exceeded. Current burst rate is 63 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 3054",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 13384,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
         "tags": [
             "cisco-asa",
             "forwarded"

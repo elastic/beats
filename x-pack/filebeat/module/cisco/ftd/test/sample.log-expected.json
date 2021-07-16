@@ -631,6 +631,7 @@
         "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
+        "destination.user.name": "user2",
         "event.action": "flow-expiration",
         "event.category": [
             "network"
@@ -666,14 +667,20 @@
             "10.123.1.35",
             "192.0.2.222"
         ],
+        "related.user": [
+            "user1",
+            "user2"
+        ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
+        "source.user.name": "user1",
         "tags": [
             "cisco-ftd",
             "forwarded"
-        ]
+        ],
+        "user.name": "user2"
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
