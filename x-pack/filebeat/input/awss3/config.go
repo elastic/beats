@@ -22,7 +22,8 @@ type config struct {
 	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
 	FIPSEnabled         bool                 `config:"fips_enabled"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url" validate:"required"`
+	QueueURL            string               `config:"queue_url"`
+	S3Bucket            string               `config:"s3_bucket"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
@@ -40,6 +41,15 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
+	if c.QueueURL == "" && c.S3Bucket == "" {
+		return fmt.Errorf("queue_url or s3_bucket must provided")
+	}
+
+	if c.QueueURL != "" && c.S3Bucket != "" {
+		return fmt.Errorf("queue_url <%v> and s3_bucket <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.S3Bucket)
+	}
+
 	if c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12 {
 		return fmt.Errorf("visibility_timeout <%v> must be greater than 0 and "+
 			"less than or equal to 12h", c.VisibilityTimeout)

@@ -16,6 +16,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -38,8 +40,8 @@ const (
 	visibilityTimeout = 300 * time.Second
 )
 
-// GetConfigForTest function gets aws credentials for integration tests.
-func getConfigForTest(t *testing.T) config {
+// getConfigForTestSQSCollector function gets aws credentials for integration tests.
+func getConfigForTestSQSCollector(t *testing.T) config {
 	t.Helper()
 
 	awsConfig := awscommon.ConfigAWS{}
@@ -75,7 +77,44 @@ func getConfigForTest(t *testing.T) config {
 	return config
 }
 
-func defaultTestConfig() *common.Config {
+// getConfigForTestBucketCollector function gets aws credentials for integration tests.
+func getConfigForTestBucketCollector(t *testing.T) config {
+	t.Helper()
+
+	awsConfig := awscommon.ConfigAWS{}
+	s3Bucket := os.Getenv("S3_BUCKET_NAME")
+	profileName := os.Getenv("AWS_PROFILE_NAME")
+	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
+	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
+
+	config := config{
+		VisibilityTimeout: visibilityTimeout,
+	}
+	switch {
+	case s3Bucket == "":
+		t.Fatal("S3_BUCKET_NAME is not set in environment")
+	case profileName == "" && accessKeyID == "":
+		t.Fatal("$AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty")
+	case profileName != "":
+		awsConfig.ProfileName = profileName
+		config.S3Bucket = s3Bucket
+		config.AWSConfig = awsConfig
+		return config
+	case secretAccessKey == "":
+		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
+	}
+
+	awsConfig.AccessKeyID = accessKeyID
+	awsConfig.SecretAccessKey = secretAccessKey
+	if sessionToken != "" {
+		awsConfig.SessionToken = sessionToken
+	}
+	config.AWSConfig = awsConfig
+	return config
+}
+
+func defaultTestConfigSQSCollector() *common.Config {
 	return common.MustNewConfigFrom(common.MapStr{
 		"queue_url": os.Getenv("QUEUE_URL"),
 		"file_selectors": []common.MapStr{
@@ -100,6 +139,30 @@ func defaultTestConfig() *common.Config {
 	})
 }
 
+func defaultTestConfigBucketCollector() *common.Config {
+	return common.MustNewConfigFrom(common.MapStr{
+		"s3_bucket": os.Getenv("S3_BUCKET_NAME"),
+		"file_selectors": []common.MapStr{
+			{
+				"regex":     strings.Replace(fileName1, ".", "\\.", -1),
+				"max_bytes": 4096,
+			},
+			{
+				"regex":     strings.Replace(fileName2, ".", "\\.", -1),
+				"max_bytes": 4096,
+				"parsers": []common.MapStr{
+					{
+						"multiline": common.MapStr{
+							"pattern": "^<Event",
+							"negate":  true,
+							"match":   "after",
+						},
+					},
+				},
+			},
+		},
+	})
+}
 func newV2Context() (v2.Context, func()) {
 	ctx, cancel := context.WithCancel(context.Background())
 	return v2.Context{
@@ -109,7 +172,7 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-func setupInput(t *testing.T, cfg *common.Config) (*s3Collector, chan beat.Event) {
+func setupInputSQSCollector(t *testing.T, cfg *common.Config) (*s3SQSCollector, chan beat.Event) {
 	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -120,15 +183,39 @@ func setupInput(t *testing.T, cfg *common.Config) (*s3Collector, chan beat.Event
 
 	client := pubtest.NewChanClient(0)
 	pipeline := pubtest.ConstClient(client)
-	collector, err := inp.(*s3Input).createCollector(ctx, pipeline)
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
+	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
+
+	collector, err := inp.(*s3Input).createSQSCollector(ctx, pipeline, inputMetrics)
 	if err != nil {
 		t.Fatal(err)
 	}
 	return collector, client.Channel
 }
 
-func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, chan beat.Event) {
-	collector, receiver := setupInput(t, cfg)
+func setupInputBucketCollector(t *testing.T, cfg *common.Config) (*s3BucketCollector, chan beat.Event) {
+	inp, err := Plugin().Manager.Create(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := newV2Context()
+	t.Cleanup(cancel)
+
+	client := pubtest.NewChanClient(0)
+	pipeline := pubtest.ConstClient(client)
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
+	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
+
+	collector, err := inp.(*s3Input).createS3Collector(ctx, pipeline, inputMetrics)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return collector, client.Channel
+}
+
+func setupCollectorSQSCollector(t *testing.T, cfg *common.Config, mock bool) (*s3SQSCollector, chan beat.Event) {
+	collector, receiver := setupInputSQSCollector(t, cfg)
 	if mock {
 		svcS3 := &MockS3Client{}
 		svcSQS := &MockSQSClient{}
@@ -137,7 +224,7 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 		return collector, receiver
 	}
 
-	config := getConfigForTest(t)
+	config := getConfigForTestSQSCollector(t)
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
@@ -155,13 +242,83 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	return collector, receiver
 }
 
-func runTest(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3Collector, receiver chan beat.Event)) {
-	collector, receiver := setupCollector(t, cfg, mock)
+func setupCollectorBucketCollector(t *testing.T, cfg *common.Config, mock bool) (*s3BucketCollector, chan beat.Event) {
+	collector, receiver := setupInputBucketCollector(t, cfg)
+	if mock {
+		svcS3 := &MockS3Client{}
+		collector.s3 = svcS3
+		return collector, receiver
+	}
+
+	config := getConfigForTestBucketCollector(t)
+	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	if err != nil {
+		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
+	}
+
+	s3BucketRegion := os.Getenv("S3_BUCKET_REGION")
+	if s3BucketRegion == "" {
+		t.Log("S3_BUCKET_REGION is not set, default to us-west-1")
+		s3BucketRegion = "us-west-1"
+	}
+	awsConfig.Region = s3BucketRegion
+	awsConfig = awsConfig.Copy()
+	collector.s3 = s3.New(awsConfig)
+	return collector, receiver
+}
+
+func runTestSQSCollector(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3SQSCollector, receiver chan beat.Event)) {
+	collector, receiver := setupCollectorSQSCollector(t, cfg, mock)
 	run(t, collector, receiver)
 }
 
-func TestS3Input(t *testing.T) {
-	runTest(t, defaultTestConfig(), false, func(t *testing.T, collector *s3Collector, receiver chan beat.Event) {
+func runTestBucketCollector(t *testing.T, cfg *common.Config, mock bool, run func(t *testing.T, collector *s3BucketCollector, receiver chan beat.Event)) {
+	collector, receiver := setupCollectorBucketCollector(t, cfg, mock)
+	run(t, collector, receiver)
+}
+func TestS3InputSQSCollector(t *testing.T) {
+	runTestBucketCollector(t, defaultTestConfigBucketCollector(), false, func(t *testing.T, collector *s3BucketCollector, receiver chan beat.Event) {
+		// upload a sample log file for testing
+		s3BucketNameEnv := os.Getenv("S3_BUCKET_NAME")
+		if s3BucketNameEnv == "" {
+			t.Fatal("failed to get S3_BUCKET_NAME")
+		}
+
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			collector.run()
+		}()
+
+		for i := 0; i < 4; i++ {
+			event := <-receiver
+			bucketName, err := event.GetValue("aws.s3.bucket.name")
+			assert.NoError(t, err)
+			assert.Equal(t, s3BucketNameEnv, bucketName)
+
+			objectKey, err := event.GetValue("aws.s3.object.key")
+			assert.NoError(t, err)
+
+			switch objectKey {
+			case fileName1:
+				message, err := event.GetValue("message")
+				assert.NoError(t, err)
+				assert.Contains(t, message, "logline")
+			case fileName2:
+				message, err := event.GetValue("message")
+				assert.NoError(t, err)
+				assert.Contains(t, message, "<Event>")
+				assert.Contains(t, message, "</Event>")
+			default:
+				t.Fatalf("object key %s is unknown", objectKey)
+			}
+		}
+	})
+}
+
+func TestS3InputBucketCollector(t *testing.T) {
+	runTestSQSCollector(t, defaultTestConfigSQSCollector(), false, func(t *testing.T, collector *s3SQSCollector, receiver chan beat.Event) {
 		// upload a sample log file for testing
 		s3BucketNameEnv := os.Getenv("S3_BUCKET_NAME")
 		if s3BucketNameEnv == "" {
@@ -247,13 +404,13 @@ func (m *MockSQSClient) ChangeMessageVisibilityRequest(input *sqs.ChangeMessageV
 	}
 }
 
-func TestMockS3Input(t *testing.T) {
+func TestMockS3InputSQSCollector(t *testing.T) {
 	defer resources.NewGoroutinesChecker().Check(t)
 	cfg := common.MustNewConfigFrom(map[string]interface{}{
 		"queue_url": "https://sqs.ap-southeast-1.amazonaws.com/123456/test",
 	})
 
-	runTest(t, cfg, true, func(t *testing.T, collector *s3Collector, receiver chan beat.Event) {
+	runTestSQSCollector(t, cfg, true, func(t *testing.T, collector *s3SQSCollector, receiver chan beat.Event) {
 		defer collector.cancellation.Done()
 		defer collector.publisher.Close()
 
@@ -266,6 +423,30 @@ func TestMockS3Input(t *testing.T) {
 		grp.Go(func() (err error) {
 			return collector.processMessage(collector.s3, output.Messages[0], errC)
 		})
+
+		event := <-receiver
+		bucketName, err := event.GetValue("aws.s3.bucket.name")
+		assert.NoError(t, err)
+		assert.Equal(t, "test-s3-ks-2", bucketName)
+	})
+}
+
+func TestMockS3InputBucketCollector(t *testing.T) {
+	defer resources.NewGoroutinesChecker().Check(t)
+	cfg := common.MustNewConfigFrom(map[string]interface{}{
+		"s3_bucket": "arn:aws:s3:::aBucket",
+	})
+
+	runTestBucketCollector(t, cfg, true, func(t *testing.T, collector *s3BucketCollector, receiver chan beat.Event) {
+		defer collector.cancellation.Done()
+		defer collector.publisher.Close()
+
+		output, err := collector.getS3Objects()
+		assert.NoError(t, err)
+
+		errC := make(chan error)
+		defer close(errC)
+		err = handleS3Objects(collector.s3, output, errC, collector.cancellation, collector.config.APITimeout, collector.publisher, collector.metrics, collector.logger)
 
 		event := <-receiver
 		bucketName, err := event.GetValue("aws.s3.bucket.name")

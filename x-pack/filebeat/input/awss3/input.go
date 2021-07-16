@@ -8,6 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
@@ -16,7 +18,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -62,13 +63,28 @@ func (in *s3Input) Test(ctx v2.TestContext) error {
 }
 
 func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
-	collector, err := in.createCollector(ctx, pipeline)
-	if err != nil {
-		return err
+	var err error
+	var collector s3Collector
+
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
+	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
+
+	if in.config.QueueURL != "" {
+		collector, err = in.createSQSCollector(ctx, pipeline, inputMetrics)
+		if err != nil {
+			return err
+		}
 	}
 
-	defer collector.metrics.Close()
-	defer collector.publisher.Close()
+	if in.config.S3Bucket != "" {
+		collector, err = in.createS3Collector(ctx, pipeline, inputMetrics)
+		if err != nil {
+			return err
+		}
+	}
+
+	defer collector.getMetrics().Close()
+	defer collector.getPublisher().Close()
 	collector.run()
 
 	if ctx.Cancelation.Err() == context.Canceled {
@@ -78,16 +94,53 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 }
 
-func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3Collector, error) {
-	log := ctx.Logger.With("queue_url", in.config.QueueURL)
-
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
+func (in *s3Input) createS3Collector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics) (*s3BucketCollector, error) {
+	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
 		ACKHandler: newACKHandler(),
 	})
+
 	if err != nil {
 		return nil, err
 	}
+
+	log := ctx.Logger.With("s3_bucket", in.config.S3Bucket)
+
+	awsConfig, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
+	if err != nil {
+		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
+	}
+	s3Servicename := "s3"
+	if in.config.FIPSEnabled {
+		s3Servicename = "s3-fips"
+	}
+
+	log.Debug("s3 service name = ", s3Servicename)
+	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
+	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
+
+	return &s3BucketCollector{
+		cancellation: ctxtool.FromCanceller(ctx.Cancelation),
+		logger:       log,
+		config:       &in.config,
+		publisher:    publisher,
+		s3:           s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, awsConfig.Region, awsConfig)),
+		metrics:      metrics,
+		states:       NewStates(),
+	}, nil
+}
+
+func (in *s3Input) createSQSCollector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics) (*s3SQSCollector, error) {
+	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
+		CloseRef:   ctx.Cancelation,
+		ACKHandler: newACKHandler(),
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	log := ctx.Logger.With("queue_url", in.config.QueueURL)
 
 	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if err != nil {
@@ -116,16 +169,15 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
 	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
-	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
-	return &s3Collector{
+	return &s3SQSCollector{
 		cancellation:      ctxtool.FromCanceller(ctx.Cancelation),
 		logger:            log,
 		config:            &in.config,
-		publisher:         client,
+		publisher:         publisher,
 		visibilityTimeout: visibilityTimeout,
 		sqs:               sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, "sqs", regionName, awsConfig)),
 		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, regionName, awsConfig)),
-		metrics:           newInputMetrics(metricRegistry, ctx.ID),
+		metrics:           metrics,
 	}, nil
 }
 

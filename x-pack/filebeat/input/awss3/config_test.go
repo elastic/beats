@@ -19,7 +19,8 @@ import (
 
 func TestConfig(t *testing.T) {
 	const queueURL = "https://example.com"
-	makeConfig := func() config {
+	const s3Bucket = "arn:aws:s3:::aBucket"
+	makeConfig := func(quequeURL, s3Bucket string) config {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
 		cfg := common.MustNewConfigFrom("")
@@ -27,7 +28,8 @@ func TestConfig(t *testing.T) {
 		err := c.Unpack(cfg)
 		assert.Nil(t, err)
 		return config{
-			QueueURL:            queueURL,
+			QueueURL:            quequeURL,
+			S3Bucket:            s3Bucket,
 			APITimeout:          120 * time.Second,
 			VisibilityTimeout:   300 * time.Second,
 			FIPSEnabled:         false,
@@ -43,12 +45,16 @@ func TestConfig(t *testing.T) {
 
 	testCases := []struct {
 		name        string
+		queueURL    string
+		s3Bucket    string
 		config      common.MapStr
 		expectedErr string
-		expectedCfg func() config
+		expectedCfg func(queueURL, s3Bucket string) config
 	}{
 		{
-			"input with defaults",
+			"input with defaults for queueURL",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url": queueURL,
 			},
@@ -56,7 +62,19 @@ func TestConfig(t *testing.T) {
 			makeConfig,
 		},
 		{
+			"input with defaults for s3Bucket",
+			"",
+			s3Bucket,
+			common.MapStr{
+				"s3_bucket": s3Bucket,
+			},
+			"",
+			makeConfig,
+		},
+		{
 			"input with file_selectors",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url": queueURL,
 				"file_selectors": []common.MapStr{
@@ -66,8 +84,8 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			"",
-			func() config {
-				c := makeConfig()
+			func(queueURL, s3Bucketr string) config {
+				c := makeConfig(queueURL, "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
 					{
@@ -79,7 +97,31 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
+			"error on no queueURL and s3Bucket",
+			"",
+			"",
+			common.MapStr{
+				"queue_url": "",
+				"s3_bucket": "",
+			},
+			"queue_url or s3_bucket must provided",
+			nil,
+		},
+		{
+			"error on both queueURL and s3Bucket",
+			queueURL,
+			s3Bucket,
+			common.MapStr{
+				"queue_url": queueURL,
+				"s3_bucket": s3Bucket,
+			},
+			"queue_url <https://example.com> and s3_bucket <arn:aws:s3:::aBucket> cannot be set at the same time",
+			nil,
+		},
+		{
 			"error on api_timeout == 0",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":   queueURL,
 				"api_timeout": "0",
@@ -89,6 +131,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on api_timeout less than visibility_timeout/2",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":   queueURL,
 				"api_timeout": "3m",
@@ -98,6 +142,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on visibility_timeout == 0",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":          queueURL,
 				"visibility_timeout": "0",
@@ -107,6 +153,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on visibility_timeout > 12h",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":          queueURL,
 				"visibility_timeout": "12h1ns",
@@ -116,6 +164,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on max_number_of_messages == 0",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":              queueURL,
 				"max_number_of_messages": "0",
@@ -125,6 +175,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on max_number_of_messages > 10",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":              queueURL,
 				"max_number_of_messages": "11",
@@ -134,6 +186,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on buffer_size == 0 ",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":   queueURL,
 				"buffer_size": "0",
@@ -143,6 +197,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on max_bytes == 0 ",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url": queueURL,
 				"max_bytes": "0",
@@ -152,6 +208,8 @@ func TestConfig(t *testing.T) {
 		},
 		{
 			"error on expand_event_list_from_field and content_type != application/json ",
+			queueURL,
+			"",
 			common.MapStr{
 				"queue_url":                    queueURL,
 				"expand_event_list_from_field": "Records",
@@ -178,7 +236,7 @@ func TestConfig(t *testing.T) {
 			if tc.expectedCfg == nil {
 				t.Fatal("missing expected config in test case")
 			}
-			assert.EqualValues(t, tc.expectedCfg(), c)
+			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket), c)
 		})
 	}
 }
