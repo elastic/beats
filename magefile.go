@@ -32,6 +32,8 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+        // mage:import
+        "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 )
 
 var (
@@ -147,4 +149,9 @@ func CheckLicenseHeaders() error {
 // DumpVariables writes the template variables and values to stdout.
 func DumpVariables() error {
 	return devtools.DumpVariables()
+}
+
+// UnitTest run unit tests (Go and Python) for all Beats
+func UnitTest() {
+	testtools.UnitTest()
 }

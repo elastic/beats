@@ -36,7 +36,7 @@ All Python tests are under `tests/system` directory.
 
 ==== Test commands
 
-This is a quick summary of the available test commands:
+This is a quick summary of the available `make` test commands:
 
 * `unit`: Go tests
 * `unit-tests`: Go tests with coverage reports

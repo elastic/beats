@@ -57,6 +57,17 @@ After https://golang.org/doc/install[installing Go], set the
 https://golang.org/doc/code.html#GOPATH[GOPATH] environment variable to point to
 your workspace location, and make sure `$GOPATH/bin` is in your PATH.
 
+NOTE: One deterministic manner to install Go in the proper version to work with Beats is using
+https://github.com/andrewkroh/gvm[GVM] Go version manager. An example for Mac users would be:
+
+[source,shell,subs=attributes+]
+----------------------------------------------------------------------
+gvm use {go-version}
+eval $(gvm {go-version})
+----------------------------------------------------------------------
+
+Then you can clone Beats git repository:
+
 [source,shell]
 ----------------------------------------------------------------------
 mkdir -p ${GOPATH}/src/github.com/elastic
@@ -65,13 +76,13 @@ git clone https://github.com/elastic/beats ${GOPATH}/src/github.com/elastic/beat
 
 NOTE: If you have multiple go paths, use `${GOPATH%%:*}` instead of `${GOPATH}`.
 
-Then you can compile a particular Beat by using the Makefile. For example, for
+Then you can compile a particular Beat by using mage commands. For example, for
 Packetbeat:
 
 [source,shell]
 --------------------------------------------------------------------------------
 cd beats/packetbeat
-make
+mage build
 --------------------------------------------------------------------------------
 
 Some of the Beats might have extra development requirements, in which case
@@ -105,7 +116,7 @@ make fmt
 --------------------------------------------------------------------------------
 
 Both of these commands should be run before submitting a PR. You can view all
-the available make targets with `make help`.
+the available make targets with `mage`.
 
 These commands have the following dependencies:
 
@@ -146,7 +157,14 @@ You can find the complete list of supported build targets with `go tool dist lis
 [[running-testsuite]]
 === Testing
 
-You can run the whole testsuite with the following command:
+You can run the unit test suite with the following command:
+
+[source,shell]
+--------------------------------------------------------------------------------
+mage unitTest
+--------------------------------------------------------------------------------
+
+On the other hand, you can run the whole testsuite with the following command:
 
 [source,shell]
 --------------------------------------------------------------------------------
@@ -177,13 +195,6 @@ contributing docs, see the https://github.com/elastic/docs/blob/master/README.as
 
 In order to create Beats we rely on Golang libraries and other
 external tools.
-
-[float]
-==== Golang
-
-To manage the `vendor/` folder we use go modules.
-
-To update the contents of `vendor/`, run `mage vendor`.
 
 [float]
 ==== Other dependencies
