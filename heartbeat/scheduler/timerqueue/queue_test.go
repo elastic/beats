@@ -30,7 +30,7 @@ import (
 func TestQueueRunsInOrder(t *testing.T) {
 	t.Skip("flaky test on windows: https://github.com/elastic/beats/issues/26205")
 	// Bugs can show up only occasionally
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000; i++ {
 		testQueueRunsInOrderOnce(t)
 	}
 }
@@ -67,9 +67,7 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	// we use the internal push because pushing and running are in the same threads, so
 	// using Push() may result in tasks being executed before all are inserted.
 	// This private method is not threadsafe, so is kept private.
-	for _, tt := range tasks {
-		tq.pushInternal(tt)
-	}
+	tq.pushInternal(tasks)
 
 	tq.Start()
 
