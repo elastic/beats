@@ -528,14 +528,12 @@ def e2e(Map args = [:]) {
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
-        status = sh(script: ".ci/scripts/${entrypoint}",
-                    label: "Run functional tests ${entrypoint}",
-                    returnStatus: true)
-      }
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
-      if (status != 0) {
-        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+        try {
+          sh(script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}")
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+          archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+        }
       }
     }
   }
@@ -573,18 +571,14 @@ def target(Map args = [:]) {
             cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // TODO:
-        // Packaging should happen only after the e2e?
+        // Publish packages shoud happen always to easily consume those artifacts if the
+        // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
         if(isE2E) {
           e2e(args)
-        }
-        // TODO:
-        // push docker images should happen only after the e2e?
-        if (isPackaging) {
-          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
     }
