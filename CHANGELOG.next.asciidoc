@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change logging in logs input to structure logging. Some log message formats have changed. {pull}25299[25299]
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
+- Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
 
 *Heartbeat*
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
@@ -139,6 +140,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
 - Added Airflow lightweight module {pull}26220[26220]
 - Add state_job metricset to Kubernetes module{pull}26479[26479]
+- Recover service.address field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 *Packetbeat*
 
@@ -399,6 +401,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
 - Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
 - Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
+- Cisco asa/ftd: Fix reversed usage of observer ingress and egress interfaces. {pull}26265[26265]
 
 *Heartbeat*
 
@@ -510,6 +513,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
 - Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
+- Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
 
 *Packetbeat*
 
