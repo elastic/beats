@@ -41,9 +41,8 @@ const (
 	ftMinuteOfHour
 	ftSecondOfDay
 	ftSecondOfMinute
-	ftMillisOfDay
-	ftMillisOfSecond
 	ftTimeZoneOffset
+	ftNanoOfSecond
 )
 
 func getIntField(ft fieldType, ctx *ctx, t time.Time) (int, error) {
@@ -105,11 +104,8 @@ func getIntField(ft fieldType, ctx *ctx, t time.Time) (int, error) {
 	case ftSecondOfMinute:
 		return ctx.sec, nil
 
-	case ftMillisOfDay:
-		return ((ctx.hour*60+ctx.min)*60+ctx.sec)*1000 + ctx.millis, nil
-
-	case ftMillisOfSecond:
-		return ctx.millis, nil
+	case ftNanoOfSecond:
+		return ctx.nano, nil
 	}
 
 	return 0, nil

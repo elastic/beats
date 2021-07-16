@@ -55,11 +55,20 @@ func releaseCtx(c *ctx) {
 	ctxPool.Put(c)
 }
 
+// MustNewFormatter creates a new time formatter based on the provided pattern.
+// The functions panics if the pattern is invalid
+func MustNewFormatter(pattern string) *Formatter {
+	f, err := NewFormatter(pattern)
+	if err != nil {
+		panic(err)
+	}
+	return f
+}
+
 // NewFormatter creates a new time formatter based on provided pattern.
 // If pattern is invalid an error is returned.
 func NewFormatter(pattern string) (*Formatter, error) {
 	b := newBuilder()
-
 	err := parsePatternTo(b, pattern)
 	if err != nil {
 		return nil, err
@@ -209,7 +218,17 @@ func parsePatternTo(b *builder, pattern string) error {
 			b.secondOfMinute(tokLen)
 
 		case 'S': // fraction of second
-			b.millisOfSecond(tokLen)
+			b.nanoOfSecond(tokLen)
+
+		case 'f': // faction of second (without zeros)
+			b.fractNanoOfSecond(tokLen)
+
+		case 'n': // nano second
+			// if timestamp layout use `n`, it always return 9 digits nanoseconds.
+			if tokLen != 9 {
+				tokLen = 9
+			}
+			b.nanoOfSecond(tokLen)
 
 		case 'z': // timezone offset
 			b.timeZoneOffsetText()
@@ -234,7 +253,6 @@ func parseToken(pattern string, i *int) (rune, string, error) {
 	start := *i
 	idx := start
 	length := len(pattern)
-
 	r, w := utf8.DecodeRuneInString(pattern[idx:])
 	idx += w
 	if ('A' <= r && r <= 'Z') || ('a' <= r && r <= 'z') {
