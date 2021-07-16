@@ -222,11 +222,6 @@ func (in *awsCloudWatchInput) getLogGroupNames(svc cloudwatchlogsiface.ClientAPI
 
 // getLogEventsFromCloudWatch uses FilterLogEvents API to collect logs from CloudWatch
 func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface.ClientAPI) error {
-	ctx, cancelFn := context.WithTimeout(in.inputCtx, in.config.APITimeout)
-	defer cancelFn()
-
-	init := true
-	nextToken := ""
 	currentTime := time.Now()
 	startTime, endTime := getStartPosition(in.config.StartPosition, currentTime, in.prevEndTime, in.config.ScanFrequency)
 	in.logger.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
@@ -234,45 +229,36 @@ func (in *awsCloudWatchInput) getLogEventsFromCloudWatch(svc cloudwatchlogsiface
 	// overwrite prevEndTime using new endTime
 	in.prevEndTime = endTime
 
-	for nextToken != "" || init {
-		// construct FilterLogEventsInput
-		filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime, nextToken)
+	// construct FilterLogEventsInput
+	filterLogEventsInput := in.constructFilterLogEventsInput(startTime, endTime)
 
-		// make API request
-		req := svc.FilterLogEventsRequest(filterLogEventsInput)
-		resp, err := req.Send(ctx)
-		if err != nil {
-			in.logger.Error("failed FilterLogEventsRequest", err)
-			return err
-		}
+	// make API request
+	req := svc.FilterLogEventsRequest(filterLogEventsInput)
+	paginator := cloudwatchlogs.NewFilterLogEventsPaginator(req)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
 
-		// get token for next API call, if resp.NextToken is nil, nextToken set to ""
-		nextToken = ""
-		if resp.NextToken != nil {
-			nextToken = *resp.NextToken
-		}
-
-		logEvents := resp.Events
+		logEvents := page.Events
 		in.logger.Debugf("Processing #%v events", len(logEvents))
-
-		err = in.processLogEvents(logEvents)
+		err := in.processLogEvents(logEvents)
 		if err != nil {
 			err = errors.Wrap(err, "processLogEvents failed")
 			in.logger.Error(err)
-			cancelFn()
 		}
-
-		init = false
-
-		// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
-		in.logger.Debugf("sleeping for %v before making FilterLogEvents API call again", in.config.APISleep)
-		time.Sleep(in.config.APISleep)
-		in.logger.Debug("done sleeping")
 	}
+
+	if err := paginator.Err(); err != nil {
+		return errors.Wrap(err, "error FilterLogEvents with Paginator")
+	}
+
+	// This sleep is to avoid hitting the FilterLogEvents API limit(5 transactions per second (TPS)/account/Region).
+	in.logger.Debugf("sleeping for %v before making FilterLogEvents API call again", in.config.APISleep)
+	time.Sleep(in.config.APISleep)
+	in.logger.Debug("done sleeping")
 	return nil
 }
 
-func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64, nextToken string) *cloudwatchlogs.FilterLogEventsInput {
+func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, endTime int64) *cloudwatchlogs.FilterLogEventsInput {
 	filterLogEventsInput := &cloudwatchlogs.FilterLogEventsInput{
 		LogGroupName: awssdk.String(in.config.LogGroupName),
 		StartTime:    awssdk.Int64(startTime),
@@ -285,10 +271,6 @@ func (in *awsCloudWatchInput) constructFilterLogEventsInput(startTime int64, end
 
 	if in.config.LogStreamPrefix != "" {
 		filterLogEventsInput.LogStreamNamePrefix = awssdk.String(in.config.LogStreamPrefix)
-	}
-
-	if nextToken != "" {
-		filterLogEventsInput.NextToken = awssdk.String(nextToken)
 	}
 	return filterLogEventsInput
 }
