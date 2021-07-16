@@ -329,9 +329,22 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 		bt.log.Errorf("failed to resolve query types: %s", res.Name)
 		return
 	}
-	_ = hits
+
+	// Map to ECS
+	var ecsFields []common.MapStr
+	mapping, ok := configPlugin.LookupECSMapping(res.Name)
+	if ok && len(mapping) > 0 {
+		ecsFields = make([]common.MapStr, len(hits))
+		for i, hit := range hits {
+			ecsFields[i] = common.MapStr(mapping.Map(hit))
+		}
+	} else {
+		// ECS mapping is optional, continue
+		bt.log.Debugf("ECS mapping is not found for query name: %s", res.Name)
+	}
+
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, nil)
+	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, ecsFields, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -412,17 +425,25 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	}
 }
 
-func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, reqData interface{}) {
+func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, ecsFields []common.MapStr, reqData interface{}) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	for _, hit := range hits {
+	for i, hit := range hits {
+		var fields common.MapStr
+
+		if len(ecsFields) > i {
+			fields = ecsFields[i]
+		} else {
+			fields = common.MapStr{}
+		}
+
+		fields["type"] = bt.b.Info.Name
+		fields["action_id"] = actionID
+		fields["osquery"] = hit
+
 		event := beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"type":      bt.b.Info.Name,
-				"action_id": actionID,
-				"osquery":   hit,
-			},
+			Fields:    fields,
 		}
 
 		if reqData != nil {

@@ -95,6 +95,6 @@ func (a *actionHandler) executeQuery(ctx context.Context, index, id, query, resp
 	if err != nil {
 		return err
 	}
-	a.bt.publishEvents(index, id, responseID, hits, req["data"])
+	a.bt.publishEvents(index, id, responseID, hits, nil, req["data"])
 	return nil
 }
