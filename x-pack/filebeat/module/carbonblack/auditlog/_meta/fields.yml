@@ -1,0 +1,18 @@
+- name: auditlog
+  type: group
+  release: beta
+  description: >
+    Fileset for parsing Carbon Black Auditlogs
+  fields:
+    - name: org_name
+      type: keyword
+      description: >
+        The Organization name or account related to the endpoint.
+    - name: flagged
+      type: boolean
+      description: >
+        If the endpoint has been flagged by this event.
+    - name: verbose
+      type: boolean
+      description: >
+        The status of the verbosity setting, can be either true or false.

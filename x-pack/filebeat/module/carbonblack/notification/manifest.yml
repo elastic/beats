@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: tags
+    default: [carbonblack-notification, forwarded]
+  - name: url
+  - name: token
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml
