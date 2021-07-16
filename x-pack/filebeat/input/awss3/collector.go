@@ -287,7 +287,7 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 			return nil, fmt.Errorf("this SQS queue should be dedicated to s3 ObjectCreated event notifications")
 		}
 		// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
-		filename, err := url.QueryUnescape(record.S3.object.Key)
+		filename, err := url.PathUnescape(record.S3.object.Key)
 		if err != nil {
 			return nil, fmt.Errorf("url.QueryUnescape failed for '%s': %w", record.S3.object.Key, err)
 		}
@@ -344,8 +344,9 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	// Download the S3 object using GetObjectRequest.
 	s3GetObjectInput := &s3.GetObjectInput{
-		Bucket: awssdk.String(info.name),
-		Key:    awssdk.String(info.key),
+		Bucket:                  awssdk.String(info.name),
+		Key:                     awssdk.String(info.key),
+		ResponseContentEncoding: awssdk.String(string(s3.EncodingTypeUrl)),
 	}
 	req := svc.GetObjectRequest(s3GetObjectInput)
 
