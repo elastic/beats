@@ -151,3 +151,16 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: backport patches to 6.8 branch
+    conditions:
+      - merged
+      - label=backport-v6.8.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "6.8"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
