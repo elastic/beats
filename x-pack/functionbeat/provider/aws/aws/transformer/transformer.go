@@ -5,6 +5,7 @@
 package transformer
 
 import (
+	"bufio"
 	"bytes"
 	"compress/gzip"
 	"encoding/base64"
@@ -234,29 +235,35 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 
 		defer result.Body.Close()
 		obj, err := ioutil.ReadAll(result.Body)
+
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
 		}
 
-		s3evt := beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"event": common.MapStr{
-					"kind": "event",
+		obj_r := bytes.NewReader(obj)
+		obj_line := bufio.NewScanner(obj_r)
+
+		for obj_line.Scan() {
+			s3evt := beat.Event{
+				Timestamp: time.Now(),
+				Fields: common.MapStr{
+					"event": common.MapStr{
+						"kind": "event",
+					},
+					"cloud": common.MapStr{
+						"provider": "aws",
+						"region":   record.AWSRegion,
+					},
+					"message":      obj_line.Text(),
+					"event_source": record.EventSource,
+					"bucket_name":  record.S3.Bucket.Name,
+					"bucket_key":   record.S3.Object.Key,
+					"aws_region":   record.AWSRegion,
 				},
-				"cloud": common.MapStr{
-					"provider": "aws",
-					"region":   record.AWSRegion,
-				},
-				"message":      fmt.Sprintf("%s", obj),
-				"event_source": record.EventSource,
-				"bucket_name":  record.S3.Bucket.Name,
-				"bucket_key":   record.S3.Object.Key,
-				"aws_region":   record.AWSRegion,
-			},
+			}
+			evts = append(evts, s3evt)
 		}
-		evts = append(evts, s3evt)
 	}
 	return evts, nil
 }
