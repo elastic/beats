@@ -11,8 +11,9 @@ processors:
       GREEDYMULTILINE: |-
         (.|
         )*
+      DEP_LOGLEVEL: '(%{LOGLEVEL}|DEPRECATION)'
     patterns:
-    - \[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\]\[%{LOGLEVEL:log.level}%{SPACE}\]\[%{DATA:elasticsearch.component}%{SPACE}\]
+    - \[%{TIMESTAMP_ISO8601:elasticsearch.deprecation.timestamp}\]\[%{DEP_LOGLEVEL:log.level}(%{SPACE})?\]\[%{DATA:elasticsearch.component}(%{SPACE})?\](%{SPACE}\[%{HOSTNAME:elasticsearch.node.name}\])?
       %{GREEDYMULTILINE:message}
 - date:
     if: ctx.event.timezone == null
