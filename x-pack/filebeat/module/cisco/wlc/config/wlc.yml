@@ -1,0 +1,31 @@
+{{ if eq .input "syslog" }}
+
+# Below udp instead of syslog input format is necessary in order to avoid the "ERROR [syslog] syslog/input.go:132 can't parse event as syslog rfc3164" error.
+#type: syslog
+#protocol.udp:
+#  host: "{{.syslog_host}}:{{.syslog_port}}"
+
+# I belive a nicer way would be to have the udp type after a if clause saying if input udp and then uncomment the above "old" syslog way of doing it. This way it will be controlled from the config file and both syslog and udp types would work.
+type: udp
+host: "{{.syslog_host}}:{{.syslog_port}}"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.7.0

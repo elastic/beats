@@ -1,0 +1,42 @@
+- name: cisco.aci
+  type: group
+  release: beta
+  description: >
+    Module for parsing Cisco ACI style logs
+  fields:
+  # - name: priority
+  #   description: Please add description
+  #   example: Please add example
+  # - name: timestamp
+  #   description: Please add description
+  #   example: Please add example
+  # - name: hostname
+  #   description: Please add description
+  #   example: Please add example
+  # - name: facilitycode
+  #   description: Please add description
+  #   example: Please add example
+  # - name: severity
+  #   description: Please add description
+  #   example: Please add example
+  # - name: acimessage
+  #   description: Please add description
+  #   example: Please add example
+  # - name: message
+  #   description: Please add description
+  #   example: Please add example
+  # - name: messagetype
+  #   description: Please add description
+  #   example: Please add example
+  # - name: code
+  #   description: Please add description
+  #   example: Please add example
+  # - name: state
+  #   description: Please add description
+  #   example: Please add example
+  # - name: cause
+  #   description: Please add description
+  #   example: Please add example
+  # - name: mo
+  #   description: Please add description
+  #   example: Please add example

@@ -1,0 +1,18 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/cisco-aci.log
+  - name: tags
+    default: [cisco-aci, forwarded]
+  - name: syslog_host
+    default: localhost
+  - name: syslog_port
+    default: 9005
+  - name: input
+    default: syslog
+
+ingest_pipeline: ingest/pipeline.yml
+
+input: config/aci.yml

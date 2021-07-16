@@ -1,0 +1,33 @@
+- name: cisco.wlc
+  type: group
+  release: beta
+  description: >
+    Module for parsing Cisco WLC
+  fields:
+  # - name: priority
+  #   description: Please add description
+  #   example: Please add example
+  # - name: hostname
+  #   description: Please add description
+  #   example: Please add example
+  # - name: errorcode
+  #   description: Please add description
+  #   example: Please add example
+  # - name: timestamp
+  #   description: Please add description
+  #   example: Please add example
+  # - name: timezone
+  #   description: Please add description
+  #   example: Please add example
+  # - name: category
+  #   description: Please add description
+  #   example: Please add example
+  # - name: severity
+  #   description: Please add description
+  #   example: Please add example
+  # - name: mnemonic
+  #   description: Please add description
+  #   example: Please add example
+  # - name: message
+  #   description: Please add description
+  #   example: Please add example

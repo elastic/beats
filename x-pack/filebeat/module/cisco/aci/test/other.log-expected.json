@@ -1,0 +1,58 @@
+[
+    {
+        "@timestamp": "2021-01-15T14:12:06.000-02:00",
+        "event.action": "login,session",
+        "event.category": "network",
+        "event.dataset": "cisco.aci",
+        "event.module": "cisco",
+        "event.provider": "subj-[uni/userext/remoteuser-bagginsb]/sess-4728758993261",
+        "event.severity": "6",
+        "event.timezone": "-02:00",
+        "fileset.name": "aci",
+        "input.type": "log",
+        "log.level": "info",
+        "log.offset": 0,
+        "log.original": "<190>Jan 15 14:12:06 leaf1101 %LOG_LOCAL7-6-SYSTEM_MSG [login,session][info][subj-[uni/userext/remoteuser-bagginsb]/sess-4728758993261] From-10.248.128.25-client-type-ssh-Success",
+        "log.syslog.facility.code": "23",
+        "log.syslog.facility.name": "local7",
+        "log.syslog.priority": "190",
+        "message": "From-10.248.128.25-client-type-ssh-Success",
+        "observer.hostname": "leaf1101",
+        "observer.type": "Switch",
+        "observer.vendor": "Cisco",
+        "os.family": "aci",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-aci",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T14:12:16.000-02:00",
+        "event.action": "refresh,session",
+        "event.category": "network",
+        "event.dataset": "cisco.aci",
+        "event.module": "cisco",
+        "event.provider": "subj-[uni/userext/remoteuser-sauruman]/sess-8591339927",
+        "event.severity": "6",
+        "event.timezone": "-02:00",
+        "fileset.name": "aci",
+        "input.type": "log",
+        "log.level": "info",
+        "log.offset": 179,
+        "log.original": "<190>Jan 15 14:12:16 apic02 %LOG_LOCAL7-6-SYSTEM_MSG [refresh,session][info][subj-[uni/userext/remoteuser-sauruman]/sess-8591339927] From-10.34.0.102-client-type-REST-Success",
+        "log.syslog.facility.code": "23",
+        "log.syslog.facility.name": "local7",
+        "log.syslog.priority": "190",
+        "message": "From-10.34.0.102-client-type-REST-Success",
+        "observer.hostname": "apic02",
+        "observer.type": "Switch",
+        "observer.vendor": "Cisco",
+        "os.family": "aci",
+        "service.type": "cisco",
+        "tags": [
+            "cisco-aci",
+            "forwarded"
+        ]
+    }
+]
