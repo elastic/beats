@@ -98,6 +98,12 @@ processors:
     - \[%{INDEXNAME:elasticsearch.index.name}\]\[%{NUMBER:elasticsearch.shard.id}\]
 - remove:
     field: elasticsearch.slowlog.message
+- remove:
+    field: message
+- rename:
+    field: elasticsearch.slowlog.source
+    target_field: message
+    ignore_missing: true
 - rename:
     field: elasticsearch.slowlog.@timestamp
     target_field: '@timestamp'

@@ -83,13 +83,17 @@ processors:
       GC_ALL: \[gc\]\[%{NUMBER:elasticsearch.server.gc.overhead_seq}\] overhead, spent
         \[%{NUMBER:elasticsearch.server.gc.collection_duration.time:float}%{DATA:elasticsearch.server.gc.collection_duration.unit}\]
         collecting in the last \[%{NUMBER:elasticsearch.server.gc.observation_duration.time:float}%{DATA:elasticsearch.server.gc.observation_duration.unit}\]
-      GC_YOUNG: \[gc\]\[young\]\[%{NUMBER:elasticsearch.server.gc.young.one}\]\[%{NUMBER:elasticsearch.server.gc.young.two}\]%{SPACE}%{GREEDYMULTILINE:message}
+      GC_YOUNG: \[gc\]\[young\]\[%{NUMBER:elasticsearch.server.gc.young.one}\]\[%{NUMBER:elasticsearch.server.gc.young.two}\]%{SPACE}%{GREEDYMULTILINE:elasticsearch.server.message}
     patterns:
     - '%{GC_ALL}'
     - '%{GC_YOUNG}'
-    - ((\[%{INDEXNAME:elasticsearch.index.name}\]|\[%{INDEXNAME:elasticsearch.index.name}\/%{DATA:elasticsearch.index.id}\]))?%{SPACE}%{GREEDYMULTILINE:message}
+    - ((\[%{INDEXNAME:elasticsearch.index.name}\]|\[%{INDEXNAME:elasticsearch.index.name}\/%{DATA:elasticsearch.index.id}\]))?%{SPACE}%{GREEDYMULTILINE:elasticsearch.server.message}
 - remove:
+    field: message
+- rename:
     field: elasticsearch.server.message
+    target_field: message
+    ignore_missing: true
 - rename:
     field: elasticsearch.server.@timestamp
     target_field: '@timestamp'
