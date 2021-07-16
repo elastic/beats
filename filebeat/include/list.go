@@ -35,6 +35,7 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/module/auditd"
 	_ "github.com/elastic/beats/v7/filebeat/module/elasticsearch"
 	_ "github.com/elastic/beats/v7/filebeat/module/haproxy"
+	_ "github.com/elastic/beats/v7/filebeat/module/hid_bravura_monitor"
 	_ "github.com/elastic/beats/v7/filebeat/module/icinga"
 	_ "github.com/elastic/beats/v7/filebeat/module/iis"
 	_ "github.com/elastic/beats/v7/filebeat/module/kafka"

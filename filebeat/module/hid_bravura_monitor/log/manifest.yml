@@ -1,0 +1,13 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - C:/Program Files/Hitachi ID/IDM Suite/Logs/default/*.log
+  - name: node
+    default: 0.0.0.0
+  - name: instancename
+    default: default
+
+ingest_pipeline: ingest/pipeline.json
+input: config/log.yml

@@ -1,0 +1,10 @@
+- key: hid_bravura_monitor
+  title: "Hitachi ID Bravura Monitor"
+  description: >
+    Hitachi ID Bravura Monitor Module
+  fields:
+    - name: hid_bravura_monitor
+      type: group
+      description: >
+        Hitachi ID Bravura Monitor Module Group
+      fields:

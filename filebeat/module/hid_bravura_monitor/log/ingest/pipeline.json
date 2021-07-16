@@ -1,0 +1,210 @@
+{
+  "description": "Pipeline for parsing hid_bravura_monitor logs",
+  "version": "1",
+  "processors": [
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "(^[[:cntrl:]])?%{TIMESTAMP_ISO8601:logdate}.%{NONNEGINT} - \\[(%{DATA:pslogid})?\\] %{DATA:log.logger} \\[%{NONNEGINT:process.pid},%{NONNEGINT:process.thread.id}\\] %{DATA:log.level}: %{MULTILINEDATA:msg}"
+        ],
+        "pattern_definitions": {
+          "MULTILINEDATA": "(.|\n)*"
+        },
+        "description": "Initial parse"
+      }
+    },
+    {
+      "drop": {
+        "if": "ctx?.msg ==~ /last message repeated \\d+ times/",
+        "description": "Drop repeated log message"
+      }
+    },
+    {
+      "grok": {
+        "field": "message",
+        "patterns": [
+          "(^[[:cntrl:]])?%{TIMESTAMP_ISO8601}.%{NONNEGINT} - \\[%{DATA}\\] %{DATA} \\[%{NONNEGINT},%{NONNEGINT}\\] %{DATA}: %{NOTSPACE:hid_bravura_monitor.perf.kind}. %{GREEDYDATA:kvpairs}"
+        ],
+        "ignore_missing": true,
+        "if": "ctx?.log?.level ==~ /Perf.*/",
+        "description": "Parse Perf messages"
+      }
+    },
+    {
+      "set": {
+        "field": "log.level",
+        "value": "Perf",
+        "if": "ctx?.log?.level ==~ /Perf.*/",
+        "description": "Set log.level to Perf"
+      }
+    },
+    {
+      "kv": {
+        "if": "ctx?.log?.level ==~ /Perf.*/",
+        "trim_key": " \\r\\n",
+        "trim_value": " {}\\r\\n",
+        "value_split": ": ",
+        "target_field": "hid_bravura_monitor.perf",
+        "ignore_missing": true,
+        "description": "Separate perf info",
+        "field": "kvpairs",
+        "field_split": " \\| "
+      }
+    },
+    {
+      "set": {
+        "if": "ctx?.hid_bravura_monitor?.perf?.kind == 'PerfAjax'",
+        "field": "user.id",
+        "value": "{{hid_bravura_monitor.perf.User}}",
+        "ignore_empty_value": true,
+        "description": "Copy hid_bravura_monitor.perf.User to user.id"
+      }
+    },
+    {
+      "remove": {
+        "if": "ctx?.hid_bravura_monitor?.perf?.kind == 'PerfAjax'",
+        "field": "hid_bravura_monitor.perf.User",
+        "ignore_missing": true,
+        "description": "Remove hid_bravura_monitor.perf.User"
+      }
+    },
+    {
+      "script": {
+        "if": "ctx?.log?.level ==~ /Perf.*/",
+        "source": "Map m = new HashMap(); ctx['hid_bravura_monitor']['perf'].forEach((k,v) -> m.put(k.toLowerCase(), v)); ctx['hid_bravura_monitor'].remove('perf'); ctx['hid_bravura_monitor']['perf'] = new HashMap(); m.forEach((k,v) -> ctx['hid_bravura_monitor']['perf'][k] = v ); ",
+        "description": "lowercase perf fields"
+      }
+    },
+    {
+      "set": {
+        "if": "ctx?.hid_bravura_monitor?.perf?.kind == 'PerfExe'",
+        "field": "hid_bravura_monitor.perf.exe",
+        "value": "{{log.logger}}",
+        "ignore_empty_value": true,
+        "description": "Copy log.logger to hid_bravura_monitor.perf.exe"
+      }
+    },
+    {
+      "remove": {
+        "field": "kvpairs",
+        "ignore_missing": true,
+        "description": "Remove kvpairs"
+      }
+    },
+    {
+      "set": {
+        "field": "hid_bravura_monitor.request.id",
+        "value": "{{pslogid}}",
+        "ignore_empty_value": true,
+        "if": "ctx?.pslogid ==~ /[A-F0-9]{32}/ || ctx?.pslogid ==~ /[\\da-zA-Z]{8}-([\\da-zA-Z]{4}-){3}[\\da-zA-Z]{12}/",
+        "description": "Set requestid if batchid"
+      }
+    },
+    {
+      "set": {
+        "field": "user.id",
+        "value": "{{pslogid}}",
+        "ignore_empty_value": true,
+        "if": "ctx?.hid_bravura_monitor?.perf?.kind != 'PerfAjax' && ctx?.pslogid != null && !(ctx?.pslogid ==~ /[A-F0-9]{32}/ || ctx?.pslogid ==~ /[\\da-zA-Z]{8}-([\\da-zA-Z]{4}-){3}[\\da-zA-Z]{12}/)",
+        "description": "Set userid if not a guid"
+      }
+    },
+    {
+      "remove": {
+        "field": "pslogid",
+        "ignore_missing": true,
+        "description": "Remove pslogid"
+      }
+    },
+    {
+      "date": {
+        "field": "logdate",
+        "formats": [
+          "yyyy-MM-dd HH:mm:ss.SSS"
+        ],
+        "description": "Convert logdate to @timestamp"
+      }
+    },
+    {
+      "set": {
+        "field": "message",
+        "value": "{{msg}}",
+        "description": "Override message"
+      }
+    },
+    {
+      "remove": {
+        "field": "msg",
+        "description": "Remove msg"
+      }
+    },
+    {
+      "remove": {
+        "field": "logdate",
+        "description": "Remove logdate"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.duration",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.duration to Long"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.kernel",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.kernel to Long"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.user",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.user to Long"
+      }
+    },
+    {
+      "dot_expander": {
+        "field": "hid_bravura_monitor.perf.kind",
+        "ignore_failure": true,
+        "description": "move hid_bravura_monitor.perf.kind to object"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.line",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.line to Long"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.records",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.records to Long"
+      }
+    },
+    {
+      "convert": {
+        "field": "hid_bravura_monitor.perf.result",
+        "type": "long",
+        "ignore_missing": true,
+        "description": "hid_bravura_monitor.perf.result to Long"
+      }
+    }
+  ],
+  "on_failure" : [{
+    "set" : {
+      "field" : "error.message",
+      "value" : "{{ _ingest.on_failure_message }}"
+    }
+  }]
+}

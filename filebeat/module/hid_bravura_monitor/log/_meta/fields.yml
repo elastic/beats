@@ -1,0 +1,159 @@
+- name: instancename
+  type: text
+  description: >
+    Instance name
+  multi_fields:
+    - name: keyword
+      type: keyword
+- name: node
+  type: text
+  description: >
+    Node
+  multi_fields:
+    - name: keyword
+      type: keyword
+- name: request
+  type: group
+  description: >
+    Request fields
+  fields:
+    - name: id
+      type: text
+      description: >
+        Request ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+- name: perf
+  type: group
+  description: >
+    Performance fields
+  fields:
+    - name: address
+      type: text
+      description: >
+        Server address
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: adminid
+      type: text
+      description: >
+        Administrator ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: dbcommand
+      type: text
+      description: >
+        Database command
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: duration
+      type: long
+      description: >
+        Performance duration
+    - name: event
+      type: text
+      description: >
+        Event
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: exe
+      type: text
+      description: >
+        Executable
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: function
+      type: text
+      description: >
+        Performance function
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: kernel
+      type: long
+      description: >
+        Kernel Time
+    - name: kind
+      type: text
+      description: >
+        Performance type (ie. PerfExe, PerfAjax, PerfFileRep, etc.)
+      multi_fields:
+        - name: keyword
+          type: keyword    
+    - name: message
+      type: text
+      description: >
+        Performance message
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: operation
+      type: text
+      description: >
+        Operation
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: receivequeue
+      type: text
+      description: >
+        Receive queue
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: records
+      type: long
+      description: >
+        Database records
+    - name: result
+      type: text
+      description: >
+        Result
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: sessionid
+      type: text
+      description: >
+        Session ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: sysid
+      type: text
+      description: >
+        System ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: table
+      type: text
+      description: >
+        Database table
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: targetid
+      type: text
+      description: >
+        Target ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: transid
+      type: text
+      description: >
+        Transaction ID
+      multi_fields:
+        - name: keyword
+          type: keyword
+    - name: user
+      type: long
+      description: >
+        User time

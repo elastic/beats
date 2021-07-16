@@ -1,0 +1,1 @@
+2021-02-05 08:41:11.845.2545 - [] ajaxsvc.exe [4248,10876] Perf: PerfAjax. Duration: {0} | Function: {session:expiry} | Operation: {POST} | TransID: {C_SELECT_ATTRDEF} | User: {joe.test}
