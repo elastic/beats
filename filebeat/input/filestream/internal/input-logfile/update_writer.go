@@ -32,16 +32,19 @@ import (
 type updateWriter struct {
 	store *store
 	tg    unison.TaskGroup
+	ch    *updateChan
+}
+
+type updateChan struct {
+	// pending update operations for key value pairs. The new state always
+	// overwrites the old state.
+	pending map[string]int
+	updates []scheduledUpdate
 
 	// we use a chan as conditional, so we can break on context cancellation.
 	// `waiter` is set if the writer is waiting for new entries to be reported to the store.
 	mutex  sync.Mutex
 	waiter chan struct{}
-
-	// pending update operations for key value pairs. The new state always
-	// overwrites the old state.
-	pending map[string]int
-	updates []scheduledUpdate
 }
 
 type scheduledUpdate struct {
@@ -49,10 +52,10 @@ type scheduledUpdate struct {
 	n  uint
 }
 
-func newUpdateWriter(store *store) *updateWriter {
+func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 	w := &updateWriter{
-		store:   store,
-		pending: map[string]int{},
+		store: store,
+		ch:    ch,
 	}
 	w.tg.Go(func(ctx unison.Canceler) error {
 		w.run(ctxtool.FromCanceller(ctx))
@@ -66,35 +69,12 @@ func newUpdateWriter(store *store) *updateWriter {
 // all pending operations.
 func (w *updateWriter) Close() {
 	w.tg.Stop()
-	w.syncStates(w.updates)
-}
-
-// Set overwrites key value pair in the pending update operations.
-func (w *updateWriter) Schedule(op *updateOp, n uint) {
-	w.mutex.Lock()
-	defer w.mutex.Unlock()
-
-	key := op.resource.key
-
-	idx, exists := w.pending[key]
-	if !exists {
-		idx = len(w.updates)
-		w.updates = append(w.updates, scheduledUpdate{op: op, n: n})
-		w.pending[key] = idx
-	} else {
-		w.updates[idx].op = op
-		w.updates[idx].n += n
-	}
-
-	if w.waiter != nil {
-		close(w.waiter)
-		w.waiter = nil
-	}
+	w.syncStates(w.ch.TryRecv())
 }
 
 func (w *updateWriter) run(ctx context.Context) {
 	for ctx.Err() == nil {
-		updates, err := w.fetchPending(ctx)
+		updates, err := w.ch.Recv(ctx)
 		if err != nil {
 			return
 		}
@@ -109,31 +89,77 @@ func (w *updateWriter) syncStates(updates []scheduledUpdate) {
 	}
 }
 
-// pending waits until at least one entry is available and returns
-// a table of key value pairs with pending updates that need to be written to the registry.
-func (w *updateWriter) fetchPending(ctx context.Context) ([]scheduledUpdate, error) {
-	w.mutex.Lock()
+func newUpdateChan() *updateChan {
+	return &updateChan{
+		pending: map[string]int{},
+	}
+}
+
+// Send adds a new update to the channel. Update operations
+// for the same resource key will be merged by dropping the old operation.
+func (ch *updateChan) Send(upd scheduledUpdate) {
+	ch.mutex.Lock()
+	defer ch.mutex.Unlock()
+
+	key := upd.op.resource.key
+
+	idx, exists := ch.pending[key]
+	if !exists {
+		idx = len(ch.updates)
+		ch.updates = append(ch.updates, upd)
+		ch.pending[key] = idx
+	} else {
+		ch.updates[idx].op = upd.op
+		ch.updates[idx].n += upd.n
+	}
+
+	// notify pending Read that new updates are available.
+	if ch.waiter != nil {
+		close(ch.waiter)
+		ch.waiter = nil
+	}
+}
+
+// Recv waits until at least one entry is available and returns a table of key
+// value pairs with pending updates that need to be written to the registry.
+func (ch *updateChan) Recv(ctx context.Context) ([]scheduledUpdate, error) {
+	ch.mutex.Lock()
 
 	for ctx.Err() == nil {
-		updates := w.updates
+		updates := ch.updates
 		if len(updates) > 0 {
-			w.pending = map[string]int{}
-			w.updates = nil
-			w.mutex.Unlock()
+			ch.pending = map[string]int{}
+			ch.updates = nil
+			ch.mutex.Unlock()
 			return updates, nil
 		}
 
 		waiter := make(chan struct{})
-		w.waiter = waiter
-		w.mutex.Unlock()
+		ch.waiter = waiter
+		ch.mutex.Unlock()
 
 		select {
 		case <-ctx.Done():
 			return nil, ctx.Err()
 		case <-waiter:
-			w.mutex.Lock()
+			ch.mutex.Lock()
 		}
 	}
 
 	return nil, ctx.Err()
+}
+
+// TryRecv returns available update operations or nil if there
+// are no pending operations. The channel is cleared if there had been pending
+// operations.
+func (ch *updateChan) TryRecv() []scheduledUpdate {
+	ch.mutex.Lock()
+	defer ch.mutex.Unlock()
+
+	updates := ch.updates
+	if len(updates) > 0 {
+		ch.pending = map[string]int{}
+	}
+
+	return updates
 }

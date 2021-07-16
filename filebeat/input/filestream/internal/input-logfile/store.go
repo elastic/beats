@@ -49,7 +49,6 @@ type store struct {
 	refCount        concert.RefCount
 	persistentStore *statestore.Store
 	ephemeralStore  *states
-	writer          *updateWriter
 }
 
 // states stores resource states in memory. When a cursor for an input is updated,
@@ -156,14 +155,11 @@ func openStore(log *logp.Logger, statestore StateStore, prefix string) (*store, 
 	}
 
 	ok = true
-	store := &store{
+	return &store{
 		log:             log,
 		persistentStore: persistentStore,
 		ephemeralStore:  states,
-	}
-	store.writer = newUpdateWriter(store)
-	return store, nil
-
+	}, nil
 }
 
 func newSourceStore(s *store, identifier *sourceIdentifier) *sourceStore {
@@ -260,7 +256,6 @@ func (s *store) Release() {
 }
 
 func (s *store) close() {
-	s.writer.Close()
 	if err := s.persistentStore.Close(); err != nil {
 		s.log.Errorf("Closing registry store did report an error: %+v", err)
 	}

@@ -133,6 +133,7 @@ type defaultHarvesterGroup struct {
 	harvester    Harvester
 	cleanTimeout time.Duration
 	store        *store
+	ackCH        *updateChan
 	identifier   *sourceIdentifier
 	tg           unison.TaskGroup
 }
@@ -191,7 +192,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
 			CloseRef:   ctx.Cancelation,
-			ACKHandler: newInputACKHandler(hg.store, ctx.Logger),
+			ACKHandler: newInputACKHandler(hg.ackCH, ctx.Logger),
 		})
 		if err != nil {
 			hg.readers.remove(srcID)

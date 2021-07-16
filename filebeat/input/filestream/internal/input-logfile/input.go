@@ -32,6 +32,7 @@ import (
 type managedInput struct {
 	userID           string
 	manager          *InputManager
+	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
@@ -67,6 +68,7 @@ func (inp *managedInput) Run(
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
+		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
 		tg:           unison.TaskGroup{},
 	}
@@ -80,7 +82,7 @@ func (inp *managedInput) Run(
 	return nil
 }
 
-func newInputACKHandler(store *store, log *logp.Logger) beat.ACKer {
+func newInputACKHandler(ch *updateChan, log *logp.Logger) beat.ACKer {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int
@@ -103,6 +105,6 @@ func newInputACKHandler(store *store, log *logp.Logger) beat.ACKer {
 		}
 
 		op := private[last].(*updateOp)
-		store.writer.Schedule(op, n)
+		ch.Send(scheduledUpdate{op: op, n: n})
 	})
 }
