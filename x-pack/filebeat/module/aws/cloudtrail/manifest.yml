@@ -22,6 +22,7 @@ var:
   - name: process_insight_logs
     default: true
   - name: fips_enabled
+  - name: proxy_url
   - name: max_number_of_messages
 
 ingest_pipeline: ingest/pipeline.yml

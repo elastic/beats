@@ -47,6 +47,10 @@ fips_enabled: {{ .fips_enabled }}
 max_number_of_messages: {{ .max_number_of_messages }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
 {{ else if eq .input "file" }}
 
 type: log

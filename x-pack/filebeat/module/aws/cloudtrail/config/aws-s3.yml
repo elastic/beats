@@ -59,6 +59,10 @@ fips_enabled: {{ .fips_enabled }}
 max_number_of_messages: {{ .max_number_of_messages }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 

@@ -5,6 +5,9 @@
 package aws
 
 import (
+	"net/http"
+	"net/url"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/defaults"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
@@ -18,14 +21,15 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string `config:"access_key_id"`
-	SecretAccessKey      string `config:"secret_access_key"`
-	SessionToken         string `config:"session_token"`
-	ProfileName          string `config:"credential_profile_name"`
-	SharedCredentialFile string `config:"shared_credential_file"`
-	Endpoint             string `config:"endpoint"`
-	RoleArn              string `config:"role_arn"`
-	AWSPartition         string `config:"aws_partition"` // Deprecated.
+	AccessKeyID          string   `config:"access_key_id"`
+	SecretAccessKey      string   `config:"secret_access_key"`
+	SessionToken         string   `config:"session_token"`
+	ProfileName          string   `config:"credential_profile_name"`
+	SharedCredentialFile string   `config:"shared_credential_file"`
+	Endpoint             string   `config:"endpoint"`
+	RoleArn              string   `config:"role_arn"`
+	AWSPartition         string   `config:"aws_partition"` // Deprecated.
+	ProxyUrl             *url.URL `config:"proxy_url"`
 }
 
 // GetAWSCredentials function gets aws credentials from the config.
@@ -123,6 +127,19 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 		} else {
 			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
 		}
+	}
+	return awsConfig
+}
+
+// EnrichAWSConfigWithProxy function enables proxy support for AWS
+func EnrichAWSConfigWithProxy(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
+	if config.ProxyUrl != nil {
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(config.ProxyUrl),
+			},
+		}
+		awsConfig.HTTPClient = httpClient
 	}
 	return awsConfig
 }

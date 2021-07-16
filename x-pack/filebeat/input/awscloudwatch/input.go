@@ -107,6 +107,7 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 	if err != nil {
 		return nil, errors.Wrap(err, "getAWSCredentials failed")
 	}
+	awsConfig = awscommon.EnrichAWSConfigWithProxy(config.AwsConfig, awsConfig)
 	awsConfig.Region = config.RegionName
 
 	closeChannel := make(chan struct{})
