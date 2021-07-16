@@ -135,6 +135,12 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 			"-E", "logging.files.permission=0640",
 			"-E", "logging.files.interval=1h",
 		)
+
+		if !b.config.LogMetrics {
+			appendix = append(appendix,
+				"-E", "logging.metrics.enabled=false",
+			)
+		}
 	}
 
 	return append(args, appendix...)
