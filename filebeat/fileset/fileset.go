@@ -160,11 +160,22 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 		return nil, err
 	}
 
+	// init from the config
+	for name, val := range fs.fcfg.Var {
+		vars[name] = val
+	}
+
 	for _, vals := range fs.manifest.Vars {
 		var exists bool
 		name, exists := vals["name"].(string)
 		if !exists {
 			return nil, fmt.Errorf("Variable doesn't have a string 'name' key")
+		}
+
+		// overrides
+		_, exists = vars[name]
+		if exists {
+			continue
 		}
 
 		// Variables are not required to have a default. Templates should
@@ -184,11 +195,6 @@ func (fs *Fileset) evaluateVars(info beat.Info) (map[string]interface{}, error) 
 		if err != nil {
 			return nil, fmt.Errorf("Error resolving variables on %s: %v", name, err)
 		}
-	}
-
-	// overrides from the config
-	for name, val := range fs.fcfg.Var {
-		vars[name] = val
 	}
 
 	return vars, nil
