@@ -97,11 +97,6 @@ type resource struct {
 	// in the persistent state.
 	invalid bool
 
-	// internalInSync is true if all 'Internal' metadata like TTL or update timestamp are in sync.
-	// Normally resources are added when being created. But if operations failed we will retry inserting
-	// them on each update operation until we eventually succeeded
-	internalInSync bool
-
 	activeCursorOperations uint
 	internalState          stateInternal
 
@@ -112,9 +107,10 @@ type resource struct {
 	// When processing update operations on ACKs, the state is applied to cursor
 	// first, which is finally written to the persistent store. This ensures that
 	// we always write the complete state of the key/value pair.
-	cursor        interface{}
-	pendingCursor interface{}
-	cursorMeta    interface{}
+	cursor             interface{}
+	pendingCursorValue interface{}
+	pendingUpdate      interface{} // delta value of most recent pending updateOp
+	cursorMeta         interface{}
 }
 
 type (
@@ -303,10 +299,8 @@ func (s *store) writeState(r *resource) {
 	err := s.persistentStore.Set(r.key, r.inSyncStateSnapshot())
 	if err != nil {
 		s.log.Errorf("Failed to update resource fields for '%v'", r.key)
-		r.internalInSync = false
 	} else {
 		r.stored = true
-		r.internalInSync = true
 	}
 
 }
@@ -326,7 +320,8 @@ func (s *store) resetCursor(key string, cur interface{}) error {
 	r.version++
 	r.UpdatesReleaseN(r.activeCursorOperations)
 	r.activeCursorOperations = 0
-	r.pendingCursor = nil
+	r.pendingCursorValue = nil
+	r.pendingUpdate = nil
 	typeconv.Convert(&r.cursor, cur)
 
 	s.writeState(r)
@@ -406,7 +401,7 @@ func (s *states) Find(key string, create bool) *resource {
 func (r *resource) IsNew() bool {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	return r.pendingCursor == nil && r.cursor == nil
+	return r.pendingCursorValue == nil && r.pendingUpdate == nil && r.cursor == nil
 }
 
 func (r *resource) isDeleted() bool {
@@ -434,10 +429,7 @@ func (r *resource) Finished() bool { return r.pending.Load() == 0 }
 func (r *resource) UnpackCursor(to interface{}) error {
 	r.stateMutex.Lock()
 	defer r.stateMutex.Unlock()
-	if r.activeCursorOperations == 0 {
-		return typeconv.Convert(to, r.cursor)
-	}
-	return typeconv.Convert(to, r.pendingCursor)
+	return typeconv.Convert(to, r.activeCursor())
 }
 
 func (r *resource) UnpackCursorMeta(to interface{}) error {
@@ -466,11 +458,11 @@ func (r *resource) copyInto(dst *resource) {
 	// time. If removed the whole file is resent to the output when found/updated.
 	internalState.Updated = time.Now()
 	dst.stored = r.stored
-	dst.internalInSync = true
 	dst.internalState = internalState
 	dst.activeCursorOperations = r.activeCursorOperations
 	dst.cursor = r.cursor
-	dst.pendingCursor = nil
+	dst.pendingCursorValue = nil
+	dst.pendingUpdate = nil
 	dst.cursorMeta = r.cursorMeta
 	dst.lock = unison.MakeMutex()
 }
@@ -486,28 +478,45 @@ func (r *resource) copyWithNewKey(key string) *resource {
 	return &resource{
 		key:                    key,
 		stored:                 r.stored,
-		internalInSync:         true,
 		internalState:          internalState,
 		activeCursorOperations: r.activeCursorOperations,
 		cursor:                 r.cursor,
-		pendingCursor:          nil,
+		pendingCursorValue:     nil,
+		pendingUpdate:          nil,
 		cursorMeta:             r.cursorMeta,
 		lock:                   unison.MakeMutex(),
 	}
 }
 
+// pendingCursor returns the current published cursor state not yet ACKed.
+//
+// Note: The stateMutex must be locked when calling pendingCursor.
+func (r *resource) pendingCursor() interface{} {
+	if r.pendingUpdate != nil {
+		var tmp interface{}
+		typeconv.Convert(&tmp, &r.cursor)
+		typeconv.Convert(&tmp, r.pendingUpdate)
+		r.pendingCursorValue = tmp
+		r.pendingUpdate = nil
+	}
+	return r.pendingCursorValue
+}
+
+// activeCursor
+func (r *resource) activeCursor() interface{} {
+	if r.activeCursorOperations != 0 {
+		return r.pendingCursor()
+	}
+	return r.cursor
+}
+
 // stateSnapshot returns the current in memory state, that already contains state updates
 // not yet ACKed.
 func (r *resource) stateSnapshot() state {
-	cursor := r.pendingCursor
-	if r.activeCursorOperations == 0 {
-		cursor = r.cursor
-	}
-
 	return state{
 		TTL:     r.internalState.TTL,
 		Updated: r.internalState.Updated,
-		Cursor:  cursor,
+		Cursor:  r.activeCursor(),
 		Meta:    r.cursorMeta,
 	}
 }
@@ -531,10 +540,9 @@ func readStates(log *logp.Logger, store *statestore.Store, prefix string) (*stat
 		}
 
 		resource := &resource{
-			key:            key,
-			stored:         true,
-			lock:           unison.MakeMutex(),
-			internalInSync: true,
+			key:    key,
+			stored: true,
+			lock:   unison.MakeMutex(),
 			internalState: stateInternal{
 				TTL:     st.TTL,
 				Updated: st.Updated,
