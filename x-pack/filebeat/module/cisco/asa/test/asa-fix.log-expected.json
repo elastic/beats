@@ -4,7 +4,7 @@
         "cisco.asa.destination_interface": "Inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "Outside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "cisco.asa.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
@@ -49,10 +49,14 @@
             "10.123.123.123",
             "10.233.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 53723,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -162,7 +166,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "Inside_access_in",
         "cisco.asa.source_interface": "Inside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",
         "destination.port": 57621,
@@ -202,10 +206,14 @@
         "related.ip": [
             "10.123.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 57621,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
