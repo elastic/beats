@@ -72,7 +72,11 @@ var pdhErrors = map[PdhErrno]struct{}{
 {{- end }}
 }
 
+// PdhCounterValue is the structure that receives the counter value.
+type PdhCounterValue C.PDH_FMT_COUNTERVALUE
+
 type PdhCounterFormat uint32
+
 
 // PDH Counter Formats
 const (

@@ -210,6 +210,9 @@ var pdhErrors = map[PdhErrno]struct{}{
 	PDH_QUERY_PERF_DATA_TIMEOUT:                struct{}{},
 }
 
+// PdhCounterValue is the structure that receives the counter value.
+type PdhCounterValue C.PDH_FMT_COUNTERVALUE
+
 type PdhCounterFormat uint32
 
 // PDH Counter Formats

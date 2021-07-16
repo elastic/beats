@@ -4,13 +4,12 @@
 
 // +build windows
 
-package application_pool
+package website
 
 import (
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -18,7 +17,7 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("iis", "application_pool", New)
+	mb.Registry.MustAddMetricSet("iis", "website", New, mb.DefaultMetricSet())
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -28,6 +27,7 @@ func init() {
 type MetricSet struct {
 	*iis.MetricSet
 	log *logp.Logger
+	//reader     *WebsiteReader
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking

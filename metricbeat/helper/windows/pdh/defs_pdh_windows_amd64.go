@@ -200,6 +200,13 @@ var pdhErrors = map[PdhErrno]struct{}{
 	PDH_QUERY_PERF_DATA_TIMEOUT:                struct{}{},
 }
 
+type PdhCounterValue struct {
+	CStatus   uint32
+	Pad_cgo_0 [4]byte
+	LongValue int32
+	Pad_cgo_1 [4]byte
+}
+
 type PdhCounterFormat uint32
 
 const (
