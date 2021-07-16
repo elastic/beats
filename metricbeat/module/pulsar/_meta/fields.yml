@@ -1,0 +1,11 @@
+- key: pulsar
+  title: "pulsar"
+  release: beta
+  description: >
+    Pulsar broker metrics collected from Apache Pulsar.
+  fields:
+    - name: pulsar
+      type: group
+      description: >
+        `pulsar` contains statistics that were read from Apache Pulsar.
+      fields:

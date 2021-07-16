@@ -1,0 +1,5 @@
+This is broker metricset of the module pulsar.
+
+The broker metricset contains namespace, topic and subscription metrics.
+
+The broker metricset  were tested with Apache Pulsar 2.7.1.

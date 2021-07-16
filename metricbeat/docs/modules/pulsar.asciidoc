@@ -1,0 +1,41 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-module-pulsar]]
+== pulsar module
+
+beta[]
+
+This is Pulsar module.
+
+Metrics are retrieved from the `/metrics` endpoint.
+The default metricset is `broker`.
+
+The Pulsar module were tested with Apache Pulsar 2.7.1.
+
+
+[float]
+=== Example configuration
+
+The pulsar module supports the standard configuration options that are described
+in <<configuration-metricbeat>>. Here is an example configuration:
+
+[source,yaml]
+----
+metricbeat.modules:
+- module: pulsar
+  metricsets: ["broker"]
+  period: 10s
+  hosts: ["localhost:8080"]
+----
+
+[float]
+=== Metricsets
+
+The following metricsets are available:
+
+* <<metricbeat-metricset-pulsar-broker,broker>>
+
+include::pulsar/broker.asciidoc[]
+
