@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+@Library('apm@feature/override-notify-message-template') _
 
 pipeline {
   agent { label 'ubuntu-18 && immutable' }
@@ -187,6 +187,8 @@ VERSION=${env.VERSION}-SNAPSHOT""")
       // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
       dir("${BASE_DIR}"){
         notifyBuildResult(prComment: true,
+                          buildCommentTemplate: readFile('.ci/github-comment.template'),
+                          useContentTemplate: true,
                           slackComment: true, slackNotify: (isBranch() || isTag()),
                           analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()))
       }

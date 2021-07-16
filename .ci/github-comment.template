@@ -1,0 +1,46 @@
+<!-- See for further examaples https://github.com/elastic/apm-pipeline-library/blob/master/resources/github-comment-markdown.template -->
+
+<%if (statusSuccess) {%>
+## :green_heart: Build Succeeded
+<%} else if (buildStatus?.equals('ABORTED')) {%>
+## :grey_exclamation: Build Aborted
+  <%if (!build?.description != null && build?.description.toString().toLowerCase().contains('aborted')) {%>
+  > There is a new build on-going so the previous on-going builds have been aborted.
+  <%} else if (!build?.description != null && build?.description.toString().toLowerCase().contains('allowed')) {%>
+  > ${build.description}
+  <%} else {%>
+  > Either there was a build timeout or someone aborted the build.'}
+  <%}%>
+<%} else {%>
+## :broken_heart: ${(testsSummary?.failed != 0) ? 'Tests Failed' : 'Build Failed'}
+<%}%>
+
+<!-- TEST RESULTS IF ANY-->
+<% if(testsErrors?.any{item -> item?.status == "FAILED"}) {%>
+  ### Test errors [![${testsSummary?.failed}](https://img.shields.io/badge/${testsSummary?.failed}%20-red)](${jobUrl}/tests)
+<details><summary>Expand to view the tests failures</summary><p>
+    ${(testsSummary?.failed > 10) ? '> Show only the first 10 test failures' : ''}
+    <% testsErrors?.findAll{item -> item?.status == "FAILED"}?.take(10)?.each { test -> %>
+##### `${test?.name}`
+<% errorDetails = (test?.errorDetails && !test?.errorDetails?.equals('null')) ? "<details><summary>Expand to view the error details</summary><p>\n\n```\n ${test?.errorDetails} \n ```\n</p></details>" : '<li>no error details</li>'%>
+<% errorStackTrace = (test?.errorStackTrace && !test?.errorStackTrace?.equals('null')) ? "<details><summary>Expand to view the stacktrace</summary><p>\n\n```\n ${test?.errorStackTrace} \n ```\n</p></details>" : '<li>no stacktrace</li>'%>
+<ul>
+${errorDetails}
+${errorStackTrace}
+</ul>
+    <%}%>
+</p></details>
+<%}%>
+
+<!-- STEPS ERRORS IF ANY -->
+<% stepsErrors = stepsErrors?.findAll{it?.result == "FAILURE" && !it?.displayName?.contains('Notifies GitHub') && !it?.displayName?.contains('Archive JUnit') && !it?.displayName?.contains('Recursively delete')}%>
+<% if (stepsErrors?.size() != 0 && !statusSuccess) {%>
+### Steps errors [![${stepsErrors?.size()}](https://img.shields.io/badge/${stepsErrors?.size()}%20-red)](${jobUrl}/pipeline)
+<% if (stepsErrors?.size() > 10) {%>
+> Show only the first 10 steps failures
+<% }%>
+  <% stepsErrors?.takeRight(10)?.each{ c -> %>
+  <% url = (c?.url && c?.url != 'null') ? ". See logs <a href=\"${c?.url}/?start=0\">here</a>" : ''%>
+##### `${c?.displayName && c?.displayName != 'null' ? c?.displayName.replaceAll('\\n', '') : ''}` ${url}
+  <%}%>
+<%}%>
