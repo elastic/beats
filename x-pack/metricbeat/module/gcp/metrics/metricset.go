@@ -51,9 +51,23 @@ type MetricSet struct {
 
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
-	ServiceName string   `config:"service"  validate:"required"`
-	MetricTypes []string `config:"metric_types" validate:"required"`
-	Aligner     string   `config:"aligner"`
+	ServiceName string `config:"service"  validate:"required"`
+	// MetricPrefix allows to specify the prefix string for MetricTypes
+	// Stackdriver requires metrics to be prefixed with a common prefix.
+	// This prefix changes based on the services the metrics belongs to.
+	ServiceMetricPrefix string   `config:"metric_prefix"`
+	MetricTypes         []string `config:"metric_types" validate:"required"`
+	Aligner             string   `config:"aligner"`
+}
+
+func (mc metricsConfig) MetricPrefix() string {
+	// NOTE: fallback to Google Cloud prefix for backward compatibility
+	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
+	// List: https://cloud.google.com/monitoring/api/metrics_gcp
+	if mc.ServiceMetricPrefix == "" {
+		return mc.ServiceName + ".googleapis.com/"
+	}
+	return mc.ServiceMetricPrefix
 }
 
 type metricMeta struct {
@@ -226,13 +240,20 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 		Name: "projects/" + m.config.ProjectID,
 	}
 
+	m.Logger().Debugf("metrics config %+v", m.MetricsConfig)
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.ServiceName+".googleapis.com/"+mt)
-			it := client.ListMetricDescriptors(ctx, req)
+			m.Logger().Debugf("list metric descriptors: %s", mt)
 
+			fullMetricIdentifier := fmt.Sprintf("%s%s", sdc.MetricPrefix(), mt)
+			metricFilter := fmt.Sprintf(`metric.type = starts_with("%s")`, fullMetricIdentifier)
+			req.Filter = metricFilter
+			m.Logger().Debugf("ListMetricDescriptors req: %+v", req)
+
+			it := client.ListMetricDescriptors(ctx, req)
 			for {
 				out, err := it.Next()
+
 				if err != nil && err != iterator.Done {
 					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
 					m.Logger().Error(err)
@@ -246,6 +267,14 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 				if err == iterator.Done {
 					break
 				}
+
+			}
+
+			// NOTE: if a metric is not added to the metricsWithMeta map is not collected subsequently.
+			// Such a case is an error, as the configuration is explicitly requesting a metric that the beat
+			// is not able to collect, so we provide a logging statement for this behaviour.
+			if _, ok := metricsWithMeta[fullMetricIdentifier]; !ok {
+				m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
 			}
 		}
 	}
