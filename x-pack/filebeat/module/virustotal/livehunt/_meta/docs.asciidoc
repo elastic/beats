@@ -1,0 +1,128 @@
+[role="xpack"]
+
+:modulename: virustotal
+:has-dashboards: true
+
+== VirusTotal LiveHunt Module
+
+VirusTotal was founded as a free service that analyzes files and URLs for viruses, worms, trojans and other kinds of malicious content. In addition to the free services, VirusTotal offers several premium services. One of those premium services is LiveHunting.
+
+LiveHunt leverages customer provided YARA rules uploaded and applied to all files sent to VirusTotal from all around the world, live. Whenever there is a rule match you get an immediate notification. Notifications can be viewed via the web interface, email alerts or retrieved through a REST API.
+
+This module uses Filebeat's https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-httpjson.html[HTTP JSON input plugin] to query the notification queue and write the results, and companion metadata, to Elasticsearch. Additionally, this module leverages ECS fieldsets.
+
+include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: livehunt
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+=== Compatibility
+
+This module has been tested against `v3.0` of the https://developers.virustotal.com/v3.0/reference#hunting-notification-object[VirusTotal LiveHunt API Endpoint].
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: {livehunt}
+
+include::../include/config-option-intro.asciidoc[]
+
+[float]
+==== `livehunt` fileset settings
+
+[source,yaml]
+----
+- module: virustotal
+    livehunt:
+      enabled: true
+      # Set the VirusTotal private API key
+      var.apikey: ""
+      # Set retrieval limit, maximum 40, default 10
+      var.limit: 10
+----
+
+[float]
+==== `VirusTotal` fields
+
+[source,yaml]
+----
+- top-level field: virustotal
+  description: Main fieldset for all VirusTotal events
+
+  - field: analysis
+    description: Information about the sample analysis.
+
+  - field: attributes
+    description: File-level attributes about the sample.
+
+  - field: bytehero_info
+    description: ByteHero heuristic detection engine information.
+
+  - field: capabilities
+    description: Capabilities of the sample.
+
+  - field: community
+    description: Community information and votes about the sample.
+
+  - field: downloadable
+    description: The sample is or is not downloadable from VirusTotal.
+
+  - field: exiftool
+    description: Exif metadata provided about the sample.
+
+  - field: hash
+    description: Hashing algorithm provided by VirusTotal to identify similar samples.
+
+  - field: id
+    description: VirusTotal identification number for the sample.
+
+  - field: last_modified
+    description: UTC date when the sample itself was last modified.
+
+  - field: magic
+    description: Magic number of the sample.
+
+  - field: notification
+    description: UTC date when the LiveHunt notification was generated.
+
+  - field: packers
+    description: Type of packers used by the sample.
+
+  - field: sigma_analysis
+    description: Analysis of sandbox generated sysmon logs.
+
+  - field: submission
+    description: UTC date when the sample itself was submitted to VirusTotal.
+
+  - field: tags
+    description: VirusTotal applied tags about the sample.
+
+  - field: trid
+    description: TrID is an utility designed to identify file types from their binary signatures
+
+  - field: type_description
+    description: File architecture description about the sample.
+
+  - field: type_tag
+    description: File architecture tag about the sample.
+----
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with several visualizations and a dashboard.
+
+[role="screenshot"]
+image::./images/kibana-virustotal-dashboard-1.png[]
+image::./images/kibana-virustotal-dashboard-2.png[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:

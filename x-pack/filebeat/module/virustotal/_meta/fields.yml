@@ -1,0 +1,7 @@
+#spellchecker: disable
+- key: virustotal
+  title: VirusTotal
+  description: >
+    Module for handling the VirusTotal API notifications
+  fields:
+

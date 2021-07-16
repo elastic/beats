@@ -1,0 +1,60 @@
+# Section objects
+
+// Abstract structure for all binary types, missing fields for a given data source will be excluded
+{
+    name: "Name of code section",
+    physical_offset: "[keyword] Offset of the section from the beginning of the segment, in hex",
+    physical_size: "[long] Size of the code section in the file in bytes",
+    virtual_address: "[keyword] relative virtual memory address when loaded",
+    virtual_size: "[long] Size of the section in bytes when loaded into memory",
+    flags: "[keyword] List of flag values as strings for this section",
+    type: "[keyword] Section type as string, if applicable",
+    segment_name: "[keyword] Name of segment for this section, if applicable",
+    entropy: "[float] shannon entropy calculated from section content in bits per byte of information",
+    chi2: "[float]"
+}
+
+
+// Mach-O example
+{
+    file.macho.sections: [
+        {
+            name: "__nl_symbol_ptr",
+            flags: ["S_8BYTE_LITERALS"],
+            type: "S_CSTRING_LITERALS",
+            segment_name: "__DATA"
+        }, ...
+    ]
+}
+// ELF example
+{
+    file.elf.sections: [
+        {
+            name: ".data",
+            physical_offset: "0x3000",
+            physical_size: 16,
+            virtual_address: "0x4000",
+            flags: ["WA"], // This is how VT presents the data. Pretty sure this maps to ["WRITE", "ALLOC"], but I don't have an exhaustive mapping
+            type: "PROGBITS"
+        }, ...
+    ]
+}
+
+// PE example
+
+{
+    file.pe.sections: [
+        {
+            name: ".data",
+            physical_size: 2542592,
+            virtual_address: "0x2DE000",
+            virtual_size: 2579264,
+            flags: ["rw"], // Again, this is how VT presents it. Likely maps to ["MEM_READ", "MEM_WRITE"], but I don't have an exhaustive mapping
+            entropy: 6.83,
+            chi2: 13360996,
+            hash: {
+                md5: "9002a963c87901397a986c3333d09627"
+            }
+        }, ...
+    ]
+}

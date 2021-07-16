@@ -59,6 +59,7 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/suricata"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/threatintel"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/tomcat"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/virustotal"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zeek"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zoom"
