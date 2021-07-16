@@ -48,7 +48,7 @@ func (m *MetricSet) extractAndTransform(ctx context.Context) ([]mb.Event, error)
 
 // transform is the T of an ETL (refer to the 'extract' method above if you need to see the origin). Transforms the data
 // to create a Kibana/Elasticsearch friendly JSON. Data from Oracle is pretty fragmented by design so a lot of data
-// was necessary. More than one different event is generated. Refer to the _meta folder too see ones.
+// manipulation was necessary. More than one different event is generated. Refer to the _meta folder too see ones.
 func (m *MetricSet) transform(in *extractedData) []mb.Event {
 	bufferCache := m.addBufferCacheRatioData(in.bufferCacheHitRatios)
 	cursorByUsernameAndMachineEvents := m.addCursorByUsernameAndMachine(in.cursorsByUsernameAndMachine)
