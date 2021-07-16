@@ -74,6 +74,10 @@ func newParser(tokenizer string) (*parser, error) {
 	// Some delimiters also need information about their surrounding for decision.
 	for i := 0; i < len(delimiters); i++ {
 		if i+1 < len(delimiters) {
+			// If the current delimiter is greedy verify that there is a delimiter before the next field
+			if delimiters[i].IsGreedy() && (i+1 < len(matches)) && (matches[i][1] == matches[i+1][3]) {
+				return nil, errInvalidTokenizer
+			}
 			delimiters[i].SetNext(delimiters[i+1])
 		}
 	}
