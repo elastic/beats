@@ -20,6 +20,7 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
+	"sync"
 	"time"
 )
 
@@ -34,11 +35,12 @@ type TimerTaskFn func(now time.Time)
 
 // TimerQueue represents a priority queue of timers.
 type TimerQueue struct {
-	th        timerHeap
-	ctx       context.Context
-	nextRunAt *time.Time
-	pushCh    chan *timerTask
-	timer     *time.Timer
+	doneWg sync.WaitGroup
+	th     timerHeap
+	ctx    context.Context
+	ticker *time.Ticker
+	pushCh chan *timerTask
+	runNow chan time.Time
 }
 
 // NewTimerQueue creates a new instance.
@@ -47,7 +49,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		th:     timerHeap{},
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
-		timer:  time.NewTimer(time.Hour * 86400),
+		runNow: make(chan time.Time),
 	}
 	heap.Init(&tq.th)
 
@@ -69,58 +71,45 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // Start runs a goroutine within the given context that processes items in the queue, spawning a new goroutine
 // for each.
 func (tq *TimerQueue) Start() {
+	tq.doneWg.Add(1)
+	tq.ticker = time.NewTicker(time.Millisecond * 200)
 	go func() {
+		defer tq.doneWg.Done()
 		for {
 			select {
 			case <-tq.ctx.Done():
-				// Stop the timerqueue
+				tq.ticker.Stop()
 				return
-			case now := <-tq.timer.C:
-				tasks := tq.popRunnable(now)
-
-				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
-				go func() {
-					for _, tt := range tasks {
-						tt.fn(now)
-					}
-				}()
-
-				if tq.th.Len() > 0 {
-					nr := tq.th[0].runAt
-					tq.nextRunAt = &nr
-					tq.timer.Reset(nr.Sub(time.Now()))
-				} else {
-					tq.timer.Stop()
-					tq.nextRunAt = nil
-				}
+			case now := <-tq.ticker.C:
+				tq.runTasksInternal(now)
 			case tt := <-tq.pushCh:
-				tq.pushInternal(tt)
+				heap.Push(&tq.th, tt)
+				// If some items were scheduled to run right now, do it quickly!
+				tq.runTasksInternal(time.Now())
 			}
+
 		}
 	}()
 }
 
-func (tq *TimerQueue) pushInternal(tt *timerTask) {
-	heap.Push(&tq.th, tt)
+func (tq *TimerQueue) runTasksInternal(now time.Time) {
+	// Look ahead 5ms and grab soonish tasks
+	tasks := tq.popRunnable(now)
 
-	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
-		// channel is empty (and thus would block)
-		if tq.nextRunAt != nil && !tq.timer.Stop() {
-			<-tq.timer.C
+	// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
+	go func() {
+		for _, tt := range tasks {
+			tt.fn(now)
 		}
-		tq.timer.Reset(tt.runAt.Sub(time.Now()))
-
-		tq.nextRunAt = &tt.runAt
-	}
+	}()
 }
 
 func (tq *TimerQueue) popRunnable(now time.Time) (res []*timerTask) {
 	for i := 0; tq.th.Len() > 0; i++ {
 		// the zeroth element of the heap is the same as a peek
 		peeked := tq.th[0]
-		if peeked.runAt.Before(now) {
+		// Add 1 to now because it's really before or equal to
+		if peeked.runAt.Before(now.Add(1)) {
 			popped := heap.Pop(&tq.th).(*timerTask)
 			res = append(res, popped)
 		} else {

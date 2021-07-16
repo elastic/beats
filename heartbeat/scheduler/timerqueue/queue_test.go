@@ -18,6 +18,7 @@
 package timerqueue
 
 import (
+	"container/heap"
 	"context"
 	"math/rand"
 	"sort"
@@ -36,9 +37,12 @@ func TestQueueRunsInOrder(t *testing.T) {
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithCancel(context.Background())
-	defer ctxCancel()
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*15)
 	tq := NewTimerQueue(ctx)
+	defer func() {
+		ctxCancel()
+		tq.doneWg.Wait()
+	}()
 
 	// Number of items to test with
 	numItems := 10
@@ -68,7 +72,7 @@ func testQueueRunsInOrderOnce(t *testing.T) {
 	// using Push() may result in tasks being executed before all are inserted.
 	// This private method is not threadsafe, so is kept private.
 	for _, tt := range tasks {
-		tq.pushInternal(tt)
+		heap.Push(&tq.th, tt)
 	}
 
 	tq.Start()
@@ -82,6 +86,8 @@ Reader:
 				break Reader
 			}
 			taskResults = append(taskResults, res)
+		case <-ctx.Done():
+			require.Fail(t, "context deadline expired")
 		}
 	}
 
