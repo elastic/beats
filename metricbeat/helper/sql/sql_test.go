@@ -18,11 +18,18 @@
 package sql
 
 import (
+	"context"
+	"database/sql"
+	"database/sql/driver"
+	"fmt"
 	"math"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
 )
 
 type kv struct {
@@ -185,4 +192,56 @@ func TestToDotKeys(t *testing.T) {
 	if ms["key"].(common.MapStr)["value"] != "value" {
 		t.Fail()
 	}
+}
+
+func TestNewDBClient(t *testing.T) {
+	t.Run("create and close", func(t *testing.T) {
+		goroutines := resources.NewGoroutinesChecker()
+		defer goroutines.Check(t)
+
+		client, err := NewDBClient("dummy", "localhost", nil)
+		require.NoError(t, err)
+
+		err = client.Close()
+		require.NoError(t, err)
+	})
+
+	t.Run("unavailable", func(t *testing.T) {
+		goroutines := resources.NewGoroutinesChecker()
+		defer goroutines.Check(t)
+
+		_, err := NewDBClient("dummy", "unavailable", nil)
+		require.Error(t, err)
+	})
+}
+
+func init() {
+	sql.Register("dummy", dummyDriver{})
+}
+
+type dummyDriver struct{}
+
+func (dummyDriver) Open(name string) (driver.Conn, error) {
+	if name == "error" {
+		return nil, fmt.Errorf("error")
+	}
+
+	return &dummyConnection{name: name}, nil
+}
+
+type dummyConnection struct {
+	name string
+}
+
+// Ensure that this dummy connection implements the pinger interface, used by the helper.
+var _ driver.Pinger = &dummyConnection{}
+
+func (*dummyConnection) Prepare(query string) (driver.Stmt, error) { return nil, nil }
+func (*dummyConnection) Close() error                              { return nil }
+func (*dummyConnection) Begin() (driver.Tx, error)                 { return nil, nil }
+func (c *dummyConnection) Ping(context.Context) error {
+	if c.name == "unavailable" {
+		return fmt.Errorf("database unavailable")
+	}
+	return nil
 }
