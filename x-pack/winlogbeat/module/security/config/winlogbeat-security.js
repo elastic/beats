@@ -1947,7 +1947,7 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             if (user) {
-                if (/.@*/.test(user)) {
+                if (user.indexOf('@')>0) {
                     user = user.split('@')[0];
                     evt.Put('user.effective.name', user);
                 }
