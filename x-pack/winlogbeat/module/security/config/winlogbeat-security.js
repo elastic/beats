@@ -1907,15 +1907,10 @@ var security = (function () {
 
     var copyTargetUser = function(evt) {
         var targetUserId = evt.Get("winlog.event_data.TargetUserSid");
+        if (!targetUserId) targetUserId = evt.Get("winlog.event_data.TargetSid");
         if (targetUserId) {
             if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
             else evt.Put("user.id", targetUserId);
-        } else {
-            targetUserId = evt.Get("winlog.event_data.TargetSid");
-            if (targetUserId) {
-                if (evt.Get("user.id")) evt.Put("user.target.id", targetUserId);
-                else evt.Put("user.id", targetUserId);
-            }
         }
         var targetUserName = evt.Get("winlog.event_data.TargetUserName");
         if (targetUserName) {
