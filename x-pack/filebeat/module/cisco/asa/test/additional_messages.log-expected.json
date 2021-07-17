@@ -599,9 +599,10 @@
         ]
     },
     {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302021",
-        "cisco.asa.source_username": "type",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
         "event.action": "flow-expiration",
@@ -639,14 +640,10 @@
             "192.168.2.2",
             "8.8.8.8"
         ],
-        "related.user": [
-            "type"
-        ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
         "source.ip": "10.10.10.10",
         "source.nat.ip": "8.8.8.8",
-        "source.user.name": "type",
         "tags": [
             "cisco-asa",
             "forwarded"
