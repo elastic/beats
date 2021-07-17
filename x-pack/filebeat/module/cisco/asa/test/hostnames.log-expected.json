@@ -76,6 +76,7 @@
         "log.file.path": "hostnames.log",
         "log.level": "informational",
         "log.offset": 169,
+        "network.community_id": "1:TIG5OyXflKDSW/Fgd/O5r5A7Zk4=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "MYHOSTNAME",
