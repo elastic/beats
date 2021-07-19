@@ -51,22 +51,22 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 
 // Run runs the kubernetes context provider.
 func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
-	if p.config.Resource.Pod != nil {
-		resourceConfig := p.config.Resource.Pod
+	if p.config.Resources.Pod != nil {
+		resourceConfig := p.config.Resources.Pod
 		err := p.watchResource(comm, "pod", resourceConfig)
 		if err != nil {
 			return err
 		}
 	}
-	if p.config.Resource.Node != nil {
-		resourceConfig := p.config.Resource.Node
+	if p.config.Resources.Node != nil {
+		resourceConfig := p.config.Resources.Node
 		err := p.watchResource(comm, "node", resourceConfig)
 		if err != nil {
 			return err
 		}
 	}
-	if p.config.Resource.Service != nil {
-		resourceConfig := p.config.Resource.Service
+	if p.config.Resources.Service != nil {
+		resourceConfig := p.config.Resources.Service
 		err := p.watchResource(comm, "service", resourceConfig)
 		if err != nil {
 			return err
