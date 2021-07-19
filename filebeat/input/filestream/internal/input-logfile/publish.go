@@ -66,6 +66,10 @@ func newUpdateOp(resource *resource, ts time.Time, delta interface{}) *updateOp 
 	}
 }
 
+func (op *updateOp) Key() string {
+	return op.resource.key
+}
+
 // Publish publishes an event. Publish returns false if the inputs cancellation context has been marked as done.
 // If cursorUpdate is not nil, Publish updates the in memory state and create and updateOp for the pending update.
 // It overwrite event.Private with the update operation, before finally sending the event.

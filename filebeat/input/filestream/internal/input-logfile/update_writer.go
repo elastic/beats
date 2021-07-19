@@ -48,8 +48,13 @@ type updateChan struct {
 }
 
 type scheduledUpdate struct {
-	op *updateOp
+	op scheduledOp
 	n  uint
+}
+
+type scheduledOp interface {
+	Key() string
+	Execute(store *store, n uint)
 }
 
 func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
@@ -101,7 +106,7 @@ func (ch *updateChan) Send(upd scheduledUpdate) {
 	ch.mutex.Lock()
 	defer ch.mutex.Unlock()
 
-	key := upd.op.resource.key
+	key := upd.op.Key()
 
 	idx, exists := ch.pending[key]
 	if !exists {
@@ -159,6 +164,7 @@ func (ch *updateChan) TryRecv() []scheduledUpdate {
 	updates := ch.updates
 	if len(updates) > 0 {
 		ch.pending = map[string]int{}
+		ch.updates = nil
 	}
 
 	return updates
