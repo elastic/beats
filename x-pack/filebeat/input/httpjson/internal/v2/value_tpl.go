@@ -7,6 +7,7 @@ package v2
 import (
 	"bytes"
 	"errors"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -45,6 +46,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"getRFC5988Link":      getRFC5988Link,
 			"toInt":               toInt,
 			"add":                 add,
+			"mul":                 mul,
+			"div":                 div,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -201,15 +204,35 @@ func getRFC5988Link(rel string, links []string) string {
 	return ""
 }
 
-func toInt(s string) int {
-	i, _ := strconv.ParseInt(s, 10, 64)
-	return int(i)
+func toInt(v interface{}) int64 {
+	vv := reflect.ValueOf(v)
+	switch vv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return int64(vv.Int())
+	case reflect.Float32, reflect.Float64:
+		return int64(vv.Float())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return int64(vv.Uint())
+	case reflect.String:
+		f, _ := strconv.ParseFloat(vv.String(), 64)
+		return int64(f)
+	default:
+		return 0
+	}
 }
 
-func add(vs ...int) int {
-	var sum int
+func add(vs ...int64) int64 {
+	var sum int64
 	for _, v := range vs {
 		sum += v
 	}
 	return sum
+}
+
+func mul(a, b int64) int64 {
+	return a * b
+}
+
+func div(a, b int64) int64 {
+	return a / b
 }

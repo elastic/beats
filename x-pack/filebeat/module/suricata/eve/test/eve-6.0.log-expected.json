@@ -60,16 +60,12 @@
         "source.packets": 6,
         "source.port": 80,
         "suricata.eve.alert.category": "Potentially Bad Traffic",
+        "suricata.eve.alert.created_at": "2010-09-23T00:00:00.000Z",
         "suricata.eve.alert.gid": 1,
-        "suricata.eve.alert.metadata.created_at": [
-            "2010_09_23"
-        ],
-        "suricata.eve.alert.metadata.updated_at": [
-            "2010_09_23"
-        ],
         "suricata.eve.alert.rev": 7,
         "suricata.eve.alert.signature": "GPL ATTACK_RESPONSE id check returned root",
         "suricata.eve.alert.signature_id": 2100498,
+        "suricata.eve.alert.updated_at": "2010-09-23T00:00:00.000Z",
         "suricata.eve.event_type": "alert",
         "suricata.eve.flow_id": "1805461738637437",
         "suricata.eve.http.http_content_type": "text/html",

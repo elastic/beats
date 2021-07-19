@@ -11,6 +11,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-activemq-topic,topic>>   
 |<<metricbeat-module-aerospike,Aerospike>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-aerospike-namespace,namespace>>   
+|<<metricbeat-module-airflow,Airflow>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-airflow-statsd,statsd>> beta[]  
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-appsearch,App Search>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -157,7 +159,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kibana-stats,stats>>   
 |<<metricbeat-metricset-kibana-status,status>>   
 |<<metricbeat-module-kubernetes,Kubernetes>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.22+| .22+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
+.23+| .23+|  |<<metricbeat-metricset-kubernetes-apiserver,apiserver>>   
 |<<metricbeat-metricset-kubernetes-container,container>>   
 |<<metricbeat-metricset-kubernetes-controllermanager,controllermanager>>   
 |<<metricbeat-metricset-kubernetes-event,event>>   
@@ -169,6 +171,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-kubernetes-state_cronjob,state_cronjob>>   
 |<<metricbeat-metricset-kubernetes-state_daemonset,state_daemonset>>   
 |<<metricbeat-metricset-kubernetes-state_deployment,state_deployment>>   
+|<<metricbeat-metricset-kubernetes-state_job,state_job>>   
 |<<metricbeat-metricset-kubernetes-state_node,state_node>>   
 |<<metricbeat-metricset-kubernetes-state_persistentvolumeclaim,state_persistentvolumeclaim>>   
 |<<metricbeat-metricset-kubernetes-state_pod,state_pod>>   
@@ -305,6 +308,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 include::modules/activemq.asciidoc[]
 include::modules/aerospike.asciidoc[]
+include::modules/airflow.asciidoc[]
 include::modules/apache.asciidoc[]
 include::modules/appsearch.asciidoc[]
 include::modules/aws.asciidoc[]
