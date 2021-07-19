@@ -402,6 +402,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
 - Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
 - Cisco asa/ftd: Fix reversed usage of observer ingress and egress interfaces. {pull}26265[26265]
+- Fix `aws.s3access` pipeline when remote IP is a `-`. {issue}26913[26913] {pull}26940[26940]
 
 *Heartbeat*
 
@@ -615,6 +616,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
 - Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
+- `add_process_metadata` processor enrich process information with owner name and id. {issue}21068[21068] {pull}21111[21111]
 
 *Auditbeat*
 
@@ -1000,6 +1002,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add total CPU to vSphere virtual machine metrics. {pull}26167[26167]
 - Add AWS Kinesis metricset. {pull}25989[25989]
 - Move openmetrics module to oss. {pull}26561[26561]
+- Add Cluster filter on ECS Kubernetes overview dashboard and corresponding section on Kubernetes module documentation page. {pull}26919[26919]
 
 *Packetbeat*
 
