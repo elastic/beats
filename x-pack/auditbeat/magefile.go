@@ -11,8 +11,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	auditbeat "github.com/elastic/beats/v7/auditbeat/scripts/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
