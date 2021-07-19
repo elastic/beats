@@ -32,9 +32,9 @@ import (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("http", "json", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("http", "json", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 const (
