@@ -19,6 +19,7 @@ type Config struct {
 	Resources Resources `config:"resources"`
 }
 
+// Resources config section for resources' config blocks
 type Resources struct {
 	Pod     *ResourceConfig `config:"pod"`
 	Node    *ResourceConfig `config:"node"`
