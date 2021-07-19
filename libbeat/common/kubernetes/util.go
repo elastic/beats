@@ -34,8 +34,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const defaultNode = "localhost"
-
 func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
