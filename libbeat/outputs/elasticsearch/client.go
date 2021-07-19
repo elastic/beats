@@ -45,7 +45,8 @@ type Client struct {
 	index    outputs.IndexSelector
 	pipeline *outil.Selector
 
-	observer outputs.Observer
+	observer           outputs.Observer
+	NonIndexableAction string
 
 	log *logp.Logger
 }
@@ -53,16 +54,17 @@ type Client struct {
 // ClientSettings contains the settings for a client.
 type ClientSettings struct {
 	eslegclient.ConnectionSettings
-	Index    outputs.IndexSelector
-	Pipeline *outil.Selector
-	Observer outputs.Observer
+	Index              outputs.IndexSelector
+	Pipeline           *outil.Selector
+	Observer           outputs.Observer
+	NonIndexableAction string
 }
 
 type bulkResultStats struct {
 	acked        int // number of events ACKed by Elasticsearch
 	duplicates   int // number of events failed with `create` due to ID already being indexed
 	fails        int // number of failed events (can be retried)
-	nonIndexable int // number of failed events (not indexable -> must be dropped)
+	nonIndexable int // number of failed events (not indexable)
 	tooMany      int // number of events receiving HTTP 429 Too Many Requests
 }
 
@@ -123,11 +125,11 @@ func NewClient(
 	}
 
 	client := &Client{
-		conn:     *conn,
-		index:    s.Index,
-		pipeline: pipeline,
-
-		observer: s.Observer,
+		conn:               *conn,
+		index:              s.Index,
+		pipeline:           pipeline,
+		observer:           s.Observer,
+		NonIndexableAction: s.NonIndexableAction,
 
 		log: logp.NewLogger("elasticsearch"),
 	}
@@ -235,7 +237,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		failedEvents, stats = bulkCollectPublishFails(client.log, result, data)
+		failedEvents, stats = bulkCollectPublishFails(client.log, result, data, client.NonIndexableAction)
 	}
 
 	failed := len(failedEvents)
@@ -368,6 +370,7 @@ func bulkCollectPublishFails(
 	log *logp.Logger,
 	result eslegclient.BulkResult,
 	data []publisher.Event,
+	action string,
 ) ([]publisher.Event, bulkResultStats) {
 	reader := newJSONReader(result)
 	if err := bulkReadToItems(reader); err != nil {
@@ -401,10 +404,31 @@ func bulkCollectPublishFails(
 			if status == http.StatusTooManyRequests {
 				stats.tooMany++
 			} else {
-				// hard failure, don't collect
-				log.Warnf("Cannot index event %#v (status=%v): %s", data[i], status, msg)
-				stats.nonIndexable++
-				continue
+				// hard failure, apply policy action
+				result, _ := data[i].Content.Meta.HasKey("deathlettered")
+				if result {
+					stats.nonIndexable++
+					log.Errorf("Can't deliver to death letter index event %#v (status=%v): %s", data[i], status, msg)
+					// poison pill - this will clog the pipeline if the underlying failure is non transient.
+				} else if action == "death_letter_index" {
+					log.Warnf("Cannot index event %#v (status=%v): %s, trying death letter index", data[i], status, msg)
+					if data[i].Content.Meta == nil {
+						data[i].Content.Meta = common.MapStr{
+							"deathlettered": true,
+						}
+					} else {
+						_, _ = data[i].Content.Meta.Put("deathlettered", true)
+					}
+					data[i].Content.Fields = common.MapStr{
+						"message":       data[i].Content.Fields.String(),
+						"error.type":    status,
+						"error.message": string(msg),
+					}
+				} else { // drop
+					stats.nonIndexable++
+					log.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+					continue
+				}
 			}
 		}
 

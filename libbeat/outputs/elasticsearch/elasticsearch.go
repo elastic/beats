@@ -67,6 +67,13 @@ func makeES(
 		params = nil
 	}
 
+	if config.NonIndexablePolicy.Action == "death_letter_index" {
+		index = DeathLetterSelector{
+			Selector:         index,
+			DeathLetterIndex: config.NonIndexablePolicy.Index,
+		}
+	}
+
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(config.Protocol, config.Path, host, 9200)
@@ -90,9 +97,10 @@ func makeES(
 				EscapeHTML:       config.EscapeHTML,
 				Transport:        config.Transport,
 			},
-			Index:    index,
-			Pipeline: pipeline,
-			Observer: observer,
+			Index:              index,
+			Pipeline:           pipeline,
+			Observer:           observer,
+			NonIndexableAction: config.NonIndexablePolicy.Action,
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

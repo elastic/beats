@@ -26,20 +26,21 @@ import (
 )
 
 type elasticsearchConfig struct {
-	Protocol         string            `config:"protocol"`
-	Path             string            `config:"path"`
-	Params           map[string]string `config:"parameters"`
-	Headers          map[string]string `config:"headers"`
-	Username         string            `config:"username"`
-	Password         string            `config:"password"`
-	APIKey           string            `config:"api_key"`
-	LoadBalance      bool              `config:"loadbalance"`
-	CompressionLevel int               `config:"compression_level" validate:"min=0, max=9"`
-	EscapeHTML       bool              `config:"escape_html"`
-	Kerberos         *kerberos.Config  `config:"kerberos"`
-	BulkMaxSize      int               `config:"bulk_max_size"`
-	MaxRetries       int               `config:"max_retries"`
-	Backoff          Backoff           `config:"backoff"`
+	Protocol           string             `config:"protocol"`
+	Path               string             `config:"path"`
+	Params             map[string]string  `config:"parameters"`
+	Headers            map[string]string  `config:"headers"`
+	Username           string             `config:"username"`
+	Password           string             `config:"password"`
+	APIKey             string             `config:"api_key"`
+	LoadBalance        bool               `config:"loadbalance"`
+	CompressionLevel   int                `config:"compression_level" validate:"min=0, max=9"`
+	EscapeHTML         bool               `config:"escape_html"`
+	Kerberos           *kerberos.Config   `config:"kerberos"`
+	BulkMaxSize        int                `config:"bulk_max_size"`
+	MaxRetries         int                `config:"max_retries"`
+	Backoff            Backoff            `config:"backoff"`
+	NonIndexablePolicy NonIndexablePolicy `config:"non_indexable_policy"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
@@ -47,6 +48,11 @@ type elasticsearchConfig struct {
 type Backoff struct {
 	Init time.Duration
 	Max  time.Duration
+}
+
+type NonIndexablePolicy struct {
+	Index  string
+	Action string
 }
 
 const (
@@ -70,6 +76,10 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
+		NonIndexablePolicy: NonIndexablePolicy{
+			Action: "drop",
+			Index:  "",
+		},
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
 )
@@ -79,5 +89,22 @@ func (c *elasticsearchConfig) Validate() error {
 		return fmt.Errorf("cannot set both api_key and username/password")
 	}
 
+	if !stringInSlice(c.NonIndexablePolicy.Action, []string{"drop", "death_letter_index"}) {
+		return fmt.Errorf("invalid value for non_indexable_policy.action: %s, supported values are: drop, death_letter_index", c.NonIndexablePolicy.Action)
+	}
+
+	if c.NonIndexablePolicy.Action == "death_letter_index" && c.NonIndexablePolicy.Index == "" {
+		return fmt.Errorf("empty or missing value for non_indexable_policy.index while 'non_indexable_policy.action: death_letter_index' is set ")
+	}
+
 	return nil
+}
+
+func stringInSlice(str string, list []string) bool {
+	for _, v := range list {
+		if v == str {
+			return true
+		}
+	}
+	return false
 }
