@@ -26,7 +26,7 @@ type Resources struct {
 	Service *ResourceConfig `config:"service"`
 }
 
-// Config for kubernetes provider
+// ResourceConfig for kubernetes resource
 type ResourceConfig struct {
 	KubeConfig     string        `config:"kube_config"`
 	Namespace      string        `config:"namespace"`
