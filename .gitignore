@@ -33,8 +33,6 @@ beat.db
 *.test
 *.prof
 *.pyc
-<<<<<<< HEAD
-=======
 
 # Terraform
 *.terraform
@@ -42,4 +40,3 @@ beat.db
 
 # Files generated with the bump elastic stack version automation
 testing/environments/*.bck
->>>>>>> cc29196df (Bump elastic stack version automation (#25148))
