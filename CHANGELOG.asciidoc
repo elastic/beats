@@ -15,7 +15,7 @@ https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
 
 *Auditbeat*
 
-- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
+- Do not close filestream harvester if an unexpected error is returned when `close.on_state_change.*` is enabled. {pull}26411[26411]
 
 *Filebeat*
 
