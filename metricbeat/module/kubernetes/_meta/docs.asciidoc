@@ -147,11 +147,18 @@ The Kubernetes module is tested with the following versions of Kubernetes:
 [float]
 === Dashboard
 
-Kubernetes module is shipped including default dashboards for `apiserver`, `controllermanager`, `scheduler` and `proxy`.
+Kubernetes module is shipped including default dashboards for `cluster overview`, `apiserver`, `controllermanager`, `scheduler` and `proxy`.
 
 If you are using HA for those components, be aware that when gathering data from all instances the dashboard will usually show and average of the metrics. For those scenarios filtering by hosts or service address is possible.
 
 Dashboards for `controllermanager` `scheduler` and `proxy` are not compatible with kibana versions below `7.2.0`
+
+Cluster selector in `cluster overview` dashboard helps in distinguishing and filtering metrics collected from multiple clusters. If you want to focus on a subset of the Kubernetes clusters for monitoring a specific scenario, this cluster selector could be a handy tool. Note that this selector gets populated from the `orchestrator.cluster.name` field that may not always be available. This field gets its value from sources like `kube_config`, `kubeadm-config` configMap, and Google Cloud's meta API for GKE. If the sources mentioned above don't provide this value, metricbeat will not report it. However, you can always use https://www.elastic.co/guide/en/beats/metricbeat/current/defining-processors.html[processors] to set this field and utilize it in the `cluster overview` dashboard.
+
+Kubernetes cluster overview example:
+
+image::./images/metricbeat-kubernetes-clusteroverview.png[]
+
 
 Kubernetes controller manager example:
 
