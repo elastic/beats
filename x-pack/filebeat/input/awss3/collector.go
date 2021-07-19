@@ -73,13 +73,11 @@ type s3BucketCollector struct {
 }
 
 type s3Info struct {
-	name         string
-	key          string
-	region       string
-	arn          string
-	size         int64
-	lastModified time.Time
-	meta         map[string]interface{} // S3 object metadata.
+	name   string
+	key    string
+	region string
+	arn    string
+	meta   map[string]interface{} // S3 object metadata.
 	readerConfig
 }
 
@@ -142,8 +140,6 @@ func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 				name:         bucketName,
 				key:          filename,
 				arn:          c.config.S3Bucket,
-				size:         *object.Size,
-				lastModified: *object.LastModified,
 				readerConfig: c.config.ReaderConfig,
 			}
 
