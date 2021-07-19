@@ -32,7 +32,7 @@ type nodeData struct {
 }
 
 // NewNodeWatcher creates a watcher that can discover and process node objects
-func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *Config, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
+func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,

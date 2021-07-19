@@ -15,6 +15,18 @@ import (
 
 // Config for kubernetes provider
 type Config struct {
+	Scope    string   `config:"scope"`
+	Resource Resource `config:"resource"`
+}
+
+type Resource struct {
+	Pod     *ResourceConfig `config:"pod"`
+	Node    *ResourceConfig `config:"node"`
+	Service *ResourceConfig `config:"service"`
+}
+
+// Config for kubernetes provider
+type ResourceConfig struct {
 	KubeConfig     string        `config:"kube_config"`
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
@@ -22,31 +34,24 @@ type Config struct {
 
 	// Needed when resource is a pod
 	Node string `config:"node"`
-
-	// Scope of the provider (cluster or node)
-	Scope    string `config:"scope"`
-	Resource string `config:"resource"`
 }
 
 // InitDefaults initializes the default values for the config.
 func (c *Config) InitDefaults() {
-	c.SyncPeriod = 10 * time.Minute
-	c.CleanupTimeout = 60 * time.Second
+	if c.Resource.Pod == nil {
+		c.Resource.Pod = &ResourceConfig{}
+	}
+	c.Resource.Pod.SyncPeriod = 10 * time.Minute
+	c.Resource.Pod.CleanupTimeout = 60 * time.Second
 	c.Scope = "node"
 }
 
 // Validate ensures correctness of config
 func (c *Config) Validate() error {
-	// Check if resource is either node or pod. If yes then default the scope to "node" if not provided.
-	// Default the scope to "cluster" for everything else.
-	switch c.Resource {
-	case "node", "pod":
-		if c.Scope == "" {
-			c.Scope = "node"
-		}
-	default:
+	// Check if resource is service. If yes then default the scope to "cluster".
+	if c.Resource.Service != nil {
 		if c.Scope == "node" {
-			logp.L().Warnf("can not set scope to `node` when using resource %s. resetting scope to `cluster`", c.Resource)
+			logp.L().Warnf("can not set scope to `node` when using resource `Service`. resetting scope to `cluster`")
 		}
 		c.Scope = "cluster"
 	}
