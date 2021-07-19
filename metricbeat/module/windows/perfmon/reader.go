@@ -132,11 +132,12 @@ func (re *Reader) Read() ([]mb.Event, error) {
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	var val map[string][]pdh.CounterValue
 	rand.Seed(time.Now().UnixNano())
-	title := windows.StringToUTF16Ptr(randSeq(10))
+	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
 	event, err := windows.CreateEvent(nil, 0, 0, title)
 	if err != nil {
 		return nil, err
 	}
+	defer windows.CloseHandle(event)
 	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
 	if err != nil {
 		return nil, err
@@ -156,8 +157,6 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	default:
 		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
 	}
-
-	err = windows.CloseHandle(event)
 	return val, err
 }
 

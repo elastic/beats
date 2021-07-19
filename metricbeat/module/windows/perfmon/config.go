@@ -20,9 +20,11 @@
 package perfmon
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
 
 var allowedFormats = []string{"float", "large", "long"}
