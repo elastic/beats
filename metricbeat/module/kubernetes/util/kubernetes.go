@@ -96,7 +96,10 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 
 	// Watch objects in the node only
 	if nodeScope {
-		options.Node = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		options.Node, err = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't discover kubernetes node: %+v", err)
+		}
 	}
 
 	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)

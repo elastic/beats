@@ -19,6 +19,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -94,54 +95,65 @@ func IsInCluster(kubeconfig string) bool {
 // If host is provided in the config use it directly.
 // If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
 // If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (node string) {
+// If node can not be discovered return NODE_NAME env var as default value. In case it is not set return error.
+func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (string, error) {
 	if host != "" {
 		log.Infof("kubernetes: Using node %s provided in the config", host)
-		return host
+		return host, nil
+	}
+	nodeNameEnv := os.Getenv("NODE_NAME")
+	var envError, logerror error
+	if nodeNameEnv == "" {
+		envError = errors.New("kubernetes: NODE_NAME environment variable was not set")
 	}
 	ctx := context.TODO()
 	if inCluster {
 		ns, err := InClusterNamespace()
 		if err != nil {
-			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
-			return defaultNode
+			logerror = fmt.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
+			log.Error(logerror)
+			return nodeNameEnv, enrichedError([]error{envError, logerror})
 		}
 		podName, err := os.Hostname()
 		if err != nil {
-			log.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
-			return defaultNode
+			logerror = fmt.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
+			log.Error(logerror)
+			return nodeNameEnv, enrichedError([]error{envError, logerror})
 		}
 		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
 		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
 		if err != nil {
-			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
-			return defaultNode
+			logerror = fmt.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
+			log.Error(logerror)
+			return nodeNameEnv, enrichedError([]error{envError, logerror})
 		}
 		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
-		return pod.Spec.NodeName
+		return pod.Spec.NodeName, nil
 	}
 
 	mid := machineID()
 	if mid == "" {
-		log.Error("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
-		return defaultNode
+		logerror = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
+		log.Error(logerror)
+		return nodeNameEnv, enrichedError([]error{envError, logerror})
 	}
 
 	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
-		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
-		return defaultNode
+		logerror = fmt.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
+		log.Error(logerror)
+		return nodeNameEnv, enrichedError([]error{envError, logerror})
 	}
 	for _, n := range nodes.Items {
 		if n.Status.NodeInfo.MachineID == mid {
 			name := n.GetObjectMeta().GetName()
 			log.Infof("kubernetes: Using node %s discovered by machine-id matching", name)
-			return name
+			return name, nil
 		}
 	}
 
-	log.Warn("kubernetes: Couldn't discover node, using localhost as default")
-	return defaultNode
+	log.Warn("kubernetes: Couldn't discover node, returning default")
+	return nodeNameEnv, envError
 }
 
 // machineID borrowed from cadvisor.
@@ -167,4 +179,24 @@ func InClusterNamespace() (string, error) {
 		return "", err
 	}
 	return strings.TrimSpace(string(data)), nil
+}
+
+// enrichedError gets a slice of errors as input and combines them together with : as delimiter.
+// In case one of the errors received is nil then nil is returned.
+// Example input:[first error, second error]
+// Example output: first error: second error
+func enrichedError(flatErrors []error) (enrichedError error) {
+
+	for _, err := range flatErrors {
+		if err == nil {
+			return nil
+		}
+		if enrichedError == nil {
+			enrichedError = fmt.Errorf("%+v", err)
+		} else {
+			enrichedError = fmt.Errorf("%+v: %+v", enrichedError, err)
+		}
+
+	}
+	return enrichedError
 }
