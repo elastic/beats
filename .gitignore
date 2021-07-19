@@ -33,3 +33,10 @@ beat.db
 *.test
 *.prof
 *.pyc
+
+# Terraform
+*.terraform
+*.tfstate*
+
+# Files generated with the bump elastic stack version automation
+testing/environments/*.bck
