@@ -246,7 +246,7 @@
           }
         ],
         "timeRestore": false,
-        "title": "[Metricbeat Kubernetes] Overview ECS - Updated",
+        "title": "[Metricbeat Kubernetes] Overview ECS",
         "version": 1
       },
       "coreMigrationVersion": "7.12.0",
