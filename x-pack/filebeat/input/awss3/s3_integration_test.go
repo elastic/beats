@@ -16,6 +16,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3/ftest"
+
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -39,80 +41,6 @@ const (
 	fileName2         = "sample2.txt"
 	visibilityTimeout = 300 * time.Second
 )
-
-// getConfigForTestSQSCollector function gets aws credentials for integration tests.
-func getConfigForTestSQSCollector(t *testing.T) config {
-	t.Helper()
-
-	awsConfig := awscommon.ConfigAWS{}
-	queueURL := os.Getenv("QUEUE_URL")
-	profileName := os.Getenv("AWS_PROFILE_NAME")
-	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
-	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
-	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
-
-	config := config{
-		VisibilityTimeout: visibilityTimeout,
-	}
-	switch {
-	case queueURL == "":
-		t.Fatal("$QUEUE_URL is not set in environment")
-	case profileName == "" && accessKeyID == "":
-		t.Fatal("$AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty")
-	case profileName != "":
-		awsConfig.ProfileName = profileName
-		config.QueueURL = queueURL
-		config.AWSConfig = awsConfig
-		return config
-	case secretAccessKey == "":
-		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
-	}
-
-	awsConfig.AccessKeyID = accessKeyID
-	awsConfig.SecretAccessKey = secretAccessKey
-	if sessionToken != "" {
-		awsConfig.SessionToken = sessionToken
-	}
-	config.AWSConfig = awsConfig
-	return config
-}
-
-// getConfigForTestBucketCollector function gets aws credentials for integration tests.
-func getConfigForTestBucketCollector(t *testing.T) config {
-	t.Helper()
-
-	awsConfig := awscommon.ConfigAWS{}
-	s3Bucket := os.Getenv("S3_BUCKET_NAME")
-	profileName := os.Getenv("AWS_PROFILE_NAME")
-	accessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
-	secretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
-	sessionToken := os.Getenv("AWS_SESSION_TOKEN")
-
-	config := config{
-		VisibilityTimeout: visibilityTimeout,
-	}
-	switch {
-	case s3Bucket == "":
-		t.Fatal("S3_BUCKET_NAME is not set in environment")
-	case profileName == "" && accessKeyID == "":
-		t.Fatal("$AWS_ACCESS_KEY_ID or $AWS_PROFILE_NAME not set or set to empty")
-	case profileName != "":
-		awsConfig.ProfileName = profileName
-		config.S3Bucket = s3Bucket
-		config.AWSConfig = awsConfig
-		return config
-	case secretAccessKey == "":
-		t.Fatal("$AWS_SECRET_ACCESS_KEY not set or set to empty")
-	}
-
-	awsConfig.AccessKeyID = accessKeyID
-	awsConfig.SecretAccessKey = secretAccessKey
-	if sessionToken != "" {
-		awsConfig.SessionToken = sessionToken
-	}
-	config.AWSConfig = awsConfig
-	return config
-}
 
 func defaultTestConfigSQSCollector() *common.Config {
 	return common.MustNewConfigFrom(common.MapStr{
@@ -224,7 +152,12 @@ func setupCollectorSQSCollector(t *testing.T, cfg *common.Config, mock bool) (*s
 		return collector, receiver
 	}
 
-	config := getConfigForTestSQSCollector(t)
+	testConfig := ftest.GetConfigForTestSQSCollector(t)
+	config := config{}
+	if err := cfg.Unpack(&testConfig); err != nil {
+		t.Fatal("failed generating config: ", err)
+	}
+
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
@@ -250,7 +183,12 @@ func setupCollectorBucketCollector(t *testing.T, cfg *common.Config, mock bool) 
 		return collector, receiver
 	}
 
-	config := getConfigForTestBucketCollector(t)
+	testConfig := ftest.GetConfigForTestS3BucketCollector(t)
+	config := config{}
+	if err := cfg.Unpack(&testConfig); err != nil {
+		t.Fatal("failed generating config: ", err)
+	}
+
 	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
 	if err != nil {
 		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
