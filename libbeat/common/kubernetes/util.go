@@ -35,6 +35,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+var namespaceFilePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+var osHostname = os.Hostname
+var machineId = machineID
+
 func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
 	if _, err := os.Stat(envKubeConfig); !os.IsNotExist(err) {
@@ -113,7 +117,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 			log.Error(logerror)
 			return nodeNameEnv, errors.Wrap(envError, logerror.Error())
 		}
-		podName, err := os.Hostname()
+		podName, err := osHostname()
 		if err != nil {
 			logerror = fmt.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
 			log.Error(logerror)
@@ -130,7 +134,7 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 		return pod.Spec.NodeName, nil
 	}
 
-	mid := machineID()
+	mid := machineId()
 	if mid == "" {
 		logerror = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
 		log.Error(logerror)
@@ -173,7 +177,7 @@ func machineID() string {
 // code borrowed from client-go with some changes.
 func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
-	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
+	data, err := ioutil.ReadFile(namespaceFilePath)
 	if err != nil {
 		return "", err
 	}
