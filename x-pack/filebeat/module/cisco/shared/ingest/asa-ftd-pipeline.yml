@@ -332,19 +332,25 @@ processors:
       field: "message"
       description: "302013, 302015"
       patterns:
-        - Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTSPACE:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\)(\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTSPACE:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\)(\(%{NOTSPACE:destination.user.name}\))?( \(%{CISCO_USER:_temp_.cisco.termination_user}\))?%{GREEDYDATA}
+        - Built %{NOTSPACE:network.direction} %{NOTSPACE:network.transport} connection %{NUMBER:_temp_.cisco.connection_id} for %{NOTCOLON:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port} \(%{IP:_temp_.natsrcip}/%{NUMBER:_temp_.cisco.mapped_source_port}\)(\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTCOLON:_temp_.cisco.destination_interface}:%{NOTSPACE:destination.address}/%{NUMBER:destination.port} \(%{NOTSPACE:_temp_.natdstip}/%{NUMBER:_temp_.cisco.mapped_destination_port}\)(\(%{CISCO_USER:destination.user.name}\))?( \(%{CISCO_USER:_temp_.cisco.termination_user}\))?%{GREEDYDATA}
       pattern_definitions:
+        NOTCOLON: "[^:]*"
         CISCO_USER: ((LOCAL|%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
   - dissect:
       if: "ctx._temp_.cisco.message_id == '303002'"
       field: "message"
       description: "303002"
       pattern: "%{network.protocol} connection from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port}, user %{client.user.name} %{} file %{file.path}"
-  - dissect:
+  - grok:
       if: "ctx._temp_.cisco.message_id == '305012'"
       field: "message"
       description: "305012"
-      pattern: "Teardown %{} %{network.transport} translation from %{_temp_.cisco.source_interface}:%{source.address}/%{source.port} to %{_temp_.cisco.destination_interface}:%{destination.address}/%{destination.port} duration %{_temp_.duration_hms}"
+      patterns:
+        - Teardown %{DATA} %{NOTSPACE:network.transport} translation from %{NOTCOLON:_temp_.cisco.source_interface}:%{IP:source.address}/%{NUMBER:source.port}(\s*\(%{CISCO_USER:_temp_.cisco.source_username}\))? to %{NOTCOLON:_temp_.cisco.destination_interface}:%{IP:destination.address}/%{NUMBER:destination.port} duration %{DURATION:_temp_.duration_hms}
+      pattern_definitions:
+        NOTCOLON: "[^:]*"
+        CISCO_USER: ((LOCAL|%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
+        DURATION: "%{INT}:%{MINUTE}:%{SECOND}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '302020'"
       field: "message"
@@ -789,7 +795,7 @@ processors:
         NOTCOLON: "[^:]*"
         ECSSOURCEIPORHOST: "(?:%{IP:source.address}|%{HOSTNAME:source.domain})"
         ECSDESTIPORHOST: "(?:%{IP:destination.address}|%{HOSTNAME:destination.domain})"
-        MAPPEDSRC: "(?:%{DATA:_temp_.natsrcip}|%{HOSTNAME})"
+        MAPPEDSRC: "(?:%{IPORHOST:_temp_.natsrcip}|%{HOSTNAME})"
         DURATION: "%{INT}:%{MINUTE}:%{SECOND}"
         CISCO_USER: ((LOCAL|%{HOSTNAME}\\)?%{USERNAME}(@%{HOSTNAME})?)
   #

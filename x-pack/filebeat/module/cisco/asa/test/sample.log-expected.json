@@ -4192,5 +4192,180 @@
             "forwarded"
         ],
         "user.name": "USER002"
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "305012",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.source_username": "LOCAL\\USER001",
+        "destination.address": "75.0.0.1",
+        "destination.as.number": 7018,
+        "destination.as.organization.name": "AT&T Services, Inc.",
+        "destination.geo.city_name": "Carson City",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 39.1507,
+        "destination.geo.location.lon": -119.7459,
+        "destination.geo.region_iso_code": "US-NV",
+        "destination.geo.region_name": "Nevada",
+        "destination.ip": "75.0.0.1",
+        "destination.port": 18449,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 305012,
+        "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-01-15T19:12:37.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-305012: Teardown dynamic TCP translation from OUTSIDE:192.168.0.1/59677(LOCAL\\USER001) to OUTSIDE:75.0.0.1/18449 duration 0:00:00",
+        "event.severity": 6,
+        "event.start": "2021-01-15T21:12:37.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12100,
+        "network.community_id": "1:kOYfvYjW0lZrPxD+ArQ6vDYnS7g=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "192.168.0.1",
+            "75.0.0.1"
+        ],
+        "related.user": [
+            "USER001"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.0.1",
+        "source.ip": "192.168.0.1",
+        "source.port": 59677,
+        "source.user.name": "USER001",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 134,
+        "cisco.asa.mapped_source_ip": "fe80::2205:baff:fe9d:f637",
+        "cisco.asa.message_id": "302021",
+        "destination.address": "ff02::1",
+        "destination.ip": "ff02::1",
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302021,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302021: Teardown ICMP connection for faddr ff02::1/0 gaddr fe80::2205:baff:fe9d:f637/0 laddr fe80::2205:baff:fe9d:f637/0 type 134 code 0",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12259,
+        "network.community_id": "1:bHWN9qumWIGMl/MbjgS2bQi/Jsw=",
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "fe80::2205:baff:fe9d:f637",
+            "ff02::1"
+        ],
+        "service.type": "cisco",
+        "source.address": "fe80::2205:baff:fe9d:f637",
+        "source.ip": "fe80::2205:baff:fe9d:f637",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-01-15T19:12:37.000-02:00",
+        "cisco.asa.connection_id": "251933191",
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.mapped_destination_ip": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "cisco.asa.mapped_destination_port": 443,
+        "cisco.asa.mapped_source_ip": "fe00::fede:bbe1",
+        "cisco.asa.mapped_source_port": 62477,
+        "cisco.asa.message_id": "302013",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "cisco.asa.termination_user": "soc@danskecommodities.com",
+        "destination.address": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "destination.as.number": 32934,
+        "destination.as.organization.name": "Facebook, Inc.",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "IE",
+        "destination.geo.country_name": "Ireland",
+        "destination.geo.location.lat": 53.0,
+        "destination.geo.location.lon": -8.0,
+        "destination.ip": "2a03:2880:f253:cb:face:b00c:0:43fe",
+        "destination.port": 443,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302013,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 251933191 for OUTSIDE:fe00::fede:bbe1/62477 (fe00::fede:bbe1/62477) to OUTSIDE:2a03:2880:f253:cb:face:b00c:0:43fe/443 (2a03:2880:f253:cb:face:b00c:0:43fe/443) (soc@danskecommodities.com)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 12425,
+        "network.community_id": "1:lOTrEnVpsUc4jukAUBxF/BkD8jE=",
+        "network.direction": "inbound",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "2a03:2880:f253:cb:face:b00c:0:43fe",
+            "fe00::fede:bbe1"
+        ],
+        "service.type": "cisco",
+        "source.address": "fe00::fede:bbe1",
+        "source.ip": "fe00::fede:bbe1",
+        "source.port": 62477,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
     }
 ]
