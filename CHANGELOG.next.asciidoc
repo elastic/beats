@@ -1,3 +1,4 @@
+
 // Use these for links to issue and pulls. Note issues and pulls redirect one to
 // each other on Github, so don't worry too much on using the right prefix.
 :issue: https://github.com/elastic/beats/issues/
@@ -108,8 +109,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}26934[26934]
 
 *Heartbeat*
+
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
 
 *Journalbeat*
