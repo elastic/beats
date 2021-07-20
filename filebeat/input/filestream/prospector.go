@@ -165,7 +165,7 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(evtLog, fe, ignoreSince) {
-			break
+			return
 		}
 
 		hg.Start(ctx, src)

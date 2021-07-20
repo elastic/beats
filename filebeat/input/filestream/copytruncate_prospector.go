@@ -238,6 +238,7 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			if fe.Op == loginp.OpDone {
 				return nil
 			}
+
 			p.onFSEvent(log, ctx, fe, s, hg, ignoreInactiveSince)
 
 		}
