@@ -214,7 +214,7 @@ func NewCLI(
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
 	}
-	awsCfg, err := awscommon.GetAWSCredentials(config.Credentials)
+	awsCfg, err := awscommon.InitializeAWSConfig(config.Credentials)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
 	}

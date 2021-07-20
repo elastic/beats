@@ -32,6 +32,20 @@ type ConfigAWS struct {
 	ProxyUrl             *url.URL `config:"proxy_url"`
 }
 
+// InitializeAWSConfig function creates the awssdk.Config object from the provided config
+func InitializeAWSConfig(config ConfigAWS) (awssdk.Config, error) {
+	AWSConfig, _ := GetAWSCredentials(config)
+	if config.ProxyUrl != nil {
+		httpClient := &http.Client{
+			Transport: &http.Transport{
+				Proxy: http.ProxyURL(config.ProxyUrl),
+			},
+		}
+		AWSConfig.HTTPClient = httpClient
+	}
+	return AWSConfig, nil
+}
+
 // GetAWSCredentials function gets aws credentials from the config.
 // If access keys given, use them as credentials.
 // If access keys are not given, then load from AWS config file. If credential_profile_name is not
@@ -127,19 +141,6 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 		} else {
 			awsConfig.EndpointResolver = awssdk.ResolveWithEndpointURL("https://" + serviceName + "." + regionName + "." + endpoint)
 		}
-	}
-	return awsConfig
-}
-
-// EnrichAWSConfigWithProxy function enables proxy support for AWS
-func EnrichAWSConfigWithProxy(config ConfigAWS, awsConfig awssdk.Config) awssdk.Config {
-	if config.ProxyUrl != nil {
-		httpClient := &http.Client{
-			Transport: &http.Transport{
-				Proxy: http.ProxyURL(config.ProxyUrl),
-			},
-		}
-		awsConfig.HTTPClient = httpClient
 	}
 	return awsConfig
 }

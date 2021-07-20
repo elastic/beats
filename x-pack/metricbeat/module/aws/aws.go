@@ -76,11 +76,10 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 		return nil, err
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %w", err)
 	}
-	awsConfig = awscommon.EnrichAWSConfigWithProxy(config.AWSConfig, awsConfig)
 
 	_, err = awsConfig.Credentials.Retrieve()
 	if err != nil {
