@@ -21,6 +21,7 @@ type service struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
+	scope          string
 }
 
 type serviceData struct {
@@ -30,7 +31,12 @@ type serviceData struct {
 }
 
 // NewServiceWatcher creates a watcher that can discover and process service objects
-func NewServiceWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
+func NewServiceWatcher(
+	comm composable.DynamicProviderComm,
+	cfg *ResourceConfig,
+	logger *logp.Logger,
+	client k8s.Interface,
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -39,13 +45,14 @@ func NewServiceWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig,
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&service{logger, cfg.CleanupTimeout, comm})
+	watcher.AddEventHandler(&service{logger, cfg.CleanupTimeout, comm, scope})
 
 	return watcher, nil
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
 	data := generateServiceData(service)
+	data.mapping["scope"] = s.scope
 
 	// Emit the service
 	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, data.mapping, data.processors)

@@ -16,8 +16,16 @@ import (
 // Config for kubernetes provider
 type Config struct {
 	Scope     string    `config:"scope"`
-	ResourceConfig
 	Resources Resources `config:"resources"`
+
+	// expand config settings at root level of config too
+	KubeConfig     string        `config:"kube_config"`
+	Namespace      string        `config:"namespace"`
+	SyncPeriod     time.Duration `config:"sync_period"`
+	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
+
+	// Needed when resource is a Pod or Node
+	Node string `config:"node"`
 }
 
 // Resources config section for resources' config blocks
@@ -34,7 +42,7 @@ type ResourceConfig struct {
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
 
-	// Needed when resource is a pod
+	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
 }
 
@@ -56,19 +64,16 @@ func (c *Config) Validate() error {
 	}
 	baseCfg := &ResourceConfig{
 		CleanupTimeout: c.CleanupTimeout,
-		SyncPeriod: c.CleanupTimeout,
-		KubeConfig: c.KubeConfig,
-		Namespace: c.Namespace,
-		Node: c.Node,
+		SyncPeriod:     c.CleanupTimeout,
+		KubeConfig:     c.KubeConfig,
+		Namespace:      c.Namespace,
+		Node:           c.Node,
 	}
 	if c.Resources.Pod == nil {
 		c.Resources.Pod = baseCfg
 	}
 	if c.Resources.Node == nil {
 		c.Resources.Node = baseCfg
-	}
-	if c.Resources.Service == nil {
-		c.Resources.Service = baseCfg
 	}
 
 	return nil

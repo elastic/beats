@@ -23,6 +23,7 @@ type pod struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
+	scope          string
 }
 
 type providerData struct {
@@ -32,7 +33,12 @@ type providerData struct {
 }
 
 // NewPodWatcher creates a watcher that can discover and process pod objects
-func NewPodWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
+func NewPodWatcher(
+	comm composable.DynamicProviderComm,
+	cfg *ResourceConfig,
+	logger *logp.Logger,
+	client k8s.Interface,
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -42,13 +48,14 @@ func NewPodWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, log
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&pod{logger, cfg.CleanupTimeout, comm})
+	watcher.AddEventHandler(&pod{logger, cfg.CleanupTimeout, comm, scope})
 
 	return watcher, nil
 }
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	data := generatePodData(pod)
+	data.mapping["scope"] = p.scope
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
 	// get Pod metadata (not specific to any container)
@@ -71,6 +78,7 @@ func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Contai
 		select {
 		case data := <-providerDataChan:
 			// Emit the container
+			data.mapping["scope"] = p.scope
 			p.comm.AddOrUpdate(data.uid, ContainerPriority, data.mapping, data.processors)
 		case <-done:
 			return

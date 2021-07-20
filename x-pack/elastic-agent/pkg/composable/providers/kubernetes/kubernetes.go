@@ -124,19 +124,19 @@ func (p *dynamicProvider) newWatcher(
 	config *ResourceConfig) (kubernetes.Watcher, error) {
 	switch resourceType {
 	case "pod":
-		watcher, err := NewPodWatcher(comm, config, p.logger, client)
+		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
 		return watcher, nil
 	case "node":
-		watcher, err := NewNodeWatcher(comm, config, p.logger, client)
+		watcher, err := NewNodeWatcher(comm, config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
 		return watcher, nil
 	case "service":
-		watcher, err := NewServiceWatcher(comm, config, p.logger, client)
+		watcher, err := NewServiceWatcher(comm, config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}

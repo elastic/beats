@@ -23,6 +23,7 @@ type node struct {
 	logger         *logp.Logger
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
+	scope          string
 }
 
 type nodeData struct {
@@ -32,7 +33,12 @@ type nodeData struct {
 }
 
 // NewNodeWatcher creates a watcher that can discover and process node objects
-func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, logger *logp.Logger, client k8s.Interface) (kubernetes.Watcher, error) {
+func NewNodeWatcher(
+	comm composable.DynamicProviderComm,
+	cfg *ResourceConfig,
+	logger *logp.Logger,
+	client k8s.Interface,
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -42,13 +48,14 @@ func NewNodeWatcher(comm composable.DynamicProviderComm, cfg *ResourceConfig, lo
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&node{logger, cfg.CleanupTimeout, comm})
+	watcher.AddEventHandler(&node{logger, cfg.CleanupTimeout, comm, scope})
 
 	return watcher, nil
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
 	data := generateNodeData(node)
+	data.mapping["scope"] = n.scope
 	if data == nil {
 		return
 	}
