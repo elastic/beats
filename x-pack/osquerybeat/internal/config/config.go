@@ -22,11 +22,12 @@ import (
 const DefaultStreamIndex = "logs-osquery_manager.result-default"
 
 type StreamConfig struct {
-	ID       string `config:"id"`
-	Query    string `config:"query"`    // the SQL query to run
-	Interval int    `config:"interval"` // an interval in seconds to run the query (subject to splay/smoothing). It has a maximum value of 604,800 (1 week).
-	Platform string `config:"platform"` // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
-	Version  string `config:"version"`  // only run on osquery versions greater than or equal-to this version string
+	ID         string            `config:"id"`
+	Query      string            `config:"query"`       // the SQL query to run
+	Interval   int               `config:"interval"`    // an interval in seconds to run the query (subject to splay/smoothing). It has a maximum value of 604,800 (1 week).
+	Platform   string            `config:"platform"`    // restrict this query to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
+	Version    string            `config:"version"`     // only run on osquery versions greater than or equal-to this version string
+	ECSMapping map[string]string `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
 }
 
 type InputConfig struct {
