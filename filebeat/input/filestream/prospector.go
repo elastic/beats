@@ -129,46 +129,46 @@ func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, h
 			}
 
 			src := p.identifier.GetSource(fe)
-			log = loggerWithEvent(log, fe, src)
+			evtLog := loggerWithEvent(log, fe, src)
 
 			switch fe.Op {
 			case loginp.OpCreate, loginp.OpWrite:
 				if fe.Op == loginp.OpCreate {
-					log.Debugf("A new file %s has been found", fe.NewPath)
+					evtLog.Debugf("A new file %s has been found", fe.NewPath)
 
 					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
 					if err != nil {
-						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+						evtLog.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
 					}
 
 				} else if fe.Op == loginp.OpWrite {
-					log.Debugf("File %s has been updated", fe.NewPath)
+					evtLog.Debugf("File %s has been updated", fe.NewPath)
 				}
 
-				if p.isFileIgnored(log, fe, ignoreInactiveSince) {
+				if p.isFileIgnored(evtLog, fe, ignoreInactiveSince) {
 					break
 				}
 
 				hg.Start(ctx, src)
 
 			case loginp.OpTruncate:
-				log.Debugf("File %s has been truncated", fe.NewPath)
+				evtLog.Debugf("File %s has been truncated", fe.NewPath)
 
 				s.ResetCursor(src, state{Offset: 0})
 				hg.Restart(ctx, src)
 
 			case loginp.OpDelete:
-				log.Debugf("File %s has been removed", fe.OldPath)
+				evtLog.Debugf("File %s has been removed", fe.OldPath)
 
-				p.onRemove(log, fe, src, s, hg)
+				p.onRemove(evtLog, fe, src, s, hg)
 
 			case loginp.OpRename:
-				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
+				evtLog.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
 
-				p.onRename(log, ctx, fe, src, s, hg)
+				p.onRename(evtLog, ctx, fe, src, s, hg)
 
 			default:
-				log.Error("Unkown return value %v", fe.Op)
+				evtLog.Error("Unkown return value %v", fe.Op)
 			}
 		}
 		return nil
