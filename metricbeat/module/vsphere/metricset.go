@@ -15,22 +15,45 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package wineventlog
+package vsphere
 
 import (
-	"encoding/xml"
+	"net/url"
+
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-type eventTemplate struct {
-	Data []EventData `xml:"data"`
+var HostParser = parse.URLHostParserBuilder{
+	DefaultScheme: "https",
+	DefaultPath:   "/sdk",
+}.Build()
+
+// MetricSet type defines all fields of the MetricSet.
+type MetricSet struct {
+	mb.BaseMetricSet
+	Insecure bool
+	HostURL  *url.URL
 }
 
-type EventData struct {
-	Name    string `xml:"name,attr"`
-	InType  string `xml:"inType,attr"`
-	OutType string `xml:"outType,attr"`
-}
+// NewMetricSet creates a new instance of the MetricSet.
+func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
+	config := struct {
+		Insecure bool `config:"insecure"`
+	}{}
 
-func (t *eventTemplate) Unmarshal(xmlData []byte) error {
-	return xml.Unmarshal(xmlData, t)
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+
+	u, err := url.Parse(base.HostData().URI)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{
+		BaseMetricSet: base,
+		HostURL:       u,
+		Insecure:      config.Insecure,
+	}, nil
 }
