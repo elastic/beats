@@ -638,7 +638,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '713049'"
       field: "message"
       description: "713049"
-      pattern: "Group = %{}, IP = %{source.address}, Security negotiation complete for LAN-to-LAN Group (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+      pattern: "Group = %{}, Username = %{user.name}, IP = %{source.address}, Security negotiation complete for LAN-to-LAN Group (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
   - grok:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
