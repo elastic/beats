@@ -245,7 +245,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Omit full index template from errors that occur while loading the template. {pull}25743[25743]
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 - Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
-- Fix `add_process_metadata` processor complaining about valid pid fields not being valid integers. {pull}26829[26829] {issue}26830[26830]
 
 *Auditbeat*
 
@@ -284,7 +283,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix CredentialsJSON unpacking for `gcp-pubsub` and `httpjson` inputs. {pull}23277[23277]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
-- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
 - Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
 - Change type of max_bytes in all configs to be cfgtype.ByteSize {pull}26699[26699]
 
@@ -396,9 +394,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
 - Removed incorrect `http.request.referrer` field from `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 - Fix `threatintel.indicator.url.full` not being populated. {issue}26351[26351] {pull}26508[26508]
-- Fix Elasticsearch compatibility for modules that use `type: ip` with `convert` processors. {issue}26629[26629] {pull}26676[26676]
-- Fix Elasticsearch compatibility for modules that use the `network_direction` processor. {issue}26629[26629] {pull}26676[26676]
-- Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
 - Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
 - Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
 - Cisco asa/ftd: Fix reversed usage of observer ingress and egress interfaces. {pull}26265[26265]
