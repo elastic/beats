@@ -29,11 +29,31 @@ import (
 
 func TestQueueRunsInOrder(t *testing.T) {
 	// Bugs can show up only occasionally
+	var min time.Duration
+	var max time.Duration
+	var slow int
+	var times = []time.Duration{}
 	for i := 0; i < 1000000; i++ {
-		if i%1000 == 0 {
-			t.Logf("Runs %d\n", i)
-		}
+		start := time.Now()
+
 		testQueueRunsInOrderOnce(t)
+
+		duration := time.Now().Sub(start)
+		if duration < min || min == 0 {
+			min = duration
+		}
+		if duration > max {
+			max = duration
+		}
+		if duration > time.Millisecond*5 {
+			slow++
+		}
+		times = append(times, duration)
+
+		if i%1000 == 0 && i > 0 {
+			ninetyFifth := int(float64(len(times)) * 0.95)
+			t.Logf("count: %07d | min: %s\t | max: %s\t| slow: %d\t| @95th: %s\n", i, min, max, slow, times[ninetyFifth])
+		}
 	}
 }
 
