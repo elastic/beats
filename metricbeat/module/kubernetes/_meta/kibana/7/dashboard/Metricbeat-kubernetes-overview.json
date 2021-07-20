@@ -399,7 +399,7 @@
       "coreMigrationVersion": "7.14.0",
       "id": "022a54c0-2bf5-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -552,10 +552,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "44f12b40-2bf4-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -640,10 +640,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "cd059410-2bfb-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -731,10 +731,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "e1018b90-2bfb-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -867,10 +867,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "d6564360-2bfc-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -968,10 +968,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "16fa4470-2bfd-11e7-859b-f78b612cde28-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1069,10 +1069,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "294546b0-30d6-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1157,10 +1157,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "408fccf0-30d6-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1247,10 +1247,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "58e644f0-30d6-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1337,10 +1337,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "a4c9d360-30df-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1427,10 +1427,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "174a6ad0-30e0-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1503,10 +1503,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "7aac4fd0-30e0-11e7-8df8-6d3604a72912-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1595,10 +1595,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "da1ff7c0-30ed-11e7-b9e5-2b5b07213ab3-ecs",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1651,10 +1651,10 @@
           "type": "input_control_vis"
         }
       },
-      "coreMigrationVersion": "7.14.0",
+      "coreMigrationVersion": "7.12.0",
       "id": "d54c65f0-e4a6-11eb-9d53-3b3d1d47c519",
       "migrationVersion": {
-        "visualization": "7.14.0"
+        "visualization": "7.12.0"
       },
       "namespaces": [
         "default"
@@ -1671,5 +1671,5 @@
       "version": "WzI2MjEsMV0="
     }
   ],
-  "version": "7.14.0"
+  "version": "7.12.0"
 }
