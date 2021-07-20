@@ -21,7 +21,7 @@ const (
 	maxActionTimeout     = time.Hour
 )
 
-var ErrActionTimeoutInvalid = errors.New("action timeout is invalid")
+var errActionTimeoutInvalid = errors.New("action timeout is invalid")
 
 // AppAction is a handler for application actions.
 type AppAction struct {
@@ -65,7 +65,7 @@ func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.F
 		timeout = time.Duration(action.Timeout) * time.Second
 		if timeout > maxActionTimeout {
 			h.log.Debugf("handlerAppAction: action '%v' timeout exceeds maximum allowed %v", action.InputType, maxActionTimeout)
-			err = ErrActionTimeoutInvalid
+			err = errActionTimeoutInvalid
 		}
 	}
 
