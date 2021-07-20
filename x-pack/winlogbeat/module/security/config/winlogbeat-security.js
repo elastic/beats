@@ -1914,7 +1914,7 @@ var security = (function () {
         }
         var targetUserName = evt.Get("winlog.event_data.TargetUserName");
         if (targetUserName) {
-            if (/.@*/.test(targetUserName)) {
+            if (targetUserName.indexOf('@')>0) {
                 targetUserName = targetUserName.split('@')[0];
             }
 
