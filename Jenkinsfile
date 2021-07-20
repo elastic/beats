@@ -671,7 +671,7 @@ def withBeatsEnv(Map args = [:], Closure body) {
           error("Error '${err.toString()}'")
         } finally {
           if (archive) {
-            archiveTestOutput(testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
+            archiveTestOutput(directory: directory, testResults: testResults, artifacts: artifacts, id: args.id, upload: upload)
           }
           tearDown()
         }
