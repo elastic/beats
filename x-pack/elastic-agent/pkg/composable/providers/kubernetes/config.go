@@ -16,6 +16,7 @@ import (
 // Config for kubernetes provider
 type Config struct {
 	Scope     string    `config:"scope"`
+	ResourceConfig
 	Resources Resources `config:"resources"`
 }
 
@@ -39,11 +40,8 @@ type ResourceConfig struct {
 
 // InitDefaults initializes the default values for the config.
 func (c *Config) InitDefaults() {
-	if c.Resources.Pod == nil {
-		c.Resources.Pod = &ResourceConfig{}
-	}
-	c.Resources.Pod.SyncPeriod = 10 * time.Minute
-	c.Resources.Pod.CleanupTimeout = 60 * time.Second
+	c.CleanupTimeout = 60 * time.Second
+	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
 }
 
@@ -55,6 +53,22 @@ func (c *Config) Validate() error {
 			logp.L().Warnf("can not set scope to `node` when using resource `Service`. resetting scope to `cluster`")
 		}
 		c.Scope = "cluster"
+	}
+	baseCfg := &ResourceConfig{
+		CleanupTimeout: c.CleanupTimeout,
+		SyncPeriod: c.CleanupTimeout,
+		KubeConfig: c.KubeConfig,
+		Namespace: c.Namespace,
+		Node: c.Node,
+	}
+	if c.Resources.Pod == nil {
+		c.Resources.Pod = baseCfg
+	}
+	if c.Resources.Node == nil {
+		c.Resources.Node = baseCfg
+	}
+	if c.Resources.Service == nil {
+		c.Resources.Service = baseCfg
 	}
 
 	return nil
