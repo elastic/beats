@@ -8,6 +8,8 @@ var:
     default: 0.0.0.0
   - name: instancename
     default: default
+  - name: timezone
+    default: UTC
 
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml

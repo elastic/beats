@@ -123,6 +123,7 @@
         "formats": [
           "yyyy-MM-dd HH:mm:ss.SSS"
         ],
+        "timezone": "{{event.timezone}}",
         "description": "Convert logdate to @timestamp"
       }
     },

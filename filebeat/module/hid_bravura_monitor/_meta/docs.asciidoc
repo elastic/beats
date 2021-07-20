@@ -31,6 +31,7 @@ However it can be configured for any file path. See the following example.
     var.paths: ["C:/Program Files/Hitachi ID/IDM Suite/Logs/default/*.log"]
     var.instancename: default
     var.node: 0.0.0.0
+    var.timezone: UTC
 -----
 
 :fileset_ex: log
@@ -63,6 +64,19 @@ The address of the instance node. The default is `0.0.0.0`. For example:
   log:
     enabled: true
     var.node: 127.0.0.1
+    ...
+----
+
+*`var.timezone`*::
+
+The UTC offset for the given instance server. The default is `UTC`. For example:
++
+[source,yaml]
+----
+- module: hid_bravura_monitor
+  log:
+    enabled: true
+    var.timezone: Canada/Mountain
     ...
 ----
 
