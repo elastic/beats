@@ -28,15 +28,17 @@ import (
 )
 
 func TestQueueRunsInOrder(t *testing.T) {
-	t.Skip("flaky test on windows: https://github.com/elastic/beats/issues/26205")
 	// Bugs can show up only occasionally
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1000000; i++ {
+		if i%1000 == 0 {
+			t.Logf("Runs %d\n", i)
+		}
 		testQueueRunsInOrderOnce(t)
 	}
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithCancel(context.Background())
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer ctxCancel()
 	tq := NewTimerQueue(ctx)
 
