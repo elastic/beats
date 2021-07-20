@@ -36,6 +36,7 @@ func TestDockerJSON(t *testing.T) {
 		partial         bool
 		format          string
 		criflags        bool
+		maxBytes        int
 		expectedError   error
 		expectedMessage reader.Message
 	}{
@@ -344,12 +345,32 @@ func TestDockerJSON(t *testing.T) {
 				Bytes:   205,
 			},
 		},
+		{
+			name: "Total size of partial log message exceed max_bytes",
+			input: [][]byte{
+				[]byte(`{"log":"hello","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+				[]byte(`{"log":"hello","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+				[]byte(`{"log":"hello\n","stream":"stdout","time":"2017-11-09T13:27:36.277747246Z"}`),
+			},
+			stream:   "stdout",
+			partial:  true,
+			maxBytes: 8,
+			expectedMessage: reader.Message{
+				Content: []byte("hellohel"),
+				Fields:  common.MapStr{"stream": "stdout"},
+				Ts:      time.Date(2017, 11, 9, 13, 27, 36, 277747246, time.UTC),
+				Bytes:   221,
+			},
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			r := &mockReader{messages: test.input}
-			json := New(r, test.stream, test.partial, test.format, test.criflags)
+			if test.maxBytes == 0 {
+				test.maxBytes = 10 * 1024 * 1024
+			}
+			json := New(r, test.stream, test.partial, test.format, test.criflags, test.maxBytes)
 			message, err := json.Next()
 
 			if test.expectedError != nil {

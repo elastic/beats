@@ -101,6 +101,7 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 			}
 		case "container":
 			config := readjson.DefaultContainerConfig()
+			config.MaxBytes = pCfg.MaxBytes
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {

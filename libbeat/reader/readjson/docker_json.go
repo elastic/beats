@@ -48,6 +48,8 @@ type DockerJSONReader struct {
 	stripNewLine func(msg *reader.Message)
 
 	logger *logp.Logger
+
+	maxBytes int
 }
 
 type logLine struct {
@@ -60,13 +62,14 @@ type logLine struct {
 }
 
 // New creates a new reader renaming a field
-func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool) *DockerJSONReader {
+func New(r reader.Reader, stream string, partial bool, format string, CRIFlags bool, maxBytes int) *DockerJSONReader {
 	reader := DockerJSONReader{
 		stream:   stream,
 		partial:  partial,
 		reader:   r,
 		criflags: CRIFlags,
 		logger:   logp.NewLogger("reader_docker_json"),
+		maxBytes: maxBytes,
 	}
 
 	switch strings.ToLower(format) {
@@ -94,6 +97,7 @@ func NewContainerParser(r reader.Reader, config *ContainerJSONConfig) *DockerJSO
 		reader:   r,
 		criflags: true,
 		logger:   logp.NewLogger("parser_container"),
+		maxBytes: int(config.MaxBytes),
 	}
 
 	switch config.Format {
@@ -232,6 +236,7 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			continue
 		}
 
+		size := len(logLine.Log)
 		// Handle multiline messages, join partial lines
 		for p.partial && logLine.Partial {
 			next, err := p.reader.Next()
@@ -243,16 +248,27 @@ func (p *DockerJSONReader) Next() (reader.Message, error) {
 			if err != nil {
 				return message, err
 			}
+
 			err = p.parseLine(&next, &logLine)
 			if err != nil {
 				p.logger.Errorf("Parse line error: %v", err)
 				continue
 			}
+
+			if size > p.maxBytes {
+				continue
+			}
+			size += len(logLine.Log)
+
 			message.Content = append(message.Content, next.Content...)
 		}
 
 		if p.stream != "all" && p.stream != logLine.Stream {
 			continue
+		}
+
+		if size > p.maxBytes {
+			message.Content = message.Content[:p.maxBytes]
 		}
 
 		return message, err

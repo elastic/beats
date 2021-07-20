@@ -17,7 +17,13 @@
 
 package readjson
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/dustin/go-humanize"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+)
 
 type ContainerFormat uint8
 
@@ -50,14 +56,16 @@ var (
 )
 
 type ContainerJSONConfig struct {
-	Stream Stream          `config:"stream"`
-	Format ContainerFormat `config:"format"`
+	Stream   Stream           `config:"stream"`
+	Format   ContainerFormat  `config:"format"`
+	MaxBytes cfgtype.ByteSize `config:"max_bytes"`
 }
 
 func DefaultContainerConfig() ContainerJSONConfig {
 	return ContainerJSONConfig{
-		Format: Auto,
-		Stream: All,
+		Format:   Auto,
+		Stream:   All,
+		MaxBytes: 10 * humanize.MiByte,
 	}
 }
 
