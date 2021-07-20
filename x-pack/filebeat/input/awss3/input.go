@@ -8,8 +8,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
@@ -18,6 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/ctxtool"
 )
@@ -72,14 +71,14 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	if in.config.QueueURL != "" {
 		collector, err = in.createSQSCollector(ctx, pipeline, inputMetrics)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot create SQS collector: %w", err)
 		}
 	}
 
 	if in.config.S3Bucket != "" {
 		collector, err = in.createS3Collector(ctx, pipeline, inputMetrics)
 		if err != nil {
-			return err
+			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
 	}
 

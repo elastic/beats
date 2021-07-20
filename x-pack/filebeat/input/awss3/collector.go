@@ -123,7 +123,7 @@ func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 	req := c.s3.ListObjectsRequest(listObjectInput)
 	paginator := s3.NewListObjectsPaginator(req)
 
-	for paginator.Next(context.TODO()) {
+	for paginator.Next(c.cancellation) {
 		page := paginator.CurrentPage()
 		for _, object := range page.Contents {
 			// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
