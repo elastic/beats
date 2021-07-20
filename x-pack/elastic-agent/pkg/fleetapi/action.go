@@ -211,7 +211,7 @@ type ActionApp struct {
 	ActionID    string          `json:"id" mapstructure:"id"`
 	ActionType  string          `json:"type" mapstructure:"type"`
 	InputType   string          `json:"input_type" mapstructure:"input_type"`
-	Timeout     int64           `json:"timeout" mapstructure:"timeout"`
+	Timeout     int64           `json:"timeout,omitempty" mapstructure:"timeout,omitempty"`
 	Data        json.RawMessage `json:"data" mapstructure:"data"`
 	StartedAt   string          `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
 	CompletedAt string          `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
