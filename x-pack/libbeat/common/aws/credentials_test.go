@@ -55,7 +55,6 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 			awssdk.Config{},
 			awssdk.Config{
 				EndpointResolver: awssdk.ResolveWithEndpointURL("https://cloudwatch.us-west-1.amazonaws.com"),
-				Region:           "us-west-1",
 			},
 		},
 	}
