@@ -35,6 +35,12 @@ type addFramesTestStep struct {
 	expectedSegment  *segmentID
 }
 
+type addFramesTest struct {
+	frameID  frameID
+	position queuePosition
+	steps    []addFramesTestStep
+}
+
 func TestAddFrames(t *testing.T) {
 	// If the done channel is closed, diskQueueACKs.addFrames
 	// should do nothing and immediately return. Otherwise it should:
@@ -50,20 +56,9 @@ func TestAddFrames(t *testing.T) {
 	//   * if we cross any segment boundaries, send the highest such segmentID
 	//     to segmentACKChan (notifying the core loop that they can be
 	//     deleted) and remove earlier segments from segmentBoundaries.
-	dir, err := ioutil.TempDir("", "diskqueue_acks_test")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
 
-	testCases := []struct {
-		name     string
-		frameID  frameID
-		position queuePosition
-		steps    []addFramesTestStep
-	}{
-		{
-			name: "2-segment test",
+	testCases := map[string]addFramesTest{
+		"2-segment test": {
 			steps: []addFramesTestStep{
 				{
 					"Acknowledge first frame",
@@ -106,8 +101,7 @@ func TestAddFrames(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "3 segments with 3 frames each",
+		"3 segments with 3 frames each": {
 			steps: []addFramesTestStep{
 				{
 					"Acknowledge frames from segment 1 and 2",
@@ -160,8 +154,7 @@ func TestAddFrames(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "ACKing multiple segments only sends the final one to the core loop",
+		"ACKing multiple segments only sends the final one to the core loop": {
 			steps: []addFramesTestStep{
 				{
 					"Add four one-frame segments",
@@ -179,8 +172,7 @@ func TestAddFrames(t *testing.T) {
 				},
 			},
 		},
-		{
-			name:     "The first frame of a segment resets nextPosition.byteIndex",
+		"The first frame of a segment resets nextPosition.byteIndex": {
 			frameID:  35,
 			position: queuePosition{9, 1000, 10},
 			steps: []addFramesTestStep{
@@ -197,13 +189,12 @@ func TestAddFrames(t *testing.T) {
 				},
 			},
 		},
-		{
+		"The first frame after the queue opens doesn't overwrite nextPosition.byteIndex": {
 			// Usually on the first frame of a segment, nextPosition is updated
 			// to point to the beginning of the new segment. On the very first
 			// frame of a new run, we don't do this, to allow the position to be
 			// restored from a previous run in case we shut down partway through
 			// a segment.
-			name:     "The first frame after the queue opens doesn't overwrite nextPosition.byteIndex",
 			frameID:  0,
 			position: queuePosition{5, 1000, 10},
 			steps: []addFramesTestStep{
@@ -220,8 +211,7 @@ func TestAddFrames(t *testing.T) {
 				},
 			},
 		},
-		{
-			name: "Segments with old schema versions have the correct positions",
+		"Segments with old schema versions have the correct positions": {
 			steps: []addFramesTestStep{
 				{
 					"Add a frame for a schema-0 segment",
@@ -242,6 +232,18 @@ func TestAddFrames(t *testing.T) {
 		},
 	}
 
+	for name, test := range testCases {
+		runAddFramesTest(t, name, test)
+	}
+}
+
+func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
+	dir, err := ioutil.TempDir("", "diskqueue_acks_test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
 	path := filepath.Join(dir, "state.dat")
 	stateFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
@@ -249,31 +251,29 @@ func TestAddFrames(t *testing.T) {
 	}
 	defer stateFile.Close()
 
-	for _, test := range testCases {
-		dqa := newDiskQueueACKs(logp.L(), test.position, stateFile)
-		dqa.nextFrameID = test.frameID
-		for _, step := range test.steps {
-			prefix := fmt.Sprintf("[%v] %v", test.name, step.description)
-			expectedPosition := dqa.nextPosition
-			if step.expectedPosition != nil {
-				expectedPosition = *step.expectedPosition
-			}
-			dqa.addFrames(step.input)
-			if step.expectedFrameID != dqa.nextFrameID {
-				t.Errorf("%v expected nextFrameID %v, got %v",
-					prefix, step.expectedFrameID, dqa.nextFrameID)
-				break
-			}
-			if expectedPosition != dqa.nextPosition {
-				t.Errorf("%v expected nextPosition %v, got %v",
-					prefix, step.expectedPosition, dqa.nextPosition)
-				break
-			}
-			if step.expectedSegment == nil {
-				dqa.assertNoACKedSegment(t, prefix)
-			} else {
-				dqa.assertACKedSegment(t, prefix, *step.expectedSegment)
-			}
+	dqa := newDiskQueueACKs(logp.L(), test.position, stateFile)
+	dqa.nextFrameID = test.frameID
+	for _, step := range test.steps {
+		prefix := fmt.Sprintf("[%v] %v", name, step.description)
+		expectedPosition := dqa.nextPosition
+		if step.expectedPosition != nil {
+			expectedPosition = *step.expectedPosition
+		}
+		dqa.addFrames(step.input)
+		if step.expectedFrameID != dqa.nextFrameID {
+			t.Errorf("%v expected nextFrameID %v, got %v",
+				prefix, step.expectedFrameID, dqa.nextFrameID)
+			break
+		}
+		if expectedPosition != dqa.nextPosition {
+			t.Errorf("%v expected nextPosition %v, got %v",
+				prefix, step.expectedPosition, dqa.nextPosition)
+			break
+		}
+		if step.expectedSegment == nil {
+			dqa.assertNoACKedSegment(t, prefix)
+		} else {
+			dqa.assertACKedSegment(t, prefix, *step.expectedSegment)
 		}
 	}
 }
