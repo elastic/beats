@@ -65,8 +65,9 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	// Emit all containers in the pod
 	p.emitContainers(pod, pod.Spec.Containers, pod.Status.ContainerStatuses)
 
-	// TODO deal with init containers stopping after initialization
+	// TODO: deal with init containers stopping after initialization
 	p.emitContainers(pod, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
+	// TODO: deal with ephemeral containers
 }
 
 func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Container, containerstatuses []kubernetes.PodContainerStatus) {
@@ -123,7 +124,7 @@ func (p *pod) OnDelete(obj interface{}) {
 }
 
 func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
-	//TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
+	// TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
