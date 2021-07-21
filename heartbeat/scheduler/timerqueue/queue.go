@@ -108,7 +108,9 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 			<-tq.timer.C
 		}
 		// Originally the line below this comment was
-		//   tq.timer.Reset(time.Until(tt.runAt))
+		//
+		//  tq.timer.Reset(time.Until(tt.runAt))
+		//
 		// however this broke in go1.16rc1, specifically on the commit b4b014465216790e01aa66f9120d03230e4aff46
 		//, specifically on this line:
 		// https://github.com/golang/go/commit/b4b014465216790e01aa66f9120d03230e4aff46#diff-73699b6edfe5dbb3f6824e66bb3566bce9405e9a8c810cac55c8199459f0ac19R652

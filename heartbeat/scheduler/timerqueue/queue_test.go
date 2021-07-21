@@ -59,9 +59,7 @@ func TestStress(t *testing.T) {
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer ctxCancel()
-	tq := NewTimerQueue(ctx)
+	tq := NewTimerQueue(context.Background())
 
 	// Number of items to test with
 	numItems := 10
