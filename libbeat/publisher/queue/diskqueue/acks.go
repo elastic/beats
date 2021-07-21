@@ -92,7 +92,9 @@ type diskQueueACKs struct {
 	frameSize map[frameID]uint64
 
 	// segmentBoundaries maps the first frameID of each segment to its
-	// corresponding segment ID.
+	// corresponding segment. We only need *queueSegment so we can
+	// call queueSegment.headerSize to calculate our position on
+	// disk; otherwise this could be a map from frameID to segmentID.
 	segmentBoundaries map[frameID]*queueSegment
 
 	// When a call to addFrames results in a segment being completely
@@ -111,9 +113,6 @@ type diskQueueACKs struct {
 	// the core loop will not accept any more acked segments and any future
 	// ACKs should be ignored.
 	done chan struct{}
-
-	addFramesPending int
-	fakeLock         sync.Mutex
 }
 
 func newDiskQueueACKs(
@@ -132,17 +131,7 @@ func newDiskQueueACKs(
 }
 
 func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
-	dqa.fakeLock.Lock()
-	dqa.addFramesPending++
-	//fmt.Printf("begin (pending %v)\n", dqa.addFramesPending)
-	dqa.fakeLock.Unlock()
 	dqa.lock.Lock()
-	defer func() {
-		dqa.fakeLock.Lock()
-		dqa.addFramesPending--
-		//fmt.Printf("end (pending %v)\n", dqa.addFramesPending)
-		dqa.fakeLock.Unlock()
-	}()
 	defer dqa.lock.Unlock()
 	select {
 	case <-dqa.done:
@@ -168,7 +157,7 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 				// segment boundary list and reset the byte index to immediately
 				// after the segment header.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
-				if newSegment.firstFrameID != 0 {
+				if dqa.nextFrameID != 0 {
 					// Special case if this is the first frame of a new session:
 					// don't overwrite nextPosition, since it may contain the saved
 					// position of the previous session.
