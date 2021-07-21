@@ -20,14 +20,7 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
-	"runtime"
 	"time"
-)
-
-const (
-	T_INIT = iota
-	T_STARTED
-	T_CONSUMED
 )
 
 // timerTask represents a task run by the TimerQueue.
@@ -46,7 +39,6 @@ type TimerQueue struct {
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
 	timer     *time.Timer
-	tstate    int
 }
 
 // NewTimerQueue creates a new instance.
@@ -56,7 +48,6 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
 		timer:  time.NewTimer(time.Hour * 86400),
-		tstate: T_INIT,
 	}
 	heap.Init(&tq.th)
 
@@ -83,16 +74,11 @@ func (tq *TimerQueue) Start() {
 	//}
 	go func() {
 		for {
-			runtime.Gosched()
 			select {
-			//case <-tt.C:
-			//	panic("WHUT")
-			//fmt.Printf("SLOOOW\n")
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
 				return
 			case now := <-tq.timer.C:
-				tq.tstate = T_CONSUMED
 				tasks := tq.popRunnable(now)
 
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
@@ -105,8 +91,7 @@ func (tq *TimerQueue) Start() {
 				if tq.th.Len() > 0 {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
-					tq.timer.Reset(nr.Sub(time.Now()))
-					tq.tstate = T_STARTED
+					tq.timer = time.NewTimer(time.Until(nr))
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -122,24 +107,19 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		//fmt.Printf("T")
-		if tq.tstate == T_STARTED {
-			//fmt.Printf("S")
-			if !tq.timer.Stop() {
-				//fmt.Printf("D")
-				select {
-				case <-tq.timer.C:
-					//fmt.Printf("EXECIT\n")
-					break
-				default:
-				}
-			}
-			//fmt.Printf("X")
-
+		if !tq.timer.Stop() {
+			<-tq.timer.C
 		}
-		tq.timer.Reset(tt.runAt.Sub(time.Now()))
-		tq.tstate = T_STARTED
-
+		// Originally the line below this comment was
+		//   tq.timer.Reset(time.Until(tt.runAt))
+		// however this broke in go1.16rc1, specifically on the commit b4b014465216790e01aa66f9120d03230e4aff46
+		//, specifically on this line:
+		// https://github.com/golang/go/commit/b4b014465216790e01aa66f9120d03230e4aff46#diff-73699b6edfe5dbb3f6824e66bb3566bce9405e9a8c810cac55c8199459f0ac19R652
+		// where some nice new optimizations don't actually work reliably
+		// This can be worked around by instantiating a new timer rather than resetting the timer.
+		// since that internally calls deltimer in runtime/timer.go rather than modtimer,
+		// I suspect that the problem is in modtimer's setting of &pp.timerModifiedEarliest
+		tq.timer = time.NewTimer(time.Until(tt.runAt))
 		tq.nextRunAt = &tt.runAt
 	}
 }

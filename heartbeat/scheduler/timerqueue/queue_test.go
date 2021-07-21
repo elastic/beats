@@ -19,7 +19,6 @@ package timerqueue
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
 	"os"
 	"runtime/pprof"
@@ -30,71 +29,33 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestQueueRunsInOrder(t *testing.T) {
-	// Bugs can show up only occasionally
-	var min time.Duration
-	var max time.Duration
-	var slow int
-	var failures int
-	for i := 0; i < 1000000; i++ {
-		start := time.Now()
-
-		sd := time.AfterFunc(time.Second*5, func() {
-			t.Logf("Stall detected!")
-			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
-		})
-
-		testQueueRunsInOrderOnce(t)
-
-		sd.Stop()
-
-		res := false
-		//res := timerReset()
-		if res {
-			failures++
-		}
-
-		duration := time.Now().Sub(start)
-		if duration < min || min == 0 {
-			min = duration
-		}
-		if duration > max {
-			max = duration
-		}
-		if duration > time.Millisecond*5000 {
-			slow++
-		}
-
-		if i%1000 == 0 && i > 0 {
-			t.Logf("count: %07d | min/max: %s/%s\t| slow: %d\t| fail: %d\n", i, min, max, slow, failures)
-		}
-	}
+func TestRunsInOrder(t *testing.T) {
+	testQueueRunsInOrderOnce(t)
 }
 
-func timerReset() bool {
-	t := time.NewTimer(time.Millisecond)
+// TestStress tries to figure out if we have any deadlocks that show up under concurrency
+func TestStress(t *testing.T) {
+	for i := 0; i < 120000; i++ {
+		failed := make(chan bool)
+		succeeded := make(chan bool)
 
-	ran := []time.Time{}
-	var expired bool
+		watchdog := time.AfterFunc(time.Second*5, func() {
+			failed <- true
+		})
 
-	ctx, _ := context.WithTimeout(context.TODO(), time.Second*5)
+		go func() {
+			testQueueRunsInOrderOnce(t)
+			succeeded <- true
+		}()
 
-	for len(ran) < 10 {
 		select {
-		case now := <-t.C:
-			ran = append(ran, now)
-			if false && !t.Stop() {
-				fmt.Printf("BLOCK\n")
-				<-t.C
-				fmt.Printf("UNB\n")
-			}
-			t.Reset(time.Nanosecond * -2)
-		case <-ctx.Done():
-			expired = true
+		case <-failed:
+			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+			require.FailNow(t, "Scheduler test iteration timed out, deadlock issue?")
+		case <-succeeded:
+			watchdog.Stop()
 		}
 	}
-
-	return expired
 }
 
 func testQueueRunsInOrderOnce(t *testing.T) {
