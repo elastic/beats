@@ -104,7 +104,7 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		if !tq.timer.Stop() {
+		if tq.nextRunAt != nil && !tq.timer.Stop() {
 			<-tq.timer.C
 		}
 		// Originally the line below this comment was
