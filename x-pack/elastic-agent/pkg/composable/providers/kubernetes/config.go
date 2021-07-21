@@ -37,6 +37,7 @@ type Resources struct {
 	Service Enabled `config:"service"`
 }
 
+// Enabled config section for resources' config blocks
 type Enabled struct {
 	Enabled bool `config:"enabled"`
 }
