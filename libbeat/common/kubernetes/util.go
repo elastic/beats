@@ -35,9 +35,20 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var namespaceFilePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
-var osHostname = os.Hostname
-var machineId = machineID
+const namespaceFilePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+
+type discoveryUtils struct {
+	eDisc       HostDiscovery
+	client      kubernetes.Interface
+	isInCluster bool
+}
+type HostDiscovery interface {
+	GetNamespace() (string, error)
+	GetPodName() (string, error)
+	GetMachineID() string
+}
+
+type hostDiscovery struct{}
 
 func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
@@ -96,56 +107,61 @@ func IsInCluster(kubeconfig string) bool {
 
 // DiscoverKubernetesNode figures out the Kubernetes node to use.
 // If host is provided in the config use it directly.
-// If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
+// If it is empty then return discoverKubernetesNode.
+func DiscoverKubernetesNode(log *logp.Logger, configHost string, isInCluster bool, client kubernetes.Interface) (string, error) {
+	if configHost != "" {
+		log.Infof("kubernetes: Using node %s provided in the config", configHost)
+		return configHost, nil
+	}
+	hd := &hostDiscovery{}
+	d := &discoveryUtils{eDisc: hd, client: client, isInCluster: isInCluster}
+
+	return d.discoverKubernetesNode(log)
+}
+
+// discoverKubernetesNode figures out the Kubernetes node to use.
+// If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
 // If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
 // If node cannot be discovered, return NODE_NAME env var as default value. In case it is not set return error.
-func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (string, error) {
-	if host != "" {
-		log.Infof("kubernetes: Using node %s provided in the config", host)
-		return host, nil
-	}
+func (d *discoveryUtils) discoverKubernetesNode(log *logp.Logger) (string, error) {
 	nodeNameEnv := os.Getenv("NODE_NAME")
-	var envError, logerror error
+	var envError error
+	var errorMsg string
 	if nodeNameEnv == "" {
 		envError = errors.New("kubernetes: NODE_NAME environment variable was not set")
 	}
 	ctx := context.TODO()
-	if inCluster {
-		ns, err := InClusterNamespace()
+	if d.isInCluster {
+		ns, err := d.eDisc.GetNamespace()
 		if err != nil {
-			logerror = fmt.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
-			log.Error(logerror)
-			return nodeNameEnv, errors.Wrap(envError, logerror.Error())
+			errorMsg = fmt.Sprintf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
+			return nodeNameEnv, errors.Wrap(envError, errorMsg)
 		}
-		podName, err := osHostname()
+		podName, err := d.eDisc.GetPodName()
 		if err != nil {
-			logerror = fmt.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
-			log.Error(logerror)
-			return nodeNameEnv, errors.Wrap(envError, logerror.Error())
+			errorMsg = fmt.Sprintf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
+			return nodeNameEnv, errors.Wrap(envError, errorMsg)
 		}
 		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
+		pod, err := d.client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
 		if err != nil {
-			logerror = fmt.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
-			log.Error(logerror)
-			return nodeNameEnv, errors.Wrap(envError, logerror.Error())
+			errorMsg = fmt.Sprintf("kubernetes: Querying for pod failed with error: %+v", err)
+			return nodeNameEnv, errors.Wrap(envError, errorMsg)
 		}
 		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
 		return pod.Spec.NodeName, nil
 	}
 
-	mid := machineId()
+	mid := d.eDisc.GetMachineID()
 	if mid == "" {
-		logerror = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
-		log.Error(logerror)
-		return nodeNameEnv, errors.Wrap(envError, logerror.Error())
+		errorMsg = "kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id"
+		return nodeNameEnv, errors.Wrap(envError, errorMsg)
 	}
 
-	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	nodes, err := d.client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
 	if err != nil {
-		logerror = fmt.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
-		log.Error(logerror)
-		return nodeNameEnv, errors.Wrap(envError, logerror.Error())
+		errorMsg = fmt.Sprintf("kubernetes: Querying for nodes failed with error: %+v", err)
+		return nodeNameEnv, errors.Wrap(envError, errorMsg)
 	}
 	for _, n := range nodes.Items {
 		if n.Status.NodeInfo.MachineID == mid {
@@ -154,13 +170,13 @@ func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, clien
 			return name, nil
 		}
 	}
-
-	log.Warn("kubernetes: Couldn't discover node, returning default")
-	return nodeNameEnv, envError
+	errorMsg = fmt.Sprintf("kubernetes: Couldn't discover node %s", mid)
+	return nodeNameEnv, errors.Wrap(envError, errorMsg)
 }
 
-// machineID borrowed from cadvisor.
-func machineID() string {
+//GetMachineID returns the machine-id
+// borrowed from machineID of cadvisor.
+func (hd *hostDiscovery) GetMachineID() string {
 	for _, file := range []string{
 		"/etc/machine-id",
 		"/var/lib/dbus/machine-id",
@@ -173,11 +189,21 @@ func machineID() string {
 	return ""
 }
 
+// GetNamespace gets namespace from serviceaccount when beat is in cluster.
+func (hd *hostDiscovery) GetNamespace() (string, error) {
+	return InClusterNamespace()
+}
+
+// GetPodName returns the hostname of the pod
+func (hd *hostDiscovery) GetPodName() (string, error) {
+	return os.Hostname()
+}
+
 // InClusterNamespace gets namespace from serviceaccount when beat is in cluster.
 // code borrowed from client-go with some changes.
 func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
-	data, err := ioutil.ReadFile(namespaceFilePath)
+	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")
 	if err != nil {
 		return "", err
 	}
