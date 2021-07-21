@@ -70,21 +70,7 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 }
 
 func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Container, containerstatuses []kubernetes.PodContainerStatus) {
-
-	providerDataChan := make(chan providerData)
-	done := make(chan bool, 1)
-	go generateContainerData(pod, containers, containerstatuses, providerDataChan, done, p.config)
-
-	for {
-		select {
-		case data := <-providerDataChan:
-			// Emit the container
-			data.mapping["scope"] = p.scope
-			p.comm.AddOrUpdate(data.uid, ContainerPriority, data.mapping, data.processors)
-		case <-done:
-			return
-		}
-	}
+	generateContainerData(p.comm, pod, containers, containerstatuses, p.config)
 }
 
 func (p *pod) emitStopped(pod *kubernetes.Pod) {
@@ -185,11 +171,10 @@ func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
 }
 
 func generateContainerData(
+	comm composable.DynamicProviderComm,
 	pod *kubernetes.Pod,
 	containers []kubernetes.Container,
 	containerstatuses []kubernetes.PodContainerStatus,
-	dataChan chan providerData,
-	done chan bool,
 	cfg *Config) {
 	//TODO: add metadata here too ie -> meta := s.metagen.Generate()
 
@@ -247,11 +232,6 @@ func generateContainerData(
 				},
 			},
 		}
-		dataChan <- providerData{
-			uid:        eventID,
-			mapping:    mapping,
-			processors: processors,
-		}
+		comm.AddOrUpdate(eventID, ContainerPriority, mapping, processors)
 	}
-	done <- true
 }

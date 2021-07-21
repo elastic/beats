@@ -5,6 +5,7 @@
 package kubernetes
 
 import (
+	"context"
 	"fmt"
 	"testing"
 
@@ -97,8 +98,7 @@ func TestGenerateContainerPodData(t *testing.T) {
 		Status: kubernetes.PodStatus{PodIP: "127.0.0.5"},
 	}
 
-	providerDataChan := make(chan providerData)
-	done := make(chan bool, 1)
+	providerDataChan := make(chan providerData, 1)
 
 	containers := []kubernetes.Container{
 		{
@@ -120,12 +120,16 @@ func TestGenerateContainerPodData(t *testing.T) {
 			ContainerID: "crio://asdfghdeadbeef",
 		},
 	}
-	go generateContainerData(
+	comm := MockDynamicComm{
+		context.TODO(),
+		providerDataChan,
+	}
+	generateContainerData(
+		&comm,
 		pod,
 		containers,
 		containerStatuses,
-		providerDataChan,
-		done, &Config{LabelsDedot: true, AnnotationsDedot: true})
+		&Config{LabelsDedot: true, AnnotationsDedot: true})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
@@ -155,15 +159,29 @@ func TestGenerateContainerPodData(t *testing.T) {
 	}
 
 	cuid := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), "nginx")
-	for {
-		select {
-		case data := <-providerDataChan:
-			assert.Equal(t, cuid, data.uid)
-			assert.Equal(t, mapping, data.mapping)
-			assert.Equal(t, processors, data.processors)
-		case <-done:
-			return
-		}
-	}
+	data := <-providerDataChan
+	assert.Equal(t, cuid, data.uid)
+	assert.Equal(t, mapping, data.mapping)
+	assert.Equal(t, processors, data.processors)
 
+}
+
+// MockDynamicComm is used in tests.
+type MockDynamicComm struct {
+	context.Context
+	providerDataChan chan providerData
+}
+
+// AddOrUpdate adds or updates a current mapping.
+func (t *MockDynamicComm) AddOrUpdate(id string, priority int, mapping map[string]interface{}, processors []map[string]interface{}) error {
+	t.providerDataChan <- providerData{
+		id,
+		mapping,
+		processors,
+	}
+	return nil
+}
+
+// Remove
+func (t *MockDynamicComm) Remove(id string) {
 }
