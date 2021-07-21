@@ -65,7 +65,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	if config.Scope == "node" {
 		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't discover kubernetes node due to error %+v", err)
+			return nil, fmt.Errorf("couldn't discover kubernetes node due to error %w", err)
 		}
 	} else {
 		config.Node = ""

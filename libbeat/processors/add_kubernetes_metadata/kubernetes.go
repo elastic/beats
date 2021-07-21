@@ -159,7 +159,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 
 		config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 		if err != nil {
-			k.log.Errorf("Couldn't discover Kubernetes node: %+v", err)
+			k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
 			return
 		}
 		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)

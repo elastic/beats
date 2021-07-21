@@ -59,7 +59,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 	if config.Scope == "node" {
 		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
 		if err != nil {
-			return nil, fmt.Errorf("could not discover kubernetes node: %+v", err)
+			return nil, fmt.Errorf("could not discover kubernetes node: %w", err)
 		}
 	} else {
 		config.Node = ""

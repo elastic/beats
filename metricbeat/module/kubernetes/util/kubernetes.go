@@ -98,7 +98,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 	if nodeScope {
 		options.Node, err = kubernetes.DiscoverKubernetesNode(log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
 		if err != nil {
-			return nil, fmt.Errorf("couldn't discover kubernetes node: %+v", err)
+			return nil, fmt.Errorf("couldn't discover kubernetes node: %w", err)
 		}
 	}
 
