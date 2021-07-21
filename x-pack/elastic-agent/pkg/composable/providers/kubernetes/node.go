@@ -24,6 +24,7 @@ type node struct {
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
 	scope          string
+	config         *Config
 }
 
 type nodeData struct {
@@ -35,7 +36,7 @@ type nodeData struct {
 // NewNodeWatcher creates a watcher that can discover and process node objects
 func NewNodeWatcher(
 	comm composable.DynamicProviderComm,
-	cfg *ResourceConfig,
+	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (kubernetes.Watcher, error) {
@@ -48,17 +49,17 @@ func NewNodeWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&node{logger, cfg.CleanupTimeout, comm, scope})
+	watcher.AddEventHandler(&node{logger, cfg.CleanupTimeout, comm, scope, cfg})
 
 	return watcher, nil
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
-	data := generateNodeData(node)
-	data.mapping["scope"] = n.scope
+	data := generateNodeData(node, n.config)
 	if data == nil {
 		return
 	}
+	data.mapping["scope"] = n.scope
 
 	// Emit the node
 	n.comm.AddOrUpdate(string(node.GetUID()), NodePriority, data.mapping, data.processors)
@@ -86,7 +87,6 @@ func (n *node) OnUpdate(obj interface{}) {
 		time.AfterFunc(n.cleanupTimeout, func() { n.emitStopped(node) })
 	} else {
 		n.logger.Debugf("Watcher Node update: %+v", obj)
-		n.emitStopped(node)
 		n.emitRunning(node)
 	}
 }
@@ -131,6 +131,9 @@ func isUpdated(o, n interface{}) bool {
 	return false
 }
 
+// getAddress returns the IP of the node Resource. If there is a
+// NodeExternalIP then it is returned, if not then it will try to find
+// an address of NodeExternalIP type and if not found it looks for a NodeHostName address type
 func getAddress(node *kubernetes.Node) string {
 	for _, address := range node.Status.Addresses {
 		if address.Type == v1.NodeExternalIP && address.Address != "" {
@@ -139,7 +142,7 @@ func getAddress(node *kubernetes.Node) string {
 	}
 
 	for _, address := range node.Status.Addresses {
-		if address.Type == v1.NodeInternalIP && address.Address != "" {
+		if address.Type == v1.NodeExternalIP && address.Address != "" {
 			return address.Address
 		}
 	}
@@ -162,7 +165,7 @@ func isNodeReady(node *kubernetes.Node) bool {
 	return false
 }
 
-func generateNodeData(node *kubernetes.Node) *nodeData {
+func generateNodeData(node *kubernetes.Node, cfg *Config) *nodeData {
 	host := getAddress(node)
 
 	// If a node doesn't have an IP then dont monitor it
@@ -180,14 +183,29 @@ func generateNodeData(node *kubernetes.Node) *nodeData {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		if cfg.AnnotationsDedot {
+			annotation := common.DeDot(k)
+			annotations.Put(annotation, v)
+		} else {
+			safemapstr.Put(annotations, k, v)
+		}
+	}
+
+	labels := common.MapStr{}
+	for k, v := range node.GetObjectMeta().GetLabels() {
+		if cfg.LabelsDedot {
+			label := common.DeDot(k)
+			labels.Put(label, v)
+		} else {
+			safemapstr.Put(labels, k, v)
+		}
 	}
 
 	mapping := map[string]interface{}{
 		"node": map[string]interface{}{
 			"uid":         string(node.GetUID()),
 			"name":        node.GetName(),
-			"labels":      node.GetLabels(),
+			"labels":      labels,
 			"annotations": annotations,
 			"ip":          host,
 		},

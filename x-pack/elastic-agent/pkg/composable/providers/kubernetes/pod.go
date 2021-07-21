@@ -24,6 +24,7 @@ type pod struct {
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
 	scope          string
+	config         *Config
 }
 
 type providerData struct {
@@ -35,7 +36,7 @@ type providerData struct {
 // NewPodWatcher creates a watcher that can discover and process pod objects
 func NewPodWatcher(
 	comm composable.DynamicProviderComm,
-	cfg *ResourceConfig,
+	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (kubernetes.Watcher, error) {
@@ -48,13 +49,13 @@ func NewPodWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&pod{logger, cfg.CleanupTimeout, comm, scope})
+	watcher.AddEventHandler(&pod{logger, cfg.CleanupTimeout, comm, scope, cfg})
 
 	return watcher, nil
 }
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
-	data := generatePodData(pod)
+	data := generatePodData(pod, p.config)
 	data.mapping["scope"] = p.scope
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
@@ -72,7 +73,7 @@ func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Contai
 
 	providerDataChan := make(chan providerData)
 	done := make(chan bool, 1)
-	go generateContainerData(pod, containers, containerstatuses, providerDataChan, done)
+	go generateContainerData(pod, containers, containerstatuses, providerDataChan, done, p.config)
 
 	for {
 		select {
@@ -135,13 +136,28 @@ func (p *pod) OnDelete(obj interface{}) {
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
 }
 
-func generatePodData(pod *kubernetes.Pod) providerData {
+func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
 	//TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		if cfg.AnnotationsDedot {
+			annotation := common.DeDot(k)
+			annotations.Put(annotation, v)
+		} else {
+			safemapstr.Put(annotations, k, v)
+		}
+	}
+
+	labels := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetLabels() {
+		if cfg.LabelsDedot {
+			label := common.DeDot(k)
+			labels.Put(label, v)
+		} else {
+			safemapstr.Put(labels, k, v)
+		}
 	}
 
 	mapping := map[string]interface{}{
@@ -149,7 +165,7 @@ func generatePodData(pod *kubernetes.Pod) providerData {
 		"pod": map[string]interface{}{
 			"uid":         string(pod.GetUID()),
 			"name":        pod.GetName(),
-			"labels":      pod.GetLabels(),
+			"labels":      labels,
 			"annotations": annotations,
 			"ip":          pod.Status.PodIP,
 		},
@@ -173,7 +189,8 @@ func generateContainerData(
 	containers []kubernetes.Container,
 	containerstatuses []kubernetes.PodContainerStatus,
 	dataChan chan providerData,
-	done chan bool) {
+	done chan bool,
+	cfg *Config) {
 	//TODO: add metadata here too ie -> meta := s.metagen.Generate()
 
 	containerIDs := map[string]string{}
@@ -182,6 +199,16 @@ func generateContainerData(
 		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
 		containerIDs[c.Name] = cid
 		runtimes[c.Name] = runtime
+	}
+
+	labels := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetLabels() {
+		if cfg.LabelsDedot {
+			label := common.DeDot(k)
+			labels.Put(label, v)
+		} else {
+			safemapstr.Put(labels, k, v)
+		}
 	}
 
 	for _, c := range containers {
@@ -201,7 +228,7 @@ func generateContainerData(
 			"pod": map[string]interface{}{
 				"uid":    string(pod.GetUID()),
 				"name":   pod.GetName(),
-				"labels": pod.GetLabels(),
+				"labels": labels,
 				"ip":     pod.Status.PodIP,
 			},
 			"container": map[string]interface{}{

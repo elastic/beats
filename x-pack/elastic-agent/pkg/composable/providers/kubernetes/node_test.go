@@ -41,13 +41,15 @@ func TestGenerateNodeData(t *testing.T) {
 		},
 	}
 
-	data := generateNodeData(node)
+	data := generateNodeData(node, &Config{LabelsDedot: true, AnnotationsDedot: true})
 
 	mapping := map[string]interface{}{
 		"node": map[string]interface{}{
-			"uid":    string(node.GetUID()),
-			"name":   node.GetName(),
-			"labels": node.GetLabels(),
+			"uid":  string(node.GetUID()),
+			"name": node.GetName(),
+			"labels": common.MapStr{
+				"foo": "bar",
+			},
 			"annotations": common.MapStr{
 				"baz": "ban",
 			},

@@ -51,23 +51,20 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 
 // Run runs the kubernetes context provider.
 func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
-	if p.config.Resources.Pod != nil {
-		resourceConfig := p.config.Resources.Pod
-		err := p.watchResource(comm, "pod", resourceConfig)
+	if p.config.Resources.Pod.Enabled {
+		err := p.watchResource(comm, "pod", p.config)
 		if err != nil {
 			return err
 		}
 	}
-	if p.config.Resources.Node != nil {
-		resourceConfig := p.config.Resources.Node
-		err := p.watchResource(comm, "node", resourceConfig)
+	if p.config.Resources.Node.Enabled {
+		err := p.watchResource(comm, "node", p.config)
 		if err != nil {
 			return err
 		}
 	}
-	if p.config.Resources.Service != nil {
-		resourceConfig := p.config.Resources.Service
-		err := p.watchResource(comm, "service", resourceConfig)
+	if p.config.Resources.Service.Enabled {
+		err := p.watchResource(comm, "service", p.config)
 		if err != nil {
 			return err
 		}
@@ -80,8 +77,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 func (p *dynamicProvider) watchResource(
 	comm composable.DynamicProviderComm,
 	resourceType string,
-	resourceConfig *ResourceConfig) error {
-	client, err := kubernetes.GetKubernetesClient(resourceConfig.KubeConfig)
+	config *Config) error {
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes provider for resource %s skipped, unable to connect: %s", resourceType, err)
@@ -95,16 +92,16 @@ func (p *dynamicProvider) watchResource(
 		p.logger.Debugf(
 			"Initializing Kubernetes watcher for resource %s using node: %v",
 			resourceType,
-			resourceConfig.Node)
-		resourceConfig.Node = kubernetes.DiscoverKubernetesNode(
-			p.logger, resourceConfig.Node,
-			kubernetes.IsInCluster(resourceConfig.KubeConfig),
+			config.Node)
+		config.Node = kubernetes.DiscoverKubernetesNode(
+			p.logger, config.Node,
+			kubernetes.IsInCluster(config.KubeConfig),
 			client)
 	} else {
-		resourceConfig.Node = ""
+		config.Node = ""
 	}
 
-	watcher, err := p.newWatcher(resourceType, comm, client, resourceConfig)
+	watcher, err := p.newWatcher(resourceType, comm, client, config)
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher for resource %s", resourceType)
 	}
@@ -121,7 +118,7 @@ func (p *dynamicProvider) newWatcher(
 	resourceType string,
 	comm composable.DynamicProviderComm,
 	client k8s.Interface,
-	config *ResourceConfig) (kubernetes.Watcher, error) {
+	config *Config) (kubernetes.Watcher, error) {
 	switch resourceType {
 	case "pod":
 		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope)

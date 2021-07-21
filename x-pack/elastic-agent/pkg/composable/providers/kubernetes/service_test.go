@@ -45,13 +45,15 @@ func TestGenerateServiceData(t *testing.T) {
 		},
 	}
 
-	data := generateServiceData(service)
+	data := generateServiceData(service, &Config{LabelsDedot: true, AnnotationsDedot: true})
 
 	mapping := map[string]interface{}{
 		"service": map[string]interface{}{
-			"uid":    string(service.GetUID()),
-			"name":   service.GetName(),
-			"labels": service.GetLabels(),
+			"uid":  string(service.GetUID()),
+			"name": service.GetName(),
+			"labels": common.MapStr{
+				"foo": "bar",
+			},
 			"annotations": common.MapStr{
 				"baz": "ban",
 			},

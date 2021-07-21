@@ -43,14 +43,16 @@ func TestGeneratePodData(t *testing.T) {
 		Status: kubernetes.PodStatus{PodIP: "127.0.0.5"},
 	}
 
-	data := generatePodData(pod)
+	data := generatePodData(pod, &Config{LabelsDedot: true, AnnotationsDedot: true})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": map[string]interface{}{
-			"uid":    string(pod.GetUID()),
-			"name":   pod.GetName(),
-			"labels": pod.GetLabels(),
+			"uid":  string(pod.GetUID()),
+			"name": pod.GetName(),
+			"labels": common.MapStr{
+				"foo": "bar",
+			},
 			"annotations": common.MapStr{
 				"app": "production",
 			},
@@ -118,15 +120,22 @@ func TestGenerateContainerPodData(t *testing.T) {
 			ContainerID: "crio://asdfghdeadbeef",
 		},
 	}
-	go generateContainerData(pod, containers, containerStatuses, providerDataChan, done)
+	go generateContainerData(
+		pod,
+		containers,
+		containerStatuses,
+		providerDataChan,
+		done, &Config{LabelsDedot: true, AnnotationsDedot: true})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": map[string]interface{}{
-			"uid":    string(pod.GetUID()),
-			"name":   pod.GetName(),
-			"labels": pod.GetLabels(),
-			"ip":     pod.Status.PodIP,
+			"uid":  string(pod.GetUID()),
+			"name": pod.GetName(),
+			"labels": common.MapStr{
+				"foo": "bar",
+			},
+			"ip": pod.Status.PodIP,
 		},
 		"container": map[string]interface{}{
 			"id":      "asdfghdeadbeef",

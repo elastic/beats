@@ -18,7 +18,6 @@ type Config struct {
 	Scope     string    `config:"scope"`
 	Resources Resources `config:"resources"`
 
-	// expand config settings at root level of config too
 	KubeConfig     string        `config:"kube_config"`
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
@@ -26,24 +25,20 @@ type Config struct {
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
+
+	LabelsDedot      bool `config:"labels.dedot"`
+	AnnotationsDedot bool `config:"annotations.dedot"`
 }
 
 // Resources config section for resources' config blocks
 type Resources struct {
-	Pod     *ResourceConfig `config:"pod"`
-	Node    *ResourceConfig `config:"node"`
-	Service *ResourceConfig `config:"service"`
+	Pod     Enabled `config:"pod"`
+	Node    Enabled `config:"node"`
+	Service Enabled `config:"service"`
 }
 
-// ResourceConfig for kubernetes resource
-type ResourceConfig struct {
-	KubeConfig     string        `config:"kube_config"`
-	Namespace      string        `config:"namespace"`
-	SyncPeriod     time.Duration `config:"sync_period"`
-	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
-
-	// Needed when resource is a Pod or Node
-	Node string `config:"node"`
+type Enabled struct {
+	Enabled bool `config:"enabled"`
 }
 
 // InitDefaults initializes the default values for the config.
@@ -51,29 +46,21 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
+	c.Resources.Pod = Enabled{true}
+	c.Resources.Node = Enabled{true}
+	c.Resources.Service = Enabled{true}
+	c.LabelsDedot = true
+	c.AnnotationsDedot = true
 }
 
 // Validate ensures correctness of config
 func (c *Config) Validate() error {
 	// Check if resource is service. If yes then default the scope to "cluster".
-	if c.Resources.Service != nil {
+	if c.Resources.Service.Enabled {
 		if c.Scope == "node" {
 			logp.L().Warnf("can not set scope to `node` when using resource `Service`. resetting scope to `cluster`")
 		}
 		c.Scope = "cluster"
-	}
-	baseCfg := &ResourceConfig{
-		CleanupTimeout: c.CleanupTimeout,
-		SyncPeriod:     c.CleanupTimeout,
-		KubeConfig:     c.KubeConfig,
-		Namespace:      c.Namespace,
-		Node:           c.Node,
-	}
-	if c.Resources.Pod == nil {
-		c.Resources.Pod = baseCfg
-	}
-	if c.Resources.Node == nil {
-		c.Resources.Node = baseCfg
 	}
 
 	return nil

@@ -22,6 +22,7 @@ type service struct {
 	cleanupTimeout time.Duration
 	comm           composable.DynamicProviderComm
 	scope          string
+	config         *Config
 }
 
 type serviceData struct {
@@ -33,7 +34,7 @@ type serviceData struct {
 // NewServiceWatcher creates a watcher that can discover and process service objects
 func NewServiceWatcher(
 	comm composable.DynamicProviderComm,
-	cfg *ResourceConfig,
+	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
 	scope string) (kubernetes.Watcher, error) {
@@ -45,13 +46,16 @@ func NewServiceWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&service{logger, cfg.CleanupTimeout, comm, scope})
+	watcher.AddEventHandler(&service{logger, cfg.CleanupTimeout, comm, scope, cfg})
 
 	return watcher, nil
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
-	data := generateServiceData(service)
+	data := generateServiceData(service, s.config)
+	if data == nil {
+		return
+	}
 	data.mapping["scope"] = s.scope
 
 	// Emit the service
@@ -77,7 +81,6 @@ func (s *service) OnUpdate(obj interface{}) {
 		time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
 	} else {
 		s.logger.Debugf("Watcher Node update: %+v", obj)
-		s.emitStopped(service)
 		s.emitRunning(service)
 	}
 }
@@ -89,7 +92,7 @@ func (s *service) OnDelete(obj interface{}) {
 	time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
 }
 
-func generateServiceData(service *kubernetes.Service) *serviceData {
+func generateServiceData(service *kubernetes.Service, cfg *Config) *serviceData {
 	host := service.Spec.ClusterIP
 
 	// If a service doesn't have an IP then dont monitor it
@@ -102,14 +105,29 @@ func generateServiceData(service *kubernetes.Service) *serviceData {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+		if cfg.AnnotationsDedot {
+			annotation := common.DeDot(k)
+			annotations.Put(annotation, v)
+		} else {
+			safemapstr.Put(annotations, k, v)
+		}
+	}
+
+	labels := common.MapStr{}
+	for k, v := range service.GetObjectMeta().GetLabels() {
+		if cfg.LabelsDedot {
+			label := common.DeDot(k)
+			labels.Put(label, v)
+		} else {
+			safemapstr.Put(labels, k, v)
+		}
 	}
 
 	mapping := map[string]interface{}{
 		"service": map[string]interface{}{
 			"uid":         string(service.GetUID()),
 			"name":        service.GetName(),
-			"labels":      service.GetLabels(),
+			"labels":      labels,
 			"annotations": annotations,
 			"ip":          host,
 		},
