@@ -19,7 +19,10 @@ package timerqueue
 
 import (
 	"context"
+	"fmt"
 	"math/rand"
+	"os"
+	"runtime/pprof"
 	"sort"
 	"testing"
 	"time"
@@ -32,11 +35,24 @@ func TestQueueRunsInOrder(t *testing.T) {
 	var min time.Duration
 	var max time.Duration
 	var slow int
-	var times = []time.Duration{}
+	var failures int
 	for i := 0; i < 1000000; i++ {
 		start := time.Now()
 
+		sd := time.AfterFunc(time.Second*5, func() {
+			t.Logf("Stall detected!")
+			pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
+		})
+
 		testQueueRunsInOrderOnce(t)
+
+		sd.Stop()
+
+		res := false
+		//res := timerReset()
+		if res {
+			failures++
+		}
 
 		duration := time.Now().Sub(start)
 		if duration < min || min == 0 {
@@ -45,20 +61,44 @@ func TestQueueRunsInOrder(t *testing.T) {
 		if duration > max {
 			max = duration
 		}
-		if duration > time.Millisecond*5 {
+		if duration > time.Millisecond*5000 {
 			slow++
 		}
-		times = append(times, duration)
 
 		if i%1000 == 0 && i > 0 {
-			ninetyFifth := int(float64(len(times)) * 0.95)
-			t.Logf("count: %07d | min: %s\t | max: %s\t| slow: %d\t| @95th: %s\n", i, min, max, slow, times[ninetyFifth])
+			t.Logf("count: %07d | min/max: %s/%s\t| slow: %d\t| fail: %d\n", i, min, max, slow, failures)
 		}
 	}
 }
 
+func timerReset() bool {
+	t := time.NewTimer(time.Millisecond)
+
+	ran := []time.Time{}
+	var expired bool
+
+	ctx, _ := context.WithTimeout(context.TODO(), time.Second*5)
+
+	for len(ran) < 10 {
+		select {
+		case now := <-t.C:
+			ran = append(ran, now)
+			if false && !t.Stop() {
+				fmt.Printf("BLOCK\n")
+				<-t.C
+				fmt.Printf("UNB\n")
+			}
+			t.Reset(time.Nanosecond * -2)
+		case <-ctx.Done():
+			expired = true
+		}
+	}
+
+	return expired
+}
+
 func testQueueRunsInOrderOnce(t *testing.T) {
-	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, ctxCancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer ctxCancel()
 	tq := NewTimerQueue(ctx)
 

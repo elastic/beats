@@ -20,7 +20,14 @@ package timerqueue
 import (
 	"container/heap"
 	"context"
+	"runtime"
 	"time"
+)
+
+const (
+	T_INIT = iota
+	T_STARTED
+	T_CONSUMED
 )
 
 // timerTask represents a task run by the TimerQueue.
@@ -39,6 +46,7 @@ type TimerQueue struct {
 	nextRunAt *time.Time
 	pushCh    chan *timerTask
 	timer     *time.Timer
+	tstate    int
 }
 
 // NewTimerQueue creates a new instance.
@@ -48,6 +56,7 @@ func NewTimerQueue(ctx context.Context) *TimerQueue {
 		ctx:    ctx,
 		pushCh: make(chan *timerTask, 4096),
 		timer:  time.NewTimer(time.Hour * 86400),
+		tstate: T_INIT,
 	}
 	heap.Init(&tq.th)
 
@@ -69,13 +78,22 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // Start runs a goroutine within the given context that processes items in the queue, spawning a new goroutine
 // for each.
 func (tq *TimerQueue) Start() {
+	//tt := time.NewTimer(time.Second * 5)
+	//if tt == nil {
+	//}
 	go func() {
+		t := time.NewTimer(time.Hour * 999999)
 		for {
+			runtime.Gosched()
 			select {
+			//case <-tt.C:
+			//	panic("WHUT")
+			//fmt.Printf("SLOOOW\n")
 			case <-tq.ctx.Done():
 				// Stop the timerqueue
 				return
 			case now := <-tq.timer.C:
+				tq.tstate = T_CONSUMED
 				tasks := tq.popRunnable(now)
 
 				// Run the tasks in a separate goroutine so we can unblock the thread here for pushes etc.
@@ -89,6 +107,7 @@ func (tq *TimerQueue) Start() {
 					nr := tq.th[0].runAt
 					tq.nextRunAt = &nr
 					tq.timer.Reset(nr.Sub(time.Now()))
+					tq.tstate = T_STARTED
 				} else {
 					tq.timer.Stop()
 					tq.nextRunAt = nil
@@ -104,13 +123,23 @@ func (tq *TimerQueue) pushInternal(tt *timerTask) {
 	heap.Push(&tq.th, tt)
 
 	if tq.nextRunAt == nil || tq.nextRunAt.After(tt.runAt) {
-		// Stop and drain the timer prior to reset per https://golang.org/pkg/time/#Timer.Reset
-		// Only drain if nextRunAt is set, otherwise the timer channel has already been stopped the
-		// channel is empty (and thus would block)
-		if tq.nextRunAt != nil && !tq.timer.Stop() {
-			<-tq.timer.C
+		//fmt.Printf("T")
+		if tq.tstate == T_STARTED {
+			//fmt.Printf("S")
+			if !tq.timer.Stop() {
+				//fmt.Printf("D")
+				select {
+				case <-tq.timer.C:
+					//fmt.Printf("EXECIT\n")
+					break
+				default:
+				}
+			}
+			//fmt.Printf("X")
+
 		}
 		tq.timer.Reset(tt.runAt.Sub(time.Now()))
+		tq.tstate = T_STARTED
 
 		tq.nextRunAt = &tt.runAt
 	}
