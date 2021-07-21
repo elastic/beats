@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build go1.15
+// +build !go1.15
 
 package httpcommon
 
@@ -237,7 +237,6 @@ func (settings *HTTPTransportSettings) httpRoundTripper(
 ) (*http.Transport, error) {
 	t := http.DefaultTransport.(*http.Transport).Clone()
 	t.DialContext = nil
-	t.DialTLSContext = nil
 	t.Dial = dialer.Dial
 	t.DialTLS = tlsDialer.Dial
 	t.TLSClientConfig = tls.ToConfig()

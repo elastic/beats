@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build go1.15
+// +build !go1.15
 
 package tlscommon
 
@@ -109,6 +109,20 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		VerifyPeerCertificate: verifyPeerCertFn,
 		Time:                  c.time,
 	}
+}
+
+func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
+	if c == nil {
+		// use default TLS settings, if config is empty.
+		return &tls.Config{
+			ServerName:         host,
+			InsecureSkipVerify: true,
+		}
+	}
+
+	config := c.ToConfig()
+	config.ServerName = host
+	return config
 }
 
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.

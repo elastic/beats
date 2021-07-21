@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build go1.15
+// +build !go1.15
 
 package tlscommon
 
@@ -30,14 +30,13 @@ import (
 // ServerConfig defines the user configurable tls options for any TCP based service.
 type ServerConfig struct {
 	Enabled          *bool               `config:"enabled"`
-	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full', 'strict', 'certificate'
+	VerificationMode TLSVerificationMode `config:"verification_mode"` // one of 'none', 'full'
 	Versions         []TLSVersion        `config:"supported_protocols"`
-	CipherSuites     []CipherSuite       `config:"cipher_suites"`
+	CipherSuites     []tlsCipherSuite    `config:"cipher_suites"`
 	CAs              []string            `config:"certificate_authorities"`
 	Certificate      CertificateConfig   `config:",inline"`
 	CurveTypes       []tlsCurveType      `config:"curve_types"`
 	ClientAuth       tlsClientAuth       `config:"client_authentication"` //`none`, `optional` or `required`
-	CASha256         []string            `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
 }
 
 // LoadTLSServerConfig tranforms a ServerConfig into a `tls.Config` to be used directly with golang
@@ -88,10 +87,9 @@ func LoadTLSServerConfig(config *ServerConfig) (*TLSConfig, error) {
 		Verification:     config.VerificationMode,
 		Certificates:     certs,
 		ClientCAs:        cas,
-		CipherSuites:     config.CipherSuites,
+		CipherSuites:     cipherSuites,
 		CurvePreferences: curves,
 		ClientAuth:       tls.ClientAuthType(config.ClientAuth),
-		CASha256:         config.CASha256,
 	}, nil
 }
 
