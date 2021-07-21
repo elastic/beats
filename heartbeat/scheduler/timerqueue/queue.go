@@ -82,7 +82,6 @@ func (tq *TimerQueue) Start() {
 	//if tt == nil {
 	//}
 	go func() {
-		t := time.NewTimer(time.Hour * 999999)
 		for {
 			runtime.Gosched()
 			select {
