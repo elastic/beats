@@ -1,7 +1,12 @@
 {{ if eq .input "aws-s3" }}
 
 type: aws-s3
+if {{ .queue_url }}
 queue_url: {{ .queue_url }}
+{{ end }}
+if {{ .s3_bucket }}
+s3_bucket: {{ .s3_bucket }}
+{{ end }}
 
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}

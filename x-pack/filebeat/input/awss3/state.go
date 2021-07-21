@@ -6,16 +6,17 @@ package awss3
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
 // State is used to communicate the reading state of a file
 type State struct {
+	Id           string    `json:"id" struct:"id"`
 	Bucket       string    `json:"bucket" struct:"bucket"`
 	Key          string    `json:"key" struct:"key"`
 	LastModified time.Time `json:"last_modified" struct:"last_modifed"`
 	Size         int64     `json:"size" struct:"size"`
-	Offset       int64     `json:"offset" struct:"offset"`
 }
 
 // NewState creates a new s3 object state
@@ -25,14 +26,11 @@ func NewState(bucket, key string, size int64, lastModified time.Time) State {
 		Key:          key,
 		LastModified: lastModified,
 		Size:         size,
-		Offset:       0,
 	}
 
-	return s
-}
+	s.Id = s.Bucket + s.Key + strconv.FormatInt(s.Size, 10) + s.LastModified.String()
 
-func (s *State) Update(offset int64) {
-	s.Offset = offset
+	return s
 }
 
 // IsEqual checks if the two states point to the same file.
@@ -43,9 +41,10 @@ func (s *State) IsEqual(c *State) bool {
 // String returns string representation of the struct
 func (s *State) String() string {
 	return fmt.Sprintf(
-		"{Key: %v, Size: %v, Offset: %v, LastModified: %v}",
+		"{Id: %v, Bucket: %v, Key: %v, Size: %v, LastModified: %v}",
+		s.Id,
+		s.Bucket,
 		s.Key,
 		s.Size,
-		s.Offset,
 		s.LastModified)
 }

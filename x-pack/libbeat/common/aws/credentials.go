@@ -57,8 +57,10 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		Value: awsCredentials,
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	// Set default region if empty to make initial aws api call
+	if awsConfig.Region == "" {
+		awsConfig.Region = "us-east-1"
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
@@ -94,8 +96,10 @@ func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "external.LoadDefaultAWSConfig failed with shared credential profile given")
 	}
 
-	// Set default region to make initial aws api call
-	awsConfig.Region = "us-east-1"
+	// Set default region if empty to make initial aws api call
+	if awsConfig.Region == "" {
+		awsConfig.Region = "us-east-1"
+	}
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {

@@ -219,6 +219,7 @@
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
