@@ -192,11 +192,10 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			}
 
 			if test.name == "test value without inCluster, machine-id set, node found and env var not set" {
-				err := createNode(client)
+				err := createNode(client, "worker-2")
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer deleteNode(client)
 			}
 			var nodeName string
 			var error error
@@ -236,8 +235,8 @@ func deletePod(client kubernetes.Interface) error {
 	return nil
 }
 
-func createNode(client kubernetes.Interface) error {
-	node := getNodeObject()
+func createNode(client kubernetes.Interface, name string) error {
+	node := getNodeObject(name)
 
 	_, err := client.CoreV1().Nodes().Create(context.Background(), node, metav1.CreateOptions{})
 	if err != nil {
@@ -246,8 +245,7 @@ func createNode(client kubernetes.Interface) error {
 	return nil
 }
 
-func deleteNode(client kubernetes.Interface) error {
-	node := "worker-2"
+func deleteNode(client kubernetes.Interface, node string) error {
 
 	err := client.CoreV1().Nodes().Delete(context.Background(), node, metav1.DeleteOptions{})
 	if err != nil {
@@ -282,16 +280,16 @@ func getPodObject() *core.Pod {
 	}
 }
 
-func getNodeObject() *core.Node {
+func getNodeObject(name string) *core.Node {
 	return &core.Node{
 		ObjectMeta: metav1.ObjectMeta{
-			Name: "worker-2",
+			Name: name,
 			Labels: map[string]string{
-				"name": "worker-2",
+				"name": name,
 			},
 		},
 		Spec:   core.NodeSpec{},
-		Status: core.NodeStatus{NodeInfo: core.NodeSystemInfo{MachineID: "worker-2"}},
+		Status: core.NodeStatus{NodeInfo: core.NodeSystemInfo{MachineID: name}},
 	}
 }
 
