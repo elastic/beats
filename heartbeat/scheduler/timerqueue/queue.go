@@ -69,9 +69,6 @@ func (tq *TimerQueue) Push(runAt time.Time, fn TimerTaskFn) bool {
 // Start runs a goroutine within the given context that processes items in the queue, spawning a new goroutine
 // for each.
 func (tq *TimerQueue) Start() {
-	//tt := time.NewTimer(time.Second * 5)
-	//if tt == nil {
-	//}
 	go func() {
 		for {
 			select {
