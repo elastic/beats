@@ -141,7 +141,7 @@ func TestPod_Generate(t *testing.T) {
 			},
 		},
 		{
-			name: "test object with owner reference",
+			name: "test object with owner reference to Deployment",
 			input: &v1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
@@ -181,6 +181,61 @@ func TestPod_Generate(t *testing.T) {
 					},
 					"namespace": "default",
 					"deployment": common.MapStr{
+						"name": "owner",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
+				},
+			},
+		},
+		{
+			name: "test object with owner reference to DaemonSet",
+			input: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: namespace,
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{
+						"app": "production",
+					},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "DaemonSet",
+							Name:       "owner",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "v1",
+				},
+				Spec: v1.PodSpec{
+					NodeName: "testnode",
+				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
+			},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"daemonset": common.MapStr{
 						"name": "owner",
 					},
 					"node": common.MapStr{

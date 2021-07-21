@@ -122,7 +122,7 @@ processors:
 
   - set:
       field: json.ip_range
-      copy_from: json.entity.name
+      value: '{{{json.entity.name}}}'
       if: 'ctx.json.entity?.type == "IpAddress" && ctx.json.entity.name != null && ctx.json.entity.name.contains("/")'
   - set:
       field: json.ip_range
@@ -134,7 +134,7 @@ processors:
       if: 'ctx.threatintel?.indicator?.type == "ipv6-addr" && ctx.json.entity.name != null && !ctx.json.entity.name.contains("/")'
   - set:
       field: json.ip_range
-      copy_from: json.entity.name
+      value: '{{{json.entity.name}}}'
       if: 'ctx.json.entity?.type == "IpAddress" && ctx.json.entity.name != null && ctx.json.entity.name.contains("/")'
 
   - rename:

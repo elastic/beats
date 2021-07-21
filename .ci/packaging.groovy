@@ -138,7 +138,11 @@ pipeline {
                     'linux/amd64',
                     'linux/386',
                     'linux/arm64',
-                    'linux/armv7',
+                    // armv7 packaging isn't working, and we don't currently
+                    // need it for release. Do not re-enable it without
+                    // confirming it is fixed, you will break the packaging
+                    // pipeline!
+                    //'linux/armv7',
                     // The platforms above are disabled temporarly as crossbuild images are
                     // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
                     //'linux/ppc64le',
