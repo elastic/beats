@@ -46,9 +46,6 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
-	c.Resources.Pod = Enabled{true}
-	c.Resources.Node = Enabled{true}
-	c.Resources.Service = Enabled{true}
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
 }
@@ -61,6 +58,11 @@ func (c *Config) Validate() error {
 			logp.L().Warnf("can not set scope to `node` when using resource `Service`. resetting scope to `cluster`")
 		}
 		c.Scope = "cluster"
+	}
+
+	if !c.Resources.Pod.Enabled && !c.Resources.Node.Enabled && !c.Resources.Service.Enabled {
+		c.Resources.Pod = Enabled{true}
+		c.Resources.Node = Enabled{true}
 	}
 
 	return nil
