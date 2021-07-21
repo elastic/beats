@@ -23,7 +23,7 @@ import (
 
 // Stdin reads all incoming traffic from stdin and sends it directly to the output
 
-func (h *Harvester) openStdin() error {
+func (h *FileHarvester) openStdin() error {
 	h.source = Pipe{File: os.Stdin}
 
 	var err error

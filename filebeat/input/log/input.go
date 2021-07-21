@@ -512,7 +512,7 @@ func (p *Input) scan() {
 
 		// Decides if previous state exists
 		if lastState.IsEmpty() {
-			logp.Debug("input", "Start harvester for new file: %s, offset: %s", newState.Source, newState.Offset)
+			logp.Debug("input", "Start harvester for new file: %s, offset: %d", newState.Source, newState.Offset)
 			err := p.startHarvester(newState, 0)
 			if err == errHarvesterLimit {
 				logp.Debug("input", harvesterErrMsg, newState.Source, err)

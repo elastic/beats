@@ -55,6 +55,9 @@ var (
 		RecursiveGlob:  true,
 
 		// Harvester
+		ReuseHarvester: true,
+		ReuseMaxBytes:  100 * humanize.MiByte,
+
 		BufferSize: 16 * humanize.KiByte,
 		MaxBytes:   10 * humanize.MiByte,
 		LogConfig: LogConfig{
@@ -91,10 +94,12 @@ type config struct {
 	RecursiveGlob  bool            `config:"recursive_glob.enabled"`
 
 	// Harvester
-	BufferSize int    `config:"harvester_buffer_size"`
-	Encoding   string `config:"encoding"`
-	ScanOrder  string `config:"scan.order"`
-	ScanSort   string `config:"scan.sort"`
+	ReuseHarvester bool   `config:"reuse_harvester"`
+	ReuseMaxBytes  int64  `config:"reuse_max_bytes"`
+	BufferSize     int    `config:"harvester_buffer_size"`
+	Encoding       string `config:"encoding"`
+	ScanOrder      string `config:"scan.order"`
+	ScanSort       string `config:"scan.sort"`
 
 	ExcludeLines []match.Matcher   `config:"exclude_lines"`
 	IncludeLines []match.Matcher   `config:"include_lines"`
