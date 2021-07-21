@@ -19,18 +19,9 @@ package kubernetes
 
 import (
 	"context"
-	// "github.com/prashantv/gostub"
-
-	// "io/ioutil"
-	"os"
-	//"github.com/pkg/errors"
-
-	// "strings"
-
 	"fmt"
+	"os"
 	"testing"
-
-	//"github.com/pkg/errors"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -39,12 +30,6 @@ import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-
-	// restclient "k8s.io/client-go/rest"
-	// "k8s.io/client-go/tools/clientcmd"
-	// clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
-
-	// "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
