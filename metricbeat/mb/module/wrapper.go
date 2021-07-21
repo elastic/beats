@@ -218,7 +218,6 @@ func (msw *metricSetWrapper) startPeriodicFetching(reporter reporter) {
 			return
 		case <-t.C:
 			msw.fetch(reporter)
-			return // mando: hack here, run once only
 		}
 	}
 }
