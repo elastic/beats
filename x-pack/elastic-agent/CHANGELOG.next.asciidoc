@@ -122,3 +122,4 @@
 - Add proxy support to enroll command. {pull}26514[26514]
 - Enable configuring monitoring namespace {issue}26439[26439]
 - Communicate with Fleet Server over HTTP2. {pull}26474[26474]
+- Support Node and Service autodiscovery in kubernetes dynamic provider. {pull}26801[26801]
