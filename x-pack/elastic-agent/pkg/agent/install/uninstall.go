@@ -253,7 +253,7 @@ func applyDynamics(ctx context.Context, log *logger.Logger, cfg *config.Config) 
 		}
 		err = transpiler.Insert(ast, renderedInputs, "inputs")
 		if err != nil {
-			return nil, err
+			return nil, errors.New("inserting rendered inputs failed", err)
 		}
 	}
 

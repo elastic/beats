@@ -417,7 +417,7 @@ func bytesToInt(b []byte) int {
 
 func skipLeadZero(b []byte) []byte {
 	if len(b) > 1 && b[0] == '0' {
-		return b[1:len(b)]
+		return b[1:]
 	}
 	return b
 }

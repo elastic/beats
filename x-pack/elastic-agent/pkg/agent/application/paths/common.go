@@ -75,7 +75,7 @@ func Home() string {
 	if unversionedHome {
 		return topPath
 	}
-	return versionedHome(topPath)
+	return VersionedHome(topPath)
 }
 
 // IsVersionHome returns true if the Home path is versioned based on build.
@@ -134,6 +134,11 @@ func SetLogs(path string) {
 	logsPath = path
 }
 
+// VersionedHome returns a versioned path based on a TopPath and used commit.
+func VersionedHome(base string) string {
+	return filepath.Join(base, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
+}
+
 // initialTop returns the initial top-level path for the binary
 //
 // When nested in top-level/data/elastic-agent-${hash}/ the result is top-level/.
@@ -162,8 +167,4 @@ func retrieveExecutablePath() string {
 func insideData(exePath string) bool {
 	expectedPath := filepath.Join("data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
 	return strings.HasSuffix(exePath, expectedPath)
-}
-
-func versionedHome(base string) string {
-	return filepath.Join(base, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
 }

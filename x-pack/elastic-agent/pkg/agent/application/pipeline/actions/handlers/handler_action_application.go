@@ -9,13 +9,19 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 )
 
-const defaultActionTimeout = time.Minute
+const (
+	defaultActionTimeout = time.Minute
+	maxActionTimeout     = time.Hour
+)
+
+var errActionTimeoutInvalid = errors.New("action timeout is invalid")
 
 // AppAction is a handler for application actions.
 type AppAction struct {
@@ -24,9 +30,10 @@ type AppAction struct {
 }
 
 // NewAppAction creates a new AppAction handler.
-func NewAppAction(log *logger.Logger) *AppAction {
+func NewAppAction(log *logger.Logger, srv *server.Server) *AppAction {
 	return &AppAction{
 		log: log,
+		srv: srv,
 	}
 }
 
@@ -40,7 +47,11 @@ func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.F
 
 	appState, ok := h.srv.FindByInputType(action.InputType)
 	if !ok {
-		return fmt.Errorf("matching app is not found for action input: %s", action.InputType)
+		// If the matching action is not found ack the action with the error for action result document
+		action.StartedAt = time.Now().UTC().Format(time.RFC3339Nano)
+		action.CompletedAt = action.StartedAt
+		action.Error = fmt.Sprintf("matching app is not found for action input: %s", action.InputType)
+		return acker.Ack(ctx, action)
 	}
 
 	params, err := action.MarshalMap()
@@ -49,11 +60,25 @@ func (h *AppAction) Handle(ctx context.Context, a fleetapi.Action, acker store.F
 	}
 
 	start := time.Now().UTC()
-	res, err := appState.PerformAction(action.InputType, params, defaultActionTimeout)
+	timeout := defaultActionTimeout
+	if action.Timeout > 0 {
+		timeout = time.Duration(action.Timeout) * time.Second
+		if timeout > maxActionTimeout {
+			h.log.Debugf("handlerAppAction: action '%v' timeout exceeds maximum allowed %v", action.InputType, maxActionTimeout)
+			err = errActionTimeoutInvalid
+		}
+	}
+
+	var res map[string]interface{}
+	if err == nil {
+		h.log.Debugf("handlerAppAction: action '%v' started with timeout: %v", action.InputType, timeout)
+		res, err = appState.PerformAction(action.InputType, params, timeout)
+	}
 	end := time.Now().UTC()
 
 	startFormatted := start.Format(time.RFC3339Nano)
 	endFormatted := end.Format(time.RFC3339Nano)
+	h.log.Debugf("handlerAppAction: action '%v' finished, startFormatted: %v, endFormatted: %v, err: %v", action.InputType, startFormatted, endFormatted, err)
 	if err != nil {
 		action.StartedAt = startFormatted
 		action.CompletedAt = endFormatted

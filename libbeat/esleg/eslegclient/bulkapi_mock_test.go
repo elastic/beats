@@ -228,7 +228,6 @@ func TestEnforceParameters(t *testing.T) {
 			client, _ := NewConnection(ConnectionSettings{
 				Parameters: test.preconfigured,
 				URL:        "http://localhost",
-				Timeout:    0,
 			})
 
 			client.Encoder = NewJSONEncoder(nil, false)

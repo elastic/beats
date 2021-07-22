@@ -44,11 +44,12 @@ func New(
 
 func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace, routesFetchFn func() *sorted.Set, enableProcessStats bool) (*api.Server, error) {
 	r := mux.NewRouter()
-	r.Handle("/stats", createHandler(statsHandler(ns("stats"))))
+	statsHandler := statsHandler(ns("stats"))
+	r.Handle("/stats", createHandler(statsHandler))
 
 	if enableProcessStats {
 		r.HandleFunc("/processes", processesHandler(routesFetchFn))
-		r.Handle("/processes/{processID}", createHandler(processHandler()))
+		r.Handle("/processes/{processID}", createHandler(processHandler(statsHandler)))
 	}
 
 	mux := http.NewServeMux()

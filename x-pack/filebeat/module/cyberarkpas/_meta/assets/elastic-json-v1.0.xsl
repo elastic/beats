@@ -127,9 +127,23 @@
       <xsl:with-param name="to" select="'\n'"/>
     </xsl:call-template>
   </xsl:variable>
+  <xsl:variable name="tmp3">
+    <xsl:call-template name="string-replace">
+      <xsl:with-param name="string" select="$tmp2"/>
+      <xsl:with-param name="from" select="'&#xd;'"/>
+      <xsl:with-param name="to" select="'\r'"/>
+    </xsl:call-template>
+  </xsl:variable>
+  <xsl:variable name="tmp4">
+    <xsl:call-template name="string-replace">
+      <xsl:with-param name="string" select="$tmp3"/>
+      <xsl:with-param name="from" select="'&#x09;'"/>
+      <xsl:with-param name="to" select="'\t'"/>
+    </xsl:call-template>
+  </xsl:variable>
   <xsl:text>&quot;</xsl:text>
   <xsl:call-template name="string-replace">
-    <xsl:with-param name="string" select="translate($tmp2,'&#9;&#xd;','  ')"/>
+    <xsl:with-param name="string" select="$tmp4"/>
     <xsl:with-param name="from" select="'&quot;'"/>
     <xsl:with-param name="to" select="'\&quot;'"/>
   </xsl:call-template>

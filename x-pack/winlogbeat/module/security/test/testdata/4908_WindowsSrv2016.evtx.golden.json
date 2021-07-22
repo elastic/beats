@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4908,
+      "code": "4908",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -38,7 +38,7 @@
           "S-1-5-32-123-54-65"
         ]
       },
-      "event_id": 4908,
+      "event_id": "4908",
       "keywords": [
         "Audit Success"
       ],

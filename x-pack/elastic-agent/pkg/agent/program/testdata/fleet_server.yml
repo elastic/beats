@@ -11,6 +11,12 @@ fleet:
   host:
     id: host-agent-id
   server:
+    host: 127.0.0.1
+    port: 8822
+    ssl:
+      verification_mode: none
+    policy:
+      id: copy-policy-id
     output:
       elasticsearch:
         hosts: [ 127.0.0.1:9200, 127.0.0.1:9300 ]
@@ -31,4 +37,15 @@ inputs:
     type: fleet-server
     use_output: default
     data_stream:
-      type: default
+      namespace: default
+    name: fleet_server-1
+    revision: 6
+    server:
+      host: 0.0.0.0
+      port: 8220
+      limits:
+        max_connections: 40
+      runtime:
+        gc_percent: 50
+      timeouts:
+        read: 5m

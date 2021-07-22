@@ -11,7 +11,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input. Experimental.
+# * filestream: Improved version of log input
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -281,12 +281,26 @@ filebeat.inputs:
   # are matching any regular expression from the list. By default, no files are dropped.
   #prospector.scanner.exclude_files: ['.gz$']
 
+  # Include files. A list of regular expressions to match. Filebeat keeps only the files that
+  # are matching any regular expression from the list. By default, no files are dropped.
+  #prospector.scanner.include_files: ['/var/log/.*']
+
   # Expand "**" patterns into regular glob patterns.
   #prospector.scanner.recursive_glob: true
 
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
+
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
 
   ### State options
 
@@ -484,7 +498,6 @@ filebeat.inputs:
     #max_message_size: 10KiB
 
 # Accept RFC5424 formatted syslog event via TCP.
-# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
   #format: rfc5424

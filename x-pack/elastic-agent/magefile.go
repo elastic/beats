@@ -58,6 +58,9 @@ func init() {
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
+
+	devtools.Platforms = devtools.Platforms.Filter("!linux/386")
+	devtools.Platforms = devtools.Platforms.Filter("!windows/386")
 }
 
 // Default set to build everything by default.
@@ -303,10 +306,8 @@ func Package() {
 		packages string
 	}{
 		{"darwin/amd64", "darwin-x86_64.tar.gz"},
-		{"linux/386", "linux-x86.tar.gz"},
 		{"linux/amd64", "linux-x86_64.tar.gz"},
 		{"linux/arm64", "linux-arm64.tar.gz"},
-		{"windows/386", "windows-x86.zip"},
 		{"windows/amd64", "windows-x86_64.zip"},
 	}
 
@@ -565,6 +566,16 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
+		if runtime.GOARCH == "arm64" {
+			const platformsVar = "PLATFORMS"
+			oldPlatforms := os.Getenv(platformsVar)
+			os.Setenv(platformsVar, runtime.GOOS+"/"+runtime.GOARCH)
+			if oldPlatforms != "" {
+				defer os.Setenv(platformsVar, oldPlatforms)
+			} else {
+				defer os.Unsetenv(oldPlatforms)
+			}
+		}
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)

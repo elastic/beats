@@ -213,6 +213,72 @@
       description: >
         The URL.
 
+    - name: suspicious_activity
+      description: >
+        The suspicious activity fields from the debug data.
+      type: group
+      fields:
+
+        - name: browser
+          type: keyword
+          description: >
+            The browser used.
+
+        - name: event_city
+          type: keyword
+          description: >
+            The city where the suspicious activity took place.
+
+        - name: event_country
+          type: keyword
+          description: >
+            The country where the suspicious activity took place.
+
+        - name: event_id
+          type: keyword
+          description: >
+            The event ID.
+
+        - name: event_ip
+          type: ip
+          description: >
+            The IP of the suspicious event.
+
+        - name: event_latitude
+          type: float
+          description: >
+            The latitude where the suspicious activity took place.
+
+        - name: event_longitude
+          type: float
+          description: >
+            The longitude where the suspicious activity took place.
+
+        - name: event_state
+          type: keyword
+          description: >
+            The state where the suspicious activity took place.
+
+        - name: event_transaction_id
+          type: keyword
+          description: >
+            The event transaction ID.
+
+        - name: event_type
+          type: keyword
+          description: >
+            The event type.
+
+        - name: os
+          type: keyword
+          description: >
+            The OS of the system from where the suspicious activity occured.
+
+        - name: timestamp
+          type: date
+          description: >
+            The timestamp of when the activity occurred.
+
 - name: authentication_context
   title: Authentication Context
   short: Fields that let you store information about authentication context.

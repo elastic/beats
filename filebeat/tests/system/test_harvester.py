@@ -370,7 +370,7 @@ class Test(BaseTest):
         # Wait until harvester is closed
         self.wait_until(
             lambda: self.log_contains(
-                "Stopping harvester for file"),
+                "Stopping harvester."),
             max_timeout=15)
 
         # Write 1 line -> truncation

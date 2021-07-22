@@ -58,8 +58,8 @@
         "source.port": 0,
         "source.user.email": "firewall@firewallgate.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -147,8 +147,8 @@
         "source.port": 52742,
         "source.user.email": "telekommunikation@constant-big.email",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -184,9 +184,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -238,8 +238,8 @@
         "source.port": 51789,
         "source.user.email": "ripxfc@17buddies.net",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -275,9 +275,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -326,8 +326,8 @@
         "source.port": 55002,
         "source.user.email": "SHERIF.TOBGI@ELTOBGI.COM",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -353,9 +353,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -397,8 +397,8 @@
         "source.port": 22420,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -424,9 +424,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -468,8 +468,8 @@
         "source.port": 58043,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -495,9 +495,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -539,8 +539,8 @@
         "source.port": 60134,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -608,8 +608,8 @@
         "source.port": 60298,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -634,9 +634,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -674,8 +674,8 @@
         "source.ip": "10.198.16.121",
         "source.port": 60392,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -701,9 +701,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -744,8 +744,8 @@
         "source.port": 60608,
         "source.user.email": "pankhil1@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -771,9 +771,9 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -816,8 +816,8 @@
         "source.port": 22333,
         "source.user.email": "gaurav1@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -75,6 +76,7 @@ func TestReadLine(t *testing.T) {
 	source := File{File: readFile}
 
 	h := Harvester{
+		logger: logp.NewLogger("harvester"),
 		config: config{
 			LogConfig: LogConfig{
 				CloseInactive: 500 * time.Millisecond,

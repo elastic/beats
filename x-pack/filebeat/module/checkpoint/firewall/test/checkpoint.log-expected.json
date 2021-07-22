@@ -120,8 +120,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -242,8 +242,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -306,8 +306,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -361,8 +361,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -425,8 +425,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -480,8 +480,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -544,8 +544,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -599,8 +599,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -663,8 +663,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.81.142.43"
+            "104.81.142.43",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
@@ -718,8 +718,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -782,8 +782,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -837,8 +837,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -901,8 +901,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -956,8 +956,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1020,8 +1020,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -1075,8 +1075,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1139,8 +1139,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -1194,8 +1194,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1258,8 +1258,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -1313,8 +1313,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1377,8 +1377,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -1432,8 +1432,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1496,8 +1496,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -1551,8 +1551,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1615,8 +1615,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -1670,8 +1670,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1734,8 +1734,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -1789,8 +1789,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1853,8 +1853,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -1908,8 +1908,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -1972,8 +1972,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -2027,8 +2027,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2091,8 +2091,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -2146,8 +2146,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2258,8 +2258,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -2408,8 +2408,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2516,8 +2516,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2580,8 +2580,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -2635,8 +2635,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2699,8 +2699,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -2754,8 +2754,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2818,8 +2818,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -2873,8 +2873,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -2937,8 +2937,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -2992,8 +2992,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3056,8 +3056,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -3111,8 +3111,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3175,8 +3175,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -3278,8 +3278,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3342,8 +3342,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -3397,8 +3397,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3461,8 +3461,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -3516,8 +3516,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3580,8 +3580,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -3635,8 +3635,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3699,8 +3699,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -3754,8 +3754,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3818,8 +3818,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -3883,8 +3883,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -3938,8 +3938,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -3992,8 +3992,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4056,8 +4056,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -4111,8 +4111,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4175,8 +4175,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -4379,8 +4379,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4433,8 +4433,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4497,8 +4497,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.81.142.43"
+            "104.81.142.43",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.81.142.43",
@@ -4552,8 +4552,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4616,8 +4616,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -4671,8 +4671,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4735,8 +4735,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -4790,8 +4790,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4854,8 +4854,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -4909,8 +4909,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -4973,8 +4973,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -5028,8 +5028,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5092,8 +5092,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",
@@ -5147,8 +5147,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5211,8 +5211,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -5266,8 +5266,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5330,8 +5330,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.41"
+            "192.124.249.41",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.41",
@@ -5385,8 +5385,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5449,8 +5449,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.36"
+            "192.124.249.36",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.36",
@@ -5504,8 +5504,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5568,8 +5568,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "104.99.234.45"
+            "104.99.234.45",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "104.99.234.45",
@@ -5623,8 +5623,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.168.1.1",
@@ -5687,8 +5687,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Checkpoint",
         "related.ip": [
-            "192.168.1.100",
-            "192.124.249.31"
+            "192.124.249.31",
+            "192.168.1.100"
         ],
         "rule.uuid": "1fde807b-6300-4b1a-914f-f1c1f3e2e7d2",
         "server.ip": "192.124.249.31",

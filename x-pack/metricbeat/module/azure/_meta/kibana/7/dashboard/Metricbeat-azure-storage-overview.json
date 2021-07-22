@@ -494,7 +494,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.storage.usedcapacity.avg",
+                    "field": "azure.storage.used_capacity.avg",
                     "id": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                     "type": "avg"
                   }
@@ -1138,7 +1138,7 @@
                 "line_width": 2,
                 "metrics": [
                   {
-                    "field": "azure.storage.usedcapacity.avg",
+                    "field": "azure.storage.used_capacity.avg",
                     "id": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
                     "type": "avg"
                   }

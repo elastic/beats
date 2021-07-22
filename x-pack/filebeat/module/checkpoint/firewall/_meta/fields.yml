@@ -807,7 +807,7 @@
       type: keyword
       overwrite: true
       description: >
-        Scan duration.      
+        Scan duration.
 
     - name: dlp_fingerprint_long_status
       type: keyword
@@ -861,7 +861,7 @@
       type: keyword
       overwrite: true
       description: >
-        Next scan scheduled time according to time object.     
+        Next scan scheduled time according to time object.
 
     - name: dlp_repository_scanned_total_size
       type: integer
@@ -1890,7 +1890,7 @@
         Reports whether watermark is added to the cleaned file.
 
     - name: source_object
-      type: integer
+      type: keyword
       overwrite: true
       description: >
         Matched object name on source column.
@@ -1948,6 +1948,12 @@
       overwrite: true
       description: >
         Connection drop reason.
+
+    - name: action_reason_msg
+      type: keyword
+      overwrite: true
+      description: >
+        Connection drop reason message.
 
     - name: c_bytes
       type: integer

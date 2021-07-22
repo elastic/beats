@@ -51,7 +51,7 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *common.Config,
 ) (outputs.Group, error) {
-	config := defaultConfig
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)
 	}
@@ -84,6 +84,7 @@ func (out *fileOutput) init(beat beat.Info, c config) error {
 	var err error
 	out.rotator, err = file.NewFileRotator(
 		path,
+		file.Suffix(c.Suffix),
 		file.MaxSizeBytes(c.RotateEveryKb*1024),
 		file.MaxBackups(c.NumberOfFiles),
 		file.Permissions(os.FileMode(c.Permissions)),

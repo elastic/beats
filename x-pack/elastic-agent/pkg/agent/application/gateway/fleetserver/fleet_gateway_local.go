@@ -52,15 +52,18 @@ func New(
 	cfg *configuration.FleetAgentConfig,
 	rawConfig *config.Config,
 	wrapped gateway.FleetGateway,
-	emitter pipeline.EmitterFunc) (gateway.FleetGateway, error) {
-	if cfg.Server == nil {
+	emitter pipeline.EmitterFunc,
+	injectServer bool) (gateway.FleetGateway, error) {
+	if cfg.Server == nil || !injectServer {
 		// not running a local Fleet Server
 		return wrapped, nil
 	}
+
 	injectedCfg, err := injectFleetServer(rawConfig)
 	if err != nil {
 		return nil, errors.New(err, "failed to inject fleet-server input to start local Fleet Server", errors.TypeConfig)
 	}
+
 	return &fleetServerWrapper{
 		bgContext:   ctx,
 		log:         log,

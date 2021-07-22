@@ -98,7 +98,7 @@ func (e Event) Fields() common.MapStr {
 	win := common.MapStr{}
 
 	AddOptional(win, "channel", e.Channel)
-	AddOptional(win, "event_id", e.EventIdentifier.ID)
+	AddOptional(win, "event_id", fmt.Sprint(e.EventIdentifier.ID))
 	AddOptional(win, "provider_name", e.Provider.Name)
 	AddOptional(win, "record_id", e.RecordID)
 	AddOptional(win, "task", e.Task)

@@ -23,8 +23,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -82,8 +82,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -141,8 +141,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -200,8 +200,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -259,8 +259,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -318,8 +318,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -376,8 +376,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -435,8 +435,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -495,8 +495,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -555,8 +555,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -612,8 +612,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",
@@ -669,8 +669,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.name": "VAULT",

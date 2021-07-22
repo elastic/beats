@@ -66,6 +66,7 @@ var gauges = map[string]bool{
 // TODO: Change this when gauges are refactored, too.
 var strConsts = map[string]bool{
 	"beat.info.ephemeral_id": true,
+	"beat.info.version":      true,
 }
 
 var (

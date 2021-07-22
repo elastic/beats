@@ -154,20 +154,22 @@ func (p *processor) buildFlow(event *beat.Event) *flowhash.Flow {
 		if err != nil {
 			return nil
 		}
-		flow.SourcePort, ok = tryToUint16(v)
-		if !ok || flow.SourcePort == 0 {
+		sp, ok := tryToUint(v)
+		if !ok || sp < 1 || sp > 65535 {
 			return nil
 		}
+		flow.SourcePort = uint16(sp)
 
 		// destination port
 		v, err = event.GetValue(p.Fields.DestinationPort)
 		if err != nil {
 			return nil
 		}
-		flow.DestinationPort, ok = tryToUint16(v)
-		if !ok || flow.DestinationPort == 0 {
+		dp, ok := tryToUint(v)
+		if !ok || dp < 1 || dp > 65535 {
 			return nil
 		}
+		flow.DestinationPort = uint16(dp)
 	case icmpProtocol, icmpIPv6Protocol:
 		// Return a flow even if the ICMP type/code is unavailable.
 		if t, c, ok := getICMPTypeCode(event, p.Fields.ICMPType, p.Fields.ICMPCode); ok {
@@ -211,43 +213,43 @@ func tryToIP(from interface{}) (net.IP, bool) {
 	}
 }
 
-// tryToUint16 tries to coerce the given interface to an uint16. On success it
+// tryToUint tries to coerce the given interface to an uint16. On success it
 // returns the int value and true.
-func tryToUint16(from interface{}) (uint16, bool) {
+func tryToUint(from interface{}) (uint, bool) {
 	switch v := from.(type) {
 	case int:
-		return uint16(v), true
+		return uint(v), true
 	case int8:
-		return uint16(v), true
+		return uint(v), true
 	case int16:
-		return uint16(v), true
+		return uint(v), true
 	case int32:
-		return uint16(v), true
+		return uint(v), true
 	case int64:
-		return uint16(v), true
+		return uint(v), true
 	case uint:
-		return uint16(v), true
+		return uint(v), true
 	case uint8:
-		return uint16(v), true
+		return uint(v), true
 	case uint16:
-		return v, true
+		return uint(v), true
 	case uint32:
-		return uint16(v), true
+		return uint(v), true
 	case uint64:
-		return uint16(v), true
+		return uint(v), true
 	case string:
-		num, err := strconv.ParseUint(v, 0, 16)
+		num, err := strconv.ParseUint(v, 0, 64)
 		if err != nil {
 			return 0, false
 		}
-		return uint16(num), true
+		return uint(num), true
 	default:
 		return 0, false
 	}
 }
 
 func tryToUint8(from interface{}) (uint8, bool) {
-	to, ok := tryToUint16(from)
+	to, ok := tryToUint(from)
 	return uint8(to), ok
 }
 

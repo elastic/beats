@@ -69,7 +69,7 @@ type instantVectorResult struct {
 	Vector []interface{}     `json:"value"`
 }
 
-// InstantVectorResponse is for "vector" type from Prometheus Query API Request
+// RangeVectorResponse is for "vector" type from Prometheus Query API Request
 // rangeVectorResult format:
 // [
 //  {

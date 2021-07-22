@@ -16,8 +16,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
@@ -29,8 +29,8 @@
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
-            "192.168.86.167",
-            "192.168.86.1"
+            "192.168.86.1",
+            "192.168.86.167"
         ],
         "service.type": "zeek",
         "source.address": "192.168.86.167",
@@ -39,9 +39,9 @@
         "source.packets": 1,
         "source.port": 38339,
         "tags": [
-            "zeek.connection",
             "local_orig",
-            "local_resp"
+            "local_resp",
+            "zeek.connection"
         ],
         "zeek.connection.history": "Dd",
         "zeek.connection.local_orig": true,
@@ -75,8 +75,8 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
@@ -98,8 +98,8 @@
         "source.packets": 1,
         "source.port": 38340,
         "tags": [
-            "zeek.connection",
-            "local_orig"
+            "local_orig",
+            "zeek.connection"
         ],
         "zeek.connection.history": "Dd",
         "zeek.connection.local_orig": true,
@@ -133,14 +133,14 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "start",
-            "end"
+            "end",
+            "start"
         ],
         "fileset.name": "connection",
         "input.type": "log",
         "log.offset": 792,
         "network.bytes": 309,
-        "network.community_id": "1:9xAq+MIBct9Is73ErTrU/RZ+Nq0=",
+        "network.community_id": "1:7pTO7SRt6R5Ms7DZet2wPuZnXSs=",
         "network.direction": "external",
         "network.packets": 2,
         "network.protocol": "dns",
@@ -161,7 +161,7 @@
         "source.geo.location.lon": -97.822,
         "source.ip": "4.4.2.2",
         "source.packets": 1,
-        "source.port": 383341,
+        "source.port": 38341,
         "tags": [
             "zeek.connection"
         ],
@@ -192,7 +192,7 @@
         ],
         "fileset.name": "connection",
         "input.type": "log",
-        "log.offset": 1181,
+        "log.offset": 1180,
         "network.bytes": 107,
         "network.community_id": "1:gzTID87+KHoT4RFDSqb5aInTPeg=",
         "network.direction": "external",
@@ -218,5 +218,60 @@
         "zeek.connection.state": "OTH",
         "zeek.connection.state_message": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
         "zeek.session_id": "Cc6NJ3GRlfjE44I3h"
+    },
+    {
+        "@timestamp": "2021-06-09T20:55:13.160Z",
+        "destination.address": "172.217.9.68",
+        "destination.as.number": 15169,
+        "destination.as.organization.name": "Google LLC",
+        "destination.bytes": 0,
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "172.217.9.68",
+        "destination.packets": 0,
+        "destination.port": 80,
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "zeek.connection",
+        "event.id": "C2KP1V3alRLoxl4JB9",
+        "event.kind": "event",
+        "event.module": "zeek",
+        "event.type": [
+            "connection",
+            "info"
+        ],
+        "fileset.name": "connection",
+        "input.type": "log",
+        "log.offset": 1488,
+        "network.bytes": 0,
+        "network.community_id": "1:DzqI9CYXjMSYV8VoSAHtMNfMIeU=",
+        "network.direction": "outbound",
+        "network.packets": 0,
+        "network.transport": "tcp",
+        "related.ip": [
+            "10.0.2.15",
+            "172.217.9.68"
+        ],
+        "service.type": "zeek",
+        "source.address": "10.0.2.15",
+        "source.bytes": 0,
+        "source.ip": "10.0.2.15",
+        "source.packets": 0,
+        "source.port": 46408,
+        "tags": [
+            "local_orig",
+            "zeek.connection"
+        ],
+        "zeek.connection.history": "C",
+        "zeek.connection.local_orig": true,
+        "zeek.connection.local_resp": false,
+        "zeek.connection.missed_bytes": 0,
+        "zeek.connection.state": "OTH",
+        "zeek.connection.state_message": "No SYN seen, just midstream traffic (a 'partial connection' that was not later closed).",
+        "zeek.session_id": "C2KP1V3alRLoxl4JB9"
     }
 ]

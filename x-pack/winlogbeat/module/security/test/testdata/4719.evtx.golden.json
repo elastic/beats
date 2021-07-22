@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4719,
+      "code": "4719",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -52,7 +52,7 @@
         "SubjectUserName": "WIN-41OB2LO92CR$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4719,
+      "event_id": "4719",
       "keywords": [
         "Audit Success"
       ],

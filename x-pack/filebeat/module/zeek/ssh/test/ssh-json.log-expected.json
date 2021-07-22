@@ -20,11 +20,12 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:42tg9bemt74qgrdvJOy2n5Veg4A=",
+        "network.direction": "internal",
         "network.protocol": "ssh",
         "network.transport": "tcp",
         "related.ip": [
-            "192.168.1.2",
-            "192.168.1.1"
+            "192.168.1.1",
+            "192.168.1.2"
         ],
         "service.type": "zeek",
         "source.address": "192.168.1.2",

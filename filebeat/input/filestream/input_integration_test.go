@@ -80,6 +80,8 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 }
 
 func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/26608")
+
 	if runtime.GOOS == "windows" {
 		t.Skip("renaming files while Filebeat is running is not supported on Windows")
 	}
@@ -868,8 +870,9 @@ func TestFilestreamTruncate(t *testing.T) {
 		"paths": []string{
 			env.abspath("*"),
 		},
-		"prospector.scanner.check_interval": "1ms",
-		"prospector.scanner.symlinks":       "true",
+		"prospector.scanner.check_interval":  "1ms",
+		"prospector.scanner.resend_on_touch": "true",
+		"prospector.scanner.symlinks":        "true",
 	})
 
 	lines := []byte("first line\nsecond line\nthird line\n")
@@ -895,8 +898,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	moreLines := []byte("forth line\nfifth line\n")
 	env.mustWriteLinesToFile(testlogName, moreLines)
 
-	env.waitUntilEventCount(5)
-	env.requireOffsetInRegistry(testlogName, len(moreLines))
+	env.waitUntilOffsetInRegistry(testlogName, len(moreLines))
 
 	cancelInput()
 	env.waitUntilInputStops()

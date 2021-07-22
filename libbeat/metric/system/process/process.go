@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	sysinfo "github.com/elastic/go-sysinfo"
 	sigar "github.com/elastic/gosigar"
 	"github.com/elastic/gosigar/cgroup"
 )
@@ -234,15 +234,11 @@ func getProcEnv(pid int, out common.MapStr, filter func(v string) bool) error {
 	return nil
 }
 
+// GetProcMemPercentage returns process memory usage as a percent of total memory usage
 func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 	// in unit tests, total_phymem is set to a value greater than zero
 	if totalPhyMem == 0 {
-		memStat, err := memory.Get()
-		if err != nil {
-			logp.Warn("Getting memory details: %v", err)
-			return 0
-		}
-		totalPhyMem = memStat.Mem.Total
+		return 0
 	}
 
 	perc := (float64(proc.Mem.Resident) / float64(totalPhyMem))
@@ -250,6 +246,7 @@ func GetProcMemPercentage(proc *Process, totalPhyMem uint64) float64 {
 	return common.Round(perc, 4)
 }
 
+// Pids returns a list of PIDs
 func Pids() ([]int, error) {
 	pids := sigar.ProcList{}
 	err := pids.Get()
@@ -290,6 +287,22 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 }
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
+	// This is a holdover until we migrate this library to metricbeat/internal
+	// At which point we'll use the memory code there.
+	var totalPhyMem uint64
+	host, err := sysinfo.Host()
+	if err != nil {
+		logp.Warn("Getting host details: %v", err)
+	} else {
+		memStats, err := host.Memory()
+		if err != nil {
+			logp.Warn("Getting memory details: %v", err)
+		} else {
+			totalPhyMem = memStats.Total
+		}
+
+	}
+
 	proc := common.MapStr{
 		"pid":      process.Pid,
 		"ppid":     process.Ppid,
@@ -301,7 +314,7 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 			"size": process.Mem.Size,
 			"rss": common.MapStr{
 				"bytes": process.Mem.Resident,
-				"pct":   GetProcMemPercentage(process, 0 /* read total mem usage */),
+				"pct":   GetProcMemPercentage(process, totalPhyMem),
 			},
 			"share": process.Mem.Share,
 		},

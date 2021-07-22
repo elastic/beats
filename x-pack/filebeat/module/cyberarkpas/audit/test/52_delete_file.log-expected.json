@@ -39,8 +39,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -91,8 +91,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -195,11 +195,11 @@
     {
         "@timestamp": "2021-03-11T19:32:12.000Z",
         "cyberarkpas.audit.action": "Delete File",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_1": "",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_2": "",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_3": "",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_4": "",
-        "cyberarkpas.audit.ca_properties.__psm_live_sessions_5": "",
+        "cyberarkpas.audit.ca_properties.other.__psm_live_sessions_1": "",
+        "cyberarkpas.audit.ca_properties.other.__psm_live_sessions_2": "",
+        "cyberarkpas.audit.ca_properties.other.__psm_live_sessions_3": "",
+        "cyberarkpas.audit.ca_properties.other.__psm_live_sessions_4": "",
+        "cyberarkpas.audit.ca_properties.other.__psm_live_sessions_5": "",
         "cyberarkpas.audit.desc": "Delete File",
         "cyberarkpas.audit.file": "Root\\PSMPApp_VAGRANT.LiveSessions",
         "cyberarkpas.audit.iso_timestamp": "2021-03-11T19:32:12Z",
@@ -280,8 +280,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -330,8 +330,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -380,8 +380,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -434,8 +434,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",
@@ -488,8 +488,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "service.type": "cyberarkpas",
         "source.address": "127.0.0.1",

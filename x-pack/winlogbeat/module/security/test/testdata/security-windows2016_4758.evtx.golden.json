@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4758,
+      "code": "4758",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -49,7 +49,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1113",
         "TargetUserName": "Test_group3v2"
       },
-      "event_id": 4758,
+      "event_id": "4758",
       "keywords": [
         "Audit Success"
       ],

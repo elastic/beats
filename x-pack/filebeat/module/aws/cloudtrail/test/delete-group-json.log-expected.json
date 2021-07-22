@@ -26,8 +26,8 @@
         "event.outcome": "success",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "deletion"
+            "deletion",
+            "group"
         ],
         "fileset.name": "cloudtrail",
         "group.name": "TEST-GROUP",
@@ -74,8 +74,8 @@
         "event.outcome": "failure",
         "event.provider": "iam.amazonaws.com",
         "event.type": [
-            "group",
-            "deletion"
+            "deletion",
+            "group"
         ],
         "fileset.name": "cloudtrail",
         "group.name": "TEST-GROUP",

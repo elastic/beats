@@ -28,7 +28,11 @@
     #var.oauth2.client.secret: ""
 
     # Oauth Token URL, should include the tenant ID
-    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
+    
+    # Related scopes, default should be included
+    #var.oauth2.scopes:
+    #  - "https://api.security.microsoft.com/.default"
   dhcp:
     enabled: true
 

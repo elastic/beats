@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/weird.log
   - name: tags
     default: [zeek.weird]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/weird.yml

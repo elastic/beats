@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4670,
+      "code": "4670",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -57,7 +57,7 @@
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4670,
+      "event_id": "4670",
       "keywords": [
         "Audit Success"
       ],

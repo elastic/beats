@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 1104,
+      "code": "1104",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -25,7 +25,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1104,
+      "event_id": "1104",
       "keywords": [
         "Audit Success"
       ],

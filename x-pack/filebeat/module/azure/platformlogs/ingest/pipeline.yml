@@ -51,17 +51,30 @@ processors:
     field:
       - azure.platformlogs.EventProperties
     ignore_missing: true
+- json:
+    field: azure.platformlogs.properties.log
+    target_field: azure.platformlogs.properties.log
+    ignore_failure: true
+- rename:
+    field: azure.platformlogs.properties.log
+    if: "ctx.azure?.platformlogs?.properties?.log != null && ctx.azure?.platformlogs?.properties?.log instanceof String"
+    target_field: message
+    ignore_missing: true
 - rename:
     field: azure.platformlogs.EventName
     target_field: event.action
     ignore_missing: true
-- rename:
-    field: azure.platformlogs.properties.log
-    target_field: message
-    ignore_missing: true
-- rename:
+- grok:
     field: azure.platformlogs.callerIpAddress
-    target_field: source.ip
+    patterns:
+      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
+      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      - "%{IPORHOST:source.ip}"
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: azure.platformlogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
     ignore_missing: true
 - set:
     field: client.ip
@@ -174,10 +187,6 @@ processors:
       }
       def hm = new HashMap(params.get(ctx.azure.platformlogs.category.toLowerCase()));
       hm.forEach((k, v) -> ctx.event[k] = v);
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
 - geoip:
     database_file: GeoLite2-ASN.mmdb
     field: source.ip

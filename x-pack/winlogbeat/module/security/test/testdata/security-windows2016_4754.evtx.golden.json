@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4754,
+      "code": "4754",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1113",
         "TargetUserName": "Test_group3"
       },
-      "event_id": 4754,
+      "event_id": "4754",
       "keywords": [
         "Audit Success"
       ],

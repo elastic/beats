@@ -70,6 +70,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
+  * <<filebeat-module-zookeeper>>
   * <<filebeat-module-zoom>>
   * <<filebeat-module-zscaler>>
 
@@ -144,5 +145,6 @@ include::modules/threatintel.asciidoc[]
 include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
+include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]
 include::modules/zscaler.asciidoc[]

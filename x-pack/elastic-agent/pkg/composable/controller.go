@@ -43,7 +43,6 @@ type controller struct {
 // New creates a new controller.
 func New(log *logger.Logger, c *config.Config) (Controller, error) {
 	l := log.Named("composable")
-	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
 	if c != nil {

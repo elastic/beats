@@ -121,25 +121,27 @@ func TestPod_Generate(t *testing.T) {
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"app": "production",
-				},
-				"namespace": "default",
-				"node": common.MapStr{
-					"name": "testnode",
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
+					"namespace": "default",
+					"node": common.MapStr{
+						"name": "testnode",
+					},
 				},
 			},
 		},
 		{
-			name: "test object with owner reference",
+			name: "test object with owner reference to Deployment",
 			input: &v1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      name,
@@ -171,23 +173,80 @@ func TestPod_Generate(t *testing.T) {
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "owner",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
 				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "owner",
+			},
+		},
+		{
+			name: "test object with owner reference to DaemonSet",
+			input: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: namespace,
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{
+						"app": "production",
+					},
+					OwnerReferences: []metav1.OwnerReference{
+						{
+							APIVersion: "apps",
+							Kind:       "DaemonSet",
+							Name:       "owner",
+							UID:        "005f3b90-4b9d-12f8-acf0-31020a840144",
+							Controller: &boolean,
+						},
+					},
 				},
-				"node": common.MapStr{
-					"name": "testnode",
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "v1",
 				},
-				"labels": common.MapStr{
-					"foo": "bar",
+				Spec: v1.PodSpec{
+					NodeName: "testnode",
 				},
-				"annotations": common.MapStr{
-					"app": "production",
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
+			},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"daemonset": common.MapStr{
+						"name": "owner",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
 				},
 			},
 		},
@@ -224,26 +283,28 @@ func TestPod_Generate(t *testing.T) {
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
-				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "nginx-deployment",
-				},
-				"replicaset": common.MapStr{
-					"name": "nginx-rs",
-				},
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"app": "production",
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "nginx-deployment",
+					},
+					"replicaset": common.MapStr{
+						"name": "nginx-rs",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
 				},
 			},
 		},
@@ -280,26 +341,28 @@ func TestPod_Generate(t *testing.T) {
 				Status: v1.PodStatus{PodIP: "127.0.0.5"},
 			},
 			output: common.MapStr{
-				"pod": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
-					"ip":   "127.0.0.5",
-				},
-				"namespace": "default",
-				"deployment": common.MapStr{
-					"name": "nginx-deployment",
-				},
-				"replicaset": common.MapStr{
-					"name": "nginx-rs",
-				},
-				"node": common.MapStr{
-					"name": "testnode",
-				},
-				"labels": common.MapStr{
-					"foo": "bar",
-				},
-				"annotations": common.MapStr{
-					"k8s": common.MapStr{"app": "production"},
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name": "obj",
+						"uid":  uid,
+						"ip":   "127.0.0.5",
+					},
+					"namespace": "default",
+					"deployment": common.MapStr{
+						"name": "nginx-deployment",
+					},
+					"replicaset": common.MapStr{
+						"name": "nginx-rs",
+					},
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"k8s": common.MapStr{"app": "production"},
+					},
 				},
 			},
 		},
@@ -320,6 +383,7 @@ func TestPod_Generate(t *testing.T) {
 }
 
 func TestPod_GenerateFromName(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	namespace := "default"
 	name := "obj"
@@ -432,7 +496,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 		assert.Nil(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
-		metagen := NewPodMetadataGenerator(config, pods, nil, nil, nil)
+		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil)
 
 		accessor, err := meta.Accessor(test.input)
 		require.Nil(t, err)
@@ -444,6 +508,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 }
 
 func TestPod_GenerateWithNodeNamespace(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	namespace := "default"
 	name := "obj"
@@ -508,7 +573,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 					APIVersion: "v1",
 				},
 			},
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"pod": common.MapStr{
 					"name": "obj",
 					"uid":  uid,
@@ -533,7 +598,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 				"annotations": common.MapStr{
 					"app": "production",
 				},
-			},
+			}},
 		},
 	}
 
@@ -547,13 +612,13 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.node)
-		nodeMeta := NewNodeMetadataGenerator(config, nodes)
+		nodeMeta := NewNodeMetadataGenerator(config, nodes, client)
 
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.namespace)
-		nsMeta := NewNamespaceMetadataGenerator(config, namespaces)
+		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
-		metagen := NewPodMetadataGenerator(config, pods, nil, nodeMeta, nsMeta)
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})

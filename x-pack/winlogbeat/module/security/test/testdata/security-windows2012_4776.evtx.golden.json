@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4776,
+      "code": "4776",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -37,7 +37,7 @@
         "TargetUserName": "at_adm",
         "Workstation": "EQP01777"
       },
-      "event_id": 4776,
+      "event_id": "4776",
       "keywords": [
         "Audit Success"
       ],

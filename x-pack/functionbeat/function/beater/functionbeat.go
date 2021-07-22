@@ -12,9 +12,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/licenser"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -22,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
-	"github.com/elastic/beats/v7/x-pack/libbeat/licenser"
 )
 
 var (
@@ -87,9 +88,7 @@ func (bt *Functionbeat) Run(b *beat.Beat) error {
 		return fmt.Errorf("unsupported output type: %s; supported ones: %+v", outputName, supportedOutputs)
 	}
 
-	if outputName == "elasticsearch" {
-		licenser.Enforce(b.Info.Name, licenser.BasicAndAboveOrTrial)
-	}
+	elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
 
 	bt.log.Info("Functionbeat is running")
 	defer bt.log.Info("Functionbeat stopped running")

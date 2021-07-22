@@ -11,11 +11,11 @@ import (
 
 func addHostMetadata(event *mb.Event, metricList common.MapStr) {
 	hostFieldTable := map[string]string{
-		"percentage_cpu.avg":      "host.cpu.pct",
-		"network_in_total.total":  "host.network.in.bytes",
-		"network_in.total":        "host.network.in.packets",
-		"network_out_total.total": "host.network.out.bytes",
-		"network_out.total":       "host.network.out.packets",
+		"percentage_cpu.avg":      "host.cpu.usage",
+		"network_in_total.total":  "host.network.ingress.bytes",
+		"network_in.total":        "host.network.ingress.packets",
+		"network_out_total.total": "host.network.egress.bytes",
+		"network_out.total":       "host.network.egress.packets",
 		"disk_read_bytes.total":   "host.disk.read.bytes",
 		"disk_write_bytes.total":  "host.disk.write.bytes",
 	}

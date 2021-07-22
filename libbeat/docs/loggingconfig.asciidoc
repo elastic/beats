@@ -239,6 +239,15 @@ Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
 are boundary-aligned with minutes, hours, days, weeks, months, and years as
 reported by the local system clock. All other intervals are calculated from the
 unix epoch. Defaults to disabled.
+
+[float]
+==== `logging.files.suffix`
+
+When a log rotation happens it can either rename older files with
+an incresing index if `count` is configured. The other option is `date`
+that appends the current date and time to the end of the filename.
+When the log is rotated a new file is created and older files
+remain untouched.
 endif::serverless[]
 
 [float]

@@ -158,6 +158,13 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:3000"]
 
+#------------------------------- Airflow Module -------------------------------
+- module: airflow
+  host: "localhost"
+  port: "8126"
+  #ttl: "30s"
+  metricsets: [ 'statsd' ]
+
 #-------------------------------- Apache Module --------------------------------
 - module: apache
   metricsets: ["status"]
@@ -460,6 +467,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -863,6 +871,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -1143,6 +1152,61 @@ metricbeat.modules:
   # Password to use when connecting to PostgreSQL. Empty by default.
   #password: pass
 
+#------------------------------ Prometheus Module ------------------------------
+# Metrics collected from a Prometheus endpoint
+- module: prometheus
+  period: 10s
+  metricsets: ["collector"]
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  #metrics_filters:
+  #  include: []
+  #  exclude: []
+  #username: "user"
+  #password: "secret"
+
+  # This can be used for service account based authorization:
+  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+  #ssl.certificate_authorities:
+  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
+
+
+# Metrics sent by a Prometheus server using remote_write option
+#- module: prometheus
+#  metricsets: ["remote_write"]
+#  host: "localhost"
+#  port: "9201"
+
+  # Secure settings for the server using TLS/SSL:
+  #ssl.certificate: "/etc/pki/server/cert.pem"
+  #ssl.key: "/etc/pki/server/cert.key"
+
+# Metrics that will be collected using a PromQL
+#- module: prometheus
+#  metricsets: ["query"]
+#  hosts: ["localhost:9090"]
+#  period: 10s
+#  queries:
+#  - name: "instant_vector"
+#    path: "/api/v1/query"
+#    params:
+#      query: "sum(rate(prometheus_http_requests_total[1m]))"
+#  - name: "range_vector"
+#    path: "/api/v1/query_range"
+#    params:
+#      query: "up"
+#      start: "2019-12-20T00:00:00.000Z"
+#      end:  "2019-12-21T00:00:00.000Z"
+#      step: 1h
+#  - name: "scalar"
+#    path: "/api/v1/query"
+#    params:
+#      query: "100"
+#  - name: "string"
+#    path: "/api/v1/query"
+#    params:
+#      query: "some_value"
+
 #----------------------- Prometheus Typed Metrics Module -----------------------
 - module: prometheus
   period: 10s
@@ -1187,61 +1251,6 @@ metricbeat.modules:
   #types_patterns:
   #  counter_patterns: []
   #  histogram_patterns: []
-
-# Metrics that will be collected using a PromQL
-#- module: prometheus
-#  metricsets: ["query"]
-#  hosts: ["localhost:9090"]
-#  period: 10s
-#  queries:
-#  - name: "instant_vector"
-#    path: "/api/v1/query"
-#    params:
-#      query: "sum(rate(prometheus_http_requests_total[1m]))"
-#  - name: "range_vector"
-#    path: "/api/v1/query_range"
-#    params:
-#      query: "up"
-#      start: "2019-12-20T00:00:00.000Z"
-#      end:  "2019-12-21T00:00:00.000Z"
-#      step: 1h
-#  - name: "scalar"
-#    path: "/api/v1/query"
-#    params:
-#      query: "100"
-#  - name: "string"
-#    path: "/api/v1/query"
-#    params:
-#      query: "some_value"
-
-#------------------------------ Prometheus Module ------------------------------
-# Metrics collected from a Prometheus endpoint
-- module: prometheus
-  period: 10s
-  metricsets: ["collector"]
-  hosts: ["localhost:9090"]
-  metrics_path: /metrics
-  #metrics_filters:
-  #  include: []
-  #  exclude: []
-  #username: "user"
-  #password: "secret"
-
-  # This can be used for service account based authorization:
-  #bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-  #ssl.certificate_authorities:
-  #  - /var/run/secrets/kubernetes.io/serviceaccount/service-ca.crt
-
-
-# Metrics sent by a Prometheus server using remote_write option
-#- module: prometheus
-#  metricsets: ["remote_write"]
-#  host: "localhost"
-#  port: "9201"
-
-  # Secure settings for the server using TLS/SSL:
-  #ssl.certificate: "/etc/pki/server/cert.pem"
-  #ssl.key: "/etc/pki/server/cert.key"
 
 # Metrics that will be collected using a PromQL
 #- module: prometheus
@@ -1893,6 +1902,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -2151,10 +2161,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -2232,6 +2238,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -2729,6 +2739,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. metricbeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

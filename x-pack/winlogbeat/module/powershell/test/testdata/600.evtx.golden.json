@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 600,
+      "code": "600",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -49,7 +49,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 600,
+      "event_id": "600",
       "keywords": [
         "Classic"
       ],
@@ -66,7 +66,7 @@
       "category": [
         "process"
       ],
-      "code": 600,
+      "code": "600",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -106,7 +106,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 600,
+      "event_id": "600",
       "keywords": [
         "Classic"
       ],
@@ -123,7 +123,7 @@
       "category": [
         "process"
       ],
-      "code": 600,
+      "code": "600",
       "kind": "event",
       "module": "powershell",
       "provider": "PowerShell",
@@ -155,7 +155,7 @@
       "api": "wineventlog",
       "channel": "Windows PowerShell",
       "computer_name": "vagrant",
-      "event_id": 600,
+      "event_id": "600",
       "keywords": [
         "Classic"
       ],

@@ -6,7 +6,7 @@
       "category": [
         "authentication"
       ],
-      "code": 4768,
+      "code": "4768",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -22,6 +22,7 @@
       "level": "information"
     },
     "related": {
+      "ip": "::1",
       "user": "at_adm"
     },
     "source": {
@@ -55,7 +56,7 @@
           "Forwardable"
         ]
       },
-      "event_id": 4768,
+      "event_id": "4768",
       "keywords": [
         "Audit Success"
       ],

@@ -14,6 +14,7 @@ grouped in the following categories:
 
 * <<exported-fields-activemq>>
 * <<exported-fields-aerospike>>
+* <<exported-fields-airflow>>
 * <<exported-fields-apache>>
 * <<exported-fields-appsearch>>
 * <<exported-fields-aws>>
@@ -842,6 +843,234 @@ type: boolean
 
 --
 
+[[exported-fields-airflow]]
+== Airflow fields
+
+Airflow module
+
+
+
+
+*`airflow.*.1m_rate`*::
++
+--
+Airflow 1m rate timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.5m_rate`*::
++
+--
+Airflow 5m rate timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.15m_rate`*::
++
+--
+Airflow 15 rate timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.count`*::
++
+--
+Airflow counters
+
+
+type: object
+
+--
+
+*`airflow.*.max`*::
++
+--
+Airflow max timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.mean_rate`*::
++
+--
+Airflow mean rate timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.mean`*::
++
+--
+Airflow mean timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.median`*::
++
+--
+Airflow median timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.min`*::
++
+--
+Airflow min timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.p75`*::
++
+--
+Airflow 75 percentile timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.p95`*::
++
+--
+Airflow 95 percentile timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.p99_9`*::
++
+--
+Airflow 99.9 percentile timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.p99`*::
++
+--
+Airflow 99 percentile timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.stddev`*::
++
+--
+Airflow standard deviation timers metric
+
+
+type: object
+
+--
+
+*`airflow.*.value`*::
++
+--
+Airflow gauges
+
+
+type: object
+
+--
+
+*`airflow.dag_file`*::
++
+--
+Airflow dag file metadata
+
+
+type: keyword
+
+--
+
+*`airflow.dag_id`*::
++
+--
+Airflow dag id metadata
+
+
+type: keyword
+
+--
+
+*`airflow.job_name`*::
++
+--
+Airflow job name metadata
+
+
+type: keyword
+
+--
+
+*`airflow.operator_name`*::
++
+--
+Airflow operator name metadata
+
+
+type: keyword
+
+--
+
+*`airflow.pool_name`*::
++
+--
+Airflow pool name metadata
+
+
+type: keyword
+
+--
+
+*`airflow.status`*::
++
+--
+Airflow status metadata
+
+
+type: keyword
+
+--
+
+*`airflow.task_id`*::
++
+--
+Airflow task id metadata
+
+
+type: keyword
+
+--
+
 [[exported-fields-apache]]
 == Apache fields
 
@@ -1560,6 +1789,27 @@ Metrics that returned from Cloudwatch API query.
 
 
 type: object
+
+--
+
+
+*`aws.linked_account.id`*::
++
+--
+ID used to identify linked account.
+
+
+type: keyword
+
+--
+
+*`aws.linked_account.name`*::
++
+--
+Name or alias used to identify linked account.
+
+
+type: keyword
 
 --
 
@@ -2992,6 +3242,264 @@ type: long
 +
 --
 The number of targets that are considered unhealthy.
+
+type: long
+
+--
+
+[float]
+=== kinesis
+
+`kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+
+
+
+
+*`aws.kinesis.metrics.GetRecords_Bytes.avg`*::
++
+--
+The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_IteratorAgeMilliseconds.avg`*::
++
+--
+The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period. Age is the difference between the current time and when the last record of the GetRecords call was written to the stream.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Latency.avg`*::
++
+--
+The time taken per GetRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Records.sum`*::
++
+--
+The number of records retrieved from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.GetRecords_Success.sum`*::
++
+--
+The number of successful GetRecords operations per stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.IncomingBytes.avg`*::
++
+--
+The number of bytes successfully put to the Kinesis stream over the specified time period. This metric includes bytes from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.IncomingRecords.avg`*::
++
+--
+The number of records successfully put to the Kinesis stream over the specified time period. This metric includes record counts from PutRecord and PutRecords operations.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Bytes.avg`*::
++
+--
+The number of bytes put to the Kinesis stream using the PutRecord operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Latency.avg`*::
++
+--
+The time taken per PutRecord operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecord_Success.avg`*::
++
+--
+The percentage of successful writes to a Kinesis stream, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Bytes.avg`*::
++
+--
+The average number of bytes put to the Kinesis stream using the PutRecords operation over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Latency.avg`*::
++
+--
+The average time taken per PutRecords operation, measured over the specified time period.
+
+
+type: double
+
+--
+
+*`aws.kinesis.metrics.PutRecords_Success.avg`*::
++
+--
+The total number of PutRecords operations where at least one record succeeded, per Kinesis stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_TotalRecords.sum`*::
++
+--
+The total number of records sent in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_SuccessfulRecords.sum`*::
++
+--
+The number of successful records in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_FailedRecords.sum`*::
++
+--
+The number of records rejected due to internal failures in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.PutRecords_ThrottledRecords.sum`*::
++
+--
+The number of records rejected due to throttling in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.ReadProvisionedThroughputExceeded.avg`*::
++
+--
+The number of GetRecords calls throttled for the stream over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShard_RateExceeded.avg`*::
++
+--
+This metric is emitted when a new subscription attempt fails because there already is an active subscription by the same consumer or if you exceed the number of calls per second allowed for this operation.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShard_Success.avg`*::
++
+--
+This metric records whether the SubscribeToShard subscription was successfully established.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Bytes.avg`*::
++
+--
+The number of bytes received from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_MillisBehindLatest.avg`*::
++
+--
+The difference between the current time and when the last record of the SubscribeToShard event was written to the stream.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Records.sum`*::
++
+--
+The number of records received from the shard, measured over the specified time period.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.SubscribeToShardEvent_Success.avg`*::
++
+--
+This metric is emitted every time an event is published successfully. It is only emitted when there's an active subscription.
+
+
+type: long
+
+--
+
+*`aws.kinesis.metrics.WriteProvisionedThroughputExceeded.avg`*::
++
+--
+The number of records rejected due to throttling for the stream over the specified time period. This metric includes throttling from PutRecord and PutRecords operations.
+
 
 type: long
 
@@ -5180,6 +5688,16 @@ type: keyword
 
 --
 
+*`azure.resource.name`*::
++
+--
+The name of the resource
+
+
+type: keyword
+
+--
+
 *`azure.resource.group`*::
 +
 --
@@ -7296,80 +7814,6 @@ type: keyword
 the unit name of the systemd service
 
 type: keyword
-
---
-
-
-*`host.cpu.pct`*::
-+
---
-Percent CPU used. This value is normalized by the number of CPU cores and it ranges from 0 to 1.
-
-type: scaled_float
-
-format: percent
-
---
-
-*`host.network.in.bytes`*::
-+
---
-The number of bytes received on all network interfaces by the host in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.network.out.bytes`*::
-+
---
-The number of bytes sent out on all network interfaces by the host in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.network.in.packets`*::
-+
---
-The number of packets received on all network interfaces by the host in a given period of time.
-
-type: long
-
---
-
-*`host.network.out.packets`*::
-+
---
-The number of packets sent out on all network interfaces by the host in a given period of time.
-
-type: long
-
---
-
-*`host.disk.read.bytes`*::
-+
---
-The total number of bytes read successfully in a given period of time.
-
-type: long
-
-format: bytes
-
---
-
-*`host.disk.write.bytes`*::
-+
---
-The total number of bytes write successfully in a given period of time.
-
-type: long
-
-format: bytes
 
 --
 
@@ -9904,6 +10348,83 @@ type: long
 
 --
 
+[float]
+=== network_summary
+
+network_summary
+
+
+
+*`docker.network_summary.ip.*`*::
++
+--
+IP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.tcp.*`*::
++
+--
+TCP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp.*`*::
++
+--
+UDP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.udp_lite.*`*::
++
+--
+UDP Lite counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.icmp.*`*::
++
+--
+ICMP counters
+
+
+type: object
+
+--
+
+*`docker.network_summary.namespace.pid`*::
++
+--
+The root PID of the container, corresponding to /proc/[pid]/net
+
+
+type: long
+
+--
+
+*`docker.network_summary.namespace.id`*::
++
+--
+The ID of the network namespace used by the container, corresponding to /proc/[pid]/ns/net
+
+
+type: long
+
+--
+
 [[exported-fields-dropwizard]]
 == Dropwizard fields
 
@@ -10783,6 +11304,56 @@ Runtime managing this container.
 type: keyword
 
 example: docker
+
+--
+
+[float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
 
 --
 
@@ -14519,6 +15090,105 @@ example: Symantec
 Observer version.
 
 type: keyword
+
+--
+
+[float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
 
 --
 
@@ -30737,6 +31407,185 @@ type: integer
 --
 
 [float]
+=== job
+
+Kubernetes job metrics
+
+
+
+*`kubernetes.job.name`*::
++
+--
+The name of the job resource
+
+
+type: keyword
+
+--
+
+[float]
+=== pods
+
+Pod metrics for the job
+
+
+
+*`kubernetes.job.pods.active`*::
++
+--
+Number of active pods
+
+
+type: long
+
+--
+
+*`kubernetes.job.pods.failed`*::
++
+--
+Number of failed pods
+
+
+type: long
+
+--
+
+*`kubernetes.job.pods.succeeded`*::
++
+--
+Number of successful pods
+
+
+type: long
+
+--
+
+[float]
+=== time
+
+Kubernetes job timestamps
+
+
+
+*`kubernetes.job.time.created`*::
++
+--
+The time at which the job was created
+
+
+type: date
+
+--
+
+*`kubernetes.job.time.completed`*::
++
+--
+The time at which the job completed
+
+
+type: date
+
+--
+
+[float]
+=== completions
+
+Kubernetes job completion settings
+
+
+
+*`kubernetes.job.completions.desired`*::
++
+--
+The configured completion count for the job (Spec)
+
+
+type: long
+
+--
+
+[float]
+=== parallelism
+
+Kubernetes job parallelism settings
+
+
+
+*`kubernetes.job.parallelism.desired`*::
++
+--
+The configured parallelism of the job (Spec)
+
+
+type: long
+
+--
+
+[float]
+=== owner
+
+Kubernetes job owner information
+
+
+
+*`kubernetes.job.owner.name`*::
++
+--
+The name of the resource that owns this job
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.kind`*::
++
+--
+The kind of resource that owns this job (eg. "CronJob")
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.owner.is_controller`*::
++
+--
+Owner is controller ("true", "false", or "<none>")
+
+
+type: keyword
+
+--
+
+[float]
+=== status
+
+Kubernetes job status information
+
+
+
+*`kubernetes.job.status.complete`*::
++
+--
+Whether the job completed ("true", "false", or "unknown")
+
+
+type: keyword
+
+--
+
+*`kubernetes.job.status.failed`*::
++
+--
+Whether the job failed ("true", "false", or "unknown")
+
+
+type: keyword
+
+--
+
+[float]
 === node
 
 kubernetes node metrics
@@ -31281,6 +32130,16 @@ type: long
 +
 --
 The number of desired replicas per StatefulSet
+
+
+type: long
+
+--
+
+*`kubernetes.statefulset.replicas.ready`*::
++
+--
+The number of ready replicas per StatefulSet
 
 
 type: long
@@ -41336,7 +42195,7 @@ type: scaled_float
 *`redis.info.cpu.used.sys_children`*::
 +
 --
-User CPU consumed by the Redis server.
+System CPU consumed by the background processes.
 
 
 type: scaled_float
@@ -41346,7 +42205,7 @@ type: scaled_float
 *`redis.info.cpu.used.user`*::
 +
 --
-System CPU consumed by the background processes.
+User CPU consumed by the Redis server.
 
 
 type: scaled_float
@@ -42973,6 +43832,18 @@ type: long
 
 --
 
+*`system.core.total.pct`*::
++
+--
+Total active time spent by the core
+
+
+type: scaled_float
+
+format: percent
+
+--
+
 *`system.core.user.pct`*::
 +
 --
@@ -44034,6 +44905,18 @@ format: bytes
 +
 --
 The total amount of free memory in bytes. This value does not include memory consumed by system caches and buffers (see system.memory.actual.free).
+
+
+type: long
+
+format: bytes
+
+--
+
+*`system.memory.cached`*::
++
+--
+Total Cached memory on system.
 
 
 type: long
@@ -47282,6 +48165,26 @@ type: keyword
 +
 --
 Used CPU in Mhz
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.cpu.total.mhz`*::
++
+--
+Total CPU in Mhz
+
+
+type: long
+
+--
+
+*`vsphere.virtualmachine.cpu.free.mhz`*::
++
+--
+Available CPU in Mhz
 
 
 type: long

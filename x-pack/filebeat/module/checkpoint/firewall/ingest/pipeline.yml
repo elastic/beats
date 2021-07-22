@@ -741,6 +741,11 @@ processors:
     source: "ctx.network.packets = ctx.source.packets + ctx.destination.packets"
     if: ctx?.source?.packets != null && ctx?.destination?.packets != null && ctx?.network?.packets == null
     ignore_failure: true
+- rename:
+    field: checkpoint.action_reason
+    target_field: checkpoint.action_reason_msg
+    if: ctx.checkpoint?.action_reason != null && ctx.checkpoint?.action_reason.contains(" ")
+    ignore_missing: true
 - geoip:
     field: source.ip
     target_field: source.geo

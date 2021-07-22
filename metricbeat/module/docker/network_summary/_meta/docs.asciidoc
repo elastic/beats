@@ -1,0 +1,4 @@
+The `network_summary` metricset collects detailed network metrics from the processes associated with a container.
+These stats come from `/proc/[PID]/net`, and are summed across the different namespaces found across the PIDs.
+
+Because this metricset will try to access network counters from procfs, it is only available on linux.

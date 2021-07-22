@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4725,
+      "code": "4725",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -47,7 +47,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1000",
         "TargetUserName": "audittest"
       },
-      "event_id": 4725,
+      "event_id": "4725",
       "keywords": [
         "Audit Success"
       ],
@@ -74,7 +74,7 @@
       "category": [
         "iam"
       ],
-      "code": 4725,
+      "code": "4725",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -115,7 +115,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1006",
         "TargetUserName": "audittest0609"
       },
-      "event_id": 4725,
+      "event_id": "4725",
       "keywords": [
         "Audit Success"
       ],

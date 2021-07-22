@@ -42,7 +42,7 @@ var (
 	}
 
 	ErrMissingPattern = errors.New("multiline.pattern cannot be empty when pattern based matching is selected")
-	ErrMissingCount   = errors.New("multiline.pattern cannot be empty when pattern based matching is selected")
+	ErrMissingCount   = errors.New("multiline.count cannot be empty when count based aggregation is selected")
 )
 
 // Config holds the options of multiline readers.
@@ -73,6 +73,8 @@ func (c *Config) Validate() error {
 		if c.LinesCount == 0 {
 			return ErrMissingCount
 		}
+	} else {
+		return fmt.Errorf("unknown multiline type %d", c.Type)
 	}
 	return nil
 }

@@ -227,6 +227,10 @@
         "input.type": "log",
         "log.logger": "projects/foo/logs/cloudaudit.googleapis.com%2Fdata_access",
         "log.offset": 5100,
+        "orchestrator.api_version": "v1beta1",
+        "orchestrator.cluster.name": "analysis-cluster",
+        "orchestrator.resource.type": "subjectaccessreviews",
+        "orchestrator.type": "kubernetes",
         "service.name": "k8s.io",
         "service.type": "gcp",
         "source.ip": "10.11.12.13",
@@ -345,5 +349,173 @@
         "user_agent.os.name": "Mac OS X",
         "user_agent.os.version": "10.15",
         "user_agent.version": "79.0."
+    },
+    {
+        "@timestamp": "2021-04-23T14:47:07.535Z",
+        "cloud.project.id": "elastic-siem",
+        "event.action": "io.k8s.core.v1.nodes.list",
+        "event.dataset": "gcp.audit",
+        "event.id": "94170ac4-6e82-4345-98ad-3c780222d19d",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "gcp.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "gcp.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "io.k8s.core.v1.nodes.list",
+                "resource": "core/v1/nodes"
+            }
+        ],
+        "gcp.audit.method_name": "io.k8s.core.v1.nodes.list",
+        "gcp.audit.request_metadata.caller_ip": "192.168.1.1",
+        "gcp.audit.request_metadata.caller_supplied_user_agent": "GoogleCloudConsole",
+        "gcp.audit.resource_name": "core/v1/nodes",
+        "gcp.audit.service_name": "k8s.io",
+        "gcp.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-siem/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 10917,
+        "orchestrator.api_version": "v1",
+        "orchestrator.cluster.name": "analysis-cluster",
+        "orchestrator.resource.type": "nodes",
+        "orchestrator.type": "kubernetes",
+        "service.name": "k8s.io",
+        "service.type": "gcp",
+        "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "GoogleCloudConsole"
+    },
+    {
+        "@timestamp": "2021-04-23T14:16:07.574Z",
+        "cloud.project.id": "elastic-siem",
+        "event.action": "io.k8s.extensions.v1beta1.ingresses.list",
+        "event.dataset": "gcp.audit",
+        "event.id": "b10a904a-faa4-4e0d-9ec3-7bc6a180196a",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "gcp.audit.authentication_info.principal_email": "xxx@xxx.xxx",
+        "gcp.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "io.k8s.extensions.v1beta1.ingresses.list",
+                "resource": "extensions/v1beta1/namespaces/cos-auditd/ingresses"
+            }
+        ],
+        "gcp.audit.method_name": "io.k8s.extensions.v1beta1.ingresses.list",
+        "gcp.audit.request_metadata.caller_ip": "192.168.1.1",
+        "gcp.audit.request_metadata.caller_supplied_user_agent": "GoogleCloudConsole",
+        "gcp.audit.resource_name": "extensions/v1beta1/namespaces/cos-auditd/ingresses",
+        "gcp.audit.service_name": "k8s.io",
+        "gcp.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-siem/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 11897,
+        "orchestrator.api_version": "v1beta1",
+        "orchestrator.cluster.name": "analysis-cluster",
+        "orchestrator.namespace": "cos-auditd",
+        "orchestrator.resource.type": "ingresses",
+        "orchestrator.type": "kubernetes",
+        "service.name": "k8s.io",
+        "service.type": "gcp",
+        "source.ip": "192.168.1.1",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "xxx@xxx.xxx",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "GoogleCloudConsole"
+    },
+    {
+        "@timestamp": "2021-04-29T08:19:20.805Z",
+        "cloud.project.id": "elastic-siem",
+        "event.action": "io.k8s.get",
+        "event.dataset": "gcp.audit",
+        "event.id": "e973134d-b4d5-4e2f-92b8-82bba13fdb92",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "gcp.audit.authentication_info.principal_email": "system:anonymous",
+        "gcp.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "io.k8s.get",
+                "resource": "readyz"
+            }
+        ],
+        "gcp.audit.method_name": "io.k8s.get",
+        "gcp.audit.request_metadata.caller_ip": "127.0.0.1",
+        "gcp.audit.request_metadata.caller_supplied_user_agent": "kube-probe/1.19+",
+        "gcp.audit.resource_name": "readyz",
+        "gcp.audit.service_name": "k8s.io",
+        "gcp.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-siem/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 13040,
+        "orchestrator.cluster.name": "analysis-cluster",
+        "orchestrator.resource.type": "readyz",
+        "orchestrator.type": "kubernetes",
+        "service.name": "k8s.io",
+        "service.type": "gcp",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "system:anonymous",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "kube-probe/1.19+"
+    },
+    {
+        "@timestamp": "2021-04-29T08:23:18.899Z",
+        "cloud.project.id": "elastic-siem",
+        "event.action": "io.k8s.get",
+        "event.dataset": "gcp.audit",
+        "event.id": "03adfb9f-71a3-4f41-9701-29b5542f4d22",
+        "event.kind": "event",
+        "event.module": "gcp",
+        "event.outcome": "success",
+        "fileset.name": "audit",
+        "gcp.audit.authentication_info.principal_email": "system:serviceaccount:kube-system:generic-garbage-collector",
+        "gcp.audit.authorization_info": [
+            {
+                "granted": true,
+                "permission": "io.k8s.get",
+                "resource": "api/v1"
+            }
+        ],
+        "gcp.audit.method_name": "io.k8s.get",
+        "gcp.audit.request_metadata.caller_ip": "::1",
+        "gcp.audit.request_metadata.caller_supplied_user_agent": "kube-controller-manager/v1.19.8 (linux/amd64) kubernetes/4f6f69f/system:serviceaccount:kube-system:generic-garbage-collector",
+        "gcp.audit.resource_name": "api/v1",
+        "gcp.audit.service_name": "k8s.io",
+        "gcp.audit.type": "type.googleapis.com/google.cloud.audit.AuditLog",
+        "input.type": "log",
+        "log.logger": "projects/elastic-siem/logs/cloudaudit.googleapis.com%2Fdata_access",
+        "log.offset": 14123,
+        "orchestrator.api_version": "v1",
+        "orchestrator.cluster.name": "analysis-cluster",
+        "orchestrator.type": "kubernetes",
+        "service.name": "k8s.io",
+        "service.type": "gcp",
+        "source.ip": "::1",
+        "tags": [
+            "forwarded"
+        ],
+        "user.email": "system:serviceaccount:kube-system:generic-garbage-collector",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "kube-controller-manager/v1.19.8 (linux/amd64) kubernetes/4f6f69f/system:serviceaccount:kube-system:generic-garbage-collector",
+        "user_agent.os.name": "Linux"
     }
 ]

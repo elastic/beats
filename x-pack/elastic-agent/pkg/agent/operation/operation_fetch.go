@@ -58,7 +58,7 @@ func (o *operationFetch) Check(_ context.Context, _ Application) (bool, error) {
 		return true, nil
 	}
 
-	o.logger.Infof("%s.%s already exists in %s. Skipping operation %s", o.program.BinaryName(), o.program.Version(), fullPath, o.Name())
+	o.logger.Debugf("binary '%s.%s' already exists in %s. Skipping operation %s", o.program.BinaryName(), o.program.Version(), fullPath, o.Name())
 	return false, err
 }
 
@@ -72,7 +72,7 @@ func (o *operationFetch) Run(ctx context.Context, application Application) (err 
 
 	fullPath, err := o.downloader.Download(ctx, o.program.Spec(), o.program.Version())
 	if err == nil {
-		o.logger.Infof("operation '%s' downloaded %s.%s into %s", o.Name(), o.program.BinaryName(), o.program.Version(), fullPath)
+		o.logger.Infof("downloaded binary '%s.%s' into '%s' as part of operation '%s'", o.program.BinaryName(), o.program.Version(), fullPath, o.Name())
 	}
 
 	return err

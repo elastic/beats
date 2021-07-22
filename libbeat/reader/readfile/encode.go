@@ -22,6 +22,7 @@ import (
 	"io"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
@@ -57,6 +58,7 @@ func (r EncoderReader) Next() (reader.Message, error) {
 		Ts:      time.Now(),
 		Content: bytes.Trim(c, "\xef\xbb\xbf"),
 		Bytes:   sz,
+		Fields:  common.MapStr{},
 	}, err
 }
 

@@ -1,0 +1,98 @@
+pull_request_rules:
+  - name: backport patches to 7.x branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.x"
+        labels:
+          - "backport"
+  - name: backport patches to 7.13 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.13.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.13"
+        labels:
+          - "backport"
+  - name: backport patches to 7.12 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.12.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.12"
+        labels:
+          - "backport"
+  - name: backport patches to 7.11 branch
+    conditions:
+      - merged
+      - base=master
+      - label=backport-v7.11.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.11"
+        labels:
+          - "backport"
+  - name: ask to resolve conflict
+    conditions:
+      - conflict
+    actions:
+        comment:
+          message: |
+            This pull request is now in conflicts. Could you fix it? 🙏
+            To fixup this pull request, you can check out it locally. See documentation: https://help.github.com/articles/checking-out-pull-requests-locally/
+            ```
+            git fetch upstream
+            git checkout -b {{head}} upstream/{{head}}
+            git merge upstream/{{base}}
+            git push upstream {{head}}
+            ```
+  - name: Automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
+    conditions:
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      merge:
+        method: squash
+        strict: smart+fasttrack
+  - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-stack-version
+        - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      delete_head_branch:
+  - name: delete upstream branch after merging changes on .go-version or it's closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^update-go-version
+        - files~=^.go-version$
+    actions:
+      delete_head_branch:

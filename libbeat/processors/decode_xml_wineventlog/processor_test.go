@@ -55,7 +55,7 @@ func TestProcessor(t *testing.T) {
 			Output: common.MapStr{
 				"event": common.MapStr{
 					"action":   "Special Logon",
-					"code":     uint32(4672),
+					"code":     "4672",
 					"kind":     "event",
 					"outcome":  "success",
 					"provider": "Microsoft-Windows-Security-Auditing",
@@ -71,7 +71,7 @@ func TestProcessor(t *testing.T) {
 					"outcome":       "success",
 					"activity_id":   "{ffb23523-1f32-0000-c335-b2ff321fd701}",
 					"level":         "information",
-					"event_id":      uint32(4672),
+					"event_id":      "4672",
 					"provider_name": "Microsoft-Windows-Security-Auditing",
 					"record_id":     uint64(11303),
 					"computer_name": "vagrant",
@@ -129,7 +129,7 @@ func TestProcessor(t *testing.T) {
 					"outcome":       "success",
 					"activity_id":   "{ffb23523-1f32-0000-c335-b2ff321fd701}",
 					"level":         "information",
-					"event_id":      uint32(4672),
+					"event_id":      "4672",
 					"provider_name": "Microsoft-Windows-Security-Auditing",
 					"record_id":     uint64(11303),
 					"computer_name": "vagrant",

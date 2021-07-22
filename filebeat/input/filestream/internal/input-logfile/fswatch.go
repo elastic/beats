@@ -30,10 +30,31 @@ const (
 	OpDelete
 	OpRename
 	OpTruncate
+	OpArchived
+)
+
+var (
+	operationNames = map[Operation]string{
+		OpDone:     "done",
+		OpCreate:   "create",
+		OpWrite:    "write",
+		OpDelete:   "delete",
+		OpRename:   "rename",
+		OpTruncate: "truncate",
+		OpArchived: "archive",
+	}
 )
 
 // Operation describes what happened to a file.
 type Operation uint8
+
+func (o *Operation) String() string {
+	name, ok := operationNames[*o]
+	if !ok {
+		return ""
+	}
+	return name
+}
 
 // FSEvent returns inforamation about file system changes.
 type FSEvent struct {

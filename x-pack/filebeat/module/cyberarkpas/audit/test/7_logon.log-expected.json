@@ -36,8 +36,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.6.0000",
         "related.ip": [
-            "10.2.0.6",
-            "10.2.0.3"
+            "10.2.0.3",
+            "10.2.0.6"
         ],
         "related.user": [
             "adm2"
@@ -341,8 +341,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "127.0.0.1",
-            "10.0.1.20"
+            "10.0.1.20",
+            "127.0.0.1"
         ],
         "related.user": [
             "Administrator"
@@ -396,8 +396,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "81.32.170.205",
-            "10.0.1.20"
+            "10.0.1.20",
+            "81.32.170.205"
         ],
         "related.user": [
             "Administrator"
@@ -459,8 +459,8 @@
         "observer.vendor": "Cyber-Ark",
         "observer.version": "11.7.0000",
         "related.ip": [
-            "37.223.7.45",
-            "10.0.1.20"
+            "10.0.1.20",
+            "37.223.7.45"
         ],
         "related.user": [
             "Administrator"

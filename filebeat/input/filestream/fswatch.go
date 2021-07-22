@@ -51,6 +51,7 @@ type watcherFactory func(paths []string, cfg *common.Config) (loginp.FSWatcher, 
 type fileScanner struct {
 	paths         []string
 	excludedFiles []match.Matcher
+	includedFiles []match.Matcher
 	symlinks      bool
 
 	log *logp.Logger
@@ -234,6 +235,7 @@ func (w *fileWatcher) GetFiles() map[string]os.FileInfo {
 
 type fileScannerConfig struct {
 	ExcludedFiles []match.Matcher `config:"exclude_files"`
+	IncludedFiles []match.Matcher `config:"include_files"`
 	Symlinks      bool            `config:"symlinks"`
 	RecursiveGlob bool            `config:"recursive_glob"`
 }
@@ -249,6 +251,7 @@ func newFileScanner(paths []string, cfg fileScannerConfig) (loginp.FSScanner, er
 	fs := fileScanner{
 		paths:         paths,
 		excludedFiles: cfg.ExcludedFiles,
+		includedFiles: cfg.IncludedFiles,
 		symlinks:      cfg.Symlinks,
 		log:           logp.NewLogger(scannerName),
 	}
@@ -337,7 +340,7 @@ func (s *fileScanner) GetFiles() map[string]os.FileInfo {
 }
 
 func (s *fileScanner) shouldSkipFile(file string) bool {
-	if s.isFileExcluded(file) {
+	if s.isFileExcluded(file) || !s.isFileIncluded(file) {
 		s.log.Debugf("Exclude file: %s", file)
 		return true
 	}
@@ -356,6 +359,18 @@ func (s *fileScanner) shouldSkipFile(file string) bool {
 	isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
 	if isSymlink && !s.symlinks {
 		s.log.Debugf("File %s skipped as it is a symlink", file)
+		return true
+	}
+
+	originalFile, err := filepath.EvalSymlinks(file)
+	if err != nil {
+		s.log.Debugf("finding path to original file has failed %s: %+v", file, err)
+		return true
+	}
+	// Check if original file is included to make sure we are not reading from
+	// unwanted files.
+	if s.isFileExcluded(originalFile) || !s.isFileIncluded(originalFile) {
+		s.log.Debugf("Exclude original file: %s", file)
 		return true
 	}
 
@@ -382,6 +397,13 @@ func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, paths map[stri
 
 func (s *fileScanner) isFileExcluded(file string) bool {
 	return len(s.excludedFiles) > 0 && s.matchAny(s.excludedFiles, file)
+}
+
+func (s *fileScanner) isFileIncluded(file string) bool {
+	if len(s.includedFiles) == 0 {
+		return true
+	}
+	return s.matchAny(s.includedFiles, file)
 }
 
 // matchAny checks if the text matches any of the regular expressions

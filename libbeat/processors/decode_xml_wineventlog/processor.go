@@ -51,7 +51,7 @@ func init() {
 				"overwrite_keys", "map_ecs_fields",
 				"ignore_missing", "ignore_failure",
 			)))
-	jsprocessor.RegisterPlugin(procName, New)
+	jsprocessor.RegisterPlugin("DecodeXMLWineventlog", New)
 }
 
 type processor struct {
@@ -139,8 +139,9 @@ func fields(evt winevent.Event) (common.MapStr, common.MapStr) {
 
 	ecs := common.MapStr{}
 
+	eventCode, _ := win.GetValue("event_id")
+	ecs.Put("event.code", eventCode)
 	ecs.Put("event.kind", "event")
-	ecs.Put("event.code", evt.EventIdentifier.ID)
 	ecs.Put("event.provider", evt.Provider.Name)
 	winevent.AddOptional(ecs, "event.action", evt.Task)
 	winevent.AddOptional(ecs, "host.name", evt.Computer)

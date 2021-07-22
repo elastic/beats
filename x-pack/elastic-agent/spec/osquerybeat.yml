@@ -1,6 +1,6 @@
 name: Osquerybeat
 cmd: osquerybeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.enabled=true", "-E", "logging.level=debug"]
 restart_on_output_change: true
 artifact: beats/osquerybeat
 action_input_types:
@@ -21,10 +21,12 @@ rules:
     values:
     - osquery
 
+- inject_agent_info: {}
+
 - filter:
     selectors:
     - inputs
     - output
 
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
-constraints: ${runtime.arch} != 'arm64'
+constraints: ${runtime.arch} != '386'
