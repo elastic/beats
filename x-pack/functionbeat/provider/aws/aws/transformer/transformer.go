@@ -250,6 +250,27 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 			return nil, err
 		}
 
+		if obj[0] == 31 && obj[1] == 139 {
+			inBuf := bytes.NewBuffer(obj)
+			r, err := gzip.NewReader(inBuf)
+			if err != nil {
+				return nil, err
+			}
+
+			var outBuf bytes.Buffer
+			_, err = io.Copy(&outBuf, r)
+			if err != nil {
+				r.Close()
+				return nil, err
+			}
+
+			err = r.Close()
+			if err != nil {
+				return nil, err
+			}
+			obj = outBuf.Bytes()
+		}
+
 		obj_r := bytes.NewReader(obj)
 		obj_line := bufio.NewScanner(obj_r)
 
