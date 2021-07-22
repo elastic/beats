@@ -3,6 +3,27 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.13.4]]
+=== Beats version 7.13.4
+https://github.com/elastic/beats/compare/v7.13.3...v7.13.4[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Fix `add_process_metadata` processor complaining about valid pid fields not being valid integers. {pull}26829[26829] {issue}26830[26830]
+
+*Auditbeat*
+
+- Do not close filestream harvester if an unexpected error is returned when `close.on_state_change.*` is enabled. {pull}26411[26411]
+
+*Filebeat*
+
+- Fix Elasticsearch compatibility for modules that use `type: ip` with `convert` processors. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `network_direction` processor. {issue}26629[26629] {pull}26676[26676]
+- Fix Elasticsearch compatibility for modules that use the `registered_domain` processor. {issue}26629[26629] {pull}26676[26676]
+
+
 [[release-notes-7.13.3]]
 === Beats version 7.13.3
 https://github.com/elastic/beats/compare/v7.13.2...v7.13.3[View commits]
