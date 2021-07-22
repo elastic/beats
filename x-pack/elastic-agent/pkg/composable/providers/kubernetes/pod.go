@@ -129,22 +129,13 @@ func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		if cfg.AnnotationsDedot {
-			annotation := common.DeDot(k)
-			annotations.Put(annotation, v)
-		} else {
-			safemapstr.Put(annotations, k, v)
-		}
+		safemapstr.Put(annotations, k, v)
 	}
 
 	labels := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetLabels() {
-		if cfg.LabelsDedot {
-			label := common.DeDot(k)
-			labels.Put(label, v)
-		} else {
-			safemapstr.Put(labels, k, v)
-		}
+		// TODO: add dedoting option
+		safemapstr.Put(labels, k, v)
 	}
 
 	mapping := map[string]interface{}{
@@ -189,12 +180,7 @@ func generateContainerData(
 
 	labels := common.MapStr{}
 	for k, v := range pod.GetObjectMeta().GetLabels() {
-		if cfg.LabelsDedot {
-			label := common.DeDot(k)
-			labels.Put(label, v)
-		} else {
-			safemapstr.Put(labels, k, v)
-		}
+		safemapstr.Put(labels, k, v)
 	}
 
 	for _, c := range containers {

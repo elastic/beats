@@ -44,7 +44,7 @@ func TestGeneratePodData(t *testing.T) {
 		Status: kubernetes.PodStatus{PodIP: "127.0.0.5"},
 	}
 
-	data := generatePodData(pod, &Config{LabelsDedot: true, AnnotationsDedot: true})
+	data := generatePodData(pod, &Config{})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
@@ -129,7 +129,7 @@ func TestGenerateContainerPodData(t *testing.T) {
 		pod,
 		containers,
 		containerStatuses,
-		&Config{LabelsDedot: true, AnnotationsDedot: true})
+		&Config{})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),

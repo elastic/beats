@@ -25,9 +25,6 @@ type Config struct {
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
-
-	LabelsDedot      bool `config:"labels.dedot"`
-	AnnotationsDedot bool `config:"annotations.dedot"`
 }
 
 // Resources config section for resources' config blocks
@@ -47,8 +44,6 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
-	c.LabelsDedot = true
-	c.AnnotationsDedot = true
 }
 
 // Validate ensures correctness of config

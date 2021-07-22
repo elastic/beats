@@ -105,22 +105,13 @@ func generateServiceData(service *kubernetes.Service, cfg *Config) *serviceData 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetAnnotations() {
-		if cfg.AnnotationsDedot {
-			annotation := common.DeDot(k)
-			annotations.Put(annotation, v)
-		} else {
-			safemapstr.Put(annotations, k, v)
-		}
+		safemapstr.Put(annotations, k, v)
 	}
 
 	labels := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetLabels() {
-		if cfg.LabelsDedot {
-			label := common.DeDot(k)
-			labels.Put(label, v)
-		} else {
-			safemapstr.Put(labels, k, v)
-		}
+		// TODO: add dedoting option
+		safemapstr.Put(labels, k, v)
 	}
 
 	mapping := map[string]interface{}{

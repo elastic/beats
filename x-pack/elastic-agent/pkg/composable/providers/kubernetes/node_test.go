@@ -41,7 +41,7 @@ func TestGenerateNodeData(t *testing.T) {
 		},
 	}
 
-	data := generateNodeData(node, &Config{LabelsDedot: true, AnnotationsDedot: true})
+	data := generateNodeData(node, &Config{})
 
 	mapping := map[string]interface{}{
 		"node": map[string]interface{}{
