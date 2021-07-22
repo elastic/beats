@@ -250,25 +250,18 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 		Message           string
 		MessageAttributes map[string]struct{ Value string }
 	}
+	// detect Messages delivered via SNS and select the right message body
 	if err := json.Unmarshal([]byte(*m.Body), &bodyJSON); err == nil && bodyJSON.TopicArn != "" {
 		err := json.Unmarshal([]byte(bodyJSON.Message), &msg)
-		if err != nil {
-			c.logger.Debug("sqs message body = ", *m.Body)
-			if jsonError, ok := err.(*json.SyntaxError); ok {
-				return nil, fmt.Errorf("json unmarshal sqs message body failed at offset %d with syntax error: %w", jsonError.Offset, err)
-			} else {
-				return nil, fmt.Errorf("json unmarshal sqs message body failed: %w", err)
-			}
-		}
 	} else {
 		err := json.Unmarshal([]byte(*m.Body), &msg)
-		if err != nil {
-			c.logger.Debug("sqs message body = ", *m.Body)
-			if jsonError, ok := err.(*json.SyntaxError); ok {
-				return nil, fmt.Errorf("json unmarshal sqs message body failed at offset %d with syntax error: %w", jsonError.Offset, err)
-			} else {
-				return nil, fmt.Errorf("json unmarshal sqs message body failed: %w", err)
-			}
+	}
+	if err != nil {
+		c.logger.Debug("sqs message body = ", *m.Body)
+		if jsonError, ok := err.(*json.SyntaxError); ok {
+			return nil, fmt.Errorf("json unmarshal sqs message body failed at offset %d with syntax error: %w", jsonError.Offset, err)
+		} else {
+			return nil, fmt.Errorf("json unmarshal sqs message body failed: %w", err)
 		}
 	}
 
