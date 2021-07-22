@@ -100,8 +100,3 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 func (c *Config) Validate() error {
 	return c.Certificate.Validate()
 }
-
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (c *Config) IsEnabled() bool {
-	return c != nil && (c.Enabled == nil || *c.Enabled)
-}

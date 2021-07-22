@@ -15,30 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build go1.15
-
 package tlscommon
 
-import (
-	"io/ioutil"
-	"os"
-	"strings"
-)
-
-// ResolveCipherSuite takes the integer representation and return the cipher name.
-func ResolveCipherSuite(cipher uint16) string {
-	return CipherSuite(cipher).String()
-}
-
-// NewPEMReader returns a new PEMReader.
-func NewPEMReader(certificate string) (*PEMReader, error) {
-	if IsPEMString(certificate) {
-		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate)), debugStr: "inline"}, nil
-	}
-
-	r, err := os.Open(certificate)
-	if err != nil {
-		return nil, err
-	}
-	return &PEMReader{reader: r, debugStr: certificate}, nil
+// IsEnabled returns true if the `enable` field is set to true in the yaml.
+func (c *Config) IsEnabled() bool {
+	return c != nil && (c.Enabled == nil || *c.Enabled)
 }

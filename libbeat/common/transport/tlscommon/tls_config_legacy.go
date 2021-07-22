@@ -125,6 +125,20 @@ func (c *TLSConfig) BuildModuleClientConfig(host string) *tls.Config {
 	return config
 }
 
+// BuildServerConfig takes the TLSConfig and transform it into a `tls.Config` for server side objects.
+func (c *TLSConfig) BuildServerConfig(host string) *tls.Config {
+	if c == nil {
+		// use default TLS settings, if config is empty.
+		return &tls.Config{
+			ServerName: host,
+		}
+	}
+
+	config := c.ToConfig()
+	config.ServerName = host
+	return config
+}
+
 // BuildModuleConfig takes the TLSConfig and transform it into a `tls.Config`.
 func (c *TLSConfig) BuildModuleConfig(host string) *tls.Config {
 	if c == nil {
