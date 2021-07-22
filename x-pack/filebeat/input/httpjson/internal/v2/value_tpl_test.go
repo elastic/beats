@@ -224,6 +224,34 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "2020-11-05T12:25:32Z",
 		},
+		{
+			name:        "func toInt",
+			value:       `[[(toInt "1")]] [[(toInt 1.0)]] [[(toInt "1,0")]] [[(toInt 2)]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1 1 0 2",
+		},
+		{
+			name:        "func add",
+			value:       `[[add 1 2 3 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "10",
+		},
+		{
+			name:        "func mul",
+			value:       `[[mul 4 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "16",
+		},
+		{
+			name:        "func div",
+			value:       `[[div 16 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4",
+		},
 	}
 
 	for _, tc := range cases {

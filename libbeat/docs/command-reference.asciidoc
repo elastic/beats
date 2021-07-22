@@ -134,12 +134,12 @@ ifdef::apm-server[]
 
 experimental::[]
 
-Communication between APM agents and APM Server now supports sending an
+Communication between APM agents and APM Server supports sending an
 <<api-key,API Key in the Authorization header>>.
 APM Server provides an `apikey` command that can create, verify, invalidate,
 and show information about API Keys for agent/server communication.
 Most operations require the `manage_api_key` cluster privilege,
-and you must ensure that `apm-server.api_key` or `output.elasticsearch` are configured appropriately.
+and you must ensure that either `apm-server.auth.api_key` or `output.elasticsearch` are configured appropriately.
 
 *SYNOPSIS*
 

@@ -98,11 +98,6 @@ func CrossBuild() error {
 		return err
 	}
 
-	if runtime.GOARCH != "amd64" {
-		fmt.Println("Crossbuilding functions only works on amd64 architecture.")
-		return nil
-	}
-
 	err = devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
 	if err != nil {
 		return err

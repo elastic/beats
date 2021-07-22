@@ -59,7 +59,7 @@ func init() {
 				"to_lower", "ignore_missing",
 				"ignore_failure",
 			)))
-	jsprocessor.RegisterPlugin(procName, New)
+	jsprocessor.RegisterPlugin("DecodeXML", New)
 }
 
 // New constructs a new decode_xml processor.

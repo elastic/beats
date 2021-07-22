@@ -1,0 +1,49 @@
+---
+description: Pipeline for PanOS Threat Logs
+processors:
+  # Set network.direction from threat direction (Threat logs).
+  - set:
+      field: network.direction
+      value: inbound
+      if: '(ctx?._temp_?.direction == "0" || ctx?._temp_?.direction == "client-to-server")'
+  - set:
+      field: network.direction
+      value: outbound
+      if: '(ctx?._temp_?.direction == "1" || ctx?._temp_?.direction == "server-to-client")'
+  - set:
+      field: network.direction
+      value: unknown
+      if: 'ctx?.network?.direction == null'
+
+  # Set event.category depending on log type.
+  - set:
+      field: event.kind
+      value: alert
+  - append:
+      field: event.category
+      allow_duplicates: false
+      value:
+        - security_threat
+        - intrusion_detection
+        - network
+
+  - grok:
+      if: 'ctx?.panw?.panos?.threat?.name != null'
+      field: panw.panos.threat.name
+      ignore_failure: true
+      patterns:
+        - '%{GREEDYDATA:panw.panos.threat.name}\(\s*%{GREEDYDATA:panw.panos.threat.id}\s*\)'
+
+  - set:
+      field: panw.panos.threat.name
+      value: 'URL-filtering'
+      if: 'ctx?.panw?.panos?.threat?.id == "9999"'
+
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in Threat pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}

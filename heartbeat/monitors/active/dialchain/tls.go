@@ -40,11 +40,7 @@ func TLSLayer(cfg *tlscommon.TLSConfig, to time.Duration) Layer {
 		// This gets us the timestamp for when the TLS layer will start the handshake.
 		next = startTimerAfterDial(&timer, next)
 
-		dialer, err := transport.TLSDialer(next, cfg, to)
-		if err != nil {
-			return nil, err
-		}
-
+		dialer := transport.TLSDialer(next, cfg, to)
 		return afterDial(dialer, func(conn net.Conn) (net.Conn, error) {
 			tlsConn, ok := conn.(*cryptoTLS.Conn)
 			if !ok {

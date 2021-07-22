@@ -102,6 +102,15 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+	var jobErr error
+	if se.Error != nil {
+		jobErr = stepError(se.Error)
+		je.errorCount++
+		if je.firstError == nil {
+			je.firstError = jobErr
+		}
+	}
+
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
@@ -133,16 +142,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 			}
 		}
 	}
-
-	var jobErr error
-	if se.Error != nil {
-		jobErr = stepError(se.Error)
-		je.errorCount++
-		if je.firstError == nil {
-			je.firstError = jobErr
-		}
-	}
-
 	return jobErr
 }
 

@@ -10,8 +10,10 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestNewSet(t *testing.T) {
@@ -130,7 +132,7 @@ func TestNewSet(t *testing.T) {
 func TestSetFunctions(t *testing.T) {
 	cases := []struct {
 		name        string
-		tfunc       func(ctx *transformContext, transformable transformable, key, val string) error
+		tfunc       func(ctx *transformContext, transformable transformable, key string, val interface{}) error
 		paramCtx    *transformContext
 		paramTr     transformable
 		paramKey    string
@@ -191,6 +193,82 @@ func TestSetFunctions(t *testing.T) {
 			assert.EqualValues(t, tcase.expectedTr, tcase.paramTr)
 		})
 	}
+}
+
+func TestDifferentSetValueTypes(t *testing.T) {
+	c1 := map[string]interface{}{
+		"target":     "body.p1",
+		"value":      `{"param":"value"}`,
+		"value_type": "json",
+	}
+
+	cfg, err := common.NewConfigFrom(c1)
+	require.NoError(t, err)
+
+	transform, err := newSetResponse(cfg, logp.NewLogger("test"))
+	require.NoError(t, err)
+
+	testAppend := transform.(*set)
+
+	trCtx := emptyTransformContext()
+	tr := transformable{}
+
+	tr, err = testAppend.run(trCtx, tr)
+	require.NoError(t, err)
+
+	exp := common.MapStr{
+		"p1": map[string]interface{}{
+			"param": "value",
+		},
+	}
+
+	assert.EqualValues(t, exp, tr.body())
+
+	c2 := map[string]interface{}{
+		"target":     "body.p1",
+		"value":      "1",
+		"value_type": "int",
+	}
+
+	cfg, err = common.NewConfigFrom(c2)
+	require.NoError(t, err)
+
+	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	require.NoError(t, err)
+
+	testAppend = transform.(*set)
+
+	tr = transformable{}
+
+	tr, err = testAppend.run(trCtx, tr)
+	require.NoError(t, err)
+
+	exp = common.MapStr{
+		"p1": int64(1),
+	}
+
+	assert.EqualValues(t, exp, tr.body())
+
+	c2["value_type"] = "string"
+
+	cfg, err = common.NewConfigFrom(c2)
+	require.NoError(t, err)
+
+	transform, err = newSetResponse(cfg, logp.NewLogger("test"))
+	require.NoError(t, err)
+
+	testAppend = transform.(*set)
+
+	tr = transformable{}
+
+	tr, err = testAppend.run(trCtx, tr)
+	require.NoError(t, err)
+
+	exp = common.MapStr{
+		"p1": "1",
+	}
+
+	assert.EqualValues(t, exp, tr.body())
 }
 
 func newURL(u string) url.URL {

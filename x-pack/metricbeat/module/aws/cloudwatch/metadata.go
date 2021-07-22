@@ -8,9 +8,9 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/ec2"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/rds"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/sqs"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/ec2"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/rds"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/cloudwatch/metadata/sqs"
 )
 
 // AWS namespaces

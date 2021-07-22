@@ -1,3 +1,5 @@
+# Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
+
 - module: misp
   threat:
     enabled: true

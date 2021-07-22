@@ -15,3 +15,33 @@ rules:
   resources:
     - replicasets
   verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditbeat
+  # should be the namespace where auditbeat is running
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: auditbeat-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: auditbeat
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]

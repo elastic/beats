@@ -128,9 +128,19 @@ func TestExtraArgs(t *testing.T) {
 			nil,
 		},
 		{
+			"default",
+			DefaultConfig(),
+			[]string{"--screenshots", "on"},
+		},
+		{
 			"sandbox",
 			&Config{Sandbox: true},
 			[]string{"--sandbox"},
+		},
+		{
+			"screenshots",
+			&Config{Screenshots: "off"},
+			[]string{"--screenshots", "off"},
 		},
 		{
 			"capabilities",

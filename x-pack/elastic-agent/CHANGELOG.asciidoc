@@ -12,6 +12,7 @@
 - Remove obfuscation of fleet.yml, causes re-enroll of agent to Fleet {pull}19678[19678]
 - Rename enroll --ca_sha256 to --ca-sha256 {pull}19900[19900]
 - Rename enroll --certificate_authorities to --certificate-authorities {pull}19900[19900]
+- Don't build 32 bits version of Elastic Agent. {issue}25533[25533]
 
 ==== Bugfixes
 
@@ -43,6 +44,7 @@
 - Fix capabilities resolution in inspect command {pull}[24346]24346
 - Logging to file disabled on enroll {issue}[24173]24173
 - Prevent uninstall failures on empty config {pull}[24838]24838
+- Fix issue with FLEET_CA not being used with Fleet Server in container {pull}26529[26529]
 
 ==== New features
 

@@ -111,9 +111,13 @@ func (m *ServiceMetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Enrich(events)
 
 	for _, event := range events {
-		event[mb.NamespaceKey] = "service"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
+
+		e, err := util.CreateEvent(event, "kubernetes.service")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

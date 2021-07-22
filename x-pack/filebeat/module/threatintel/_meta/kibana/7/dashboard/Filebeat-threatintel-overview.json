@@ -30,8 +30,41 @@
               "y": 0
             },
             "panelIndex": "0a8c6e54-3d3a-4e88-a230-75d7a3856154",
-            "panelRefName": "panel_0",
-            "version": "7.11.0"
+            "panelRefName": "panel_0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+            "type": "visualization",
+            "version": "7.13.2"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "eed57854-9d6a-4373-ab79-aba5025ab5ed",
+              "w": 10,
+              "x": 0,
+              "y": 7
+            },
+            "panelIndex": "eed57854-9d6a-4373-ab79-aba5025ab5ed",
+            "panelRefName": "panel_eed57854-9d6a-4373-ab79-aba5025ab5ed",
+            "type": "visualization",
+            "version": "7.13.2"
+          },
+          {
+            "embeddableConfig": {
+              "enhancements": {}
+            },
+            "gridData": {
+              "h": 15,
+              "i": "cecb5fce-b1c6-4121-a943-73c163554fff",
+              "w": 13,
+              "x": 30,
+              "y": 7
+            },
+            "panelIndex": "cecb5fce-b1c6-4121-a943-73c163554fff",
+            "panelRefName": "panel_cecb5fce-b1c6-4121-a943-73c163554fff",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -40,13 +73,14 @@
             "gridData": {
               "h": 15,
               "i": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
-              "w": 8,
-              "x": 40,
+              "w": 5,
+              "x": 43,
               "y": 7
             },
             "panelIndex": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
-            "panelRefName": "panel_1",
-            "version": "7.11.0"
+            "panelRefName": "panel_8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -56,12 +90,13 @@
               "h": 15,
               "i": "81f493cc-5459-4baf-b57a-295f290debf3",
               "w": 8,
-              "x": 0,
+              "x": 10,
               "y": 7
             },
             "panelIndex": "81f493cc-5459-4baf-b57a-295f290debf3",
-            "panelRefName": "panel_2",
-            "version": "7.11.0"
+            "panelRefName": "panel_81f493cc-5459-4baf-b57a-295f290debf3",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -70,28 +105,14 @@
             "gridData": {
               "h": 15,
               "i": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
-              "w": 15,
-              "x": 8,
+              "w": 12,
+              "x": 18,
               "y": 7
             },
             "panelIndex": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
-            "panelRefName": "panel_3",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 15,
-              "i": "cecb5fce-b1c6-4121-a943-73c163554fff",
-              "w": 17,
-              "x": 23,
-              "y": 7
-            },
-            "panelIndex": "cecb5fce-b1c6-4121-a943-73c163554fff",
-            "panelRefName": "panel_4",
-            "version": "7.11.0"
+            "panelRefName": "panel_c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -105,8 +126,9 @@
               "y": 22
             },
             "panelIndex": "8788d810-774f-4190-bc01-16fb04c0b38c",
-            "panelRefName": "panel_5",
-            "version": "7.11.0"
+            "panelRefName": "panel_8788d810-774f-4190-bc01-16fb04c0b38c",
+            "type": "lens",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -120,8 +142,9 @@
               "y": 22
             },
             "panelIndex": "51db6286-e72d-4a6c-99f5-363f17bb333a",
-            "panelRefName": "panel_6",
-            "version": "7.11.0"
+            "panelRefName": "panel_51db6286-e72d-4a6c-99f5-363f17bb333a",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -135,8 +158,9 @@
               "y": 22
             },
             "panelIndex": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
-            "panelRefName": "panel_7",
-            "version": "7.11.0"
+            "panelRefName": "panel_4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -150,8 +174,9 @@
               "y": 37
             },
             "panelIndex": "f7fb86cb-c07f-4489-afaa-942bcacfedda",
-            "panelRefName": "panel_8",
-            "version": "7.11.0"
+            "panelRefName": "panel_f7fb86cb-c07f-4489-afaa-942bcacfedda",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -165,8 +190,9 @@
               "y": 37
             },
             "panelIndex": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
-            "panelRefName": "panel_9",
-            "version": "7.11.0"
+            "panelRefName": "panel_e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
@@ -180,17 +206,19 @@
               "y": 37
             },
             "panelIndex": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
-            "panelRefName": "panel_10",
-            "version": "7.11.0"
+            "panelRefName": "panel_ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+            "type": "visualization",
+            "version": "7.13.2"
           }
         ],
         "timeRestore": false,
         "title": "[Filebeat Threat Intel] Overview",
         "version": 1
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "dashboard": "7.11.0"
+        "dashboard": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -198,57 +226,62 @@
       "references": [
         {
           "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_0",
+          "name": "0a8c6e54-3d3a-4e88-a230-75d7a3856154:panel_0a8c6e54-3d3a-4e88-a230-75d7a3856154",
           "type": "visualization"
         },
         {
-          "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_3",
+          "id": "f13f5650-df5b-11eb-8f2b-753caedf727d",
+          "name": "eed57854-9d6a-4373-ab79-aba5025ab5ed:panel_eed57854-9d6a-4373-ab79-aba5025ab5ed",
           "type": "visualization"
         },
         {
           "id": "1a1c60c0-72d5-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_4",
+          "name": "cecb5fce-b1c6-4121-a943-73c163554fff:panel_cecb5fce-b1c6-4121-a943-73c163554fff",
+          "type": "visualization"
+        },
+        {
+          "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+          "name": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929:panel_8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+          "type": "visualization"
+        },
+        {
+          "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+          "name": "81f493cc-5459-4baf-b57a-295f290debf3:panel_81f493cc-5459-4baf-b57a-295f290debf3",
+          "type": "visualization"
+        },
+        {
+          "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
+          "name": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89:panel_c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
           "type": "visualization"
         },
         {
           "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_5",
+          "name": "8788d810-774f-4190-bc01-16fb04c0b38c:panel_8788d810-774f-4190-bc01-16fb04c0b38c",
           "type": "lens"
         },
         {
           "id": "f9f89660-72d9-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_6",
+          "name": "51db6286-e72d-4a6c-99f5-363f17bb333a:panel_51db6286-e72d-4a6c-99f5-363f17bb333a",
           "type": "visualization"
         },
         {
           "id": "9047e8b0-72de-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_7",
+          "name": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045:panel_4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
           "type": "visualization"
         },
         {
           "id": "b9aa1d70-72db-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_8",
+          "name": "f7fb86cb-c07f-4489-afaa-942bcacfedda:panel_f7fb86cb-c07f-4489-afaa-942bcacfedda",
           "type": "visualization"
         },
         {
           "id": "aebde030-72d2-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_9",
+          "name": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264:panel_e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
           "type": "visualization"
         },
         {
           "id": "c813c5d0-72dd-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_10",
+          "name": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce:panel_ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
           "type": "visualization"
         },
         {
@@ -258,8 +291,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNDEsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzNywxXQ=="
     },
     {
       "attributes": {
@@ -334,9 +367,10 @@
           "type": "input_control_vis"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -364,106 +398,44 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzAsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyNCwxXQ=="
     },
     {
       "attributes": {
-        "description": "Total number of datasets reflected by the threat intel Filebeat module.",
+        "description": "Navigation pane for the threat intel Filebeat module.",
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "event.dataset"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
+            "filter": [],
             "query": {
               "language": "kuery",
               "query": ""
             }
           }
         },
-        "savedSearchRefName": "search_0",
-        "title": "Total Datasets [Filebeat Threat Intel]",
+        "title": "Threat Intel Module Navigation [Filebeat Threat Intel]",
         "uiStateJSON": {},
         "version": 1,
         "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Total Datasets",
-                "field": "event.dataset"
-              },
-              "schema": "metric",
-              "type": "cardinality"
-            }
-          ],
+          "aggs": [],
           "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
+            "fontSize": 12,
+            "markdown": "**Filebeat Threat Intel Module Navigation**\n\n[Abuse Malware Overview](#/dashboard/5ba16340-72e6-11eb-a3e3-b3cc7c78a70f)  \n[Abuse URL Overview](#/dashboard/65fa6bc0-72f0-11eb-a3e3-b3cc7c78a70f)  \n[AlienVault Overview](#/dashboard/53e4e630-76cf-11eb-a3e3-b3cc7c78a70f)  \n[Anomali Overview](#/dashboard/68c48a30-739e-11eb-a3e3-b3cc7c78a70f)  \n[Malware Bazaar Overview](#/dashboard/dee7be00-82ab-11eb-ac13-d5ca87cb8fa2)  \n[MISP Overview](#/dashboard/47e6fdc0-76b9-11eb-a3e3-b3cc7c78a70f)  \n[Recorded Future Overview](#/dashboard/894dd3e0-df57-11eb-8f2b-753caedf727d)  ",
+            "openLinksInNewTab": false
           },
-          "title": "Total Datasets [Filebeat Threat Intel]",
-          "type": "metric"
+          "title": "Threat Intel Module Navigation [Filebeat Threat Intel]",
+          "type": "markdown"
         }
       },
-      "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+      "coreMigrationVersion": "7.13.2",
+      "id": "f13f5650-df5b-11eb-8f2b-753caedf727d",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
       "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
         {
           "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
           "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
@@ -471,219 +443,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzEsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Total number of indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "event.dataset"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Total Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Total Indicators"
-              },
-              "schema": "metric",
-              "type": "count"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Total Indicators [Filebeat Threat Intel]",
-          "type": "metric"
-        }
-      },
-      "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzIsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Total number of indicators by dataset ingested by the threat intel Filebeat module. Top 10 datasets.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "event.dataset"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.dataset",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzMsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyNSwxXQ=="
     },
     {
       "attributes": {
@@ -795,9 +556,10 @@
           "type": "pie"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "1a1c60c0-72d5-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -825,8 +587,329 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzQsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyNywxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "Total number of datasets reflected by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Datasets [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Datasets",
+                "field": "event.dataset"
+              },
+              "schema": "metric",
+              "type": "cardinality"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Total Datasets [Filebeat Threat Intel]",
+          "type": "metric"
+        }
+      },
+      "coreMigrationVersion": "7.13.2",
+      "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.13.1"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyOCwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {
+                "customLabel": "Total Indicators"
+              },
+              "schema": "metric",
+              "type": "count"
+            }
+          ],
+          "params": {
+            "addLegend": false,
+            "addTooltip": true,
+            "metric": {
+              "colorSchema": "Green to Red",
+              "colorsRange": [
+                {
+                  "from": 0,
+                  "to": 10000
+                }
+              ],
+              "invertColors": false,
+              "labels": {
+                "show": true
+              },
+              "metricColorMode": "None",
+              "percentageMode": false,
+              "style": {
+                "bgColor": false,
+                "bgFill": "#000",
+                "fontSize": 60,
+                "labelColor": false,
+                "subText": ""
+              },
+              "useRanges": false
+            },
+            "type": "metric"
+          },
+          "title": "Total Indicators [Filebeat Threat Intel]",
+          "type": "metric"
+        }
+      },
+      "coreMigrationVersion": "7.13.2",
+      "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.13.1"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyOSwxXQ=="
+    },
+    {
+      "attributes": {
+        "description": "Total number of indicators by dataset ingested by the threat intel Filebeat module. Top 10 datasets.",
+        "kibanaSavedObjectMeta": {
+          "searchSourceJSON": {
+            "filter": [
+              {
+                "$state": {
+                  "store": "appState"
+                },
+                "exists": {
+                  "field": "event.dataset"
+                },
+                "meta": {
+                  "alias": null,
+                  "disabled": false,
+                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                  "key": "event.dataset",
+                  "negate": false,
+                  "type": "exists",
+                  "value": "exists"
+                }
+              }
+            ],
+            "query": {
+              "language": "kuery",
+              "query": ""
+            }
+          }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+          "aggs": [
+            {
+              "enabled": true,
+              "id": "1",
+              "params": {},
+              "schema": "metric",
+              "type": "count"
+            },
+            {
+              "enabled": true,
+              "id": "2",
+              "params": {
+                "field": "event.dataset",
+                "missingBucket": false,
+                "missingBucketLabel": "Missing",
+                "order": "desc",
+                "orderBy": "1",
+                "otherBucket": false,
+                "otherBucketLabel": "Other",
+                "size": 10
+              },
+              "schema": "segment",
+              "type": "terms"
+            }
+          ],
+          "params": {
+            "addLegend": true,
+            "addTooltip": true,
+            "isDonut": true,
+            "labels": {
+              "last_level": true,
+              "show": true,
+              "truncate": 100,
+              "values": true
+            },
+            "legendPosition": "right",
+            "type": "pie"
+          },
+          "title": "Total Indicators per Dataset [Filebeat Threat Intel]",
+          "type": "pie"
+        }
+      },
+      "coreMigrationVersion": "7.13.2",
+      "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
+      "migrationVersion": {
+        "visualization": "7.13.1"
+      },
+      "namespaces": [
+        "default"
+      ],
+      "references": [
+        {
+          "id": "filebeat-*",
+          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+          "type": "index-pattern"
+        },
+        {
+          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+          "name": "search_0",
+          "type": "search"
+        },
+        {
+          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+          "type": "tag"
+        }
+      ],
+      "type": "visualization",
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzMCwxXQ=="
     },
     {
       "attributes": {
@@ -942,9 +1025,10 @@
         "title": "Total Indicators per Type [Filebeat Threat Intel]",
         "visualizationType": "lnsPie"
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "lens": "7.11.0"
+        "lens": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -977,8 +1061,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzUsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzMSwxXQ=="
     },
     {
       "attributes": {
@@ -1034,9 +1118,10 @@
           "type": "tagcloud"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "f9f89660-72d9-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -1054,8 +1139,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzYsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzMiwxXQ=="
     },
     {
       "attributes": {
@@ -1129,14 +1214,20 @@
                 "type": "category"
               }
             ],
+            "detailedTooltip": true,
             "grid": {
               "categoryLines": false,
               "valueAxis": "ValueAxis-1"
             },
+            "isVislibVis": true,
             "labels": {
               "show": true
             },
             "legendPosition": "right",
+            "palette": {
+              "name": "kibana_palette",
+              "type": "palette"
+            },
             "seriesParams": [
               {
                 "data": {
@@ -1189,9 +1280,10 @@
           "type": "horizontal_bar"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "9047e8b0-72de-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -1209,8 +1301,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzcsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzMywxXQ=="
     },
     {
       "attributes": {
@@ -1316,11 +1408,18 @@
                 "type": "category"
               }
             ],
+            "detailedTooltip": true,
+            "fittingFunction": "zero",
             "grid": {
               "categoryLines": false
             },
+            "isVislibVis": true,
             "labels": {},
             "legendPosition": "right",
+            "palette": {
+              "name": "kibana_palette",
+              "type": "palette"
+            },
             "seriesParams": [
               {
                 "data": {
@@ -1374,9 +1473,10 @@
           "type": "area"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "b9aa1d70-72db-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -1399,8 +1499,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzgsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzNCwxXQ=="
     },
     {
       "attributes": {
@@ -1510,13 +1610,19 @@
                 "type": "category"
               }
             ],
+            "detailedTooltip": true,
             "grid": {
               "categoryLines": false
             },
+            "isVislibVis": true,
             "labels": {
               "show": true
             },
             "legendPosition": "right",
+            "palette": {
+              "name": "kibana_palette",
+              "type": "palette"
+            },
             "seriesParams": [
               {
                 "data": {
@@ -1569,9 +1675,10 @@
           "type": "histogram"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "aebde030-72d2-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -1594,8 +1701,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMzksMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzNSwxXQ=="
     },
     {
       "attributes": {
@@ -1701,11 +1808,18 @@
                 "type": "category"
               }
             ],
+            "detailedTooltip": true,
+            "fittingFunction": "zero",
             "grid": {
               "categoryLines": false
             },
+            "isVislibVis": true,
             "labels": {},
             "legendPosition": "right",
+            "palette": {
+              "name": "kibana_palette",
+              "type": "palette"
+            },
             "seriesParams": [
               {
                 "data": {
@@ -1759,9 +1873,10 @@
           "type": "area"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "c813c5d0-72dd-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
-        "visualization": "7.11.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -1784,8 +1899,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNDAsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgzNiwxXQ=="
     },
     {
       "attributes": {
@@ -1793,14 +1908,15 @@
         "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
         "name": "threat intel"
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "tag",
-      "updated_at": "2021-03-10T19:01:18.125Z",
-      "version": "WzIyMTcsMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyMywxXQ=="
     },
     {
       "attributes": {
@@ -1910,6 +2026,7 @@
         "title": "All Logs [Filebeat Threat Intel] ECS",
         "version": 1
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
       "migrationVersion": {
         "search": "7.9.3"
@@ -1945,9 +2062,9 @@
         }
       ],
       "type": "search",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMTksMl0="
+      "updated_at": "2021-07-08T18:07:38.586Z",
+      "version": "WzgyNiwxXQ=="
     }
   ],
-  "version": "7.11.1"
+  "version": "7.13.2"
 }

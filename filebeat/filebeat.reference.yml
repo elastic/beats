@@ -699,6 +699,16 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
 
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
+
   ### State options
 
   # Files for the modification data is older then clean_inactive the state from the registry is removed
@@ -895,7 +905,6 @@ filebeat.inputs:
     #max_message_size: 10KiB
 
 # Accept RFC5424 formatted syslog event via TCP.
-# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
   #format: rfc5424
@@ -1497,6 +1506,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1755,10 +1765,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1836,6 +1842,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:

@@ -23,7 +23,7 @@ func NewDownloader(config *artifact.Config, versionOverride string) (download.Do
 	if err != nil {
 		return nil, err
 	}
-	return http.NewDownloader(cfg), nil
+	return http.NewDownloader(cfg)
 }
 
 func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.Config, error) {
@@ -33,13 +33,13 @@ func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.
 	}
 
 	return &artifact.Config{
-		OperatingSystem: config.OperatingSystem,
-		Architecture:    config.Architecture,
-		SourceURI:       snapshotURI,
-		TargetDirectory: config.TargetDirectory,
-		Timeout:         config.Timeout,
-		InstallPath:     config.InstallPath,
-		DropPath:        config.DropPath,
+		OperatingSystem:       config.OperatingSystem,
+		Architecture:          config.Architecture,
+		SourceURI:             snapshotURI,
+		TargetDirectory:       config.TargetDirectory,
+		InstallPath:           config.InstallPath,
+		DropPath:              config.DropPath,
+		HTTPTransportSettings: config.HTTPTransportSettings,
 	}, nil
 }
 

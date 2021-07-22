@@ -180,6 +180,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		return err
 	}
 
+	trCtx.clearIntervalData()
+
 	var n int
 	for maybeMsg := range eventsCh {
 		if maybeMsg.failed() {
