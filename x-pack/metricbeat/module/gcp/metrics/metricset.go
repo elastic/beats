@@ -7,7 +7,7 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"strings"
+	"path"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -61,18 +61,16 @@ type metricsConfig struct {
 	Aligner             string   `config:"aligner"`
 }
 
-func (mc metricsConfig) MetricPrefix() string {
+func (mc metricsConfig) AddPrefixTo(metric string) string {
+	prefix := mc.ServiceMetricPrefix
 	// NOTE: fallback to Google Cloud prefix for backward compatibility
 	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
 	// List: https://cloud.google.com/monitoring/api/metrics_gcp
-	if mc.ServiceMetricPrefix == "" {
-		return mc.ServiceName + ".googleapis.com/"
+	if prefix == "" {
+		prefix = mc.ServiceName + ".googleapis.com"
 	}
 
-	if !strings.HasSuffix(mc.ServiceMetricPrefix, "/") {
-		mc.ServiceMetricPrefix += "/"
-	}
-	return mc.ServiceMetricPrefix
+	return path.Join(prefix, metric)
 }
 
 type metricMeta struct {
@@ -247,7 +245,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s%s")`, sdc.MetricPrefix(), mt)
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.AddPrefixTo(mt))
 			it := client.ListMetricDescriptors(ctx, req)
 
 			for {

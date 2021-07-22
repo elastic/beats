@@ -6,44 +6,39 @@ package metrics
 
 import "testing"
 
-func Test_metricsConfig_MetricPrefix(t *testing.T) {
-	type fields struct {
-		ServiceName         string
-		ServiceMetricPrefix string
-		MetricTypes         []string
-		Aligner             string
-	}
+var fakeMetricsConfig = []metricsConfig{
+	{"billing", "", []string{}, ""},
+	{"billing", "foobar/", []string{}, ""},
+	{"billing", "foobar", []string{}, ""},
+}
+
+func Test_metricsConfig_AddPrefixTo(t *testing.T) {
+	metric := "awesome/metric"
 	tests := []struct {
 		name   string
-		fields fields
+		fields metricsConfig
 		want   string
 	}{
 		{
 			name:   "only service name",
-			fields: fields{"billing", "", []string{}, ""},
-			want:   "billing.googleapis.com/",
+			fields: fakeMetricsConfig[0],
+			want:   "billing.googleapis.com/" + metric,
 		},
 		{
 			name:   "service metric prefix override",
-			fields: fields{"billing", "foobar/", []string{}, ""},
-			want:   "foobar/",
+			fields: fakeMetricsConfig[1],
+			want:   "foobar/" + metric,
 		},
 		{
 			name:   "service metric prefix override (without trailing /)",
-			fields: fields{"billing", "foobar", []string{}, ""},
-			want:   "foobar/",
+			fields: fakeMetricsConfig[2],
+			want:   "foobar/" + metric,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mc := metricsConfig{
-				ServiceName:         tt.fields.ServiceName,
-				ServiceMetricPrefix: tt.fields.ServiceMetricPrefix,
-				MetricTypes:         tt.fields.MetricTypes,
-				Aligner:             tt.fields.Aligner,
-			}
-			if got := mc.MetricPrefix(); got != tt.want {
-				t.Errorf("metricsConfig.MetricPrefix() = %v, want %v", got, tt.want)
+			if got := tt.fields.AddPrefixTo(metric); got != tt.want {
+				t.Errorf("metricsConfig.AddPrefixTo(%s) = %v, want %v", metric, got, tt.want)
 			}
 		})
 	}
