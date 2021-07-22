@@ -62,14 +62,14 @@ type PromEventsGenerator interface {
 	// Start must be called before using the generator
 	Start()
 
-	// converts a Prometheus metric family into a list of PromEvents
+	// GeneratePromEvents converts a Prometheus metric family into a list of PromEvents
 	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
 }
 
-// PromEventsGeneratorFactory creates a PromEventsGenerator when instanciating a metricset
+// PromEventsGeneratorFactory creates a PromEventsGenerator when instantiating a MetricSet
 type PromEventsGeneratorFactory func(ms mb.BaseMetricSet) (PromEventsGenerator, error)
 
 // MetricSet for fetching prometheus data

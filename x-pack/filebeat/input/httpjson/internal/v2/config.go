@@ -7,6 +7,8 @@ package v2
 import (
 	"errors"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 type config struct {
@@ -17,9 +19,16 @@ type config struct {
 	Cursor   cursorConfig    `config:"cursor"`
 }
 
-type cursorConfig map[string]struct {
-	Value   *valueTpl `config:"value"`
-	Default *valueTpl `config:"default"`
+type cursorConfig map[string]cursorEntry
+
+type cursorEntry struct {
+	Value            *valueTpl `config:"value"`
+	Default          *valueTpl `config:"default"`
+	IgnoreEmptyValue *bool     `config:"ignore_empty_value"`
+}
+
+func (ce cursorEntry) mustIgnoreEmptyValue() bool {
+	return ce.IgnoreEmptyValue == nil || *ce.IgnoreEmptyValue
 }
 
 func (c config) Validate() error {
@@ -30,16 +39,17 @@ func (c config) Validate() error {
 }
 
 func defaultConfig() config {
-	timeout := 30 * time.Second
 	maxAttempts := 5
 	waitMin := time.Second
 	waitMax := time.Minute
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 30 * time.Second
+
 	return config{
 		Interval: time.Minute,
 		Auth:     &authConfig{},
 		Request: &requestConfig{
-			Timeout: &timeout,
-			Method:  "GET",
+			Method: "GET",
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,
 				WaitMin:     &waitMin,
@@ -47,6 +57,7 @@ func defaultConfig() config {
 			},
 			RedirectForwardHeaders: false,
 			RedirectMaxRedirects:   10,
+			Transport:              transport,
 		},
 		Response: &responseConfig{},
 	}

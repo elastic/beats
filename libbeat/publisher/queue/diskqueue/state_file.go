@@ -24,6 +24,8 @@ import (
 	"os"
 )
 
+const currentStateFileVersion = 1
+
 // Given an open file handle to the queue state, decode the current position
 // and return the result if successful, otherwise an error.
 func queuePositionFromHandle(
@@ -40,7 +42,7 @@ func queuePositionFromHandle(
 	if err != nil {
 		return queuePosition{}, err
 	}
-	if version != 0 {
+	if version > currentStateFileVersion {
 		return queuePosition{},
 			fmt.Errorf("Unsupported queue metadata version (%d)", version)
 	}
@@ -52,11 +54,19 @@ func queuePositionFromHandle(
 	}
 
 	err = binary.Read(
-		reader, binary.LittleEndian, &position.offset)
+		reader, binary.LittleEndian, &position.byteIndex)
 	if err != nil {
 		return queuePosition{}, err
 	}
 
+	// frameIndex field was added in schema version 1
+	if version >= 1 {
+		err = binary.Read(
+			reader, binary.LittleEndian, &position.frameIndex)
+		if err != nil {
+			return queuePosition{}, err
+		}
+	}
 	return position, nil
 }
 
@@ -82,7 +92,8 @@ func writeQueuePositionToHandle(
 	}
 
 	// Want to write: version (0), segment id, segment offset.
-	err = binary.Write(file, binary.LittleEndian, uint32(0))
+	err = binary.Write(
+		file, binary.LittleEndian, uint32(currentStateFileVersion))
 	if err != nil {
 		return err
 	}
@@ -90,6 +101,10 @@ func writeQueuePositionToHandle(
 	if err != nil {
 		return err
 	}
-	err = binary.Write(file, binary.LittleEndian, position.offset)
+	err = binary.Write(file, binary.LittleEndian, position.byteIndex)
+	if err != nil {
+		return err
+	}
+	err = binary.Write(file, binary.LittleEndian, position.frameIndex)
 	return err
 }

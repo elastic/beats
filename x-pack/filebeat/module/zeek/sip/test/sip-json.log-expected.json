@@ -22,13 +22,14 @@
         "event.outcome": "failure",
         "event.type": [
             "connection",
-            "protocol",
-            "error"
+            "error",
+            "protocol"
         ],
         "fileset.name": "sip",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:t8Jl0amIXPHemzxKgsLjtkB+ewo=",
+        "network.direction": "outbound",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
@@ -100,11 +101,12 @@
         "input.type": "log",
         "log.offset": 805,
         "network.community_id": "1:U/Makwsc8lm6pVKLfRMzoNTI++0=",
+        "network.direction": "external",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
-            "200.57.7.204",
-            "200.57.7.195"
+            "200.57.7.195",
+            "200.57.7.204"
         ],
         "service.type": "zeek",
         "source.address": "200.57.7.204",
@@ -141,8 +143,8 @@
         "zeek.sip.response.from": "<sip:200.57.7.195:55061;user=phone>",
         "zeek.sip.response.path": [
             "SIP/2.0/UDP 200.57.7.195",
-            "SIP/2.0/UDP 200.57.7.195:55061",
             "SIP/2.0/UDP 200.57.7.195",
+            "SIP/2.0/UDP 200.57.7.195:55061",
             "SIP/2.0/UDP 200.57.7.195:55061"
         ],
         "zeek.sip.response.to": "\"francisco@bestel.com\" <sip:francisco@bestel.com:55060>;tag=298852044",
@@ -185,11 +187,12 @@
         "input.type": "log",
         "log.offset": 1654,
         "network.community_id": "1:0hvHF/bh5wFKg7nfRXxsno4F198=",
+        "network.direction": "external",
         "network.protocol": "sip",
         "network.transport": "udp",
         "related.ip": [
-            "200.57.7.205",
-            "200.57.7.195"
+            "200.57.7.195",
+            "200.57.7.205"
         ],
         "service.type": "zeek",
         "source.address": "200.57.7.205",

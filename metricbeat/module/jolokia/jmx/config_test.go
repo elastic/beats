@@ -370,6 +370,19 @@ func TestCanonicalizeMbeanName(t *testing.T) {
 			escape:   true,
 			expected: `Catalina:name=HttpRequest1,type=RequestProcessor,worker=!"http-nio-8080!"`,
 		},
+		{
+			mbean: &MBeanName{
+				Domain: `solr`,
+				Properties: map[string]string{
+					"dom1":  "jvm",
+					"name":  "used",
+					"name0": "memory",
+					"name1": "total",
+				},
+			},
+			escape:   true,
+			expected: `solr:dom1=jvm,name=used,name0=memory,name1=total`,
+		},
 	}
 
 	for _, c := range cases {

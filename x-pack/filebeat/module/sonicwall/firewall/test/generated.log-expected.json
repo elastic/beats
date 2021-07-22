@@ -36,8 +36,8 @@
         ],
         "source.port": 1001,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -64,8 +64,8 @@
             "oreetdol1714.internal.corp"
         ],
         "related.ip": [
-            "10.92.136.230",
-            "10.49.111.67"
+            "10.49.111.67",
+            "10.92.136.230"
         ],
         "rsa.internal.messageid": "914",
         "rsa.internal.msg": "lupt",
@@ -77,8 +77,8 @@
         "source.nat.ip": "10.92.136.230",
         "source.nat.port": 6437,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -98,8 +98,8 @@
         "rsa.time.event_time": "2016-02-26T22:15:08.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -126,9 +126,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.227.15.1",
             "10.149.203.46",
-            "10.150.156.22"
+            "10.150.156.22",
+            "10.227.15.1"
         ],
         "rsa.internal.event_desc": "ctetur",
         "rsa.internal.messageid": "1369",
@@ -150,8 +150,8 @@
         "source.mac": "01:00:5e:84:66:6c",
         "source.port": 6378,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -170,8 +170,8 @@
         "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -191,8 +191,8 @@
         "rsa.time.event_time": "2016-04-09T19:22:51.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -212,8 +212,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.95.245.65",
-            "10.13.70.213"
+            "10.13.70.213",
+            "10.95.245.65"
         ],
         "rsa.internal.messageid": "372",
         "rsa.internal.msg": "llu",
@@ -224,8 +224,8 @@
             "10.95.245.65"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -244,8 +244,8 @@
         "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -264,8 +264,8 @@
         "rsa.time.event_time": "2016-05-22T16:30:33.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -285,8 +285,8 @@
         "rsa.time.event_time": "2016-06-05T23:33:08.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -322,8 +322,8 @@
         ],
         "source.port": 3788,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -342,8 +342,8 @@
         "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -363,8 +363,8 @@
         "rsa.time.event_time": "2016-07-18T20:40:50.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -384,8 +384,8 @@
         "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -410,8 +410,8 @@
         "rsa.time.event_time": "2016-08-16T10:45:59.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -431,8 +431,8 @@
         "rsa.time.event_time": "2016-08-30T17:48:33.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -455,8 +455,8 @@
         "rsa.time.event_time": "2016-09-14T00:51:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -476,8 +476,8 @@
         "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -512,8 +512,8 @@
         "source.address": "fugi4637.www.lan",
         "source.nat.ip": "10.241.178.107",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -533,8 +533,8 @@
         "rsa.time.event_time": "2016-10-26T21:58:50.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -553,8 +553,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.78.151.178",
-            "10.157.161.103"
+            "10.157.161.103",
+            "10.78.151.178"
         ],
         "rsa.internal.event_desc": "taut",
         "rsa.internal.messageid": "24",
@@ -565,8 +565,8 @@
         "source.nat.ip": "10.157.161.103",
         "source.nat.port": 383,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -587,8 +587,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.206.136.206",
-            "10.153.136.222"
+            "10.153.136.222",
+            "10.206.136.206"
         ],
         "rsa.internal.messageid": "242",
         "rsa.internal.msg": "imidest",
@@ -599,8 +599,8 @@
             "10.153.136.222"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -620,8 +620,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.239.201.234",
-            "10.204.11.20"
+            "10.204.11.20",
+            "10.239.201.234"
         ],
         "rsa.internal.messageid": "87",
         "rsa.internal.msg": "Loremip",
@@ -632,8 +632,8 @@
             "10.204.11.20"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -660,9 +660,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
+            "10.219.116.137",
             "10.245.200.97",
-            "10.34.161.166",
-            "10.219.116.137"
+            "10.34.161.166"
         ],
         "rsa.internal.event_desc": "rehend",
         "rsa.internal.messageid": "428",
@@ -684,8 +684,8 @@
         "source.mac": "01:00:5e:1a:ec:91",
         "source.port": 3768,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -718,8 +718,8 @@
             "10.118.80.140"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -739,8 +739,8 @@
         "rsa.time.event_time": "2017-01-20T16:14:16.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -760,8 +760,8 @@
         "rsa.time.event_time": "2017-02-03T23:16:50.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -781,8 +781,8 @@
         "rsa.time.event_time": "2017-02-18T06:19:24.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -802,8 +802,8 @@
         "rsa.time.event_time": "2017-03-04T13:21:59.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -846,8 +846,8 @@
         ],
         "source.port": 3266,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -867,8 +867,8 @@
         "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -888,8 +888,8 @@
         "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -920,8 +920,8 @@
             "10.237.163.139"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -956,8 +956,8 @@
         ],
         "source.port": 1493,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -977,8 +977,8 @@
         "rsa.time.event_time": "2017-05-29T07:37:24.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -997,8 +997,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.16.72.220",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.16.72.220"
         ],
         "related.user": [
             "tenbyCi"
@@ -1011,8 +1011,8 @@
         "source.nat.ip": "10.16.72.220",
         "source.nat.port": 1842,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ],
         "user.name": "tenbyCi"
     },
@@ -1033,8 +1033,8 @@
         "rsa.time.event_time": "2017-06-26T21:42:33.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1056,8 +1056,8 @@
         "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1078,8 +1078,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.143.76.137",
-            "10.131.61.13"
+            "10.131.61.13",
+            "10.143.76.137"
         ],
         "rsa.internal.messageid": "538",
         "rsa.misc.action": [
@@ -1094,8 +1094,8 @@
         ],
         "source.port": 1414,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1118,12 +1118,12 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.hosts": [
-            "sequatu341.mail.invalid",
-            "Nemoenim2039.api.localhost"
+            "Nemoenim2039.api.localhost",
+            "sequatu341.mail.invalid"
         ],
         "related.ip": [
-            "10.99.0.226",
-            "10.77.129.130"
+            "10.77.129.130",
+            "10.99.0.226"
         ],
         "rsa.internal.messageid": "793",
         "rsa.internal.msg": "osquira",
@@ -1137,8 +1137,8 @@
         "source.nat.ip": "10.99.0.226",
         "source.nat.port": 2984,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1161,8 +1161,8 @@
         "rsa.time.event_time": "2017-08-23T01:52:50.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1182,8 +1182,8 @@
         "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1205,8 +1205,8 @@
         "rsa.time.event_time": "2017-09-20T15:57:58.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1225,8 +1225,8 @@
         "rsa.time.event_time": "2017-10-04T23:00:32.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1246,8 +1246,8 @@
         "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1267,8 +1267,8 @@
         "rsa.time.event_time": "2017-11-02T13:05:41.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1304,8 +1304,8 @@
         ],
         "source.port": 2631,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1325,8 +1325,8 @@
         "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1346,8 +1346,8 @@
         "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1369,8 +1369,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.227.15.253",
-            "10.190.175.158"
+            "10.190.175.158",
+            "10.227.15.253"
         ],
         "rsa.internal.messageid": "195",
         "rsa.internal.msg": "taevita",
@@ -1382,8 +1382,8 @@
         ],
         "source.port": 271,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1403,8 +1403,8 @@
         "rsa.time.event_time": "2018-01-13T00:18:32.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1440,8 +1440,8 @@
         ],
         "source.port": 1871,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1461,8 +1461,8 @@
         "rsa.time.event_time": "2018-02-10T14:23:41.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1485,8 +1485,8 @@
         "rsa.time.event_time": "2018-02-24T21:26:15.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1506,8 +1506,8 @@
         "rsa.time.event_time": "2018-03-11T04:28:49.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1527,8 +1527,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.25.32.107",
-            "10.18.204.87"
+            "10.18.204.87",
+            "10.25.32.107"
         ],
         "related.user": [
             "cteturad"
@@ -1542,8 +1542,8 @@
             "10.18.204.87"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ],
         "user.name": "cteturad"
     },
@@ -1571,9 +1571,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.71.238.250",
+            "10.21.89.175",
             "10.246.0.167",
-            "10.21.89.175"
+            "10.71.238.250"
         ],
         "rsa.internal.event_desc": "elitse",
         "rsa.internal.messageid": "428",
@@ -1595,8 +1595,8 @@
         "source.mac": "01:00:5e:7c:42:0b",
         "source.port": 41,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1620,8 +1620,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.176.209.227",
-            "10.13.66.97"
+            "10.13.66.97",
+            "10.176.209.227"
         ],
         "rsa.identity.user_sid_dst": "mex",
         "rsa.internal.event_desc": "upt",
@@ -1639,8 +1639,8 @@
         ],
         "source.port": 2000,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1660,8 +1660,8 @@
         "rsa.time.event_time": "2018-05-07T08:39:06.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1679,8 +1679,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.77.174.205",
-            "10.240.49.224"
+            "10.240.49.224",
+            "10.77.174.205"
         ],
         "rsa.internal.messageid": "240",
         "rsa.internal.msg": "issuscip",
@@ -1690,8 +1690,8 @@
         "service.type": "sonicwall",
         "source.nat.ip": "10.240.49.224",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1711,8 +1711,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.44.150.31",
-            "10.187.210.173"
+            "10.187.210.173",
+            "10.44.150.31"
         ],
         "rsa.internal.messageid": "255",
         "rsa.internal.msg": "quamnih",
@@ -1723,8 +1723,8 @@
             "10.44.150.31"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1750,9 +1750,9 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.251.248.228",
             "10.108.84.24",
-            "10.113.100.237"
+            "10.113.100.237",
+            "10.251.248.228"
         ],
         "rsa.internal.event_desc": "volupt",
         "rsa.internal.messageid": "606",
@@ -1773,8 +1773,8 @@
         "source.mac": "01:00:5e:8b:c1:b4",
         "source.port": 3887,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1794,8 +1794,8 @@
         "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1814,8 +1814,8 @@
         "rsa.time.event_time": "2018-07-17T19:51:58.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1837,8 +1837,8 @@
         "rsa.time.event_time": "2018-08-01T02:54:32.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1877,8 +1877,8 @@
         ],
         "source.port": 3346,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1916,8 +1916,8 @@
         ],
         "source.port": 1081,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1937,8 +1937,8 @@
         "rsa.time.event_time": "2018-09-13T00:02:15.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1973,8 +1973,8 @@
         "rsa.time.event_time": "2018-09-27T07:04:49.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -1994,8 +1994,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.240.54.28",
-            "10.115.38.80"
+            "10.115.38.80",
+            "10.240.54.28"
         ],
         "rsa.internal.messageid": "441",
         "rsa.internal.msg": "labor",
@@ -2006,8 +2006,8 @@
             "10.240.54.28"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2027,8 +2027,8 @@
         "rsa.time.event_time": "2018-10-25T21:09:57.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2060,8 +2060,8 @@
             "10.102.166.19"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2084,8 +2084,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.203.77.154",
-            "10.120.25.169"
+            "10.120.25.169",
+            "10.203.77.154"
         ],
         "rsa.internal.messageid": "199",
         "rsa.misc.action": [
@@ -2101,8 +2101,8 @@
         ],
         "source.port": 3916,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2121,8 +2121,8 @@
         "rsa.time.event_time": "2018-12-07T18:17:40.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2142,8 +2142,8 @@
         "rsa.time.event_time": "2018-12-22T01:20:14.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2178,8 +2178,8 @@
         ],
         "source.port": 2310,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2198,8 +2198,8 @@
         "rsa.time.event_time": "2019-01-19T15:25:23.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2229,8 +2229,8 @@
         "source.nat.ip": "10.165.48.224",
         "source.nat.port": 5386,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2252,8 +2252,8 @@
         "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2284,8 +2284,8 @@
         "source.nat.ip": "10.185.37.32",
         "source.nat.port": 708,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2316,8 +2316,8 @@
         "source.nat.ip": "10.219.42.212",
         "source.nat.port": 5708,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2356,8 +2356,8 @@
         ],
         "source.port": 2737,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2401,8 +2401,8 @@
             "10.132.171.15"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2422,8 +2422,8 @@
         "rsa.time.event_time": "2019-04-29T16:43:23.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2443,8 +2443,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.195.223.82",
-            "10.135.70.159"
+            "10.135.70.159",
+            "10.195.223.82"
         ],
         "rsa.internal.messageid": "351",
         "rsa.internal.msg": "CSe",
@@ -2455,8 +2455,8 @@
             "10.135.70.159"
         ],
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2494,8 +2494,8 @@
         ],
         "source.port": 1865,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ],
         "user.name": "usmo"
     },
@@ -2516,8 +2516,8 @@
         "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2537,8 +2537,8 @@
         "rsa.time.event_time": "2019-06-25T20:53:40.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2557,8 +2557,8 @@
         "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2578,8 +2578,8 @@
         "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2610,8 +2610,8 @@
         "source.nat.ip": "10.56.10.84",
         "source.nat.port": 5366,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2633,8 +2633,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.222.169.140",
-            "10.117.63.181"
+            "10.117.63.181",
+            "10.222.169.140"
         ],
         "rsa.internal.messageid": "195",
         "rsa.internal.msg": "magnaal",
@@ -2646,8 +2646,8 @@
         ],
         "source.port": 5299,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2670,8 +2670,8 @@
         "rsa.time.event_time": "2019-09-05T08:06:31.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2690,8 +2690,8 @@
         "rsa.time.event_time": "2019-09-19T15:09:05.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2715,8 +2715,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.57.255.4",
-            "10.200.122.184"
+            "10.200.122.184",
+            "10.57.255.4"
         ],
         "rsa.identity.user_sid_dst": "sBon",
         "rsa.internal.event_desc": "fic",
@@ -2734,8 +2734,8 @@
         ],
         "source.port": 239,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2755,8 +2755,8 @@
         "rsa.time.event_time": "2019-10-18T05:14:14.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2786,8 +2786,8 @@
         "source.nat.ip": "10.206.229.61",
         "source.nat.port": 3467,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2807,8 +2807,8 @@
         "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2831,8 +2831,8 @@
         "observer.type": "Firewall",
         "observer.vendor": "Sonicwall",
         "related.ip": [
-            "10.167.9.200",
-            "10.119.4.120"
+            "10.119.4.120",
+            "10.167.9.200"
         ],
         "rsa.internal.messageid": "520",
         "rsa.internal.msg": "itse",
@@ -2846,8 +2846,8 @@
         ],
         "source.port": 4003,
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     },
     {
@@ -2869,8 +2869,8 @@
         "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "sonicwall",
         "tags": [
-            "sonicwall.firewall",
-            "forwarded"
+            "forwarded",
+            "sonicwall.firewall"
         ]
     }
 ]

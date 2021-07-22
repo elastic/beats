@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -46,9 +46,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -59,10 +59,10 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
         "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
         "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -71,8 +71,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -94,8 +94,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -140,9 +140,9 @@
         "event.start": "2019-08-15T16:05:33.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -153,10 +153,10 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
         "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
         "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -165,8 +165,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -188,8 +188,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -243,9 +243,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -256,10 +256,10 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -292,8 +292,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -353,9 +353,9 @@
         "event.start": "2019-08-15T16:07:00.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -366,10 +366,10 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -402,8 +402,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -453,9 +453,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -464,10 +464,10 @@
         "log.offset": 2515,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -500,8 +500,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -563,9 +563,9 @@
         "event.start": "2019-08-15T16:07:18.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -580,10 +580,10 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -622,8 +622,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -673,9 +673,9 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -684,10 +684,10 @@
         "log.offset": 3919,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -720,8 +720,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -782,9 +782,9 @@
         "event.start": "2019-08-16T09:33:15.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -796,10 +796,10 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -838,8 +838,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Block-inbound-ICMP"
+            "Block-inbound-ICMP",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -879,8 +879,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "start",
-            "failure"
+            "failure",
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -889,10 +889,10 @@
         "log.offset": 5177,
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
         "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
         "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -901,8 +901,8 @@
             "firepower"
         ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -924,8 +924,8 @@
         "cisco.ftd.destination_interface": "output",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -992,10 +992,10 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "input",
+        "observer.egress.interface.name": "output",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "output",
+        "observer.ingress.interface.name": "input",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",

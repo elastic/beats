@@ -31,8 +31,8 @@
         ],
         "source.mac": "01:00:5e:ce:bf:42",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "ventore"
     },
@@ -64,8 +64,8 @@
             "10.124.22.221"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -97,8 +97,8 @@
         ],
         "source.mac": "01:00:5e:3a:fe:e3",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -129,8 +129,8 @@
             "10.103.162.55"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -162,8 +162,8 @@
         ],
         "source.mac": "01:00:5e:ad:16:77",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -195,8 +195,8 @@
         ],
         "source.mac": "01:00:5e:33:84:66",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -228,8 +228,8 @@
         ],
         "source.mac": "01:00:5e:69:9a:1a",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -264,8 +264,8 @@
         ],
         "source.mac": "01:00:5e:a2:09:ea",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "tionulam"
     },
@@ -306,8 +306,8 @@
         ],
         "source.mac": "01:00:5e:35:c0:09",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "con"
     },
@@ -340,8 +340,8 @@
         ],
         "source.mac": "01:00:5e:f5:8e:0d",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -376,8 +376,8 @@
         ],
         "source.mac": "01:00:5e:0b:42:ab",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "uaerat"
     },
@@ -409,8 +409,8 @@
             "10.58.0.245"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -445,8 +445,8 @@
         ],
         "source.mac": "01:00:5e:8b:ba:06",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "ect"
     },
@@ -480,8 +480,8 @@
             "10.163.217.10"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -521,8 +521,8 @@
         ],
         "source.mac": "01:00:5e:42:6c:b4",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "suntinc"
     },
@@ -555,8 +555,8 @@
         ],
         "source.mac": "01:00:5e:c9:5b:b2",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -587,8 +587,8 @@
             "10.111.27.193"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -622,8 +622,8 @@
         ],
         "source.mac": "01:00:5e:e7:c7:cb",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -661,8 +661,8 @@
         ],
         "source.mac": "01:00:5e:a4:f5:60",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "olupta"
     },
@@ -695,8 +695,8 @@
         ],
         "source.mac": "01:00:5e:10:76:60",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -728,8 +728,8 @@
         ],
         "source.mac": "01:00:5e:b9:7e:b1",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -764,8 +764,8 @@
         ],
         "source.mac": "01:00:5e:fa:2b:37",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -797,8 +797,8 @@
         ],
         "source.mac": "01:00:5e:37:14:9d",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -830,8 +830,8 @@
         ],
         "source.mac": "01:00:5e:59:a3:48",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -863,8 +863,8 @@
         ],
         "source.mac": "01:00:5e:44:c4:69",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -901,8 +901,8 @@
         ],
         "source.mac": "01:00:5e:3a:d0:86",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "ita"
     },
@@ -934,8 +934,8 @@
             "10.97.38.141"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -970,8 +970,8 @@
         ],
         "source.mac": "01:00:5e:24:f1:b2",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1006,8 +1006,8 @@
         ],
         "source.mac": "01:00:5e:31:b9:65",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1039,8 +1039,8 @@
         ],
         "source.mac": "01:00:5e:60:77:c7",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1071,8 +1071,8 @@
             "10.17.21.125"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1103,8 +1103,8 @@
             "10.73.69.75"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1139,8 +1139,8 @@
         ],
         "source.mac": "01:00:5e:4e:97:83",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "iscinge"
     },
@@ -1172,8 +1172,8 @@
             "10.45.25.68"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1205,8 +1205,8 @@
         ],
         "source.mac": "01:00:5e:cc:0b:8f",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1237,8 +1237,8 @@
             "10.68.93.6"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1272,8 +1272,8 @@
         ],
         "source.mac": "01:00:5e:e1:73:47",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1304,8 +1304,8 @@
             "10.192.110.182"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1337,8 +1337,8 @@
         ],
         "source.mac": "01:00:5e:a0:cd:2f",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1369,8 +1369,8 @@
             "10.148.153.201"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1402,8 +1402,8 @@
         ],
         "source.mac": "01:00:5e:c7:b7:18",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1435,8 +1435,8 @@
         ],
         "source.mac": "01:00:5e:81:99:6f",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1467,8 +1467,8 @@
             "10.213.147.241"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1501,8 +1501,8 @@
             "10.183.233.5"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1533,8 +1533,8 @@
             "10.52.186.29"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1568,8 +1568,8 @@
         ],
         "source.mac": "01:00:5e:35:a8:83",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1604,8 +1604,8 @@
         ],
         "source.mac": "01:00:5e:3b:7a:f1",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1638,8 +1638,8 @@
         ],
         "source.mac": "01:00:5e:1e:d6:07",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1670,8 +1670,8 @@
             "10.194.114.58"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1702,8 +1702,8 @@
             "10.212.42.224"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1736,8 +1736,8 @@
             "10.244.144.198"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1769,8 +1769,8 @@
         ],
         "source.mac": "01:00:5e:5b:99:6c",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1802,8 +1802,8 @@
         ],
         "source.mac": "01:00:5e:78:a7:55",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1835,8 +1835,8 @@
         ],
         "source.mac": "01:00:5e:ed:c2:f7",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1867,8 +1867,8 @@
             "10.90.86.89"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1908,8 +1908,8 @@
         ],
         "source.mac": "01:00:5e:69:58:0e",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "ecte"
     },
@@ -1943,8 +1943,8 @@
             "10.158.237.92"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -1979,8 +1979,8 @@
         ],
         "source.mac": "01:00:5e:a7:ac:70",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "stquido"
     },
@@ -2016,8 +2016,8 @@
         ],
         "source.mac": "01:00:5e:e2:17:79",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "reetdolo"
     },
@@ -2053,8 +2053,8 @@
             "10.20.147.134"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2085,8 +2085,8 @@
             "10.213.145.202"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2118,8 +2118,8 @@
         ],
         "source.mac": "01:00:5e:7e:22:1b",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2150,8 +2150,8 @@
             "10.76.10.73"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2188,8 +2188,8 @@
         ],
         "source.mac": "01:00:5e:55:ee:a4",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "reetdolo"
     },
@@ -2222,8 +2222,8 @@
         ],
         "source.mac": "01:00:5e:f6:ba:65",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2254,8 +2254,8 @@
             "10.20.129.206"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2295,8 +2295,8 @@
         ],
         "source.mac": "01:00:5e:bb:1d:bf",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "str"
     },
@@ -2332,8 +2332,8 @@
         ],
         "source.mac": "01:00:5e:c1:3c:48",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2364,8 +2364,8 @@
             "10.22.110.210"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2396,8 +2396,8 @@
             "10.218.87.174"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2428,8 +2428,8 @@
             "10.140.113.244"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2460,8 +2460,8 @@
             "10.159.181.29"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2492,8 +2492,8 @@
             "10.178.173.128"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2524,8 +2524,8 @@
             "10.217.38.30"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2556,8 +2556,8 @@
             "10.178.49.161"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2592,8 +2592,8 @@
         ],
         "source.mac": "01:00:5e:fd:3d:c2",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2624,8 +2624,8 @@
             "10.175.103.215"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2657,8 +2657,8 @@
         ],
         "source.mac": "01:00:5e:ba:09:4a",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2695,8 +2695,8 @@
         ],
         "source.mac": "01:00:5e:8f:35:71",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "orsit"
     },
@@ -2737,8 +2737,8 @@
         ],
         "source.mac": "01:00:5e:c7:c2:10",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "odoconse"
     },
@@ -2771,8 +2771,8 @@
         ],
         "source.mac": "01:00:5e:27:0a:9d",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2805,8 +2805,8 @@
             "10.192.21.74"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2837,8 +2837,8 @@
             "10.142.25.100"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2872,8 +2872,8 @@
             "10.162.114.217"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2912,8 +2912,8 @@
         ],
         "source.mac": "01:00:5e:d8:53:15",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "iduntu"
     },
@@ -2946,8 +2946,8 @@
         ],
         "source.mac": "01:00:5e:7a:4c:6e",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -2978,8 +2978,8 @@
             "10.0.132.176"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3013,8 +3013,8 @@
         ],
         "source.mac": "01:00:5e:0b:fb:4a",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3046,8 +3046,8 @@
         ],
         "source.mac": "01:00:5e:80:9d:2c",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3081,8 +3081,8 @@
             "10.22.187.69"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3113,8 +3113,8 @@
             "10.2.128.234"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3149,8 +3149,8 @@
             "10.223.160.140"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3181,8 +3181,8 @@
             "10.137.14.180"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3217,8 +3217,8 @@
         ],
         "source.mac": "01:00:5e:1b:92:a6",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3249,8 +3249,8 @@
             "10.192.182.230"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3287,8 +3287,8 @@
         ],
         "source.mac": "01:00:5e:64:62:d1",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "sequat"
     },
@@ -3324,8 +3324,8 @@
         ],
         "source.mac": "01:00:5e:2f:ff:49",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ],
         "user.name": "rcit"
     },
@@ -3361,8 +3361,8 @@
             "10.95.241.28"
         ],
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3394,8 +3394,8 @@
         ],
         "source.mac": "01:00:5e:11:45:1e",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     },
     {
@@ -3427,8 +3427,8 @@
         ],
         "source.mac": "01:00:5e:01:2f:7d",
         "tags": [
-            "microsoft.dhcp",
-            "forwarded"
+            "forwarded",
+            "microsoft.dhcp"
         ]
     }
 ]

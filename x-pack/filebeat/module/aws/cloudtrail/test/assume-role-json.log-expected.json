@@ -9,17 +9,17 @@
         "aws.cloudtrail.flattened.request_parameters.roleSessionName": "Role2WithTags",
         "aws.cloudtrail.flattened.request_parameters.tags": [
             {
-                "key": "Email",
-                "value": "johndoe@example.com"
-            },
-            {
                 "key": "CostCenter",
                 "value": "12345"
+            },
+            {
+                "key": "Email",
+                "value": "johndoe@example.com"
             }
         ],
         "aws.cloudtrail.flattened.request_parameters.transitiveTagKeys": [
-            "Email",
-            "CostCenter"
+            "CostCenter",
+            "Email"
         ],
         "aws.cloudtrail.flattened.response_elements.assumedRoleUser.arn": "arn:aws:sts::111111111111:assumed-role/test-role/Role2WithTags",
         "aws.cloudtrail.flattened.response_elements.assumedRoleUser.assumedRoleId": "AROAIFR7WHDTSOYQYHFUE:Role2WithTags",

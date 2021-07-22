@@ -117,8 +117,8 @@
     {
         "event.action": "CHANGE_DOCS_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "gsuite.admin",
         "event.id": "1",

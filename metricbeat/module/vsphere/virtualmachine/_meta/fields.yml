@@ -24,6 +24,14 @@
       type: long
       description: >
         Used CPU in Mhz
+    - name: cpu.total.mhz
+      type: long
+      description: >
+        Total CPU in Mhz
+    - name: cpu.free.mhz
+      type: long
+      description: >
+        Available CPU in Mhz
     - name: memory.used.guest.bytes
       type: long
       description: >

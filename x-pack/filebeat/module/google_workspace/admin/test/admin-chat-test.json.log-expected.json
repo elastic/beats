@@ -107,8 +107,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "MEET_INTEROP_MODIFY_GATEWAY",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -160,8 +160,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_CHAT_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",

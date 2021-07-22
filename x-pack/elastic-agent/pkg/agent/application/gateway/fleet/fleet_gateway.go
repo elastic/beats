@@ -159,8 +159,8 @@ func (f *fleetGateway) worker() {
 		case <-f.scheduler.WaitTick():
 			f.log.Debug("FleetGateway calling Checkin API")
 
-			// Execute the checkin call and for any errors returned by the fleet API
-			// the function will retry to communicate with fleet with an exponential delay and some
+			// Execute the checkin call and for any errors returned by the fleet-server API
+			// the function will retry to communicate with fleet-server with an exponential delay and some
 			// jitter to help better distribute the load from a fleet of agents.
 			resp, err := f.doExecute()
 			if err != nil {
@@ -199,9 +199,10 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	f.backoff.Reset()
 	for f.bgContext.Err() == nil {
 		// TODO: wrap with timeout context
+		f.log.Debugf("Checking started")
 		resp, err := f.execute(f.bgContext)
 		if err != nil {
-			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
+			f.log.Errorf("Could not communicate with fleet-server Checking API will retry, error: %s", err)
 			if !f.backoff.Wait() {
 				return nil, errors.New(
 					"execute retry loop was stopped",

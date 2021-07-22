@@ -24,8 +24,7 @@ import (
 	"testing"
 )
 
-// test_docker_logs from test_json.py
-func TestParsersDockerLogs(t *testing.T) {
+func TestParsersAgentLogs(t *testing.T) {
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -35,13 +34,14 @@ func TestParsersDockerLogs(t *testing.T) {
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
 				"ndjson": map[string]interface{}{
-					"message_key": "log",
+					"message_key":    "log",
+					"overwrite_keys": true,
 				},
 			},
 		},
 	})
 
-	testline := []byte("{\"log\":\"Fetching main repository github.com/elastic/beats...\\n\",\"stream\":\"stdout\",\"time\":\"2016-03-02T22:58:51.338462311Z\"}\n")
+	testline := []byte("{\"log.level\":\"info\",\"@timestamp\":\"2021-05-12T16:15:09.411+0000\",\"log.origin\":{\"file.name\":\"log/harvester.go\",\"file.line\":302},\"message\":\"Harvester started for file: /var/log/auth.log\",\"ecs.version\":\"1.6.0\"}\n")
 	env.mustWriteLinesToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
@@ -50,9 +50,9 @@ func TestParsersDockerLogs(t *testing.T) {
 	env.waitUntilEventCount(1)
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
-	env.requireEventContents(0, "json.log", "Fetching main repository github.com/elastic/beats...\n")
-	env.requireEventContents(0, "json.time", "2016-03-02T22:58:51.338462311Z")
-	env.requireEventContents(0, "json.stream", "stdout")
+	env.requireEventContents(0, "message", "Harvester started for file: /var/log/auth.log")
+	env.requireEventContents(0, "log.level", "info")
+	env.requireEventTimestamp(0, "2021-05-12T16:15:09.411")
 
 	cancelInput()
 	env.waitUntilInputStops()
@@ -69,8 +69,8 @@ func TestParsersDockerLogsFiltering(t *testing.T) {
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
 				"ndjson": map[string]interface{}{
-					"message_key":     "log",
-					"keys_under_root": true,
+					"message_key": "log",
+					"target":      "",
 				},
 			},
 		},
@@ -107,9 +107,9 @@ func TestParsersSimpleJSONOverwrite(t *testing.T) {
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
 				"ndjson": map[string]interface{}{
-					"message_key":     "message",
-					"keys_under_root": true,
-					"overwrite_keys":  true,
+					"message_key":    "message",
+					"target":         "",
+					"overwrite_keys": true,
 				},
 			},
 		},
@@ -142,15 +142,15 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 		"parsers": []map[string]interface{}{
 			map[string]interface{}{
 				"ndjson": map[string]interface{}{
-					"keys_under_root": true,
-					"overwrite_keys":  true,
-					"add_error_key":   true,
+					"target":         "",
+					"overwrite_keys": true,
+					"add_error_key":  true,
 				},
 			},
 		},
 	})
 
-	testline := []byte(`{"@timestamp":"2016-04-05T18:47:18.444Z"}
+	testline := []byte(`{"@timestamp":"2016-04-05T18:47:18.444Z", "msg":"hallo"}
 {"@timestamp":"invalid"}
 {"@timestamp":{"hello": "test"}}
 `)
@@ -163,7 +163,7 @@ func TestParsersTimestampInJSONMessage(t *testing.T) {
 	env.waitUntilEventCount(3)
 	env.requireOffsetInRegistry(testlogName, len(testline))
 
-	env.requireEventTimestamp(0, "2016-04-05 18:47:18.444 +0000 UTC")
+	env.requireEventTimestamp(0, "2016-04-05T18:47:18.444")
 	env.requireEventContents(1, "error.message", "@timestamp not overwritten (parse error on invalid)")
 	env.requireEventContents(2, "error.message", "@timestamp not overwritten (not string)")
 

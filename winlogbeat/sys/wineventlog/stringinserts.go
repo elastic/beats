@@ -30,6 +30,9 @@ const (
 	// maxInsertStrings is the maximum number of parameters supported in a
 	// Windows event message.
 	maxInsertStrings = 99
+
+	leftTemplateDelim  = "[{{"
+	rightTemplateDelim = "}}]"
 )
 
 // templateInserts contains EvtVariant values that can be used to substitute
@@ -45,7 +48,7 @@ type stringInserts struct {
 	evtVariants   [maxInsertStrings]EvtVariant
 }
 
-// Pointer returns a pointer the EvtVariant array.
+// Slice returns a slice of the full EvtVariant array.
 func (si *stringInserts) Slice() []EvtVariant {
 	return si.evtVariants[:]
 }
@@ -66,7 +69,8 @@ func newTemplateStringInserts() *stringInserts {
 
 	for i := 0; i < len(si.evtVariants); i++ {
 		// Use i+1 to keep our inserts numbered the same as Window's inserts.
-		strSlice, err := windows.UTF16FromString(`{{eventParam $ ` + strconv.Itoa(i+1) + `}}`)
+		templateParam := leftTemplateDelim + `eventParam $ ` + strconv.Itoa(i+1) + rightTemplateDelim
+		strSlice, err := windows.UTF16FromString(templateParam)
 		if err != nil {
 			// This will never happen.
 			panic(err)

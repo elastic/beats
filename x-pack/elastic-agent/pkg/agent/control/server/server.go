@@ -60,6 +60,7 @@ func (s *Server) Start() error {
 
 	lis, err := createListener(s.logger)
 	if err != nil {
+		s.logger.Errorf("unable to create listener: %s", err)
 		return err
 	}
 	s.listener = lis

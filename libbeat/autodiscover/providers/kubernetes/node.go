@@ -79,7 +79,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		config:  config,
 		uuid:    uuid,
 		publish: publish,
-		metagen: metadata.NewNodeMetadataGenerator(cfg, watcher.Store()),
+		metagen: metadata.NewNodeMetadataGenerator(cfg, watcher.Store(), client),
 		logger:  logger,
 		watcher: watcher,
 	}
@@ -177,7 +177,9 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	eventID := fmt.Sprint(node.GetObjectMeta().GetUID())
 	meta := n.metagen.Generate(node)
 
-	kubemeta := meta.Clone()
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
@@ -190,9 +192,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 		flag:         true,
 		"host":       host,
 		"kubernetes": kubemeta,
-		"meta": common.MapStr{
-			"kubernetes": meta,
-		},
+		"meta":       meta,
 	}
 	n.publish([]bus.Event{event})
 }

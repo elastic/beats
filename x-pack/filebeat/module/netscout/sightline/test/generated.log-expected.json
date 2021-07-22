@@ -20,8 +20,8 @@
         "rsa.misc.version": "1.6078",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "rci"
     },
@@ -44,8 +44,8 @@
         "rsa.time.starttime": "2016-02-12T15:12:33.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "tatemac"
     },
@@ -68,8 +68,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "nseq"
     },
@@ -87,8 +87,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -108,8 +108,8 @@
         "rsa.time.starttime": "2016-03-26T12:20:16.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -138,8 +138,8 @@
             "10.51.132.10"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -161,8 +161,8 @@
         "rsa.time.starttime": "2016-04-24T02:25:25.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "incidi"
     },
@@ -183,8 +183,8 @@
         "rsa.time.starttime": "2016-05-08T09:27:59.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -206,8 +206,8 @@
         "rsa.time.starttime": "2016-05-22T16:30:33.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "anti"
     },
@@ -231,8 +231,8 @@
         "rsa.time.starttime": "2016-06-05T23:33:08.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -249,8 +249,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -274,8 +274,8 @@
         "rsa.misc.version": "1.5162",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "nci"
     },
@@ -297,8 +297,8 @@
         "rsa.time.endtime": "2016-07-18T20:40:50.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -320,8 +320,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
@@ -351,8 +351,8 @@
         "rsa.time.starttime": "2016-08-16T10:45:59.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -371,8 +371,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.66.171.247",
-            "10.155.162.162"
+            "10.155.162.162",
+            "10.66.171.247"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -382,8 +382,8 @@
             "10.66.171.247"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "jpg",
@@ -412,8 +412,8 @@
         "rsa.misc.node": "iusmodt",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -435,8 +435,8 @@
         "rsa.time.starttime": "2016-09-28T07:53:42.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "uiano"
     },
@@ -456,8 +456,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.38.77.13",
-            "10.179.26.34"
+            "10.179.26.34",
+            "10.38.77.13"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -467,8 +467,8 @@
             "10.38.77.13"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "example.org",
         "url.extension": "gif",
@@ -495,8 +495,8 @@
         "rsa.time.starttime": "2016-10-26T21:58:50.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -522,8 +522,8 @@
         "rsa.network.interface": "lo5882",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -549,8 +549,8 @@
         "rsa.network.interface": "lo4987",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -572,8 +572,8 @@
         "rsa.time.starttime": "2016-12-08T19:06:33.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "qua"
     },
@@ -591,8 +591,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -614,8 +614,8 @@
         "rsa.time.starttime": "2017-01-06T09:11:41.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "turveli"
     },
@@ -638,8 +638,8 @@
         "rsa.time.starttime": "2017-01-20T16:14:16.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "caecatc"
     },
@@ -665,8 +665,8 @@
         "rsa.time.endtime": "2017-02-03T23:16:50.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -686,8 +686,8 @@
         "rsa.time.starttime": "2017-02-18T06:19:24.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -706,8 +706,8 @@
         "rsa.misc.node": "oin",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -727,8 +727,8 @@
         "rsa.time.endtime": "2017-03-18T20:24:33.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -750,8 +750,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "mqui"
     },
@@ -772,8 +772,8 @@
         "rsa.time.starttime": "2017-04-16T10:29:41.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -798,8 +798,8 @@
         "rsa.time.starttime": "2017-04-30T17:32:16.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -816,8 +816,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -840,8 +840,8 @@
         "rsa.time.starttime": "2017-05-29T07:37:24.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -863,8 +863,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www.example.net",
         "url.extension": "gif",
@@ -891,8 +891,8 @@
         "rsa.misc.node": "reetd",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -912,8 +912,8 @@
         "rsa.time.endtime": "2017-07-11T04:45:07.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -936,8 +936,8 @@
         "rsa.time.starttime": "2017-07-25T11:47:41.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -957,8 +957,8 @@
         "rsa.misc.node": "doloremi",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -978,8 +978,8 @@
         "rsa.misc.trigger_val": "sci",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1001,8 +1001,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
@@ -1031,8 +1031,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "suntexp"
     },
@@ -1063,8 +1063,8 @@
             "10.136.232.108"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "example.net",
         "url.extension": "jpg",
@@ -1096,8 +1096,8 @@
         "rsa.time.endtime": "2017-10-19T06:03:07.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1117,8 +1117,8 @@
         "rsa.time.endtime": "2017-11-02T13:05:41.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1139,8 +1139,8 @@
         "rsa.time.starttime": "2017-11-16T20:08:15.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1163,8 +1163,8 @@
         "rsa.time.starttime": "2017-12-01T03:10:49.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1194,8 +1194,8 @@
             "10.83.23.104"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "txt",
@@ -1227,8 +1227,8 @@
         "rsa.time.endtime": "2017-12-29T17:15:58.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1245,8 +1245,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1266,8 +1266,8 @@
         "rsa.time.starttime": "2018-01-27T07:21:06.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1290,8 +1290,8 @@
         "rsa.time.starttime": "2018-02-10T14:23:41.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1313,8 +1313,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "uiac"
     },
@@ -1334,8 +1334,8 @@
         "rsa.misc.node": "iatisu",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1357,8 +1357,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "ersp"
     },
@@ -1376,8 +1376,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1394,8 +1394,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1417,8 +1417,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "rsitv"
     },
@@ -1441,8 +1441,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "api.example.com",
         "url.extension": "html",
@@ -1471,8 +1471,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "udexerci"
     },
@@ -1493,8 +1493,8 @@
         "rsa.time.starttime": "2018-06-19T05:46:49.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1518,8 +1518,8 @@
         "rsa.misc.version": "1.4425",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "ati"
     },
@@ -1546,8 +1546,8 @@
         "rsa.network.interface": "enp0s4306",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1568,8 +1568,8 @@
         "rsa.time.endtime": "2018-08-01T02:54:32.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1598,8 +1598,8 @@
             "10.54.49.84"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1616,8 +1616,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1643,8 +1643,8 @@
         "rsa.network.interface": "lo4293",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1667,8 +1667,8 @@
         "rsa.time.starttime": "2018-09-27T07:04:49.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1688,8 +1688,8 @@
         "rsa.misc.trigger_val": "tpersp",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1711,8 +1711,8 @@
         "rsa.misc.node": "proiden",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1732,8 +1732,8 @@
         "rsa.time.endtime": "2018-11-09T04:12:32.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1756,8 +1756,8 @@
         "rsa.time.starttime": "2018-11-23T11:15:06.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1780,8 +1780,8 @@
         "rsa.time.starttime": "2018-12-07T18:17:40.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -1811,8 +1811,8 @@
             "10.122.76.148"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "txt",
@@ -1841,8 +1841,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "html",
@@ -1871,8 +1871,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "txt",
@@ -1901,8 +1901,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "txt",
@@ -1928,8 +1928,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.98.209.10",
-            "10.31.177.226"
+            "10.31.177.226",
+            "10.98.209.10"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -1939,8 +1939,8 @@
             "10.31.177.226"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www.example.org",
         "url.extension": "html",
@@ -1977,8 +1977,8 @@
             "10.44.47.27"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www.example.org",
         "url.extension": "jpg",
@@ -2009,8 +2009,8 @@
         "rsa.misc.version": "1.2883",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "lor"
     },
@@ -2031,8 +2031,8 @@
         "rsa.misc.trigger_val": "ita",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2049,8 +2049,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2072,8 +2072,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "tMal"
     },
@@ -2098,8 +2098,8 @@
         "rsa.misc.version": "1.2552",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "onu"
     },
@@ -2119,8 +2119,8 @@
         "rsa.misc.node": "norumet",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2143,8 +2143,8 @@
         "rsa.time.starttime": "2019-06-11T13:51:06.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2167,8 +2167,8 @@
         "rsa.time.starttime": "2019-06-25T20:53:40.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2190,8 +2190,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "orroqu"
     },
@@ -2209,8 +2209,8 @@
         "rsa.internal.messageid": "Test",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2232,8 +2232,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "veniamq"
     },
@@ -2253,8 +2253,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.55.156.64",
-            "10.151.129.181"
+            "10.151.129.181",
+            "10.55.156.64"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2264,8 +2264,8 @@
             "10.151.129.181"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www.example.net",
         "url.extension": "txt",
@@ -2294,8 +2294,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www.example.net",
         "url.extension": "jpg",
@@ -2331,8 +2331,8 @@
             "10.46.77.76"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2352,8 +2352,8 @@
         "rsa.time.starttime": "2019-10-03T22:11:40.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2376,8 +2376,8 @@
         "rsa.time.starttime": "2019-10-18T05:14:14.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2396,8 +2396,8 @@
         "observer.type": "DDOS",
         "observer.vendor": "Netscout",
         "related.ip": [
-            "10.73.89.189",
-            "10.166.90.130"
+            "10.166.90.130",
+            "10.73.89.189"
         ],
         "rsa.internal.messageid": "Blocked_Host",
         "rsa.misc.msgIdPart1": "Blocked",
@@ -2407,8 +2407,8 @@
             "10.73.89.189"
         ],
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "api.example.org",
         "url.extension": "htm",
@@ -2438,8 +2438,8 @@
         "rsa.time.starttime": "2019-11-15T19:19:22.000Z",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ]
     },
     {
@@ -2461,8 +2461,8 @@
         "rsa.misc.msgIdPart2": "Mode",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "htm",
@@ -2491,8 +2491,8 @@
         "rsa.misc.msgIdPart2": "Log",
         "service.type": "netscout",
         "tags": [
-            "netscout.sightline",
-            "forwarded"
+            "forwarded",
+            "netscout.sightline"
         ],
         "user.name": "rcitat"
     }

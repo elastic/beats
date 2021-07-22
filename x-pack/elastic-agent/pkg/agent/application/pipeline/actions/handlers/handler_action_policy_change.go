@@ -100,6 +100,14 @@ func (h *PolicyChange) handleFleetServerHosts(ctx context.Context, c *config.Con
 	if len(h.setters) == 0 {
 		return nil
 	}
+	data, err := c.ToMapStr()
+	if err != nil {
+		return errors.New(err, "could not convert the configuration from the policy", errors.TypeConfig)
+	}
+	if _, ok := data["fleet"]; !ok {
+		// no fleet information in the configuration (skip checking client)
+		return nil
+	}
 
 	cfg, err := configuration.NewFromConfig(c)
 	if err != nil {

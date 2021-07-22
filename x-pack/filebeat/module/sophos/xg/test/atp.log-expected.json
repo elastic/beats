@@ -27,8 +27,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -66,8 +66,8 @@
         "source.port": 22623,
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.original": "46.161.30.47"
     },
@@ -102,8 +102,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -119,8 +119,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.22"
+            "13.226.155.22",
+            "172.16.34.24"
         ],
         "server.ip": "13.226.155.22",
         "server.port": 80,
@@ -137,8 +137,8 @@
         "source.ip": "172.16.34.24",
         "source.port": 57579,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
         "url.extension": "html",
@@ -177,8 +177,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -194,8 +194,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.22"
+            "13.226.155.22",
+            "172.16.34.24"
         ],
         "server.ip": "13.226.155.22",
         "server.port": 80,
@@ -212,8 +212,8 @@
         "source.ip": "172.16.34.24",
         "source.port": 57540,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
         "url.extension": "html",
@@ -249,8 +249,8 @@
         "event.severity": "5",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -284,8 +284,8 @@
         "source.ip": "10.198.32.89",
         "source.port": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.original": "82.211.30.202"
     }

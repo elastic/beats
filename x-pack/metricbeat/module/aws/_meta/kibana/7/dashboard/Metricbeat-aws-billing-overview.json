@@ -20,7 +20,7 @@
         "panelsJSON": [
           {
             "embeddableConfig": {
-              "title": "AWS Account Filter"
+              "enhancements": {}
             },
             "gridData": {
               "h": 5,
@@ -30,13 +30,14 @@
               "y": 0
             },
             "panelIndex": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
-            "panelRefName": "panel_0",
+            "panelRefName": "panel_89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
             "title": "AWS Account Filter",
-            "version": "7.9.0"
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Current Total Unblended Cost"
+              "enhancements": {}
             },
             "gridData": {
               "h": 18,
@@ -46,13 +47,14 @@
               "y": 0
             },
             "panelIndex": "f1db16b5-ce0a-4f21-885f-434c16346c26",
-            "panelRefName": "panel_1",
+            "panelRefName": "panel_f1db16b5-ce0a-4f21-885f-434c16346c26",
             "title": "Current Total Unblended Cost",
-            "version": "7.9.0"
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Availability Zone Utilization"
+              "enhancements": {}
             },
             "gridData": {
               "h": 18,
@@ -62,13 +64,14 @@
               "y": 0
             },
             "panelIndex": "57912f48-42ec-4d3e-ba54-bf94757d1eec",
-            "panelRefName": "panel_2",
+            "panelRefName": "panel_57912f48-42ec-4d3e-ba54-bf94757d1eec",
             "title": "Availability Zone Utilization",
-            "version": "7.9.0"
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Total Estimated Charges For This Month"
+              "enhancements": {}
             },
             "gridData": {
               "h": 13,
@@ -78,13 +81,14 @@
               "y": 5
             },
             "panelIndex": "221aab02-2747-4d84-9dde-028ccd51bdce",
-            "panelRefName": "panel_3",
+            "panelRefName": "panel_221aab02-2747-4d84-9dde-028ccd51bdce",
             "title": "Total Estimated Charges For This Month",
-            "version": "7.9.0"
+            "type": "visualization",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Cost Per Service Per User"
+              "enhancements": {}
             },
             "gridData": {
               "h": 20,
@@ -94,13 +98,14 @@
               "y": 18
             },
             "panelIndex": "376f236b-1365-4e80-8076-eec88c1a67bd",
-            "panelRefName": "panel_4",
+            "panelRefName": "panel_376f236b-1365-4e80-8076-eec88c1a67bd",
             "title": "Cost Per Service Per User",
-            "version": "7.9.0"
+            "type": "lens",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "High Spenders"
+              "enhancements": {}
             },
             "gridData": {
               "h": 20,
@@ -110,13 +115,14 @@
               "y": 18
             },
             "panelIndex": "dd5220c2-dc8a-4d3e-964b-6137d1e447ad",
-            "panelRefName": "panel_5",
+            "panelRefName": "panel_dd5220c2-dc8a-4d3e-964b-6137d1e447ad",
             "title": "High Spenders",
-            "version": "7.9.0"
+            "type": "lens",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Top 10 Estimated Charges per Service Name"
+              "enhancements": {}
             },
             "gridData": {
               "h": 18,
@@ -126,13 +132,14 @@
               "y": 38
             },
             "panelIndex": "1de716e2-bad9-4fe3-ba49-0e2ea2a59bb4",
-            "panelRefName": "panel_6",
+            "panelRefName": "panel_1de716e2-bad9-4fe3-ba49-0e2ea2a59bb4",
             "title": "Top 10 Estimated Charges per Service Name",
-            "version": "7.9.0"
+            "type": "lens",
+            "version": "7.13.2"
           },
           {
             "embeddableConfig": {
-              "title": "Daily Unblended Cost"
+              "enhancements": {}
             },
             "gridData": {
               "h": 18,
@@ -142,18 +149,20 @@
               "y": 38
             },
             "panelIndex": "60181fec-fea9-4f99-b5f9-a53ffbc2ac65",
-            "panelRefName": "panel_7",
+            "panelRefName": "panel_60181fec-fea9-4f99-b5f9-a53ffbc2ac65",
             "title": "Daily Unblended Cost",
-            "version": "7.9.0"
+            "type": "visualization",
+            "version": "7.13.2"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat AWS] Billing Overview",
         "version": 1
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "e6776b10-1534-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "dashboard": "7.3.0"
+        "dashboard": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -161,48 +170,48 @@
       "references": [
         {
           "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
-          "name": "panel_0",
+          "name": "89dccfe8-a25e-44ea-afdb-ff01ab1f05d6:panel_89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
           "type": "visualization"
         },
         {
           "id": "1731c440-e649-11ea-a838-3f4a45f85600",
-          "name": "panel_1",
+          "name": "f1db16b5-ce0a-4f21-885f-434c16346c26:panel_f1db16b5-ce0a-4f21-885f-434c16346c26",
           "type": "visualization"
         },
         {
           "id": "a5670a20-e65a-11ea-a838-3f4a45f85600",
-          "name": "panel_2",
+          "name": "57912f48-42ec-4d3e-ba54-bf94757d1eec:panel_57912f48-42ec-4d3e-ba54-bf94757d1eec",
           "type": "visualization"
         },
         {
           "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
-          "name": "panel_3",
+          "name": "221aab02-2747-4d84-9dde-028ccd51bdce:panel_221aab02-2747-4d84-9dde-028ccd51bdce",
           "type": "visualization"
         },
         {
           "id": "b3da5ac0-e6f1-11ea-a5b5-d5a0accaec95",
-          "name": "panel_4",
+          "name": "376f236b-1365-4e80-8076-eec88c1a67bd:panel_376f236b-1365-4e80-8076-eec88c1a67bd",
           "type": "lens"
         },
         {
           "id": "d7b399c0-e6f1-11ea-a5b5-d5a0accaec95",
-          "name": "panel_5",
+          "name": "dd5220c2-dc8a-4d3e-964b-6137d1e447ad:panel_dd5220c2-dc8a-4d3e-964b-6137d1e447ad",
           "type": "lens"
         },
         {
           "id": "cde34840-e6f2-11ea-a5b5-d5a0accaec95",
-          "name": "panel_6",
+          "name": "1de716e2-bad9-4fe3-ba49-0e2ea2a59bb4:panel_1de716e2-bad9-4fe3-ba49-0e2ea2a59bb4",
           "type": "lens"
         },
         {
           "id": "3e091620-e64b-11ea-a838-3f4a45f85600",
-          "name": "panel_7",
+          "name": "60181fec-fea9-4f99-b5f9-a53ffbc2ac65:panel_60181fec-fea9-4f99-b5f9-a53ffbc2ac65",
           "type": "visualization"
         }
       ],
       "type": "dashboard",
-      "updated_at": "2020-09-14T04:08:21.260Z",
-      "version": "WzcyNjksOF0="
+      "updated_at": "2021-06-16T19:03:42.260Z",
+      "version": "WzEwMzEsMV0="
     },
     {
       "attributes": {
@@ -237,6 +246,21 @@
                 },
                 "parent": "",
                 "type": "list"
+              },
+              {
+                "fieldName": "cloud.linked_account.name",
+                "id": "1623870032405",
+                "indexPatternRefName": "control_1_index_pattern",
+                "label": "linked account name",
+                "options": {
+                  "dynamicOptions": true,
+                  "multiselect": true,
+                  "order": "desc",
+                  "size": 5,
+                  "type": "terms"
+                },
+                "parent": "1549397251041",
+                "type": "list"
               }
             ],
             "pinFilters": false,
@@ -247,9 +271,10 @@
           "type": "input_control_vis"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -259,23 +284,22 @@
           "id": "metricbeat-*",
           "name": "control_0_index_pattern",
           "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "control_1_index_pattern",
+          "type": "index-pattern"
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-09-14T04:04:04.990Z",
-      "version": "WzY2MDYsOF0="
+      "updated_at": "2021-06-16T19:03:22.893Z",
+      "version": "WzEwMjcsMV0="
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Total Unblended Cost [Metricbeat AWS]",
         "uiStateJSON": {},
@@ -291,13 +315,12 @@
                 "id": "cf04e620-e648-11ea-bdad-df8839db1393"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": {
               "language": "kuery",
               "query": "aws.billing.group_definition.key : \"AZ\""
             },
+            "hide_last_value_indicator": true,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "\u003e=2d",
@@ -341,23 +364,25 @@
             "time_field": "@timestamp",
             "time_range_mode": "last_value",
             "tooltip_mode": "show_all",
-            "type": "metric"
+            "type": "metric",
+            "use_kibana_indexes": false
           },
           "title": "Total Unblended Cost [Metricbeat AWS]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "1731c440-e649-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NjksOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "Wzc2LDFd"
     },
     {
       "attributes": {
@@ -419,9 +444,10 @@
           "type": "pie"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "a5670a20-e65a-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
@@ -434,20 +460,14 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzAsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "Wzc3LDFd"
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Total Estimated Charges [Metricbeat AWS]",
         "uiStateJSON": {},
@@ -468,8 +488,6 @@
                 "id": "ebb52700-1531-11ea-961e-c1db9cc6166e"
               }
             ],
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": {
               "language": "kuery",
@@ -483,6 +501,7 @@
             "gauge_inner_width": 10,
             "gauge_style": "half",
             "gauge_width": 10,
+            "hide_last_value_indicator": true,
             "id": "61ca57f0-469d-11e7-af02-69e470af7417",
             "index_pattern": "metricbeat-*",
             "interval": "\u003e=1d",
@@ -527,40 +546,31 @@
             "time_field": "@timestamp",
             "time_range_mode": "last_value",
             "tooltip_mode": "show_all",
-            "type": "metric"
+            "type": "metric",
+            "use_kibana_indexes": false
           },
           "title": "Total Estimated Charges [Metricbeat AWS]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzEsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "Wzc4LDFd"
     },
     {
       "attributes": {
-        "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true  aggConfigs=\"[{\\\"id\\\":\\\"5d850e8e-f3e0-4ad2-9697-b8c00c03f753\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.group_by.SERVICE\\\",\\\"orderBy\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":5,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.group_by.aws:createdBy\\\",\\\"orderBy\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":10,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"sum\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.UnblendedCost.amount\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-5d850e8e-f3e0-4ad2-9697-b8c00c03f753\\\":{\\\"label\\\":\\\"Service Name\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"sourceField\\\":\\\"aws.billing.group_by.SERVICE\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":5,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"5d850e8e-f3e0-4ad2-9697-b8c00c03f753\\\"},\\\"col-2-a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\":{\\\"label\\\":\\\"Top values of aws.billing.group_by.aws:createdBy\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"aws.billing.group_by.aws:createdBy\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":10,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"id\\\":\\\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\"},\\\"col-3-75188758-7734-4fc3-af1d-297c455715f0\\\":{\\\"label\\\":\\\"Total Unblended Cost\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"sum\\\",\\\"sourceField\\\":\\\"aws.billing.UnblendedCost.amount\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\"}}\"}\n| lens_xy_chart xTitle=\"Service Name\" yTitle=\"Total Unblended Cost\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3\" hide=false xAccessor=\"5d850e8e-f3e0-4ad2-9697-b8c00c03f753\" yScaleType=\"linear\" xScaleType=\"ordinal\" isHistogram=false splitAccessor=\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\"  seriesType=\"bar_stacked\" accessors=\"75188758-7734-4fc3-af1d-297c455715f0\" columnToLabel=\"{\\\"75188758-7734-4fc3-af1d-297c455715f0\\\":\\\"Total Unblended Cost\\\",\\\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\":\\\"Top values of aws.billing.group_by.aws:createdBy\\\"}\"}",
         "state": {
-          "datasourceMetaData": {
-            "filterableIndexPatterns": [
-              {
-                "id": "metricbeat-*",
-                "title": "metricbeat-*"
-              }
-            ]
-          },
           "datasourceStates": {
             "indexpattern": {
-              "currentIndexPatternId": "metricbeat-*",
               "layers": {
                 "cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3": {
                   "columnOrder": [
@@ -609,11 +619,9 @@
                         "size": 10
                       },
                       "scale": "ordinal",
-                      "sourceField": "aws.billing.group_by.aws:createdBy",
-                      "suggestedPriority": 0
+                      "sourceField": "aws.billing.group_by.aws:createdBy"
                     }
-                  },
-                  "indexPatternId": "metricbeat-*"
+                  }
                 }
               }
             }
@@ -646,34 +654,35 @@
         "title": "Cost Per Service Per User [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "b3da5ac0-e6f1-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.8.0"
+        "lens": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
-      "references": [],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3",
+          "type": "index-pattern"
+        }
+      ],
       "type": "lens",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzIsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "Wzc5LDFd"
     },
     {
       "attributes": {
-        "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true  aggConfigs=\"[{\\\"id\\\":\\\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.group_by.aws:createdBy\\\",\\\"orderBy\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":10,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"sum\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.UnblendedCost.amount\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\":{\\\"label\\\":\\\"Top Users\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"aws.billing.group_by.aws:createdBy\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":10,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\\\"},\\\"col-1-75188758-7734-4fc3-af1d-297c455715f0\\\":{\\\"label\\\":\\\"Total Unblended Cost\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"sum\\\",\\\"sourceField\\\":\\\"aws.billing.UnblendedCost.amount\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"75188758-7734-4fc3-af1d-297c455715f0\\\"}}\"}\n| lens_xy_chart xTitle=\"Top Users\" yTitle=\"Total Unblended Cost\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3\" hide=false xAccessor=\"a1f5b3b8-41da-452b-8683-7a9ca6b6267f\" yScaleType=\"linear\" xScaleType=\"ordinal\" isHistogram=false   seriesType=\"bar_horizontal\" accessors=\"75188758-7734-4fc3-af1d-297c455715f0\" columnToLabel=\"{\\\"75188758-7734-4fc3-af1d-297c455715f0\\\":\\\"Total Unblended Cost\\\"}\"}",
         "state": {
-          "datasourceMetaData": {
-            "filterableIndexPatterns": [
-              {
-                "id": "metricbeat-*",
-                "title": "metricbeat-*"
-              }
-            ]
-          },
           "datasourceStates": {
             "indexpattern": {
-              "currentIndexPatternId": "metricbeat-*",
               "layers": {
                 "cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3": {
                   "columnOrder": [
@@ -705,11 +714,9 @@
                         "size": 10
                       },
                       "scale": "ordinal",
-                      "sourceField": "aws.billing.group_by.aws:createdBy",
-                      "suggestedPriority": 0
+                      "sourceField": "aws.billing.group_by.aws:createdBy"
                     }
-                  },
-                  "indexPatternId": "metricbeat-*"
+                  }
                 }
               }
             }
@@ -741,34 +748,35 @@
         "title": "High Spenders [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "d7b399c0-e6f1-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.8.0"
+        "lens": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
-      "references": [],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-cbffa0b1-50bb-40fe-bd8d-6a26d2b58fb3",
+          "type": "index-pattern"
+        }
+      ],
       "type": "lens",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzMsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "WzgwLDFd"
     },
     {
       "attributes": {
-        "description": "",
-        "expression": "kibana\n| kibana_context  query=\"{\\\"query\\\":\\\"\\\",\\\"language\\\":\\\"kuery\\\"}\" filters=\"[]\"\n| lens_merge_tables layerIds=\"dc597043-d867-4f94-ae90-f31ffc0c2674\" \n  tables={esaggs index=\"metricbeat-*\" metricsAtAllLevels=true partialRows=true includeFormatHints=true timeFields=\"@timestamp\" aggConfigs=\"[{\\\"id\\\":\\\"ea87bf3d-0a35-424b-b00b-3614c431b135\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"terms\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.ServiceName\\\",\\\"orderBy\\\":\\\"d54f4e58-d8dd-4404-8da9-12b667dd7910\\\",\\\"order\\\":\\\"desc\\\",\\\"size\\\":10,\\\"otherBucket\\\":false,\\\"otherBucketLabel\\\":\\\"Other\\\",\\\"missingBucket\\\":false,\\\"missingBucketLabel\\\":\\\"Missing\\\"}},{\\\"id\\\":\\\"faa5dba4-1fab-4f88-b67f-28bafa26a32d\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"date_histogram\\\",\\\"schema\\\":\\\"segment\\\",\\\"params\\\":{\\\"field\\\":\\\"@timestamp\\\",\\\"useNormalizedEsInterval\\\":true,\\\"interval\\\":\\\"1d\\\",\\\"drop_partials\\\":false,\\\"min_doc_count\\\":0,\\\"extended_bounds\\\":{}}},{\\\"id\\\":\\\"d54f4e58-d8dd-4404-8da9-12b667dd7910\\\",\\\"enabled\\\":true,\\\"type\\\":\\\"avg\\\",\\\"schema\\\":\\\"metric\\\",\\\"params\\\":{\\\"field\\\":\\\"aws.billing.EstimatedCharges\\\",\\\"missing\\\":0}}]\" | lens_rename_columns idMap=\"{\\\"col-0-ea87bf3d-0a35-424b-b00b-3614c431b135\\\":{\\\"label\\\":\\\"Service Names\\\",\\\"dataType\\\":\\\"string\\\",\\\"operationType\\\":\\\"terms\\\",\\\"scale\\\":\\\"ordinal\\\",\\\"suggestedPriority\\\":0,\\\"sourceField\\\":\\\"aws.billing.ServiceName\\\",\\\"isBucketed\\\":true,\\\"params\\\":{\\\"size\\\":10,\\\"orderBy\\\":{\\\"type\\\":\\\"column\\\",\\\"columnId\\\":\\\"d54f4e58-d8dd-4404-8da9-12b667dd7910\\\"},\\\"orderDirection\\\":\\\"desc\\\"},\\\"customLabel\\\":true,\\\"id\\\":\\\"ea87bf3d-0a35-424b-b00b-3614c431b135\\\"},\\\"col-2-faa5dba4-1fab-4f88-b67f-28bafa26a32d\\\":{\\\"label\\\":\\\"@timestamp\\\",\\\"dataType\\\":\\\"date\\\",\\\"operationType\\\":\\\"date_histogram\\\",\\\"sourceField\\\":\\\"@timestamp\\\",\\\"isBucketed\\\":true,\\\"scale\\\":\\\"interval\\\",\\\"params\\\":{\\\"interval\\\":\\\"1d\\\"},\\\"id\\\":\\\"faa5dba4-1fab-4f88-b67f-28bafa26a32d\\\"},\\\"col-3-d54f4e58-d8dd-4404-8da9-12b667dd7910\\\":{\\\"label\\\":\\\"Estimated Charges\\\",\\\"dataType\\\":\\\"number\\\",\\\"operationType\\\":\\\"avg\\\",\\\"sourceField\\\":\\\"aws.billing.EstimatedCharges\\\",\\\"isBucketed\\\":false,\\\"scale\\\":\\\"ratio\\\",\\\"customLabel\\\":true,\\\"id\\\":\\\"d54f4e58-d8dd-4404-8da9-12b667dd7910\\\"}}\"}\n| lens_xy_chart xTitle=\"@timestamp\" yTitle=\"Estimated Charges\" legend={lens_xy_legendConfig isVisible=true position=\"right\"} fittingFunction=\"None\" \n  layers={lens_xy_layer layerId=\"dc597043-d867-4f94-ae90-f31ffc0c2674\" hide=false xAccessor=\"faa5dba4-1fab-4f88-b67f-28bafa26a32d\" yScaleType=\"linear\" xScaleType=\"time\" isHistogram=true splitAccessor=\"ea87bf3d-0a35-424b-b00b-3614c431b135\"  seriesType=\"line\" accessors=\"d54f4e58-d8dd-4404-8da9-12b667dd7910\" columnToLabel=\"{\\\"d54f4e58-d8dd-4404-8da9-12b667dd7910\\\":\\\"Estimated Charges\\\",\\\"ea87bf3d-0a35-424b-b00b-3614c431b135\\\":\\\"Service Names\\\"}\"}",
         "state": {
-          "datasourceMetaData": {
-            "filterableIndexPatterns": [
-              {
-                "id": "metricbeat-*",
-                "title": "metricbeat-*"
-              }
-            ]
-          },
           "datasourceStates": {
             "indexpattern": {
-              "currentIndexPatternId": "metricbeat-*",
               "layers": {
                 "dc597043-d867-4f94-ae90-f31ffc0c2674": {
                   "columnOrder": [
@@ -782,7 +790,7 @@
                       "dataType": "number",
                       "isBucketed": false,
                       "label": "Estimated Charges",
-                      "operationType": "avg",
+                      "operationType": "average",
                       "scale": "ratio",
                       "sourceField": "aws.billing.EstimatedCharges"
                     },
@@ -801,8 +809,7 @@
                         "size": 10
                       },
                       "scale": "ordinal",
-                      "sourceField": "aws.billing.ServiceName",
-                      "suggestedPriority": 0
+                      "sourceField": "aws.billing.ServiceName"
                     },
                     "faa5dba4-1fab-4f88-b67f-28bafa26a32d": {
                       "dataType": "date",
@@ -815,8 +822,7 @@
                       "scale": "interval",
                       "sourceField": "@timestamp"
                     }
-                  },
-                  "indexPatternId": "metricbeat-*"
+                  }
                 }
               }
             }
@@ -851,29 +857,35 @@
         "title": "Top 10 Estimated Charges per Service Name [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "cde34840-e6f2-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.8.0"
+        "lens": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
-      "references": [],
+      "references": [
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-current-indexpattern",
+          "type": "index-pattern"
+        },
+        {
+          "id": "metricbeat-*",
+          "name": "indexpattern-datasource-layer-dc597043-d867-4f94-ae90-f31ffc0c2674",
+          "type": "index-pattern"
+        }
+      ],
       "type": "lens",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzQsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "WzgxLDFd"
     },
     {
       "attributes": {
         "description": "",
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+          "searchSourceJSON": {}
         },
         "title": "Daily Unblended Cost [Metricbeat AWS]",
         "uiStateJSON": {},
@@ -884,8 +896,6 @@
             "axis_formatter": "number",
             "axis_position": "left",
             "axis_scale": "normal",
-            "default_index_pattern": "metricbeat-*",
-            "default_timefield": "@timestamp",
             "drop_last_bucket": 0,
             "filter": {
               "language": "kuery",
@@ -929,24 +939,26 @@
             "show_legend": 1,
             "time_field": "@timestamp",
             "tooltip_mode": "show_all",
-            "type": "timeseries"
+            "type": "timeseries",
+            "use_kibana_indexes": false
           },
           "title": "Daily Unblended Cost [Metricbeat AWS]",
           "type": "metrics"
         }
       },
+      "coreMigrationVersion": "7.13.2",
       "id": "3e091620-e64b-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.8.0"
+        "visualization": "7.13.1"
       },
       "namespaces": [
         "default"
       ],
       "references": [],
       "type": "visualization",
-      "updated_at": "2020-09-14T04:03:51.696Z",
-      "version": "WzY0NzUsOF0="
+      "updated_at": "2021-06-16T18:25:55.172Z",
+      "version": "WzgyLDFd"
     }
   ],
-  "version": "7.9.0"
+  "version": "7.13.2"
 }

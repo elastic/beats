@@ -44,10 +44,10 @@ func TestPortDefaults(t *testing.T) {
 		ExpectedPort   int
 		ExpectedScheme string
 	}{
-		{"no scheme uri", "test.url", defaultPort, "http"},
-		{"default port", "http://test.url", defaultPort, "http"},
+		{"no scheme uri", "test.url", 0, "http"},
+		{"default port", "http://test.url", 0, "http"},
 		{"specified port", "http://test.url:123", 123, "http"},
-		{"default https port", "https://test.url", defaultPort, "https"},
+		{"default https port", "https://test.url", 0, "https"},
 		{"specified https port", "https://test.url:123", 123, "https"},
 	}
 	for _, tc := range testCases {
@@ -61,7 +61,11 @@ func TestPortDefaults(t *testing.T) {
 			r, err := c.nextRequester().request("GET", "/", nil, strings.NewReader(""))
 			require.NoError(t, err)
 
-			assert.True(t, strings.HasSuffix(r.Host, fmt.Sprintf(":%d", tc.ExpectedPort)))
+			if tc.ExpectedPort > 0 {
+				assert.True(t, strings.HasSuffix(r.Host, fmt.Sprintf(":%d", tc.ExpectedPort)))
+			} else {
+				assert.False(t, strings.HasSuffix(r.Host, fmt.Sprintf(":%d", tc.ExpectedPort)))
+			}
 			assert.Equal(t, tc.ExpectedScheme, r.URL.Scheme)
 		})
 	}

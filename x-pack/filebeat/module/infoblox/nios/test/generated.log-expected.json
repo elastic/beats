@@ -20,8 +20,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -45,8 +45,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -70,8 +70,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -95,8 +95,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -121,8 +121,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -149,8 +149,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -174,8 +174,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -206,8 +206,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -233,8 +233,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -267,8 +267,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ],
         "user.name": "ueipsaqu"
     },
@@ -294,8 +294,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -322,8 +322,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -347,8 +347,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -373,8 +373,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -400,8 +400,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -425,8 +425,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -451,8 +451,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -476,8 +476,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -502,8 +502,8 @@
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -527,8 +527,8 @@
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -552,8 +552,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -578,8 +578,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -603,8 +603,8 @@
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -621,8 +621,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "conse2991.internal.lan",
-            "amvolup7700.www5.corp"
+            "amvolup7700.www5.corp",
+            "conse2991.internal.lan"
         ],
         "related.ip": [
             "10.116.104.101"
@@ -637,8 +637,8 @@
             "10.116.104.101"
         ],
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -663,8 +663,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -689,8 +689,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -715,8 +715,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -756,8 +756,8 @@
             "10.153.111.103"
         ],
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ],
         "user.name": "doloremi"
     },
@@ -783,8 +783,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -817,8 +817,8 @@
         "rsa.time.month": "Mar",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -842,8 +842,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -876,8 +876,8 @@
         ],
         "source.port": 2285,
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ],
         "user.name": "vitaedi"
     },
@@ -902,8 +902,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -934,8 +934,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -965,8 +965,8 @@
             "10.177.36.38"
         ],
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -992,8 +992,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1017,8 +1017,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1042,8 +1042,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1067,8 +1067,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1096,8 +1096,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1124,8 +1124,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1149,8 +1149,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1174,8 +1174,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1200,8 +1200,8 @@
         "service.type": "infoblox",
         "source.bytes": 1792,
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1229,8 +1229,8 @@
         "rsa.time.month": "Oct",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1254,8 +1254,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1280,8 +1280,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1309,8 +1309,8 @@
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1335,8 +1335,8 @@
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1361,8 +1361,8 @@
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1386,8 +1386,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1412,8 +1412,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1437,8 +1437,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1462,8 +1462,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1487,8 +1487,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1528,8 +1528,8 @@
             "10.204.128.215"
         ],
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ],
         "user.name": "lorin"
     },
@@ -1554,8 +1554,8 @@
         "rsa.time.month": "Apr",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1581,8 +1581,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1608,8 +1608,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1634,8 +1634,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1663,8 +1663,8 @@
         "rsa.time.month": "Jun",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1689,8 +1689,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1714,8 +1714,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1742,8 +1742,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1768,8 +1768,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1792,8 +1792,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1817,8 +1817,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1843,8 +1843,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1876,8 +1876,8 @@
         ],
         "source.port": 4184,
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1903,8 +1903,8 @@
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1928,8 +1928,8 @@
         "rsa.time.month": "October",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1953,8 +1953,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -1987,8 +1987,8 @@
         "server.top_level_domain": "host",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2012,8 +2012,8 @@
         "rsa.time.month": "December",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2046,8 +2046,8 @@
         "rsa.time.month": "Dec",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2073,8 +2073,8 @@
         "rsa.time.month": "Jan",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2098,8 +2098,8 @@
         "rsa.time.month": "January",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2123,8 +2123,8 @@
         "rsa.time.month": "February",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2142,8 +2142,8 @@
             "col3570.www.invalid"
         ],
         "related.user": [
-            "rroq",
-            "rcit"
+            "rcit",
+            "rroq"
         ],
         "rsa.email.email_dst": "tsed",
         "rsa.internal.messageid": "sSMTP",
@@ -2153,8 +2153,8 @@
         "service.type": "infoblox",
         "source.bytes": 2807,
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ],
         "user.name": "rcit"
     },
@@ -2179,8 +2179,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2204,8 +2204,8 @@
         "rsa.time.month": "March",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2229,8 +2229,8 @@
         "rsa.time.month": "Apr",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2246,8 +2246,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "tatem4180.www.home",
-            "eritatis6343.api.local"
+            "eritatis6343.api.local",
+            "tatem4180.www.home"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [
@@ -2263,8 +2263,8 @@
         "server.top_level_domain": "local",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2289,8 +2289,8 @@
         "rsa.time.month": "April",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2314,8 +2314,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2339,8 +2339,8 @@
         "rsa.time.month": "May",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2364,8 +2364,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2390,8 +2390,8 @@
         "rsa.time.month": "June",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2408,8 +2408,8 @@
         "observer.type": "IPAM",
         "observer.vendor": "Infoblox",
         "related.hosts": [
-            "uamnihil6127.api.domain",
-            "olli3116.internal.example"
+            "olli3116.internal.example",
+            "uamnihil6127.api.domain"
         ],
         "rsa.internal.messageid": "python",
         "rsa.misc.action": [
@@ -2423,8 +2423,8 @@
         "rsa.time.month": "July",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2454,8 +2454,8 @@
         "rsa.time.month": "Jul",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2480,8 +2480,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2505,8 +2505,8 @@
         "rsa.time.month": "August",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2530,8 +2530,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2555,8 +2555,8 @@
         "rsa.time.month": "September",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2583,8 +2583,8 @@
         "rsa.time.month": "Oct",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2611,8 +2611,8 @@
         "service.type": "infoblox",
         "source.port": 2496,
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2636,8 +2636,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2671,8 +2671,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2696,8 +2696,8 @@
         "rsa.time.month": "November",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     },
     {
@@ -2729,8 +2729,8 @@
         "rsa.time.month": "Dec",
         "service.type": "infoblox",
         "tags": [
-            "infoblox.nios",
-            "forwarded"
+            "forwarded",
+            "infoblox.nios"
         ]
     }
 ]

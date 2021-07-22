@@ -101,8 +101,8 @@
         "observer.vendor": "Elastic",
         "observer.version": "1.0.0-alpha",
         "related.hash": [
-            "bc8bbe52f041fd17318f08a0f73762ce",
-            "a9796280592f86b74b27e370662d41eb"
+            "a9796280592f86b74b27e370662d41eb",
+            "bc8bbe52f041fd17318f08a0f73762ce"
         ],
         "related.ip": [
             "1.2.3.4",

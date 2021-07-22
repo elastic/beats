@@ -1365,8 +1365,8 @@
         "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 100,
         "nginx.ingress_controller.upstream.response.length_list": [
-            "61",
-            "100"
+            "100",
+            "61"
         ],
         "nginx.ingress_controller.upstream.response.status_code": 203,
         "nginx.ingress_controller.upstream.response.status_code_list": [
@@ -1375,8 +1375,8 @@
         ],
         "nginx.ingress_controller.upstream.response.time": 0.104,
         "nginx.ingress_controller.upstream.response.time_list": [
-            "0.100",
-            "0.004"
+            "0.004",
+            "0.100"
         ],
         "nginx.ingress_controller.upstream_address_list": [
             "172.17.0.6:8080",
@@ -1432,8 +1432,8 @@
         "nginx.ingress_controller.upstream.port": 8080,
         "nginx.ingress_controller.upstream.response.length": 100,
         "nginx.ingress_controller.upstream.response.length_list": [
-            "61",
-            "100"
+            "100",
+            "61"
         ],
         "nginx.ingress_controller.upstream.response.status_code": 203,
         "nginx.ingress_controller.upstream.response.status_code_list": [
@@ -1442,8 +1442,8 @@
         ],
         "nginx.ingress_controller.upstream.response.time": 0.104,
         "nginx.ingress_controller.upstream.response.time_list": [
-            "0.100",
-            "0.004"
+            "0.004",
+            "0.100"
         ],
         "nginx.ingress_controller.upstream_address_list": [
             "172.17.0.6:8080",

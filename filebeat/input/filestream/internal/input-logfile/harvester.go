@@ -119,6 +119,8 @@ type HarvesterGroup interface {
 	Start(input.Context, Source)
 	// Restart starts a Harvester if it might be already running.
 	Restart(input.Context, Source)
+	// Continue starts a new Harvester with the state information of the previous.
+	Continue(ctx input.Context, previous, next Source)
 	// Stop cancels the reader of a given Source.
 	Stop(Source)
 	// StopGroup cancels all running Harvesters.
@@ -131,6 +133,7 @@ type defaultHarvesterGroup struct {
 	harvester    Harvester
 	cleanTimeout time.Duration
 	store        *store
+	ackCH        *updateChan
 	identifier   *sourceIdentifier
 	tg           unison.TaskGroup
 }
@@ -189,7 +192,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
 			CloseRef:   ctx.Cancelation,
-			ACKHandler: newInputACKHandler(ctx.Logger),
+			ACKHandler: newInputACKHandler(hg.ackCH, ctx.Logger),
 		})
 		if err != nil {
 			hg.readers.remove(srcID)
@@ -198,7 +201,7 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 		defer client.Close()
 
 		hg.store.UpdateTTL(resource, hg.cleanTimeout)
-		cursor := makeCursor(hg.store, resource)
+		cursor := makeCursor(resource)
 		publisher := &cursorPublisher{canceler: ctx.Cancelation, client: client, cursor: &cursor}
 
 		err = hg.harvester.Run(ctx, s, cursor, publisher)
@@ -215,6 +218,36 @@ func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, rest
 
 		return nil
 	}
+}
+
+// Continue start a new Harvester with the state information from a different Source.
+func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Source) {
+	ctx.Logger.Debugf("Continue harvester for file prev=%s, next=%s", previous.Name(), next.Name())
+	prevID := hg.identifier.ID(previous)
+	nextID := hg.identifier.ID(next)
+
+	hg.tg.Go(func(canceler unison.Canceler) error {
+		previousResource, err := lock(ctx, hg.store, prevID)
+		if err != nil {
+			return fmt.Errorf("error while locking previous resource: %v", err)
+		}
+		// mark previous state out of date
+		// so when reading starts again the offset is set to zero
+		hg.store.remove(prevID)
+
+		nextResource, err := lock(ctx, hg.store, nextID)
+		if err != nil {
+			return fmt.Errorf("error while locking next resource: %v", err)
+		}
+		hg.store.UpdateTTL(nextResource, hg.cleanTimeout)
+
+		previousResource.copyInto(nextResource)
+		releaseResource(previousResource)
+		releaseResource(nextResource)
+
+		hg.Start(ctx, next)
+		return nil
+	})
 }
 
 // Stop stops the running Harvester for a given Source.

@@ -15,7 +15,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
@@ -66,8 +65,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	}
 	locker.Unlock()
 
-	warn.PrintNotGA(streams.Out)
-
 	if status == install.Broken {
 		if !force {
 			fmt.Fprintf(streams.Out, "Elastic Agent is installed but currently broken: %s\n", reason)
@@ -94,9 +91,6 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	enroll := true
 	askEnroll := true
 	url, _ := cmd.Flags().GetString("url")
-	if url == "" {
-		url, _ = cmd.Flags().GetString("kibana-url")
-	}
 	token, _ := cmd.Flags().GetString("enrollment-token")
 	if url != "" && token != "" {
 		askEnroll = false

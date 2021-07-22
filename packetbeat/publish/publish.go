@@ -112,7 +112,7 @@ func (p *TransactionPublisher) CreateReporter(
 		clientConfig.PublishMode = beat.DropIfFull
 	}
 	if meta.Index != "" {
-		clientConfig.Processing.Meta = common.MapStr{"index": meta.Index}
+		clientConfig.Processing.Meta = common.MapStr{"raw_index": meta.Index}
 	}
 
 	client, err := p.pipeline.ConnectWith(clientConfig)

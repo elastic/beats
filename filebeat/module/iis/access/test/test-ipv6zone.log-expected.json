@@ -6,8 +6,8 @@
         "destination.ip": "::1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 789000000,

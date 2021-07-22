@@ -21,7 +21,13 @@ var:
     default:
       - untrust
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/pipeline.yml
+  - ingest/traffic.yml
+  - ingest/threat.yml
+  - ingest/globalprotect.yml
+  - ingest/userid.yml
+  - ingest/hipmatch.yml
 input: config/input.yml
 
 requires.processors:

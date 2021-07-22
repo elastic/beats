@@ -39,69 +39,58 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
 	var metricsTotal []cloudwatch.Metric
-	init := true
 	var nextToken *string
 
-	for init || nextToken != nil {
-		init = false
-		listMetricsInput := &cloudwatch.ListMetricsInput{
-			NextToken: nextToken,
-		}
-		if namespace != "*" {
-			listMetricsInput.Namespace = &namespace
-		}
-		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-		// List metrics of a given namespace for each region
-		listMetricsOutput, err := reqListMetrics.Send(context.TODO())
-		if err != nil {
-			return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		}
-		metricsTotal = append(metricsTotal, listMetricsOutput.Metrics...)
-		nextToken = listMetricsOutput.NextToken
+	listMetricsInput := &cloudwatch.ListMetricsInput{
+		NextToken: nextToken,
+	}
+	if namespace != "*" {
+		listMetricsInput.Namespace = &namespace
 	}
 
+	// List metrics of a given namespace for each region
+	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+	paginator := cloudwatch.NewListMetricsPaginator(req)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
+		metricsTotal = append(metricsTotal, page.Metrics...)
+	}
+
+	if err := paginator.Err(); err != nil {
+		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+	}
 	return metricsTotal, nil
-}
-
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
-	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: metricDataQueries,
-	}
-
-	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataResponse, err := reqGetMetricData.Send(context.TODO())
-	if err != nil {
-		return nil, errors.Wrap(err, "Error GetMetricDataInput")
-	}
-	return getMetricDataResponse.GetMetricDataOutput, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
-	init := true
 	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-	for init || getMetricDataOutput.NextToken != nil {
-		init = false
-		// Split metricDataQueries into smaller slices that length no longer than 100.
-		// 100 is defined in maxQuerySize.
-		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-		for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-			metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
-			if len(metricDataQueriesPartial) == 0 {
-				return getMetricDataOutput.MetricDataResults, nil
-			}
 
-			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
-			if err != nil {
-				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "getMetricDataPerRegion failed")
-			}
+	// Split metricDataQueries into smaller slices that length no longer than 100.
+	// 100 is defined in maxQuerySize.
+	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
+		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
+		if len(metricDataQueriesPartial) == 0 {
+			return getMetricDataOutput.MetricDataResults, nil
+		}
 
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
+		getMetricDataInput := &cloudwatch.GetMetricDataInput{
+			StartTime:         &startTime,
+			EndTime:           &endTime,
+			MetricDataQueries: metricDataQueriesPartial,
+		}
+
+		req := svc.GetMetricDataRequest(getMetricDataInput)
+		paginator := cloudwatch.NewGetMetricDataPaginator(req)
+		for paginator.Next(context.TODO()) {
+			page := paginator.CurrentPage()
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
+		}
+
+		if err := paginator.Err(); err != nil {
+			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil
@@ -177,27 +166,16 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 		ResourceTypeFilters: resourceTypeFilters,
 	}
 
-	init := true
-	for init || *getResourcesInput.PaginationToken != "" {
-		init = false
-		getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
-		output, err := getResourcesRequest.Send(context.TODO())
-		if err != nil {
-			err = errors.Wrap(err, "error GetResources")
-			return nil, err
-		}
-
-		getResourcesInput.PaginationToken = output.PaginationToken
-		if resourceTypeFilters == nil || len(output.ResourceTagMappingList) == 0 {
-			return nil, nil
-		}
-
-		for _, resourceTag := range output.ResourceTagMappingList {
+	getResourcesRequest := svc.GetResourcesRequest(getResourcesInput)
+	paginator := resourcegroupstaggingapi.NewGetResourcesPaginator(getResourcesRequest)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
+		for _, resourceTag := range page.ResourceTagMappingList {
 			shortIdentifier, err := FindShortIdentifierFromARN(*resourceTag.ResourceARN)
 			if err == nil {
 				resourceTagMap[shortIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when proccessing shortIdentifier")
+				err = errors.Wrap(err, "error occurs when processing shortIdentifier")
 				return nil, err
 			}
 
@@ -205,10 +183,15 @@ func GetResourcesTags(svc resourcegroupstaggingapiiface.ClientAPI, resourceTypeF
 			if err == nil {
 				resourceTagMap[wholeIdentifier] = resourceTag.Tags
 			} else {
-				err = errors.Wrap(err, "error occurs when proccessing longIdentifier")
+				err = errors.Wrap(err, "error occurs when processing longIdentifier")
 				return nil, err
 			}
 		}
+	}
+
+	if err := paginator.Err(); err != nil {
+		err = errors.Wrap(err, "error GetResources with Paginator")
+		return nil, err
 	}
 	return resourceTagMap, nil
 }

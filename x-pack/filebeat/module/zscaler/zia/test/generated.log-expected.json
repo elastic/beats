@@ -41,8 +41,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntium",
         "rsa.misc.action": [
-            "pisciv",
-            "Blocked"
+            "Blocked",
+            "pisciv"
         ],
         "rsa.misc.category": "umq",
         "rsa.misc.filter": "oremi",
@@ -62,8 +62,8 @@
             "10.176.10.114"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "htm",
@@ -121,8 +121,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "luptat",
         "rsa.misc.action": [
-            "tur",
-            "Allowed"
+            "Allowed",
+            "tur"
         ],
         "rsa.misc.category": "eius",
         "rsa.misc.filter": "ameaqu",
@@ -142,8 +142,8 @@
             "10.26.46.95"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
@@ -188,8 +188,8 @@
             "orsitame3262.domain"
         ],
         "related.ip": [
-            "10.254.146.57",
-            "10.204.86.149"
+            "10.204.86.149",
+            "10.254.146.57"
         ],
         "related.user": [
             "tenima"
@@ -224,8 +224,8 @@
             "10.254.146.57"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "gif",
@@ -285,8 +285,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ima",
         "rsa.misc.action": [
-            "llam",
-            "Allowed"
+            "Allowed",
+            "llam"
         ],
         "rsa.misc.category": "aboris",
         "rsa.misc.filter": "atatnonp",
@@ -306,8 +306,8 @@
             "10.252.125.53"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "jpg",
@@ -352,8 +352,8 @@
             "ore2933.www.test"
         ],
         "related.ip": [
-            "10.61.78.108",
-            "10.136.153.149"
+            "10.136.153.149",
+            "10.61.78.108"
         ],
         "related.user": [
             "ercit"
@@ -367,8 +367,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inim",
         "rsa.misc.action": [
-            "reetdolo",
-            "Blocked"
+            "Blocked",
+            "reetdolo"
         ],
         "rsa.misc.category": "osquir",
         "rsa.misc.filter": "ipit",
@@ -388,8 +388,8 @@
             "10.136.153.149"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "gif",
@@ -434,8 +434,8 @@
             "ollit4105.mail.localdomain"
         ],
         "related.ip": [
-            "10.66.250.92",
-            "10.183.16.166"
+            "10.183.16.166",
+            "10.66.250.92"
         ],
         "related.user": [
             "tessec"
@@ -449,8 +449,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "avol",
         "rsa.misc.action": [
-            "ist",
-            "Allowed"
+            "Allowed",
+            "ist"
         ],
         "rsa.misc.category": "lorema",
         "rsa.misc.filter": "sun",
@@ -470,8 +470,8 @@
             "10.66.250.92"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "jpg",
@@ -531,8 +531,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lupt",
         "rsa.misc.action": [
-            "dun",
-            "Blocked"
+            "Blocked",
+            "dun"
         ],
         "rsa.misc.category": "rsitamet",
         "rsa.misc.filter": "usmod",
@@ -552,8 +552,8 @@
             "10.123.104.59"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "txt",
@@ -634,8 +634,8 @@
             "10.74.17.5"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "jpg",
@@ -716,8 +716,8 @@
             "10.25.192.202"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "txt",
@@ -777,8 +777,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ihilm",
         "rsa.misc.action": [
-            "psaquae",
-            "Allowed"
+            "Allowed",
+            "psaquae"
         ],
         "rsa.misc.category": "eFinib",
         "rsa.misc.filter": "inesci",
@@ -798,8 +798,8 @@
             "10.135.225.244"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "gif",
@@ -880,8 +880,8 @@
             "10.19.145.131"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "htm",
@@ -941,8 +941,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dolorem",
         "rsa.misc.action": [
-            "lorsitam",
-            "Allowed"
+            "Allowed",
+            "lorsitam"
         ],
         "rsa.misc.category": "proide",
         "rsa.misc.filter": "pariatu",
@@ -962,8 +962,8 @@
             "10.181.80.139"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "htm",
@@ -1008,8 +1008,8 @@
             "uamei2493.www.test"
         ],
         "related.ip": [
-            "10.31.240.6",
-            "10.167.98.76"
+            "10.167.98.76",
+            "10.31.240.6"
         ],
         "related.user": [
             "ratvolu"
@@ -1023,8 +1023,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "catc",
         "rsa.misc.action": [
-            "veni",
-            "Allowed"
+            "Allowed",
+            "veni"
         ],
         "rsa.misc.category": "sBono",
         "rsa.misc.filter": "isnisiu",
@@ -1044,8 +1044,8 @@
             "10.167.98.76"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "html",
@@ -1126,8 +1126,8 @@
             "10.135.160.125"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "html",
@@ -1172,8 +1172,8 @@
             "spi3544.www.host"
         ],
         "related.ip": [
-            "10.63.250.128",
-            "10.111.187.12"
+            "10.111.187.12",
+            "10.63.250.128"
         ],
         "related.user": [
             "saute"
@@ -1187,8 +1187,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nnum",
         "rsa.misc.action": [
-            "ntoccae",
-            "Allowed"
+            "Allowed",
+            "ntoccae"
         ],
         "rsa.misc.category": "tium",
         "rsa.misc.filter": "uteirure",
@@ -1208,8 +1208,8 @@
             "10.111.187.12"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "html",
@@ -1254,8 +1254,8 @@
             "tlab5981.www.host"
         ],
         "related.ip": [
-            "10.5.126.127",
-            "10.252.124.150"
+            "10.252.124.150",
+            "10.5.126.127"
         ],
         "related.user": [
             "inibusB"
@@ -1269,8 +1269,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mod",
         "rsa.misc.action": [
-            "xeacomm",
-            "Allowed"
+            "Allowed",
+            "xeacomm"
         ],
         "rsa.misc.category": "sauteiru",
         "rsa.misc.filter": "antiu",
@@ -1290,8 +1290,8 @@
             "10.252.124.150"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "txt",
@@ -1372,8 +1372,8 @@
             "10.91.126.231"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "jpg",
@@ -1418,8 +1418,8 @@
             "oditem5255.api.localdomain"
         ],
         "related.ip": [
-            "10.135.82.97",
-            "10.107.251.87"
+            "10.107.251.87",
+            "10.135.82.97"
         ],
         "related.user": [
             "str"
@@ -1433,8 +1433,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quid",
         "rsa.misc.action": [
-            "itecto",
-            "Allowed"
+            "Allowed",
+            "itecto"
         ],
         "rsa.misc.category": "quam",
         "rsa.misc.filter": "adeser",
@@ -1454,8 +1454,8 @@
             "10.107.251.87"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "gif",
@@ -1515,8 +1515,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "oNemoeni",
         "rsa.misc.action": [
-            "nre",
-            "Blocked"
+            "Blocked",
+            "nre"
         ],
         "rsa.misc.category": "labo",
         "rsa.misc.filter": "tutlab",
@@ -1536,8 +1536,8 @@
             "10.215.205.216"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "gif",
@@ -1582,8 +1582,8 @@
             "eacommod1930.internal.lan"
         ],
         "related.ip": [
-            "10.29.155.171",
-            "10.229.83.165"
+            "10.229.83.165",
+            "10.29.155.171"
         ],
         "related.user": [
             "ulapar"
@@ -1618,8 +1618,8 @@
             "10.229.83.165"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "gif",
@@ -1700,8 +1700,8 @@
             "10.161.148.64"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "htm",
@@ -1746,8 +1746,8 @@
             "lapariat7287.internal.host"
         ],
         "related.ip": [
-            "10.7.200.140",
-            "10.203.65.161"
+            "10.203.65.161",
+            "10.7.200.140"
         ],
         "related.user": [
             "snost"
@@ -1761,8 +1761,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tdol",
         "rsa.misc.action": [
-            "nte",
-            "Allowed"
+            "Allowed",
+            "nte"
         ],
         "rsa.misc.category": "adeseru",
         "rsa.misc.filter": "mac",
@@ -1782,8 +1782,8 @@
             "10.203.65.161"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "html",
@@ -1828,8 +1828,8 @@
             "licabo1493.api.corp"
         ],
         "related.ip": [
-            "10.86.22.67",
-            "10.218.98.29"
+            "10.218.98.29",
+            "10.86.22.67"
         ],
         "related.user": [
             "olori"
@@ -1864,8 +1864,8 @@
             "10.218.98.29"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "html",
@@ -1910,8 +1910,8 @@
             "stenatu4844.www.invalid"
         ],
         "related.ip": [
-            "10.39.31.115",
-            "10.24.111.229"
+            "10.24.111.229",
+            "10.39.31.115"
         ],
         "related.user": [
             "fugi"
@@ -1925,8 +1925,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ulpa",
         "rsa.misc.action": [
-            "gnaal",
-            "Allowed"
+            "Allowed",
+            "gnaal"
         ],
         "rsa.misc.category": "nte",
         "rsa.misc.filter": "pid",
@@ -1946,8 +1946,8 @@
             "10.24.111.229"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "gif",
@@ -1992,8 +1992,8 @@
             "sitam5077.internal.host"
         ],
         "related.ip": [
-            "10.32.39.220",
-            "10.179.210.218"
+            "10.179.210.218",
+            "10.32.39.220"
         ],
         "related.user": [
             "boreetdo"
@@ -2007,8 +2007,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "riss",
         "rsa.misc.action": [
-            "risnis",
-            "Blocked"
+            "Blocked",
+            "risnis"
         ],
         "rsa.misc.category": "emqu",
         "rsa.misc.filter": "oluptas",
@@ -2028,8 +2028,8 @@
             "10.32.39.220"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "jpg",
@@ -2074,8 +2074,8 @@
             "dquia107.www.test"
         ],
         "related.ip": [
-            "10.88.172.34",
-            "10.128.173.19"
+            "10.128.173.19",
+            "10.88.172.34"
         ],
         "related.user": [
             "agnaaliq"
@@ -2110,8 +2110,8 @@
             "10.88.172.34"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "html",
@@ -2156,8 +2156,8 @@
             "lloin4019.www.localhost"
         ],
         "related.ip": [
-            "10.238.224.49",
-            "10.130.241.232"
+            "10.130.241.232",
+            "10.238.224.49"
         ],
         "related.user": [
             "onse"
@@ -2192,8 +2192,8 @@
             "10.238.224.49"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "txt",
@@ -2253,8 +2253,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "quatD",
         "rsa.misc.action": [
-            "tatem",
-            "Allowed"
+            "Allowed",
+            "tatem"
         ],
         "rsa.misc.category": "aincidun",
         "rsa.misc.filter": "uela",
@@ -2274,8 +2274,8 @@
             "10.2.67.127"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "htm",
@@ -2320,8 +2320,8 @@
             "saquaea6344.www.invalid"
         ],
         "related.ip": [
-            "10.204.214.251",
-            "10.101.38.213"
+            "10.101.38.213",
+            "10.204.214.251"
         ],
         "related.user": [
             "ueipsa"
@@ -2356,8 +2356,8 @@
             "10.101.38.213"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
@@ -2438,8 +2438,8 @@
             "10.101.85.169"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "jpg",
@@ -2499,8 +2499,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "mag",
         "rsa.misc.action": [
-            "tali",
-            "Allowed"
+            "Allowed",
+            "tali"
         ],
         "rsa.misc.category": "oconse",
         "rsa.misc.filter": "npr",
@@ -2520,8 +2520,8 @@
             "10.242.182.193"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "gif",
@@ -2566,8 +2566,8 @@
             "tatio6513.www.invalid"
         ],
         "related.ip": [
-            "10.80.57.247",
-            "10.229.242.223"
+            "10.229.242.223",
+            "10.80.57.247"
         ],
         "related.user": [
             "itasp"
@@ -2602,8 +2602,8 @@
             "10.80.57.247"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.net",
         "url.extension": "jpg",
@@ -2648,8 +2648,8 @@
             "lapar1599.www.lan"
         ],
         "related.ip": [
-            "10.193.66.155",
-            "10.106.77.138"
+            "10.106.77.138",
+            "10.193.66.155"
         ],
         "related.user": [
             "iusmodt"
@@ -2663,8 +2663,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uteir",
         "rsa.misc.action": [
-            "Section",
-            "Allowed"
+            "Allowed",
+            "Section"
         ],
         "rsa.misc.category": "cididu",
         "rsa.misc.filter": "Utenima",
@@ -2684,8 +2684,8 @@
             "10.106.77.138"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "txt",
@@ -2730,8 +2730,8 @@
             "aquioff3853.www.localdomain"
         ],
         "related.ip": [
-            "10.54.159.1",
-            "10.236.230.136"
+            "10.236.230.136",
+            "10.54.159.1"
         ],
         "related.user": [
             "mUteni"
@@ -2766,8 +2766,8 @@
             "10.54.159.1"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "txt",
@@ -2848,8 +2848,8 @@
             "10.131.246.134"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "gif",
@@ -2894,8 +2894,8 @@
             "iamea478.www5.host"
         ],
         "related.ip": [
-            "10.166.10.42",
-            "10.142.120.198"
+            "10.142.120.198",
+            "10.166.10.42"
         ],
         "related.user": [
             "olori"
@@ -2909,8 +2909,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ende",
         "rsa.misc.action": [
-            "doconse",
-            "Blocked"
+            "Blocked",
+            "doconse"
         ],
         "rsa.misc.category": "uovolupt",
         "rsa.misc.filter": "litesse",
@@ -2930,8 +2930,8 @@
             "10.166.10.42"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "html",
@@ -3012,8 +3012,8 @@
             "10.128.184.241"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "html",
@@ -3058,8 +3058,8 @@
             "eufug1756.mail.corp"
         ],
         "related.ip": [
-            "10.53.101.131",
-            "10.213.57.165"
+            "10.213.57.165",
+            "10.53.101.131"
         ],
         "related.user": [
             "isau"
@@ -3094,8 +3094,8 @@
             "10.213.57.165"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.net",
         "url.extension": "html",
@@ -3176,8 +3176,8 @@
             "10.55.81.14"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "gif",
@@ -3222,8 +3222,8 @@
             "pariatur7238.www5.invalid"
         ],
         "related.ip": [
-            "10.33.144.10",
-            "10.202.224.79"
+            "10.202.224.79",
+            "10.33.144.10"
         ],
         "related.user": [
             "rios"
@@ -3237,8 +3237,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "lit",
         "rsa.misc.action": [
-            "quu",
-            "Blocked"
+            "Blocked",
+            "quu"
         ],
         "rsa.misc.category": "oluptate",
         "rsa.misc.filter": "exercita",
@@ -3258,8 +3258,8 @@
             "10.202.224.79"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "gif",
@@ -3319,8 +3319,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "Loremip",
         "rsa.misc.action": [
-            "quid",
-            "Allowed"
+            "Allowed",
+            "quid"
         ],
         "rsa.misc.category": "mini",
         "rsa.misc.filter": "uisnos",
@@ -3340,8 +3340,8 @@
             "10.20.124.138"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "jpg",
@@ -3401,8 +3401,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "voluptas",
         "rsa.misc.action": [
-            "olor",
-            "Allowed"
+            "Allowed",
+            "olor"
         ],
         "rsa.misc.category": "ataevita",
         "rsa.misc.filter": "nderi",
@@ -3422,8 +3422,8 @@
             "10.118.177.136"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "html",
@@ -3483,8 +3483,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "amni",
         "rsa.misc.action": [
-            "edutp",
-            "Allowed"
+            "Allowed",
+            "edutp"
         ],
         "rsa.misc.category": "ames",
         "rsa.misc.filter": "dmi",
@@ -3504,8 +3504,8 @@
             "10.125.120.97"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "htm",
@@ -3550,8 +3550,8 @@
             "remagnam796.mail.corp"
         ],
         "related.ip": [
-            "10.143.0.78",
-            "10.137.164.122"
+            "10.137.164.122",
+            "10.143.0.78"
         ],
         "related.user": [
             "orissus"
@@ -3586,8 +3586,8 @@
             "10.137.164.122"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "htm",
@@ -3668,8 +3668,8 @@
             "10.156.177.53"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "gif",
@@ -3729,8 +3729,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "tatemse",
         "rsa.misc.action": [
-            "upta",
-            "Blocked"
+            "Blocked",
+            "upta"
         ],
         "rsa.misc.category": "tlabo",
         "rsa.misc.filter": "aliqui",
@@ -3750,8 +3750,8 @@
             "10.111.249.184"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "txt",
@@ -3796,8 +3796,8 @@
             "idexeac1655.internal.test"
         ],
         "related.ip": [
-            "10.180.150.47",
-            "10.141.195.13"
+            "10.141.195.13",
+            "10.180.150.47"
         ],
         "related.user": [
             "taliq"
@@ -3811,8 +3811,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "itesse",
         "rsa.misc.action": [
-            "uip",
-            "Allowed"
+            "Allowed",
+            "uip"
         ],
         "rsa.misc.category": "teturad",
         "rsa.misc.filter": "roquisqu",
@@ -3832,8 +3832,8 @@
             "10.180.150.47"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "htm",
@@ -3878,8 +3878,8 @@
             "laboree3880.api.invalid"
         ],
         "related.ip": [
-            "10.255.40.12",
-            "10.166.195.20"
+            "10.166.195.20",
+            "10.255.40.12"
         ],
         "related.user": [
             "lamcolab"
@@ -3914,8 +3914,8 @@
             "10.255.40.12"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "gif",
@@ -3994,8 +3994,8 @@
             "10.100.143.226"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "html",
@@ -4040,8 +4040,8 @@
             "ine3181.www.invalid"
         ],
         "related.ip": [
-            "10.121.9.5",
-            "10.119.53.68"
+            "10.119.53.68",
+            "10.121.9.5"
         ],
         "related.user": [
             "ssec"
@@ -4076,8 +4076,8 @@
             "10.121.9.5"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "htm",
@@ -4137,8 +4137,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "eritqui",
         "rsa.misc.action": [
-            "dolor",
-            "Blocked"
+            "Blocked",
+            "dolor"
         ],
         "rsa.misc.category": "taspe",
         "rsa.misc.filter": "oremipsu",
@@ -4158,8 +4158,8 @@
             "10.31.153.177"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "jpg",
@@ -4202,8 +4202,8 @@
             "pitl6126.www.localdomain"
         ],
         "related.ip": [
-            "10.243.182.229",
-            "10.229.102.140"
+            "10.229.102.140",
+            "10.243.182.229"
         ],
         "related.user": [
             "duntut"
@@ -4238,8 +4238,8 @@
             "10.229.102.140"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "jpg",
@@ -4316,8 +4316,8 @@
             "10.120.138.109"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "jpg",
@@ -4398,8 +4398,8 @@
             "10.133.102.57"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.org",
         "url.extension": "html",
@@ -4444,8 +4444,8 @@
             "cia5990.api.localdomain"
         ],
         "related.ip": [
-            "10.91.2.225",
-            "10.89.41.97"
+            "10.89.41.97",
+            "10.91.2.225"
         ],
         "related.user": [
             "tem"
@@ -4480,8 +4480,8 @@
             "10.89.41.97"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "gif",
@@ -4562,8 +4562,8 @@
             "10.7.18.226"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.net",
         "url.extension": "jpg",
@@ -4608,8 +4608,8 @@
             "pici1525.www5.corp"
         ],
         "related.ip": [
-            "10.178.148.188",
-            "10.155.252.123"
+            "10.155.252.123",
+            "10.178.148.188"
         ],
         "related.user": [
             "inrepreh"
@@ -4623,8 +4623,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "inimve",
         "rsa.misc.action": [
-            "niam",
-            "Allowed"
+            "Allowed",
+            "niam"
         ],
         "rsa.misc.category": "perspici",
         "rsa.misc.filter": "uipe",
@@ -4644,8 +4644,8 @@
             "10.155.252.123"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "jpg",
@@ -4690,8 +4690,8 @@
             "dolo6418.internal.host"
         ],
         "related.ip": [
-            "10.220.1.249",
-            "10.190.42.245"
+            "10.190.42.245",
+            "10.220.1.249"
         ],
         "related.user": [
             "olup"
@@ -4705,8 +4705,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "uamquaer",
         "rsa.misc.action": [
-            "aerat",
-            "Blocked"
+            "Blocked",
+            "aerat"
         ],
         "rsa.misc.category": "quela",
         "rsa.misc.filter": "qui",
@@ -4726,8 +4726,8 @@
             "10.220.1.249"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "html",
@@ -4770,8 +4770,8 @@
             "imveni193.www5.host"
         ],
         "related.ip": [
-            "10.55.38.153",
-            "10.112.190.154"
+            "10.112.190.154",
+            "10.55.38.153"
         ],
         "related.user": [
             "oremeu"
@@ -4806,8 +4806,8 @@
             "10.55.38.153"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "txt",
@@ -4888,8 +4888,8 @@
             "10.250.48.82"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "jpg",
@@ -4970,8 +4970,8 @@
             "10.60.52.219"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
@@ -5027,8 +5027,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "dipisc",
         "rsa.misc.action": [
-            "turad",
-            "Allowed"
+            "Allowed",
+            "turad"
         ],
         "rsa.misc.category": "ulpaquio",
         "rsa.misc.filter": "ngelits",
@@ -5048,8 +5048,8 @@
             "10.122.102.156"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "gif",
@@ -5094,8 +5094,8 @@
             "iatnulap7662.internal.local"
         ],
         "related.ip": [
-            "10.248.108.55",
-            "10.120.215.174"
+            "10.120.215.174",
+            "10.248.108.55"
         ],
         "related.user": [
             "prehend"
@@ -5130,8 +5130,8 @@
             "10.248.108.55"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "txt",
@@ -5210,8 +5210,8 @@
             "10.15.254.181"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "htm",
@@ -5256,8 +5256,8 @@
             "onorumet4871.lan"
         ],
         "related.ip": [
-            "10.7.152.238",
-            "10.129.66.196"
+            "10.129.66.196",
+            "10.7.152.238"
         ],
         "related.user": [
             "equamn"
@@ -5292,8 +5292,8 @@
             "10.129.66.196"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.com",
         "url.extension": "txt",
@@ -5353,8 +5353,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "orinrep",
         "rsa.misc.action": [
-            "squirat",
-            "Blocked"
+            "Blocked",
+            "squirat"
         ],
         "rsa.misc.category": "sequa",
         "rsa.misc.filter": "orainci",
@@ -5374,8 +5374,8 @@
             "10.185.107.27"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "gif",
@@ -5435,8 +5435,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "odita",
         "rsa.misc.action": [
-            "dqu",
-            "Blocked"
+            "Blocked",
+            "dqu"
         ],
         "rsa.misc.category": "ipex",
         "rsa.misc.filter": "ine",
@@ -5456,8 +5456,8 @@
             "10.138.0.214"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "htm",
@@ -5538,8 +5538,8 @@
             "10.12.130.224"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "htm",
@@ -5584,8 +5584,8 @@
             "quia7214.example"
         ],
         "related.ip": [
-            "10.91.20.27",
-            "10.193.152.42"
+            "10.193.152.42",
+            "10.91.20.27"
         ],
         "related.user": [
             "edict"
@@ -5620,8 +5620,8 @@
             "10.91.20.27"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "html",
@@ -5666,8 +5666,8 @@
             "aturExc7343.invalid"
         ],
         "related.ip": [
-            "10.55.192.102",
-            "10.146.69.38"
+            "10.146.69.38",
+            "10.55.192.102"
         ],
         "related.user": [
             "quia"
@@ -5681,8 +5681,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "omnisi",
         "rsa.misc.action": [
-            "userro",
-            "Allowed"
+            "Allowed",
+            "userro"
         ],
         "rsa.misc.category": "etd",
         "rsa.misc.filter": "loremeum",
@@ -5702,8 +5702,8 @@
             "10.55.192.102"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "gif",
@@ -5784,8 +5784,8 @@
             "10.124.177.226"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.org",
         "url.extension": "gif",
@@ -5830,8 +5830,8 @@
             "uiin1342.mail.invalid"
         ],
         "related.ip": [
-            "10.167.176.220",
-            "10.146.228.249"
+            "10.146.228.249",
+            "10.167.176.220"
         ],
         "related.user": [
             "estla"
@@ -5845,8 +5845,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ect",
         "rsa.misc.action": [
-            "maccu",
-            "Blocked"
+            "Blocked",
+            "maccu"
         ],
         "rsa.misc.category": "iaecon",
         "rsa.misc.filter": "eni",
@@ -5866,8 +5866,8 @@
             "10.146.228.249"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "html",
@@ -5912,8 +5912,8 @@
             "agna5654.www.corp"
         ],
         "related.ip": [
-            "10.203.47.23",
-            "10.200.74.101"
+            "10.200.74.101",
+            "10.203.47.23"
         ],
         "related.user": [
             "litesse"
@@ -5927,8 +5927,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "nde",
         "rsa.misc.action": [
-            "iqu",
-            "Allowed"
+            "Allowed",
+            "iqu"
         ],
         "rsa.misc.category": "ametco",
         "rsa.misc.filter": "ntincul",
@@ -5948,8 +5948,8 @@
             "10.203.47.23"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "jpg",
@@ -5994,8 +5994,8 @@
             "ites5711.internal.host"
         ],
         "related.ip": [
-            "10.24.23.209",
-            "10.162.78.48"
+            "10.162.78.48",
+            "10.24.23.209"
         ],
         "related.user": [
             "ntore"
@@ -6009,8 +6009,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ereprehe",
         "rsa.misc.action": [
-            "tutl",
-            "Blocked"
+            "Blocked",
+            "tutl"
         ],
         "rsa.misc.category": "mip",
         "rsa.misc.filter": "umSecti",
@@ -6030,8 +6030,8 @@
             "10.24.23.209"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.com",
         "url.extension": "gif",
@@ -6112,8 +6112,8 @@
             "10.211.66.68"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "txt",
@@ -6194,8 +6194,8 @@
             "10.209.203.156"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "jpg",
@@ -6240,8 +6240,8 @@
             "tiumtot3611.internal.localdomain"
         ],
         "related.ip": [
-            "10.84.9.150",
-            "10.107.68.114"
+            "10.107.68.114",
+            "10.84.9.150"
         ],
         "related.user": [
             "sequatDu"
@@ -6276,8 +6276,8 @@
             "10.107.68.114"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.net",
         "url.extension": "gif",
@@ -6322,8 +6322,8 @@
             "gnaa4656.api.example"
         ],
         "related.ip": [
-            "10.26.222.144",
-            "10.124.119.48"
+            "10.124.119.48",
+            "10.26.222.144"
         ],
         "related.user": [
             "nre"
@@ -6358,8 +6358,8 @@
             "10.124.119.48"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "txt",
@@ -6419,8 +6419,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "officiad",
         "rsa.misc.action": [
-            "antium",
-            "Allowed"
+            "Allowed",
+            "antium"
         ],
         "rsa.misc.category": "emoeni",
         "rsa.misc.filter": "itvo",
@@ -6440,8 +6440,8 @@
             "10.223.11.164"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "htm",
@@ -6501,8 +6501,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "vitaedic",
         "rsa.misc.action": [
-            "rinc",
-            "Blocked"
+            "Blocked",
+            "rinc"
         ],
         "rsa.misc.category": "prehende",
         "rsa.misc.filter": "rume",
@@ -6522,8 +6522,8 @@
             "10.121.181.243"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "jpg",
@@ -6568,8 +6568,8 @@
             "uame1361.api.local"
         ],
         "related.ip": [
-            "10.90.20.202",
-            "10.10.93.133"
+            "10.10.93.133",
+            "10.90.20.202"
         ],
         "related.user": [
             "evita"
@@ -6604,8 +6604,8 @@
             "10.10.93.133"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "gif",
@@ -6686,8 +6686,8 @@
             "10.77.102.206"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "gif",
@@ -6732,8 +6732,8 @@
             "elit912.www5.test"
         ],
         "related.ip": [
-            "10.75.144.118",
-            "10.176.233.249"
+            "10.176.233.249",
+            "10.75.144.118"
         ],
         "related.user": [
             "isnos"
@@ -6768,8 +6768,8 @@
             "10.75.144.118"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "example.org",
         "url.extension": "txt",
@@ -6850,8 +6850,8 @@
             "10.236.55.236"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "jpg",
@@ -6911,8 +6911,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "atcupi",
         "rsa.misc.action": [
-            "uaUten",
-            "Blocked"
+            "Blocked",
+            "uaUten"
         ],
         "rsa.misc.category": "modt",
         "rsa.misc.filter": "magnidol",
@@ -6932,8 +6932,8 @@
             "10.13.125.101"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "html",
@@ -6978,8 +6978,8 @@
             "ficiad1312.api.host"
         ],
         "related.ip": [
-            "10.230.61.102",
-            "10.141.66.163"
+            "10.141.66.163",
+            "10.230.61.102"
         ],
         "related.user": [
             "umdolo"
@@ -7014,8 +7014,8 @@
             "10.230.61.102"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "jpg",
@@ -7060,8 +7060,8 @@
             "itaspe921.mail.invalid"
         ],
         "related.ip": [
-            "10.224.249.228",
-            "10.10.25.145"
+            "10.10.25.145",
+            "10.224.249.228"
         ],
         "related.user": [
             "mnisiuta"
@@ -7096,8 +7096,8 @@
             "10.224.249.228"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "html",
@@ -7157,8 +7157,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "neavolu",
         "rsa.misc.action": [
-            "nofdeF",
-            "Blocked"
+            "Blocked",
+            "nofdeF"
         ],
         "rsa.misc.category": "remagnam",
         "rsa.misc.filter": "maveniam",
@@ -7178,8 +7178,8 @@
             "10.247.255.107"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "gif",
@@ -7224,8 +7224,8 @@
             "aria1424.mail.home"
         ],
         "related.ip": [
-            "10.250.102.42",
-            "10.124.81.20"
+            "10.124.81.20",
+            "10.250.102.42"
         ],
         "related.user": [
             "tNequ"
@@ -7260,8 +7260,8 @@
             "10.250.102.42"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "htm",
@@ -7342,8 +7342,8 @@
             "10.154.188.132"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "htm",
@@ -7420,8 +7420,8 @@
             "10.138.193.38"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "gif",
@@ -7498,8 +7498,8 @@
             "10.172.159.251"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "api.example.net",
         "url.extension": "html",
@@ -7544,8 +7544,8 @@
             "edutpe1255.internal.lan"
         ],
         "related.ip": [
-            "10.98.126.206",
-            "10.195.62.230"
+            "10.195.62.230",
+            "10.98.126.206"
         ],
         "related.user": [
             "ptassit"
@@ -7580,8 +7580,8 @@
             "10.98.126.206"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "txt",
@@ -7626,8 +7626,8 @@
             "nderit1171.www5.domain"
         ],
         "related.ip": [
-            "10.84.140.5",
-            "10.144.93.186"
+            "10.144.93.186",
+            "10.84.140.5"
         ],
         "related.user": [
             "eroi"
@@ -7641,8 +7641,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "ntut",
         "rsa.misc.action": [
-            "nima",
-            "Blocked"
+            "Blocked",
+            "nima"
         ],
         "rsa.misc.category": "boru",
         "rsa.misc.filter": "umquia",
@@ -7662,8 +7662,8 @@
             "10.84.140.5"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "htm",
@@ -7708,8 +7708,8 @@
             "nos4114.api.lan"
         ],
         "related.ip": [
-            "10.31.58.6",
-            "10.198.84.190"
+            "10.198.84.190",
+            "10.31.58.6"
         ],
         "related.user": [
             "unt"
@@ -7744,8 +7744,8 @@
             "10.198.84.190"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "gif",
@@ -7790,8 +7790,8 @@
             "oremeum4231.internal.host"
         ],
         "related.ip": [
-            "10.139.90.218",
-            "10.131.81.172"
+            "10.131.81.172",
+            "10.139.90.218"
         ],
         "related.user": [
             "hende"
@@ -7826,8 +7826,8 @@
             "10.131.81.172"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "gif",
@@ -7887,8 +7887,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "olupt",
         "rsa.misc.action": [
-            "temvele",
-            "Blocked"
+            "Blocked",
+            "temvele"
         ],
         "rsa.misc.category": "natuser",
         "rsa.misc.filter": "amnihil",
@@ -7908,8 +7908,8 @@
             "10.152.217.174"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.org",
         "url.extension": "gif",
@@ -7954,8 +7954,8 @@
             "fugiatqu7793.www.localdomain"
         ],
         "related.ip": [
-            "10.26.149.221",
-            "10.217.193.148"
+            "10.217.193.148",
+            "10.26.149.221"
         ],
         "related.user": [
             "uisa"
@@ -7990,8 +7990,8 @@
             "10.217.193.148"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.org",
         "url.extension": "jpg",
@@ -8036,8 +8036,8 @@
             "onsequ3168.www.corp"
         ],
         "related.ip": [
-            "10.172.17.6",
-            "10.109.192.53"
+            "10.109.192.53",
+            "10.172.17.6"
         ],
         "related.user": [
             "eprehen"
@@ -8051,8 +8051,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "temUte",
         "rsa.misc.action": [
-            "tassit",
-            "Blocked"
+            "Blocked",
+            "tassit"
         ],
         "rsa.misc.category": "ita",
         "rsa.misc.filter": "scive",
@@ -8072,8 +8072,8 @@
             "10.172.17.6"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "www.example.com",
         "url.extension": "htm",
@@ -8133,8 +8133,8 @@
         "rsa.investigations.ec_theme": "Communication",
         "rsa.investigations.event_vcat": "exeacomm",
         "rsa.misc.action": [
-            "volup",
-            "Blocked"
+            "Blocked",
+            "volup"
         ],
         "rsa.misc.category": "ten",
         "rsa.misc.filter": "ssecil",
@@ -8154,8 +8154,8 @@
             "10.135.38.213"
         ],
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.domain": "mail.example.com",
         "url.extension": "txt",

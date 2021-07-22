@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == MISP module
 
+deprecated::[7.14.0,"This module is deprecated. Use the <<filebeat-module-threatintel,Threat Intel module>> instead."]
+
 beta[]
 
 This is a filebeat module for reading threat intel information from the MISP platform (https://www.circl.lu/doc/misp/). It uses the httpjson input to access the MISP REST API interface.

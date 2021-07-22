@@ -105,3 +105,5 @@ include::monitors/monitor-icmp.asciidoc[]
 include::monitors/monitor-tcp.asciidoc[]
 
 include::monitors/monitor-http.asciidoc[]
+
+include::monitors/monitor-browser.asciidoc[]

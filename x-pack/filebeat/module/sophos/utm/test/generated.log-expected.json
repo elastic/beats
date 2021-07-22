@@ -17,8 +17,8 @@
         "rsa.time.event_time": "2016-01-29T08:09:59.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -59,9 +59,9 @@
             "10.57.170.140"
         ],
         "related.user": [
+            "dexeac",
             "icistatuscode=giatquov",
-            "sunt",
-            "dexeac"
+            "sunt"
         ],
         "rsa.db.index": "run",
         "rsa.identity.logon_type": "nofdeF",
@@ -70,8 +70,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "ugiatnu",
-            "block"
+            "block",
+            "ugiatnu"
         ],
         "rsa.misc.comments": "colabo",
         "rsa.misc.content_type": "sedd",
@@ -100,8 +100,8 @@
         "source.mac": "01:00:5e:1d:c1:c0",
         "source.port": 2289,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "html",
@@ -142,8 +142,8 @@
         "rsa.time.event_time": "2016-02-26T22:15:08.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -169,8 +169,8 @@
             "10.106.239.55"
         ],
         "related.user": [
-            "itquiin",
-            "eaq"
+            "eaq",
+            "itquiin"
         ],
         "rsa.identity.logon_type": "stquidol",
         "rsa.internal.event_desc": "bor",
@@ -191,8 +191,8 @@
             "10.106.239.55"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "itquiin"
     },
@@ -225,8 +225,8 @@
         "rsa.time.event_time": "2016-03-26T12:20:16.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -247,8 +247,8 @@
         "rsa.time.event_time": "2016-04-09T19:22:51.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -270,8 +270,8 @@
         "rsa.time.event_time": "2016-04-24T02:25:25.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -310,8 +310,8 @@
         "rsa.time.event_time": "2016-05-08T09:27:59.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -338,8 +338,8 @@
         "rsa.time.event_time": "2016-05-22T16:30:33.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -369,8 +369,8 @@
         "rsa.time.event_time": "2016-06-05T23:33:08.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -403,8 +403,8 @@
         "rsa.time.event_time": "2016-06-20T06:35:42.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -435,8 +435,8 @@
         "rsa.time.event_time": "2016-07-04T13:38:16.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -471,8 +471,8 @@
         "service.name": "col",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "agnaaliq"
     },
@@ -494,8 +494,8 @@
         "rsa.time.event_time": "2016-08-02T03:43:25.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -529,8 +529,8 @@
         ],
         "source.port": 6676,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -561,8 +561,8 @@
         "rsa.time.event_time": "2016-08-30T17:48:33.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -595,8 +595,8 @@
         "rsa.time.event_time": "2016-09-14T00:51:07.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -617,8 +617,8 @@
         "rsa.time.event_time": "2016-09-28T07:53:42.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -666,8 +666,8 @@
             "10.54.169.175"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "scipit"
     },
@@ -697,8 +697,8 @@
         "service.name": "aeabillo",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "eruntmo"
     },
@@ -727,8 +727,8 @@
         ],
         "source.port": 6195,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -761,8 +761,8 @@
         "rsa.time.event_time": "2016-11-24T12:03:59.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -801,8 +801,8 @@
         "rsa.time.event_time": "2016-12-08T19:06:33.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -829,8 +829,8 @@
         "rsa.time.event_time": "2016-12-23T02:09:07.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -864,8 +864,8 @@
         ],
         "source.port": 4713,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -922,8 +922,8 @@
         "source.mac": "01:00:5e:15:3a:74",
         "source.port": 7807,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -956,8 +956,8 @@
         "rsa.time.event_time": "2017-02-03T23:16:50.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -999,8 +999,8 @@
             "10.232.108.32"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "llum"
     },
@@ -1043,8 +1043,8 @@
             "10.89.41.97"
         ],
         "related.user": [
-            "tcustatuscode=eumiu",
             "pteurs",
+            "tcustatuscode=eumiu",
             "tio"
         ],
         "rsa.db.index": "eavolupt",
@@ -1087,8 +1087,8 @@
         "source.mac": "01:00:5e:6f:71:02",
         "source.port": 5334,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "txt",
@@ -1131,8 +1131,8 @@
         "service.name": "dminimve",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "uptate"
     },
@@ -1159,8 +1159,8 @@
         "rsa.time.event_time": "2017-04-02T03:27:07.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "atcupi"
     },
@@ -1184,8 +1184,8 @@
         "rsa.time.event_time": "2017-04-16T10:29:41.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1212,8 +1212,8 @@
         "rsa.time.event_time": "2017-04-30T17:32:16.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1246,8 +1246,8 @@
         "rsa.time.event_time": "2017-05-15T00:34:50.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "www5.example.com",
         "url.extension": "htm",
@@ -1278,8 +1278,8 @@
         "service.name": "oNemoeni",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1309,8 +1309,8 @@
         "rsa.time.event_time": "2017-06-12T14:39:58.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1350,8 +1350,8 @@
         "rsa.time.event_time": "2017-06-26T21:42:33.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1383,8 +1383,8 @@
         "rsa.time.event_time": "2017-07-11T04:45:07.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "sitv"
     },
@@ -1421,8 +1421,8 @@
         ],
         "source.port": 5794,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1455,8 +1455,8 @@
             "10.230.4.70"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1484,8 +1484,8 @@
         "rsa.time.event_time": "2017-08-23T01:52:50.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1512,8 +1512,8 @@
         "rsa.time.event_time": "2017-09-06T08:55:24.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1546,8 +1546,8 @@
         "rsa.time.event_time": "2017-09-20T15:57:58.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1570,8 +1570,8 @@
         "rsa.time.event_time": "2017-10-04T23:00:32.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1604,8 +1604,8 @@
         "rsa.time.event_time": "2017-10-19T06:03:07.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1628,8 +1628,8 @@
             "10.244.96.61"
         ],
         "related.user": [
-            "iumt",
-            "itsedqui"
+            "itsedqui",
+            "iumt"
         ],
         "rsa.identity.logon_type": "psamvolu",
         "rsa.internal.event_desc": "orroqui",
@@ -1647,8 +1647,8 @@
             "10.244.96.61"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "itsedqui"
     },
@@ -1675,8 +1675,8 @@
         "rsa.time.event_time": "2017-11-16T20:08:15.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1710,8 +1710,8 @@
         "rsa.time.event_time": "2017-12-01T03:10:49.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1738,8 +1738,8 @@
         "rsa.time.event_time": "2017-12-15T10:13:24.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1771,8 +1771,8 @@
         "rsa.time.event_time": "2017-12-29T17:15:58.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1805,8 +1805,8 @@
         "rsa.time.event_time": "2018-01-13T00:18:32.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1831,8 +1831,8 @@
         "rsa.time.event_time": "2018-01-27T07:21:06.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -1869,13 +1869,13 @@
             "tenbyCi4371.www5.localdomain"
         ],
         "related.ip": [
-            "10.98.126.206",
-            "10.214.167.164"
+            "10.214.167.164",
+            "10.98.126.206"
         ],
         "related.user": [
             "amremapstatuscode=dolorsit",
-            "isnostru",
-            "hen"
+            "hen",
+            "isnostru"
         ],
         "rsa.db.index": "spernatu",
         "rsa.identity.logon_type": "untutl",
@@ -1884,8 +1884,8 @@
         "rsa.investigations.event_cat": 1901000000,
         "rsa.investigations.event_cat_name": "Other.Default",
         "rsa.misc.action": [
-            "nsectetu",
-            "block"
+            "block",
+            "nsectetu"
         ],
         "rsa.misc.comments": "uaer",
         "rsa.misc.content_type": "eaqu",
@@ -1914,8 +1914,8 @@
         "source.mac": "01:00:5e:65:2d:fe",
         "source.port": 4562,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "api.example.org",
         "url.extension": "txt",
@@ -1974,8 +1974,8 @@
         "source.mac": "01:00:5e:78:1a:5a",
         "source.port": 6585,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2014,8 +2014,8 @@
         "rsa.time.process_time": "volup",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2049,18 +2049,18 @@
         "observer.vendor": "Sophos",
         "observer.version": "1.2707",
         "related.hosts": [
-            "tenima5715.api.example",
-            "iusmo901.www.home"
+            "iusmo901.www.home",
+            "tenima5715.api.example"
         ],
         "related.ip": [
-            "10.92.93.236",
-            "10.2.24.156"
+            "10.2.24.156",
+            "10.92.93.236"
         ],
         "related.user": [
-            "ulpaq",
-            "ntoccae",
             "Sedutper",
-            "dolorsistatuscode=acc"
+            "dolorsistatuscode=acc",
+            "ntoccae",
+            "ulpaq"
         ],
         "rsa.db.index": "snisiut",
         "rsa.identity.logon_type": "umdol",
@@ -2103,8 +2103,8 @@
         "source.mac": "01:00:5e:34:8c:d2",
         "source.port": 6938,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "www.example.org",
         "url.extension": "jpg",
@@ -2152,13 +2152,13 @@
             "mni4032.lan"
         ],
         "related.ip": [
-            "10.202.65.2",
-            "10.180.169.49"
+            "10.180.169.49",
+            "10.202.65.2"
         ],
         "related.user": [
-            "tasu",
             "atatno",
-            "iscivelistatuscode=urve"
+            "iscivelistatuscode=urve",
+            "tasu"
         ],
         "rsa.db.index": "amrem",
         "rsa.identity.logon_type": "nulamcol",
@@ -2197,8 +2197,8 @@
         "source.mac": "01:00:5e:1a:03:f5",
         "source.port": 3308,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "mail.example.net",
         "url.extension": "html",
@@ -2239,8 +2239,8 @@
         "rsa.time.event_time": "2018-04-23T01:36:32.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2278,8 +2278,8 @@
         "rule.name": "nidolo",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "uaUteni"
     },
@@ -2314,8 +2314,8 @@
             "10.194.12.83"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2356,9 +2356,9 @@
             "10.45.12.53"
         ],
         "related.user": [
-            "umqustatuscode=ntexpli",
+            "eturadip",
             "porincid",
-            "eturadip"
+            "umqustatuscode=ntexpli"
         ],
         "rsa.db.index": "dolor",
         "rsa.identity.logon_type": "eturadi",
@@ -2397,8 +2397,8 @@
         "source.mac": "01:00:5e:a1:a3:9f",
         "source.port": 1455,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "www5.example.org",
         "url.extension": "jpg",
@@ -2434,8 +2434,8 @@
         ],
         "source.port": 2274,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2468,8 +2468,8 @@
         "rsa.time.event_time": "2018-07-03T12:49:23.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "ectetu"
     },
@@ -2501,8 +2501,8 @@
         "rsa.time.event_time": "2018-07-17T19:51:58.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2525,8 +2525,8 @@
             "10.32.85.21"
         ],
         "related.user": [
-            "etconsec",
-            "antium"
+            "antium",
+            "etconsec"
         ],
         "rsa.identity.logon_type": "umiurere",
         "rsa.internal.event_desc": "serro",
@@ -2544,8 +2544,8 @@
             "10.32.85.21"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "antium"
     },
@@ -2573,8 +2573,8 @@
         "rsa.time.event_time": "2018-08-15T09:57:06.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2607,8 +2607,8 @@
         "rsa.time.event_time": "2018-08-29T16:59:40.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2634,8 +2634,8 @@
         "rsa.time.event_time": "2018-09-13T00:02:15.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2672,8 +2672,8 @@
             "nisiuta4810.api.test"
         ],
         "related.ip": [
-            "10.85.200.58",
-            "10.210.175.52"
+            "10.210.175.52",
+            "10.85.200.58"
         ],
         "related.user": [
             "Loremi",
@@ -2719,8 +2719,8 @@
         "source.mac": "01:00:5e:0e:b3:8e",
         "source.port": 1125,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.domain": "internal.example.com",
         "url.extension": "jpg",
@@ -2728,8 +2728,8 @@
         "url.original": "https://internal.example.com/ritat/dipi.jpg?aliquide=aliqui#agnaaliq",
         "url.path": "/ritat/dipi.jpg",
         "url.query": [
-            "iatquovo",
-            "aliquide=aliqui"
+            "aliquide=aliqui",
+            "iatquovo"
         ],
         "url.scheme": "https",
         "user.name": "reetd"
@@ -2759,8 +2759,8 @@
             "itametc1599.api.test"
         ],
         "related.ip": [
-            "10.133.45.45",
-            "10.115.166.48"
+            "10.115.166.48",
+            "10.133.45.45"
         ],
         "rsa.internal.event_desc": "Authentication",
         "rsa.internal.messageid": "ulogd",
@@ -2788,8 +2788,8 @@
         "source.mac": "01:00:5e:5a:9d:a9",
         "source.port": 4180,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2816,8 +2816,8 @@
         "rsa.time.event_time": "2018-10-25T21:09:57.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2851,8 +2851,8 @@
         ],
         "source.port": 3506,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2873,8 +2873,8 @@
         "rsa.time.event_time": "2018-11-23T11:15:06.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2907,8 +2907,8 @@
         "rsa.time.event_time": "2018-12-07T18:17:40.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2939,8 +2939,8 @@
         "rsa.time.event_time": "2018-12-22T01:20:14.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -2961,8 +2961,8 @@
         "rsa.time.event_time": "2019-01-05T08:22:49.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3000,8 +3000,8 @@
         "rule.name": "uat",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "turvelil"
     },
@@ -3034,8 +3034,8 @@
         "rsa.time.event_time": "2019-02-02T22:27:57.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3067,8 +3067,8 @@
         "rsa.time.event_time": "2019-02-17T05:30:32.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3108,8 +3108,8 @@
         "rsa.time.event_time": "2019-03-03T12:33:06.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3141,8 +3141,8 @@
         "rsa.time.event_time": "2019-03-17T19:35:40.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3163,8 +3163,8 @@
         "rsa.time.event_time": "2019-04-01T02:38:14.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3191,8 +3191,8 @@
         "rsa.time.event_time": "2019-04-15T09:40:49.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3233,8 +3233,8 @@
         "rule.name": "uipex",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "url.path": "ercitati"
     },
@@ -3267,8 +3267,8 @@
         "rsa.time.event_time": "2019-05-13T23:45:57.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3294,8 +3294,8 @@
         "rsa.time.event_time": "2019-05-28T06:48:31.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3320,8 +3320,8 @@
         "rsa.time.event_time": "2019-06-11T13:51:06.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3349,8 +3349,8 @@
             "10.165.217.56"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3381,8 +3381,8 @@
         "rsa.time.event_time": "2019-07-10T03:56:14.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3415,8 +3415,8 @@
         "rsa.time.event_time": "2019-07-24T10:58:48.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3452,8 +3452,8 @@
         "rsa.time.event_time": "2019-08-07T18:01:23.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3486,8 +3486,8 @@
         "rsa.time.event_time": "2019-08-22T01:03:57.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3515,8 +3515,8 @@
             "imv1805.api.host"
         ],
         "related.ip": [
-            "10.96.243.231",
-            "10.248.62.55"
+            "10.248.62.55",
+            "10.96.243.231"
         ],
         "rsa.internal.event_desc": "ICMP",
         "rsa.internal.messageid": "ulogd",
@@ -3544,8 +3544,8 @@
         "source.mac": "01:00:5e:87:02:08",
         "source.port": 5632,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3584,8 +3584,8 @@
         "rsa.time.process_time": "cipitlab",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3606,8 +3606,8 @@
         "rsa.time.event_time": "2019-10-03T22:11:40.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3647,8 +3647,8 @@
         ],
         "source.port": 5342,
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3690,8 +3690,8 @@
             "10.96.200.83"
         ],
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ],
         "user.name": "acommod"
     },
@@ -3719,8 +3719,8 @@
         "rsa.time.event_time": "2019-11-15T19:19:22.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3744,8 +3744,8 @@
         "service.name": "rnatu",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     },
     {
@@ -3772,8 +3772,8 @@
         "rsa.time.event_time": "2019-12-14T09:24:31.000Z",
         "service.type": "sophos",
         "tags": [
-            "sophos.utm",
-            "forwarded"
+            "forwarded",
+            "sophos.utm"
         ]
     }
 ]

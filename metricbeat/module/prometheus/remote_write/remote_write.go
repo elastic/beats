@@ -44,7 +44,7 @@ type RemoteWriteEventsGenerator interface {
 	// Start must be called before using the generator
 	Start()
 
-	// converts Prometheus Samples to a map of mb.Event
+	// GenerateEvents converts Prometheus Samples to a map of mb.Event
 	GenerateEvents(metrics model.Samples) map[string]mb.Event
 
 	// Stop must be called when the generator won't be used anymore

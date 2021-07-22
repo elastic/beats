@@ -87,6 +87,7 @@
         "log.original": "2021-04-19 01:58:20,645 [myid:1] - INFO  [main:DatadirCleanupManager@78] - autopurge.snapRetainCount set to 3",
         "message": "autopurge.snapRetainCount set to 3",
         "process.thread.name": "main",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -105,6 +106,7 @@
         "log.original": "2021-04-19 01:58:20,645 [myid:1] - INFO  [main:DatadirCleanupManager@79] - autopurge.purgeInterval set to 1",
         "message": "autopurge.purgeInterval set to 1",
         "process.thread.name": "main",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -123,6 +125,7 @@
         "log.original": "2021-04-19 01:58:20,650 [myid:1] - INFO  [main:ManagedUtil@46] - Log4j found with jmx enabled.",
         "message": "Log4j found with jmx enabled.",
         "process.thread.name": "main",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -141,6 +144,7 @@
         "log.original": "2021-04-19 01:58:20,653 [myid:1] - INFO  [PurgeTask:DatadirCleanupManager$PurgeTask@138] - Purge task started.",
         "message": "Purge task started.",
         "process.thread.name": "PurgeTask",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -159,6 +163,7 @@
         "log.original": "2021-04-19 01:58:20,686 [myid:1] - INFO  [PurgeTask:DatadirCleanupManager$PurgeTask@144] - Purge task completed.",
         "message": "Purge task completed.",
         "process.thread.name": "PurgeTask",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -177,6 +182,7 @@
         "log.original": "2021-04-19 01:58:20,729 [myid:1] - INFO  [main:QuorumPeerMain@138] - Starting quorum peer",
         "message": "Starting quorum peer",
         "process.thread.name": "main",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -195,6 +201,7 @@
         "log.original": "2021-04-19 01:58:21,411 [myid:1] - INFO  [main:JettyAdminServer@112] - Started AdminServer on address 0.0.0.0, port 18081 and command URL /commands",
         "message": "Started AdminServer on address 0.0.0.0, port 18081 and command URL /commands",
         "process.thread.name": "main",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -213,6 +220,7 @@
         "log.original": "2021-04-19 01:58:21,453 [myid:1] - INFO  [QuorumPeerListener:QuorumCnxManager$Listener@636] - My election bind port: 0.0.0.0/0.0.0.0:3888",
         "message": "My election bind port: 0.0.0.0/0.0.0.0:3888",
         "process.thread.name": "QuorumPeerListener",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -231,6 +239,7 @@
         "log.original": "2021-04-19 01:58:21,482 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):QuorumPeer@1055] - LOOKING",
         "message": "LOOKING",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -249,6 +258,7 @@
         "log.original": "2021-04-19 01:58:21,484 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):FastLeaderElection@894] - New election. My id =  1, proposed zxid=0x0",
         "message": "New election. My id =  1, proposed zxid=0x0",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -267,6 +277,7 @@
         "log.original": "2021-04-19 01:58:21,488 [myid:1] - INFO  [WorkerReceiver[myid=1]:FastLeaderElection@688] - Notification: 2 (message format version), 1 (n.leader), 0x0 (n.zxid), 0x1 (n.round), LOOKING (n.state), 1 (n.sid), 0x0 (n.peerEPoch), LOOKING (my state)0 (n.config version)",
         "message": "Notification: 2 (message format version), 1 (n.leader), 0x0 (n.zxid), 0x1 (n.round), LOOKING (n.state), 1 (n.sid), 0x0 (n.peerEPoch), LOOKING (my state)0 (n.config version)",
         "process.thread.name": "WorkerReceiver[myid=1]",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -285,6 +296,7 @@
         "log.original": "2021-04-19 01:58:21,691 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):MBeanRegistry@128] - Unregister MBean [org.apache.ZooKeeperService:name0=ReplicatedServer_id1,name1=replica.1,name2=LeaderElection]",
         "message": "Unregister MBean [org.apache.ZooKeeperService:name0=ReplicatedServer_id1,name1=replica.1,name2=LeaderElection]",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -303,6 +315,7 @@
         "log.original": "2021-04-19 01:58:21,691 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):QuorumPeer@1143] - LEADING",
         "message": "LEADING",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -321,6 +334,7 @@
         "log.original": "2021-04-19 01:58:21,698 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Leader@63] - TCP NoDelay set to: true",
         "message": "TCP NoDelay set to: true",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -339,6 +353,7 @@
         "log.original": "2021-04-19 01:58:21,698 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Leader@83] - zookeeper.leader.maxConcurrentSnapshots = 10",
         "message": "zookeeper.leader.maxConcurrentSnapshots = 10",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -357,6 +372,7 @@
         "log.original": "2021-04-19 01:58:21,701 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Leader@85] - zookeeper.leader.maxConcurrentSnapshotTimeout = 5",
         "message": "zookeeper.leader.maxConcurrentSnapshotTimeout = 5",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -375,6 +391,7 @@
         "log.original": "2021-04-19 01:58:21,717 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Environment@109] - Server environment:zookeeper.version=3.5.3-beta-8ce24f9e675cbefffb8f21a47e06b42864475a60, built on 04/03/2017 16:19 GMT",
         "message": "Server environment:zookeeper.version=3.5.3-beta-8ce24f9e675cbefffb8f21a47e06b42864475a60, built on 04/03/2017 16:19 GMT",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -393,6 +410,7 @@
         "log.original": "2021-04-19 01:58:21,717 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Environment@109] - Server environment:host.name=ip-192-168-40-10.ec2.internal",
         "message": "Server environment:host.name=ip-192-168-40-10.ec2.internal",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -411,6 +429,7 @@
         "log.original": "2021-04-19 01:58:21,717 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Environment@109] - Server environment:java.version=1.8.0_144",
         "message": "Server environment:java.version=1.8.0_144",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -429,6 +448,7 @@
         "log.original": "2021-04-19 01:58:21,717 [myid:1] - INFO  [QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled):Environment@109] - Server environment:java.vendor=Oracle Corporation",
         "message": "Server environment:java.vendor=Oracle Corporation",
         "process.thread.name": "QuorumPeer[myid=1](plain=/0.0.0.0:2181)(secure=disabled)",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -447,6 +467,7 @@
         "log.original": "2021-04-19 01:58:31,148 [myid:1] - INFO  [NIOServerCxnFactory.AcceptThread:0.0.0.0/0.0.0.0:2181:NIOServerCnxnFactory$AcceptThread@296] - Accepted socket connection from /172.17.0.2:55730",
         "message": "Accepted socket connection from /172.17.0.2:55730",
         "process.thread.name": "NIOServerCxnFactory.AcceptThread:0.0.0.0/0.0.0.0:2181",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -465,6 +486,7 @@
         "log.original": "2021-04-19 01:58:31,149 [myid:1] - INFO  [NIOWorkerThread-2:ZooKeeperServer@1013] - Client attempting to establish new session at /172.17.0.2:55730",
         "message": "Client attempting to establish new session at /172.17.0.2:55730",
         "process.thread.name": "NIOWorkerThread-2",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -483,6 +505,7 @@
         "log.original": "2021-04-19 01:58:31,152 [myid:1] - INFO  [CommitProcWorkThread-4:ZooKeeperServer@727] - Established session 0x10000318e5f0003 with negotiated timeout 15000 for client /172.17.0.2:55730",
         "message": "Established session 0x10000318e5f0003 with negotiated timeout 15000 for client /172.17.0.2:55730",
         "process.thread.name": "CommitProcWorkThread-4",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -501,6 +524,7 @@
         "log.original": "2021-04-19 01:58:31,157 [myid:1] - INFO  [NIOWorkerThread-4:ZooKeeperServer@1050] - got auth packet /172.17.0.2:55730",
         "message": "got auth packet /172.17.0.2:55730",
         "process.thread.name": "NIOWorkerThread-4",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -519,6 +543,7 @@
         "log.original": "2021-04-19 01:58:31,157 [myid:1] - INFO  [NIOWorkerThread-4:ZooKeeperServer@1068] - auth success /172.17.0.2:55730",
         "message": "auth success /172.17.0.2:55730",
         "process.thread.name": "NIOWorkerThread-4",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -537,6 +562,7 @@
         "log.original": "2021-04-19 02:10:20,448 [myid:1] - INFO  [ProcessThread(sid:1 cport:-1)::PrepRequestProcessor@613] - Processed session termination for sessionid: 0x10000318e5f0020",
         "message": "Processed session termination for sessionid: 0x10000318e5f0020",
         "process.thread.name": "ProcessThread(sid:1 cport:-1):",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -555,6 +581,7 @@
         "log.original": "2021-04-19 03:05:03,964 [myid:1] - WARN  [NIOWorkerThread-7:NIOServerCnxn@366] - Unable to read additional data from client sessionid 0x10000318e5f0022, likely client has closed socket",
         "message": "Unable to read additional data from client sessionid 0x10000318e5f0022, likely client has closed socket",
         "process.thread.name": "NIOWorkerThread-7",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -573,6 +600,7 @@
         "log.original": "2021-04-19 03:05:03,965 [myid:1] - INFO  [NIOWorkerThread-7:MBeanRegistry@128] - Unregister MBean [org.apache.ZooKeeperService:name0=ReplicatedServer_id1,name1=replica.1,name2=Leader,name3=Connections,name4=172.17.0.2,name5=0x10000318e5f0022]",
         "message": "Unregister MBean [org.apache.ZooKeeperService:name0=ReplicatedServer_id1,name1=replica.1,name2=Leader,name3=Connections,name4=172.17.0.2,name5=0x10000318e5f0022]",
         "process.thread.name": "NIOWorkerThread-7",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -591,6 +619,7 @@
         "log.original": "2021-04-19 03:05:03,965 [myid:1] - INFO  [NIOWorkerThread-7:NIOServerCnxn@627] - Closed socket connection for client /172.17.0.2:58658 which had sessionid 0x10000318e5f0022",
         "message": "Closed socket connection for client /172.17.0.2:58658 which had sessionid 0x10000318e5f0022",
         "process.thread.name": "NIOWorkerThread-7",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     },
     {
@@ -609,6 +638,7 @@
         "log.original": "2021-04-19 03:05:14,058 [myid:1] - INFO  [SessionTracker:ZooKeeperServer@391] - Expiring session 0x10000318e5f0022, timeout of 10000ms exceeded",
         "message": "Expiring session 0x10000318e5f0022, timeout of 10000ms exceeded",
         "process.thread.name": "SessionTracker",
+        "service.node.name": "1",
         "service.type": "zookeeper"
     }
 ]

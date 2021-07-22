@@ -236,6 +236,29 @@ processors:
     field: related.hash
     value: "{{cisco.umbrella.sha_sha256}}"
     if: ctx?.cisco?.umbrella?.sha_sha256 != null
+- script:
+    if: ctx?.cisco?.umbrella?.identities != null && ctx.cisco.umbrella.identities instanceof List
+    lang: painless
+    description: "Extract user name values from ctx.cisco.umbrella.identities and append it to related.user"
+    source: |-
+      void addRelatedUser(def ctx, def x) {
+        if (ctx?.related == null) {
+          Map map = new HashMap();
+          ctx.put("related", map);
+        }
+        if (ctx?.related?.user == null) {
+          ArrayList al = new ArrayList();
+          ctx.related.put("user", al);
+        }
+        if (!ctx.related.user.contains(x)) {
+          ctx.related.user.add(x);
+        }
+      }
+      for (cisco_identity in ctx.cisco.umbrella.identities) {
+        if (cisco_identity.contains('@')) {
+          addRelatedUser(ctx, cisco_identity);
+        }
+      }
 
 ###########
 # Cleanup #

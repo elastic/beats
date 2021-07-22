@@ -10,6 +10,11 @@ processors:
       - json.comments
       - host
     ignore_missing: true
+- remove:
+    field:
+      - json.alerts
+    ignore_missing: true
+    if: 'ctx?.json?.alerts == null || ctx?.json?.alerts instanceof List'
 
 #########################
 ## ECS General Mapping ##
@@ -45,11 +50,16 @@ processors:
 - set:
     field: '@timestamp'
     value: '{{json.lastUpdateTime}}'
-    if: ctx.json?.lastUpdateTime != null
+    if: ctx?.json?.lastUpdateTime != null
 - rename:
     field: json.alerts.title
     target_field: message
     ignore_missing: true
+- rename:
+    field: json.incidentName
+    target_field: message
+    ignore_missing: true
+    if: ctx?.message == null
 
 #######################
 ## ECS Event Mapping ##
@@ -144,7 +154,7 @@ processors:
 - set:
     field: threat.framework
     value: MITRE ATT&CK
-    if: ctx.json?.alerts?.category != null
+    if: ctx?.json?.alerts?.category != null
 - rename:
     field: json.alerts.category
     target_field: threat.technique.name
@@ -153,7 +163,7 @@ processors:
     field: json.alerts.description
     target_field: rule.description
     ignore_missing: true
-    if: ctx.json?.alerts?.description.length() < 1020
+    if: ctx?.json?.alerts != null && ctx.json?.alerts?.description.length() < 1020
 
 ######################
 ## ECS File Mapping ##
@@ -220,7 +230,7 @@ processors:
     field: json.alerts.entities.url
     target_field: url.full
     ignore_missing: true
-    if: ctx?.json?.entities?.url != null
+    if: ctx?.json?.alerts?.entities?.url != null
 - uri_parts:
     field: url.full
     ignore_failure: true
@@ -264,23 +274,23 @@ processors:
 - append:
     field: related.ip
     value: '{{json.alerts.entities.ipAddress}}'
-    if: ctx.json?.entities?.ipAddress != null
+    if: ctx?.json?.alerts?.entities?.ipAddress != null
 - append:
     field: related.user
     value: '{{user.name}}'
-    if: ctx.user?.name != null
+    if: ctx?.user?.name != null
 - append:
     field: related.hash
     value: '{{file.hash.sha1}}'
-    if: ctx.file?.hash?.sha1 != null
+    if: ctx?.file?.hash?.sha1 != null
 - append:
     field: related.hash
     value: '{{file.hash.sha256}}'
-    if: ctx.file?.hash?.sha256 != null
+    if: ctx?.file?.hash?.sha256 != null
 - append:
     field: related.hosts
     value: '{{host.hostname}}'
-    if: ctx.host?.hostname != null
+    if: ctx?.host?.hostname != null
 
 #############
 ## Cleanup ##
@@ -296,15 +306,15 @@ processors:
 - remove:
     field: json.alerts.mitreTechniques
     ignore_missing: true
-    if: ctx?.json?.alerts?.mitreTechniques.isEmpty()
+    if: 'ctx?.json?.alerts != null && ctx?.json?.alerts?.mitreTechniques.isEmpty()'
 - remove:
     field: json.alerts.devices
     ignore_missing: true
-    if: ctx?.json?.alerts?.devices.isEmpty()
+    if: 'ctx?.json?.alerts != null && ctx?.json?.alerts?.devices.isEmpty()'
 - remove:
     field: json.tags
     ignore_missing: true
-    if: ctx?.json?.tags.isEmpty()
+    if: 'ctx?.json?.alerts != null && ctx?.json?.tags.isEmpty()'
 - remove:
     ignore_missing: true
     field:

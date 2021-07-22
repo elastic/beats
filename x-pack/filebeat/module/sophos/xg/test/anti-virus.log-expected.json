@@ -31,9 +31,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -50,8 +50,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.93"
+            "13.226.155.93",
+            "172.16.34.24"
         ],
         "rule.id": "2",
         "server.bytes": 1616,
@@ -73,8 +73,8 @@
         "source.ip": "172.16.34.24",
         "source.port": 57695,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
         "url.extension": "pdf",
@@ -115,9 +115,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -134,8 +134,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.18"
+            "13.226.155.18",
+            "172.16.34.24"
         ],
         "rule.id": "2",
         "server.bytes": 553,
@@ -157,8 +157,8 @@
         "source.ip": "172.16.34.24",
         "source.port": 57835,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "sophostest.com",
         "url.extension": "html",
@@ -197,9 +197,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -215,8 +215,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "82.165.194.211",
-            "186.8.209.194"
+            "186.8.209.194",
+            "82.165.194.211"
         ],
         "rule.id": "22",
         "server.bytes": 0,
@@ -250,8 +250,8 @@
         "source.port": 56336,
         "source.user.email": "info@farasamed.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "farasamed.com"
     },
@@ -285,9 +285,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -303,8 +303,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "23.254.247.78",
-            "185.7.209.194"
+            "185.7.209.194",
+            "23.254.247.78"
         ],
         "rule.id": "22",
         "server.bytes": 0,
@@ -341,8 +341,8 @@
         "source.port": 54693,
         "source.user.email": "spedizioni@divella.it",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "divella.it"
     },
@@ -369,9 +369,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -415,8 +415,8 @@
         "source.port": 56653,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "postman.local"
     },
@@ -443,9 +443,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -489,8 +489,8 @@
         "source.port": 56632,
         "source.user.email": "pankhil@postman.local",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.domain": "postman.local"
     },
@@ -516,9 +516,9 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "file.directory": "/var/www//home/ftp-user/ta_test_file_1ta-cl1-46",
         "file.name": " /home/ftp-user/ta_test_file_1ta-cl1-46",
@@ -562,8 +562,8 @@
         "source.ip": "10.146.13.49",
         "source.port": 39910,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -629,8 +629,8 @@
         "source.ip": "10.146.13.49",
         "source.port": 39936,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

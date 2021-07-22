@@ -8,8 +8,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "creation"
+            "creation",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -22,8 +22,8 @@
         "service.type": "zoom",
         "source.user.id": "cadsd32wA",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQ33fdf34YxHMA",
         "zoom.phone.call_id": "ddd5540",
@@ -59,8 +59,8 @@
         "service.type": "zoom",
         "source.user.id": "cajhdsf3wA",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQdfg34VYxHMA",
         "zoom.phone.call_id": "684445540",
@@ -83,8 +83,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "creation"
+            "creation",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -97,8 +97,8 @@
         "service.type": "zoom",
         "source.user.id": "z8yCxjgjsuyd58uQ",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "cbvxnYyO30GVYxHMA",
         "zoom.phone.call_id": "68sdsasdda7",
@@ -133,8 +133,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPsjdhgffgHMA",
         "zoom.phone.answer_start_time": "2020-07-22T01:42:04Z",
@@ -158,8 +158,8 @@
         "event.module": "zoom",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "end"
+            "end",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -171,8 +171,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQjuh6768MA",
         "zoom.phone.call_end_time": "2020-07-22T21:09:24Z",
@@ -195,8 +195,8 @@
         "event.start": "2020-07-22T21:09:20Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "end"
+            "end",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -208,8 +208,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQjuh6768MA",
         "zoom.phone.answer_start_time": "2020-07-22T21:09:20Z",
@@ -233,8 +233,8 @@
         "event.start": "2020-07-22T21:09:20Z",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "end"
+            "end",
+            "info"
         ],
         "fileset.name": "webhook",
         "input.type": "log",
@@ -246,8 +246,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQjuh6768MA",
         "zoom.phone.answer_start_time": "2020-07-22T21:09:20Z",
@@ -283,8 +283,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "MKDRWo34535wow",
         "zoom.phone.call_end_time": "2020-07-22T21:06:39Z",
@@ -317,8 +317,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "url.domain": "testurl.com",
         "url.extension": "mp4",
@@ -357,8 +357,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPebnxvbdn342MA",
         "zoom.phone.user_id": "caddsfsdfv_VaHE53wA"
@@ -381,8 +381,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPeQt3543hvxzc",
         "zoom.phone.user_id": "z8sdfsdfds3uQ"

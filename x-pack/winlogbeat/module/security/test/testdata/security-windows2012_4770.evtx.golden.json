@@ -22,6 +22,7 @@
       "level": "information"
     },
     "related": {
+      "ip": "::1",
       "user": "DC_TEST2K12$"
     },
     "source": {

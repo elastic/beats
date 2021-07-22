@@ -5,8 +5,8 @@
         "destination.ip": "10.100.220.70",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 792000000,
@@ -47,8 +47,8 @@
         "destination.ip": "10.0.140.107",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 15000000,
@@ -67,8 +67,8 @@
         "input.type": "log",
         "log.offset": 532,
         "related.ip": [
-            "10.0.140.2",
-            "10.0.140.107"
+            "10.0.140.107",
+            "10.0.140.2"
         ],
         "service.type": "iis",
         "source.address": "10.0.140.2",
@@ -82,8 +82,8 @@
         "destination.ip": "10.0.140.107",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 15000000,
@@ -102,8 +102,8 @@
         "input.type": "log",
         "log.offset": 619,
         "related.ip": [
-            "10.0.140.2",
-            "10.0.140.107"
+            "10.0.140.107",
+            "10.0.140.2"
         ],
         "service.type": "iis",
         "source.address": "10.0.140.2",
@@ -117,8 +117,8 @@
         "destination.ip": "2001:cdba:0000:0000:0000:0000:3257:9652",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 15000000,

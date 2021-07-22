@@ -5,8 +5,8 @@
         "destination.ip": "172.31.77.6",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.error",
         "event.kind": "event",
@@ -41,8 +41,8 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.error",
         "event.kind": "event",
@@ -60,8 +60,8 @@
         "input.type": "log",
         "log.offset": 286,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -87,8 +87,8 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.error",
         "event.kind": "event",
@@ -106,8 +106,8 @@
         "input.type": "log",
         "log.offset": 384,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -132,8 +132,8 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.error",
         "event.kind": "event",
@@ -147,8 +147,8 @@
         "input.type": "log",
         "log.offset": 470,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",

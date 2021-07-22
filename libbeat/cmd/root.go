@@ -29,6 +29,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/cmd/platformcheck"
+	"github.com/elastic/beats/v7/libbeat/licenser"
+	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 )
 
 func init() {
@@ -57,6 +59,10 @@ type BeatsRootCmd struct {
 // run command, which will be called if no args are given (for backwards compatibility),
 // and beat settings
 func GenRootCmdWithSettings(beatCreator beat.Creator, settings instance.Settings) *BeatsRootCmd {
+	// Add global Elasticsearch license endpoint check.
+	// Check we are actually talking with Elasticsearch, to ensure that used features actually exist.
+	elasticsearch.RegisterGlobalCallback(licenser.FetchAndVerify)
+
 	if err := platformcheck.CheckNativePlatformCompat(); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)
 		os.Exit(1)

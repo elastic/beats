@@ -12,8 +12,8 @@
         "event.module": "iptables",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -46,8 +46,8 @@
         "observer.ingress.zone": "wan",
         "observer.name": "Hostname",
         "related.ip": [
-            "158.109.0.1",
-            "10.4.0.5"
+            "10.4.0.5",
+            "158.109.0.1"
         ],
         "rule.id": "default",
         "rule.name": "wan-lan",
@@ -63,8 +63,8 @@
         "source.mac": "90:10:65:29:b6:2a",
         "source.port": 38842,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

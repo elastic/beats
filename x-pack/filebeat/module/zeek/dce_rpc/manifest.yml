@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/dce_rpc.log
   - name: tags
     default: [zeek.dce_rpc]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/dce_rpc.yml

@@ -5,8 +5,8 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 123000000,
@@ -25,8 +25,8 @@
         "input.type": "log",
         "log.offset": 257,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -99,8 +99,8 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 789000000,
@@ -124,8 +124,8 @@
         "input.type": "log",
         "log.offset": 1204,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -157,8 +157,8 @@
         "destination.ip": "10.44.0.136",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 0,
@@ -177,8 +177,8 @@
         "input.type": "log",
         "log.offset": 1447,
         "related.ip": [
-            "10.50.6.188",
-            "10.44.0.136"
+            "10.44.0.136",
+            "10.50.6.188"
         ],
         "service.type": "iis",
         "source.address": "10.50.6.188",
@@ -200,8 +200,8 @@
         "destination.ip": "10.44.0.136",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 0,
@@ -220,8 +220,8 @@
         "input.type": "log",
         "log.offset": 1802,
         "related.ip": [
-            "10.50.6.188",
-            "10.44.0.136"
+            "10.44.0.136",
+            "10.50.6.188"
         ],
         "service.type": "iis",
         "source.address": "10.50.6.188",

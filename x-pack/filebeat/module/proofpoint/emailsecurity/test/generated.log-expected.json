@@ -20,8 +20,8 @@
         "rsa.time.duration_str": "sse",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -50,8 +50,8 @@
         "rule.name": "mquia",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -70,8 +70,8 @@
         "rsa.misc.msgIdPart2": "nse",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -105,8 +105,8 @@
         "rsa.network.host_dst": "tenbyCic5882.api.home",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -130,8 +130,8 @@
         "rsa.time.duration_str": "toccae",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -154,8 +154,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -184,8 +184,8 @@
             "10.89.185.38"
         ],
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -208,8 +208,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -234,8 +234,8 @@
         "rule.name": "fugi",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -263,8 +263,8 @@
         "rsa.network.host_dst": "ommod3671.mail.domain",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -283,8 +283,8 @@
         "rsa.misc.msgIdPart2": "eataev",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -311,8 +311,8 @@
         "rule.name": "tem",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -332,8 +332,8 @@
         "rsa.misc.severity": "err",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -354,8 +354,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -377,8 +377,8 @@
         "rsa.misc.severity": "warn",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -397,8 +397,8 @@
         "rsa.misc.msgIdPart2": "sectetur",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -419,8 +419,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -443,8 +443,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -469,8 +469,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -497,8 +497,8 @@
         "rsa.network.host_dst": "ersp3536.www5.lan",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -524,8 +524,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -548,8 +548,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -577,8 +577,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -606,8 +606,8 @@
         "rsa.misc.version": "1.5020",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -631,8 +631,8 @@
         "rule.name": "uamei",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -658,8 +658,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -689,8 +689,8 @@
         "rsa.network.host_dst": "sit6590.lan",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -713,8 +713,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -737,8 +737,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -765,8 +765,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -793,8 +793,8 @@
         "rule.name": "remagn",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -817,8 +817,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -846,8 +846,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -872,8 +872,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -901,8 +901,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -930,8 +930,8 @@
         "rsa.misc.severity": "note",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -962,8 +962,8 @@
         "rule.name": "umetMal",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -984,8 +984,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1010,8 +1010,8 @@
         "rule.name": "irured",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1037,8 +1037,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1059,8 +1059,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1084,8 +1084,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1106,8 +1106,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1126,8 +1126,8 @@
         "rsa.misc.msgIdPart2": "litan",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1153,8 +1153,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1174,8 +1174,8 @@
         "rsa.misc.client": "queued-reinject",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1201,8 +1201,8 @@
         "rsa.time.duration_str": "mip",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1230,8 +1230,8 @@
         "rule.name": "equuntur",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1257,8 +1257,8 @@
         "rule.name": "ugitsedq",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1291,8 +1291,8 @@
         ],
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1313,8 +1313,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1342,8 +1342,8 @@
         "rsa.misc.result_code": "atur",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1371,8 +1371,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1393,8 +1393,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1421,8 +1421,8 @@
         "rsa.web.reputation_num": 25.933,
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1448,8 +1448,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1472,8 +1472,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1507,8 +1507,8 @@
         "rsa.network.host_dst": "str4641.domain",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1536,8 +1536,8 @@
         "rule.name": "iaecon",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1562,8 +1562,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1584,8 +1584,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1613,8 +1613,8 @@
         "rsa.misc.result_code": "quioff",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1634,8 +1634,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1657,8 +1657,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1686,8 +1686,8 @@
         "rule.name": "taevi",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1714,8 +1714,8 @@
         "rule.name": "etMa",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1736,8 +1736,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1759,8 +1759,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1780,8 +1780,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1800,8 +1800,8 @@
         "rsa.misc.msgIdPart2": "tassitas",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1822,8 +1822,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1850,8 +1850,8 @@
             "10.27.154.247"
         ],
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1872,8 +1872,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1901,8 +1901,8 @@
         "rule.name": "leumiur",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1927,8 +1927,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1950,8 +1950,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -1973,8 +1973,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2016,8 +2016,8 @@
         "rule.name": "aea",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2045,8 +2045,8 @@
         "rsa.misc.result_code": "onpr",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2072,8 +2072,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2101,8 +2101,8 @@
         "rsa.misc.result_code": "estq",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2123,8 +2123,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2152,8 +2152,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2176,8 +2176,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2198,8 +2198,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2223,8 +2223,8 @@
         "rsa.misc.severity": "very-high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2249,8 +2249,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2269,8 +2269,8 @@
         "rsa.misc.msgIdPart2": "itse",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2291,8 +2291,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2311,8 +2311,8 @@
         "rsa.misc.msgIdPart2": "umexe",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2337,8 +2337,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2364,8 +2364,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2387,8 +2387,8 @@
         "rsa.misc.severity": "low",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2415,8 +2415,8 @@
             "10.199.46.88"
         ],
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2450,8 +2450,8 @@
         "rsa.network.host_dst": "Sedutper7794.www5.domain",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2471,8 +2471,8 @@
         "rsa.misc.severity": "medium",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2497,8 +2497,8 @@
         "rsa.misc.severity": "info",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2525,8 +2525,8 @@
             "10.38.111.125"
         ],
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2549,8 +2549,8 @@
         "rsa.misc.severity": "high",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     },
     {
@@ -2574,8 +2574,8 @@
         "rsa.network.host_dst": "estla4081.corp",
         "service.type": "proofpoint",
         "tags": [
-            "proofpoint.emailsecurity",
-            "forwarded"
+            "forwarded",
+            "proofpoint.emailsecurity"
         ]
     }
 ]

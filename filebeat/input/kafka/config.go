@@ -193,6 +193,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !config.Kerberos.EnableFAST,
 		}
 	}
 

@@ -121,8 +121,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_SITES_SETTING",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",
@@ -178,8 +178,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "CHANGE_SITES_WEB_ADDRESS_MAPPING_UPDATES",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.admin",
         "event.id": "1",

@@ -28,6 +28,12 @@ type Config struct {
 	ExpandKeys          bool   `config:"expand_keys"`
 }
 
+type ParserConfig struct {
+	Config `config:",inline"`
+	Field  string `config:"field"`
+	Target string `config:"target"`
+}
+
 // Validate validates the Config option for JSON reader.
 func (c *Config) Validate() error {
 	return nil
