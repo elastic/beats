@@ -28,12 +28,13 @@ func TestConfig(t *testing.T) {
 		err := c.Unpack(cfg)
 		assert.Nil(t, err)
 		return config{
-			QueueURL:            quequeURL,
-			S3Bucket:            s3Bucket,
-			APITimeout:          120 * time.Second,
-			VisibilityTimeout:   300 * time.Second,
-			FIPSEnabled:         false,
-			MaxNumberOfMessages: 5,
+			QueueURL:             quequeURL,
+			S3Bucket:             s3Bucket,
+			APITimeout:           120 * time.Second,
+			VisibilityTimeout:    300 * time.Second,
+			S3BucketPollInterval: 120 * time.Second,
+			FIPSEnabled:          false,
+			MaxNumberOfMessages:  5,
 			ReaderConfig: readerConfig{
 				BufferSize:     16 * humanize.KiByte,
 				MaxBytes:       10 * humanize.MiByte,
@@ -160,6 +161,28 @@ func TestConfig(t *testing.T) {
 				"visibility_timeout": "12h1ns",
 			},
 			"visibility_timeout <12h0m0.000000001s> must be greater than 0 and less than or equal to 12h",
+			nil,
+		},
+		{
+			"error on s3_bucket_poll_interval == 0",
+			queueURL,
+			"",
+			common.MapStr{
+				"queue_url":               queueURL,
+				"s3_bucket_poll_interval": "0",
+			},
+			"s3_bucket_poll_interval <0s> must be greater than 0 and less than or equal to 12h",
+			nil,
+		},
+		{
+			"error on s3_bucket_poll_interval > 12h",
+			queueURL,
+			"",
+			common.MapStr{
+				"queue_url":               queueURL,
+				"s3_bucket_poll_interval": "12h1ns",
+			},
+			"s3_bucket_poll_interval <12h0m0.000000001s> must be greater than 0 and less than or equal to 12h",
 			nil,
 		},
 		{

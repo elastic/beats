@@ -21,6 +21,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/statestore"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -70,6 +72,7 @@ type s3BucketCollector struct {
 	s3        s3iface.ClientAPI
 	publisher beat.Client
 	states    *States
+	store     *statestore.Store
 }
 
 type s3Info struct {
@@ -163,12 +166,14 @@ func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 	}
 
 	return s3Infos, nil
-
 }
+
 func (c *s3BucketCollector) run() {
 	defer c.logger.Info("s3 input worker has stopped.")
 	c.logger.Info("s3 input worker has started.")
 	for c.cancellation.Err() == nil {
+		// "sleep" for S3BucketPollInterval duration to reduce list operations
+		<-time.After(c.config.S3BucketPollInterval)
 		s3Infos, err := c.getS3Objects()
 		if err != nil {
 			c.logger.Error("S3 get objects failed: ", err)
@@ -186,6 +191,7 @@ func (c *s3BucketCollector) run() {
 			c.logger.Error(fmt.Errorf("handleS3Objects failed: %w", err))
 			return
 		}
+
 		c.logger.Debugf("handleS3Objects succeed")
 	}
 }
@@ -570,21 +576,30 @@ func createEventsFromS3Info(svc s3iface.ClientAPI,
 	r = readfile.NewLimitReader(r, int(info.MaxBytes))
 
 	var offset int64
+	var fullStored bool
+	var previousMessage *reader.Message
 	for {
-		message, err := r.Next()
-		if err == io.EOF {
+		message, nextErr := r.Next()
+		if nextErr == io.EOF {
+			// No more lines
+			fullStored = true
+		} else if nextErr != nil {
+			return fmt.Errorf("error reading message: %w", nextErr)
+		}
+
+		if previousMessage != nil {
+			event := createEvent(string(previousMessage.Content), offset, info, objectHash, s3Ctx, fullStored)
+			event.Fields.DeepUpdate(previousMessage.Fields)
+			offset += int64(message.Bytes)
+			if err := forwardEvent(event, publisher, metrics, cancellation); err != nil {
+				return fmt.Errorf("forwardEvent failed: %w", err)
+			}
+		}
+		if nextErr == io.EOF {
 			// No more lines
 			break
 		}
-		if err != nil {
-			return fmt.Errorf("error reading message: %w", err)
-		}
-		event := createEvent(string(message.Content), offset, info, objectHash, s3Ctx)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		if err = forwardEvent(event, publisher, metrics, cancellation); err != nil {
-			return fmt.Errorf("forwardEvent failed: %w", err)
-		}
+		previousMessage = &message
 	}
 	return nil
 }
@@ -606,7 +621,7 @@ func decodeJSON(decoder *json.Decoder,
 		}
 
 		if err == io.EOF {
-			offsetNew, err := jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, publisher, metrics, cancellation, logger)
+			offsetNew, err := jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, true, publisher, metrics, cancellation, logger)
 			if err != nil {
 				return err
 			}
@@ -618,7 +633,7 @@ func decodeJSON(decoder *json.Decoder,
 			return nil
 		}
 
-		offset, err = jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, publisher, metrics, cancellation, logger)
+		offset, err = jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, false, publisher, metrics, cancellation, logger)
 		if err != nil {
 			return err
 		}
@@ -630,6 +645,7 @@ func jsonFieldsType(jsonFields interface{},
 	objectHash string,
 	s3Info s3Info,
 	s3Ctx *s3Context,
+	fullStored bool,
 	publisher beat.Client,
 	metrics *inputMetrics,
 	cancellation context.Context,
@@ -644,7 +660,7 @@ func jsonFieldsType(jsonFields interface{},
 				return offset, err
 			}
 			for _, v := range textValues {
-				offset, err := convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx, publisher, metrics, cancellation, logger)
+				offset, err := convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
 				if err != nil {
 					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 					logger.Error(err)
@@ -664,7 +680,7 @@ func jsonFieldsType(jsonFields interface{},
 
 			valuesConverted := textValues.([]interface{})
 			for _, textValue := range valuesConverted {
-				offsetNew, err := convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx, publisher, metrics, cancellation, logger)
+				offsetNew, err := convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
 				if err != nil {
 					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 					logger.Error(err)
@@ -675,7 +691,7 @@ func jsonFieldsType(jsonFields interface{},
 			return offset, nil
 		}
 
-		offset, err := convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx, publisher, metrics, cancellation, logger)
+		offset, err := convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
 		if err != nil {
 			err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
 			logger.Error(err)
@@ -691,6 +707,7 @@ func convertJSONToEvent(jsonFields interface{},
 	objectHash string,
 	s3Info s3Info,
 	s3Ctx *s3Context,
+	fullStored bool,
 	publisher beat.Client,
 	metrics *inputMetrics,
 	cancellation context.Context,
@@ -700,7 +717,7 @@ func convertJSONToEvent(jsonFields interface{},
 	logOriginal := string(vJSON)
 	log := trimLogDelimiter(logOriginal)
 	offset += int64(len(log))
-	event := createEvent(log, offset, s3Info, objectHash, s3Ctx)
+	event := createEvent(log, offset, s3Info, objectHash, s3Ctx, fullStored)
 
 	err := forwardEvent(event, publisher, metrics, cancellation)
 	if err != nil {
@@ -743,7 +760,7 @@ func trimLogDelimiter(log string) string {
 	return strings.TrimSuffix(log, "\n")
 }
 
-func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context) beat.Event {
+func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx *s3Context, fullStored bool) beat.Event {
 	s3Ctx.Inc()
 
 	event := beat.Event{
@@ -771,7 +788,11 @@ func createEvent(log string, offset int64, info s3Info, objectHash string, s3Ctx
 				"region":   info.region,
 			},
 		},
-		Private: s3Ctx,
+		Private: []interface{}{s3Ctx},
+	}
+
+	if fullStored {
+		event.Private = append(event.Private.([]interface{}), info)
 	}
 	event.SetID(objectID(objectHash, offset))
 

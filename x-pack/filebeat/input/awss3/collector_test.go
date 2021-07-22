@@ -321,12 +321,12 @@ func TestCreateEvent(t *testing.T) {
 			break
 		}
 		if err == io.EOF {
-			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
+			event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, false)
 			events = append(events, event)
 			break
 		}
 
-		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context)
+		event := createEvent(log, int64(len(log)), s3Info, s3ObjectHash, s3Context, false)
 		events = append(events, event)
 	}
 

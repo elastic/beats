@@ -101,7 +101,7 @@ func newV2Context() (v2.Context, func()) {
 }
 
 func setupInputSQSCollector(t *testing.T, cfg *common.Config) (*s3SQSCollector, chan beat.Event) {
-	inp, err := Plugin().Manager.Create(cfg)
+	inp, err := Plugin(nil).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,7 +122,7 @@ func setupInputSQSCollector(t *testing.T, cfg *common.Config) (*s3SQSCollector, 
 }
 
 func setupInputBucketCollector(t *testing.T, cfg *common.Config) (*s3BucketCollector, chan beat.Event) {
-	inp, err := Plugin().Manager.Create(cfg)
+	inp, err := Plugin(nil).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -135,7 +135,7 @@ func setupInputBucketCollector(t *testing.T, cfg *common.Config) (*s3BucketColle
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
 
-	collector, err := inp.(*s3Input).createS3Collector(ctx, pipeline, inputMetrics)
+	collector, err := inp.(*s3Input).createS3Collector(ctx, pipeline, inputMetrics, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}

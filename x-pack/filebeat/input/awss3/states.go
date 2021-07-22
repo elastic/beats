@@ -9,10 +9,40 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+// storedOp keeps track of pending updates that are not written to the persistent store yet.
+// Update operations are ordered. The input manager guarantees that only one
+// input can create update operation for a source, such that new input
+// instances can add update operations to be executed after already pending
+// update operations from older inputs instances that have been shutdown.
+type storedOp struct {
+	states *States
+	store  *statestore.Store
+}
+
+func newStoredOp(states *States, store *statestore.Store) *storedOp {
+	return &storedOp{
+		states: states,
+		store:  store,
+	}
+}
+
+func (op *storedOp) execute(info s3Info) {
+	if op == nil {
+		return
+	}
+
+	id := info.name + info.key
+	state := op.states.FindPreviousByID(id)
+	if !state.IsEmpty() {
+		state.MarkAsStored()
+		op.states.Update(state)
+		op.states.writeStates(op.store)
+	}
+}
 
 // States handles list of s3 object state. One must use NewStates to instantiate a
 // file states registry. Using the zero-value is not safe.
@@ -31,6 +61,23 @@ func NewStates() *States {
 	return &States{
 		states: nil,
 		idx:    map[string]int{},
+	}
+}
+
+func (s *States) Delete(id string) {
+	s.Lock()
+	defer s.Unlock()
+
+	index := s.findPrevious(id)
+	if index >= 0 {
+		last := len(s.states) - 1
+		s.states[last], s.states[index] = s.states[index], s.states[last]
+		s.states = s.states[:last]
+	}
+
+	s.idx = map[string]int{}
+	for i, state := range s.states {
+		s.idx[state.Id] = i
 	}
 }
 
@@ -58,6 +105,18 @@ func (s *States) FindPrevious(newState State) State {
 	s.RLock()
 	defer s.RUnlock()
 	id := newState.Bucket + newState.Key
+	i := s.findPrevious(id)
+	if i < 0 {
+		return State{}
+	}
+	return s.states[i]
+}
+
+// FindPreviousByID lookups a registered state, that matching the id.
+// Returns a zero-state if no match is found.
+func (s *States) FindPreviousByID(id string) State {
+	s.RLock()
+	defer s.RUnlock()
 	i := s.findPrevious(id)
 	if i < 0 {
 		return State{}
@@ -177,10 +236,10 @@ func mergeStates(st, other *State) {
 	}
 }
 
-func writeStates(store backend.Store, states []State) error {
-	for i := range states {
-		key := awsS3StatePrefix + states[i].Id
-		if err := store.Set(key, states[i]); err != nil {
+func (s *States) writeStates(store *statestore.Store) error {
+	for _, state := range s.GetStates() {
+		key := awsS3StatePrefix + state.Id
+		if err := store.Set(key, state); err != nil {
 			return err
 		}
 	}

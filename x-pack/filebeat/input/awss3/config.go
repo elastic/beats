@@ -18,23 +18,25 @@ import (
 )
 
 type config struct {
-	APITimeout          time.Duration        `config:"api_timeout"`
-	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
-	FIPSEnabled         bool                 `config:"fips_enabled"`
-	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url"`
-	S3Bucket            string               `config:"s3_bucket"`
-	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	APITimeout           time.Duration        `config:"api_timeout"`
+	VisibilityTimeout    time.Duration        `config:"visibility_timeout"`
+	FIPSEnabled          bool                 `config:"fips_enabled"`
+	MaxNumberOfMessages  int                  `config:"max_number_of_messages"`
+	QueueURL             string               `config:"queue_url"`
+	S3Bucket             string               `config:"s3_bucket"`
+	S3BucketPollInterval time.Duration        `config:"s3_bucket_poll_interval"`
+	AWSConfig            awscommon.ConfigAWS  `config:",inline"`
+	FileSelectors        []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig         readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
 }
 
 func defaultConfig() config {
 	c := config{
-		APITimeout:          120 * time.Second,
-		VisibilityTimeout:   300 * time.Second,
-		FIPSEnabled:         false,
-		MaxNumberOfMessages: 5,
+		APITimeout:           120 * time.Second,
+		VisibilityTimeout:    300 * time.Second,
+		S3BucketPollInterval: 120 * time.Second,
+		FIPSEnabled:          false,
+		MaxNumberOfMessages:  5,
 	}
 	c.ReaderConfig.InitDefaults()
 	return c
@@ -48,6 +50,11 @@ func (c *config) Validate() error {
 	if c.QueueURL != "" && c.S3Bucket != "" {
 		return fmt.Errorf("queue_url <%v> and s3_bucket <%v> "+
 			"cannot be set at the same time", c.QueueURL, c.S3Bucket)
+	}
+
+	if c.S3BucketPollInterval <= 0 || c.S3BucketPollInterval.Hours() > 12 {
+		return fmt.Errorf("s3_bucket_poll_interval <%v> must be greater than 0 and "+
+			"less than or equal to 12h", c.S3BucketPollInterval)
 	}
 
 	if c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12 {

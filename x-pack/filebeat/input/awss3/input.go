@@ -7,6 +7,9 @@ package awss3
 import (
 	"context"
 	"fmt"
+	"time"
+
+	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 
@@ -63,7 +66,7 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 	ok := false
 	persistentStore, err := im.store.Access()
 	if err != nil {
-		return err
+		return sderr.Wrap(err, "Can not access persistent store")
 	}
 
 	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
@@ -71,7 +74,20 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 	states := NewStates()
 	err = states.readStatesFrom(persistentStore)
 	if err != nil {
-		return err
+		return sderr.Wrap(err, "Can not start persistent store")
+	}
+
+	err = grp.Go(func(canceler unison.Canceler) error {
+		interval := im.store.CleanupInterval()
+		if interval <= 0 {
+			interval = 5 * time.Minute
+		}
+		cleanStore(canceler, persistentStore, states, interval)
+		return nil
+	})
+
+	if err != nil {
+		return sderr.Wrap(err, "Can not start cleanup process")
 	}
 
 	im.persistentStore = persistentStore
@@ -112,12 +128,6 @@ func (in *s3Input) Test(ctx v2.TestContext) error {
 }
 
 func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
-	defer in.store.Close()
-
-	defer func() {
-		writeStates(in.store, in.states.GetStates())
-	}()
-
 	var err error
 	var collector s3Collector
 
@@ -132,7 +142,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 
 	if in.config.S3Bucket != "" {
-		collector, err = in.createS3Collector(ctx, pipeline, inputMetrics, in.states)
+		collector, err = in.createS3Collector(ctx, pipeline, inputMetrics, in.states, in.store)
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
@@ -149,10 +159,11 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 }
 
-func (in *s3Input) createS3Collector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States) (*s3BucketCollector, error) {
+func (in *s3Input) createS3Collector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States, store *statestore.Store) (*s3BucketCollector, error) {
+	storedOp := newStoredOp(in.states, in.store)
 	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
-		ACKHandler: newACKHandler(),
+		ACKHandler: newACKHandler(storedOp),
 	})
 
 	if err != nil {
@@ -182,13 +193,14 @@ func (in *s3Input) createS3Collector(ctx v2.Context, pipeline beat.Pipeline, met
 		s3:           s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, awsConfig.Region, awsConfig)),
 		metrics:      metrics,
 		states:       states,
+		store:        store,
 	}, nil
 }
 
 func (in *s3Input) createSQSCollector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics) (*s3SQSCollector, error) {
 	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
-		ACKHandler: newACKHandler(),
+		ACKHandler: newACKHandler(nil),
 	})
 
 	if err != nil {
@@ -236,12 +248,19 @@ func (in *s3Input) createSQSCollector(ctx v2.Context, pipeline beat.Pipeline, me
 	}, nil
 }
 
-func newACKHandler() beat.ACKer {
+func newACKHandler(storedOp *storedOp) beat.ACKer {
 	return acker.ConnectionOnly(
 		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
 			for _, private := range privates {
-				if s3Context, ok := private.(*s3Context); ok {
-					s3Context.done()
+				if private, ok := private.([]interface{}); ok {
+					for _, currentPrivate := range private {
+						if s3Context, ok := currentPrivate.(*s3Context); ok {
+							s3Context.done()
+						}
+						if info, ok := currentPrivate.(s3Info); ok && storedOp != nil {
+							storedOp.execute(info)
+						}
+					}
 				}
 			}
 		}),
