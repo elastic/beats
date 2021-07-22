@@ -11,12 +11,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type stateTestCase struct {
-	states [2]State
-	isSame bool
-}
-
 func TestStateIsEqual(t *testing.T) {
+	type stateTestCase struct {
+		states [2]State
+		isSame bool
+	}
+
 	lastModifed := time.Now()
 	tests := map[string]stateTestCase{
 		"two states pointing to the same key with same size and same last modified": {
