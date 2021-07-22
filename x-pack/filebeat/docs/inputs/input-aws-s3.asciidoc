@@ -144,11 +144,24 @@ sqs:DeleteMessage
 ----
 
 [float]
-=== S3 and SQS setup
+=== S3 and bucket notification setup
+
+++++
+<titleabbrev>S3 → SQS</titleabbrev>
+++++
 Enable bucket notification: any new object creation in S3 bucket will also
 create a notification through SQS. Please see
-https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification]
-for more details.
+https://docs.aws.amazon.com/AmazonS3/latest/dev/ways-to-add-notification-config-to-bucket.html#step1-create-sqs-queue-for-notification[create-sqs-queue-for-notification] for more details.
+
+
+++++
+<titleabbrev>S3 → SNS → SQS</titleabbrev>
+++++
+If you would like to use the bucket notification in multiple different consumers (others than beats), you should use an SNS topic for the bucket notification. 
+Please see https://docs.aws.amazon.com/AmazonS3/latest/userguide/ways-to-add-notification-config-to-bucket.html#step1-create-sns-topic-for-notification[create-SNS-topic-for-notification] for more details.
+Your SQS queue will be configured as an https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html[subscriber to the SNS topic].
+
+The SNS subscription provides metadata with each message delivered -- the SNS MessageId, a Signature to validate authenticity, a Timestamp of when SNS originally accepted the message, and other attributes.
 
 [float]
 === Parallel Processing
