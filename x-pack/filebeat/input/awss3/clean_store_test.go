@@ -55,23 +55,6 @@ func TestGcFind(t *testing.T) {
 			true,
 		},
 		{
-			"stateBeforeStartedStored",
-			func() State {
-				state := NewState("bucket", "key", 100, started.Add(5*time.Second))
-				state.MarkAsStored()
-				return state
-			},
-			false,
-		},
-		{
-			"stateBeforeStartedNotStored",
-			func() State {
-				state := NewState("bucket", "key", 100, started.Add(5*time.Second))
-				return state
-			},
-			true,
-		},
-		{
 			"stateAfterTTLStored",
 			func() State {
 				state := NewState("bucket", "key", 100, started.Add(25*60*time.Second))
