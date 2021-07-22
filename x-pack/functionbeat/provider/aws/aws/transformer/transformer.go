@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -222,9 +223,17 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 	var evts []beat.Event
 	svc := s3.New(session.New())
 	for _, record := range request.Records {
+		unescaped_key, err := url.QueryUnescape(record.S3.Object.Key)
+
+		if err != nil {
+			fmt.Println("Got error unescaping key: %s", record.S3.Object.Key)
+			fmt.Println(err.Error())
+			return nil, err
+		}
+
 		result, err := svc.GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(record.S3.Bucket.Name),
-			Key:    aws.String(record.S3.Object.Key),
+			Key:    aws.String(unescaped_key),
 		})
 
 		if err != nil {
@@ -258,7 +267,7 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 					"message":      obj_line.Text(),
 					"event_source": record.EventSource,
 					"bucket_name":  record.S3.Bucket.Name,
-					"bucket_key":   record.S3.Object.Key,
+					"bucket_key":   unescaped_key,
 					"aws_region":   record.AWSRegion,
 				},
 			}
