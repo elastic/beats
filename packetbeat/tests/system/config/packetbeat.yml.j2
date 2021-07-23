@@ -24,6 +24,9 @@ packetbeat.flows.timeout: 2s
 
 # Configure reporting period. If set to -1, only killed flows will be reported
 packetbeat.flows.period: -1s
+
+{% if flows_use_transport_hint %}packetbeat.flows.transport_hint: true{% endif %}
+
 {% endif %}
 
 packetbeat.protocols:

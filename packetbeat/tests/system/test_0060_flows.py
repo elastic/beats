@@ -218,3 +218,63 @@ class Test(BaseTest):
             required_fields=FLOWS_REQUIRED_FIELDS)
 
         return objs
+
+    def test_gap_in_tcp_stream_with_transport_hint(self):
+        self.render_config_template(
+            flows=True,
+            shutdown_timeout="1s",
+            flows_use_transport_hint=True,
+        )
+        self.run_packetbeat(
+            pcap="gap_in_stream_reversed.pcap",
+            debug_selectors=["*"])
+
+        objs = self.read_output(
+            types=["flow"],
+            required_fields=FLOWS_REQUIRED_FIELDS)
+
+        pprint(objs)
+        assert len(objs) == 2
+        check_fields(objs[0], {
+            'flow.final': True,
+            'source.ip': '192.168.1.2',
+            'source.port': 41872,
+            'destination.ip': '10.0.0.1',
+            'destination.port': 443,
+            'network.transport': 'tcp',
+            'network.packets': 6,
+        })
+        check_fields(objs[1], {
+            'flow.final': True,
+            'source.ip': '10.0.0.1',
+            'source.port': 443,
+            'destination.ip': '192.168.1.2',
+            'destination.port': 41872,
+            'network.transport': 'tcp',
+            'network.packets': 3,
+        })
+
+    def test_gap_in_tcp_stream_without_transport_hint(self):
+        self.render_config_template(
+            flows=True,
+            shutdown_timeout="1s",
+        )
+        self.run_packetbeat(
+            pcap="gap_in_stream_reversed.pcap",
+            debug_selectors=["*"])
+
+        objs = self.read_output(
+            types=["flow"],
+            required_fields=FLOWS_REQUIRED_FIELDS)
+
+        pprint(objs)
+        assert len(objs) == 1
+        check_fields(objs[0], {
+            'flow.final': True,
+            'source.ip': '192.168.1.2',
+            'source.port': 41872,
+            'destination.ip': '10.0.0.1',
+            'destination.port': 443,
+            'network.transport': 'tcp',
+            'network.packets': 9,
+        })
