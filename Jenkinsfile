@@ -116,7 +116,7 @@ def runBuildAndTest(Map args = [:]) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   dir("${BASE_DIR}"){
     def mapParallelTasks = [:]
-    1.upto(args.number) { k
+    for(int k = 0;k<args.number;k++) {
       mapParallelTasks["${k}"] = target(command: 'mage build',
                                         context: args.context + '-'+k,
                                         directory: 'auditbeat',
