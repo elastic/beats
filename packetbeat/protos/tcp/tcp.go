@@ -45,6 +45,7 @@ type TCP struct {
 	portMap      map[uint16]protos.Protocol
 	protocols    protos.Protocols
 	expiredConns expirationQueue
+	hintFlows    bool
 }
 
 type expiredConnection struct {
@@ -169,7 +170,7 @@ func (tcp *TCP) Process(id *flows.FlowID, tcphdr *layers.TCP, pkt *protos.Packet
 	}
 
 	conn := stream.conn
-	if id != nil {
+	if tcp.hintFlows && id != nil {
 		id.AddConnectionID(uint64(conn.id))
 	}
 
@@ -318,7 +319,7 @@ func buildPortsMap(plugins map[protos.Protocol]protos.TCPPlugin) (map[uint16]pro
 }
 
 // Creates and returns a new Tcp.
-func NewTCP(p protos.Protocols) (*TCP, error) {
+func NewTCP(p protos.Protocols, hintFlows bool) (*TCP, error) {
 	isDebug = logp.IsDebug("tcp")
 
 	portMap, err := buildPortsMap(p.GetAllTCP())
@@ -329,6 +330,7 @@ func NewTCP(p protos.Protocols) (*TCP, error) {
 	tcp := &TCP{
 		protocols: p,
 		portMap:   portMap,
+		hintFlows: hintFlows,
 	}
 	tcp.streams = common.NewCacheWithRemovalListener(
 		protos.DefaultTransactionExpiration,

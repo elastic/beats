@@ -55,7 +55,7 @@ func workerFactory(publisher *publish.TransactionPublisher, protocols *protos.Pr
 			icmp6 = icmp
 		}
 
-		tcp, err := tcp.NewTCP(protocols)
+		tcp, err := tcp.NewTCP(protocols, cfg.Flows.IsEnabled() && cfg.Flows.TransportHint)
 		if err != nil {
 			return nil, err
 		}

@@ -99,6 +99,10 @@ type Flows struct {
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
+
+	// Use hints from transport layer (TCP) to detect flow end from transport layer.
+	// This has the side-effect of creating a new flow after a gap in the TCP stream.
+	TransportHint bool `config:"transport_hint"`
 }
 
 type ProtocolCommon struct {

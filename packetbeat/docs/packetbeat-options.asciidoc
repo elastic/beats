@@ -414,6 +414,18 @@ If a duplicate field is declared in the general configuration, then its value
 will be overwritten by the value declared here.
 
 [float]
+=== `transport_hint`
+
+Flag to control whether {beatname_uc} uses information from the transport layer (TCP)
+to determine the logical termination of a flow due to the FIN flags bein set. If unset,
+flows will ignore TCP flags, which can cause multiple TCP connections to appear as a
+single flow when both source and destination ports are reused in quick succession.
+If set, FIN flags will be analysed to determine flow termination, but it also has
+the side-effect of a gap in TCP sequence numbers (i.e. due to packet loss) being
+detected as flow termination, which can sometimes lead to flows with reversed
+source and destination. The default is `false`.
+
+[float]
 ==== `fields_under_root`
 
 If this option is set to true, the custom <<packetbeat-configuration-flows-fields,fields>>
