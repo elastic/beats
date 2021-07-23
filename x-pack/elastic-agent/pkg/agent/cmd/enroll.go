@@ -264,6 +264,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
+		FixPermissions:       fromInstall,
 		FleetServer: enrollCmdFleetServerOption{
 			ConnStr:         fServer,
 			ElasticsearchCA: fElasticSearchCA,
