@@ -119,6 +119,7 @@ def runBuildAndTest(Map args = [:]) {
     for(int k = 0;k<args.number;k++) {
       mapParallelTasks["${k}"] = target(command: 'mage build',
                                         context: args.context + '-'+k,
+                                        label: 'windows-10',
                                         directory: 'auditbeat',
                                         isMage: true,
                                         enableRetry: false)
