@@ -279,10 +279,11 @@ func (c *s3Collector) handleSQSMessage(m sqs.Message) ([]s3Info, error) {
 	// detect Messages delivered via SNS and select the right message body
 	// by testing on SNS metadata fields (e.g. TopicArn)
 	// See: https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html
-	if err := json.Unmarshal([]byte(*m.Body), &bodyJSON); err == nil && bodyJSON.TopicArn != "" {
-		err := json.Unmarshal([]byte(bodyJSON.Message), &msg)
+	err := json.Unmarshal([]byte(*m.Body), &bodyJSON)
+	if err == nil && bodyJSON.TopicArn != "" {
+		err = json.Unmarshal([]byte(bodyJSON.Message), &msg)
 	} else {
-		err := json.Unmarshal([]byte(*m.Body), &msg)
+		err = json.Unmarshal([]byte(*m.Body), &msg)
 	}
 	if err != nil {
 		c.logger.Debug("sqs message body = ", *m.Body)
