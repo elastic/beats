@@ -44,6 +44,9 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -57,6 +60,9 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -70,6 +76,9 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -83,6 +92,9 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -96,6 +108,9 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -109,6 +124,9 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+    #var.s3_bucket_poll_interval: 300s
+    #var.s3_bucket_objects_expiration: 120h
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id

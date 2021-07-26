@@ -5,6 +5,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket
+    #var.s3_bucket: 'arn:aws:s3:::mybucket
+
+    # AWS S3 bucket poll interval
+    #var.s3_bucket_poll_interval: 300s
+
+    # AWS S3 bucket objects expiration
+    #var.s3_bucket_objects_expiration: 120h
+
     # Process CloudTrail logs
     # default is true, set to false to skip Cloudtrail logs
     # var.process_cloudtrail_logs: false
