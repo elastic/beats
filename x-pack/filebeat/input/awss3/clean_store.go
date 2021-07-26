@@ -7,35 +7,35 @@ package awss3
 import (
 	"time"
 
-	"gotest.tools/gotestsum/log"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )
 
-func cleanStore(canceler unison.Canceler, store *statestore.Store, states *States, interval time.Duration, objectExpiration time.Duration) {
+func cleanStore(canceler unison.Canceler, logger *logp.Logger, store *statestore.Store, states *States, interval time.Duration, objectExpiration time.Duration) {
 	started := time.Now()
 	timed.Periodic(canceler, interval, func() error {
-		gcStore(started, store, states, objectExpiration)
+		gcStore(logger, started, store, states, objectExpiration)
 		return nil
 	})
 }
 
 // gcStore looks for states to remove and deletes these. `gcStore` receives
 // the start timestamp of the cleaner as reference.
-func gcStore(started time.Time, store *statestore.Store, states *States, objectExpiration time.Duration) {
-	log.Debugf("Start store cleanup")
-	defer log.Debugf("Done store cleanup")
+func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, states *States, objectExpiration time.Duration) {
+	logger.Debugf("Start store cleanup")
+	defer logger.Debugf("Done store cleanup")
 
 	keys := gcFind(states, started, time.Now(), objectExpiration)
 	if len(keys) == 0 {
-		log.Debugf("No entries to remove were found")
+		logger.Debugf("No entries to remove were found")
 		return
 	}
 
 	if err := gcClean(store, states, keys); err != nil {
-		log.Errorf("Failed to remove all entries from the registry: %+v", err)
+		logger.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
 }
 

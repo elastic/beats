@@ -81,6 +81,26 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 		return sderr.Wrap(err, "Can not start persistent store")
 	}
 
+	// We should close the persistent store when filebeat stops:
+	// we have to manage it at Init time because the input could not run
+	err = grp.Go(func(canceler unison.Canceler) error {
+	cancelerLoop:
+		for {
+			select {
+			case <-canceler.Done():
+				persistentStore.Close()
+				break cancelerLoop
+			default:
+				if canceler.Err() != nil {
+					persistentStore.Close()
+					break cancelerLoop
+				}
+			}
+		}
+
+		return nil
+	})
+
 	im.grp = grp
 	im.persistentStore = persistentStore
 	im.states = states
@@ -147,7 +167,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		if interval <= 0 {
 			interval = 5 * time.Minute
 		}
-		cleanStore(canceler, in.store, in.states, interval, in.config.S3BucketObjectExpiration)
+		cleanStore(canceler, ctx.Logger, in.store, in.states, interval, in.config.S3BucketObjectExpiration)
 		return nil
 	})
 
