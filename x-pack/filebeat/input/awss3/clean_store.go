@@ -14,21 +14,21 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-func cleanStore(canceler unison.Canceler, store *statestore.Store, states *States, interval time.Duration) {
+func cleanStore(canceler unison.Canceler, store *statestore.Store, states *States, interval time.Duration, objectExpiration time.Duration) {
 	started := time.Now()
 	timed.Periodic(canceler, interval, func() error {
-		gcStore(started, store, states)
+		gcStore(started, store, states, objectExpiration)
 		return nil
 	})
 }
 
 // gcStore looks for states to remove and deletes these. `gcStore` receives
 // the start timestamp of the cleaner as reference.
-func gcStore(started time.Time, store *statestore.Store, states *States) {
+func gcStore(started time.Time, store *statestore.Store, states *States, objectExpiration time.Duration) {
 	log.Debugf("Start store cleanup")
 	defer log.Debugf("Done store cleanup")
 
-	keys := gcFind(states, started, time.Now())
+	keys := gcFind(states, started, time.Now(), objectExpiration)
 	if len(keys) == 0 {
 		log.Debugf("No entries to remove were found")
 		return
@@ -40,7 +40,7 @@ func gcStore(started time.Time, store *statestore.Store, states *States) {
 }
 
 // gcFind searches the store of states that can be removed. A set of keys to delete is returned.
-func gcFind(states *States, started, now time.Time) map[string]struct{} {
+func gcFind(states *States, started, now time.Time, objectExpiration time.Duration) map[string]struct{} {
 	keys := map[string]struct{}{}
 	for _, state := range states.GetStates() {
 		reference := state.LastModified
@@ -53,9 +53,12 @@ func gcFind(states *States, started, now time.Time) map[string]struct{} {
 			continue
 		}
 
-		// @TODO set this value from config
-		ttl := time.Second * 60 * 24
-		if reference.Add(ttl).Before(now) && state.Stored {
+		// objectExpiration is 0, skip collecting for state.Stored
+		if reference.Add(objectExpiration).Equal(reference) {
+			continue
+		}
+
+		if reference.Add(objectExpiration).Before(now) && state.Stored {
 			keys[state.Id] = struct{}{}
 		}
 	}

@@ -45,17 +45,21 @@ func Plugin(store beater.StateStore) v2.Plugin {
 }
 
 type s3InputManager struct {
-	s3Input         *s3Input
-	store           beater.StateStore
-	persistentStore *statestore.Store
-	states          *States
+	s3Input              *s3Input
+	store                beater.StateStore
+	persistentStore      *statestore.Store
+	states               *States
+	grp                  unison.Group
+	storeCleanupInterval time.Duration
 }
 
 // s3Input is a input for s3
 type s3Input struct {
-	config config
-	store  *statestore.Store
-	states *States
+	config               config
+	store                *statestore.Store
+	states               *States
+	grp                  unison.Group
+	storeCleanupInterval time.Duration
 }
 
 func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
@@ -77,22 +81,10 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 		return sderr.Wrap(err, "Can not start persistent store")
 	}
 
-	err = grp.Go(func(canceler unison.Canceler) error {
-		interval := im.store.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
-		}
-		cleanStore(canceler, persistentStore, states, interval)
-		return nil
-	})
-
-	if err != nil {
-		return sderr.Wrap(err, "Can not start cleanup process")
-	}
-
+	im.grp = grp
 	im.persistentStore = persistentStore
 	im.states = states
-
+	im.storeCleanupInterval = im.store.CleanupInterval()
 	ok = true
 
 	return nil
@@ -104,16 +96,18 @@ func (im *s3InputManager) Create(cfg *common.Config) (v2.Input, error) {
 		return nil, err
 	}
 
-	im.s3Input = newInput(config, im.persistentStore, im.states)
+	im.s3Input = newInput(config, im.persistentStore, im.states, im.grp, im.storeCleanupInterval)
 
 	return im.s3Input, nil
 }
 
-func newInput(config config, store *statestore.Store, states *States) *s3Input {
+func newInput(config config, store *statestore.Store, states *States, grp unison.Group, storeCleanupInterval time.Duration) *s3Input {
 	return &s3Input{
-		config: config,
-		store:  store,
-		states: states,
+		config:               config,
+		store:                store,
+		states:               states,
+		grp:                  grp,
+		storeCleanupInterval: storeCleanupInterval,
 	}
 }
 
@@ -146,6 +140,19 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
+	}
+
+	err = in.grp.Go(func(canceler unison.Canceler) error {
+		interval := in.storeCleanupInterval
+		if interval <= 0 {
+			interval = 5 * time.Minute
+		}
+		cleanStore(canceler, in.store, in.states, interval, in.config.S3BucketObjectExpiration)
+		return nil
+	})
+
+	if err != nil {
+		return sderr.Wrap(err, "Can not start cleanup process")
 	}
 
 	defer collector.getMetrics().Close()

@@ -96,7 +96,7 @@ func TestGcFind(t *testing.T) {
 			states := NewStates()
 			state := testCase.stateFn()
 			states.Update(state)
-			keys := gcFind(states, started, now)
+			keys := gcFind(states, started, now, 24*60*time.Second)
 			expected := map[string]struct{}{}
 			if testCase.expected {
 				expected[state.Id] = struct{}{}
