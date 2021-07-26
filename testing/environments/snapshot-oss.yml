@@ -14,7 +14,8 @@ services:
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
 
-  logstash:35-280f3dca-SNAPSHOT
+  logstash:
+    image: docker.elastic.co/logstash/logstash-oss:7.13.3-280f3dca-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
