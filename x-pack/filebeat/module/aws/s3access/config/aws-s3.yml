@@ -1,5 +1,18 @@
 type: aws-s3
+if {{ .queue_url }}
 queue_url: {{ .queue_url }}
+{{ end }}
+if {{ .s3_bucket }}
+s3_bucket: {{ .s3_bucket }}
+{{ end }}
+
+if {{ .s3_bucket_poll_interval }}
+s3_bucket_poll_interval: {{ .s3_bucket_poll_interval }}
+{{ end }}
+
+if {{ .s3_bucket_objects_expiration }}
+s3_bucket_objects_expiration: {{ .s3_bucket_objects_expiration }}
+{{ end }}
 
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
