@@ -399,10 +399,13 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUploadExt(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-    pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true)
+  // sometimes google storage reports ResumableUploadException: 503 Server Error
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    googleStorageUploadExt(bucket: bucketUri,
+      credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+      pattern: "${beatsFolder}/build/distributions/**/*",
+      sharedPublicly: true)
+  }
 }
 
 /**
