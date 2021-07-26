@@ -179,6 +179,9 @@ func PythonTestForModule(params PythonTestArgs) error {
 		params.Files = []string{
 			fmt.Sprintf("module/%s/test_*.py", module),
 			fmt.Sprintf("module/%s/*/test_*.py", module),
+
+			// Run always the base tests, that include tests for module dashboards.
+			"tests/system/test*_base.py",
 		}
 		params.TestName += "-" + module
 	}

@@ -33,7 +33,7 @@
             "panelRefName": "panel_89dccfe8-a25e-44ea-afdb-ff01ab1f05d6",
             "title": "AWS Account Filter",
             "type": "visualization",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -50,7 +50,7 @@
             "panelRefName": "panel_f1db16b5-ce0a-4f21-885f-434c16346c26",
             "title": "Current Total Unblended Cost",
             "type": "visualization",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -67,7 +67,7 @@
             "panelRefName": "panel_57912f48-42ec-4d3e-ba54-bf94757d1eec",
             "title": "Availability Zone Utilization",
             "type": "visualization",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -84,7 +84,7 @@
             "panelRefName": "panel_221aab02-2747-4d84-9dde-028ccd51bdce",
             "title": "Total Estimated Charges For This Month",
             "type": "visualization",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -101,7 +101,7 @@
             "panelRefName": "panel_376f236b-1365-4e80-8076-eec88c1a67bd",
             "title": "Cost Per Service Per User",
             "type": "lens",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -118,7 +118,7 @@
             "panelRefName": "panel_dd5220c2-dc8a-4d3e-964b-6137d1e447ad",
             "title": "High Spenders",
             "type": "lens",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -135,7 +135,7 @@
             "panelRefName": "panel_1de716e2-bad9-4fe3-ba49-0e2ea2a59bb4",
             "title": "Top 10 Estimated Charges per Service Name",
             "type": "lens",
-            "version": "7.13.2"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -152,17 +152,17 @@
             "panelRefName": "panel_60181fec-fea9-4f99-b5f9-a53ffbc2ac65",
             "title": "Daily Unblended Cost",
             "type": "visualization",
-            "version": "7.13.2"
+            "version": "7.11.0"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat AWS] Billing Overview",
         "version": 1
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "e6776b10-1534-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "dashboard": "7.13.1"
+        "dashboard": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -271,10 +271,10 @@
           "type": "input_control_vis"
         }
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
       "migrationVersion": {
-        "visualization": "7.13.1"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -371,10 +371,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "1731c440-e649-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.13.1"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -444,10 +444,10 @@
           "type": "pie"
         }
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "a5670a20-e65a-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.13.1"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -553,10 +553,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
       "migrationVersion": {
-        "visualization": "7.13.1"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -654,10 +654,10 @@
         "title": "Cost Per Service Per User [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "b3da5ac0-e6f1-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.13.1"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -748,10 +748,10 @@
         "title": "High Spenders [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "d7b399c0-e6f1-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.13.1"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -857,10 +857,10 @@
         "title": "Top 10 Estimated Charges per Service Name [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "cde34840-e6f2-11ea-a5b5-d5a0accaec95",
       "migrationVersion": {
-        "lens": "7.13.1"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -946,10 +946,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.13.2",
+      "coreMigrationVersion": "7.11.0",
       "id": "3e091620-e64b-11ea-a838-3f4a45f85600",
       "migrationVersion": {
-        "visualization": "7.13.1"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -960,5 +960,5 @@
       "version": "WzgyLDFd"
     }
   ],
-  "version": "7.13.2"
+  "version": "7.11.0"
 }
