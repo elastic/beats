@@ -187,3 +187,9 @@
     default_field: false
     description: >
       The WebVPN group name the user belongs to
+
+  - name: termination_initiator
+    type: keyword
+    default_field: false
+    description: >
+      Interface name of the side that initiated the teardown
