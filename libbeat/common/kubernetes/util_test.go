@@ -37,7 +37,7 @@ import (
 func TestDiscoverKubernetesNode(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 	logger := logp.NewLogger("autodiscover.node")
-
+	ge := errors.New("kubernetes: Node could not be discovered with any known method. Consider setting env var NODE_NAME")
 	tests := []struct {
 		host        string
 		node        string
@@ -72,10 +72,10 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value with env var not set",
+			name:        "test value with not incluster, machine id not retrieved, env var not set",
 			host:        "",
 			node:        "",
-			err:         errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id: kubernetes: NODE_NAME environment variable was not set"),
+			err:         ge,
 			setEnv:      false,
 			isInCluster: false,
 			machineid:   "",
@@ -83,10 +83,10 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			namespace:   "",
 		},
 		{
-			name:        "test value with inCluster and env var not set",
+			name:        "test value with inCluster , serviceaccount namespace not found and env var not set",
 			host:        "",
 			node:        "",
-			err:         errors.New("kubernetes: Couldn't get namespace when beat is in cluster with error: open /var/run/secrets/kubernetes.io/serviceaccount/namespace: no such file or directory: kubernetes: NODE_NAME environment variable was not set"),
+			err:         ge,
 			setEnv:      false,
 			isInCluster: true,
 			machineid:   "",
@@ -98,7 +98,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			host:        "",
 			isInCluster: true,
 			node:        "",
-			err:         errors.New("kubernetes: Querying for pod failed with error: pods \"test-pod\" not found: kubernetes: NODE_NAME environment variable was not set"),
+			err:         ge,
 			setEnv:      false,
 			machineid:   "",
 			podname:     "test-pod",
@@ -131,7 +131,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			host:        "",
 			isInCluster: false,
 			node:        "",
-			err:         errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id: kubernetes: NODE_NAME environment variable was not set"),
+			err:         ge,
 			setEnv:      false,
 			machineid:   "",
 			podname:     "",
@@ -142,7 +142,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			host:        "",
 			isInCluster: false,
 			node:        "",
-			err:         errors.New("kubernetes: Couldn't discover node worker-2: kubernetes: NODE_NAME environment variable was not set"),
+			err:         ge,
 			setEnv:      false,
 			machineid:   "worker-2",
 			podname:     "",
@@ -176,11 +176,17 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 
 			if test.setEnv {
-				os.Setenv("NODE_NAME", "worker-2")
-				defer os.Unsetenv("NODE_NAME")
+
+				if err := os.Setenv("NODE_NAME", "worker-2"); err != nil {
+					t.Fatal(err)
+				}
+				defer func() {
+					if err := os.Unsetenv("NODE_NAME"); err != nil {
+						t.Fatal(err)
+					}
+				}()
 			}
-			mhd := createMockhd(test.namespace, test.podname, test.machineid)
-			d := &discoveryUtils{eDisc: mhd, client: client, isInCluster: test.isInCluster}
+			mhu := createMockhu(test.namespace, test.podname, test.machineid)
 
 			if test.name == "test value with inCluster, pod found and env var not set" {
 				err := createPod(client)
@@ -188,7 +194,13 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				defer deletePod(client)
+				defer func() {
+					pod := "test-pod"
+					err := client.CoreV1().Pods("default").Delete(context.Background(), pod, metav1.DeleteOptions{})
+					if err != nil {
+						t.Fatalf("failed to delete k8s pod: %v", err)
+					}
+				}()
 			}
 
 			if test.name == "test value without inCluster, machine-id set, node found and env var not set" {
@@ -196,14 +208,17 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+				defer func() {
+					err := client.CoreV1().Nodes().Delete(context.Background(), "worker-2", metav1.DeleteOptions{})
+					if err != nil {
+						t.Fatalf("failed to delete k8s node: %v", err)
+					}
+				}()
 			}
 			var nodeName string
 			var error error
-			if test.host != "" {
-				nodeName, error = DiscoverKubernetesNode(logger, test.host, test.isInCluster, client)
-			} else {
-				nodeName, error = d.discoverKubernetesNode(logger)
-			}
+			nd := &DiscoverKubernetesNodeOpts{ConfigHost: test.host, Client: client, IsInCluster: test.isInCluster, HostUtils: mhu}
+			nodeName, error = DiscoverKubernetesNode(logger, nd)
 
 			assert.Equal(t, test.node, nodeName)
 			if error != nil {
@@ -225,31 +240,12 @@ func createPod(client kubernetes.Interface) error {
 	return nil
 }
 
-func deletePod(client kubernetes.Interface) error {
-	pod := "test-pod"
-
-	err := client.CoreV1().Pods("default").Delete(context.Background(), pod, metav1.DeleteOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to delete k8s pod: %v", err)
-	}
-	return nil
-}
-
 func createNode(client kubernetes.Interface, name string) error {
 	node := getNodeObject(name)
 
 	_, err := client.CoreV1().Nodes().Create(context.Background(), node, metav1.CreateOptions{})
 	if err != nil {
 		return fmt.Errorf("failed to create k8s node: %v", err)
-	}
-	return nil
-}
-
-func deleteNode(client kubernetes.Interface, node string) error {
-
-	err := client.CoreV1().Nodes().Delete(context.Background(), node, metav1.DeleteOptions{})
-	if err != nil {
-		return fmt.Errorf("failed to delete k8s node: %v", err)
 	}
 	return nil
 }
@@ -293,21 +289,21 @@ func getNodeObject(name string) *core.Node {
 	}
 }
 
-func createMockhd(namespace, podname, machineid string) *mockHostDiscovery {
-	return &mockHostDiscovery{namespace: namespace, podname: podname, machineid: machineid}
+func createMockhu(namespace, podname, machineid string) *mockHostdiscoveryutils {
+	return &mockHostdiscoveryutils{namespace: namespace, podname: podname, machineid: machineid}
 }
 
-type mockHostDiscovery struct {
+type mockHostdiscoveryutils struct {
 	namespace string
 	podname   string
 	machineid string
 }
 
-func (hd *mockHostDiscovery) GetMachineID() string {
+func (hd *mockHostdiscoveryutils) GetMachineID() string {
 	return hd.machineid
 }
 
-func (hd *mockHostDiscovery) GetNamespace() (string, error) {
+func (hd *mockHostdiscoveryutils) GetNamespace() (string, error) {
 	var error error
 	if hd.namespace == "none" {
 		error = errors.New("open /var/run/secrets/kubernetes.io/serviceaccount/namespace: no such file or directory")
@@ -315,6 +311,6 @@ func (hd *mockHostDiscovery) GetNamespace() (string, error) {
 	return hd.namespace, error
 }
 
-func (hd *mockHostDiscovery) GetPodName() (string, error) {
+func (hd *mockHostdiscoveryutils) GetPodName() (string, error) {
 	return hd.podname, nil
 }

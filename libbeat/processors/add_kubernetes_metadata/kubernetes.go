@@ -156,8 +156,8 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 
 		k.matchers = matchers
-
-		config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, config.Host, kubernetes.IsInCluster(config.KubeConfig), client)
+		nd := &kubernetes.DiscoverKubernetesNodeOpts{ConfigHost: config.Host, Client: client, IsInCluster: kubernetes.IsInCluster(config.KubeConfig), HostUtils: &kubernetes.Hostdiscoveryutils{}}
+		config.Host, err = kubernetes.DiscoverKubernetesNode(k.log, nd)
 		if err != nil {
 			k.log.Errorf("Couldn't discover Kubernetes node: %w", err)
 			return

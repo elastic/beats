@@ -64,7 +64,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	p.logger.Infof("Kubernetes provider started with %s scope", p.config.Scope)
 	if p.config.Scope == "node" {
 		p.logger.Debugf("Initializing Kubernetes watcher using node: %v", p.config.Node)
-		p.config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, p.config.Node, kubernetes.IsInCluster(p.config.KubeConfig), client)
+		nd := &kubernetes.DiscoverKubernetesNodeOpts{ConfigHost: p.config.Node, Client: client, IsInCluster: kubernetes.IsInCluster(p.config.KubeConfig), HostUtils: &kubernetes.Hostdiscoveryutils{}}
+		p.config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
 		if err != nil {
 			p.logger.Debugf("Kubernetes provider skipped, unable to discover node: %w", err)
 			return nil
