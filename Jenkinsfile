@@ -117,12 +117,12 @@ def runBuildAndTest(Map args = [:]) {
   dir("${BASE_DIR}"){
     def mapParallelTasks = [:]
     for(int k = 0;k<args.number;k++) {
-      mapParallelTasks["${k}"] = target(command: 'mage build',
+      mapParallelTasks["${k}"] = { target(command: 'mage build',
                                         context: args.context + '-'+k,
                                         label: 'windows-10',
                                         directory: 'auditbeat',
                                         isMage: true,
-                                        enableRetry: false)
+                                        enableRetry: false) }
     }
     parallel(mapParallelTasks)
   }
@@ -503,15 +503,4 @@ def isDockerInstalled(){
     return sh(label: 'check for Docker', script: 'command -v docker', returnStatus: true) == 0
   }
   return false
-}
-
-/**
-* Notify the build reason.
-*/
-def notifyBuildReason() {
-  // Archive the build reason here, since the workspace can be deleted when running the parallel stages.
-  archiveArtifacts(allowEmptyArchive: true, artifacts: 'build-reasons/*.*')
-  if (isPR()) {
-    echo 'TODO: Add a comment with the build reason (this is required to be implemented in the shared library)'
-  }
 }
