@@ -114,6 +114,11 @@ type s3Context struct {
 	errC chan<- error
 }
 
+type logEvent struct {
+	log    string
+	offset int64
+}
+
 func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 	var s3Infos []s3Info
 	bucketMetadata := strings.Split(c.config.S3Bucket, ":")
@@ -543,10 +548,27 @@ func createEventsFromS3Info(svc s3iface.ClientAPI,
 	// Decode JSON documents when content-type is "application/json" or expand_event_list_from_field is given in config
 	if resp.ContentType != nil && *resp.ContentType == "application/json" || info.ExpandEventListFromField != "" {
 		decoder := json.NewDecoder(bodyReader)
-		err := decodeJSON(decoder, objectHash, info, s3Ctx, publisher, metrics, cancellation, logger)
+		logEvents, err := decodeJSON(decoder, info, logger)
 		if err != nil {
 			return fmt.Errorf("decodeJSONWithKey failed for '%s' from S3 bucket '%s': %w", info.key, info.name, err)
 		}
+
+		fullStored := false
+		lastEventIndex := len(logEvents) - 1
+		for i, logEvent := range logEvents {
+			if i == lastEventIndex {
+				fullStored = true
+			}
+
+			event := createEvent(logEvent.log, logEvent.offset, info, objectHash, s3Ctx, fullStored)
+			err := forwardEvent(event, publisher, metrics, cancellation)
+			if err != nil {
+				err = fmt.Errorf("forwardEvent failed: %w", err)
+				logger.Error(err)
+				return err
+			}
+		}
+
 		return nil
 	}
 
@@ -604,52 +626,46 @@ func createEventsFromS3Info(svc s3iface.ClientAPI,
 	return nil
 }
 
-func decodeJSON(decoder *json.Decoder,
-	objectHash string,
-	s3Info s3Info,
-	s3Ctx *s3Context,
-	publisher beat.Client,
-	metrics *inputMetrics,
-	cancellation context.Context,
-	logger *logp.Logger) error {
+func decodeJSON(decoder *json.Decoder, s3Info s3Info, logger *logp.Logger) ([]logEvent, error) {
 	var offset int64
+	events := make([]logEvent, 0)
 	for {
 		var jsonFields interface{}
 		err := decoder.Decode(&jsonFields)
 		if jsonFields == nil {
-			return nil
+			return events, nil
 		}
 
 		if err == io.EOF {
-			offsetNew, err := jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, true, publisher, metrics, cancellation, logger)
+			offsetNew, eventsNew, err := jsonFieldsType(jsonFields, offset, s3Info, logger)
 			if err != nil {
-				return err
+				err = fmt.Errorf("jsonFieldsType failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
+				logger.Error(err)
+				return events, err
 			}
+			events = append(events, eventsNew...)
 			offset = offsetNew
 		} else if err != nil {
 			// decode json failed, skip this log file
 			err = fmt.Errorf("decode json failed for '%s' from S3 bucket '%s', skipping this file: %w", s3Info.key, s3Info.name, err)
 			logger.Warn(err)
-			return nil
+			return nil, nil
 		}
 
-		offset, err = jsonFieldsType(jsonFields, offset, objectHash, s3Info, s3Ctx, false, publisher, metrics, cancellation, logger)
+		offsetNew, eventsNew, err := jsonFieldsType(jsonFields, offset, s3Info, logger)
 		if err != nil {
-			return err
+			err = fmt.Errorf("jsonFieldsType failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
+			logger.Error(err)
+			return events, err
 		}
+		events = append(events, eventsNew...)
+		offset = offsetNew
 	}
 }
 
-func jsonFieldsType(jsonFields interface{},
-	offset int64,
-	objectHash string,
-	s3Info s3Info,
-	s3Ctx *s3Context,
-	fullStored bool,
-	publisher beat.Client,
-	metrics *inputMetrics,
-	cancellation context.Context,
-	logger *logp.Logger) (int64, error) {
+func jsonFieldsType(jsonFields interface{}, offset int64, s3Info s3Info, logger *logp.Logger) (int64, []logEvent, error) {
+
+	logEvents := make([]logEvent, 0)
 	switch f := jsonFields.(type) {
 	case map[string][]interface{}:
 		if s3Info.ExpandEventListFromField != "" {
@@ -657,17 +673,14 @@ func jsonFieldsType(jsonFields interface{},
 			if !ok {
 				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				logger.Error(err)
-				return offset, err
+				return 0, logEvents, err
 			}
 			for _, v := range textValues {
-				offset, err := convertJSONToEvent(v, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
-				if err != nil {
-					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
-					logger.Error(err)
-					return offset, err
-				}
+				offsetNew, logEvent := convertJSONToLogString(v, offset)
+				offset = offsetNew
+				logEvents = append(logEvents, logEvent)
 			}
-			return offset, nil
+			return offset, logEvents, nil
 		}
 	case map[string]interface{}:
 		if s3Info.ExpandEventListFromField != "" {
@@ -675,57 +688,34 @@ func jsonFieldsType(jsonFields interface{},
 			if !ok {
 				err := fmt.Errorf("key '%s' not found", s3Info.ExpandEventListFromField)
 				logger.Error(err)
-				return offset, err
+				return 0, logEvents, err
 			}
 
 			valuesConverted := textValues.([]interface{})
 			for _, textValue := range valuesConverted {
-				offsetNew, err := convertJSONToEvent(textValue, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
-				if err != nil {
-					err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
-					logger.Error(err)
-					return offset, err
-				}
+				offsetNew, logEvent := convertJSONToLogString(textValue, offset)
+				logEvents = append(logEvents, logEvent)
 				offset = offsetNew
 			}
-			return offset, nil
+			return offset, logEvents, nil
 		}
 
-		offset, err := convertJSONToEvent(f, offset, objectHash, s3Info, s3Ctx, fullStored, publisher, metrics, cancellation, logger)
-		if err != nil {
-			err = fmt.Errorf("convertJSONToEvent failed for '%s' from S3 bucket '%s': %w", s3Info.key, s3Info.name, err)
-			logger.Error(err)
-			return offset, err
-		}
-		return offset, nil
+		offsetNew, logEvent := convertJSONToLogString(f, offset)
+		logEvents = append(logEvents, logEvent)
+		return offsetNew, logEvents, nil
 	}
-	return offset, nil
+
+	return offset, logEvents, nil
 }
 
-func convertJSONToEvent(jsonFields interface{},
-	offset int64,
-	objectHash string,
-	s3Info s3Info,
-	s3Ctx *s3Context,
-	fullStored bool,
-	publisher beat.Client,
-	metrics *inputMetrics,
-	cancellation context.Context,
-	logger *logp.Logger) (int64, error) {
+func convertJSONToLogString(jsonFields interface{}, offset int64) (int64, logEvent) {
 
 	vJSON, _ := json.Marshal(jsonFields)
 	logOriginal := string(vJSON)
 	log := trimLogDelimiter(logOriginal)
+	logEvent := logEvent{log: log, offset: offset}
 	offset += int64(len(log))
-	event := createEvent(log, offset, s3Info, objectHash, s3Ctx, fullStored)
-
-	err := forwardEvent(event, publisher, metrics, cancellation)
-	if err != nil {
-		err = fmt.Errorf("forwardEvent failed: %w", err)
-		logger.Error(err)
-		return offset, err
-	}
-	return offset, nil
+	return offset, logEvent
 }
 
 func forwardEvent(event beat.Event, publisher beat.Client, metrics *inputMetrics, cancellation context.Context) error {

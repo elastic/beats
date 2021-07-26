@@ -142,7 +142,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 
 	if in.config.S3Bucket != "" {
-		collector, err = in.createS3Collector(ctx, pipeline, inputMetrics, in.states, in.store)
+		collector, err = in.createS3BucketCollector(ctx, pipeline, inputMetrics, in.states, in.store)
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
@@ -159,7 +159,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 }
 
-func (in *s3Input) createS3Collector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States, store *statestore.Store) (*s3BucketCollector, error) {
+func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States, store *statestore.Store) (*s3BucketCollector, error) {
 	storedOp := newStoredOp(in.states, in.store)
 	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,

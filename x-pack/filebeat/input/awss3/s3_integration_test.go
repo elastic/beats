@@ -135,7 +135,7 @@ func setupInputBucketCollector(t *testing.T, cfg *common.Config) (*s3BucketColle
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
 
-	collector, err := inp.(*s3Input).createS3Collector(ctx, pipeline, inputMetrics, nil, nil)
+	collector, err := inp.(*s3Input).createS3BucketCollector(ctx, pipeline, inputMetrics, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
