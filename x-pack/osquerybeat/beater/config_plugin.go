@@ -7,6 +7,8 @@ package beater
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -17,6 +19,11 @@ import (
 const (
 	configName           = "osq_config"
 	scheduleSplayPercent = 10
+	maxECSMappingDepth   = 25 // max ECS dot delimited key path
+)
+
+var (
+	ErrECSMappingIsTooDeep = errors.New("ECS mapping is too deep")
 )
 
 type ConfigPlugin struct {
@@ -47,11 +54,11 @@ func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	return p
 }
 
-func (p *ConfigPlugin) Set(inputs []config.InputConfig) {
+func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	p.set(inputs)
+	return p.set(inputs)
 }
 
 func (p *ConfigPlugin) Count() int {
@@ -131,7 +138,7 @@ func (p *ConfigPlugin) render() (string, error) {
 	return p.configString, nil
 }
 
-func (p *ConfigPlugin) set(inputs []config.InputConfig) {
+func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 	p.configString = ""
 	queriesCount := 0
 	p.queryMap = make(map[string]query)
@@ -152,7 +159,11 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) {
 			}
 			p.queryMap[id] = query
 			if len(stream.ECSMapping) > 0 {
-				p.ecsMap[id] = stream.ECSMapping
+				ecsm, err := flattenECSMapping(stream.ECSMapping)
+				if err != nil {
+					return err
+				}
+				p.ecsMap[id] = ecsm
 			}
 			pack.Queries[stream.ID] = query
 			queriesCount++
@@ -160,4 +171,47 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) {
 		p.packs[input.Name] = pack
 	}
 	p.queriesCount = queriesCount
+	return nil
+}
+
+// Due to current configuration passing between the agent and beats the keys that contain dots (".")
+// are split into the nested tree-like structure.
+// This converts this dynamic map[string]interface{} tree into strongly typed flat map.
+func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+	ecsm := make(ecs.Mapping)
+	for k, v := range m {
+		err := traverseTree(0, ecsm, []string{k}, v)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ecsm, nil
+}
+
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
+	if s, ok := v.(string); ok {
+		if path[len(path)-1] == "field" {
+			ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
+				Field: s,
+			}
+		}
+		return nil
+	} else if path[len(path)-1] == "value" {
+		ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
+			Value: v,
+		}
+		return nil
+	} else if m, ok := v.(map[string]interface{}); ok {
+		if depth < maxECSMappingDepth {
+			for k, v := range m {
+				err := traverseTree(depth+1, ecsm, append(path, k), v)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			return ErrECSMappingIsTooDeep
+		}
+	}
+	return nil
 }
