@@ -48,6 +48,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 		machineid   string
 		podname     string
 		namespace   string
+		init        func(*testing.T, kubernetes.Interface)
 	}{
 		{
 			name:        "test value from config",
@@ -114,17 +115,19 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			machineid:   "",
 			podname:     "test-pod",
 			namespace:   "default",
+			init:        createResources,
 		},
 		{
 			name:        "test value with inCluster, pod found and env var set",
 			host:        "",
 			isInCluster: true,
-			node:        "worker-2",
+			node:        "test-node",
 			err:         nil,
 			setEnv:      true,
 			machineid:   "",
 			podname:     "test-pod",
 			namespace:   "default",
+			init:        createResources,
 		},
 		{
 			name:        "test value without inCluster, machine-id empty and env var not set",
@@ -158,6 +161,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			machineid:   "worker-2",
 			podname:     "",
 			namespace:   "",
+			init:        createResources,
 		},
 		{
 			name:        "test value without inCluster, machine-id set, node not found and env var set",
@@ -186,14 +190,10 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 					}
 				}()
 			}
-			mhu := createMockhu(test.namespace, test.podname, test.machineid)
+			mdu := createMockdu(test.namespace, test.podname, test.machineid)
+			if test.init != nil {
+				test.init(t, client)
 
-			if test.name == "test value with inCluster, pod found and env var not set" {
-				err := createPod(client)
-
-				if err != nil {
-					t.Fatal(err)
-				}
 				defer func() {
 					pod := "test-pod"
 					err := client.CoreV1().Pods("default").Delete(context.Background(), pod, metav1.DeleteOptions{})
@@ -201,13 +201,6 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 						t.Fatalf("failed to delete k8s pod: %v", err)
 					}
 				}()
-			}
-
-			if test.name == "test value without inCluster, machine-id set, node found and env var not set" {
-				err := createNode(client, "worker-2")
-				if err != nil {
-					t.Fatal(err)
-				}
 				defer func() {
 					err := client.CoreV1().Nodes().Delete(context.Background(), "worker-2", metav1.DeleteOptions{})
 					if err != nil {
@@ -215,9 +208,10 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 					}
 				}()
 			}
+
 			var nodeName string
 			var error error
-			nd := &DiscoverKubernetesNodeOpts{ConfigHost: test.host, Client: client, IsInCluster: test.isInCluster, HostUtils: mhu}
+			nd := &DiscoverKubernetesNodeParams{ConfigHost: test.host, Client: client, IsInCluster: test.isInCluster, HostUtils: mdu}
 			nodeName, error = DiscoverKubernetesNode(logger, nd)
 
 			assert.Equal(t, test.node, nodeName)
@@ -226,6 +220,7 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			} else {
 				assert.Equal(t, test.err, error)
 			}
+
 		})
 	}
 }
@@ -238,6 +233,18 @@ func createPod(client kubernetes.Interface) error {
 		return fmt.Errorf("failed to create k8s pod: %v", err)
 	}
 	return nil
+}
+
+func createResources(t *testing.T, client kubernetes.Interface) {
+	err := createPod(client)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = createNode(client, "worker-2")
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func createNode(client kubernetes.Interface, name string) error {
@@ -289,21 +296,21 @@ func getNodeObject(name string) *core.Node {
 	}
 }
 
-func createMockhu(namespace, podname, machineid string) *mockHostdiscoveryutils {
-	return &mockHostdiscoveryutils{namespace: namespace, podname: podname, machineid: machineid}
+func createMockdu(namespace, podname, machineid string) *mockDiscoveryUtils {
+	return &mockDiscoveryUtils{namespace: namespace, podname: podname, machineid: machineid}
 }
 
-type mockHostdiscoveryutils struct {
+type mockDiscoveryUtils struct {
 	namespace string
 	podname   string
 	machineid string
 }
 
-func (hd *mockHostdiscoveryutils) GetMachineID() string {
+func (hd *mockDiscoveryUtils) GetMachineID() string {
 	return hd.machineid
 }
 
-func (hd *mockHostdiscoveryutils) GetNamespace() (string, error) {
+func (hd *mockDiscoveryUtils) GetNamespace() (string, error) {
 	var error error
 	if hd.namespace == "none" {
 		error = errors.New("open /var/run/secrets/kubernetes.io/serviceaccount/namespace: no such file or directory")
@@ -311,6 +318,6 @@ func (hd *mockHostdiscoveryutils) GetNamespace() (string, error) {
 	return hd.namespace, error
 }
 
-func (hd *mockHostdiscoveryutils) GetPodName() (string, error) {
+func (hd *mockDiscoveryUtils) GetPodName() (string, error) {
 	return hd.podname, nil
 }

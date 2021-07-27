@@ -94,7 +94,12 @@ func (p *dynamicProvider) watchResource(
 			"Initializing Kubernetes watcher for resource %s using node: %v",
 			resourceType,
 			config.Node)
-		nd := &kubernetes.DiscoverKubernetesNodeOpts{ConfigHost: config.Node, Client: client, IsInCluster: kubernetes.IsInCluster(config.KubeConfig), HostUtils: &kubernetes.Hostdiscoveryutils{}}
+		nd := &kubernetes.DiscoverKubernetesNodeParams{
+			ConfigHost:  config.Node,
+			Client:      client,
+			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
+		}
 		config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
 		if err != nil {
 			p.logger.Debugf("Kubernetes provider skipped, unable to discover node: %w", err)
