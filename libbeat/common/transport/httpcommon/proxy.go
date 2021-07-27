@@ -28,7 +28,7 @@ import (
 //
 // Proxy usage will be disabled in general if Disable is set.
 // If URL is not set, the proxy configuration will default
-// to HTTP_PROXY, HTTPS_PPROXY, and NO_PROXY.
+// to HTTP_PROXY, HTTPS_PROXY, and NO_PROXY.
 //
 // The default (and zero) value of HTTPClientProxySettings has Proxy support
 // enabled, and will select the proxy per URL based on the environment variables.
