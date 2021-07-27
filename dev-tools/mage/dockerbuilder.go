@@ -58,6 +58,11 @@ func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
 }
 
 func (b *dockerBuilder) Build() error {
+	variants := []string{""}
+	if os.Getenv("OFFLINE_DOCKER_IMAGE") == "true" || b.ServiceName == "elastic-agent" {
+		variants = append(variants, "offline")
+	}
+
 	if err := os.RemoveAll(b.buildDir); err != nil {
 		return errors.Wrapf(err, "failed to clean existing build directory %s", b.buildDir)
 	}
@@ -66,25 +71,27 @@ func (b *dockerBuilder) Build() error {
 		return err
 	}
 
-	if err := b.prepareBuild(); err != nil {
-		return errors.Wrap(err, "failed to prepare build")
-	}
+	for _, variant := range variants {
+		if err := b.prepareBuild(variant); err != nil {
+			return errors.Wrap(err, "failed to prepare build")
+		}
 
-	tries := 3
-	tag, err := b.dockerBuild()
-	for err != nil && tries != 0 {
-		fmt.Println(">> Building docker images again (after 10 seconds)")
-		// This sleep is to avoid hitting the docker build issues when resources are not available.
-		time.Sleep(10)
-		tag, err = b.dockerBuild()
-		tries -= 1
-	}
-	if err != nil {
-		return errors.Wrap(err, "failed to build docker")
-	}
+		tag, err := b.dockerBuild(variant)
+		tries := 3
+		for err != nil && tries != 0 {
+			fmt.Println(">> Building docker images again (after 10 seconds)")
+			// This sleep is to avoid hitting the docker build issues when resources are not available.
+			time.Sleep(10)
+			tag, err = b.dockerBuild(variant)
+			tries -= 1
+		}
+		if err != nil {
+			return errors.Wrap(err, "failed to build docker")
+		}
 
-	if err := b.dockerSave(tag); err != nil {
-		return errors.Wrap(err, "failed to save docker as artifact")
+		if err := b.dockerSave(tag); err != nil {
+			return errors.Wrap(err, "failed to save docker as artifact")
+		}
 	}
 
 	return nil
@@ -120,7 +127,7 @@ func (b *dockerBuilder) copyFiles() error {
 	return nil
 }
 
-func (b *dockerBuilder) prepareBuild() error {
+func (b *dockerBuilder) prepareBuild(variant string) error {
 	elasticBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
@@ -130,6 +137,7 @@ func (b *dockerBuilder) prepareBuild() error {
 	data := map[string]interface{}{
 		"ExposePorts": b.exposePorts(),
 		"ModulesDirs": b.modulesDirs(),
+		"Variant":     variant,
 	}
 
 	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
@@ -189,11 +197,15 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 	return nil
 }
 
-func (b *dockerBuilder) dockerBuild() (string, error) {
+func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
 	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
+	if variant != "" {
+		tag = fmt.Sprintf("%s-%s", tag, variant)
+	}
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
+	b.ExtraVars["variant"] = variant
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
