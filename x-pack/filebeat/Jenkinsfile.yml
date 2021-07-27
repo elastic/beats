@@ -40,11 +40,9 @@ stages:
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
-        withModule: true
         stage: mandatory
     pythonIntegTest:
         mage: "mage pythonIntegTest"       ## run the ITs only if the changeset affects a specific module.
-        withModule: true
         stage: mandatory
     module-compat-7.11:
       mage: >-                 ## Run module integration tests under ES 7.11 to ensure ingest pipeline compatibility.

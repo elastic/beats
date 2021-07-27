@@ -38,7 +38,6 @@ stages:
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
-        withModule: true
         stage: mandatory
     macos:
         mage: "mage build unitTest"

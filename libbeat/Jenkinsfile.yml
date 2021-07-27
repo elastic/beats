@@ -36,7 +36,6 @@ stages:
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
-        withModule: true
         stage: mandatory
     crosscompile:
         make: "make -C libbeat crosscompile"

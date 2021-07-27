@@ -24,7 +24,6 @@ stages:
         stage: mandatory
     goIntegTest:
         mage: "mage goIntegTest"
-        withModule: true           ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
     macos:
         mage: "mage build unitTest"
