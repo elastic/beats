@@ -30,12 +30,12 @@ const debugSelector = "synthexec"
 func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
-	newCmd, err := suiteCommandFactory(suitePath, append(extraArgs, ".")...)
+	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
 	if err != nil {
 		return nil, err
 	}
 
-	return startCmdJob(ctx, newCmd, nil, params), nil
+	return startCmdJob(ctx, cmdFactory, nil, params), nil
 }
 
 func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
@@ -46,7 +46,11 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 
 	newCmd := func() *exec.Cmd {
 		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
-		cmd := exec.Command(bin, args...)
+		// Always put the suite path first to prevent conflation with variadic args!
+		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
+		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
+		// to the end.
+		cmd := exec.Command(bin, append([]string{suitePath}, args...)...)
 		cmd.Dir = npmRoot
 		return cmd
 	}
