@@ -63,7 +63,12 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		nd := &kubernetes.DiscoverKubernetesNodeOpts{ConfigHost: config.Node, Client: client, IsInCluster: kubernetes.IsInCluster(config.KubeConfig), HostUtils: &kubernetes.Hostdiscoveryutils{}}
+		nd := &kubernetes.DiscoverKubernetesNodeOpts{
+		    ConfigHost: config.Node,
+		    Client: client,
+		    IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+		    HostUtils: &kubernetes.Hostdiscoveryutils{},
+		}
 		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, nd)
 		if err != nil {
 			return nil, fmt.Errorf("couldn't discover kubernetes node due to error %w", err)
