@@ -143,7 +143,7 @@ func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeOpts) (s
 	// fallback to environment variable NODE_NAME
 	node = os.Getenv("NODE_NAME")
 	if node != "" {
-		log.Infof("kubernetes: Node %s discovered by NODE_NAME environment variable(fallback method)", node)
+		log.Infof("kubernetes: Node %s discovered by NODE_NAME environment variable", node)
 		return node, nil
 	}
 
