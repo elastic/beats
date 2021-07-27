@@ -54,9 +54,9 @@ func newInput(config config) (*s3Input, error) {
 func (in *s3Input) Name() string { return inputName }
 
 func (in *s3Input) Test(ctx v2.TestContext) error {
-	_, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
+	_, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
 	if err != nil {
-		return fmt.Errorf("getAWSCredentials failed: %w", err)
+		return fmt.Errorf("InitializeAWSConfig failed: %w", err)
 	}
 	return nil
 }
@@ -98,9 +98,9 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		log = log.With("region", regionName)
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
 	if err != nil {
-		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
+		return nil, fmt.Errorf("InitializeAWSConfig failed: %w", err)
 	}
 	awsConfig.Region = regionName
 
