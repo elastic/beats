@@ -193,20 +193,6 @@ func TestDiscoverKubernetesNode(t *testing.T) {
 			mdu := createMockdu(test.namespace, test.podname, test.machineid)
 			if test.init != nil {
 				test.init(t, client)
-
-				defer func() {
-					pod := "test-pod"
-					err := client.CoreV1().Pods("default").Delete(context.Background(), pod, metav1.DeleteOptions{})
-					if err != nil {
-						t.Fatalf("failed to delete k8s pod: %v", err)
-					}
-				}()
-				defer func() {
-					err := client.CoreV1().Nodes().Delete(context.Background(), "worker-2", metav1.DeleteOptions{})
-					if err != nil {
-						t.Fatalf("failed to delete k8s node: %v", err)
-					}
-				}()
 			}
 
 			var nodeName string
@@ -245,6 +231,20 @@ func createResources(t *testing.T, client kubernetes.Interface) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Cleanup(func() {
+		pod := "test-pod"
+		err := client.CoreV1().Pods("default").Delete(context.Background(), pod, metav1.DeleteOptions{})
+		if err != nil {
+			t.Fatalf("failed to delete k8s pod: %v", err)
+		}
+
+		err = client.CoreV1().Nodes().Delete(context.Background(), "worker-2", metav1.DeleteOptions{})
+		if err != nil {
+			t.Fatalf("failed to delete k8s node: %v", err)
+		}
+
+	})
 }
 
 func createNode(client kubernetes.Interface, name string) error {
