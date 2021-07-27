@@ -17,7 +17,7 @@ func init() {
 }
 
 // AssetCloudfoundry returns asset data.
-// This is the base64 encoded gzipped contents of module/cloudfoundry.
+// This is the base64 encoded zlib format compressed contents of module/cloudfoundry.
 func AssetCloudfoundry() string {
 	return "eJzcVbGS2jAQ7fmKnWtocnyAixS5TGauu+JS3wnpGTTIkiOtIP77jAQGG5uDHJAiKphhvXrv6a129UgrNAVJ46IqXbTKNxMi1mxQ0MNTJ/wwIVII0uuatbMFfZ0QEeUU+rHNocqpaDAh8jAQAQXNwWJCVGoYFYq85ZGsqDAgTYubGgUtvIv1LjJC2UfrIqbt+2CLtkKzcV514qOY2/W6RN5GriSsYZlK76r+KWe9HS8uBD03oLUwEYG0lSYq0FQ6y0Jb+OmX9Cdahp+SsIqmOXU6G+gXdT2Q3zXjAvGiro2WIn0mXoIqsNeSdCARgpNaMBRtNC+7pzj2s6tJq174tKtnxLUCn78nb7kvdWjF3r1rDHnfo7y3gOGAvPMmnCnx8VW+yDQbWFiJN20Vfo8aaJxd/JV7zwmq9a4l6NZ4joQZiN1sVJSs46yWPKomSGGg3krjxHHCmZo+vfykGMQCVMNLWBYLjPNXqJxvZvOGEW5jCX1LWMmTGKBago/If0XH4j4SxFpoI9Ik+EiH0mF1RwsCO3+yAJn7nzgwkHFo6zwHr2zqjNFr6Ry5Y0On39vOwYTYdvNO/4mqwfRk0hWlSsRKlyU80vCYgzfA9qEwIjCxrtBVtHsDnZTRe6hxgexYmBsKzHjb55RK58cdaslz2lXXKSP8R5cpn2e8UtHq8fH/aeKEeAHxcZUOzJ94cV5briPiPwEAAP//2qzeKw=="
 }

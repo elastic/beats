@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetMongodb returns asset data.
-// This is the base64 encoded gzipped contents of module/mongodb.
+// This is the base64 encoded zlib format compressed contents of module/mongodb.
 func AssetMongodb() string {
 	return "eJyUk9Gu0zAMhu/7FNa5P0eaBOeiF0iwo0lcFJ4hNG5mLbFD4o6Vp0dpJ2ghbJovf+v397tunuGEUwtB2In91gAoqccWnq7KUwNgMfeJopJwCx8aAIBO7OgRBkkQTcrEDrpiePsEXhwM5DG/NAADobe5nT3PwCbgmlVKp4gtuCRjvCoV3FKHeRgMScKaNoNKrWFroBe3mvIv8Ca01F5YDXG+Ev6foJbiT45eQhRG1s34m2SAw8h96RkPvVF0kuinKQLIAAFzNg43JryYEMsJ91+77uOXt01zWf6E0w9JthqRFS8PBdwvlrtxiEkNW09ZkR8KlfGMiXSqmIwnkzd6NHqcT/7i8Yx+0wvkkln20DRiBVXb4Dap5rjPIfvIJ/7Mig4TJIwJM7KW96ZHhJHp+4hAtmgDYSpXKI3yCLMaxfD37/b7Hu9ed+9fd7vKql7YNb8CAAD//8hOG3I="
 }
