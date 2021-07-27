@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"sort"
 	"time"
 
@@ -143,7 +144,10 @@ func (h *PolicyChange) handleFleetServerHosts(ctx context.Context, c *config.Con
 	}
 	ctx, cancel := context.WithTimeout(ctx, apiStatusTimeout)
 	defer cancel()
-	_, err = client.Send(ctx, "GET", "/api/status", nil, nil, nil)
+	resp, err := client.Send(ctx, "GET", "/api/status", nil, nil, nil)
+	// discard body for proper cancellation and connection reuse
+	io.Copy(ioutil.Discard, resp.Body)
+	resp.Body.Close()
 	if err != nil {
 		return errors.New(
 			err, "fail to communicate with updated API client hosts",

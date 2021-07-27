@@ -861,10 +861,14 @@ func (as *ApplicationState) destroyCheckinStream() {
 func (s *Server) watchdog() {
 	defer s.watchdogWG.Done()
 	for {
+		t := time.NewTimer(s.watchdogCheckInterval)
 		select {
 		case <-s.watchdogDone:
+			if !t.Stop() {
+				<-t.C
+			}
 			return
-		case <-time.After(s.watchdogCheckInterval):
+		case <-t.C:
 		}
 
 		now := time.Now().UTC()

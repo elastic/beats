@@ -296,9 +296,13 @@ func gracefulKill(proc *process.Info) {
 	wg.Wait()
 
 	// kill in case it's still running after timeout
+	t := time.NewTimer(procExitTimeout)
 	select {
 	case <-doneChan:
-	case <-time.After(procExitTimeout):
+		if !t.Stop() {
+			<-t.C
+		}
+	case <-t.C:
 		_ = proc.Process.Kill()
 	}
 }

@@ -130,6 +130,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		for {
 			// performs debounce of notifies; accumulates them into 100 millisecond chunks
 			changed := false
+			t := time.NewTimer(100 * time.Millisecond)
 			for {
 				exitloop := false
 				select {
@@ -138,13 +139,16 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					return
 				case <-notify:
 					changed = true
-				case <-time.After(100 * time.Millisecond):
+				case <-t.C:
 					exitloop = true
-					break
 				}
 				if exitloop {
 					break
 				}
+			}
+
+			if !t.Stop() {
+				<-t.C
 			}
 			if !changed {
 				continue

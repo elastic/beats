@@ -52,11 +52,14 @@ func (c *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 	// Update context when any host information changes.
 	go func() {
 		for {
+			t := time.NewTimer(c.CheckInterval)
 			select {
 			case <-comm.Done():
+				if !t.Stop() {
+					<-t.C
+				}
 				return
-			case <-time.After(c.CheckInterval):
-				break
+			case <-t.C:
 			}
 
 			updated, err := c.fetcher()

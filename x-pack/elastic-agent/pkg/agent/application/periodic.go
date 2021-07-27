@@ -31,10 +31,14 @@ func (p *periodic) Start() error {
 
 	WORK:
 		for {
+			t := time.NewTimer(p.period)
 			select {
 			case <-p.done:
+				if !t.Stop() {
+					<-t.C
+				}
 				break WORK
-			case <-time.After(p.period):
+			case <-t.C:
 			}
 
 			if err := p.work(); err != nil {
