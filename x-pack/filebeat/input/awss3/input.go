@@ -166,9 +166,9 @@ func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipelin
 
 	log := ctx.Logger.With("s3_bucket", in.config.S3Bucket)
 
-	awsConfig, err := awscommon.GetAWSCredentials(in.config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
 	if err != nil {
-		return nil, fmt.Errorf("getAWSCredentials failed: %w", err)
+		return nil, fmt.Errorf("InitializeAWSConfig failed: %w", err)
 	}
 	s3Servicename := "s3"
 	if in.config.FIPSEnabled {
@@ -176,7 +176,8 @@ func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipelin
 	}
 
 	log.Debug("s3 service name = ", s3Servicename)
-	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
+	log.Debug("s3 input config s3_bucket_poll_interval = ", in.config.S3BucketPollInterval)
+	log.Debug("s3 input config s3_bucket_objects_expiration = ", in.config.S3BucketObjectExpiration)
 	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
 
 	return &s3BucketCollector{
