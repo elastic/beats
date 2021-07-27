@@ -25,6 +25,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
@@ -72,6 +73,11 @@ func (b *dockerBuilder) Build() error {
 	}
 
 	for _, variant := range variants {
+		// There is no UBI editition of the offline agent, so we skip this
+		if variant == "offline" && regexp.MustCompile("-ubi\\d+$").MatchString(b.imageName) {
+			continue
+		}
+
 		if err := b.prepareBuild(variant); err != nil {
 			return errors.Wrap(err, "failed to prepare build")
 		}
