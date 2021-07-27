@@ -707,18 +707,17 @@ def tearDown() {
 */
 def fixPermissions(location) {
   if(isUnix()) {
-      try {
-        timeout(5) {
-          sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
-            set +x
-            echo "Cleaning up ${location}"
-            source ./dev-tools/common.bash
-            docker_setup
-            script/fix_permissions.sh ${location}""", returnStatus: true)
-        }
-      } catch (Throwable e) {
-        echo "There were some failures when fixing the permissions. ${e.toString()}"
+    try {
+      timeout(5) {
+        sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
+          set +x
+          echo "Cleaning up ${location}"
+          source ./dev-tools/common.bash
+          docker_setup
+          script/fix_permissions.sh ${location}""", returnStatus: true)
       }
+    } catch (Throwable e) {
+      echo "There were some failures when fixing the permissions. ${e.toString()}"
     }
   }
 }
