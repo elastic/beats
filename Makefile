@@ -102,9 +102,6 @@ check:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
-<<<<<<< HEAD
-## check-go : Check there is no changes in Go modules.
-=======
 ## check : Run some checks similar to what the default check validation runs in the CI.
 .PHONY: check-default
 check-default:
@@ -115,8 +112,7 @@ check-default:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
-## ccheck-go : Check there is no changes in Go modules.
->>>>>>> 7141820f0 ([CI] Add check-headers and a metadata make goal to simplify the CI (#27068))
+## check-go : Check there is no changes in Go modules.
 .PHONY: check-go
 check-go:
 	@go mod tidy
