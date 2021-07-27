@@ -106,6 +106,7 @@ check:
 .PHONY: check-default
 check-default:
 	@$(MAKE) check-python
+	@echo "The update goal is skipped to speed up the checks in the CI on a PR basis."
 	@$(MAKE) notice
 	@$(MAKE) check-headers
 	@$(MAKE) check-go

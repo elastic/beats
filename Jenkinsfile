@@ -202,7 +202,7 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = { cmd(label: "make check-python", script: "make check-default") }
+  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
 
   parallel(mapParallelTasks)
 }
