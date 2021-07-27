@@ -77,6 +77,13 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 func (in *s3Input) Name() string { return inputName }
 
 func (in *s3Input) Test(ctx v2.TestContext) error {
+<<<<<<< HEAD
+=======
+	_, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
+	if err != nil {
+		return fmt.Errorf("InitializeAWSConfig failed: %w", err)
+	}
+>>>>>>> 94af9dfced (Add Proxy settings to AWS Common (#26832))
 	return nil
 }
 
@@ -138,6 +145,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}
 
+<<<<<<< HEAD
 	if in.config.BucketARN != "" {
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
@@ -166,6 +174,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
 		longPollWaitTime:  in.config.SQSWaitTime,
+=======
+	awsConfig, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
+	if err != nil {
+		return nil, fmt.Errorf("InitializeAWSConfig failed: %w", err)
+>>>>>>> 94af9dfced (Add Proxy settings to AWS Common (#26832))
 	}
 
 	s3API := &awsS3API{
