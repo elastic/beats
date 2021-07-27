@@ -56,6 +56,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   cloudwatch:
     enabled: false
@@ -72,6 +73,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   ec2:
     enabled: false
@@ -88,6 +90,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   elb:
     enabled: false
@@ -104,6 +107,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   s3access:
     enabled: false
@@ -120,6 +124,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   vpcflow:
     enabled: false
@@ -136,6 +141,7 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 ----
 
 *`var.queue_url`*::
