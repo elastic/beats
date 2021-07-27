@@ -26,7 +26,11 @@ pipeline {
 def runBuildAndTest(Map args = [:]) {
   def mapParallelTasks = [:]
   for(int k = 0;k<args.number;k++) {
-    mapParallelTasks["${k}"] = { withNode(labels: args.labels, forceWorkspace: true) { sleep randomNumber(min: 2, max: 10) } }
+    mapParallelTasks["${k}"] = { withNode(labels: args.labels, forceWorkspace: true) {
+      sleep randomNumber(min: 2, max: 10)
+      bat 'ECHO Hello' 
+      bat 'type nul > your_file.txt' }
+    }
   }
   parallel(mapParallelTasks)
 }
