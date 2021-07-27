@@ -102,6 +102,15 @@ check:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
+## check : Run some checks similar to what the default check validation runs in the CI.
+.PHONY: check-default
+check-default:
+	@$(MAKE) check-python
+	@$(MAKE) notice
+	@$(MAKE) check-headers
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
 ## ccheck-go : Check there is no changes in Go modules.
 .PHONY: check-go
 check-go:
