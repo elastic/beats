@@ -231,6 +231,7 @@ Specific AWS permissions are required for IAM user to access SQS and S3:
 
 ----
 s3:GetObject
+s3:ListBucket
 sqs:ReceiveMessage
 sqs:ChangeMessageVisibility
 sqs:DeleteMessage
