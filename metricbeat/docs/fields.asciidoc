@@ -41073,8 +41073,15 @@ type: object
 
 --
 
+<<<<<<< HEAD
 [float]
 === query
+=======
+*`redis.info.memory.allocator_stats.active`*::
++
+--
+Active memory
+>>>>>>> e8ea14bd2 (Fix typo in redis docs (#27051))
 
 query metricset
 
