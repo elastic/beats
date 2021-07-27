@@ -131,7 +131,6 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		if interval <= 0 {
 			interval = 5 * time.Minute
 		}
-		interval = 5 * time.Second
 
 		cleanStore(canceler, ctx.Logger, persistentStore, states, interval, in.config.S3BucketObjectExpiration)
 		return nil
