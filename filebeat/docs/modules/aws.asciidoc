@@ -164,9 +164,11 @@ Interval between list requests to the S3 bucket. Default to be 120 seconds.
 Expiration of the S3 objects in the bucket. If you have an expiration set on the
 S3 objects in the bucket you can set it here so that internal status of the object will
 be purged after the expiration. Setting this value lower than the expiration time of the S3 objects
-provokes reading the S3 objects multiple times even if they didn't change.
-Not having an expiration on the S3 object and settings this value to `0s` has an impact
-on memory usage of Filebat.
+provokes ingesting the S3 objects multiple times even if they didn't change.
+Not having an expiration on the S3 objects or settings this value to `0s` has an impact on
+memory usage of Filebat since every S3 object already ingested will be kept forever in the
+state store and loaded in memory when Filebeat is started.
+(see: https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html)
 
 
 *`var.endpoint`*::
