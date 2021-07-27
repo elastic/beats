@@ -512,6 +512,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service

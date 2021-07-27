@@ -134,6 +134,7 @@ Appends a value to an array. If the field does not exist, the first entry will c
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
@@ -165,6 +166,7 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
 - `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
@@ -197,10 +199,12 @@ Some built-in helper functions are provided to work with the input state inside 
 - `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
 - `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 - `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
-- `toInt`: converts a string to an integer. Returns 0 if the conversion fails.
+- `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 - `add`: adds a list of integers and returns their sum.
+- `mul`: multiplies two integers.
+- `div`: does the integer division of two integer values.
 
-In addition to the provided functions, any of the native functions for `time.Time` and `http.Header` types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
+In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
 ==== Configuration options
 

@@ -33,6 +33,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove id_field_data {pull}25239[25239]
 - Removed beats central management {pull}25696[25696], {issue}23908[23908]
 - MacOSX minimum supported version set to 10.14 {issue}24193{24193}
+- Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 
 *Auditbeat*
 
@@ -78,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Deprecated the cyberark module (replaced by cyberarkpas). {issue}25261[25261] {pull}25505[25505]
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
 - Release Filebeat Stack Monitoring modules as GA {pull}26226[26226]
+- threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 
 *Heartbeat*
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
@@ -106,6 +108,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
 - Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
 - Fix Elasticsearch jvm.gc.collectors.old being exposed as young {issue}19636[19636] {pull}26616[26616]
+- Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
+- Added Airflow lightweight module {pull}26220[26220]
+- Add state_job metricset to Kubernetes module{pull}26479[26479]
+- Recover service.address field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 *Packetbeat*
 
@@ -179,6 +185,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Omit full index template from errors that occur while loading the template. {pull}25743[25743]
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 - Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
+- Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
 
 *Auditbeat*
 
@@ -220,10 +227,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 - Improve inode reuse handling by removing state for removed files more eagerly from the internal state table in the logs inputs. {pull}25756[25756]
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
-- Fix bug in aws-s3 input where the end of gzipped log files might have been discarded. {pull}26260[26260]
-- Fix bug in `httpjson` that prevented `first_event` getting updated. {pull}26407[26407]
-- Fix bug in the Syslog input that misparsed rfc5424 days starting with 0. {pull}26419[26419]
-- Do not close filestream harvester if an unexpected error is returned when close.on_state_change.* is enabled. {pull}26411[26411]
+- Change type of max_bytes in all configs to be cfgtype.ByteSize {pull}26699[26699]
+- Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
 
 *Filebeat*
 
@@ -308,9 +313,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
 - Add improvements to the azure activitylogs and platformlogs ingest pipelines. {pull}26148[26148]
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
-- Clone value when copy fields in processors to avoid crash. {issue}19206[19206] {pull}20500[20500]
 - Removed incorrect `http.request.referrer` field from `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 - Fix `threatintel.indicator.url.full` not being populated. {issue}26351[26351] {pull}26508[26508]
+- Fix Suricata metadata fields breaking visualizations, moved out of flattened datatype. {pull}26710[26710]
+- Fix `httpjson` template data key for `url.params`. {pull}26848[26848]
+- Cisco asa/ftd: Fix reversed usage of observer ingress and egress interfaces. {pull}26265[26265]
+- Fix `aws.s3access` pipeline when remote IP is a `-`. {issue}26913[26913] {pull}26940[26940]
+- Fix service name in aws-cloudwatch input from cloudwatchlogs to logs. {pull}27007[27007]
 
 *Heartbeat*
 
@@ -389,6 +398,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix GCP Project ID being ingested as `cloud.account.id` in `gcp.billing` module {issue}26357[26357] {pull}26412[26412]
 - Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
+- Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
 
 *Packetbeat*
 
@@ -398,8 +408,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - Change `event.code` and `winlog.event_id` from int to keyword. {pull}25176[25176]
 - Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
+- Fix an issue with message template caching in the `wineventlog-experimental` API implementation. {pull}26826[26826]
 
 *Functionbeat*
+
+- Expose region in AWS configuration so Functionbeat can deploy the Lamba in the correct place. {pull}26523[26523]
 
 *Elastic Logging Plugin*
 
@@ -612,6 +625,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added dataset `recordedfuture` to the `threatintel` module to ingest indicators from Recorded Future Connect API {pull}26481[26481]
 - Update `fortinet` ingest pipelines. {issue}22136[22136] {issue}25254[25254] {pull}24816[24816]
 - Use default add_locale for fortinet.firewall {issue}20300[20300] {pull}26524[26524]
+- Add new template functions and `value_type` parameter to `httpjson` transforms. {pull}26847[26847]
+- Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
 
 *Heartbeat*
 
@@ -697,6 +712,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add AWS Kinesis metricset. {pull}25989[25989]
 - Move openmetrics module to oss. {pull}26561[26561]
 - Add Couchbase's SyncGateway module {pull}25599[25599]
+- Fix release state of kubernetes metricsets. {pull}26864[26864]
+- Add Cluster filter on ECS Kubernetes overview dashboard and corresponding section on Kubernetes module documentation page. {pull}26919[26919]
 
 *Packetbeat*
 

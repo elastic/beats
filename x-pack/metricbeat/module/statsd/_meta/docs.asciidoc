@@ -25,7 +25,28 @@ The `statsd` module has these additional config options:
 Irrespective of the given ttl, metrics will be reported at least once.
 A ttl of zero means metrics will never expire.
 
-[float]
+*`statsd.mapping`*:: It defines how metrics will mapped from the original metric label to the event json.
+Here's an example configuration:
+[source,yaml]
+----
+statsd.mappings:
+  - metric: 'ti_failures' <1>
+    value:
+      field: task_failures <2>
+  - metric: '<job_name>_start' <1>
+    labels:
+      - attr: job_name <3>
+        field: job_name <4>
+    value:
+      field: started <2>
+----
+
+<1> `metric`, required: the label key of the metric in statsd, either as a exact match string
+or as a template with named label placeholder in the format `<label_placeholder>`
+<2> `value.field`, required: field name where to save the metric value in the event json
+<3> `label[].attr`, required when using named label placeholder: reference to the named label placeholder defined in `metric`
+<4> `label[].field`, required when using named label placeholder field name where to save the named label placeholder value from the template in the event json
+
 === Metricsets
 
 Currently, there is only `server` metricset in `statsd` module.
