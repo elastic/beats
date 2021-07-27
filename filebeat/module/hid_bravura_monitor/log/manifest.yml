@@ -3,13 +3,17 @@ module_version: 1.0
 var:
   - name: paths
     default:
-      - C:/Program Files/Hitachi ID/IDM Suite/Logs/default/*.log
+      - C:/Program Files/Hitachi ID/IDM Suite/Logs/default*/idmsuite*.log
   - name: node
     default: 0.0.0.0
   - name: instancename
     default: default
   - name: timezone
     default: UTC
+  - name: environment
+    default: PRODUCTION
+  - name: instancetype
+    default: Privilege-Identity-Password
 
 ingest_pipeline: ingest/pipeline.json
 input: config/log.yml

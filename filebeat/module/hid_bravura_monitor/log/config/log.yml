@@ -12,6 +12,8 @@ processors:
         ecs.version: 1.7.0
         hid_bravura_monitor.instancename: {{ .instancename }}
         hid_bravura_monitor.node: {{ .node }}
+        hid_bravura_monitor.environment: {{ .environment }}
+        hid_bravura_monitor.instancetype: {{ .instancetype }}
         event.timezone: {{ .timezone }}
 
 multiline:

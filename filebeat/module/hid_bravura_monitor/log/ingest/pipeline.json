@@ -147,6 +147,15 @@
       }
     },
     {
+      "set": {
+        "if": "ctx?.hid_bravura_monitor?.node == '0.0.0.0'",
+        "field": "hid_bravura_monitor.node",
+        "value": "{{host.name}}",
+        "ignore_empty_value": true,
+        "description": "Copy host.name to hid_bravura_monitor.node if left as default"
+      }
+    },
+    {
       "convert": {
         "field": "hid_bravura_monitor.perf.duration",
         "type": "long",
