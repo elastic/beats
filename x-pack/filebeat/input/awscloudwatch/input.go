@@ -103,9 +103,9 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		config.RegionName = regionName
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AwsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "getAWSCredentials failed")
+		return nil, errors.Wrap(err, "InitializeAWSConfig failed")
 	}
 	awsConfig.Region = config.RegionName
 
