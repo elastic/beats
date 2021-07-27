@@ -864,9 +864,7 @@ func (s *Server) watchdog() {
 		t := time.NewTimer(s.watchdogCheckInterval)
 		select {
 		case <-s.watchdogDone:
-			if !t.Stop() {
-				<-t.C
-			}
+			t.Stop()
 			return
 		case <-t.C:
 		}

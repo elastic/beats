@@ -147,9 +147,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				}
 			}
 
-			if !t.Stop() {
-				<-t.C
-			}
+			t.Stop()
 			if !changed {
 				continue
 			}

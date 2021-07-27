@@ -34,9 +34,7 @@ func (p *periodic) Start() error {
 			t := time.NewTimer(p.period)
 			select {
 			case <-p.done:
-				if !t.Stop() {
-					<-t.C
-				}
+				t.Stop()
 				break WORK
 			case <-t.C:
 			}

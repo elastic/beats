@@ -52,9 +52,7 @@ func (ch *ErrorChecker) Run(ctx context.Context) {
 		t := time.NewTimer(statusCheckPeriod)
 		select {
 		case <-ctx.Done():
-			if !t.Stop() {
-				<-t.C
-			}
+			t.Stop()
 			return
 		case <-t.C:
 			err := ch.agentClient.Connect(ctx)

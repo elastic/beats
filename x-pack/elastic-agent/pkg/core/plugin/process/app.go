@@ -299,9 +299,7 @@ func gracefulKill(proc *process.Info) {
 	t := time.NewTimer(procExitTimeout)
 	select {
 	case <-doneChan:
-		if !t.Stop() {
-			<-t.C
-		}
+		t.Stop()
 	case <-t.C:
 		_ = proc.Process.Kill()
 	}

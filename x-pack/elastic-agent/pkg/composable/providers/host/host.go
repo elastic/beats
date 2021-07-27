@@ -55,9 +55,7 @@ func (c *contextProvider) Run(comm corecomp.ContextProviderComm) error {
 			t := time.NewTimer(c.CheckInterval)
 			select {
 			case <-comm.Done():
-				if !t.Stop() {
-					<-t.C
-				}
+				t.Stop()
 				return
 			case <-t.C:
 			}

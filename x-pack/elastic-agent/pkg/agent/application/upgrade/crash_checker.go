@@ -70,9 +70,7 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 
 		select {
 		case <-ctx.Done():
-			if !t.Stop() {
-				<-t.C
-			}
+			t.Stop()
 			return
 		case <-t.C:
 			pid, err := ch.sc.PID(ctx)

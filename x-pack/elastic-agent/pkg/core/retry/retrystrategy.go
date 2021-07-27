@@ -56,9 +56,7 @@ RETRY_LOOP:
 			select {
 			case <-t.C:
 			case <-ctx.Done():
-				if !t.Stop() {
-					<-t.C
-				}
+				t.Stop()
 				break RETRY_LOOP
 			}
 		}

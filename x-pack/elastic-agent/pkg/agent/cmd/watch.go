@@ -144,6 +144,7 @@ func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) erro
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
 	t := time.NewTimer(tilGrace)
+	defer t.Stop()
 
 WATCHLOOP:
 	for {
@@ -168,9 +169,6 @@ WATCHLOOP:
 		}
 	}
 
-	if !t.Stop() {
-		<-t.C
-	}
 	return nil
 }
 
