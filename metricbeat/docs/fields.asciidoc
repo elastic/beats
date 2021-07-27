@@ -48571,7 +48571,7 @@ format: bytes
 *`redis.info.memory.allocator_stats.active`*::
 +
 --
-Active memeory
+Active memory
 
 
 type: long

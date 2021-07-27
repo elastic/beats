@@ -141,7 +141,7 @@
               type: long
               format: bytes
               description: >
-                Active memeory
+                Active memory
             - name: resident
               type: long
               format: bytes
