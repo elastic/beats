@@ -157,3 +157,56 @@ Loop:
 		})
 	}
 }
+
+func TestSuiteCommandFactory(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
+	suitePath, err := filepath.Abs(origPath)
+	require.NoError(t, err)
+	binPath := path.Join(suitePath, "node_modules/.bin/elastic-synthetics")
+
+	tests := []struct {
+		name      string
+		suitePath string
+		extraArgs []string
+		want      []string
+		wantErr   bool
+	}{
+		{
+			"no args",
+			suitePath,
+			nil,
+			[]string{binPath, suitePath},
+			false,
+		},
+		{
+			"with args",
+			suitePath,
+			[]string{"--capability", "foo", "bar", "--rich-events"},
+			[]string{binPath, suitePath, "--capability", "foo", "bar", "--rich-events"},
+			false,
+		},
+		{
+			"no npm root",
+			"/not/a/path/for/sure",
+			nil,
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			factory, err := suiteCommandFactory(tt.suitePath, tt.extraArgs...)
+
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			cmd := factory()
+			got := cmd.Args
+			require.Equal(t, tt.want, got)
+		})
+	}
+}

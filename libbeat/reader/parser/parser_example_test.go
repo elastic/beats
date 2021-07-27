@@ -23,11 +23,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 type inputParsersConfig struct {
-	MaxBytes       int                     `config:"max_bytes"`
+	MaxBytes       cfgtype.ByteSize        `config:"max_bytes"`
 	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 	Parsers        Config                  `config:",inline"`
 }
@@ -68,6 +69,34 @@ func TestParsersExampleInline(t *testing.T) {
 				"[log] The following are log messages\n",
 				"[log] This one is\n\n on multiple\n\n lines",
 				"[log] In total there should be 3 events\n",
+			},
+		},
+		"humanize max_bytes, multiline XML": {
+			lines: `<Event><Data>
+	A
+	B
+	C</Data></Event>
+<Event><Data>
+	D
+	E
+	F</Data></Event>
+`,
+			parsers: map[string]interface{}{
+				"max_bytes":       "4 KiB",
+				"line_terminator": "auto",
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"multiline": map[string]interface{}{
+							"match":   "after",
+							"negate":  true,
+							"pattern": "^<Event",
+						},
+					},
+				},
+			},
+			expectedMessages: []string{
+				"<Event><Data>\n\n\tA\n\n\tB\n\n\tC</Data></Event>\n",
+				"<Event><Data>\n\n\tD\n\n\tE\n\n\tF</Data></Event>\n",
 			},
 		},
 	}

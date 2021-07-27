@@ -73,7 +73,7 @@ processors:
       value: ""
   - set:
       field: http.request.id
-      copy_from: nginx.ingress_controller.http.request.id
+      value: '{{{nginx.ingress_controller.http.request.id}}}'
       ignore_empty_value: true
       ignore_failure: true
   - script:
