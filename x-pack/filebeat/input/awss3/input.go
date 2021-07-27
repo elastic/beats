@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -45,21 +44,16 @@ func Plugin(store beater.StateStore) v2.Plugin {
 }
 
 type s3InputManager struct {
-	s3Input              *s3Input
-	store                beater.StateStore
-	persistentStore      *statestore.Store
-	states               *States
-	grp                  unison.Group
-	storeCleanupInterval time.Duration
+	s3Input *s3Input
+	store   beater.StateStore
+	grp     unison.Group
 }
 
 // s3Input is a input for s3
 type s3Input struct {
-	config               config
-	store                *statestore.Store
-	states               *States
-	grp                  unison.Group
-	storeCleanupInterval time.Duration
+	config config
+	store  beater.StateStore
+	grp    unison.Group
 }
 
 func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
@@ -67,45 +61,7 @@ func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 		return nil
 	}
 
-	ok := false
-	persistentStore, err := im.store.Access()
-	if err != nil {
-		return sderr.Wrap(err, "Can not access persistent store")
-	}
-
-	defer cleanup.IfNot(&ok, func() { persistentStore.Close() })
-
-	states := NewStates()
-	err = states.readStatesFrom(persistentStore)
-	if err != nil {
-		return sderr.Wrap(err, "Can not start persistent store")
-	}
-
-	// We should close the persistent store when filebeat stops:
-	// we have to manage it at Init time because the input could not run
-	err = grp.Go(func(canceler unison.Canceler) error {
-	cancelerLoop:
-		for {
-			select {
-			case <-canceler.Done():
-				persistentStore.Close()
-				break cancelerLoop
-			default:
-				if canceler.Err() != nil {
-					persistentStore.Close()
-					break cancelerLoop
-				}
-			}
-		}
-
-		return nil
-	})
-
 	im.grp = grp
-	im.persistentStore = persistentStore
-	im.states = states
-	im.storeCleanupInterval = im.store.CleanupInterval()
-	ok = true
 
 	return nil
 }
@@ -116,18 +72,16 @@ func (im *s3InputManager) Create(cfg *common.Config) (v2.Input, error) {
 		return nil, err
 	}
 
-	im.s3Input = newInput(config, im.persistentStore, im.states, im.grp, im.storeCleanupInterval)
+	im.s3Input = newInput(config, im.store, im.grp)
 
 	return im.s3Input, nil
 }
 
-func newInput(config config, store *statestore.Store, states *States, grp unison.Group, storeCleanupInterval time.Duration) *s3Input {
+func newInput(config config, store beater.StateStore, grp unison.Group) *s3Input {
 	return &s3Input{
-		config:               config,
-		store:                store,
-		states:               states,
-		grp:                  grp,
-		storeCleanupInterval: storeCleanupInterval,
+		config: config,
+		store:  store,
+		grp:    grp,
 	}
 }
 
@@ -145,6 +99,17 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	var err error
 	var collector s3Collector
 
+	persistentStore, err := in.store.Access()
+	if err != nil {
+		return sderr.Wrap(err, "Can not access persistent store")
+	}
+
+	states := NewStates()
+	err = states.readStatesFrom(persistentStore)
+	if err != nil {
+		return sderr.Wrap(err, "Can not start persistent store")
+	}
+
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
 	inputMetrics := newInputMetrics(metricRegistry, ctx.ID)
 
@@ -156,25 +121,28 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	}
 
 	if in.config.S3Bucket != "" {
-		collector, err = in.createS3BucketCollector(ctx, pipeline, inputMetrics, in.states, in.store)
+		collector, err = in.createS3BucketCollector(ctx, pipeline, inputMetrics, states, persistentStore)
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
 	}
 
 	err = in.grp.Go(func(canceler unison.Canceler) error {
-		interval := in.storeCleanupInterval
+		interval := in.store.CleanupInterval()
 		if interval <= 0 {
 			interval = 5 * time.Minute
 		}
-		cleanStore(canceler, ctx.Logger, in.store, in.states, interval, in.config.S3BucketObjectExpiration)
+		interval = 5 * time.Second
+
+		cleanStore(canceler, ctx.Logger, persistentStore, states, interval, in.config.S3BucketObjectExpiration)
 		return nil
 	})
 
 	if err != nil {
-		return sderr.Wrap(err, "Can not start cleanup process")
+		return sderr.Wrap(err, "Can not start store cleanup process")
 	}
 
+	defer persistentStore.Close()
 	defer collector.getMetrics().Close()
 	defer collector.getPublisher().Close()
 	collector.run()
@@ -187,7 +155,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States, store *statestore.Store) (*s3BucketCollector, error) {
-	storedOp := newStoredOp(in.states, in.store)
+	storedOp := newStoredOp(states, store)
 	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
 		ACKHandler: newACKHandler(storedOp),
