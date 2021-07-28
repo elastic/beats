@@ -70,6 +70,11 @@ func TestValidateVersion(t *testing.T) {
 			current:   "0.0.1-alpha.11",
 			shouldErr: false,
 		},
+		{
+			expected:  "",
+			current:   "file://blahblahblah",
+			shouldErr: false,
+		},
 	}
 
 	for _, tt := range tests {
