@@ -112,16 +112,7 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 func (q *Query) GetCounterPaths(counterPath string) ([]string, error) {
 	paths, err := q.ExpandWildCardPath(counterPath)
 	if err == nil {
-		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
-		// A call is trigegred again
-		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == counterPath {
-			paths, err = q.ExpandWildCardPath(counterPath)
-			if err == nil {
-				return paths, err
-			}
-		} else {
-			return paths, err
-		}
+		return paths, err
 	}
 	//check if Windows installed language is not ENG, the ExpandWildCardPath will return either one of the errors below.
 	if err == PDH_CSTATUS_NO_OBJECT || err == PDH_CSTATUS_NO_COUNTER {
@@ -225,24 +216,38 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 
 	// PdhExpandWildCardPath will not return the counter paths for windows 32 bit systems but PdhExpandCounterPath will.
 	if runtime.GOARCH == "386" {
-		expdPaths, err = PdhExpandCounterPath(utfPath)
-	} else {
-		expdPaths, err = PdhExpandWildCardPath(utfPath)
-		// rarely the PdhExpandWildCardPathW will not retrieve the expanded buffer size initially so the next call will encounter the PDH_MORE_DATA error since the specified size on the input is still less than
-		// the required size. If this is the case we will fallback on the PdhExpandCounterPathW api since it looks to act in a more stable manner. The PdhExpandCounterPathW api does come with some limitations but will
-		// satisfy most cases and return valid paths.
-		if err == PDH_MORE_DATA {
-			expdPaths, err = PdhExpandCounterPath(utfPath)
+		if expdPaths, err = PdhExpandCounterPath(utfPath); err != nil {
+			return nil, err
 		}
-		expdPaths, err = PdhExpandCounterPath(utfPath)
+		if expdPaths == nil {
+			return nil, errors.New("no counter paths found")
+		}
+		return UTF16ToStringArray(expdPaths), nil
+	} else {
+		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
+			// rarely the PdhExpandWildCardPathW will not retrieve the expanded buffer size initially so the next call will encounter the PDH_MORE_DATA error since the specified size on the input is still less than
+			// the required size. If this is the case we will fallback on the PdhExpandCounterPathW api since it looks to act in a more stable manner. The PdhExpandCounterPathW api does come with some limitations but will
+			// satisfy most cases and return valid paths.
+			if err == PDH_MORE_DATA {
+				expdPaths, err = PdhExpandWildCardPath(utfPath)
+			} else {
+				return nil, err
+			}
+		}
+		paths := UTF16ToStringArray(expdPaths)
+		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
+		// A call is triggered again
+		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == wildCardPath {
+			expdPaths, err = PdhExpandWildCardPath(utfPath)
+			if err == nil {
+				return paths, err
+			}
+		} else {
+			return paths, err
+		}
 	}
-	if err != nil {
-		return nil, err
-	}
-	if expdPaths == nil {
-		return nil, errors.New("no counter paths found")
-	}
-	return UTF16ToStringArray(expdPaths), nil
+
+	return nil, PdhErrno(syscall.ERROR_NOT_FOUND)
 }
 
 // Close closes the query and all of its counters.

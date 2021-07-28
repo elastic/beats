@@ -49,7 +49,6 @@ const (
 // Reader will contain the config options
 type Reader struct {
 	query    pdh.Query    // PDH Query
-	executed bool         // Indicates if the query has been executed.
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
@@ -125,7 +124,6 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	} else {
 		events = re.groupToEvents(values)
 	}
-	re.executed = true
 	return events, nil
 }
 
