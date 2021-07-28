@@ -103,9 +103,9 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 		config.RegionName = regionName
 	}
 
-	awsConfig, err := awscommon.GetAWSCredentials(config.AwsConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AwsConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "getAWSCredentials failed")
+		return nil, errors.Wrap(err, "InitializeAWSConfig failed")
 	}
 	awsConfig.Region = config.RegionName
 
@@ -131,7 +131,8 @@ func NewInput(cfg *common.Config, connector channel.Connector, context input.Con
 
 // Run runs the input
 func (in *awsCloudWatchInput) Run() {
-	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
+	// Please see https://docs.aws.amazon.com/general/latest/gr/cwl_region.html for more info on Amazon CloudWatch Logs endpoints.
+	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "logs", in.config.RegionName, in.awsConfig)
 	svc := cloudwatchlogs.New(cwConfig)
 
 	var logGroupNames []string

@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetTraefik returns asset data.
-// This is the base64 encoded gzipped contents of module/traefik.
+// This is the base64 encoded zlib format compressed contents of module/traefik.
 func AssetTraefik() string {
 	return "eJyslTFv4zwMhvf8CqJ7DRTfN2W4pUCBG245dDdUi3aEyKKPoq7wvz/IsVvHkFzHjbZY4fu8IinqEc7YH0FYYW3OBwAxYvEID6+XLw8HAI2+YtOJIXeEHwcAgF+kg0WoiaFT7I1rQE4IYxBYaqA2Fn1xAKgNWu2PQ9wjONXinBeX9B0eoWEK3fglgYzrZZCCmqnN8+KaM+dcVVXo/cfnFHoFH9czOVHG+RExpGBu5UKIjj7MpAzNTQWPXBqNTkxtkK/+Mzk8Y/9OrBd7Kz7j+ukHa79fnuHp/6f/4MKQHqgeNipr0EnSE+OfgF7KisLiH5MjS665zc7rCcGF9g05GhgJPomvmZyg02X8eb+EDA5Ui1MCJkwsgU4aeVPVOfoIbHfaSJoIbCcPIwHeT8g4ZQXM0FnvivXMWNoh6b706KR46wV90qWyRi13OiWnI5xEuoLRd+Q8FlErKdOahtUlq8IBMy3TkmBpuhsteApcYaG05uu7uRU83J9so+TBMa5IxG1htignWpZ9Y7KHChdJhU3HzbTiykHZFsSmMU4tQ7cAo+3yL7I35PacOB26raUujVlWpG+t7nVne1ESfEpnm48amTOjeWO9Mxpb8KpZjultzV0OgbeWPn/H8j6WDyhknry5ZOLmrR8sebikyoSglMSNAPJFHaxNDZg5KL2/h7YOStdyD2mplKx7g5QZ6HtKXpET49DJd7I1vhcNUvGF3ic2OOG+NJ5SE2AX+AvFCW2pGu7Y95FZpc8h1Rhyd8rsmthHWo309ypkVmpxuvuVMCd4+BcAAP//8XRZtA=="
 }

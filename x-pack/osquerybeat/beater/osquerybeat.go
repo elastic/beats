@@ -459,5 +459,5 @@ func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []
 
 		bt.client.Publish(event)
 	}
-	bt.log.Infof("The %d events sent to index %s", len(hits), index)
+	bt.log.Infof("%d events sent to index %s", len(hits), index)
 }
