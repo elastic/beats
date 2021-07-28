@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetDropwizard returns asset data.
-// This is the base64 encoded gzipped contents of module/dropwizard.
+// This is the base64 encoded zlib format compressed contents of module/dropwizard.
 func AssetDropwizard() string {
 	return "eJxsjk2KAjEQhfc5xSPr6TlAFrOaG7gUkZBUuoPpJFSVSHt6aRX/sJaveO/7BhxocYjc+imfPUcDaNZCDvb/EVoDRJLAuWtu1eHPAMBGvQpCK4WCUkTiNuPZ+jUAUyEv5DB6Awip5jqKw9aKFPsDO6l2u1t/U2Pdh1ZTHh2SL0IGSJlKFHfFDah+pg/Z9XTpK4Hbsd+TL7LvW7e9V7tLAAAA///zhlJc"
 }
