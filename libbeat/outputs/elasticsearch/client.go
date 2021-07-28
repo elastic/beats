@@ -417,7 +417,7 @@ func bulkCollectPublishFails(
 							"deathlettered": true,
 						}
 					} else {
-						_, _ = data[i].Content.Meta.Put("deathlettered", true)
+						data[i].Content.Meta.Put("deathlettered", true)
 					}
 					data[i].Content.Fields = common.MapStr{
 						"message":       data[i].Content.Fields.String(),
