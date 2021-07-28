@@ -168,6 +168,7 @@ func (client *Client) Clone() *Client {
 			ConnectionSettings: connection,
 			Index:              client.index,
 			Pipeline:           client.pipeline,
+			NonIndexableAction: client.NonIndexableAction,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
@@ -206,7 +207,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	// events slice
 	origCount := len(data)
 	span.Context.SetLabel("events_original", origCount)
-	data, bulkItems := bulkEncodePublishRequest(client.log, client.conn.GetVersion(), client.index, client.pipeline, data)
+	data, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), data)
 	newCount := len(data)
 	span.Context.SetLabel("events_encoded", newCount)
 	if st != nil && origCount > newCount {
@@ -265,21 +266,14 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
-func bulkEncodePublishRequest(
-	log *logp.Logger,
-	version common.Version,
-	index outputs.IndexSelector,
-	pipeline *outil.Selector,
-	data []publisher.Event,
-) ([]publisher.Event, []interface{}) {
-
+func (client *Client) bulkEncodePublishRequest(version common.Version, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
 		event := &data[i].Content
-		meta, err := createEventBulkMeta(log, version, index, pipeline, event)
+		meta, err := client.createEventBulkMeta(version, event)
 		if err != nil {
-			log.Errorf("Failed to encode event meta data: %+v", err)
+			client.log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
 		if opType := events.GetOpType(*event); opType == events.OpTypeDelete {
@@ -293,25 +287,19 @@ func bulkEncodePublishRequest(
 	return okEvents, bulkItems
 }
 
-func createEventBulkMeta(
-	log *logp.Logger,
-	version common.Version,
-	indexSel outputs.IndexSelector,
-	pipelineSel *outil.Selector,
-	event *beat.Event,
-) (interface{}, error) {
+func (client *Client) createEventBulkMeta(version common.Version, event *beat.Event) (interface{}, error) {
 	eventType := ""
 	if version.Major < 7 {
 		eventType = defaultEventType
 	}
 
-	pipeline, err := getPipeline(event, pipelineSel)
+	pipeline, err := client.getPipeline(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select pipeline: %v", err)
 		return nil, err
 	}
 
-	index, err := indexSel.Select(event)
+	index, err := client.index.Select(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %v", err)
 		return nil, err
@@ -343,7 +331,7 @@ func createEventBulkMeta(
 	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
 
-func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error) {
+func (client *Client) getPipeline(event *beat.Event) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
 		if err == common.ErrKeyNotFound {
@@ -356,8 +344,8 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 		return strings.ToLower(pipeline), nil
 	}
 
-	if pipelineSel != nil {
-		return pipelineSel.Select(event)
+	if client.pipeline != nil {
+		return client.pipeline.Select(event)
 	}
 	return "", nil
 }
