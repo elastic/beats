@@ -14,6 +14,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+// cleanStore runs periodically at interval checking for states to purge from the store
 func cleanStore(canceler unison.Canceler, logger *logp.Logger, store *statestore.Store, states *States, interval time.Duration, objectExpiration time.Duration) {
 	started := time.Now()
 	timed.Periodic(canceler, interval, func() error {
@@ -40,6 +41,9 @@ func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, st
 }
 
 // gcFind searches the store of states that can be removed. A set of keys to delete is returned.
+// if the state is marked as stored it will be purged only if state.LastModified plus objectExpiration
+// is in the past. It the state is not marked as stored it will be purged if state.LastModified or
+// the time of when the cleaner started (whichever is the latest) is in the past.
 func gcFind(states *States, started, now time.Time, objectExpiration time.Duration) map[string]struct{} {
 	keys := map[string]struct{}{}
 	for _, state := range states.GetStates() {

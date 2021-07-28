@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/urso/sderr"
-
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
@@ -100,13 +98,13 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 
 	persistentStore, err := in.store.Access()
 	if err != nil {
-		return sderr.Wrap(err, "Can not access persistent store")
+		return fmt.Errorf("Can not access persistent store: %w", err)
 	}
 
 	states := NewStates()
 	err = states.readStatesFrom(persistentStore)
 	if err != nil {
-		return sderr.Wrap(err, "Can not start persistent store")
+		return fmt.Errorf("Can not start persistent store: %w", err)
 	}
 
 	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
@@ -137,7 +135,7 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	})
 
 	if err != nil {
-		return sderr.Wrap(err, "Can not start store cleanup process")
+		return fmt.Errorf("Can not start store cleanup process: %w", err)
 	}
 
 	defer persistentStore.Close()
