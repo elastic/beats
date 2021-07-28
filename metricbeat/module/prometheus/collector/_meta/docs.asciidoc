@@ -134,3 +134,18 @@ To keep only specific metrics, anchor the start and the end of the regexp of eac
   metrics_filters:
     include: ["^node_network_net_dev_group$", "^node_network_up$"]
 -------------------------------------------------------------------------------------
+
+[float]
+=== Setting limits on endpoint sizes
+
+Sometimes endpoints can get too large that they become detrimental to the agent's memory consumption or the underlying storage's stability.
+`max_content_size` can be set to ensure that an endpoint that is larger than a certain size would not get parsed at at. By default there is no set limit.
+
+[source,yaml]
+-------------------------------------------------------------------------------------
+- module: prometheus
+  period: 10s
+  hosts: ["localhost:9090"]
+  metrics_path: /metrics
+  max_content_size: 1MB
+-------------------------------------------------------------------------------------

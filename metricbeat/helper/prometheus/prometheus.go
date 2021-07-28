@@ -18,12 +18,14 @@
 package prometheus
 
 import (
+	"bytes"
 	"compress/gzip"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
+	"sync"
 
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
@@ -36,6 +38,14 @@ import (
 )
 
 const acceptHeader = `text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+
+var byteBuffer = sync.Pool{
+	New: func() interface{} {
+		return bytes.NewBuffer(nil)
+	},
+}
+
+var errMaxLengthExceeded = fmt.Errorf("`max_content_size` exceeded for prometheus endpoint")
 
 // Prometheus helper retrieves prometheus formatted metrics
 type Prometheus interface {
@@ -52,6 +62,7 @@ type Prometheus interface {
 type prometheus struct {
 	httpfetcher
 	logger *logp.Logger
+	config *config
 }
 
 type httpfetcher interface {
@@ -60,6 +71,12 @@ type httpfetcher interface {
 
 // NewPrometheusClient creates new prometheus helper
 func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
+	cfg := defaultConfig()
+	err := base.Module().UnpackConfig(cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	http, err := helper.NewHTTP(base)
 	if err != nil {
 		return nil, err
@@ -67,7 +84,7 @@ func NewPrometheusClient(base mb.BaseMetricSet) (Prometheus, error) {
 
 	http.SetHeaderDefault("Accept", acceptHeader)
 	http.SetHeaderDefault("Accept-Encoding", "gzip")
-	return &prometheus{http, base.Logger()}, nil
+	return &prometheus{http, base.Logger(), cfg}, nil
 }
 
 // GetFamilies requests metric families from prometheus endpoint and returns them
@@ -99,14 +116,23 @@ func (p *prometheus) GetFamilies() ([]*dto.MetricFamily, error) {
 		return nil, fmt.Errorf("unexpected status code %d from server", resp.StatusCode)
 	}
 
-	format := expfmt.ResponseFormat(resp.Header)
-	if format == "" {
-		return nil, fmt.Errorf("Invalid format for response of response")
+	buf := byteBuffer.Get().(*bytes.Buffer)
+	buf.Reset()
+	defer byteBuffer.Put(buf)
+
+	written, err := io.Copy(buf, io.LimitReader(reader, int64(p.config.MaxContentSize)))
+	if written >= int64(p.config.MaxContentSize) {
+		return nil, errMaxLengthExceeded
 	}
 
-	decoder := expfmt.NewDecoder(reader, format)
+	format := expfmt.ResponseFormat(resp.Header)
+	if format == "" {
+		return nil, fmt.Errorf("invalid format for response of response")
+	}
+
+	decoder := expfmt.NewDecoder(buf, format)
 	if decoder == nil {
-		return nil, fmt.Errorf("Unable to create decoder to decode response")
+		return nil, fmt.Errorf("unable to create decoder to decode response")
 	}
 
 	families := []*dto.MetricFamily{}

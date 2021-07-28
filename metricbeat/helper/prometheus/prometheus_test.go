@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -202,7 +203,7 @@ func (m mockFetcher) FetchResponse() (*http.Response, error) {
 
 func TestPrometheus(t *testing.T) {
 
-	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test")}
+	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test"), defaultConfig()}
 
 	tests := []struct {
 		mapping  *MetricsMapping
@@ -970,7 +971,7 @@ func TestPrometheusKeyLabels(t *testing.T) {
 
 	for _, tc := range testCases {
 		r := &mbtest.CapturingReporterV2{}
-		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test")}
+		p := &prometheus{mockFetcher{response: tc.prometheusResponse}, logp.NewLogger("test"), defaultConfig()}
 		p.ReportProcessedMetrics(tc.mapping, r)
 		if !assert.Nil(t, r.GetErrors(),
 			"error reporting/processing metrics, at %q", tc.testName) {
@@ -1000,4 +1001,37 @@ func TestPrometheusKeyLabels(t *testing.T) {
 			t.Logf("events: %+v", events[i].MetricSetFields)
 		}
 	}
+}
+
+func TestEndpointSizeLimit(t *testing.T) {
+	cfg := &config{
+		MaxContentSize: 10,
+	}
+	p := &prometheus{mockFetcher{response: promMetrics}, logp.NewLogger("test"), cfg}
+	r, err := p.GetFamilies()
+	require.Nil(t, r)
+	require.NotNil(t, err)
+	require.Equal(t, errMaxLengthExceeded, err)
+}
+
+func BenchmarkEndpointScrapesWithLimit(b *testing.B) {
+	bytes := make([]byte, 1e7)
+	cfg := defaultConfig()
+	p := &prometheus{mockFetcher{response: string(bytes)}, logp.NewLogger("test"), cfg}
+	b.Run("test with smaller max content length", func(b *testing.B) {
+		p.config.MaxContentSize = 1e4
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			_, err := p.GetFamilies()
+			require.Equal(b, errMaxLengthExceeded, err)
+		}
+	})
+	b.Run("test with larger max content length", func(b *testing.B) {
+		p.config.MaxContentSize = 1e10
+		b.ReportAllocs()
+		for i := 0; i < b.N; i++ {
+			_, err := p.GetFamilies()
+			require.NotEqual(b, errMaxLengthExceeded, err)
+		}
+	})
 }
