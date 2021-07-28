@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"net/http"
 	"net/url"
 
@@ -21,15 +22,25 @@ import (
 
 // ConfigAWS is a structure defined for AWS credentials
 type ConfigAWS struct {
-	AccessKeyID          string   `config:"access_key_id"`
-	SecretAccessKey      string   `config:"secret_access_key"`
-	SessionToken         string   `config:"session_token"`
-	ProfileName          string   `config:"credential_profile_name"`
-	SharedCredentialFile string   `config:"shared_credential_file"`
-	Endpoint             string   `config:"endpoint"`
-	RoleArn              string   `config:"role_arn"`
-	AWSPartition         string   `config:"aws_partition"` // Deprecated.
-	ProxyUrl             *url.URL `config:"proxy_url"`
+	AccessKeyID          string              `config:"access_key_id"`
+	SecretAccessKey      string              `config:"secret_access_key"`
+	SessionToken         string              `config:"session_token"`
+	ProfileName          string              `config:"credential_profile_name"`
+	SharedCredentialFile string              `config:"shared_credential_file"`
+	Endpoint             string              `config:"endpoint"`
+	RoleArn              string              `config:"role_arn"`
+	AWSPartition         string              `config:"aws_partition"` // Deprecated.
+	ProxyUrl             *url.URL            `config:"proxy_url"`
+	WebIdentityProvider  WebIdentityProvider `config:"web_identity_provider"`
+}
+
+type WebIdentityProvider struct {
+	RoleArn       string `config:"AWS_ROLE_ARN"`
+	TokenFilePath string `config:"AWS_WEB_IDENTITY_TOKEN_FILE"`
+}
+
+func (w WebIdentityProvider) isEmpty() bool {
+	return w.RoleArn == "" && w.TokenFilePath == ""
 }
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
@@ -56,6 +67,11 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
 		return getAccessKeys(config), nil
 	}
+
+	if !config.WebIdentityProvider.isEmpty() {
+		return getWebIdentityProvider(config)
+	}
+
 	return getSharedCredentialProfile(config)
 }
 
@@ -84,8 +100,26 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		return getRoleArn(config, awsConfig)
 	}
 
-	logger.Debug("Using access keys for AWS credential")
 	return awsConfig
+}
+
+func getWebIdentityProvider(config ConfigAWS) (awssdk.Config, error) {
+	logger := logp.NewLogger("getWebIdentityProvider")
+	logger.Debug("Using web identity provider for AWS credential")
+	awsConfig := defaults.Config()
+
+	stsSvc := sts.New(awsConfig)
+	p := stscreds.NewWebIdentityRoleProvider(stsSvc, config.WebIdentityProvider.RoleArn, "defaultRoleSessionName", stscreds.IdentityTokenFile(config.WebIdentityProvider.TokenFilePath))
+	cred, err := p.Retrieve(context.Background())
+	if err != nil {
+		return awsConfig, errors.Wrap(err, "retrieve web identity role provider failed")
+	}
+
+	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
+		Value: cred,
+	}
+
+	return awsConfig, nil
 }
 
 func getSharedCredentialProfile(config ConfigAWS) (awssdk.Config, error) {
