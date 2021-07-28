@@ -7,6 +7,7 @@ package beater
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -116,13 +117,45 @@ func TestFlattenECSMapping(t *testing.T) {
 	}
 }
 
-func TestFlattenECSMappingTooDeep(t *testing.T) {
-	const mapping = `{"a":{"b":{"c":{"d":{"e":{"f":{"g":{"h":{"i":{"j":{"k":{"value": 1}}}}}}}}}}}}`
-	var m map[string]interface{}
-	err := json.Unmarshal([]byte(mapping), &m)
-	if err != nil {
-		t.Fatal(err)
+func generateTestMapping(depth int, k string, v interface{}) map[string]interface{} {
+	m := make(map[string]interface{})
+	res := m
+	key := 'a'
+
+	for i := 0; i < depth; i++ {
+		newmap := make(map[string]interface{})
+		m[string(key)] = newmap
+		m = newmap
+		key += 1
 	}
+	m[k] = v
+	return res
+}
+
+func TestFlattenECSMappingEdges(t *testing.T) {
+
+	// zero depth map should return ErrECSMappingIsInvalid
+	m := generateTestMapping(0, keyValue, 1)
+	_, err := flattenECSMapping(m)
+	if !errors.Is(err, ErrECSMappingIsInvalid) {
+		t.Fatalf("want error: %v, got: %v", ErrECSMappingIsInvalid, err)
+	}
+
+	m = generateTestMapping(0, keyField, "foo")
+	_, err = flattenECSMapping(m)
+	if !errors.Is(err, ErrECSMappingIsInvalid) {
+		t.Fatalf("want error: %v, got: %v", ErrECSMappingIsInvalid, err)
+	}
+
+	// max depth key map should flatten
+	m = generateTestMapping(maxECSMappingDepth, "value", 1)
+	_, err = flattenECSMapping(m)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	// max + 1 depth key map should return error
+	m = generateTestMapping(maxECSMappingDepth+1, "value", 2)
 	_, err = flattenECSMapping(m)
 	if err != ErrECSMappingIsTooDeep {
 		t.Fatalf("expected error: %v", ErrECSMappingIsTooDeep)

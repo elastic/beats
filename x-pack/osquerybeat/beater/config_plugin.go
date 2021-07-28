@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strings"
 	"sync"
 
@@ -20,9 +21,13 @@ const (
 	configName           = "osq_config"
 	scheduleSplayPercent = 10
 	maxECSMappingDepth   = 25 // max ECS dot delimited key path
+
+	keyField = "field"
+	keyValue = "value"
 )
 
 var (
+	ErrECSMappingIsInvalid = errors.New("ECS mapping is invalid")
 	ErrECSMappingIsTooDeep = errors.New("ECS mapping is too deep")
 )
 
@@ -190,13 +195,22 @@ func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 
 func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
 	if s, ok := v.(string); ok {
-		if path[len(path)-1] == "field" {
+		if path[len(path)-1] == keyField {
+			if len(path) == 1 {
+				return fmt.Errorf("unexpected top level key '%s': %w", keyField, ErrECSMappingIsInvalid)
+			}
 			ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
 				Field: s,
 			}
 		}
 		return nil
-	} else if path[len(path)-1] == "value" {
+	} else if path[len(path)-1] == keyValue {
+		if len(path) == 1 {
+			return fmt.Errorf("unexpected top level key '%s': %w", keyValue, ErrECSMappingIsInvalid)
+		}
+		if len(path) == 1 {
+			return ErrECSMappingIsInvalid
+		}
 		ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
 			Value: v,
 		}
