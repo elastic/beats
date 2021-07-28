@@ -34,7 +34,6 @@ func TestGroupToEvents(t *testing.T) {
 			GroupMeasurements: true,
 		},
 		query:    pdh.Query{},
-		executed: true,
 		log:      nil,
 		counters: []PerfCounter{
 			{
@@ -150,7 +149,6 @@ func TestGroupToEvents(t *testing.T) {
 func TestGroupToSingleEvent(t *testing.T) {
 	reader := Reader{
 		query:    pdh.Query{},
-		executed: true,
 		log:      nil,
 		config: Config{
 			GroupAllCountersTo: "processor_count",

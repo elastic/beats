@@ -30,7 +30,6 @@ import (
 func TestGetCounter(t *testing.T) {
 	reader := Reader{
 		query:    pdh.Query{},
-		executed: true,
 		log:      nil,
 		counters: []PerfCounter{
 			{
