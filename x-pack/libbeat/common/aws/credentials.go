@@ -106,7 +106,11 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 func getWebIdentityProvider(config ConfigAWS) (awssdk.Config, error) {
 	logger := logp.NewLogger("getWebIdentityProvider")
 	logger.Debug("Using web identity provider for AWS credential")
+
 	awsConfig := defaults.Config()
+
+	// Set default region to make initial aws api call
+	awsConfig.Region = "us-east-1"
 
 	stsSvc := sts.New(awsConfig)
 	p := stscreds.NewWebIdentityRoleProvider(stsSvc, config.WebIdentityProvider.RoleArn, "defaultRoleSessionName", stscreds.IdentityTokenFile(config.WebIdentityProvider.TokenFilePath))
@@ -115,9 +119,13 @@ func getWebIdentityProvider(config ConfigAWS) (awssdk.Config, error) {
 		return awsConfig, errors.Wrap(err, "retrieve web identity role provider failed")
 	}
 
-	awsConfig.Credentials = awssdk.StaticCredentialsProvider{
-		Value: cred,
+	// Assume IAM role if iam_role config parameter is given
+	if config.RoleArn != "" {
+		logger.Debug("Using role arn and shared credential profile for AWS credential")
+		return getRoleArn(config, awsConfig), nil
 	}
+
+	awsConfig.Credentials = awssdk.NewStaticCredentialsProvider(cred.AccessKeyID, cred.SecretAccessKey, cred.SessionToken)
 
 	return awsConfig, nil
 }
