@@ -92,7 +92,7 @@ type pageIterator struct {
 	isFirst bool
 	done    bool
 
-	n int
+	n int64
 }
 
 func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response) *pageIterator {
