@@ -78,8 +78,9 @@ protocol connections from all interfaces:
     # var.paths:
 ----
 
-For encrypted communications, use the `TLS` protocol in the Vault's `DBPARM.ini` and use `tcp` input
-with `var.ssl` settings in Filebeat:
+For encrypted communications, follow the
+https://docs.cyberark.com/Product-Doc/OnlineHelp/PAS/Latest/en/Content/PASIMP/DV-Integrating-with-SIEM-Applications.htm#ConfigureSIEMintegration[CyberArk documentation]
+to configure encrypted protocol in the Vault server and use `tcp` input with `var.ssl` settings in Filebeat:
 
 [source,yaml]
 ----

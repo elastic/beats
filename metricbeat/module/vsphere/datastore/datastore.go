@@ -19,12 +19,12 @@ package datastore
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
@@ -33,41 +33,23 @@ import (
 
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "datastore", New,
+		mb.WithHostParser(vsphere.HostParser),
 		mb.DefaultMetricSet(),
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet
+// MetricSet type defines all fields of the MetricSet.
 type MetricSet struct {
-	mb.BaseMetricSet
-	HostURL  *url.URL
-	Insecure bool
+	*vsphere.MetricSet
 }
 
-// New create a new instance of the MetricSet
+// New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := struct {
-		Username string `config:"username"`
-		Password string `config:"password"`
-		Insecure bool   `config:"insecure"`
-	}{}
-
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
-	}
-
-	u, err := url.Parse(base.HostData().URI)
+	ms, err := vsphere.NewMetricSet(base)
 	if err != nil {
 		return nil, err
 	}
-
-	u.User = url.UserPassword(config.Username, config.Password)
-
-	return &MetricSet{
-		BaseMetricSet: base,
-		HostURL:       u,
-		Insecure:      config.Insecure,
-	}, nil
+	return &MetricSet{ms}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
