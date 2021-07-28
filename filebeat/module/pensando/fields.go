@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetPensando returns asset data.
-// This is the base64 encoded gzipped contents of module/pensando.
+// This is the base64 encoded zlib format compressed contents of module/pensando.
 func AssetPensando() string {
 	return "eJy0k92qnDAQx+99inmBsw/gRaGwHOhFYekp9FJSM3HDiU5IRmTfviSrbrSR/aidy5n4//+cjzf4xEsJFjsvOkkFAGs2WMJpzEABINHXTlvW1JXwpQCA+QP4TrI3WAAojUb6MlbfoBMtLmRD8MViCY2j3o6ZjHKI96gFylF7AzHU+MP4JDVLDaUaYE7mDEM4NCg8lvAbWSR5iUr0hqsoXoISxuOinGVNcMndaI/vv5Ina96UWdRBclGayD/xMpCTq9o2SIyvUQ+oAz4jKEPDAfLG1lZ6LX411h1jgw6edLbW6FpE+2/HvKlEz7qLbyohpUPv1y6Lf38WYZQklTptNCBlseQ4D/JaL05B7zEK7fA6sv124DhrkprXIG9vHTHVZHZ0P02Sd81db7DSfw35XzbgR28wbB+fBcMgPLSC6zPKje579D7Mfwvitel/XFUDx90eTASeBeOOjZgYom6KsdUJ6l2N/+MoP6IyiNttPoay902OHHY8zTsQrFv0LFqbR5Chq8/5/5wVR3dDzQGKPwEAAP//dBvr3Q=="
 }

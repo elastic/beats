@@ -202,13 +202,7 @@ def runLinting() {
       mapParallelTasks["${k}"] = v
     }
   }
-  mapParallelTasks['default'] = {
-                                cmd(label: "make check-python", script: "make check-python")
-                                cmd(label: "make notice", script: "make notice")
-                                // `make check-go` must follow `make notice` to ensure that the lint checks can be satisfied
-                                cmd(label: "make check-go", script: "make check-go")
-                                cmd(label: "Check for changes", script: "make check-no-changes")
-                              }
+  mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
 
   parallel(mapParallelTasks)
 }
@@ -399,10 +393,13 @@ def publishPackages(beatsFolder){
 * @param beatsFolder the beats folder.
 */
 def uploadPackages(bucketUri, beatsFolder){
-  googleStorageUploadExt(bucket: bucketUri,
-    credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-    pattern: "${beatsFolder}/build/distributions/**/*",
-    sharedPublicly: true)
+  // sometimes google storage reports ResumableUploadException: 503 Server Error
+  retryWithSleep(retries: 3, seconds: 5, backoff: true) {
+    googleStorageUploadExt(bucket: bucketUri,
+      credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
+      pattern: "${beatsFolder}/build/distributions/**/*",
+      sharedPublicly: true)
+  }
 }
 
 /**
