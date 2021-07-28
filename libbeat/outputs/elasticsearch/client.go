@@ -237,7 +237,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		failedEvents = data
 		stats.fails = len(failedEvents)
 	} else {
-		failedEvents, stats = bulkCollectPublishFails(client.log, result, data, client.NonIndexableAction)
+		failedEvents, stats = client.bulkCollectPublishFails(result, data)
 	}
 
 	failed := len(failedEvents)
@@ -366,15 +366,10 @@ func getPipeline(event *beat.Event, pipelineSel *outil.Selector) (string, error)
 // to be tried again due to error code returned for that items. If indexing an
 // event failed due to some error in the event itself (e.g. does not respect mapping),
 // the event will be dropped.
-func bulkCollectPublishFails(
-	log *logp.Logger,
-	result eslegclient.BulkResult,
-	data []publisher.Event,
-	action string,
-) ([]publisher.Event, bulkResultStats) {
+func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, data []publisher.Event) ([]publisher.Event, bulkResultStats) {
 	reader := newJSONReader(result)
 	if err := bulkReadToItems(reader); err != nil {
-		log.Errorf("failed to parse bulk response: %v", err.Error())
+		client.log.Errorf("failed to parse bulk response: %v", err.Error())
 		return nil, bulkResultStats{}
 	}
 
@@ -382,9 +377,9 @@ func bulkCollectPublishFails(
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		status, msg, err := bulkReadItemStatus(log, reader)
+		status, msg, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
-			log.Error(err)
+			client.log.Error(err)
 			return nil, bulkResultStats{}
 		}
 
@@ -408,10 +403,10 @@ func bulkCollectPublishFails(
 				result, _ := data[i].Content.Meta.HasKey("deathlettered")
 				if result {
 					stats.nonIndexable++
-					log.Errorf("Can't deliver to death letter index event %#v (status=%v): %s", data[i], status, msg)
+					client.log.Errorf("Can't deliver to death letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
-				} else if action == "death_letter_index" {
-					log.Warnf("Cannot index event %#v (status=%v): %s, trying death letter index", data[i], status, msg)
+				} else if client.NonIndexableAction == "death_letter_index" {
+					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying death letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
 						data[i].Content.Meta = common.MapStr{
 							"deathlettered": true,
@@ -426,13 +421,13 @@ func bulkCollectPublishFails(
 					}
 				} else { // drop
 					stats.nonIndexable++
-					log.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+					client.log.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}
 			}
 		}
 
-		log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
+		client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
 		stats.fails++
 		failed = append(failed, data[i])
 	}
