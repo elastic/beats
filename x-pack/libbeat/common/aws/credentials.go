@@ -31,12 +31,12 @@ type ConfigAWS struct {
 	RoleArn              string              `config:"role_arn"`
 	AWSPartition         string              `config:"aws_partition"` // Deprecated.
 	ProxyUrl             *url.URL            `config:"proxy_url"`
-	WebIdentityProvider  WebIdentityProvider `config:"web_identity_provider"`
+	WebIdentityProvider  WebIdentityProvider `config:",inline"`
 }
 
 type WebIdentityProvider struct {
-	RoleArn       string `config:"AWS_ROLE_ARN"`
-	TokenFilePath string `config:"AWS_WEB_IDENTITY_TOKEN_FILE"`
+	RoleArn       string `config:"aws_role_arn"`
+	TokenFilePath string `config:"aws_web_identity_token_file"`
 }
 
 func (w WebIdentityProvider) isEmpty() bool {
