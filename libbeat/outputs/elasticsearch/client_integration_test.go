@@ -200,23 +200,23 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
-func TestClientBulkPublishEventsWithDeathletterIndex(t *testing.T) {
+func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	type obj map[string]interface{}
 
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
 
 	index := "beat-int-test-dli-index"
-	deathletterIndex := "beat-int-test-dli-deathletter-index"
+	deadletterIndex := "beat-int-test-dli-dead-letter-index"
 
 	output, client := connectTestEsWithoutStats(t, obj{
 		"index": index,
 		"non_indexable_policy": NonIndexablePolicy{
-			Action: "death_letter_index",
-			Index:  deathletterIndex,
+			Action: "dead_letter_index",
+			Index:  deadletterIndex,
 		},
 	})
 	client.conn.Delete(index, "", "", nil)
-	client.conn.Delete(deathletterIndex, "", "", nil)
+	client.conn.Delete(deadletterIndex, "", "", nil)
 
 	err := output.Publish(context.Background(), outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -242,7 +242,7 @@ func TestClientBulkPublishEventsWithDeathletterIndex(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expecting mapping conflict")
 	}
-	_, _, err = client.conn.Refresh(deathletterIndex)
+	_, _, err = client.conn.Refresh(deadletterIndex)
 	if err == nil {
 		t.Fatal("expecting index to not exist yet")
 	}
@@ -256,7 +256,7 @@ func TestClientBulkPublishEventsWithDeathletterIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	_, _, err = client.conn.Refresh(deathletterIndex)
+	_, _, err = client.conn.Refresh(deadletterIndex)
 	if err != nil {
 		t.Fatal(err)
 	}

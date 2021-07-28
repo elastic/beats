@@ -22,15 +22,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
-type DeathLetterSelector struct {
-	Selector         outputs.IndexSelector
-	DeathLetterIndex string
+type DeadLetterSelector struct {
+	Selector        outputs.IndexSelector
+	DeadLetterIndex string
 }
 
-func (d DeathLetterSelector) Select(event *beat.Event) (string, error) {
-	result, _ := event.Meta.HasKey("deathlettered")
+func (d DeadLetterSelector) Select(event *beat.Event) (string, error) {
+	result, _ := event.Meta.HasKey(dead_letter_marker_field)
 	if result {
-		return d.DeathLetterIndex, nil
+		return d.DeadLetterIndex, nil
 	}
 	return d.Selector.Select(event)
 }

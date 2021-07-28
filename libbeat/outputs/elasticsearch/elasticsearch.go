@@ -53,6 +53,12 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
+	policy, err := newNonIndexablePolicy(config.NonIndexablePolicy)
+	if err != nil {
+		log.Errorf("error while creating file identifier: %v", err)
+		return outputs.Fail(err)
+	}
+
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
 		return outputs.Fail(err)
@@ -67,10 +73,10 @@ func makeES(
 		params = nil
 	}
 
-	if config.NonIndexablePolicy.Action == "death_letter_index" {
-		index = DeathLetterSelector{
-			Selector:         index,
-			DeathLetterIndex: config.NonIndexablePolicy.Index,
+	if policy.action() == dead_letter_index {
+		index = DeadLetterSelector{
+			Selector:        index,
+			DeadLetterIndex: policy.index(),
 		}
 	}
 
@@ -100,7 +106,7 @@ func makeES(
 			Index:              index,
 			Pipeline:           pipeline,
 			Observer:           observer,
-			NonIndexableAction: config.NonIndexablePolicy.Action,
+			NonIndexableAction: policy.action(),
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

@@ -95,10 +95,10 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
 }
 
-func TestCollectPublishFailDeathLetterQueue(t *testing.T) {
+func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 	client, err := NewClient(
 		ClientSettings{
-			NonIndexableAction: "death_letter_index",
+			NonIndexableAction: "dead_letter_index",
 		},
 		nil,
 	)
@@ -144,7 +144,7 @@ func TestCollectPublishFailDeathLetterQueue(t *testing.T) {
 					"error.message": "{\n\t\t\t\"root_cause\" : [\n\t\t\t  {\n\t\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\"\n\t\t\t  }\n\t\t\t],\n\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\",\n\t\t\t\"caused_by\" : {\n\t\t\t  \"type\" : \"illegal_argument_exception\",\n\t\t\t  \"reason\" : \"For input string: \\\"bar1\\\"\"\n\t\t\t}\n\t\t  }",
 				},
 				Meta: common.MapStr{
-					"deathlettered": true,
+					dead_letter_marker_field: true,
 				},
 			},
 		}

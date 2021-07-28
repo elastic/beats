@@ -388,19 +388,19 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				stats.tooMany++
 			} else {
 				// hard failure, apply policy action
-				result, _ := data[i].Content.Meta.HasKey("deathlettered")
+				result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
 				if result {
 					stats.nonIndexable++
-					client.log.Errorf("Can't deliver to death letter index event %#v (status=%v): %s", data[i], status, msg)
+					client.log.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
-				} else if client.NonIndexableAction == "death_letter_index" {
-					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying death letter index", data[i], status, msg)
+				} else if client.NonIndexableAction == dead_letter_index {
+					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
 						data[i].Content.Meta = common.MapStr{
-							"deathlettered": true,
+							dead_letter_marker_field: true,
 						}
 					} else {
-						data[i].Content.Meta.Put("deathlettered", true)
+						data[i].Content.Meta.Put(dead_letter_marker_field, true)
 					}
 					data[i].Content.Fields = common.MapStr{
 						"message":       data[i].Content.Fields.String(),
