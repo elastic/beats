@@ -89,14 +89,23 @@ func (p *dynamicProvider) watchResource(
 	// when cluster scope is enforced.
 	p.logger.Infof("Kubernetes provider started for resource %s with %s scope", resourceType, p.config.Scope)
 	if p.config.Scope == "node" {
+
 		p.logger.Debugf(
 			"Initializing Kubernetes watcher for resource %s using node: %v",
 			resourceType,
 			config.Node)
-		config.Node = kubernetes.DiscoverKubernetesNode(
-			p.logger, config.Node,
-			kubernetes.IsInCluster(config.KubeConfig),
-			client)
+		nd := &kubernetes.DiscoverKubernetesNodeParams{
+			ConfigHost:  config.Node,
+			Client:      client,
+			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
+		}
+		config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
+		if err != nil {
+			p.logger.Debugf("Kubernetes provider skipped, unable to discover node: %w", err)
+			return nil
+		}
+
 	} else {
 		config.Node = ""
 	}
