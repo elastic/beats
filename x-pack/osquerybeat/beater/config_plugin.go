@@ -208,9 +208,6 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 		if len(path) == 1 {
 			return fmt.Errorf("unexpected top level key '%s': %w", keyValue, ErrECSMappingIsInvalid)
 		}
-		if len(path) == 1 {
-			return ErrECSMappingIsInvalid
-		}
 		ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
 			Value: v,
 		}
