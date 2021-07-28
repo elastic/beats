@@ -512,6 +512,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 - Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
+- Allow metric prefix override per service in gcp module. {pull}26960[26960]
 
 *Packetbeat*
 
