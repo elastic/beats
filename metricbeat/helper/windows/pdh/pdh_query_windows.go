@@ -225,14 +225,7 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return UTF16ToStringArray(expdPaths), nil
 	} else {
 		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
-			// rarely the PdhExpandWildCardPathW will not retrieve the expanded buffer size initially so the next call will encounter the PDH_MORE_DATA error since the specified size on the input is still less than
-			// the required size. If this is the case we will fallback on the PdhExpandCounterPathW api since it looks to act in a more stable manner. The PdhExpandCounterPathW api does come with some limitations but will
-			// satisfy most cases and return valid paths.
-			if err == PDH_MORE_DATA {
-				expdPaths, err = PdhExpandWildCardPath(utfPath)
-			} else {
-				return nil, err
-			}
+			return nil, err
 		}
 		paths := UTF16ToStringArray(expdPaths)
 		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval

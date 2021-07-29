@@ -206,7 +206,7 @@ func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 		expandPaths := make([]uint16, bufferSize)
-		if err := _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
+		if err = _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 		return expandPaths, err
