@@ -52,7 +52,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	awsCfg, err := awscommon.GetAWSCredentials(
+	awsCfg, err := awscommon.InitializeAWSConfig(
 		awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
