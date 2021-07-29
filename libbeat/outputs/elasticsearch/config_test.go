@@ -18,9 +18,11 @@
 package elasticsearch
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 func TestValidDropPolicyConfig(t *testing.T) {

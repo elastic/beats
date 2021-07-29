@@ -19,8 +19,9 @@ package elasticsearch
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
