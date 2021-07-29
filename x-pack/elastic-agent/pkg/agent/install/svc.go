@@ -38,12 +38,12 @@ func newService() (service.Service, error) {
 		WorkingDirectory: paths.InstallPath,
 		Option: map[string]interface{}{
 			// Linux (systemd) always restart on failure
-			"Restart":   "always",
+			"Restart": "always",
 
 			// Windows setup restart on failure
-			"OnFailure": "restart",
+			"OnFailure":              "restart",
 			"OnFailureDelayDuration": "1s",
-			"OnFailureResetPeriod": 10,
+			"OnFailureResetPeriod":   10,
 		},
 	})
 }
