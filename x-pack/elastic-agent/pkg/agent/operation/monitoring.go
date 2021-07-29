@@ -220,6 +220,11 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 	inputs := []interface{}{
 		map[string]interface{}{
 			"type": "filestream",
+			"close": map[string]interface{}{
+				"on_state_change": map[string]interface{}{
+					"inactive": "5m",
+				},
+			},
 			"parsers": []map[string]interface{}{
 				{
 					"ndjson": map[string]interface{}{
@@ -288,6 +293,11 @@ func (o *Operator) getMonitoringFilebeatConfig(outputType string, output interfa
 		for name, paths := range logPaths {
 			inputs = append(inputs, map[string]interface{}{
 				"type": "filestream",
+				"close": map[string]interface{}{
+					"on_state_change": map[string]interface{}{
+						"inactive": "5m",
+					},
+				},
 				"parsers": []map[string]interface{}{
 					{
 						"ndjson": map[string]interface{}{
