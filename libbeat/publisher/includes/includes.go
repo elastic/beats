@@ -28,5 +28,4 @@ import (
 	_ "github.com/elastic/beats/libbeat/outputs/logstash"
 	_ "github.com/elastic/beats/libbeat/outputs/redis"
 	_ "github.com/elastic/beats/libbeat/publisher/queue/memqueue"
-	_ "github.com/elastic/beats/libbeat/publisher/queue/spool"
 )
