@@ -92,14 +92,12 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 	askEnroll := true
 	url, _ := cmd.Flags().GetString("url")
 	token, _ := cmd.Flags().GetString("enrollment-token")
+	delayEnroll, _ := cmd.Flags().GetBool("delay-enroll")
 	if url != "" && token != "" {
 		askEnroll = false
 	}
 	fleetServer, _ := cmd.Flags().GetString("fleet-server-es")
-	if fleetServer != "" {
-		askEnroll = false
-	}
-	if force {
+	if fleetServer != "" || force || delayEnroll {
 		askEnroll = false
 	}
 	if askEnroll {
@@ -151,17 +149,19 @@ func installCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error
 		}
 	}()
 
-	err = install.StartService()
-	if err != nil {
-		fmt.Fprintf(streams.Out, "Installation failed to start Elastic Agent service.\n")
-		return err
-	}
-
-	defer func() {
+	if !delayEnroll {
+		err = install.StartService()
 		if err != nil {
-			install.StopService()
+			fmt.Fprintf(streams.Out, "Installation failed to start Elastic Agent service.\n")
+			return err
 		}
-	}()
+
+		defer func() {
+			if err != nil {
+				install.StopService()
+			}
+		}()
+	}
 
 	if enroll {
 		enrollArgs := []string{"enroll", "--from-install"}
