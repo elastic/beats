@@ -13,11 +13,8 @@ import (
 	"path/filepath"
 	"syscall"
 
-	"gopkg.in/yaml.v2"
-
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
@@ -39,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	monitoringServer "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
