@@ -10,10 +10,6 @@ s3_bucket: {{ .s3_bucket }}
 s3_bucket_poll_interval: {{ .s3_bucket_poll_interval }}
 {{ end }}
 
-{{ if .s3_bucket_objects_expiration }}
-s3_bucket_objects_expiration: {{ .s3_bucket_objects_expiration }}
-{{ end }}
-
 file_selectors:
 {{ if .process_cloudtrail_logs }}
   - regex: '/CloudTrail/'

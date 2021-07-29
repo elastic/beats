@@ -26,8 +26,9 @@ import (
 )
 
 const (
-	inputName        = "aws-s3"
-	awsS3StatePrefix = "filebeat::aws-s3::"
+	inputName                = "aws-s3"
+	awsS3ObjectStatePrefix   = "filebeat::aws-s3::state::"
+	awsS3WriteCommitStateKey = "filebeat::aws-s3::writeCommit::"
 )
 
 func Plugin(store beater.StateStore) v2.Plugin {
@@ -130,7 +131,8 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 			interval = 5 * time.Minute
 		}
 
-		cleanStore(canceler, ctx.Logger, persistentStore, states, interval, in.config.S3BucketObjectExpiration)
+		interval = 1 * time.Minute
+		cleanStore(canceler, ctx.Logger, persistentStore, states, interval)
 		return nil
 	})
 
@@ -174,7 +176,6 @@ func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipelin
 
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config s3_bucket_poll_interval = ", in.config.S3BucketPollInterval)
-	log.Debug("s3 input config s3_bucket_objects_expiration = ", in.config.S3BucketObjectExpiration)
 	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
 
 	return &s3BucketCollector{

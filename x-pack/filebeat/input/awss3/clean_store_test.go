@@ -27,7 +27,7 @@ func TestGcFind(t *testing.T) {
 				state.MarkAsStored()
 				return state
 			},
-			false,
+			true,
 		},
 		{
 			"stateBeforeStartedNotStored",
@@ -44,7 +44,7 @@ func TestGcFind(t *testing.T) {
 				state.MarkAsStored()
 				return state
 			},
-			false,
+			true,
 		},
 		{
 			"stateAfterStartedNotStored",
@@ -62,7 +62,7 @@ func TestGcFind(t *testing.T) {
 				return state
 
 			},
-			false,
+			true,
 		},
 		{
 			"stateAfterTTLNotStored",
@@ -96,7 +96,7 @@ func TestGcFind(t *testing.T) {
 			states := NewStates()
 			state := testCase.stateFn()
 			states.Update(state)
-			keys := gcFind(states, started, now, 24*60*time.Second)
+			keys := gcFind(states, started, now)
 			expected := map[string]struct{}{}
 			if testCase.expected {
 				expected[state.Id] = struct{}{}

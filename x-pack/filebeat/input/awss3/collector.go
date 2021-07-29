@@ -141,6 +141,16 @@ func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 				continue
 			}
 
+			// status is forget. if there is no previous state and
+			// the state.LastModified is before the last cleanStore
+			// write commit we can remove
+			previousState := c.states.FindPrevious(state)
+			var commitWriteState commitWriteState
+			err := c.store.Get(awsS3WriteCommitStateKey, &commitWriteState)
+			if err == nil && previousState.IsEmpty() && state.LastModified.Before(commitWriteState.Time) {
+				continue
+			}
+
 			c.states.Update(state)
 
 			info := s3Info{

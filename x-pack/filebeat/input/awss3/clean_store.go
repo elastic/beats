@@ -14,22 +14,26 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
+type commitWriteState struct {
+	time.Time
+}
+
 // cleanStore runs periodically at interval checking for states to purge from the store
-func cleanStore(canceler unison.Canceler, logger *logp.Logger, store *statestore.Store, states *States, interval time.Duration, objectExpiration time.Duration) {
+func cleanStore(canceler unison.Canceler, logger *logp.Logger, store *statestore.Store, states *States, interval time.Duration) {
 	started := time.Now()
 	timed.Periodic(canceler, interval, func() error {
-		gcStore(logger, started, store, states, objectExpiration)
+		gcStore(logger, started, store, states)
 		return nil
 	})
 }
 
 // gcStore looks for states to remove and deletes these. `gcStore` receives
 // the start timestamp of the cleaner as reference.
-func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, states *States, objectExpiration time.Duration) {
+func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, states *States) {
 	logger.Debugf("Start store cleanup")
 	defer logger.Debugf("Done store cleanup")
 
-	keys := gcFind(states, started, time.Now(), objectExpiration)
+	keys := gcFind(states, started, time.Now())
 	if len(keys) == 0 {
 		logger.Debugf("No entries to remove were found")
 		return
@@ -38,13 +42,17 @@ func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, st
 	if err := gcClean(store, states, keys); err != nil {
 		logger.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
+
+	if err := store.Set(awsS3WriteCommitStateKey, commitWriteState{time.Now()}); err != nil {
+		logger.Errorf("Failed to write commit time to the registry: %+v", err)
+	}
 }
 
 // gcFind searches the store of states that can be removed. A set of keys to delete is returned.
-// if the state is marked as stored it will be purged only if state.LastModified plus objectExpiration
-// is in the past. It the state is not marked as stored it will be purged if state.LastModified or
-// the time of when the cleaner started (whichever is the latest) is in the past.
-func gcFind(states *States, started, now time.Time, objectExpiration time.Duration) map[string]struct{} {
+// if the state is marked as stored it will be purged. If the state is not marked as stored
+// it will be purged if state.LastModified or the time of when the cleaner started
+// (whichever is the latest) is in the past.
+func gcFind(states *States, started, now time.Time) map[string]struct{} {
 	keys := map[string]struct{}{}
 	for _, state := range states.GetStates() {
 		reference := state.LastModified
@@ -57,12 +65,8 @@ func gcFind(states *States, started, now time.Time, objectExpiration time.Durati
 			continue
 		}
 
-		// objectExpiration is 0, skip collecting for state.Stored
-		if reference.Add(objectExpiration).Equal(reference) {
-			continue
-		}
-
-		if reference.Add(objectExpiration).Before(now) && state.Stored {
+		// it is stored, forget
+		if state.Stored {
 			keys[state.Id] = struct{}{}
 		}
 	}
@@ -75,7 +79,7 @@ func gcFind(states *States, started, now time.Time, objectExpiration time.Durati
 // eventually cleaned up later.
 func gcClean(store *statestore.Store, states *States, removeSet map[string]struct{}) error {
 	for key := range removeSet {
-		if err := store.Remove(awsS3StatePrefix + key); err != nil {
+		if err := store.Remove(awsS3ObjectStatePrefix + key); err != nil {
 			return err
 		}
 

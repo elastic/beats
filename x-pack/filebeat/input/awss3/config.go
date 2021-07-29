@@ -18,17 +18,16 @@ import (
 )
 
 type config struct {
-	APITimeout               time.Duration        `config:"api_timeout"`
-	VisibilityTimeout        time.Duration        `config:"visibility_timeout"`
-	FIPSEnabled              bool                 `config:"fips_enabled"`
-	MaxNumberOfMessages      int                  `config:"max_number_of_messages"`
-	QueueURL                 string               `config:"queue_url"`
-	S3Bucket                 string               `config:"s3_bucket"`
-	S3BucketPollInterval     time.Duration        `config:"s3_bucket_poll_interval"`
-	S3BucketObjectExpiration time.Duration        `config:"s3_bucket_objects_expiration"`
-	AWSConfig                awscommon.ConfigAWS  `config:",inline"`
-	FileSelectors            []fileSelectorConfig `config:"file_selectors"`
-	ReaderConfig             readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
+	APITimeout           time.Duration        `config:"api_timeout"`
+	VisibilityTimeout    time.Duration        `config:"visibility_timeout"`
+	FIPSEnabled          bool                 `config:"fips_enabled"`
+	MaxNumberOfMessages  int                  `config:"max_number_of_messages"`
+	QueueURL             string               `config:"queue_url"`
+	S3Bucket             string               `config:"s3_bucket"`
+	S3BucketPollInterval time.Duration        `config:"s3_bucket_poll_interval"`
+	AWSConfig            awscommon.ConfigAWS  `config:",inline"`
+	FileSelectors        []fileSelectorConfig `config:"file_selectors"`
+	ReaderConfig         readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
 }
 
 func defaultConfig() config {

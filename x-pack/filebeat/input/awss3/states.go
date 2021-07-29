@@ -161,7 +161,7 @@ func (s *States) readStatesFrom(store *statestore.Store) error {
 	var states []State
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(key, awsS3StatePrefix) {
+		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
 		}
 
@@ -174,7 +174,7 @@ func (s *States) readStatesFrom(store *statestore.Store) error {
 			return true, nil
 		}
 
-		st.Id = key[len(awsS3StatePrefix):]
+		st.Id = key[len(awsS3ObjectStatePrefix):]
 		states = append(states, st)
 		return true, nil
 	})
@@ -238,7 +238,7 @@ func mergeStates(st, other *State) {
 
 func (s *States) writeStates(store *statestore.Store) error {
 	for _, state := range s.GetStates() {
-		key := awsS3StatePrefix + state.Id
+		key := awsS3ObjectStatePrefix + state.Id
 		if err := store.Set(key, state); err != nil {
 			return err
 		}
