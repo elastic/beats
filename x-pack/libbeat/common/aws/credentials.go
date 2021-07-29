@@ -121,7 +121,7 @@ func getWebIdentityProvider(config ConfigAWS) (awssdk.Config, error) {
 
 	// Assume IAM role if iam_role config parameter is given
 	if config.RoleArn != "" {
-		logger.Debug("Using role arn and shared credential profile for AWS credential")
+		logger.Debug("Using role arn and web identity role provider for AWS credential")
 		return getRoleArn(config, awsConfig), nil
 	}
 
