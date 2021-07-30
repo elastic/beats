@@ -31,15 +31,6 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
 - Recover service.address field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
