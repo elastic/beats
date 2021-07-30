@@ -33,6 +33,7 @@ data:
                     - state_replicaset
                     - state_pod
                     - state_container
+                    - state_job
                     - state_cronjob
                     - state_resourcequota
                     - state_statefulset
@@ -287,6 +288,10 @@ rules:
   - statefulsets
   - deployments
   - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
   verbs: ["get", "list", "watch"]
 - apiGroups:
   - ""

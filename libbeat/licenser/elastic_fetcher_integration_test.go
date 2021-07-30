@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common/cli"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 )
 
@@ -35,13 +36,16 @@ const (
 )
 
 func getTestClient() *eslegclient.Connection {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 60 * time.Second
+
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
 		Username:         "myelastic", // NOTE: I will refactor this in a followup PR
 		Password:         "changeme",
 		CompressionLevel: 3,
-		Timeout:          60 * time.Second,
+		Transport:        transport,
 	})
 
 	if err != nil {

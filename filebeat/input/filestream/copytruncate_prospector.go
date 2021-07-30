@@ -240,68 +240,8 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 			}
 
 			src := p.identifier.GetSource(fe)
-			log = loggerWithEvent(log, fe, src)
+			p.onFSEvent(loggerWithEvent(log, fe, src), ctx, fe, src, s, hg, ignoreInactiveSince)
 
-			switch fe.Op {
-			case loginp.OpCreate, loginp.OpWrite:
-				if fe.Op == loginp.OpCreate {
-					log.Debugf("A new file %s has been found", fe.NewPath)
-
-				} else if fe.Op == loginp.OpWrite {
-					log.Debugf("File %s has been updated", fe.NewPath)
-				}
-
-				if p.fileProspector.isFileIgnored(log, fe, ignoreInactiveSince) {
-					continue
-				}
-
-				if fe.Op == loginp.OpCreate {
-					err := s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: p.identifier.Name()})
-					if err != nil {
-						log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
-					}
-				}
-
-				// check if the event belongs to a rotated file
-				if p.isRotated(fe) {
-					log.Debugf("File %s is rotated", fe.NewPath)
-
-					p.onRotatedFile(log, ctx, fe, src, hg)
-
-				} else {
-					log.Debugf("File %s is original", fe.NewPath)
-					// if file is original, add it to the bookeeper
-					p.rotatedFiles.addOriginalFile(fe.NewPath, src)
-
-					hg.Start(ctx, src)
-				}
-
-			case loginp.OpTruncate:
-				log.Debugf("File %s has been truncated", fe.NewPath)
-
-				s.ResetCursor(src, state{Offset: 0})
-				hg.Restart(ctx, src)
-
-			case loginp.OpDelete:
-				log.Debugf("File %s has been removed", fe.OldPath)
-
-				p.fileProspector.onRemove(log, fe, src, s, hg)
-
-			case loginp.OpRename:
-				log.Debugf("File %s has been renamed to %s", fe.OldPath, fe.NewPath)
-
-				// check if the event belongs to a rotated file
-				if p.isRotated(fe) {
-					log.Debugf("File %s is rotated", fe.NewPath)
-
-					p.onRotatedFile(log, ctx, fe, src, hg)
-				}
-
-				p.fileProspector.onRename(log, ctx, fe, src, s, hg)
-
-			default:
-				log.Error("Unkown return value %v", fe.Op)
-			}
 		}
 		return nil
 	})
@@ -312,6 +252,77 @@ func (p *copyTruncateFileProspector) Run(ctx input.Context, s loginp.StateMetada
 	}
 }
 
+func (p *copyTruncateFileProspector) onFSEvent(
+	log *logp.Logger,
+	ctx input.Context,
+	event loginp.FSEvent,
+	src loginp.Source,
+	updater loginp.StateMetadataUpdater,
+	group loginp.HarvesterGroup,
+	ignoreSince time.Time,
+) {
+
+	switch event.Op {
+	case loginp.OpCreate, loginp.OpWrite:
+		if event.Op == loginp.OpCreate {
+			log.Debugf("A new file %s has been found", event.NewPath)
+
+		} else if event.Op == loginp.OpWrite {
+			log.Debugf("File %s has been updated", event.NewPath)
+		}
+
+		if p.fileProspector.isFileIgnored(log, event, ignoreSince) {
+			return
+		}
+
+		if event.Op == loginp.OpCreate {
+			err := updater.UpdateMetadata(src, fileMeta{Source: event.NewPath, IdentifierName: p.identifier.Name()})
+			if err != nil {
+				log.Errorf("Failed to set cursor meta data of entry %s: %v", src.Name(), err)
+			}
+		}
+
+		// check if the event belongs to a rotated file
+		if p.isRotated(event) {
+			log.Debugf("File %s is rotated", event.NewPath)
+
+			p.onRotatedFile(log, ctx, event, src, group)
+
+		} else {
+			log.Debugf("File %s is original", event.NewPath)
+			// if file is original, add it to the bookeeper
+			p.rotatedFiles.addOriginalFile(event.NewPath, src)
+
+			group.Start(ctx, src)
+		}
+
+	case loginp.OpTruncate:
+		log.Debugf("File %s has been truncated", event.NewPath)
+
+		updater.ResetCursor(src, state{Offset: 0})
+		group.Restart(ctx, src)
+
+	case loginp.OpDelete:
+		log.Debugf("File %s has been removed", event.OldPath)
+
+		p.fileProspector.onRemove(log, event, src, updater, group)
+
+	case loginp.OpRename:
+		log.Debugf("File %s has been renamed to %s", event.OldPath, event.NewPath)
+
+		// check if the event belongs to a rotated file
+		if p.isRotated(event) {
+			log.Debugf("File %s is rotated", event.NewPath)
+
+			p.onRotatedFile(log, ctx, event, src, group)
+		}
+
+		p.fileProspector.onRename(log, ctx, event, src, updater, group)
+
+	default:
+		log.Error("Unkown return value %v", event.Op)
+	}
+}
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
 	if p.rotatedSuffix.MatchString(event.NewPath) {
 		return true

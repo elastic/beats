@@ -16,6 +16,7 @@ var:
   - name: tags
     default: [forwarded]
   - name: fips_enabled
+  - name: proxy_url
   - name: max_number_of_messages
 
 ingest_pipeline: ingest/pipeline.yml

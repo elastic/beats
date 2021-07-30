@@ -8,21 +8,34 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
 )
 
-func buildConfigFilePath(dataPath string) string {
-	return filepath.Join(dataPath, "osquery.conf")
-}
-
-func renderFullConfig(schedule map[string]osqueryConfigInfo) (map[string]string, error) {
-	raw, err := newOsqueryConfig(schedule).render()
+func renderFullConfig(inputs []config.InputConfig) (map[string]string, error) {
+	packs := make(map[string]pack)
+	for _, input := range inputs {
+		pack := pack{
+			Queries: make(map[string]query),
+		}
+		for _, stream := range input.Streams {
+			query := query{
+				Query:    stream.Query,
+				Interval: stream.Interval,
+				Platform: stream.Platform,
+				Version:  stream.Version,
+				Snapshot: true, // enforce snapshot for all queries
+			}
+			pack.Queries[stream.ID] = query
+		}
+		packs[input.Name] = pack
+	}
+	raw, err := newOsqueryConfig(packs).render()
 	if err != nil {
 		return nil, err
 	}
@@ -62,94 +75,46 @@ func TestConfigPluginNew(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			if tc.shouldPanic {
-				testutil.AssertPanic(t, func() { NewConfigPlugin(tc.log, tc.dataPath) })
+				testutil.AssertPanic(t, func() { NewConfigPlugin(tc.log) })
 				return
 			}
 
-			p := NewConfigPlugin(tc.log, tc.dataPath)
-
-			diff := cmp.Diff(tc.dataPath, p.dataPath)
-			if diff != "" {
-				t.Error(diff)
-			}
-			diff = cmp.Diff(buildConfigFilePath(tc.dataPath), p.getConfigFilePath())
-			if diff != "" {
-				t.Error(diff)
+			p := NewConfigPlugin(tc.log)
+			if p == nil {
+				t.Fatal("nil config plugin")
 			}
 		})
 	}
 }
 
-func TestConfigPluginNoConfigFile(t *testing.T) {
-	validLogger := logp.NewLogger("config_test")
-
-	tempDirPath, err := ioutil.TempDir("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		os.RemoveAll(tempDirPath)
-	}()
-
-	p := NewConfigPlugin(validLogger, tempDirPath)
-	diff := cmp.Diff(buildConfigFilePath(tempDirPath), p.getConfigFilePath())
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	diff = cmp.Diff(0, p.Count())
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	generatedConfig, err := p.GenerateConfig(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Expecting empty config with non-existent file
-	expectedConfig, err := renderFullConfig(nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	diff = cmp.Diff(expectedConfig, generatedConfig)
-	if diff != "" {
-		t.Error(diff)
-	}
-}
-
-var testQueries = []QueryConfig{
+var testInputConfigs = []config.InputConfig{
 	{
-		Name:     "users",
-		Query:    "select * from users",
-		Interval: 60,
+		Name: "osquery_manager-1",
+		Type: "osquery",
+		Streams: []config.StreamConfig{
+			{
+				ID:       "users",
+				Query:    "select * from users",
+				Interval: 60,
+			},
+		},
 	},
 	{
-		Name:     "uptime",
-		Query:    "select * from uptime",
-		Interval: 30,
+		Name: "osquery_manager-2",
+		Type: "osquery",
+		Streams: []config.StreamConfig{
+			{
+				ID:       "uptime",
+				Query:    "select * from uptime",
+				Interval: 30,
+			},
+			{
+				ID:       "processes",
+				Query:    "select * from processes",
+				Interval: 45,
+			},
+		},
 	},
-	{
-		Name:     "processes",
-		Query:    "select * from processes",
-		Interval: 45,
-	},
-}
-
-func convertQueriesToSchedule(queryConfigs []QueryConfig) map[string]osqueryConfigInfo {
-	schedule := make(map[string]osqueryConfigInfo)
-
-	for _, qc := range queryConfigs {
-		schedule[qc.Name] = osqueryConfigInfo{
-			Query:    qc.Query,
-			Interval: qc.Interval,
-			Platform: qc.Platform,
-			Version:  qc.Version,
-			Snapshot: true, // enforce snapshot for all queries
-		}
-	}
-	return schedule
 }
 
 func TestConfigPluginWithConfig(t *testing.T) {
@@ -162,13 +127,9 @@ func TestConfigPluginWithConfig(t *testing.T) {
 		os.RemoveAll(tempDirPath)
 	}()
 
-	p := NewConfigPlugin(validLogger, tempDirPath)
-	diff := cmp.Diff(buildConfigFilePath(tempDirPath), p.getConfigFilePath())
-	if diff != "" {
-		t.Error(diff)
-	}
+	p := NewConfigPlugin(validLogger)
 
-	p.Set(testQueries)
+	p.Set(testInputConfigs)
 
 	generatedConfig, err := p.GenerateConfig(context.Background())
 	if err != nil {
@@ -176,22 +137,11 @@ func TestConfigPluginWithConfig(t *testing.T) {
 	}
 
 	// Test the expected configuration
-	expectedConfig, err := renderFullConfig(convertQueriesToSchedule(testQueries))
+	expectedConfig, err := renderFullConfig(testInputConfigs)
 	if err != nil {
 		t.Fatal(err)
 	}
-	diff = cmp.Diff(expectedConfig, generatedConfig)
-	if diff != "" {
-		t.Error(diff)
-	}
-
-	// Create a new configuration plugin, test the configuration read from the file is correct
-	p2 := NewConfigPlugin(validLogger, tempDirPath)
-	generatedConfig2, err := p2.GenerateConfig(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	diff = cmp.Diff(generatedConfig, generatedConfig2)
+	diff := cmp.Diff(expectedConfig, generatedConfig)
 	if diff != "" {
 		t.Error(diff)
 	}
