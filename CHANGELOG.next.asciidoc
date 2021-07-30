@@ -619,6 +619,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
 - `add_process_metadata` processor enrich process information with owner name and id. {issue}21068[21068] {pull}21111[21111]
 - Add proxy support for AWS functions. {pull}26832[26832]
+- Add sha256 digests to RPM packages. {issue}23670[23670]
 
 *Auditbeat*
 
