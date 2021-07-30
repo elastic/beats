@@ -9,7 +9,6 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/elastic/go-concert/chorus"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/ctxtool/osctx"
 	"github.com/elastic/go-concert/unison"
@@ -245,7 +244,7 @@ func (app *app) Run(sigContext context.Context) error {
 	// essential subsystem fails.
 	appTaskGroup := unison.TaskGroup{StopOnError: func(err error) bool {
 		// XXX: the check can be removed after updating go-concert to 0.0.4
-		if err == context.Canceled || err == chorus.ErrClosed {
+		if err == context.Canceled {
 			return false
 		}
 

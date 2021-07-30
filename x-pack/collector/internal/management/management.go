@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/collector/internal/status"
-	xmanagement "github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -52,8 +51,7 @@ type EventHandler struct {
 
 // Settings used to configure the ConfigManager.
 type Settings struct {
-	Enabled bool   `config:"enabled" yaml:"enabled"`
-	Mode    string `config:"mode" yaml:"mode"`
+	Enabled bool `config:"enabled" yaml:"enabled"`
 }
 
 type agentRPCListener struct {
@@ -84,7 +82,7 @@ type agentDialConfig struct {
 }
 
 func (settings Settings) IsManaged() bool {
-	return settings.Enabled && settings.Mode == xmanagement.ModeFleet
+	return settings.Enabled
 }
 
 func NewConfigManager(log *logp.Logger, settings Settings) (*ConfigManager, error) {
@@ -275,7 +273,5 @@ func encodeStatus(st status.State) (code proto.StateObserved_Status, msg string,
 }
 
 func defaultAgentConfigManagerSettings() Settings {
-	return Settings{
-		Mode: xmanagement.ModeCentralManagement,
-	}
+	return Settings{}
 }

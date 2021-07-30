@@ -8,7 +8,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/collector/internal/adapter/registries"
 
 	_ "github.com/elastic/beats/v7/heartbeat/include"
-	_ "github.com/elastic/beats/v7/heartbeat/monitors/defaults"
+
+	// Import packages that need to register themselves.
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 )
 
 func makeHeartbeatRegistry(info beat.Info, sched *scheduler.Scheduler) v2.Registry {

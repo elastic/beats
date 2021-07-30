@@ -88,9 +88,7 @@ func (m *metricsetInput) runTask(ctx v2.Context, ms mb.MetricSet, pipeline beat.
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(ctxtool.FromCanceller(ctx.Cancelation), reporter.V2())
-	case mb.EventFetcher, mb.EventsFetcher,
-		mb.ReportingMetricSet, mb.ReportingMetricSetV2,
-		mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
 		{
 			reporter.eventTransformer.periodic = true
 			stopCtx := ctxtool.FromCanceller(ctx.Cancelation)
@@ -111,18 +109,6 @@ func (m *metricsetInput) runTask(ctx v2.Context, ms mb.MetricSet, pipeline beat.
 
 func (m *metricsetInput) fetchAndReport(ctx context.Context, ms mb.MetricSet, reporter reporter) {
 	switch fetcher := ms.(type) {
-	case mb.EventFetcher:
-		event, err := fetcher.Fetch()
-		reporter.V1().ErrorWith(err, event)
-	case mb.EventsFetcher:
-		events, err := fetcher.Fetch()
-		if len(events) == 0 {
-			reporter.V1().ErrorWith(err, nil)
-		} else {
-			for _, event := range events {
-				reporter.V1().ErrorWith(err, event)
-			}
-		}
 	case mb.ReportingMetricSet:
 		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
