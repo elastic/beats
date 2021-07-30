@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// Reporting V2 MetricSet
+
 type testModule struct {
 	BaseModule
 	hostParser func(string) (HostData, error)
@@ -39,25 +41,11 @@ func (m testModule) ParseHost(host string) (HostData, error) {
 	return m.hostParser(host)
 }
 
-// EventFetcher
-
 type testMetricSet struct {
 	BaseMetricSet
 }
 
-func (m *testMetricSet) Fetch() (common.MapStr, error) {
-	return nil, nil
-}
-
-// EventsFetcher
-
-type testMetricSetEventsFetcher struct {
-	BaseMetricSet
-}
-
-func (m *testMetricSetEventsFetcher) Fetch() ([]common.MapStr, error) {
-	return nil, nil
-}
+func (m *testMetricSet) Fetch(reporter ReporterV2) {}
 
 // ReportingFetcher
 
@@ -259,7 +247,7 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 		return &testMetricSet{base}, nil
 	}
 
-	name := "EventFetcher"
+	name := "ReportingMetricSetV2"
 	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
 		t.Fatal(err)
 	}
@@ -269,25 +257,7 @@ func TestNewModulesMetricSetTypes(t *testing.T) {
 			"module":     moduleName,
 			"metricsets": []string{name},
 		})
-		_, ok := ms.(EventFetcher)
-		assert.True(t, ok, name+" not implemented")
-	})
-
-	factory = func(base BaseMetricSet) (MetricSet, error) {
-		return &testMetricSetEventsFetcher{base}, nil
-	}
-
-	name = "EventsFetcher"
-	if err := r.AddMetricSet(moduleName, name, factory); err != nil {
-		t.Fatal(err)
-	}
-
-	t.Run(name+" MetricSet", func(t *testing.T) {
-		ms := newTestMetricSet(t, r, map[string]interface{}{
-			"module":     moduleName,
-			"metricsets": []string{name},
-		})
-		_, ok := ms.(EventsFetcher)
+		_, ok := ms.(ReportingMetricSetV2)
 		assert.True(t, ok, name+" not implemented")
 	})
 

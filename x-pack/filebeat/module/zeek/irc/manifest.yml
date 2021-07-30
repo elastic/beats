@@ -10,8 +10,8 @@ var:
       - /usr/local/var/logs/current/irc.log
   - name: tags
     default: [zeek.irc]
-  - name: community_id
-    default: true
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/irc.yml

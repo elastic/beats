@@ -1,7 +1,13 @@
 - module: haproxy
   metricsets: ["info", "stat"]
   period: 10s
+  # TCP socket, UNIX socket, or HTTP address where HAProxy stats are reported
+  # TCP socket
   hosts: ["tcp://127.0.0.1:14567"]
+  # UNIX socket
+  #hosts: ["unix:///path/to/haproxy.sock"]
+  # Stats page
+  #hosts: ["http://127.0.0.1:14567"]
   username : "admin"
   password : "admin"
   enabled: true

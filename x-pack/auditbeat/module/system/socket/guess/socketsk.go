@@ -29,7 +29,7 @@ import (
 //  "SOCKET_SOCK": 32
 
 func init() {
-	if err := Registry.AddGuess(&guessSocketSock{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessSocketSock{} }); err != nil {
 		panic(err)
 	}
 }

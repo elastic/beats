@@ -10,8 +10,8 @@ var:
       - /usr/local/var/logs/current/rdp.log
   - name: tags
     default: [zeek.rdp]
-  - name: community_id
-    default: true
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/rdp.yml

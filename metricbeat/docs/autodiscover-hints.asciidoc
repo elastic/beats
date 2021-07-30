@@ -57,6 +57,18 @@ can make use of Kuberentes Secrets as described in <<kubernetes-secrets>>.
 SSL parameters, as seen in <<configuration-ssl>>.
 
 [float]
+===== `co.elastic.metrics/metrics_filters.*`
+
+Metrics filters (for prometheus module only).
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+co.elastic.metrics/module: prometheus
+co.elastic.metrics/metrics_filters.include: node_filesystem_*
+co.elastic.metrics/metrics_filters.exclude: node_filesystem_device_foo,node_filesystem_device_bar
+-------------------------------------------------------------------------------------
+
+[float]
 ===== `co.elastic.metrics/raw`
 When an entire module configuration needs to be completely set the `raw` hint can be used. You can provide a
 stringified JSON of the input configuration. `raw` overrides every other hint and can be used to create both a single or
@@ -152,7 +164,7 @@ The above configuration would spin up two metricbeat module configurations to en
 polled every 60s whereas the "/metrics" endpoint is polled every 60s.
 
 [float]
-===== Configuring Namespace Defaults
+=====  Namespace Defaults
 
 Hints can be configured on the Namespace's annotations as defaults to use when Pod level annotations are missing.
 The resultant hints are a combination of Pod annotations and Namespace annotations with the Pod's taking precedence. To
@@ -166,7 +178,7 @@ metricbeat.autodiscover:
       hints.enabled: true
       add_resource_metadata:
         namespace:
-          enabled: true
+          include_annotations: ["nsannotation1"]
 -------------------------------------------------------------------------------------
 
 

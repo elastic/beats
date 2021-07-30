@@ -48,7 +48,7 @@ func getMetricsetFactory(prometheusMappings *prometheus.MetricsMapping) mb.Metri
 	}
 }
 
-// Fetch as expected by `mb.EventFetcher`
+// Fetch gathers information from the apiserver and reports events with this information.
 func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	events, err := m.prometheusClient.GetProcessedMetrics(m.prometheusMappings)
 	if err != nil {

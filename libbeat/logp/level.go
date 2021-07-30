@@ -101,7 +101,8 @@ func (l Level) MarshalJSON() ([]byte, error) {
 	return nil, errors.Errorf("invalid level '%d'", l)
 }
 
-func (l Level) zapLevel() zapcore.Level {
+// ZapLevel returns zap alternative to logp.Level.
+func (l Level) ZapLevel() zapcore.Level {
 	z, found := zapLevels[l]
 	if found {
 		return z

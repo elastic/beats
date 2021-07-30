@@ -1,0 +1,40 @@
+[
+    {
+        "@timestamp": "2021-03-09T10:17:54.000Z",
+        "cyberarkpas.audit.action": "Monitor License Expiration Date start",
+        "cyberarkpas.audit.desc": "Monitor License Expiration Date start",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-09T10:17:54Z",
+        "cyberarkpas.audit.issuer": "Batch",
+        "cyberarkpas.audit.message": "Monitor License Expiration Date start",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "0.0.0.0",
+        "cyberarkpas.audit.timestamp": "Mar 09 02:17:54",
+        "event.action": "monitor license expiration date start",
+        "event.code": "355",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

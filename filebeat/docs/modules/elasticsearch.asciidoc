@@ -8,8 +8,6 @@ This file is generated! See scripts/docs_collector.py
 
 == Elasticsearch module
 
-beta[]
-
 This is the elasticsearch module.
 
 include::../include/what-happens.asciidoc[]

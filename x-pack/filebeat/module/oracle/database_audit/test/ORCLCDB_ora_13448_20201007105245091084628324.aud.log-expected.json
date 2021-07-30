@@ -1,0 +1,32 @@
+[
+    {
+        "@timestamp": "2020-10-07T14:52:45.000Z",
+        "client.user.name": "oracle",
+        "event.action": "database_audit",
+        "event.category": "database",
+        "event.dataset": "oracle.database_audit",
+        "event.kind": "event",
+        "event.module": "oracle",
+        "event.outcome": "success",
+        "event.timezone": "-04:00",
+        "event.type": "access",
+        "fileset.name": "database_audit",
+        "host.user.roles": "SYSDBA",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.offset": 562,
+        "oracle.database_audit.action": "CONNECT",
+        "oracle.database_audit.action_number": "100",
+        "oracle.database_audit.client.terminal": "pts/0",
+        "oracle.database_audit.length": 228,
+        "oracle.database_audit.status": "0",
+        "process.pid": "13448",
+        "server.user.name": "/",
+        "service.type": "oracle",
+        "tags": [
+            "oracle-database-audit"
+        ]
+    }
+]

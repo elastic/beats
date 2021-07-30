@@ -54,8 +54,8 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 	_ "github.com/elastic/beats/v7/libbeat/processors/decode_csv_fields"
 
-	// include all filebeat specific builders
-	_ "github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
+	// include all filebeat specific autodiscover features
+	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
 const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +

@@ -18,34 +18,41 @@ import (
 
 // NewDownloader creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewDownloader(config *artifact.Config) (download.Downloader, error) {
-	cfg, err := snapshotConfig(config)
+func NewDownloader(config *artifact.Config, versionOverride string) (download.Downloader, error) {
+	cfg, err := snapshotConfig(config, versionOverride)
 	if err != nil {
 		return nil, err
 	}
-	return http.NewDownloader(cfg), nil
+	return http.NewDownloader(cfg)
 }
 
-func snapshotConfig(config *artifact.Config) (*artifact.Config, error) {
-	snapshotURI, err := snapshotURI()
+func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.Config, error) {
+	snapshotURI, err := snapshotURI(versionOverride)
 	if err != nil {
 		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %v", err)
 	}
 
 	return &artifact.Config{
-		OperatingSystem: config.OperatingSystem,
-		Architecture:    config.Architecture,
-		SourceURI:       snapshotURI,
-		TargetDirectory: config.TargetDirectory,
-		Timeout:         config.Timeout,
-		PgpFile:         config.PgpFile,
-		InstallPath:     config.InstallPath,
-		DropPath:        config.DropPath,
+		OperatingSystem:       config.OperatingSystem,
+		Architecture:          config.Architecture,
+		SourceURI:             snapshotURI,
+		TargetDirectory:       config.TargetDirectory,
+		InstallPath:           config.InstallPath,
+		DropPath:              config.DropPath,
+		HTTPTransportSettings: config.HTTPTransportSettings,
 	}, nil
 }
 
-func snapshotURI() (string, error) {
-	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", release.Version())
+func snapshotURI(versionOverride string) (string, error) {
+	version := release.Version()
+	if versionOverride != "" {
+		if strings.HasSuffix(versionOverride, "-SNAPSHOT") {
+			versionOverride = strings.TrimSuffix(versionOverride, "-SNAPSHOT")
+		}
+		version = versionOverride
+	}
+
+	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", version)
 	resp, err := gohttp.Get(artifactsURI)
 	if err != nil {
 		return "", err

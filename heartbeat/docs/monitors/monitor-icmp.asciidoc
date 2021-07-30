@@ -35,5 +35,5 @@ A list of hosts to ping.
 [[monitor-icmp-wait]]
 ==== `wait`
 
-The duration to wait before emitting another ICMP Echo Request. The default is 1
+The duration to wait before emitting another ICMP Echo Request if no response is received. The default is 1
 second (1s).

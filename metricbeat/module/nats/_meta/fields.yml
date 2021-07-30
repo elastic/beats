@@ -3,6 +3,7 @@
   description: >
     nats Module
   release: ga
+  settings: ["ssl", "http"]
   fields:
     - name: nats
       type: group
@@ -15,5 +16,6 @@
             The server ID
         - name: server.time
           type: date
+          deprecated: 8.0.0
           description: >
             Server time of metric creation

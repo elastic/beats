@@ -6,13 +6,12 @@ package hooks
 
 import (
 	"context"
-	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 type embeddedUninstaller interface {
-	Uninstall(ctx context.Context, programName, version, installDir string) error
+	Uninstall(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 // Uninstaller that executes PreUninstallSteps
@@ -28,14 +27,9 @@ func NewUninstaller(i embeddedUninstaller) (*Uninstaller, error) {
 }
 
 // Uninstall performs the execution of the PreUninstallSteps
-func (i *Uninstaller) Uninstall(ctx context.Context, programName, version, installDir string) error {
-	// pre uninstall hooks
-	spec, ok := program.SupportedMap[strings.ToLower(programName)]
-	if !ok {
-		return nil
-	}
+func (i *Uninstaller) Uninstall(ctx context.Context, spec program.Spec, version, installDir string) error {
 	if spec.PreUninstallSteps != nil {
 		return spec.PreUninstallSteps.Execute(ctx, installDir)
 	}
-	return i.uninstaller.Uninstall(ctx, programName, version, installDir)
+	return i.uninstaller.Uninstall(ctx, spec, version, installDir)
 }

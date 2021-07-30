@@ -37,7 +37,7 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err)
 	event := reporter.GetEvents()[0]
 	d, _ := event.MetricSetFields.GetValue("total")
-	assert.Equal(t, d, int64(10))
+	assert.Equal(t, d, int64(2))
 }
 
 func TestFetchEventContent(t *testing.T) {

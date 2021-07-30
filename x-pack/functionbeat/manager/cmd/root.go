@@ -26,6 +26,7 @@ func init() {
 		Name:            Name,
 		HasDashboards:   false,
 		ConfigOverrides: config.Overrides,
+		ElasticLicensed: true,
 	})
 
 	RootCmd.RemoveCommand(RootCmd.RunCmd)

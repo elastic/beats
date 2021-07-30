@@ -133,8 +133,7 @@ func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
 // MetricSet interfaces
 
 // MetricSet is the common interface for all MetricSet implementations. In
-// addition to this interface, all MetricSets must implement either
-// EventFetcher or EventsFetcher (but not both).
+// addition to this interface, all MetricSets must implement a fetcher interface.
 type MetricSet interface {
 	ID() string     // Unique ID identifying a running MetricSet.
 	Name() string   // Name returns the name of the MetricSet.
@@ -152,20 +151,6 @@ type MetricSet interface {
 // cleanup any resources it has open at shutdown.
 type Closer interface {
 	Close() error
-}
-
-// EventFetcher is a MetricSet that returns a single event when collecting data.
-// Use ReportingMetricSet for new MetricSet implementations.
-type EventFetcher interface {
-	MetricSet
-	Fetch() (common.MapStr, error)
-}
-
-// EventsFetcher is a MetricSet that returns a multiple events when collecting
-// data. Use ReportingMetricSet for new MetricSet implementations.
-type EventsFetcher interface {
-	MetricSet
-	Fetch() ([]common.MapStr, error)
 }
 
 // Reporter is used by a MetricSet to report events, errors, or errors with

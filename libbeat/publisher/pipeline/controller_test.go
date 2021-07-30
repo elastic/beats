@@ -31,7 +31,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/tests/resources"
+
+	//"github.com/elastic/beats/v7/libbeat/tests/resources"
 
 	"github.com/stretchr/testify/require"
 )
@@ -46,8 +47,9 @@ func TestOutputReload(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			testutil.SeedPRNG(t)
 
-			goroutines := resources.NewGoroutinesChecker()
-			defer goroutines.Check(t)
+			// Flaky check: https://github.com/elastic/beats/issues/21656
+			//goroutines := resources.NewGoroutinesChecker()
+			//defer goroutines.Check(t)
 
 			err := quick.Check(func(q uint) bool {
 				numEventsToPublish := 15000 + (q % 500) // 15000 to 19999

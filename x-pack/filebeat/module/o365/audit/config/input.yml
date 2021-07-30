@@ -1,15 +1,15 @@
 {{ if eq .input "o365audit" }}
 
 type: o365audit
-{{ if .application_id }}application_id: {{ .application_id }}{{ end }}
+{{ if .application_id }}application_id: '{{ .application_id }}'{{ end }}
 tenant_id:
 {{ range .tenants }}
- - {{ .id }}
+ - '{{ .id }}'
 {{ end }}
-{{ if .certificate }}certificate: {{ .certificate }}{{ end }}
-{{ if .key }}key: {{ .key }}{{ end }}
-{{ if .key_passphrase }}key_passphrase: {{ .key_passphrase }}{{ end }}
-{{ if .client_secret }}client_secret: {{ .client_secret }}{{ end }}
+{{ if .certificate }}certificate: '{{ .certificate }}'{{ end }}
+{{ if .key }}key: '{{ .key }}'{{ end }}
+{{ if .key_passphrase }}key_passphrase: '{{ .key_passphrase }}'{{ end }}
+{{ if .client_secret }}client_secret: '{{ .client_secret }}'{{ end }}
 {{ if eq "string" (printf "%T" .content_type) }}
 content_type: {{ .content_type }}
 {{ else }}
@@ -39,6 +39,11 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
 {{ if eq .input "file" }}
   - rename:
+      fields:
+        - from: json.error
+          to: error
+      ignore_missing: true
+  - rename:
      fields:
       - from: json
         to: o365audit
@@ -62,4 +67,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.10.0

@@ -68,6 +68,7 @@ const (
 // system using the contained PackageSpec.
 type OSPackageArgs struct {
 	OS    string        `yaml:"os"`
+	Arch  string        `yaml:"arch,omitempty"`
 	Types []PackageType `yaml:"types"`
 	Spec  PackageSpec   `yaml:"spec"`
 }
@@ -172,6 +173,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		},
 		Docker: map[string]string{
 			"amd64": "amd64",
+			"arm64": "arm64",
 		},
 	},
 }
@@ -719,7 +721,10 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"--architecture", spec.Arch,
 	)
 	if packageType == RPM {
-		args = append(args, "--rpm-rpmbuild-define", "_build_id_links none")
+		args = append(args,
+			"--rpm-rpmbuild-define", "_build_id_links none",
+			"--rpm-digest", "sha256",
+		)
 	}
 	if spec.Version != "" {
 		args = append(args, "--version", spec.Version)

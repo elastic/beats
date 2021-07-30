@@ -19,6 +19,7 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -55,19 +56,20 @@ var (
 )
 
 type addProcessMetadata struct {
-	config      config
-	provider    processMetadataProvider
-	cidProvider cidProvider
-	log         *logp.Logger
-	mappings    common.MapStr
+	config       config
+	provider     processMetadataProvider
+	cgroupsCache *common.Cache
+	cidProvider  cidProvider
+	log          *logp.Logger
+	mappings     common.MapStr
 }
 
 type processMetadata struct {
-	name, title, exe string
-	args             []string
-	env              map[string]string
-	startTime        time.Time
-	pid, ppid        int
+	name, title, exe, username, userid string
+	args                               []string
+	env                                map[string]string
+	startTime                          time.Time
+	pid, ppid                          int
 	//
 	fields common.MapStr
 }
@@ -81,16 +83,22 @@ type cidProvider interface {
 }
 
 func init() {
-	processors.RegisterPlugin(processorName, New)
+	processors.RegisterPlugin(processorName, NewWithCache)
 	jsprocessor.RegisterPlugin("AddProcessMetadata", New)
 }
 
 // New constructs a new add_process_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache)
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider) (proc processors.Processor, err error) {
+// NewWithCache construct a new add_process_metadata processor with cache for container IDs.
+// Resulting processor implements `Close()` to release the cache resources.
+func NewWithCache(cfg *common.Config) (processors.Processor, error) {
+	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
+}
+
+func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -118,19 +126,23 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 	}
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
-		if config.CgroupCacheExpireTime != 0 {
+		if withCache && config.CgroupCacheExpireTime != 0 {
 			p.log.Debug("Initializing cgroup cache")
 			evictionListener := func(k common.Key, v common.Value) {
 				p.log.Debugf("Evicted cached cgroups for PID=%v", k)
 			}
 
-			cgroupsCache := common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
-			cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
-			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, cgroupsCache)
+			p.cgroupsCache = common.NewCacheWithRemovalListener(config.CgroupCacheExpireTime, 100, evictionListener)
+			p.cgroupsCache.StartJanitor(config.CgroupCacheExpireTime)
+			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, p.cgroupsCache)
 		} else {
 			p.cidProvider = newCidProvider(config.HostPath, config.CgroupPrefixes, config.CgroupRegex, processCgroupPaths, nil)
 		}
 
+	}
+
+	if withCache {
+		return &addProcessMetadataCloser{p}, nil
 	}
 
 	return &p, nil
@@ -171,23 +183,40 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, ErrNoMatch
 }
 
+func pidToInt(value interface{}) (pid int, err error) {
+	switch v := value.(type) {
+	case string:
+		pid, err = strconv.Atoi(v)
+		if err != nil {
+			return 0, errors.Wrap(err, "error converting string to integer")
+		}
+	case int:
+		pid = v
+	case int8, int16, int32, int64:
+		pid64 := reflect.ValueOf(v).Int()
+		if pid = int(pid64); int64(pid) != pid64 {
+			return 0, errors.Errorf("integer out of range: %d", pid64)
+		}
+	case uint, uintptr, uint8, uint16, uint32, uint64:
+		pidu64 := reflect.ValueOf(v).Uint()
+		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 {
+			return 0, errors.Errorf("integer out of range: %d", pidu64)
+		}
+	default:
+		return 0, errors.Errorf("not an integer or string, but %T", v)
+	}
+	return pid, nil
+}
+
 func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (result common.MapStr, err error) {
 	pidIf, err := event.GetValue(pidField)
 	if err != nil {
 		return nil, err
 	}
 
-	var pid int
-	switch v := pidIf.(type) {
-	case string:
-		pid, err = strconv.Atoi(v)
-		if err != nil {
-			return nil, errors.Wrapf(err, "cannot convert string field '%s' to an integer", pidField)
-		}
-	case int:
-		pid = v
-	default:
-		return nil, errors.Errorf("cannot parse field '%s' (not an integer or string)", pidField)
+	pid, err := pidToInt(pidIf)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot parse pid field '%s'", pidField)
 	}
 
 	var meta common.MapStr
@@ -253,6 +282,17 @@ func (p *addProcessMetadata) getContainerID(pid int) (string, error) {
 	return cid, nil
 }
 
+type addProcessMetadataCloser struct {
+	addProcessMetadata
+}
+
+func (p *addProcessMetadataCloser) Close() error {
+	if p.addProcessMetadata.cgroupsCache != nil {
+		p.addProcessMetadata.cgroupsCache.StopJanitor()
+	}
+	return nil
+}
+
 // String returns the processor representation formatted as a string
 func (p *addProcessMetadata) String() string {
 	return fmt.Sprintf("%v=[match_pids=%v, mappings=%v, ignore_missing=%v, overwrite_fields=%v, restricted_fields=%v, host_path=%v, cgroup_prefixes=%v]",
@@ -261,16 +301,28 @@ func (p *addProcessMetadata) String() string {
 }
 
 func (p *processMetadata) toMap() common.MapStr {
+	process := common.MapStr{
+		"name":       p.name,
+		"title":      p.title,
+		"executable": p.exe,
+		"args":       p.args,
+		"env":        p.env,
+		"pid":        p.pid,
+		"ppid":       p.ppid,
+		"start_time": p.startTime,
+	}
+	if p.username != "" || p.userid != "" {
+		user := common.MapStr{}
+		if p.username != "" {
+			user["name"] = p.username
+		}
+		if p.userid != "" {
+			user["id"] = p.userid
+		}
+		process["owner"] = user
+	}
+
 	return common.MapStr{
-		"process": common.MapStr{
-			"name":       p.name,
-			"title":      p.title,
-			"executable": p.exe,
-			"args":       p.args,
-			"env":        p.env,
-			"pid":        p.pid,
-			"ppid":       p.ppid,
-			"start_time": p.startTime,
-		},
+		"process": process,
 	}
 }

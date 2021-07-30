@@ -1,0 +1,25 @@
+processors:
+  - set:
+      field: event.kind
+      value: event
+  - append:
+      field: event.category
+      value: [network]
+  - append:
+      field: event.action
+      value: [remote_response_session_start_event]
+  - append:
+      field: event.type
+      value: [start, session]
+  - set:
+      field: event.dataset
+      value: crowdstrike.falcon_audit
+  - set:
+      field: message
+      value: Remote response session started.
+  - convert:
+      field: crowdstrike.event.HostnameField
+      target_field: host.name
+      type: string
+      ignore_failure: true
+      ignore_missing: true

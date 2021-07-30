@@ -1,0 +1,61 @@
+- name: cisco.umbrella
+  type: group
+  description: >
+    Fields for Cisco Umbrella.
+  fields:
+  - name: identities
+    type: keyword
+    description: >
+      An array of the different identities related to the event.
+  - name: categories
+    type: keyword
+    description: >
+      The security or content categories that the destination matches.
+  - name: policy_identity_type
+    type: keyword
+    description: >
+      The first identity type matched with this request. Available in version 3 and above.
+  - name: identity_types
+    type: keyword
+    description: >
+      The type of identity that made the request. For example, Roaming Computer or Network.
+  - name: blocked_categories
+    type: keyword
+    description: >
+      The categories that resulted in the destination being blocked. Available in version 4 and above.
+  - name: content_type
+    type: keyword
+    description: >
+      The type of web content, typically text/html.
+  - name: sha_sha256
+    type: keyword
+    description: >
+      Hex digest of the response content.
+  - name: av_detections
+    type: keyword
+    description: >
+      The detection name according to the antivirus engine used in file inspection.
+  - name: puas
+    type: keyword
+    description: >
+      A list of all potentially unwanted application (PUA) results for the proxied file as returned by the antivirus scanner.
+  - name: amp_disposition
+    type: keyword
+    description: >
+      The status of the files proxied and scanned by Cisco Advanced Malware Protection (AMP) as part of the Umbrella File Inspection feature; can be Clean, Malicious or Unknown.
+  - name: amp_malware_name
+    type: keyword
+    description: >
+      If Malicious, the name of the malware according to AMP.
+  - name: amp_score
+    type: keyword
+    description: >
+      The score of the malware from AMP. This field is not currently used and will be blank.
+  - name: datacenter
+    type: keyword
+    description: >
+      The name of the Umbrella Data Center that processed the user-generated traffic.
+  - name: origin_id
+    type: keyword
+    description: >
+      The unique identity of the network tunnel.

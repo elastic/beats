@@ -12,6 +12,7 @@ json.keys_under_root: false
 fields_under_root: true
 fields:
   network.transport: tcp
+  network.protocol: http
 
 processors:
   - rename:
@@ -76,6 +77,7 @@ processors:
         - {from: "destination.address", to: "destination.ip", type: "ip"}
         - {from: "destination.port", to: "url.port"}
         - {from: "http.request.method", to: "event.action"}
+        - {from: "url.username", to: "user.name"}
       ignore_missing: true
       fail_on_error: false
   - add_fields:
@@ -89,10 +91,15 @@ processors:
           - connection
           - info
           - protocol
-{{ if .community_id }}
   - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
 {{ end }}
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.10.0

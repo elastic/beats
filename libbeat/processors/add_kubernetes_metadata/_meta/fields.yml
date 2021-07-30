@@ -18,6 +18,11 @@
           description: >
             Kubernetes Pod UID
 
+        - name: pod.ip
+          type: ip
+          description: >
+            Kubernetes Pod IP
+
         - name: namespace
           type: keyword
           description: >
@@ -27,6 +32,11 @@
           type: keyword
           description: >
             Kubernetes node name
+
+        - name: node.hostname
+          type: keyword
+          description: >
+            Kubernetes hostname as reported by the node’s kernel
 
         - name: labels.*
           type: object
@@ -41,6 +51,13 @@
           object_type_mapping_type: "*"
           description: >
             Kubernetes annotations map
+
+        - name: selectors.*
+          type: object
+          object_type: keyword
+          object_type_mapping_type: "*"
+          description: >
+            Kubernetes selectors map
 
         - name: replicaset.name
           type: keyword
@@ -60,9 +77,10 @@
         - name: container.name
           type: keyword
           description: >
-            Kubernetes container name
+            Kubernetes container name (different than the name from the runtime)
 
         - name: container.image
-          type: keyword
+          type: alias
+          path: container.image.name
           description: >
             Kubernetes container image

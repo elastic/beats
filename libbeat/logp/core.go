@@ -79,7 +79,7 @@ func ConfigureWithOutputs(cfg Config, outputs ...zapcore.Core) error {
 
 	// Build a single output (stderr has priority if more than one are enabled).
 	if cfg.toObserver {
-		sink, observedLogs = observer.New(cfg.Level.zapLevel())
+		sink, observedLogs = observer.New(cfg.Level.ZapLevel())
 	} else {
 		sink, err = createLogOutput(cfg)
 	}
@@ -196,21 +196,28 @@ func makeOptions(cfg Config) []zap.Option {
 	if cfg.development {
 		options = append(options, zap.Development())
 	}
+	if cfg.ECSEnabled {
+		fields := []zap.Field{
+			zap.String("service.name", cfg.Beat),
+			zap.String("event.dataset", cfg.LogFilename()),
+		}
+		options = append(options, zap.Fields(fields...))
+	}
 	return options
 }
 
 func makeStderrOutput(cfg Config) (zapcore.Core, error) {
 	stderr := zapcore.Lock(os.Stderr)
-	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), stderr, cfg.Level.ZapLevel()), nil
 }
 
 func makeDiscardOutput(cfg Config) (zapcore.Core, error) {
 	discard := zapcore.AddSync(ioutil.Discard)
-	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), discard, cfg.Level.ZapLevel()), nil
 }
 
 func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newSyslog(buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newSyslog(buildEncoder(cfg), cfg.Level.ZapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +225,7 @@ func makeSyslogOutput(cfg Config) (zapcore.Core, error) {
 }
 
 func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
-	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.zapLevel())
+	core, err := newEventLog(cfg.Beat, buildEncoder(cfg), cfg.Level.ZapLevel())
 	if err != nil {
 		return nil, err
 	}
@@ -226,11 +233,7 @@ func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
 }
 
 func makeFileOutput(cfg Config) (zapcore.Core, error) {
-	name := cfg.Beat
-	if cfg.Files.Name != "" {
-		name = cfg.Files.Name
-	}
-	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, name))
+	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, cfg.LogFilename()))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(cfg.Files.MaxSize),
@@ -239,12 +242,13 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.Interval(cfg.Files.Interval),
 		file.RotateOnStartup(cfg.Files.RotateOnStartup),
 		file.RedirectStderr(cfg.Files.RedirectStderr),
+		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")
 	}
 
-	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.zapLevel()), nil
+	return newCore(cfg, buildEncoder(cfg), rotator, cfg.Level.ZapLevel()), nil
 }
 
 func newCore(cfg Config, enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {

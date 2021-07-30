@@ -11,3 +11,11 @@
 
     # The UDP port to listen for syslog traffic. Defaults to 9001.
     #var.syslog_port: 9001
+
+    # Set internal security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.internal_zones: [ "Internal" ]
+
+    # Set external security zones. used to override parsed network.direction
+    # based on zone egress and ingress
+    #var.external_zones: [ "External" ]

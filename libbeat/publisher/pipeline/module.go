@@ -95,7 +95,7 @@ func LoadWithSettings(
 
 	name := beatInfo.Name
 
-	queueBuilder, err := createQueueBuilder(config.Queue, monitors)
+	queueBuilder, err := createQueueBuilder(config.Queue, monitors, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -161,6 +161,8 @@ func loadOutput(
 			telemetry = monitors.Telemetry.NewRegistry("output")
 		}
 		monitoring.NewString(telemetry, "name").Set(outName)
+		monitoring.NewInt(telemetry, "batch_size").Set(int64(out.BatchSize))
+		monitoring.NewInt(telemetry, "clients").Set(int64(len(out.Clients)))
 	}
 
 	return out, nil
@@ -169,6 +171,7 @@ func loadOutput(
 func createQueueBuilder(
 	config common.ConfigNamespace,
 	monitors Monitors,
+	inQueueSize int,
 ) (func(queue.ACKListener) (queue.Queue, error), error) {
 	queueType := defaultQueueType
 	if b := config.Name(); b != "" {
@@ -191,6 +194,6 @@ func createQueueBuilder(
 	}
 
 	return func(ackListener queue.ACKListener) (queue.Queue, error) {
-		return queueFactory(ackListener, monitors.Logger, queueConfig)
+		return queueFactory(ackListener, monitors.Logger, queueConfig, inQueueSize)
 	}, nil
 }

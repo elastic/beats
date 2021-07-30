@@ -3,15 +3,17 @@
     "@timestamp": "2019-09-06T13:24:39.2933111Z",
     "event": {
       "action": "added-user-account",
-      "category": "iam",
-      "code": 4720,
+      "category": [
+        "iam"
+      ],
+      "code": "4720",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "user"
+        "user",
+        "creation"
       ]
     },
     "host": {
@@ -72,7 +74,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],
@@ -96,15 +98,17 @@
     "@timestamp": "2019-09-06T13:25:21.8672707Z",
     "event": {
       "action": "added-user-account",
-      "category": "iam",
-      "code": 4720,
+      "category": [
+        "iam"
+      ],
+      "code": "4720",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "creation",
-        "user"
+        "user",
+        "creation"
       ]
     },
     "host": {
@@ -165,7 +169,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "%%1793"
       },
-      "event_id": 4720,
+      "event_id": "4720",
       "keywords": [
         "Audit Success"
       ],

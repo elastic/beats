@@ -8,24 +8,45 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-The SQL module allows to execute custom queries against an SQL database and store the results to Elasticsearch.
+The SQL module allows you to execute custom queries against an SQL database and
+store the results in {es}.
 
-The currently supported databases are the ones already included in Metricbeat, which are:
-- PostgreSQL
-- MySQL
-- Oracle
-- Microsoft SQL
-- CockroachDB
+This module supports the databases that you can monitor with {metricbeat},
+including:
 
-== Quickstart
+* PostgreSQL
+* MySQL
+* Oracle
+* Microsoft SQL
+* CockroachDB
 
-You can setup the module by activating it first running
+To enable the module, run:
 
-    metricbeat module enable sql
+[source,shell]
+----
+metricbeat module enable sql
+----
 
-Once it is activated, open `modules.d/sql.yml` and fill the required fields. This is an example that captures Innodb related metrics from the result of the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL database:
+After enabling the module, open `modules.d/sql.yml` and set the required
+fields:
 
-.sql.yml
+`driver`:: The driver can be any driver that has a {metricbeat} module, such as
+`mssql` or `postgres`.
+`sql_query`:: The single query you want to run.
+`sql_response_format`:: Either `variables` or `table`:
+`variables`::: Expects a two-column table that looks like a key/value result.
+The left column is considered a key and the right column the value. This mode
+generates a single event on each fetch operation.
+`table`::: Expects any number of columns. This mode generates a single event for
+each row.
+
+[float]
+=== Example: capture Innodb-related metrics
+
+This `sql.yml` configuration shows how to capture Innodb-related metrics that
+result from the query `SHOW GLOBAL STATUS LIKE 'Innodb_system%'` in a MySQL
+database:
+
 [source,yaml]
 ----
 - module: sql
@@ -39,7 +60,8 @@ Once it is activated, open `modules.d/sql.yml` and fill the required fields. Thi
   sql_response_format: variables
 ----
 
-.SHOW GLOBAL STATUS LIKE 'Innodb_system%'
+The `SHOW GLOBAL STATUS` query results in this table:
+
 |====
 |Variable_name|Value
 
@@ -49,18 +71,11 @@ Once it is activated, open `modules.d/sql.yml` and fill the required fields. Thi
 |Innodb_system_rows_updated|315
 |====
 
+Results are grouped by type in the result event for convenient mapping in
+{es}. For example, `strings` values are grouped into `sql.strings`, `numeric`
+into `sql.numeric`, and so on.
 
-Keys in the YAML are defined as follow:
-
-- `driver`: The drivers currently supported are those which already have a Metricbeat module like `mssql` or `postgres`.
-- `sql_query`: Is the single query you want to run
-- `sql_response_format`: You have 2 options here:
-    - `variables`: Expects a table which looks like a key/value result. With 2 columns, left column will be considered a key and the right column the value. This mode generates a single event on each fetch operation.
-    - `table`: Table mode can contain any number of columns and a single event will be generated for each row.
-
-Results will be grouped by type in the result event for convenient mapping in Elasticsearch. So `strings` values will be grouped into `sql.strings`, `numeric` into `sql.numeric` and so on and so forth.
-
-The event generated with the example above looks like this:
+The example shown earlier generates this event:
 
 [source,json]
 ----
@@ -112,9 +127,13 @@ The event generated with the example above looks like this:
 }
 ----
 
-In this example, we are querying PostgreSQL and generate a "table" result, hence a single event for each row returned
+[float]
+=== Example: query PostgreSQL and generate a "table" result
 
-.sql.yml
+This `sql.yml` configuration shows how to query PostgreSQL and generate
+a "table" result. This configuration generates a single event for each row
+returned:
+
 [source,yaml]
 ----
 - module: sql
@@ -128,7 +147,8 @@ In this example, we are querying PostgreSQL and generate a "table" result, hence
   sql_response_format: table
 ----
 
-.SELECT datid, datname, blks_read, blks_hit, tup_returned, tup_fetched, stats_reset FROM pg_stat_database
+The SELECT query results in this table:
+
 |====
 |datid|datname|blks_read|blks_hit|tup_returned|tup_fetched|stats_reset
 
@@ -137,7 +157,8 @@ In this example, we are querying PostgreSQL and generate a "table" result, hence
 |13407|template0|0|0|0|0|
 |====
 
-With 3 rows on the table, three events will be generated with the contents of each row. As an example, below you can see the event created for the first row:
+Because the table contains three rows, three events are generated, one event
+for each row. For example, this event is created for the first row:
 
 [source,json]
 ----
@@ -194,14 +215,11 @@ With 3 rows on the table, three events will be generated with the contents of ea
 }
 ----
 
+[float]
+=== Example: get the buffer catch hit ratio in Oracle
 
-== More examples
+This `sql.yml` configuration shows how to get the buffer cache hit ratio:
 
-=== Oracle:
-
-Get the buffer cache hit ratio:
-
-.sql.yml
 [source,yaml]
 ----
 - module: sql
@@ -215,6 +233,7 @@ Get the buffer cache hit ratio:
   sql_response_format: table
 ----
 
+The example generates this event:
 
 [source,json]
 ----
@@ -269,11 +288,11 @@ Get the buffer cache hit ratio:
 }
 ----
 
-=== MSSQL
+[float]
+=== Example: get the buffer cache hit ratio for MSSQL
 
-Get the buffer cache hit ratio:
+This `sql.yml` configuration gets the buffer cache hit ratio:
 
-.sql.yml
 [source,yaml]
 ----
 - module: sql
@@ -286,6 +305,8 @@ Get the buffer cache hit ratio:
   sql_query: 'SELECT * FROM sys.dm_db_log_space_usage'
   sql_response_format: table
 ----
+
+The example generates this event:
 
 [source,json]
 ----
@@ -338,11 +359,12 @@ Get the buffer cache hit ratio:
 }
 ----
 
-=== Two or more queries
+[float]
+=== Example: launch two or more queries
 
-If you want to launch two or more queries, you need to specify them with their full configuration for each query. For example:
+To launch two or more queries, specify the full configuration for each query.
+For example:
 
-.sql.yml
 [source,yaml]
 ----
 - module: sql

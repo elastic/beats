@@ -7,6 +7,7 @@
         "destination.as.organization.name": "Petersburg Internet Network ltd.",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "RU",
+        "destination.geo.country_name": "Russia",
         "destination.geo.location.lat": 55.7386,
         "destination.geo.location.lon": 37.6068,
         "destination.ip": "46.161.30.47",
@@ -26,8 +27,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -39,6 +40,9 @@
         "observer.serial_number": "C44310050024-P29PUA",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.47.71",
             "46.161.30.47"
@@ -62,8 +66,8 @@
         "source.port": 22623,
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.original": "46.161.30.47"
     },
@@ -76,6 +80,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6348,
         "destination.geo.location.lon": -122.3451,
         "destination.geo.region_iso_code": "US-WA",
@@ -97,8 +102,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -110,9 +115,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.22"
+            "13.226.155.22",
+            "172.16.34.24"
         ],
         "server.ip": "13.226.155.22",
         "server.port": 80,
@@ -129,10 +137,14 @@
         "source.ip": "172.16.34.24",
         "source.port": 57579,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
-        "url.original": "http://sophostest.com/callhome/index.html"
+        "url.domain": "sophostest.com",
+        "url.extension": "html",
+        "url.original": "http://sophostest.com/callhome/index.html",
+        "url.path": "/callhome/index.html",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2020-05-18T14:38:35.000-02:00",
@@ -143,6 +155,7 @@
         "destination.geo.city_name": "Seattle",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 47.6348,
         "destination.geo.location.lon": -122.3451,
         "destination.geo.region_iso_code": "US-WA",
@@ -164,8 +177,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -177,9 +190,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "172.16.34.24",
-            "13.226.155.22"
+            "13.226.155.22",
+            "172.16.34.24"
         ],
         "server.ip": "13.226.155.22",
         "server.port": 80,
@@ -196,10 +212,14 @@
         "source.ip": "172.16.34.24",
         "source.port": 57540,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
-        "url.original": "http://sophostest.com/callhome/index.html"
+        "url.domain": "sophostest.com",
+        "url.extension": "html",
+        "url.original": "http://sophostest.com/callhome/index.html",
+        "url.path": "/callhome/index.html",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2018-06-05T08:49:00.000-02:00",
@@ -209,6 +229,7 @@
         "destination.as.organization.name": "Accelerated IT Services & Consulting GmbH",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 51.2993,
         "destination.geo.location.lon": 9.491,
         "destination.ip": "82.211.30.202",
@@ -228,8 +249,8 @@
         "event.severity": "5",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -241,6 +262,9 @@
         "observer.serial_number": "C30006T22TGR89B",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.198.32.89",
             "82.211.30.202"
@@ -260,8 +284,8 @@
         "source.ip": "10.198.32.89",
         "source.port": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "url.original": "82.211.30.202"
     }

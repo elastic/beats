@@ -49,6 +49,10 @@
       type: keyword
       description: >
         The bitmask value for the following TCP flags: 2=SYN,18=SYN-ACK,1=FIN,4=RST
+    - name: tcp_flags_array
+      type: keyword
+      description: >
+        List of TCP flags: 'fin, syn, rst, psh, ack, urg'
     - name: type
       type: keyword
       description: >

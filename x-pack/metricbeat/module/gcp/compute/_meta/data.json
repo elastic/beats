@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "1113015278728017638",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-c",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "instance": {
+                "disk": {
+                    "read_bytes_count": {
+                        "value": 989296850
+                    },
+                    "read_ops_count": {
+                        "value": 14862
+                    },
+                    "write_bytes_count": {
+                        "value": 1323095
+                    },
+                    "write_ops_count": {
+                        "value": 105
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "device_name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
+                "device_type": "permanent",
+                "storage_type": "pd-standard"
+            }
+        }
+    },
+    "host": {
+        "disk": {
+            "read": {
+                "bytes": 989296850
+            },
+            "write": {
+                "bytes": 1323095
+            }
+        },
+        "id": "1113015278728017638",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

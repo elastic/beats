@@ -9,6 +9,8 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 
 	"github.com/stretchr/testify/assert"
@@ -73,15 +75,17 @@ func TestController(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	c, err := composable.New(cfg)
+	log, err := logger.New("", false)
+	require.NoError(t, err)
+	c, err := composable.New(log, cfg)
 	require.NoError(t, err)
 
 	var wg sync.WaitGroup
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	wg.Add(1)
-	var setVars []transpiler.Vars
-	err = c.Run(ctx, func(vars []transpiler.Vars) {
+	var setVars []*transpiler.Vars
+	err = c.Run(ctx, func(vars []*transpiler.Vars) {
 		setVars = vars
 		wg.Done()
 	})
@@ -90,22 +94,19 @@ func TestController(t *testing.T) {
 
 	assert.Len(t, setVars, 3)
 
-	_, hostExists := setVars[0].Mapping["host"]
+	_, hostExists := setVars[0].Lookup("host")
 	assert.True(t, hostExists)
-	_, envExists := setVars[0].Mapping["env"]
+	_, envExists := setVars[0].Lookup("env")
 	assert.False(t, envExists)
-	localMap := setVars[0].Mapping["local"].(map[string]interface{})
+	local, _ := setVars[0].Lookup("local")
+	localMap := local.(map[string]interface{})
 	assert.Equal(t, "value1", localMap["key1"])
-	assert.Equal(t, "", setVars[0].ProcessorsKey)
-	assert.Nil(t, setVars[0].Processors)
 
-	localMap = setVars[1].Mapping["local_dynamic"].(map[string]interface{})
+	local, _ = setVars[1].Lookup("local_dynamic")
+	localMap = local.(map[string]interface{})
 	assert.Equal(t, "value1", localMap["key1"])
-	assert.Equal(t, "local_dynamic", setVars[1].ProcessorsKey)
-	assert.Len(t, setVars[1].Processors, 1)
 
-	localMap = setVars[2].Mapping["local_dynamic"].(map[string]interface{})
+	local, _ = setVars[2].Lookup("local_dynamic")
+	localMap = local.(map[string]interface{})
 	assert.Equal(t, "value2", localMap["key1"])
-	assert.Equal(t, "local_dynamic", setVars[2].ProcessorsKey)
-	assert.Len(t, setVars[2].Processors, 1)
 }

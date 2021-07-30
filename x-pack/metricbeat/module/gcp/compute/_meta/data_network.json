@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "1113015278728017638",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-c",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "instance": {
+                "network": {
+                    "received_bytes_count": {
+                        "value": 9519
+                    },
+                    "received_packets_count": {
+                        "value": 134
+                    },
+                    "sent_bytes_count": {
+                        "value": 0
+                    },
+                    "sent_packets_count": {
+                        "value": 0
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "loadbalanced": "true"
+            }
+        }
+    },
+    "host": {
+        "id": "1113015278728017638",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
+        "network": {
+            "egress": {
+                "bytes": 9519,
+                "packets": 134
+            },
+            "ingress": {
+                "bytes": 0,
+                "packets": 0
+            }
+        }
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

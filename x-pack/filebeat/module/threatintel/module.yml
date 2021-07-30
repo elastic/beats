@@ -1,0 +1,17 @@
+dashboards:
+  - id: 65fa6bc0-72f0-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-abuse-url.json
+  - id: 53e4e630-76cf-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-alienvault-otx.json
+  - id: 68c48a30-739e-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-anomali.json
+  - id: 5ba16340-72e6-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-aubse-malware.json
+  - id: dee7be00-82ab-11eb-ac13-d5ca87cb8fa2
+    file: Filebeat-threatintel-malwarebazaar.json
+  - id: 47e6fdc0-76b9-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-misp.json
+  - id: ad9c7430-72de-11eb-a3e3-b3cc7c78a70f
+    file: Filebeat-threatintel-overview.json
+  - id: 894dd3e0-df57-11eb-8f2b-753caedf727d
+    file: Filebeat-threatintel-recordedfuture.json

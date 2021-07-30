@@ -48,4 +48,14 @@ var schema = s.Schema{
 	"waiting":           c.Bool("waiting", s.Optional),
 	"state":             c.Str("state"),
 	"query":             c.Str("query"),
+	"backend_type":      c.Str("backend_type", s.Optional),
+}
+
+// Fields available in events from backend activity.
+var backendSchema = s.Schema{
+	"pid":             c.Int("pid"),
+	"backend_start":   c.Time(time.RFC3339Nano, "backend_start"),
+	"wait_event_type": c.Str("wait_event_type"),
+	"wait_event":      c.Str("wait_event"),
+	"backend_type":    c.Str("backend_type"),
 }

@@ -3,8 +3,10 @@
     "@timestamp": "2019-11-07T10:34:29.0559196Z",
     "event": {
       "action": "audit-log-cleared",
-      "category": "iam",
-      "code": 1102,
+      "category": [
+        "iam"
+      ],
+      "code": "1102",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -32,7 +34,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1102,
+      "event_id": "1102",
       "keywords": [
         "Audit Success"
       ],

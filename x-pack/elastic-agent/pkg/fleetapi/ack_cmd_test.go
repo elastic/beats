@@ -12,6 +12,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 func TestAck(t *testing.T) {
@@ -22,7 +24,7 @@ func TestAck(t *testing.T) {
 		func(t *testing.T) *http.ServeMux {
 			raw := `{"action": "ack"}`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/acks", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/acks", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
 
@@ -41,15 +43,15 @@ func TestAck(t *testing.T) {
 				id := responses.Events[0].ActionID
 				require.Equal(t, "my-id", id)
 
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
-			action := &ActionConfigChange{
+		func(t *testing.T, client client.Sender) {
+			action := &ActionPolicyChange{
 				ActionID:   "my-id",
-				ActionType: "CONFIG_CHANGE",
-				Config: map[string]interface{}{
+				ActionType: "POLICY_CHANGE",
+				Policy: map[string]interface{}{
 					"id": "config_id",
 				},
 			}

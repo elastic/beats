@@ -131,6 +131,11 @@ func main() {
 			filtered.WriteByte('\n')
 		}
 	}
+	if scanner.Err() != nil {
+		fmt.Fprintf(os.Stderr, "Failed reading from %s: %v\n", *header, err)
+		os.Exit(2)
+	}
+
 	reader := csv.NewReader(filtered)
 	for lineNum := 1; ; lineNum++ {
 		record, err := reader.Read()

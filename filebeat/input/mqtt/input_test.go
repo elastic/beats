@@ -27,6 +27,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	finput "github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/input/inputtest"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
@@ -320,6 +321,13 @@ func TestOnCreateHandler_SubscribeMultiple_BackoffSignalDone(t *testing.T) {
 
 	require.Equal(t, 2, client.subscribeMultipleCount)
 	require.Equal(t, 1, mockedBackoff.resetCount)
+}
+
+func TestNewInputDone(t *testing.T) {
+	config := common.MapStr{
+		"hosts": "tcp://:0",
+	}
+	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
 }
 
 func assertEventMatches(t *testing.T, expected mockedMessage, got beat.Event) {

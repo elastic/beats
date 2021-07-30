@@ -30,6 +30,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 )
 
 var (
@@ -66,7 +67,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	bif.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{10, 1}}
 	bif.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{460, 2}}
-	event := createEvent(time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
+	event := createEvent(procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
 
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{

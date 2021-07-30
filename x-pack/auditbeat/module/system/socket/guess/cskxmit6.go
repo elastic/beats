@@ -34,7 +34,7 @@ import (
 */
 
 func init() {
-	if err := Registry.AddGuess(&guessInet6CskXmit{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInet6CskXmit{} }); err != nil {
 		panic(err)
 	}
 }

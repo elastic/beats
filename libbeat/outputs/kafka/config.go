@@ -68,13 +68,8 @@ type kafkaConfig struct {
 	Username           string                    `config:"username"`
 	Password           string                    `config:"password"`
 	Codec              codec.Config              `config:"codec"`
-	Sasl               saslConfig                `config:"sasl"`
-}
-
-type saslConfig struct {
-	SaslMechanism string `config:"mechanism"`
-	//SaslUsername  string `config:"username"` //maybe use ssl.username ssl.password instead in future?
-	//SaslPassword  string `config:"password"`
+	Sasl               kafka.SaslConfig          `config:"sasl"`
+	EnableFAST         bool                      `config:"enable_krb5_fast"`
 }
 
 type metaConfig struct {
@@ -141,32 +136,6 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
-func (c *saslConfig) configureSarama(config *sarama.Config) error {
-	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
-	case "":
-		// SASL is not enabled
-		return nil
-	case saslTypePlaintext:
-		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
-	case saslTypeSCRAMSHA256:
-		config.Net.SASL.Handshake = true
-		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
-		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
-			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
-		}
-	case saslTypeSCRAMSHA512:
-		config.Net.SASL.Handshake = true
-		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
-		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
-			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
-		}
-	default:
-		return fmt.Errorf("not valid mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
-	}
-
-	return nil
-}
-
 func readConfig(cfg *common.Config) (*kafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
@@ -225,11 +194,19 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
-	if config.Kerberos.IsEnabled() {
+	switch {
+	case config.Kerberos.IsEnabled():
 		cfgwarn.Beta("Kerberos authentication for Kafka is beta.")
+
+		// Due to a regrettable past decision, the flag controlling Kerberos
+		// FAST authentication was initially added to the output configuration
+		// rather than the shared Kerberos configuration. To avoid a breaking
+		// change, we still check for the old flag, but it is deprecated and
+		// should be removed in a future version.
+		enableFAST := config.Kerberos.EnableFAST || config.EnableFAST
 
 		k.Net.SASL.Enable = true
 		k.Net.SASL.Mechanism = sarama.SASLTypeGSSAPI
@@ -241,18 +218,14 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !enableFAST,
 		}
-	}
 
-	if config.Username != "" {
+	case config.Username != "":
 		k.Net.SASL.Enable = true
 		k.Net.SASL.User = config.Username
 		k.Net.SASL.Password = config.Password
-		err = config.Sasl.configureSarama(k)
-
-		if err != nil {
-			return nil, err
-		}
+		config.Sasl.ConfigureSarama(k)
 	}
 
 	// configure metadata update properties

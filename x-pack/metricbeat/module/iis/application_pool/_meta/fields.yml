@@ -1,10 +1,72 @@
 - name: application_pool
   type: group
-  release: beta
+  release: ga
   description: >
-    application_pool
+    Application pool process stats.
   fields:
     - name: name
       type: keyword
       description: >
         application pool name
+    - name: process
+      type: group
+      description: >
+        Worker process overview.
+      fields:
+        - name: handle_count
+          type: long
+          description: >
+            The number of handles.
+        - name: io_read_operations_per_sec
+          type: float
+          description: >
+            IO read operations per sec.
+        - name: io_write_operations_per_sec
+          type: float
+          description: >
+            IO write operations per sec.
+        - name: virtual_bytes
+          type: float
+          description: >
+            Memory virtual bytes.
+        - name: cpu_usage_perc
+          type: float
+          description: >
+           The CPU usage percentage.
+        - name: thread_count
+          type: long
+          description: >
+            The number of threats.
+        - name: working_set
+          type: float
+          description: >
+            Memory working set.
+        - name: private_bytes
+          type: float
+          description: >
+            Memory private bytes.
+        - name: page_faults_per_sec
+          type: float
+          description: >
+            Memory page faults.
+    - name: net_clr
+      type: group
+      description: >
+        Common Language Runtime overview.
+      fields:
+        - name: finallys_per_sec
+          type: float
+          description: >
+            The number of finallys per sec.
+        - name: throw_to_catch_depth_per_sec
+          type: float
+          description: >
+            Throw to catch depth count per sec.
+        - name: total_exceptions_thrown
+          type: long
+          description: >
+            Total number of exceptions thrown.
+        - name: filters_per_sec
+          type: float
+          description: >
+            Number of filters per sec.

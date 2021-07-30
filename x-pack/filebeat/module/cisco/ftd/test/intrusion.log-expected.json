@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.application_protocol": "HTTP",
@@ -56,12 +56,17 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -86,8 +91,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.application_protocol": "HTTP",
@@ -138,12 +143,17 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -168,8 +178,8 @@
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.classification": "Misc Activity",
@@ -216,15 +226,20 @@
         "message": "APP-DETECT failed FTP login attempt",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -246,8 +261,8 @@
         "cisco.ftd.destination_interface": "inside",
         "cisco.ftd.message_id": "430001",
         "cisco.ftd.rule_name": [
-            "intrusion-policy",
-            "default"
+            "default",
+            "intrusion-policy"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.classification": "Misc Activity",
@@ -294,15 +309,20 @@
         "message": "APP-DETECT failed FTP login attempt",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "inside",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"

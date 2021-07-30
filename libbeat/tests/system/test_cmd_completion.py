@@ -17,7 +17,7 @@ class TestCommandCompletion(BaseTest):
     def test_zsh_completion(self):
         exit_code = self.run_beat(extra_args=["completion", "zsh"])
         assert exit_code == 0
-        assert self.log_contains("#compdef mockbeat")
+        assert self.log_contains("#compdef _mockbeat mockbeat")
 
     def test_unknown_completion(self):
         exit_code = self.run_beat(extra_args=["completion", "awesomeshell"])

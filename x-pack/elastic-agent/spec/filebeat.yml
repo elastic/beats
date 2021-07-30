@@ -1,7 +1,14 @@
 name: Filebeat
 cmd: filebeat
-args: ["-E", "setup.ilm.enabled=false", "-E", "setup.template.enabled=false", "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true", "-E", "logging.level=debug"]
+args: [
+  "-E", "setup.ilm.enabled=false",
+  "-E", "setup.template.enabled=false",
+  "-E", "management.enabled=true",
+  "-E", "logging.level=debug",
+  "-E", "gc_percent=${FILEBEAT_GOGC:100}"
+]
 artifact: beats/filebeat
+restart_on_output_change: true
 rules:
 - fix_stream: {}
 - inject_index:
@@ -59,12 +66,13 @@ rules:
     selector: inputs
     key: type
     values:
-    - awscloudwatch
-    - azureeventhub
+    - aws-cloudwatch
+    - aws-s3
+    - azure-eventhub
     - cloudfoundry
     - container
     - docker
-    - googlepubsub
+    - gcp-pubsub
     - http_endpoint
     - httpjson
     - kafka
@@ -73,19 +81,21 @@ rules:
     - netflow
     - o365audit
     - redis
-    - s3
     - stdin
     - syslog
     - tcp
     - udp
     - unix
     - winlog
+    - filestream
 
 - filter_values:
     selector: inputs
     key: enabled
     values:
     - true
+
+- inject_agent_info: {}
 
 - copy:
     from: inputs
@@ -96,5 +106,8 @@ rules:
     - filebeat
     - output
     - keystore
-when: HasItems(%{[filebeat.inputs]}) && HasNamespace('output', 'elasticsearch', 'redis',
+
+- inject_headers: {}
+
+when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')

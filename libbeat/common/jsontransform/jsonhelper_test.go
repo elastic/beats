@@ -48,6 +48,7 @@ func TestWriteJSONKeys(t *testing.T) {
 
 	tests := map[string]struct {
 		keys              map[string]interface{}
+		expandKeys        bool
 		overwriteKeys     bool
 		expectedMetadata  common.MapStr
 		expectedTimestamp time.Time
@@ -64,6 +65,41 @@ func TestWriteJSONKeys(t *testing.T) {
 					},
 				},
 				"@timestamp": now.Format(time.RFC3339),
+				"top_b": map[string]interface{}{
+					"inner_d": "NEW_dee",
+					"inner_e": "COMPLETELY_NEW_e",
+				},
+				"top_c": "COMPLETELY_NEW_c",
+			},
+			expectedMetadata: common.MapStr{
+				"foo": "NEW_bar",
+				"baz": common.MapStr{
+					"qux":   "NEW_qux",
+					"durrr": "COMPLETELY_NEW",
+				},
+			},
+			expectedTimestamp: now,
+			expectedFields: common.MapStr{
+				"top_a": 23,
+				"top_b": common.MapStr{
+					"inner_c": "see",
+					"inner_d": "NEW_dee",
+					"inner_e": "COMPLETELY_NEW_e",
+				},
+				"top_c": "COMPLETELY_NEW_c",
+			},
+		},
+		"overwrite_true_ISO8601": {
+			overwriteKeys: true,
+			keys: map[string]interface{}{
+				"@metadata": map[string]interface{}{
+					"foo": "NEW_bar",
+					"baz": map[string]interface{}{
+						"qux":   "NEW_qux",
+						"durrr": "COMPLETELY_NEW",
+					},
+				},
+				"@timestamp": now.Format(iso8601),
 				"top_b": map[string]interface{}{
 					"inner_d": "NEW_dee",
 					"inner_e": "COMPLETELY_NEW_e",
@@ -117,6 +153,45 @@ func TestWriteJSONKeys(t *testing.T) {
 				"top_c": "COMPLETELY_NEW_c",
 			},
 		},
+		"expand_true": {
+			expandKeys:    true,
+			overwriteKeys: true,
+			keys: map[string]interface{}{
+				"top_b": map[string]interface{}{
+					"inner_d.inner_e": "COMPLETELY_NEW_e",
+				},
+			},
+			expectedMetadata:  eventMetadata.Clone(),
+			expectedTimestamp: eventTimestamp,
+			expectedFields: common.MapStr{
+				"top_a": 23,
+				"top_b": common.MapStr{
+					"inner_c": "see",
+					"inner_d": common.MapStr{
+						"inner_e": "COMPLETELY_NEW_e",
+					},
+				},
+			},
+		},
+		"expand_false": {
+			expandKeys:    false,
+			overwriteKeys: true,
+			keys: map[string]interface{}{
+				"top_b": map[string]interface{}{
+					"inner_d.inner_e": "COMPLETELY_NEW_e",
+				},
+			},
+			expectedMetadata:  eventMetadata.Clone(),
+			expectedTimestamp: eventTimestamp,
+			expectedFields: common.MapStr{
+				"top_a": 23,
+				"top_b": common.MapStr{
+					"inner_c":         "see",
+					"inner_d":         "dee",
+					"inner_d.inner_e": "COMPLETELY_NEW_e",
+				},
+			},
+		},
 	}
 
 	for name, test := range tests {
@@ -127,7 +202,7 @@ func TestWriteJSONKeys(t *testing.T) {
 				Fields:    eventFields.Clone(),
 			}
 
-			WriteJSONKeys(event, test.keys, test.overwriteKeys, false)
+			WriteJSONKeys(event, test.keys, test.expandKeys, test.overwriteKeys, false)
 			require.Equal(t, test.expectedMetadata, event.Meta)
 			require.Equal(t, test.expectedTimestamp.UnixNano(), event.Timestamp.UnixNano())
 			require.Equal(t, test.expectedFields, event.Fields)

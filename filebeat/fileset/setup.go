@@ -21,7 +21,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	pubpipeline "github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 )
 
@@ -69,20 +68,20 @@ type SetupCfgRunner struct {
 
 // Start loads module pipelines for configured modules.
 func (sr *SetupCfgRunner) Start() {
-	logp.Debug("fileset", "Loading ingest pipelines for modules from modules.d")
+	sr.moduleRegistry.log.Debug("Loading ingest pipelines for modules from modules.d")
 	pipelineLoader, err := sr.pipelineLoaderFactory()
 	if err != nil {
-		logp.Err("Error loading pipeline: %+v", err)
+		sr.moduleRegistry.log.Errorf("Error loading pipeline: %+v", err)
 		return
 	}
 
 	err = sr.moduleRegistry.LoadPipelines(pipelineLoader, sr.overwritePipelines)
 	if err != nil {
-		logp.Err("Error loading pipeline: %s", err)
+		sr.moduleRegistry.log.Errorf("Error loading pipeline: %s", err)
 	}
 }
 
-// Stopp of SetupCfgRunner.
+// Stop of SetupCfgRunner.
 func (sr *SetupCfgRunner) Stop() {}
 
 // String returns information on the Runner

@@ -23,7 +23,7 @@ services to monitor and triggers
 
 The {beatname_uc} distribution contains the command line tools, configuration
 file, and binary code required to run {beatname_uc} in your serverless
-environment. 
+environment.
 
 To download and extract the package, use the commands that work with your
 system.
@@ -43,7 +43,7 @@ include::{libbeat-dir}/shared/connecting-to-es.asciidoc[]
 Before deploying {beatname_uc} to your cloud provider, you need to specify
 details about the cloud functions that you want to deploy, including the
 function name and type, and the triggers that will cause the function to
-execute. 
+execute.
 
 . In +{beatname_lc}.yml+, configure the functions that you want to deploy. The
 configuration settings vary depending on the type of function and cloud provider
@@ -124,7 +124,7 @@ include::{libbeat-dir}/tab-widgets/setup-linux-mac-win-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}.
 
 [TIP]
 =====
@@ -163,7 +163,7 @@ function. For more information, see <<iam-permissions>>.
 
 . Deploy the cloud functions.
 +
-For example, the following command deploys a function called `cloudwatch`: 
+For example, the following command deploys a function called `cloudwatch`:
 +
 --
 include::tab-widgets/deploy-aws-widget.asciidoc[]
@@ -200,7 +200,7 @@ include::tab-widgets/credentials-google-widget.asciidoc[]
 
 . Deploy the cloud functions.
 +
-For example, the following command deploys a function called `storage`: 
+For example, the following command deploys a function called `storage`:
 +
 --
 include::tab-widgets/deploy-google-widget.asciidoc[]

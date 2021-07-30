@@ -1,0 +1,75 @@
+[
+    {
+        "@timestamp": "2021-03-05T11:00:06.000Z",
+        "cyberarkpas.audit.action": "Auto Clear Users History start",
+        "cyberarkpas.audit.desc": "Auto Clear Users History start",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-05T11:00:06Z",
+        "cyberarkpas.audit.issuer": "Batch",
+        "cyberarkpas.audit.message": "Auto Clear Users History start",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "0.0.0.0",
+        "cyberarkpas.audit.timestamp": "Mar 05 03:00:06",
+        "event.action": "auto clear users history start",
+        "event.code": "288",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-03-08T03:00:20.000-02:00",
+        "cyberarkpas.audit.action": "Auto Clear Users History start",
+        "cyberarkpas.audit.desc": "Auto Clear Users History start",
+        "cyberarkpas.audit.issuer": "Batch",
+        "cyberarkpas.audit.message": "Auto Clear Users History start",
+        "cyberarkpas.audit.rfc5424": false,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "0.0.0.0",
+        "event.action": "auto clear users history start",
+        "event.code": "288",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 604,
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "0.0.0.0"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "0.0.0.0",
+        "source.ip": "0.0.0.0",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

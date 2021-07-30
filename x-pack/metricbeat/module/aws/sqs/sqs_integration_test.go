@@ -10,11 +10,11 @@ package sqs
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
-
 	"github.com/stretchr/testify/assert"
 
+	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
@@ -27,30 +27,12 @@ func TestFetch(t *testing.T) {
 	}
 
 	assert.NotEmpty(t, events)
-
-	for _, event := range events {
-		// RootField
-		mtest.CheckEventField("service.name", "string", event, t)
-		mtest.CheckEventField("cloud.region", "string", event, t)
-		// MetricSetField
-		mtest.CheckEventField("empty_receives", "float", event, t)
-		mtest.CheckEventField("messages.delayed", "float", event, t)
-		mtest.CheckEventField("messages.deleted", "float", event, t)
-		mtest.CheckEventField("messages.not_visible", "float", event, t)
-		mtest.CheckEventField("messages.received", "float", event, t)
-		mtest.CheckEventField("messages.sent", "float", event, t)
-		mtest.CheckEventField("messages.visible", "float", event, t)
-		mtest.CheckEventField("oldest_message_age.sec", "float", event, t)
-		mtest.CheckEventField("sent_message_size", "float", event, t)
-		mtest.CheckEventField("queue.name", "string", event, t)
-	}
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
 }
 
 func TestData(t *testing.T) {
 	config := mtest.GetConfigForTest(t, "sqs", "300s")
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	if err := mbtest.WriteEventsReporterV2Error(metricSet, t, "/"); err != nil {
-		t.Fatal("write", err)
-	}
+	metricSet := mbtest.NewFetcher(t, config)
+	metricSet.WriteEvents(t, "/")
 }

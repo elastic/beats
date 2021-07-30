@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
@@ -33,6 +34,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+)
+
+const (
+	// Names that are registered by the test for logging events.
+	providerName = "WinlogbeatTestGo"
+	sourceName   = "Integration Test"
+
+	// Event message files used when logging events.
+
+	// EventCreate.exe has valid event IDs in the range of 1-1000 where each
+	// event message requires a single parameter.
+	eventCreateMsgFile = "%SystemRoot%\\System32\\EventCreate.exe"
+	// services.exe is used by the Service Control Manager as its event message
+	// file; these tests use it to log messages with more than one parameter.
+	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
+	// netevent.dll has messages that require no message parameters.
+	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
 )
 
 func TestWindowsEventLogAPI(t *testing.T) {
@@ -50,12 +68,10 @@ func testWindowsEventLog(t *testing.T, api string) {
 	setLogSize(t, providerName, gigabyte)
 
 	// Publish large test messages.
+	const messageSize = 256 // Originally 31800, such a large value resulted in an empty eventlog under Win10.
 	const totalEvents = 1000
 	for i := 0; i < totalEvents; i++ {
-		err := writer.Report(eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(31800)})
-		if err != nil {
-			t.Fatal(err)
-		}
+		safeWriteEvent(t, writer, eventlog.Info, uint32(i%1000), []string{strconv.Itoa(i) + " " + randomSentence(messageSize)})
 	}
 
 	openLog := func(t testing.TB, config map[string]interface{}) EventLog {
@@ -167,6 +183,20 @@ func createLog(t testing.TB, messageFiles ...string) (log *eventlog.Log, tearDow
 	return log, tearDown
 }
 
+func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+	deadline := time.Now().Add(time.Second * 10)
+	for {
+		err := log.Report(etype, eid, msgs)
+		if err == nil {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("Failed to write event to event log", err)
+			return
+		}
+	}
+}
+
 // setLogSize set the maximum number of bytes that an event log can hold.
 func setLogSize(t testing.TB, provider string, sizeBytes int) {
 	output, err := exec.Command("wevtutil.exe", "sl", "/ms:"+strconv.Itoa(sizeBytes), provider).CombinedOutput()
@@ -187,8 +217,6 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 		log, err = newWinEventLog(cfg)
 	case winEventLogExpAPIName:
 		log, err = newWinEventLogExp(cfg)
-	case eventLoggingAPIName:
-		log, err = newEventLogging(cfg)
 	default:
 		t.Fatalf("Unknown API name: '%s'", api)
 	}

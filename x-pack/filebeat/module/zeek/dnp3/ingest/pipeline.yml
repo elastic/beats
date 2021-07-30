@@ -10,6 +10,7 @@ processors:
     field: zeek.dnp3.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.dnp3.ts
 - set:
@@ -23,14 +24,6 @@ processors:
 - lowercase:
     field: event.action
     ignore_missing: true
-- append:
-    field: related.ip
-    value: '{{source.ip}}'
-    if: ctx?.source?.ip != null
-- append:
-    field: related.ip
-    value: '{{destination.ip}}'
-    if: ctx?.destination?.ip != null
 - geoip:
     field: destination.ip
     target_field: destination.geo
@@ -69,6 +62,14 @@ processors:
     field: destination.as.organization_name
     target_field: destination.as.organization.name
     ignore_missing: true
+- append:
+    field: related.ip
+    value: '{{source.ip}}'
+    if: ctx?.source?.ip != null
+- append:
+    field: related.ip
+    value: '{{destination.ip}}'
+    if: ctx?.destination?.ip != null
 on_failure:
 - set:
     field: error.message

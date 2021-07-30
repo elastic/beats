@@ -25,7 +25,7 @@ type cloudfoundryEvent interface {
 func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       "cloudfoundry",
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "collect logs from cloudfoundry loggregator",
 		Manager:    stateless.NewInputManager(configure),

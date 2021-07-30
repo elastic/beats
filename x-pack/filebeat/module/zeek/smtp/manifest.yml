@@ -10,8 +10,8 @@ var:
       - /usr/local/var/logs/current/smtp.log
   - name: tags
     default: [zeek.smtp]
-  - name: community_id
-    default: true
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/smtp.yml

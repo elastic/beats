@@ -59,7 +59,7 @@ func newHTTPEndpoint(config config) (*httpEndpoint, error) {
 		return nil, err
 	}
 	if tlsConfigBuilder != nil {
-		tlsConfig = tlsConfigBuilder.BuildModuleConfig(addr)
+		tlsConfig = tlsConfigBuilder.BuildModuleClientConfig(addr)
 	}
 
 	return &httpEndpoint{
@@ -90,22 +90,26 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 		contentType:  e.config.ContentType,
 		secretHeader: e.config.SecretHeader,
 		secretValue:  e.config.SecretValue,
+		hmacHeader:   e.config.HMACHeader,
+		hmacKey:      e.config.HMACKey,
+		hmacType:     e.config.HMACType,
+		hmacPrefix:   e.config.HMACPrefix,
 	}
 
 	handler := &httpHandler{
-		log:          log,
-		publisher:    publisher,
-		messageField: e.config.Prefix,
-		responseCode: e.config.ResponseCode,
-		responseBody: e.config.ResponseBody,
+		log:                   log,
+		publisher:             publisher,
+		messageField:          e.config.Prefix,
+		responseCode:          e.config.ResponseCode,
+		responseBody:          e.config.ResponseBody,
+		includeHeaders:        canonicalizeHeaders(e.config.IncludeHeaders),
+		preserveOriginalEvent: e.config.PreserveOriginalEvent,
 	}
 
 	mux := http.NewServeMux()
 	mux.HandleFunc(e.config.URL, withValidator(validator, handler.apiResponse))
 	server := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux}
-	_, cancel := ctxtool.WithFunc(ctxtool.FromCanceller(ctx.Cancelation), func() {
-		server.Close()
-	})
+	_, cancel := ctxtool.WithFunc(ctx.Cancelation, func() { server.Close() })
 	defer cancel()
 
 	var err error
@@ -119,7 +123,7 @@ func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error 
 	}
 
 	if err != nil && err != http.ErrServerClosed {
-		return fmt.Errorf("Unable to start server due to error: %w", err)
+		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
 }

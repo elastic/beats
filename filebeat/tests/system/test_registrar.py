@@ -275,6 +275,8 @@ class Test(BaseTest):
 
         self.assertEqual(self.file_permissions(os.path.join(registry_path, "log.json")), "0o640")
 
+    @unittest.skipIf(platform.system() == 'Darwin' or os.name == 'nt',
+                     'Flaky test: https://github.com/elastic/beats/issues/26378')
     def test_rotating_file(self):
         """
         Checks that the registry is properly updated after a file is rotated
@@ -1219,6 +1221,7 @@ class Test(BaseTest):
         # Check that offset is set to the end of the file
         assert data[0]["offset"] == os.path.getsize(testfile_path1)
 
+    @unittest.skipIf(platform.system() == 'Darwin', 'Flaky test: https://github.com/elastic/beats/issues/22407')
     def test_ignore_older_state_clean_inactive(self):
         """
         Check that state for ignore_older is not persisted when falling under clean_inactive

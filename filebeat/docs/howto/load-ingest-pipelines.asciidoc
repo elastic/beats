@@ -3,10 +3,8 @@
 
 The ingest pipelines used to parse log lines are set up automatically the first
 time you run {beatname_uc}, assuming the {es} output is enabled. If you're sending
-events to {ls}, or plan to use
-<<configuration-central-management,{beats} central management>>, you need to
-load the ingest pipelines manually. To do this, run the `setup` command with
-the `--pipelines` option specified. If you used the
+events to {ls} you need to load the ingest pipelines manually. To do this, run the
+`setup` command with the `--pipelines` option specified. If you used the
 <<modules-command,`modules`>> command to enable modules in the `modules.d`
 directory, also specify the `--modules` flag. For example, the following command
 loads the ingest pipelines used by all filesets enabled in the system, nginx,

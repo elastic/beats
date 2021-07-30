@@ -6,6 +6,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 )
@@ -15,6 +16,7 @@ type {plugin_type} struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
 	transConfig  transactionConfig
+	watcher      procs.ProcessesWatcher
 	pub          transPub
 }
 
@@ -45,6 +47,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &{plugin_type}{}
@@ -55,17 +58,18 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func ({plugin_var} *{plugin_type}) init(results protos.Reporter, config *{protocol}Config) error {
+func ({plugin_var} *{plugin_type}) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *{protocol}Config) error {
 	if err := {plugin_var}.setFromConfig(config); err != nil {
 		return err
 	}
 	{plugin_var}.pub.results = results
+	{plugin_var}.watcher = watcher
 
 	isDebug = logp.IsDebug("http")
 	return nil
@@ -162,7 +166,7 @@ func ({plugin_var} *{plugin_type}) ensureConnection(private protos.ProtocolData)
 	conn := getConnection(private)
 	if conn == nil {
 		conn = &connection{}
-		conn.trans.init(&{plugin_var}.transConfig, {plugin_var}.pub.onTransaction)
+		conn.trans.init(&{plugin_var}.transConfig, {plugin_var}.watcher, {plugin_var}.pub.onTransaction)
 	}
 	return conn
 }

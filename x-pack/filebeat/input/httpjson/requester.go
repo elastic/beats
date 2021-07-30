@@ -12,8 +12,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -39,6 +40,8 @@ type requester struct {
 	authScheme    string
 	jsonObjects   string
 	splitEventsBy string
+
+	cursorState cursorState
 }
 
 func newRequester(
@@ -71,9 +74,9 @@ type response struct {
 }
 
 // processHTTPRequest processes HTTP request, and handles pagination if enabled
-func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.Publisher) error {
+func (r *requester) processHTTPRequest(ctx context.Context, publisher cursor.Publisher) error {
 	ri := &requestInfo{
-		url:        r.dateCursor.getURL(),
+		url:        r.dateCursor.getURL(r.cursorState.LastDateCursorValue),
 		contentMap: common.MapStr{},
 		headers:    r.headers,
 	}
@@ -110,6 +113,7 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 			return err
 		}
 
+		response.header = resp.Header
 		responseData, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return fmt.Errorf("failed to read http response: %w", err)
@@ -162,10 +166,10 @@ func (r *requester) processHTTPRequest(ctx context.Context, publisher stateless.
 		if err != nil {
 			return err
 		}
-	}
 
-	if lastObj != nil && r.dateCursor.enabled {
-		r.dateCursor.advance(common.MapStr(lastObj))
+		if lastObj != nil && r.dateCursor.enabled {
+			r.updateCursorState(ri.url, r.dateCursor.getNextValue(common.MapStr(lastObj)))
+		}
 	}
 
 	return nil
@@ -209,18 +213,20 @@ func (r *requester) createHTTPRequest(ctx context.Context, ri *requestInfo) (*ht
 }
 
 // processEventArray publishes an event for each object contained in the array. It returns the last object in the array and an error if any.
-func (r *requester) processEventArray(publisher stateless.Publisher, events []interface{}) (map[string]interface{}, error) {
+func (r *requester) processEventArray(publisher cursor.Publisher, events []interface{}) (map[string]interface{}, error) {
 	var last map[string]interface{}
 	for _, t := range events {
 		switch v := t.(type) {
 		case map[string]interface{}:
-			for _, e := range r.splitEvent(v) {
+			for _, e := range splitEvent(r.splitEventsBy, v) {
 				last = e
 				d, err := json.Marshal(e)
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal %+v: %w", e, err)
 				}
-				publisher.Publish(makeEvent(string(d)))
+				if err := publisher.Publish(makeEvent(string(d)), r.cursorState); err != nil {
+					return nil, fmt.Errorf("failed to publish: %w", err)
+				}
 			}
 		default:
 			return nil, fmt.Errorf("expected only JSON objects in the array but got a %T", v)
@@ -229,15 +235,23 @@ func (r *requester) processEventArray(publisher stateless.Publisher, events []in
 	return last, nil
 }
 
-func (r *requester) splitEvent(event map[string]interface{}) []map[string]interface{} {
+func splitEvent(splitKey string, event map[string]interface{}) []map[string]interface{} {
 	m := common.MapStr(event)
 
-	hasSplitKey, _ := m.HasKey(r.splitEventsBy)
-	if r.splitEventsBy == "" || !hasSplitKey {
+	// NOTE: this notation is only used internally, not meant to be documented
+	// and will be removed in the next release
+	keys := strings.SplitN(splitKey, "..", 2)
+	if len(keys) < 2 {
+		// we append an empty key to force the recursive call
+		keys = append(keys, "")
+	}
+
+	hasSplitKey, _ := m.HasKey(keys[0])
+	if keys[0] == "" || !hasSplitKey {
 		return []map[string]interface{}{event}
 	}
 
-	splitOnIfc, _ := m.GetValue(r.splitEventsBy)
+	splitOnIfc, _ := m.GetValue(keys[0])
 	splitOn, ok := splitOnIfc.([]interface{})
 	// if not an array or is empty, we do nothing
 	if !ok || len(splitOn) == 0 {
@@ -252,13 +266,35 @@ func (r *requester) splitEvent(event map[string]interface{}) []map[string]interf
 			return []map[string]interface{}{event}
 		}
 
-		mm := m.Clone()
-		if _, err := mm.Put(r.splitEventsBy, s); err != nil {
-			return []map[string]interface{}{event}
+		// call splitEvent recursively for each part
+		for _, nestedSplit := range splitEvent(keys[1], s) {
+			mm := m.Clone()
+			if _, err := mm.Put(keys[0], nestedSplit); err != nil {
+				return []map[string]interface{}{event}
+			}
+			events = append(events, mm)
 		}
-
-		events = append(events, mm)
 	}
 
 	return events
+}
+
+type cursorState struct {
+	LastCalledURL       string
+	LastDateCursorValue string
+}
+
+func (r *requester) updateCursorState(url, value string) {
+	r.cursorState.LastCalledURL = url
+	r.cursorState.LastDateCursorValue = value
+}
+
+func (r *requester) loadCursor(c *cursor.Cursor, log *logp.Logger) {
+	if c == nil || c.IsNew() {
+		return
+	}
+
+	if err := c.Unpack(&r.cursorState); err != nil {
+		log.Errorf("Reset http cursor state. Failed to read from registry: %v", err)
+	}
 }

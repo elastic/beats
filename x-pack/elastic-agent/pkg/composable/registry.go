@@ -21,7 +21,7 @@ type providerRegistry struct {
 
 // Providers holds all known providers, they must be added to it to enable them for use
 var Providers = &providerRegistry{
-	contextProviders: make(map[string]ContextProviderBuilder, 0),
-	dynamicProviders: make(map[string]DynamicProviderBuilder, 0),
+	contextProviders: make(map[string]ContextProviderBuilder),
+	dynamicProviders: make(map[string]DynamicProviderBuilder),
 	logger:           logp.NewLogger("dynamic"),
 }

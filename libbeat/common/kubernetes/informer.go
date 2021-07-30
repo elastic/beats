@@ -149,13 +149,24 @@ func NewInformer(client kubernetes.Interface, resource Resource, opts WatchOptio
 		}
 
 		objType = "service"
+	case *Job:
+		job := client.BatchV1().Jobs(opts.Namespace)
+		listwatch = &cache.ListWatch{
+			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
+				return job.List(ctx, options)
+			},
+			WatchFunc: func(options metav1.ListOptions) (watch.Interface, error) {
+				return job.Watch(ctx, options)
+			},
+		}
+
+		objType = "job"
 	default:
 		return nil, "", fmt.Errorf("unsupported resource type for watching %T", resource)
 	}
 
-	if indexers != nil {
-		return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
+	if indexers == nil {
+		indexers = cache.Indexers{}
 	}
-
-	return cache.NewSharedInformer(listwatch, resource, opts.SyncTimeout), objType, nil
+	return cache.NewSharedIndexInformer(listwatch, resource, opts.SyncTimeout, indexers), objType, nil
 }

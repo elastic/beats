@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"time"
 
@@ -44,17 +45,27 @@ const (
 	packageStagingDir = "build/package/"
 	packageEndDir     = "build/distributions/"
 	rootImageName     = "rootfsimage"
+	dockerfileTmpl    = "Dockerfile.tmpl"
 )
 
 var (
 	buildDir         = filepath.Join(packageStagingDir, logDriverName)
 	dockerExportPath = filepath.Join(packageStagingDir, "temproot.tar")
+
+	platformMap = map[string]map[string]interface{}{
+		"amd64": map[string]interface{}{
+			"from": "alpine:3.10",
+		},
+		"arm64": map[string]interface{}{
+			"from": "arm64v8/alpine:3.10",
+		},
+	}
 )
 
 func init() {
 	devtools.BeatLicense = "Elastic License"
 	devtools.BeatDescription = "The Docker Logging Driver is a docker plugin for the Elastic Stack."
-	devtools.Platforms = devtools.Platforms.Filter("linux/amd64")
+	devtools.Platforms = devtools.Platforms.Filter("linux/amd64 linux/arm64")
 }
 
 // getPluginName returns the fully qualified name:version string.
@@ -67,7 +78,7 @@ func getPluginName() (string, error) {
 }
 
 // createContainer builds the plugin and creates the container that will later become the rootfs used by the plugin
-func createContainer(ctx context.Context, cli *client.Client) error {
+func createContainer(ctx context.Context, cli *client.Client, arch string) error {
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
 		return errors.Wrap(err, "error getting work dir")
@@ -75,6 +86,12 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 
 	if !strings.Contains(dockerLogBeatDir, "dockerlogbeat") {
 		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
+	}
+
+	dockerfile := filepath.Join(packageStagingDir, "Dockerfile")
+	err = devtools.ExpandFile(dockerfileTmpl, dockerfile, platformMap[arch])
+	if err != nil {
+		return errors.Wrap(err, "error while expanding Dockerfile template")
 	}
 
 	// start to build the root container that'll be used to build the plugin
@@ -98,7 +115,7 @@ func createContainer(ctx context.Context, cli *client.Client) error {
 
 	buildOpts := types.ImageBuildOptions{
 		Tags:       []string{rootImageName},
-		Dockerfile: "Dockerfile",
+		Dockerfile: dockerfile,
 	}
 	//build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
@@ -137,56 +154,64 @@ func BuildContainer(ctx context.Context) error {
 		return errors.Wrap(err, "error creating build dir")
 	}
 
-	err = createContainer(ctx, cli)
-	if err != nil {
-		return errors.Wrap(err, "error creating base container")
-	}
-
-	// create the container that will become our rootfs
-	CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
-	if err != nil {
-		return errors.Wrap(err, "error creating container")
-	}
-
-	defer func() {
-		// cleanup
-		if _, noClean := os.LookupEnv("DOCKERLOGBEAT_NO_CLEANUP"); !noClean {
-			err = cleanDockerArtifacts(ctx, CreatedContainerBody.ID, cli)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error cleaning up docker: %s", err)
-			}
+	for _, plat := range devtools.Platforms {
+		arch := plat.GOARCH()
+		if runtime.GOARCH != arch {
+			fmt.Println("Skippping building for", arch, "as runtime is different")
+			continue
 		}
-	}()
 
-	fmt.Printf("Got image: %#v\n", CreatedContainerBody.ID)
+		err = createContainer(ctx, cli, arch)
+		if err != nil {
+			return errors.Wrap(err, "error creating base container")
+		}
 
-	file, err := os.Create(dockerExportPath)
-	if err != nil {
-		return errors.Wrap(err, "error creating tar archive")
-	}
+		// create the container that will become our rootfs
+		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, "")
+		if err != nil {
+			return errors.Wrap(err, "error creating container")
+		}
 
-	// export the container to a tar file
-	exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
-	if err != nil {
-		return errors.Wrap(err, "error exporting container")
-	}
+		defer func() {
+			// cleanup
+			if _, noClean := os.LookupEnv("DOCKERLOGBEAT_NO_CLEANUP"); !noClean {
+				err = cleanDockerArtifacts(ctx, CreatedContainerBody.ID, cli)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "Error cleaning up docker: %s", err)
+				}
+			}
+		}()
 
-	_, err = io.Copy(file, exportReader)
-	if err != nil {
-		return errors.Wrap(err, "error writing exported container")
-	}
+		fmt.Printf("Got image: %#v\n", CreatedContainerBody.ID)
 
-	//misc prepare operations
+		file, err := os.Create(dockerExportPath)
+		if err != nil {
+			return errors.Wrap(err, "error creating tar archive")
+		}
 
-	err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
-	if err != nil {
-		return errors.Wrap(err, "error copying config.json")
-	}
+		// export the container to a tar file
+		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
+		if err != nil {
+			return errors.Wrap(err, "error exporting container")
+		}
 
-	// unpack the tar file into a root directory, which is the format needed for the docker plugin create tool
-	err = sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(buildDir, "rootfs"))
-	if err != nil {
-		return errors.Wrap(err, "error unpacking exported container")
+		_, err = io.Copy(file, exportReader)
+		if err != nil {
+			return errors.Wrap(err, "error writing exported container")
+		}
+
+		//misc prepare operations
+
+		err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
+		if err != nil {
+			return errors.Wrap(err, "error copying config.json")
+		}
+
+		// unpack the tar file into a root directory, which is the format needed for the docker plugin create tool
+		err = sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(buildDir, "rootfs"))
+		if err != nil {
+			return errors.Wrap(err, "error unpacking exported container")
+		}
 	}
 
 	return nil
@@ -293,20 +318,23 @@ func Export() error {
 		version = version + "-SNAPSHOT"
 	}
 
-	tarballName := fmt.Sprintf("%s-%s-%s.tar.gz", logDriverName, version, "docker-plugin")
+	for _, plat := range devtools.Platforms {
+		arch := plat.GOARCH()
+		tarballName := fmt.Sprintf("%s-%s-%s-%s.tar.gz", logDriverName, version, "docker-plugin", arch)
 
-	outpath := filepath.Join("../..", packageEndDir, tarballName)
+		outpath := filepath.Join("../..", packageEndDir, tarballName)
 
-	err = os.Chdir(packageStagingDir)
-	if err != nil {
-		return errors.Wrap(err, "error changing directory")
-	}
+		err = os.Chdir(packageStagingDir)
+		if err != nil {
+			return errors.Wrap(err, "error changing directory")
+		}
 
-	err = sh.RunV("tar", "zcf", outpath,
-		filepath.Join(logDriverName, "rootfs"),
-		filepath.Join(logDriverName, "config.json"))
-	if err != nil {
-		return errors.Wrap(err, "error creating release tarball")
+		err = sh.RunV("tar", "zcf", outpath,
+			filepath.Join(logDriverName, "rootfs"),
+			filepath.Join(logDriverName, "config.json"))
+		if err != nil {
+			return errors.Wrap(err, "error creating release tarball")
+		}
 	}
 
 	return nil
@@ -337,12 +365,26 @@ func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
 
-	if _, enabled := devtools.Platforms.Get("linux/amd64"); !enabled {
-		fmt.Println(">> package: skipping because linux/amd64 is not enabled")
+	if !isSupportedPlatform() {
+		fmt.Println(">> package: skipping because no supported platform is enabled")
 		return
 	}
 
 	mg.SerialDeps(Build, Export)
+}
+
+func isSupportedPlatform() bool {
+	_, isAMD64Selected := devtools.Platforms.Get("linux/amd64")
+	_, isARM64Selected := devtools.Platforms.Get("linux/arm64")
+	arch := runtime.GOARCH
+
+	if arch == "amd64" && isARM64Selected {
+		devtools.Platforms = devtools.Platforms.Remove("linux/arm64")
+	} else if arch == "arm64" && isAMD64Selected {
+		devtools.Platforms = devtools.Platforms.Remove("linux/amd64")
+	}
+
+	return len(devtools.Platforms) > 0
 }
 
 // BuildAndInstall builds and installs the plugin

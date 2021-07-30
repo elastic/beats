@@ -45,9 +45,9 @@ type NodeInterestingStats struct {
 	CurrItems                int64   `json:"curr_items"`
 	CurrItemsTot             int64   `json:"curr_items_tot"`
 	EpBgFetched              int64   `json:"ep_bg_fetched"`
-	GetHits                  int64   `json:"get_hits"`
+	GetHits                  float64 `json:"get_hits"`
 	MemUsed                  int64   `json:"mem_used"`
-	Ops                      int64   `json:"ops"`
+	Ops                      float64 `json:"ops"`
 	VbReplicaCurrItems       int64   `json:"vb_replica_curr_items"`
 }
 

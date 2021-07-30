@@ -50,7 +50,7 @@ func TestInitResources(t *testing.T) {
 		client := NewMockClient()
 		client.Config = resourceQueryConfig
 		m := &MockService{}
-		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(resources.ListResultPage{}, errors.New("invalid resource query"))
+		m.On("GetResourceDefinitions", mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return([]resources.GenericResource{}, errors.New("invalid resource query"))
 		client.AzureMonitorService = m
 		mr := MockReporterV2{}
 		mr.On("Error", mock.Anything).Return(true)

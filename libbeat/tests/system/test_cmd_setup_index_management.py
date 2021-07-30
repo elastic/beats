@@ -110,7 +110,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
@@ -242,7 +242,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_template + "*"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.custom_template)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_template)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_template, [self.custom_template + "*"])
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
@@ -261,7 +261,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
 
         # check that settings are overwritten
         resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
@@ -284,7 +284,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.name=" + self.custom_alias,
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.custom_alias)
+        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_alias)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template

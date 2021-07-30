@@ -43,19 +43,19 @@
                   example: 3
                   description: >
                     The audit session of the object process.
-            - name: cmd
+            - name: process.command_line
               type: keyword
               required: false
               example: "/lib/systemd/systemd --user"
               description: >
                 The command line of the process.
-            - name: name
+            - name: process.name
               type: keyword
               required: false
               example: "/lib/systemd/systemd"
               description: >
                 Name of the executable.
-            - name: executable
+            - name: process.executable
               type: keyword
               required: false
               description: >
@@ -176,7 +176,7 @@
                   example: 3
                   description: >
                     The audit session of the source process.
-            - name: cmd
+            - name: command_line
               type: keyword
               required: false
               example: "/lib/systemd/systemd --user"

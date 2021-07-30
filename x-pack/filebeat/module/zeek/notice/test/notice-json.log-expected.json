@@ -8,8 +8,8 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
@@ -40,6 +40,7 @@
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 50.1188,
         "destination.geo.location.lon": 8.6843,
         "destination.geo.region_iso_code": "DE-HE",
@@ -52,15 +53,16 @@
         "event.kind": "alert",
         "event.module": "zeek",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 357,
+        "network.direction": "external",
         "related.ip": [
-            "8.42.77.171",
-            "207.154.238.205"
+            "207.154.238.205",
+            "8.42.77.171"
         ],
         "rule.description": "8.42.77.171 scanned at least 15 unique ports of host 207.154.238.205 in 0m0s",
         "rule.name": "Scan::Port_Scan",
@@ -71,6 +73,7 @@
         "source.geo.city_name": "Longmont",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 40.1559,
         "source.geo.location.lon": -105.1624,
         "source.geo.region_iso_code": "US-CO",

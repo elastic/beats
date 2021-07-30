@@ -1,0 +1,77 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+
+request.method: POST
+{{ if .ssl }}
+request.ssl: {{ .ssl | tojson }}
+{{ end }}
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+request.url: {{ .url }}
+request.body:
+    limit: 100
+    page: 1
+    returnFormat: json
+{{if .filters}}
+    {{ range $key, $value := .filters}}{{$key}}: {{$value | tojson}}{{end}}
+{{end}}
+request.transforms:
+{{ if .api_token }}
+- set:
+    target: header.Authorization
+    value: {{ .api_token }}
+{{end}}
+- set:
+    target: body.timestamp
+    value: '[[.cursor.timestamp]]'
+    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "UnixDate" ]]'
+
+response.split:
+  target: body.response
+  split:
+    target: body.Event.Attribute
+    keep_parent: true
+response.request_body_on_pagination: true
+response.pagination:
+- set:
+    target: body.page
+    value: '[[add .last_response.page 1]]'
+cursor:
+  timestamp:
+    value: '[[.last_event.Event.timestamp]]'
+
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      document_id: Event.Attribute.uuid
+      target: json
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.10.0

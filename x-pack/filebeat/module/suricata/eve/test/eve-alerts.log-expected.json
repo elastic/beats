@@ -9,6 +9,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -17,8 +18,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -38,9 +39,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:Tx1T2pcsxn4KDSlkBTi/5q9tZuo=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -60,7 +65,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 2191386088856669,
+        "suricata.eve.flow_id": "2191386088856669",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -86,6 +91,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -94,8 +100,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -115,9 +121,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:A30Bhw0tTI2EifayU+MwAocMCZs=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -137,7 +147,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 678269478904081,
+        "suricata.eve.flow_id": "678269478904081",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -163,6 +173,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -171,8 +182,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -192,9 +203,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:QI9ZBw/ltPo2cnzG5ne3IrgSdhw=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.net"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -214,7 +229,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 1170030461115650,
+        "suricata.eve.flow_id": "1170030461115650",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -240,6 +255,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -248,8 +264,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -269,9 +285,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:kvem4ydd+kylAQHyyYnQUREfRDY=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -291,7 +311,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 49628113637132,
+        "suricata.eve.flow_id": "49628113637132",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -317,6 +337,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -325,8 +346,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -346,9 +367,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:HpBUwS4J4Fkh+ON3BdMMGV4jy8I=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -368,7 +393,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 116307482565223,
+        "suricata.eve.flow_id": "116307482565223",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -394,6 +419,7 @@
         "destination.geo.city_name": "Norwell",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.1596,
         "destination.geo.location.lon": -70.8217,
         "destination.geo.region_iso_code": "US-MA",
@@ -402,8 +428,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -423,9 +449,13 @@
         "message": "Attempted Information Leak",
         "network.bytes": 2001,
         "network.community_id": "1:Bp3vB9bJiV2y/u23rxSpviRLSto=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "example.org"
+        ],
         "related.ip": [
             "192.168.1.146",
             "93.184.216.34"
@@ -445,7 +475,7 @@
         "suricata.eve.alert.signature": "ET POLICY curl User-Agent Outbound",
         "suricata.eve.alert.signature_id": 2013028,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 1205867738178946,
+        "suricata.eve.flow_id": "1205867738178946",
         "suricata.eve.http.http_content_type": "text/html",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
@@ -471,6 +501,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -479,8 +510,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -500,9 +531,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 2151,
         "network.community_id": "1:/kMBCIkdcM80Xtj2MYPWlkzcovg=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -522,7 +557,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 764842923400056,
+        "suricata.eve.flow_id": "764842923400056",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 0,
@@ -548,6 +583,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -556,8 +592,8 @@
         "destination.packets": 3,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -577,9 +613,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 904,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 7,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -599,7 +639,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 0,
@@ -625,6 +665,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -633,8 +674,8 @@
         "destination.packets": 5,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -654,9 +695,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 4287,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 11,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -676,7 +721,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 1,
@@ -702,6 +747,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -710,8 +756,8 @@
         "destination.packets": 62,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -731,9 +777,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 95353,
         "network.community_id": "1:/kMBCIkdcM80Xtj2MYPWlkzcovg=",
+        "network.direction": "outbound",
         "network.packets": 126,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -753,7 +803,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 764842923400056,
+        "suricata.eve.flow_id": "764842923400056",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 1,
@@ -779,6 +829,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -787,8 +838,8 @@
         "destination.packets": 98,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -808,9 +859,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 151605,
         "network.community_id": "1:/kMBCIkdcM80Xtj2MYPWlkzcovg=",
+        "network.direction": "outbound",
         "network.packets": 185,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -830,7 +885,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 764842923400056,
+        "suricata.eve.flow_id": "764842923400056",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 2,
@@ -856,6 +911,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5132,
         "destination.geo.location.lon": -0.0961,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -864,8 +920,8 @@
         "destination.packets": 221,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -885,9 +941,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 341985,
         "network.community_id": "1:/kMBCIkdcM80Xtj2MYPWlkzcovg=",
+        "network.direction": "outbound",
         "network.packets": 377,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "security.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.88.152"
@@ -907,7 +967,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 764842923400056,
+        "suricata.eve.flow_id": "764842923400056",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 3,
@@ -933,6 +993,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -941,8 +1002,8 @@
         "destination.packets": 67,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -962,9 +1023,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 101449,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 131,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -984,7 +1049,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 2,
@@ -1010,6 +1075,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1018,8 +1084,8 @@
         "destination.packets": 119,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1039,9 +1105,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 181775,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 210,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1061,7 +1131,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 3,
@@ -1087,6 +1157,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1095,8 +1166,8 @@
         "destination.packets": 253,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1116,9 +1187,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 388131,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 412,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1138,7 +1213,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 4,
@@ -1164,6 +1239,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1172,8 +1248,8 @@
         "destination.packets": 314,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1193,9 +1269,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 482156,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 504,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1215,7 +1295,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 5,
@@ -1241,6 +1321,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1249,8 +1330,8 @@
         "destination.packets": 588,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1270,9 +1351,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 903684,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 916,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1292,7 +1377,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 6,
@@ -1318,6 +1403,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1326,8 +1412,8 @@
         "destination.packets": 591,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1347,9 +1433,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 908100,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 921,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1369,7 +1459,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 7,
@@ -1395,6 +1485,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1403,8 +1494,8 @@
         "destination.packets": 979,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1423,9 +1514,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 1504422,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 1503,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1445,7 +1540,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 8,
@@ -1471,6 +1566,7 @@
         "destination.geo.city_name": "Boston",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 42.3562,
         "destination.geo.location.lon": -71.0631,
         "destination.geo.region_iso_code": "US-MA",
@@ -1479,8 +1575,8 @@
         "destination.packets": 1079,
         "destination.port": 80,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1499,9 +1595,13 @@
         "message": "Not Suspicious Traffic",
         "network.bytes": 1658832,
         "network.community_id": "1:v4+r8WgQyj/+LOpAIRGXwdlh/Xk=",
+        "network.direction": "outbound",
         "network.packets": 1654,
         "network.protocol": "http",
         "network.transport": "tcp",
+        "related.hosts": [
+            "archive.ubuntu.com"
+        ],
         "related.ip": [
             "192.168.1.146",
             "91.189.91.23"
@@ -1521,7 +1621,7 @@
         "suricata.eve.alert.signature": "ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management",
         "suricata.eve.alert.signature_id": 2013504,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 112424506237238,
+        "suricata.eve.flow_id": "112424506237238",
         "suricata.eve.http.protocol": "HTTP/1.1",
         "suricata.eve.in_iface": "enp0s3",
         "suricata.eve.tx_id": 9,
@@ -1553,21 +1653,11 @@
         "event.type": [
             "protocol"
         ],
-        "file.x509.issuer.common_name": "Google Internet Authority G2",
-        "file.x509.issuer.country": "US",
-        "file.x509.issuer.organization": "Google Inc",
-        "file.x509.not_after": "2024-07-16T14:52:35.000Z",
-        "file.x509.not_before": "2019-07-17T14:52:35.000Z",
-        "file.x509.serial_number": "001122334455667788",
-        "file.x509.subject.common_name": "*.google.com",
-        "file.x509.subject.country": "US",
-        "file.x509.subject.locality": "Mountain View",
-        "file.x509.subject.organization": "Google Inc",
-        "file.x509.subject.state_or_province": "California",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 16546,
         "network.community_id": "1:qsGDjYDIWp+kHhxotTdhPbUaWSo=",
+        "network.direction": "internal",
         "network.protocol": "tls",
         "network.transport": "tcp",
         "related.hash": [
@@ -1582,7 +1672,7 @@
         "source.ip": "10.126.2.140",
         "source.port": 45884,
         "suricata.eve.event_type": "tls",
-        "suricata.eve.flow_id": 1091813059495729,
+        "suricata.eve.flow_id": "1091813059495729",
         "suricata.eve.in_iface": "enp5s0",
         "suricata.eve.tls.fingerprint": "00:11:22:33:44:55:66:77:88:99:aa:bb:cc:dd:ee:ff:00:11:22:33",
         "suricata.eve.tls.issuerdn": "C=US, O=Google Inc, CN=Google Internet Authority G2",
@@ -1607,6 +1697,17 @@
         "tls.server.not_after": "2024-07-16T14:52:35.000Z",
         "tls.server.not_before": "2019-07-17T14:52:35.000Z",
         "tls.server.subject": "C=US, ST=California, L=Mountain View, O=Google Inc, CN=*.google.com",
+        "tls.server.x509.issuer.common_name": "Google Internet Authority G2",
+        "tls.server.x509.issuer.country": "US",
+        "tls.server.x509.issuer.organization": "Google Inc",
+        "tls.server.x509.not_after": "2024-07-16T14:52:35.000Z",
+        "tls.server.x509.not_before": "2019-07-17T14:52:35.000Z",
+        "tls.server.x509.serial_number": "001122334455667788",
+        "tls.server.x509.subject.common_name": "*.google.com",
+        "tls.server.x509.subject.country": "US",
+        "tls.server.x509.subject.locality": "Mountain View",
+        "tls.server.x509.subject.organization": "Google Inc",
+        "tls.server.x509.subject.state_or_province": "California",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     },
@@ -1619,8 +1720,8 @@
         "destination.packets": 8,
         "destination.port": 8443,
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "suricata.eve",
         "event.kind": "alert",
@@ -1631,27 +1732,13 @@
         "event.type": [
             "allowed"
         ],
-        "file.x509.issuer.common_name": "Unknown",
-        "file.x509.issuer.country": "Unknown",
-        "file.x509.issuer.locality": "Unknown",
-        "file.x509.issuer.organization": "Unknown",
-        "file.x509.issuer.organizational_unit": "Unknown",
-        "file.x509.issuer.state_or_province": "Unknown",
-        "file.x509.not_after": "2026-06-25T17:36:29.000Z",
-        "file.x509.not_before": "2016-06-27T17:36:29.000Z",
-        "file.x509.serial_number": "72A92C51",
-        "file.x509.subject.common_name": "Unknown",
-        "file.x509.subject.country": "Unknown",
-        "file.x509.subject.locality": "Unknown",
-        "file.x509.subject.organization": "Unknown",
-        "file.x509.subject.organizational_unit": "Unknown",
-        "file.x509.subject.state_or_province": "Unknown",
         "fileset.name": "eve",
         "input.type": "log",
         "log.offset": 17541,
         "message": "",
         "network.bytes": 5734,
         "network.community_id": "1:W6fjhboFUwyEchJ3ELaqSBzDEJE=",
+        "network.direction": "internal",
         "network.packets": 15,
         "network.protocol": "tls",
         "network.transport": "tcp",
@@ -1659,8 +1746,8 @@
             "363FEE2A1CFADEADBEEF4299CFA9B09101EBA9CC"
         ],
         "related.ip": [
-            "10.137.3.54",
-            "10.128.2.48"
+            "10.128.2.48",
+            "10.137.3.54"
         ],
         "rule.id": "2610003",
         "rule.name": "SURICATA TLS on unusual port",
@@ -1676,7 +1763,7 @@
         "suricata.eve.alert.signature": "SURICATA TLS on unusual port",
         "suricata.eve.alert.signature_id": 2610003,
         "suricata.eve.event_type": "alert",
-        "suricata.eve.flow_id": 991192778198299,
+        "suricata.eve.flow_id": "991192778198299",
         "suricata.eve.in_iface": "enp0s31f6",
         "suricata.eve.tls.fingerprint": "36:3f:ee:2a:1c:fa:de:ad:be:ef:42:99:cf:a9:b0:91:01:eb:a9:cc",
         "suricata.eve.tls.issuerdn": "C=Unknown, ST=Unknown, L=Unknown, O=Unknown, OU=Unknown, CN=Unknown",
@@ -1701,6 +1788,21 @@
         "tls.server.not_after": "2026-06-25T17:36:29.000Z",
         "tls.server.not_before": "2016-06-27T17:36:29.000Z",
         "tls.server.subject": "C=Unknown, ST=Unknown, L=Unknown, O=Unknown, OU=Unknown, CN=Unknown",
+        "tls.server.x509.issuer.common_name": "Unknown",
+        "tls.server.x509.issuer.country": "Unknown",
+        "tls.server.x509.issuer.locality": "Unknown",
+        "tls.server.x509.issuer.organization": "Unknown",
+        "tls.server.x509.issuer.organizational_unit": "Unknown",
+        "tls.server.x509.issuer.state_or_province": "Unknown",
+        "tls.server.x509.not_after": "2026-06-25T17:36:29.000Z",
+        "tls.server.x509.not_before": "2016-06-27T17:36:29.000Z",
+        "tls.server.x509.serial_number": "72A92C51",
+        "tls.server.x509.subject.common_name": "Unknown",
+        "tls.server.x509.subject.country": "Unknown",
+        "tls.server.x509.subject.locality": "Unknown",
+        "tls.server.x509.subject.organization": "Unknown",
+        "tls.server.x509.subject.organizational_unit": "Unknown",
+        "tls.server.x509.subject.state_or_province": "Unknown",
         "tls.version": "1.2",
         "tls.version_protocol": "tls"
     }

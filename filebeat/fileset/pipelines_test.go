@@ -25,10 +25,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
@@ -81,6 +83,7 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 						"fls": testFileset,
 					},
 				},
+				log: logp.NewLogger(logName),
 			}
 
 			testESServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -89,305 +92,21 @@ func TestLoadPipelinesWithMultiPipelineFileset(t *testing.T) {
 			defer testESServer.Close()
 
 			testESClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-				URL:     testESServer.URL,
-				Timeout: 90 * time.Second,
+				URL: testESServer.URL,
+				Transport: httpcommon.HTTPTransportSettings{
+					Timeout: 90 * time.Second,
+				},
 			})
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = testESClient.Connect()
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			err = testRegistry.LoadPipelines(testESClient, false)
 			if test.isErrExpected {
 				assert.IsType(t, MultiplePipelineUnsupportedError{}, err)
 			} else {
 				assert.NoError(t, err)
-			}
-		})
-	}
-}
-
-func TestSetEcsProcessors(t *testing.T) {
-	cases := []struct {
-		name          string
-		esVersion     *common.Version
-		content       map[string]interface{}
-		expected      map[string]interface{}
-		isErrExpected bool
-	}{
-		{
-			name:      "ES < 6.7.0",
-			esVersion: common.MustNewVersion("6.6.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
-							"field": "foo.http_user_agent",
-						},
-					},
-				}},
-			isErrExpected: true,
-		},
-		{
-			name:      "ES == 6.7.0",
-			esVersion: common.MustNewVersion("6.7.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
-							"field":        "foo.src_ip",
-							"target_field": "source.ip",
-						},
-					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
-							"field": "foo.http_user_agent",
-						},
-					},
-				},
-			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
-							"field":        "foo.src_ip",
-							"target_field": "source.ip",
-						},
-					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
-							"field": "foo.http_user_agent",
-							"ecs":   true,
-						},
-					},
-				},
-			},
-			isErrExpected: false,
-		},
-		{
-			name:      "ES >= 7.0.0",
-			esVersion: common.MustNewVersion("7.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
-							"field":        "foo.src_ip",
-							"target_field": "source.ip",
-						},
-					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
-							"field": "foo.http_user_agent",
-						},
-					},
-				},
-			},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"rename": map[string]interface{}{
-							"field":        "foo.src_ip",
-							"target_field": "source.ip",
-						},
-					},
-					map[string]interface{}{
-						"user_agent": map[string]interface{}{
-							"field": "foo.http_user_agent",
-						},
-					},
-				},
-			},
-			isErrExpected: false,
-		},
-	}
-
-	for _, test := range cases {
-		test := test
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-			err := setECSProcessors(*test.esVersion, "foo-pipeline", test.content)
-			if test.isErrExpected {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, test.content)
-			}
-		})
-	}
-}
-
-func TestModifySetProcessor(t *testing.T) {
-	cases := []struct {
-		name          string
-		esVersion     *common.Version
-		content       map[string]interface{}
-		expected      map[string]interface{}
-		isErrExpected bool
-	}{
-		{
-			name:      "ES < 7.9.0",
-			esVersion: common.MustNewVersion("7.8.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field": "rule.name",
-							"value": "{{panw.panos.ruleset}}",
-							"if":    "ctx?.panw?.panos?.ruleset != null",
-						},
-					},
-				},
-			},
-			isErrExpected: false,
-		},
-		{
-			name:      "ES == 7.9.0",
-			esVersion: common.MustNewVersion("7.9.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-						},
-					},
-				},
-			},
-			isErrExpected: false,
-		},
-		{
-			name:      "ES > 7.9.0",
-			esVersion: common.MustNewVersion("8.0.0"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-						},
-					},
-				},
-			},
-			isErrExpected: false,
-		},
-		{
-			name:      "existing if",
-			esVersion: common.MustNewVersion("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": true,
-							"if":                 "ctx?.panw?.panos?.ruleset != null",
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field": "rule.name",
-							"value": "{{panw.panos.ruleset}}",
-							"if":    "ctx?.panw?.panos?.ruleset != null",
-						},
-					},
-				}},
-			isErrExpected: false,
-		},
-		{
-			name:      "ignore_empty_value is false",
-			esVersion: common.MustNewVersion("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"value":              "{{panw.panos.ruleset}}",
-							"ignore_empty_value": false,
-							"if":                 "ctx?.panw?.panos?.ruleset != null",
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field": "rule.name",
-							"value": "{{panw.panos.ruleset}}",
-							"if":    "ctx?.panw?.panos?.ruleset != null",
-						},
-					},
-				}},
-			isErrExpected: false,
-		},
-		{
-			name:      "no value",
-			esVersion: common.MustNewVersion("7.7.7"),
-			content: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field":              "rule.name",
-							"ignore_empty_value": false,
-						},
-					},
-				}},
-			expected: map[string]interface{}{
-				"processors": []interface{}{
-					map[string]interface{}{
-						"set": map[string]interface{}{
-							"field": "rule.name",
-						},
-					},
-				}},
-			isErrExpected: false,
-		},
-	}
-
-	for _, test := range cases {
-		test := test
-		t.Run(test.name, func(t *testing.T) {
-			t.Parallel()
-			err := modifySetProcessor(*test.esVersion, "foo-pipeline", test.content)
-			if test.isErrExpected {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, test.expected, test.content, test.name)
 			}
 		})
 	}

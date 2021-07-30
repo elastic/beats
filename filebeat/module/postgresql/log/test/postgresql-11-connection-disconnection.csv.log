@@ -1,0 +1,28 @@
+2021-01-04 00:04:50.554 UTC,,,27,,5ff25ba2.1b,1,,2021-01-04 00:04:50 UTC,,0,LOG,00000,"database system was shut down at 2021-01-03 20:01:08 UTC",,,,,,,,,""
+2021-01-04 00:04:50.568 UTC,,,1,,5ff25ba2.1,1,,2021-01-04 00:04:50 UTC,,0,LOG,00000,"database system is ready to accept connections",,,,,,,,,""
+2021-01-04 00:05:06.011 UTC,,,34,"172.24.0.1:42304",5ff25bb2.22,1,"",2021-01-04 00:05:06 UTC,,0,LOG,00000,"connection received: host=172.24.0.1 port=42304",,,,,,,,,""
+2021-01-04 00:05:06.086 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,2,"authentication",2021-01-04 00:05:06 UTC,3/1,0,LOG,00000,"connection authorized: user=postgres database=postgres",,,,,,,,,""
+2021-01-04 00:05:12.999 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,3,"idle",2021-01-04 00:05:06 UTC,3/2,0,LOG,00000,"statement: SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,10)='log_connec'
+LIMIT 1000",,,,,,,,,"psql"
+2021-01-04 00:05:17.146 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,4,"idle",2021-01-04 00:05:06 UTC,3/3,0,LOG,00000,"statement: ALTER SYSTEM SET log_connections = on;",,,,,,,,,"psql"
+2021-01-04 00:05:23.242 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,5,"idle",2021-01-04 00:05:06 UTC,3/4,0,LOG,00000,"statement: ALTER SYSTEM SET log_disconnections = on;",,,,,,,,,"psql"
+2021-01-04 00:05:28.166 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,6,"idle",2021-01-04 00:05:06 UTC,3/5,0,LOG,00000,"statement: SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,3)='log'
+LIMIT 1000",,,,,,,,,"psql"
+2021-01-04 00:05:29.434 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,7,"idle",2021-01-04 00:05:06 UTC,3/6,0,LOG,00000,"statement: SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,6)='log_mi'
+LIMIT 1000",,,,,,,,,"psql"
+2021-01-04 00:05:31.342 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,8,"idle",2021-01-04 00:05:06 UTC,3/7,0,LOG,00000,"statement: SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,12)='log_min_dura'
+LIMIT 1000",,,,,,,,,"psql"
+2021-01-04 00:05:37.670 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,9,"idle",2021-01-04 00:05:06 UTC,3/8,0,LOG,00000,"statement: alter system set log_min_duration_statement = 0;",,,,,,,,,"psql"
+2021-01-04 00:05:51.418 UTC,"postgres","postgres",34,"172.24.0.1:42304",5ff25bb2.22,10,"idle",2021-01-04 00:05:06 UTC,,0,LOG,00000,"disconnection: session time: 0:00:45.407 user=postgres database=postgres host=172.24.0.1 port=42304",,,,,,,,,"psql"
+2021-01-04 00:05:58.207 UTC,,,36,"172.24.0.1:42326",5ff25be6.24,1,"",2021-01-04 00:05:58 UTC,,0,LOG,00000,"connection received: host=172.24.0.1 port=42326",,,,,,,,,""
+2021-01-04 00:05:58.232 UTC,"azlev","azlev",36,"172.24.0.1:42326",5ff25be6.24,2,"authentication",2021-01-04 00:05:58 UTC,3/9,0,FATAL,28P01,"password authentication failed for user ""azlev""","Role ""azlev"" does not exist.
+Connection matched pg_hba.conf line 95: ""host all all all md5""",,,,,,,,""
+2021-01-04 00:05:59.807 UTC,,,37,"172.24.0.1:42330",5ff25be7.25,1,"",2021-01-04 00:05:59 UTC,,0,LOG,00000,"connection received: host=172.24.0.1 port=42330",,,,,,,,,""
+2021-01-04 00:05:59.833 UTC,"azlev","azlev",37,"172.24.0.1:42330",5ff25be7.25,2,"authentication",2021-01-04 00:05:59 UTC,3/10,0,FATAL,28P01,"password authentication failed for user ""azlev""","Role ""azlev"" does not exist.
+Connection matched pg_hba.conf line 95: ""host all all all md5""",,,,,,,,""
+2021-01-04 00:06:03.347 UTC,,,38,"172.24.0.1:42336",5ff25beb.26,1,"",2021-01-04 00:06:03 UTC,,0,LOG,00000,"connection received: host=172.24.0.1 port=42336",,,,,,,,,""
+2021-01-04 00:06:03.370 UTC,"azlev","azlev",38,"172.24.0.1:42336",5ff25beb.26,2,"authentication",2021-01-04 00:06:03 UTC,3/11,0,FATAL,28P01,"password authentication failed for user ""azlev""","Role ""azlev"" does not exist.
+Connection matched pg_hba.conf line 95: ""host all all all md5""",,,,,,,,""
+2021-01-04 00:06:04.765 UTC,,,39,"172.24.0.1:42340",5ff25bec.27,1,"",2021-01-04 00:06:04 UTC,,0,LOG,00000,"connection received: host=172.24.0.1 port=42340",,,,,,,,,""
+2021-01-04 00:06:04.799 UTC,"azlev","azlev",39,"172.24.0.1:42340",5ff25bec.27,2,"authentication",2021-01-04 00:06:04 UTC,3/12,0,FATAL,28P01,"password authentication failed for user ""azlev""","Role ""azlev"" does not exist.
+Connection matched pg_hba.conf line 95: ""host all all all md5""",,,,,,,,""

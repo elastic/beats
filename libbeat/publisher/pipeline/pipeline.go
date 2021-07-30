@@ -89,6 +89,8 @@ type Settings struct {
 	WaitCloseMode WaitCloseMode
 
 	Processors processing.Supporter
+
+	InputQueueSize int
 }
 
 // WaitCloseMode enumerates the possible behaviors of WaitClose in a pipeline.
@@ -182,6 +184,7 @@ func New(
 		// Only active if pipeline can drop events.
 		maxEvents = 64000
 	}
+	p.observer.queueMaxEvents(maxEvents)
 	p.eventSema = newSema(maxEvents)
 
 	p.output = newOutputController(beat, monitors, p.observer, p.queue)

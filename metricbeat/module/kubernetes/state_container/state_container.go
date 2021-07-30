@@ -18,6 +18,7 @@
 package state_container
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -26,6 +27,7 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -76,9 +78,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_container", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_container", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -89,6 +91,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -99,10 +102,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -112,7 +120,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
+	if err != nil {
+		return errors.Wrap(err, "error getting families")
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		return errors.Wrap(err, "error getting event")
 	}
@@ -134,37 +146,43 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		}
 
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
-		var rootFields common.MapStr
+		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
+		containerFields := common.MapStr{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
 			cID := (containerID).(string)
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				rootFields = common.MapStr{
-					"container": common.MapStr{
-						"runtime": cID[:split],
-						"id":      cID[split+3:],
-					}}
+				containerFields.Put("runtime", cID[:split])
+				containerFields.Put("id", cID[split+3:])
+			}
+		}
+		if containerImage, ok := event["image"]; ok {
+			cImage := (containerImage).(string)
+			containerFields.Put("image.name", cImage)
+			// remove ECS container fields from kubernetes.container.* since they will be set through alias
+			event.Delete("image")
+		}
+
+		e, err := util.CreateEvent(event, "kubernetes.container")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if len(containerFields) > 0 {
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerFields,
+				}
 			}
 		}
 
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
-
-		if reported := reporter.Event(mb.Event{
-			RootFields:      rootFields,
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.container",
-		}); !reported {
+		if reported := reporter.Event(e); !reported {
 			return nil
 		}
 	}

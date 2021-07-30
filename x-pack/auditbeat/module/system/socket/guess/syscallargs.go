@@ -31,8 +31,10 @@ import (
 */
 
 func init() {
-	if err := Registry.AddGuess(&guessSyscallArgs{
-		expected: [2]uintptr{^uintptr(0x11111111), ^uintptr(0x22222222)},
+	if err := Registry.AddGuess(func() Guesser {
+		return &guessSyscallArgs{
+			expected: [2]uintptr{^uintptr(0x11111111), ^uintptr(0x22222222)},
+		}
 	}); err != nil {
 		panic(err)
 	}

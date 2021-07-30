@@ -1,29 +1,35 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.process",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "process"
+        "name": "process",
+        "period": 10000
     },
     "process": {
         "args": [
-            "/usr/bin/dockerd",
-            "-H",
-            "unix://"
+            "/usr/lib/systemd/systemd",
+            "--switched-root",
+            "--system",
+            "--deserialize",
+            "29"
         ],
-        "executable": "/usr/bin/dockerd-ce",
-        "name": "dockerd",
-        "pgid": 2080,
-        "pid": 2080,
-        "ppid": 1,
-        "working_directory": "/"
+        "command_line": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
+        "cpu": {
+            "pct": 0.0029,
+            "start_time": "2021-03-29T04:24:52.000Z"
+        },
+        "memory": {
+            "pct": 0.0011
+        },
+        "name": "systemd",
+        "pgid": 1,
+        "pid": 1,
+        "ppid": 0,
+        "state": "sleeping"
     },
     "service": {
         "type": "system"
@@ -32,11 +38,11 @@
         "process": {
             "cgroup": {
                 "blkio": {
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "total": {
-                        "bytes": 844576104448,
-                        "ios": 54869430
+                        "bytes": 3188736,
+                        "ios": 238
                     }
                 },
                 "cpu": {
@@ -49,8 +55,8 @@
                         },
                         "shares": 1024
                     },
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "rt": {
                         "period": {
                             "us": 0
@@ -68,38 +74,50 @@
                     }
                 },
                 "cpuacct": {
-                    "id": "docker.service",
-                    "path": "/system.slice/docker.service",
+                    "id": "init.scope",
+                    "path": "/init.scope",
                     "percpu": {
-                        "1": 7058282754012,
-                        "2": 7053634662537,
-                        "3": 7069386293853,
-                        "4": 7050055153087
+                        "1": 7906237728724,
+                        "2": 8055519955790,
+                        "3": 7985757217648,
+                        "4": 7270310725150
                     },
                     "stats": {
                         "system": {
-                            "ns": 7202920000000
+                            "norm": {
+                                "pct": 0.0015
+                            },
+                            "ns": 10276870000000,
+                            "pct": 0.0058
                         },
                         "user": {
-                            "ns": 19573240000000
+                            "norm": {
+                                "pct": 0.0044
+                            },
+                            "ns": 20915760000000,
+                            "pct": 0.0174
                         }
                     },
                     "total": {
-                        "ns": 28231358863489
+                        "norm": {
+                            "pct": 0.0047
+                        },
+                        "ns": 31217825627312,
+                        "pct": 0.0188
                     }
                 },
-                "id": "docker.service",
+                "id": "init.scope",
                 "memory": {
-                    "id": "docker.service",
+                    "id": "init.scope",
                     "kmem": {
                         "failures": 0,
                         "limit": {
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 21139456,
+                            "bytes": 4755456,
                             "max": {
-                                "bytes": 480030720
+                                "bytes": 8380416
                             }
                         }
                     },
@@ -121,59 +139,59 @@
                             "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 3337703424,
+                            "bytes": 31584256,
                             "max": {
-                                "bytes": 5245300736
+                                "bytes": 53239808
                             }
                         }
                     },
                     "memsw": {
                         "failures": 0,
                         "limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "usage": {
-                            "bytes": 0,
+                            "bytes": 31821824,
                             "max": {
-                                "bytes": 0
+                                "bytes": 53239808
                             }
                         }
                     },
-                    "path": "/system.slice/docker.service",
+                    "path": "/init.scope",
                     "stats": {
                         "active_anon": {
-                            "bytes": 779677696
+                            "bytes": 0
                         },
                         "active_file": {
-                            "bytes": 1753378816
+                            "bytes": 16642048
                         },
                         "cache": {
-                            "bytes": 2127810560
+                            "bytes": 20140032
                         },
                         "hierarchical_memory_limit": {
                             "bytes": 9223372036854771712
                         },
                         "hierarchical_memsw_limit": {
-                            "bytes": 0
+                            "bytes": 9223372036854771712
                         },
                         "inactive_anon": {
-                            "bytes": 409075712
+                            "bytes": 7016448
                         },
                         "inactive_file": {
-                            "bytes": 374431744
+                            "bytes": 2977792
                         },
-                        "major_page_faults": 53164,
+                        "major_page_faults": 165,
                         "mapped_file": {
-                            "bytes": 7491584
+                            "bytes": 15814656
                         },
-                        "page_faults": 21923702,
-                        "pages_in": 57261049,
-                        "pages_out": 56521859,
+                        "page_faults": 1288584,
+                        "pages_in": 364353,
+                        "pages_out": 357844,
                         "rss": {
-                            "bytes": 1188753408
+                            "bytes": 6893568
                         },
                         "rss_huge": {
-                            "bytes": 56623104
+                            "bytes": 0
                         },
                         "swap": {
                             "bytes": 0
@@ -183,33 +201,26 @@
                         }
                     }
                 },
-                "path": "/system.slice/docker.service"
+                "path": "/init.scope"
             },
-            "cmdline": "/usr/bin/dockerd -H unix://",
+            "cmdline": "/usr/lib/systemd/systemd --switched-root --system --deserialize 29",
             "cpu": {
-                "start_time": "2019-01-08T17:06:39.000Z",
+                "start_time": "2021-03-29T04:24:52.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0049
+                        "pct": 0.0029
                     },
-                    "pct": 0.0195,
-                    "value": 27827810
+                    "pct": 0.0116,
+                    "value": 31214570
                 }
-            },
-            "fd": {
-                "limit": {
-                    "hard": 1048576,
-                    "soft": 1048576
-                },
-                "open": 68
             },
             "memory": {
                 "rss": {
-                    "bytes": 1187336192,
-                    "pct": 0.0716
+                    "bytes": 17108992,
+                    "pct": 0.0011
                 },
-                "share": 8253440,
-                "size": 4438523904
+                "share": 11341824,
+                "size": 178851840
             },
             "state": "sleeping"
         }

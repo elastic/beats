@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2016-11-29T00:21:56Z",
           "kind": "event"
         },
         "netflow": {

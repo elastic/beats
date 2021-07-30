@@ -47,6 +47,7 @@ class Test(BaseTest):
             'source.bytes': 1480,
             'destination.packets': 10,
             'destination.bytes': 181133,
+            'event.type': ['connection', 'end'],
         })
 
         start_ts = parse_timestamp(objs[0]['event.start'])

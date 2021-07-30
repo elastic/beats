@@ -41,6 +41,8 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 		return nil, errors.Errorf("unexpected fileinfo sys type %T for %v", info.Sys(), path)
 	}
 
+	var errs multierror.Errors
+
 	state := file.GetOSState(info)
 
 	fileInfo := &Metadata{
@@ -65,24 +67,27 @@ func NewMetadata(path string, info os.FileInfo) (*Metadata, error) {
 	// FILE_FLAG_BACKUP_SEMANTICS flag.
 	var err error
 	if !info.IsDir() {
-		fileInfo.SID, fileInfo.Owner, err = fileOwner(path)
+		if fileInfo.SID, fileInfo.Owner, err = fileOwner(path); err != nil {
+			errs = append(errs, errors.Wrap(err, "fileOwner failed"))
+		}
+
 	}
-	fileInfo.Origin, err = GetFileOrigin(path)
-	return fileInfo, err
+	if fileInfo.Origin, err = GetFileOrigin(path); err != nil {
+		errs = append(errs, errors.Wrap(err, "GetFileOrigin failed"))
+	}
+	return fileInfo, errs.Err()
 }
 
 // fileOwner returns the SID and name (domain\user) of the file's owner.
 func fileOwner(path string) (sid, owner string, err error) {
-	f, err := file.ReadOpen(path)
-	if err != nil {
-		return "", "", errors.Wrap(err, "failed to open file to get owner")
-	}
-	defer f.Close()
-
 	var securityID *syscall.SID
 	var securityDescriptor *SecurityDescriptor
 
-	if err = GetSecurityInfo(syscall.Handle(f.Fd()), FileObject,
+	pathW, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return sid, owner, errors.Wrapf(err, "failed to convert path:'%s' to UTF16", path)
+	}
+	if err = GetNamedSecurityInfo(pathW, FileObject,
 		OwnerSecurityInformation, &securityID, nil, nil, nil, &securityDescriptor); err != nil {
 		return "", "", errors.Wrapf(err, "failed on GetSecurityInfo for %v", path)
 	}

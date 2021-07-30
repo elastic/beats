@@ -81,10 +81,138 @@ will be immediately available for consumption.
 The default value is 1s.
 
 [float]
+[[configuration-internal-queue-disk]]
+=== Configure the disk queue
+
+beta[]
+
+The disk queue stores pending events on the disk rather than main memory.
+This allows Beats to queue a larger number of events than is possible with
+the memory queue, and to save events when a Beat or device is restarted.
+This increased reliability comes with a performance tradeoff, as every
+incoming event must be written and read from the device's disk. However,
+for setups where the disk is not the main bottleneck, the disk queue gives
+a simple and relatively low-overhead way to add a layer of robustness to
+incoming event data.
+
+The disk queue is expected to replace the file spool in a future release.
+
+
+To enable the disk queue with default settings, specify a maximum size:
+
+[source,yaml]
+------------------------------------------------------------------------------
+queue.disk:
+  max_size: 10GB
+------------------------------------------------------------------------------
+
+The queue will use up to the specified maximum size on disk. It will only
+use as much space as required. For example, if the queue is only storing
+1GB of events, then it will only occupy 1GB on disk no matter how high the
+maximum is. Queue data is deleted from disk after it has been successfully
+sent to the output.
+
+[float]
+[[configuration-internal-queue-disk-reference]]
+==== Configuration options
+
+You can specify the following options in the `queue.disk` section of the
++{beatname_lc}.yml+ config file:
+
+[float]
+===== `path`
+
+The path to the directory where the disk queue should store its data files.
+The directory is created on startup if it doesn't exist.
+
+The default value is `"${path.data}/diskqueue"`.
+
+[float]
+===== `max_size` (required)
+
+The maximum size the queue should use on disk. Events that exceed this
+maximum will either pause their input or be discarded, depending on
+the input's configuration.
+
+A value of `0` means that no maximum size is enforced, and the queue can
+grow up to the amount of free space on the disk. This value should be used
+with caution, as completely filling a system's main disk can make it
+inoperable. It is best to use this setting only with a dedicated data or
+backup partition that will not interfere with {beatname_uc} or the rest
+of the host system.
+
+The default value is `10GB`.
+
+[float]
+===== `segment_size`
+
+Data added to the queue is stored in segment files. Each segment contains
+some number of events waiting to be sent to the outputs, and is deleted when
+all its events are sent. By default, segment size is limited to 1/10 of the
+maximum queue size. Using a smaller size means that the queue will use more
+data files, but they will be deleted more quickly after use. Using a larger
+size means some data will take longer to delete, but the queue will use
+fewer auxiliary files. It is usually fine to leave this value unchanged.
+
+The default value is `max_size / 10`.
+
+[float]
+===== `read_ahead`
+
+The number of events that should be read from disk into memory while
+waiting for an output to request them. If you find outputs are slowing
+down because they can't read as many events at a time, adjusting this
+setting upward may help, at the cost of higher memory usage.
+
+The default value is `512`.
+
+[float]
+===== `write_ahead`
+
+The number of events the queue should accept and store in memory while
+waiting for them to be written to disk. If you find the queue's memory
+use is too high because events are waiting too long to be written to
+disk, adjusting this setting downward may help, at the cost of reduced
+event throughput. On the other hand, if inputs are waiting or discarding
+events because they are being produced faster than the disk can handle,
+adjusting this setting upward may help, at the cost of higher memory
+usage.
+
+The default value is `2048`.
+
+[float]
+===== `retry_interval`
+
+Some disk errors may block operation of the queue, for example a permission
+error writing to the data directory, or a disk full error while writing an
+event. In this case, the queue reports the error and retries after pausing
+for the time specified in `retry_interval`.
+
+The default value is `1s` (one second).
+
+[float]
+===== `max_retry_interval`
+
+When there are multiple consecutive errors writing to the disk, the queue
+increases the retry interval by factors of 2 up to a maximum of
+`max_retry_interval`. Increase this value if you are concerned about logging
+too many errors or overloading the host system if the target disk becomes
+unavailable for an extended time.
+
+The default value is `30s` (thirty seconds).
+
+
+[float]
 [[configuration-internal-queue-spool]]
 === Configure the file spool queue
 
 beta[]
+
+NOTE: The disk queue offers similar functionality to the file spool with a
+streamlined configuration and lower overhead. It is expected to replace the
+file spool in a future release. While the file spool is still included for
+backward compatibility, new configurations should use the disk queue
+when possible.
 
 The file spool queue stores all events in an on disk ring buffer. The spool
 has a write buffer, which new events are written to. Events written to the

@@ -15,7 +15,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total capacity in bytes
@@ -23,7 +23,7 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total available in bytes
@@ -31,22 +31,27 @@
           type: group
           fields:
             - name: bytes
-              type: long
+              type: double
               format: bytes
               description: >
                 Filesystem total used in bytes
+            - name: pct
+              type: scaled_float
+              format: percent
+              description: >
+                Percentage of used storage
         - name: inodes
           type: group
           fields:
             - name: used
-              type: long
+              type: double
               description: >
                 Used inodes
             - name: free
-              type: long
+              type: double
               description: >
                 Free inodes
             - name: count
-              type: long
+              type: double
               description: >
                 Total inodes

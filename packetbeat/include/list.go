@@ -33,6 +33,7 @@ import (
 	_ "github.com/elastic/beats/v7/packetbeat/protos/nfs"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/pgsql"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/redis"
+	_ "github.com/elastic/beats/v7/packetbeat/protos/sip"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/thrift"
 	_ "github.com/elastic/beats/v7/packetbeat/protos/tls"
 )

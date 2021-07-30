@@ -1,0 +1,80 @@
+[
+    {
+        "@timestamp": "2021-03-25T10:04:06.000Z",
+        "cyberarkpas.audit.action": "CPM Verify SSH Key",
+        "cyberarkpas.audit.ca_properties.address": "rhel7.cybr.com",
+        "cyberarkpas.audit.ca_properties.cpm_status": "success",
+        "cyberarkpas.audit.ca_properties.creation_method": "PVWA",
+        "cyberarkpas.audit.ca_properties.device_type": "Operating System",
+        "cyberarkpas.audit.ca_properties.last_success_change": "1582315464",
+        "cyberarkpas.audit.ca_properties.last_success_verification": "1616666646",
+        "cyberarkpas.audit.ca_properties.last_task": "VerifyTask",
+        "cyberarkpas.audit.ca_properties.other.extra_pass3_folder": "Root",
+        "cyberarkpas.audit.ca_properties.other.extra_pass3_name": "Operating System-UnixSSH-rhel7.cybr.com-root",
+        "cyberarkpas.audit.ca_properties.other.extra_pass3_safe": "Linux Root",
+        "cyberarkpas.audit.ca_properties.policy_id": "UnixSSHKeys",
+        "cyberarkpas.audit.ca_properties.privcloud": "privcloud",
+        "cyberarkpas.audit.ca_properties.retries_count": "-1",
+        "cyberarkpas.audit.ca_properties.sequence_id": "2",
+        "cyberarkpas.audit.ca_properties.tags": "SSH",
+        "cyberarkpas.audit.ca_properties.user_name": "firecall1",
+        "cyberarkpas.audit.desc": "CPM Verify SSH Key",
+        "cyberarkpas.audit.extra_details.other.address": "rhel7.cybr.com",
+        "cyberarkpas.audit.extra_details.username": "firecall1",
+        "cyberarkpas.audit.file": "Root\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-25T10:04:06Z",
+        "cyberarkpas.audit.issuer": "PasswordManager",
+        "cyberarkpas.audit.message": "CPM Verify SSH Key",
+        "cyberarkpas.audit.raw": "<syslog>\n\n <audit_record>\n <Rfc5424>yes</Rfc5424>\n <Timestamp>Mar 25 06:04:06</Timestamp>\n <IsoTimestamp>2021-03-25T10:04:06Z</IsoTimestamp>\n <Hostname>VLT01</Hostname>\n <Vendor>Cyber-Ark</Vendor>\n <Product>Vault</Product>\n <Version>12.0.0000</Version>\n <MessageID>414</MessageID>\n <Desc>CPM Verify SSH Key</Desc>\n <Severity>Info</Severity>\n <Issuer>PasswordManager</Issuer>\n <Action>CPM Verify SSH Key</Action>\n <SourceUser></SourceUser>\n <TargetUser></TargetUser>\n <Safe>Linux SSH Keys</Safe>\n <File>Root\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1</File>\n <Station>10.0.0.15</Station>\n <Location></Location>\n <Category></Category>\n <RequestId></RequestId>\n <Reason>VerificationPeriod</Reason>\n <ExtraDetails>address=rhel7.cybr.com;username=firecall1;</ExtraDetails>\n <Message>CPM Verify SSH Key</Message>\n <GatewayStation></GatewayStation>\n <CAProperties>\n <CAProperty Name=\"PolicyID\" Value=\"UnixSSHKeys\"></CAProperty>\n <CAProperty Name=\"UserName\" Value=\"firecall1\"></CAProperty>\n <CAProperty Name=\"Address\" Value=\"rhel7.cybr.com\"></CAProperty>\n <CAProperty Name=\"DeviceType\" Value=\"Operating System\"></CAProperty>\n <CAProperty Name=\"SequenceID\" Value=\"2\"></CAProperty>\n <CAProperty Name=\"CPMStatus\" Value=\"success\"></CAProperty>\n <CAProperty Name=\"ExtraPass3Name\" Value=\"Operating System-UnixSSH-rhel7.cybr.com-root\"></CAProperty>\n <CAProperty Name=\"ExtraPass3Folder\" Value=\"Root\"></CAProperty>\n <CAProperty Name=\"ExtraPass3Safe\" Value=\"Linux Root\"></CAProperty>\n <CAProperty Name=\"RetriesCount\" Value=\"-1\"></CAProperty>\n <CAProperty Name=\"LastTask\" Value=\"VerifyTask\"></CAProperty>\n <CAProperty Name=\"LastSuccessVerification\" Value=\"1616666646\"></CAProperty>\n <CAProperty Name=\"CreationMethod\" Value=\"PVWA\"></CAProperty>\n <CAProperty Name=\"LastSuccessChange\" Value=\"1582315464\"></CAProperty>\n <CAProperty Name=\"Tags\" Value=\"SSH\"></CAProperty>\n <CAProperty Name=\"Privcloud\" Value=\"privcloud\"></CAProperty>\n </CAProperties>\n </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.reason": "VerificationPeriod",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "Linux SSH Keys",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.0.15",
+        "cyberarkpas.audit.timestamp": "Mar 25 06:04:06",
+        "destination.address": "rhel7.cybr.com",
+        "destination.domain": "rhel7.cybr.com",
+        "destination.user.name": "firecall1",
+        "event.action": "cpm verify ssh key",
+        "event.category": [
+            "iam"
+        ],
+        "event.code": "414",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "success",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "admin",
+            "info"
+        ],
+        "file.path": "Root\\Operating System-UnixSSHKeys-rhel7.cybr.com-firecall1",
+        "fileset.name": "audit",
+        "host.name": "VLT01",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VLT01",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "12.0.0000",
+        "related.ip": [
+            "10.0.0.15"
+        ],
+        "related.user": [
+            "PasswordManager",
+            "firecall1"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.0.15",
+        "source.ip": "10.0.0.15",
+        "source.user.name": "PasswordManager",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "PasswordManager"
+    }
+]

@@ -11,7 +11,7 @@
 #   - object: 'Process'
 #     instance: ["*"]
 #     counters:
-#     - name: 'Disk Writes/sec'
-#       field: physical_disk.write.per_sec
+#     - name: '% Processor Time'
+#       field: cpu_usage
 #       format: "float"
-#     - name: "% Disk Write Time"
+#     - name: "Thread Count"

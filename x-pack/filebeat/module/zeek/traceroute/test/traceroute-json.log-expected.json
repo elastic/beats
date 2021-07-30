@@ -6,6 +6,7 @@
         "destination.as.organization.name": "Google LLC",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -21,6 +22,7 @@
         "fileset.name": "traceroute",
         "input.type": "log",
         "log.offset": 0,
+        "network.direction": "outbound",
         "network.transport": "udp",
         "related.ip": [
             "192.168.1.1",

@@ -5,9 +5,9 @@
 package billing
 
 import (
-	"time"
-
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -32,19 +32,10 @@ type MetricSet struct {
 	log    *logp.Logger
 }
 
-// Config options
-type Config struct {
-	ClientId       string        `config:"client_id"    validate:"required"`
-	ClientSecret   string        `config:"client_secret" validate:"required"`
-	TenantId       string        `config:"tenant_id" validate:"required"`
-	SubscriptionId string        `config:"subscription_id" validate:"required"`
-	Period         time.Duration `config:"period" validate:"nonzero,required"`
-}
-
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	var config Config
+	var config azure.Config
 	err := base.Module().UnpackConfig(&config)
 	if err != nil {
 		return nil, errors.Wrap(err, "error unpack raw module config using UnpackConfig")

@@ -5,6 +5,10 @@
 # * full, which verifies that the provided certificate is signed by a trusted
 # authority (CA) and also verifies that the server's hostname (or IP address)
 # matches the names identified within the certificate.
+# * strict, which verifies that the provided certificate is signed by a trusted
+# authority (CA) and also verifies that the server's hostname (or IP address)
+# matches the names identified within the certificate. If the Subject Alternative
+# Name is empty, it returns an error.
 # * certificate, which verifies that the provided certificate is signed by a
 # trusted authority (CA), but does not perform any hostname verification.
 #  * none, which performs no verification of the server's certificate. This

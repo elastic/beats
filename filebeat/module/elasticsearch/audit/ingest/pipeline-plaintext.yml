@@ -19,7 +19,7 @@ processors:
       ES_AUDIT_REQUEST: (request\=\[%{WORD:elasticsearch.audit.request.name}\])?
       ES_AUDIT_REQUEST_BODY: (request_body\=\[%{DATA:http.request.body.content}\])?
     patterns:
-    - '%{ES_TIMESTAMP}\s*%{ES_NODE_NAME}\s*%{ES_AUDIT_LAYER}\s*%{ES_AUDIT_EVENT_TYPE}\s*%{ES_AUDIT_ORIGIN_TYPE},?\s*%{ES_AUDIT_ORIGIN_ADDRESS},?\s*%{ES_AUDIT_PRINCIPAL},?\s*%{ES_AUDIT_REALM},?\s*%{ES_AUDIT_ROLES},?\s*%{ES_AUDIT_ACTION},?\s*%{ES_AUDIT_INDICES},?\s*%{ES_AUDIT_URI},?\s*%{ES_AUDIT_URI_PARAMS},?\s*%{ES_AUDIT_REQUEST},?\s*%{ES_AUDIT_REQUEST_BODY},?'
+    - '%{ES_TIMESTAMP}\s*%{ES_NODE_NAME}\s*%{ES_AUDIT_LAYER}\s*%{ES_AUDIT_EVENT_TYPE}\s*%{ES_AUDIT_ORIGIN_TYPE},?\s*%{ES_AUDIT_ORIGIN_ADDRESS},?\s*%{ES_AUDIT_PRINCIPAL},?\s*%{ES_AUDIT_REALM},?\s*%{ES_AUDIT_ROLES},?\s*%{ES_AUDIT_ACTION},?\s*%{ES_AUDIT_INDICES},?\s*%{ES_AUDIT_URI},?\s*%{ES_AUDIT_URI_PARAMS},?\s*%{ES_AUDIT_REQUEST},?\s*%{ES_AUDIT_REQUEST_BODY}$'
 - split:
     field: elasticsearch.audit.user.roles
     separator: ','

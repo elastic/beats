@@ -1,61 +1,87 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "cluster": {
-            "id": "UziYVLPkTTmCzccc6102Bg",
-            "name": "elasticsearch"
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
         },
         "index": {
             "summary": {
                 "primaries": {
                     "docs": {
-                        "count": 231,
-                        "deleted": 56
+                        "count": 1257,
+                        "deleted": 11
+                    },
+                    "indexing": {
+                        "index": {
+                            "count": 1885
+                        }
+                    },
+                    "search": {
+                        "query": {
+                            "count": 81,
+                            "time": {
+                                "ms": 39
+                            }
+                        }
                     },
                     "segments": {
-                        "count": 16,
+                        "count": 20,
                         "memory": {
-                            "bytes": 105245
+                            "bytes": 190357
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 444882
+                            "bytes": 1686190
                         }
                     }
                 },
                 "total": {
                     "docs": {
-                        "count": 231,
-                        "deleted": 56
+                        "count": 1257,
+                        "deleted": 11
+                    },
+                    "indexing": {
+                        "index": {
+                            "count": 1885
+                        }
+                    },
+                    "search": {
+                        "query": {
+                            "count": 81,
+                            "time": {
+                                "ms": 39
+                            }
+                        }
                     },
                     "segments": {
-                        "count": 16,
+                        "count": 20,
                         "memory": {
-                            "bytes": 105245
+                            "bytes": 190357
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 444882
+                            "bytes": 1686190
                         }
                     }
                 }
             }
         }
     },
+    "event": {
+        "dataset": "elasticsearch.index.summary",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "index_summary",
-        "namespace": "elasticsearch.index.summary",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:32943",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }

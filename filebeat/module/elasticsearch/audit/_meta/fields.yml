@@ -1,6 +1,5 @@
 - name: audit
   type: group
-  description: >
   fields:
     - name: layer
       description: "The layer from which this event originated: rest, transport or ip_filter"
@@ -25,6 +24,12 @@
     - name: user.roles
       description: "Roles to which the principal belongs"
       example: [ "kibana_admin", "beats_admin" ]
+      type: keyword
+    - name: user.run_as.name
+      type: keyword
+    - name: user.run_as.realm
+      type: keyword
+    - name: component
       type: keyword
     - name: action
       description: "The name of the action that was executed"
@@ -63,3 +68,5 @@
       migration: true
     - name: message
       type: text
+    - name: invalidate.apikeys.owned_by_authenticated_user
+      type: boolean

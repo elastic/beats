@@ -5,13 +5,14 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 123000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 08:09:10 127.0.0.1 GET / q=100 80 - 85.181.35.98 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - 200 0 0 123",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -24,8 +25,8 @@
         "input.type": "log",
         "log.offset": 257,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -34,11 +35,13 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 52.4473,
         "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
+        "url.original": "/",
         "url.path": "/",
         "url.query": "q=100",
         "user_agent.device.name": "Other",
@@ -60,6 +63,7 @@
         "event.duration": 789000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 09:10:11 W3SVC1 GET / - 80 - 127.0.0.1 Mozilla/5.0+(Windows+NT+6.1;+Win64;+x64;+rv:57.0)+Gecko/20100101+Firefox/57.0 - - example.com 200 0 0 123 456 789",
         "event.outcome": "success",
         "fileset.name": "access",
         "http.request.body.bytes": 456,
@@ -77,6 +81,8 @@
         "service.type": "iis",
         "source.address": "127.0.0.1",
         "source.ip": "127.0.0.1",
+        "url.domain": "example.com",
+        "url.original": "/",
         "url.path": "/",
         "user_agent.device.name": "Other",
         "user_agent.name": "Firefox",
@@ -93,13 +99,14 @@
         "destination.ip": "127.0.0.1",
         "destination.port": 80,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 789000000,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-01-01 10:11:12 W3SVC1 MACHINE-NAME 127.0.0.1 GET / - 80 - 85.181.35.98 HTTP/1.1 Mozilla/5.0+(Macintosh;+Intel+Mac+OS+X+10_14_0)+AppleWebKit/537.36+(KHTML,+like+Gecko)+Chrome/70.0.3538.102+Safari/537.36 - - example.com 200 0 0 123 456 789",
         "event.outcome": "success",
         "event.type": [
             "connection"
@@ -117,8 +124,8 @@
         "input.type": "log",
         "log.offset": 1204,
         "related.ip": [
-            "85.181.35.98",
-            "127.0.0.1"
+            "127.0.0.1",
+            "85.181.35.98"
         ],
         "service.type": "iis",
         "source.address": "85.181.35.98",
@@ -127,11 +134,14 @@
         "source.geo.city_name": "Berlin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "DE",
+        "source.geo.country_name": "Germany",
         "source.geo.location.lat": 52.4473,
         "source.geo.location.lon": 13.4531,
         "source.geo.region_iso_code": "DE-BE",
         "source.geo.region_name": "Land Berlin",
         "source.ip": "85.181.35.98",
+        "url.domain": "example.com",
+        "url.original": "/",
         "url.path": "/",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Chrome",
@@ -147,13 +157,14 @@
         "destination.ip": "10.44.0.136",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-12-31 12:52:33 10.44.0.136 GET / redirect:${%23req%3d%23context.get('com.opensymphony.xwork2.dispatcher.HttpServletRequest'),%23webroot%3d%23req.getSession().getServletContext().getRealPath('/'),%23resp.println(%23webroot),%23resp.flush(),%23resp.close()} 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 401 0 0 0",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -166,14 +177,15 @@
         "input.type": "log",
         "log.offset": 1447,
         "related.ip": [
-            "10.50.6.188",
-            "10.44.0.136"
+            "10.44.0.136",
+            "10.50.6.188"
         ],
         "service.type": "iis",
         "source.address": "10.50.6.188",
         "source.ip": "10.50.6.188",
+        "url.original": "/",
         "url.path": "/",
-        "url.query": "redirect:${%23req%3d%23context.get('com.opensymphony.xwork2.dispatcher.HttpServletRequest'),%23webroot%3d%23req.getSession().getServletContext().getRealPath('/'),%23resp.println(%23webroot),%23resp.flush(),%23resp.close()}",
+        "url.query": "redirect:${#req=#context.get('com.opensymphony.xwork2.dispatcher.HttpServletRequest'),#webroot=#req.getSession().getServletContext().getRealPath('/'),#resp.println(#webroot),#resp.flush(),#resp.close()}",
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",
@@ -188,13 +200,14 @@
         "destination.ip": "10.44.0.136",
         "destination.port": 443,
         "event.category": [
-            "web",
-            "network"
+            "network",
+            "web"
         ],
         "event.dataset": "iis.access",
         "event.duration": 0,
         "event.kind": "event",
         "event.module": "iis",
+        "event.original": "2018-12-31 12:52:33 10.44.0.136 GET /${#context['xwork.MethodAccessor.denyMethodExecution']=!(#_memberAccess['allowStaticMethodAccess']=true),(@java.lang.Runtime@getRuntime()).exec('ipconfig').waitFor()}.action - 443 - 10.50.6.188 Mozilla/4.0+(compatible;+MSIE+8.0;+Windows+NT+5.1;+Trident/4.0) - 404 0 2 0",
         "event.outcome": "failure",
         "event.type": [
             "connection"
@@ -207,13 +220,13 @@
         "input.type": "log",
         "log.offset": 1802,
         "related.ip": [
-            "10.50.6.188",
-            "10.44.0.136"
+            "10.44.0.136",
+            "10.50.6.188"
         ],
         "service.type": "iis",
         "source.address": "10.50.6.188",
         "source.ip": "10.50.6.188",
-        "url.path": "/${#context['xwork.MethodAccessor.denyMethodExecution']=!(#_memberAccess['allowStaticMethodAccess']=true),(@java.lang.Runtime@getRuntime()).exec('ipconfig').waitFor()}.action",
+        "url.original": "/${#context['xwork.MethodAccessor.denyMethodExecution']=!(#_memberAccess['allowStaticMethodAccess']=true),(@java.lang.Runtime@getRuntime()).exec('ipconfig').waitFor()}.action",
         "user_agent.device.name": "Other",
         "user_agent.name": "IE",
         "user_agent.original": "Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)",

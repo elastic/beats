@@ -17,10 +17,8 @@ import (
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
 func TestGroupBy(t *testing.T) {
@@ -382,15 +380,16 @@ func TestConfiguration(t *testing.T) {
 	testcases := map[string]struct {
 		programs []string
 		expected int
+		empty    bool
 		err      bool
 	}{
-		"single_config": {
-			programs: []string{"filebeat", "heartbeat", "metricbeat", "endpoint"},
-			expected: 4,
+		"namespace": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
 		},
-		"constraints_config": {
-			programs: []string{"filebeat"},
-			expected: 1,
+		"single_config": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
 		},
 		// "audit_config": {
 		// 	programs: []string{"auditbeat"},
@@ -400,6 +399,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
+		"fleet_server": {
+			programs: []string{"fleet-server"},
+			expected: 1,
+		},
 		"synthetics_config": {
 			programs: []string{"heartbeat"},
 			expected: 1,
@@ -416,7 +419,7 @@ func TestConfiguration(t *testing.T) {
 			expected: 1,
 		},
 		"enabled_output_false": {
-			expected: 0,
+			empty: true,
 		},
 		"endpoint_basic": {
 			programs: []string{"endpoint"},
@@ -428,9 +431,11 @@ func TestConfiguration(t *testing.T) {
 		"endpoint_unknown_output": {
 			expected: 0,
 		},
+		"endpoint_arm": {
+			expected: 0,
+		},
 	}
 
-	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -443,14 +448,16 @@ func TestConfiguration(t *testing.T) {
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
 
-			filters.ConstraintFilter(l, ast)
-
-			programs, err := Programs(ast)
+			programs, err := Programs(&fakeAgentInfo{}, ast)
 			if test.err {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
+			if test.empty {
+				require.Equal(t, 0, len(programs))
+				return
+			}
 
 			require.Equal(t, 1, len(programs))
 
@@ -480,5 +487,25 @@ func TestConfiguration(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
+}
+
+func (*fakeAgentInfo) Headers() map[string]string {
+	return map[string]string{
+		"h1": "test-header",
 	}
 }

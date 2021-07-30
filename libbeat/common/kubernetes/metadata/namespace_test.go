@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -34,6 +35,7 @@ import (
 )
 
 func TestNamespace_Generate(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	name := "obj"
 	tests := []struct {
@@ -50,7 +52,9 @@ func TestNamespace_Generate(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"spam": "baz",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
@@ -60,26 +64,37 @@ func TestNamespace_Generate(t *testing.T) {
 			// Use this for 8.0
 			/*
 				output: common.MapStr{
-					"namespace": common.MapStr{
-						"name": name,
-						"uid":  uid,
-						"labels": common.MapStr{
-							"foo": "bar",
+					"kubernetes": common.MapStr{
+						"namespace": common.MapStr{
+							"name": name,
+							"uid":  uid,
+							"labels": common.MapStr{
+								"foo": "bar",
+							},
 						},
 					},
 				},*/
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"namespace":     name,
 				"namespace_uid": uid,
 				"namespace_labels": common.MapStr{
 					"foo": "bar",
 				},
-			},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
+				},
+			}},
 		},
 	}
 
-	cfg := common.NewConfig()
-	metagen := NewNamespaceMetadataGenerator(cfg, nil)
+	cfg, err := common.NewConfigFrom(Config{
+		IncludeAnnotations: []string{"spam"},
+	})
+	if err != nil {
+		t.Fatalf("Could not merge configs")
+	}
+
+	metagen := NewNamespaceMetadataGenerator(cfg, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -88,6 +103,7 @@ func TestNamespace_Generate(t *testing.T) {
 }
 
 func TestNamespace_GenerateFromName(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	name := "obj"
 	tests := []struct {
@@ -104,7 +120,9 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"spam": "baz",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
@@ -128,15 +146,24 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 				"namespace_labels": common.MapStr{
 					"foo": "bar",
 				},
+				"namespace_annotations": common.MapStr{
+					"spam": "baz",
+				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		cfg, err := common.NewConfigFrom(Config{
+			IncludeAnnotations: []string{"spam"},
+		})
+		if err != nil {
+			t.Fatalf("Could not merge configs")
+		}
+
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.input)
-		metagen := NewNamespaceMetadataGenerator(cfg, namespaces)
+		metagen := NewNamespaceMetadataGenerator(cfg, namespaces, client)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)

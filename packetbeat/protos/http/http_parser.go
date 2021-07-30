@@ -62,6 +62,7 @@ type message struct {
 	isChunked     bool
 	headers       map[string]common.NetString
 	size          uint64
+	username      string
 
 	rawHeaders []byte
 

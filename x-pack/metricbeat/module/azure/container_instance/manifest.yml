@@ -10,21 +10,25 @@ input:
       metrics:
       - name: ["CpuUsage", "MemoryUsage"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "containerName"
           value: "*"
       - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
         timegrain: "PT5M"
     - resource_id: ""
       metrics:
       - name: ["CpuUsage", "MemoryUsage"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
         timegrain: "PT5M"
         dimensions:
         - name: "containerName"
           value: "*"
       - name: ["NetworkBytesReceivedPerSecond", "NetworkBytesTransmittedPerSecond"]
         namespace: "Microsoft.ContainerInstance/containerGroups"
+        ignore_unsupported: true
         timegrain: "PT5M"

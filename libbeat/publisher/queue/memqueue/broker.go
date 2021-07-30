@@ -27,6 +27,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
+const (
+	minInputQueueSize      = 20
+	maxInputQueueSizeRatio = 0.1
+)
+
 type broker struct {
 	done chan struct{}
 
@@ -56,6 +61,7 @@ type Settings struct {
 	FlushMinEvents int
 	FlushTimeout   time.Duration
 	WaitOnClose    bool
+	InputQueueSize int
 }
 
 type ackChan struct {
@@ -82,7 +88,7 @@ func init() {
 }
 
 func create(
-	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config,
+	ackListener queue.ACKListener, logger *logp.Logger, cfg *common.Config, inQueueSize int,
 ) (queue.Queue, error) {
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -98,6 +104,7 @@ func create(
 		Events:         config.Events,
 		FlushMinEvents: config.FlushMinEvents,
 		FlushTimeout:   config.FlushTimeout,
+		InputQueueSize: inQueueSize,
 	}), nil
 }
 
@@ -108,15 +115,13 @@ func NewQueue(
 	logger logger,
 	settings Settings,
 ) queue.Queue {
-	// define internal channel size for producer/client requests
-	// to the broker
-	chanSize := 20
-
 	var (
 		sz           = settings.Events
 		minEvents    = settings.FlushMinEvents
 		flushTimeout = settings.FlushTimeout
 	)
+
+	chanSize := AdjustInputQueueSize(settings.InputQueueSize, sz)
 
 	if minEvents < 1 {
 		minEvents = 1
@@ -297,4 +302,16 @@ func (l *chanList) reverse() {
 	for !tmp.empty() {
 		l.prepend(tmp.pop())
 	}
+}
+
+// AdjustInputQueueSize decides the size for the input queue.
+func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
+	actual = requested
+	if max := int(float64(mainQueueSize) * maxInputQueueSizeRatio); mainQueueSize > 0 && actual > max {
+		actual = max
+	}
+	if actual < minInputQueueSize {
+		actual = minInputQueueSize
+	}
+	return actual
 }

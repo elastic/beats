@@ -29,9 +29,9 @@ import (
 
 // Config defines the configuration options for the DNS processor.
 type Config struct {
-	CacheConfig
+	CacheConfig  `config:",inline"`
 	Nameservers  []string      `config:"nameservers"`              // Required on Windows. /etc/resolv.conf is used if none are given.
-	Timeout      time.Duration `conifg:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
+	Timeout      time.Duration `config:"timeout"`                  // Per request timeout (with 2 nameservers the total timeout would be 2x).
 	Type         string        `config:"type" validate:"required"` // Reverse is the only supported type currently.
 	Action       FieldAction   `config:"action"`                   // Append or replace (defaults to append) when target exists.
 	TagOnFailure []string      `config:"tag_on_failure"`           // Tags to append when a failure occurs.
@@ -89,7 +89,7 @@ type CacheSettings struct {
 	TTL time.Duration `config:"ttl"`
 
 	// Minimum TTL value for successful DNS responses.
-	MinTTL time.Duration `config:"min_ttl" validate:"min=1"`
+	MinTTL time.Duration `config:"min_ttl" validate:"min=1ns"`
 
 	// Initial capacity. How much space is allocated at initialization.
 	InitialCapacity int `config:"capacity.initial" validate:"min=0"`
@@ -166,6 +166,7 @@ var defaultConfig = Config{
 			MaxCapacity:     10000,
 		},
 		FailureCache: CacheSettings{
+			MinTTL:          time.Minute,
 			TTL:             time.Minute,
 			InitialCapacity: 1000,
 			MaxCapacity:     10000,

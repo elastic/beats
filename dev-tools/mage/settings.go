@@ -38,7 +38,7 @@ import (
 )
 
 const (
-	fpmVersion = "1.11.0"
+	fpmVersion = "1.13.1"
 
 	// Docker images. See https://github.com/elastic/golang-crossbuild.
 	beatsFPMImage = "docker.elastic.co/beats-dev/fpm"
@@ -60,6 +60,8 @@ var (
 	XPackDir     = "../x-pack"
 	RaceDetector = false
 	TestCoverage = false
+	PLATFORMS    = EnvOr("PLATFORMS", "")
+	PACKAGES     = EnvOr("PACKAGES", "")
 
 	// CrossBuildMountModcache, if true, mounts $GOPATH/pkg/mod into
 	// the crossbuild images at /go/pkg/mod, read-only.
@@ -71,12 +73,13 @@ var (
 	BeatDescription = EnvOr("BEAT_DESCRIPTION", "")
 	BeatVendor      = EnvOr("BEAT_VENDOR", "Elastic")
 	BeatLicense     = EnvOr("BEAT_LICENSE", "ASL 2.0")
-	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/products/beats/"+BeatName)
+	BeatURL         = EnvOr("BEAT_URL", "https://www.elastic.co/beats/"+BeatName)
 	BeatUser        = EnvOr("BEAT_USER", "root")
 
 	BeatProjectType ProjectType
 
 	Snapshot bool
+	DevBuild bool
 
 	versionQualified bool
 	versionQualifier string
@@ -117,6 +120,11 @@ func init() {
 		panic(errors.Wrap(err, "failed to parse SNAPSHOT env value"))
 	}
 
+	DevBuild, err = strconv.ParseBool(EnvOr("DEV", "false"))
+	if err != nil {
+		panic(errors.Wrap(err, "failed to parse DEV env value"))
+	}
+
 	versionQualifier, versionQualified = os.LookupEnv("VERSION_QUALIFIER")
 }
 
@@ -154,6 +162,8 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"GOARCH":          GOARCH,
 		"GOARM":           GOARM,
 		"Platform":        Platform,
+		"PLATFORMS":       PLATFORMS,
+		"PACKAGES":        PACKAGES,
 		"BinaryExt":       BinaryExt,
 		"XPackDir":        XPackDir,
 		"BeatName":        BeatName,
@@ -165,6 +175,7 @@ func varMap(args ...map[string]interface{}) map[string]interface{} {
 		"BeatURL":         BeatURL,
 		"BeatUser":        BeatUser,
 		"Snapshot":        Snapshot,
+		"DEV":             DevBuild,
 		"Qualifier":       versionQualifier,
 	}
 
@@ -196,6 +207,8 @@ BeatLicense      = {{.BeatLicense}}
 BeatURL          = {{.BeatURL}}
 BeatUser         = {{.BeatUser}}
 VersionQualifier = {{.Qualifier}}
+PLATFORMS        = {{.PLATFORMS}}
+PACKAGES         = {{.PACKAGES}}
 
 ## Functions
 

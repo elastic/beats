@@ -2,7 +2,6 @@
 [role="xpack"]
 == Troubleshoot
 
-experimental[]
 
 You can set the debug level to capture debugging output about the {log-driver}.
 To set the debug level:

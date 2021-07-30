@@ -31,6 +31,7 @@ var drive = (function () {
             case "sheets_import_range_access_change":
             case "change_user_access":
                 evt.AppendTo("event.category", "iam");
+                evt.AppendTo("event.category", "configuration");
                 evt.Put("event.type", ["change"]);
                 break;
             case "create":

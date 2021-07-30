@@ -240,13 +240,39 @@
                 Total CPU time in nanoseconds consumed by all tasks in the
                 cgroup.
 
+            - name: total.pct
+              type: scaled_float
+              description: >
+                CPU time of the cgroup as a percentage of overall CPU time.
+
+            - name: total.norm.pct
+              type: scaled_float
+              description: >
+                CPU time of the cgroup as a percentage of overall CPU time, normalized by CPU count. This is functionally an average of time spent across individual CPUs.
+
             - name: stats.user.ns
               type: long
               description: CPU time consumed by tasks in user mode.
 
+            - name: stats.user.pct
+              type: scaled_float
+              description: time the cgroup spent in user space, as a percentage of total CPU time
+            
+            - name: stats.user.norm.pct
+              type: scaled_float
+              description: time the cgroup spent in user space, as a percentage of total CPU time, normalized by CPU count.
+
             - name: stats.system.ns
               type: long
               description: CPU time consumed by tasks in user (kernel) mode.
+
+            - name: stats.system.pct
+              type: scaled_float
+              description: Time the cgroup spent in kernel space, as a percentage of total CPU time
+
+            - name: stats.system.norm.pct
+              type: scaled_float
+              description: Time the cgroup spent in kernel space, as a percentage of total CPU time, normalized by CPU count.
 
             - name: percpu
               type: object

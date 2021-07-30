@@ -1,27 +1,25 @@
 {
-    "@timestamp": "2020-02-24T18:49:02.674Z",
+    "@timestamp": "2017-10-12T08:05:34.853Z",
     "cloudfoundry": {
         "counter": {
-            "total": 0,
-            "name": "promhttp_metric_handler_errors_total",
             "delta": 0,
-            "timestamp": "2020-02-24T18:49:02.674Z",
-            "type": "counter"
+            "name": "dropped",
+            "total": 0
         },
         "envelope": {
-            "origin": "loggregator_forwarder_agent",
-            "deployment": "cf",
-            "ip": "10.144.0.13",
-            "job": "diego-cell",
-            "index": "1e58e943-a498-4339-9d5f-2885bf223db9"
-        }
-    },
-    "event": {
-        "dataset": "cloudfoundry.counter",
-        "module": "cloudfoundry"
-    },
-    "metricset": {
-        "name": "counter"
+            "deployment": "cf-6b7aee31c8d07637ad78",
+            "index": "995eb273-f871-4fea-a834-dbc0a4a72efc",
+            "ip": "192.168.16.37",
+            "job": "syslog_adapter",
+            "origin": "loggregator.metron"
+        },
+        "tags": {
+            "direction": "ingress",
+            "metric_version": "2.0",
+            "product": "Pivotal Application Service",
+            "source_id": "metron"
+        },
+        "type": "counter"
     },
     "service": {
         "type": "cloudfoundry"

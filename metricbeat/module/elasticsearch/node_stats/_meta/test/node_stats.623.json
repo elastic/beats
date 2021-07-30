@@ -6,7 +6,7 @@
     },
     "cluster_name": "842d2a3cdf39e9ae2e0b2c7ca7cea075",
     "nodes": {
-        "r4XD9O8eTrCHyN_GJswZ5A": {
+        "test_node_id": {
             "timestamp": 1524464610026,
             "name": "instance-0000000016",
             "transport_address": "172.25.133.112:19608",
@@ -503,7 +503,7 @@
                 }
             },
             "adaptive_selection": {
-                "r4XD9O8eTrCHyN_GJswZ5A": {
+                "test_node_id": {
                     "outgoing_searches": 0,
                     "avg_queue_size": 0,
                     "avg_service_time_ns": 79338,

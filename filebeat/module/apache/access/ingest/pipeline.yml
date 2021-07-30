@@ -4,25 +4,37 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- grok:
+- rename:
     field: message
+    target_field: event.original
+- grok:
+    field: event.original
     patterns:
     - '%{IPORHOST:destination.domain} %{IPORHOST:source.ip} - %{DATA:user.name} \[%{HTTPDATE:apache.access.time}\]
-      "(?:%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}|-)?"
+      "(?:%{WORD:http.request.method} %{DATA:_tmp.url_orig} HTTP/%{NUMBER:http.version}|-)?"
       %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)(
       "%{DATA:http.request.referrer}")?( "%{DATA:user_agent.original}")?'
     - '%{IPORHOST:source.address} - %{DATA:user.name} \[%{HTTPDATE:apache.access.time}\]
-      "(?:%{WORD:http.request.method} %{DATA:url.original} HTTP/%{NUMBER:http.version}|-)?"
+      "(?:%{WORD:http.request.method} %{DATA:_tmp.url_orig} HTTP/%{NUMBER:http.version}|-)?"
       %{NUMBER:http.response.status_code:long} (?:%{NUMBER:http.response.body.bytes:long}|-)(
       "%{DATA:http.request.referrer}")?( "%{DATA:user_agent.original}")?'
     - '%{IPORHOST:source.address} - %{DATA:user.name} \[%{HTTPDATE:apache.access.time}\]
       "-" %{NUMBER:http.response.status_code:long} -'
     - \[%{HTTPDATE:apache.access.time}\] %{IPORHOST:source.address} %{DATA:apache.access.ssl.protocol}
-      %{DATA:apache.access.ssl.cipher} "%{WORD:http.request.method} %{DATA:url.original}
+      %{DATA:apache.access.ssl.cipher} "%{WORD:http.request.method} %{DATA:_tmp.url_orig}
       HTTP/%{NUMBER:http.version}" (-|%{NUMBER:http.response.body.bytes:long})
     ignore_missing: true
+- uri_parts:
+    field: _tmp.url_orig
+    ignore_failure: true
+- set:
+    field: url.domain
+    value: "{{destination.domain}}"
+    if: ctx.url?.domain == null && ctx.destination?.domain != null
 - remove:
-    field: message
+    field:
+      - _tmp.url_orig
+    ignore_missing: true
 - set:
     field: event.kind
     value: event
@@ -96,6 +108,31 @@ processors:
         ctx.tls.version = parts[1] + ".0";
       }
       ctx.tls.version_protocol = parts[0];
+
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 
 on_failure:
 - set:

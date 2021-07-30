@@ -2,7 +2,7 @@
   "objects": [
     {
       "attributes": {
-        "description": "Overview dashboard for Filebeat MSIP module.",
+        "description": "Overview dashboard for Filebeat MISP module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
           "searchSourceJSON": {

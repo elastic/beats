@@ -33,6 +33,9 @@ import (
 	"github.com/elastic/gosigar"
 )
 
+// numCPU is the number of CPUs of the host
+var numCPU = runtime.NumCPU()
+
 func TestPids(t *testing.T) {
 	pids, err := Pids()
 
@@ -65,10 +68,10 @@ func TestGetProcess(t *testing.T) {
 	assert.True(t, (process.Mem.Share >= 0))
 
 	// CPU Checks
-	assert.True(t, (process.Cpu.StartTime > 0))
-	assert.True(t, (process.Cpu.Total >= 0))
-	assert.True(t, (process.Cpu.User >= 0))
-	assert.True(t, (process.Cpu.Sys >= 0))
+	assert.True(t, (process.CPU.StartTime > 0))
+	assert.True(t, (process.CPU.Total >= 0))
+	assert.True(t, (process.CPU.User >= 0))
+	assert.True(t, (process.CPU.Sys >= 0))
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
@@ -140,7 +143,7 @@ func TestProcMemPercentage(t *testing.T) {
 
 func TestProcCpuPercentage(t *testing.T) {
 	p1 := &Process{
-		Cpu: gosigar.ProcTime{
+		CPU: gosigar.ProcTime{
 			User:  11345,
 			Sys:   37,
 			Total: 11382,
@@ -149,7 +152,7 @@ func TestProcCpuPercentage(t *testing.T) {
 	}
 
 	p2 := &Process{
-		Cpu: gosigar.ProcTime{
+		CPU: gosigar.ProcTime{
 			User:  14794,
 			Sys:   47,
 			Total: 14841,
@@ -157,11 +160,14 @@ func TestProcCpuPercentage(t *testing.T) {
 		SampleTime: p1.SampleTime.Add(time.Second),
 	}
 
-	NumCPU = 48
-	defer func() { NumCPU = runtime.NumCPU() }()
-
 	totalPercentNormalized, totalPercent, totalValue := GetProcCPUPercentage(p1, p2)
-	assert.EqualValues(t, 0.0721, totalPercentNormalized)
+	//GetProcCPUPercentage wil return a number that varies based on the host, due to NumCPU()
+	// So "un-normalize" it, then re-normalized with a constant.
+	cpu := float64(runtime.NumCPU())
+	unNormalized := totalPercentNormalized * cpu
+	normalizedTest := common.Round(unNormalized/48, common.DefaultDecimalPlacesCount)
+
+	assert.EqualValues(t, 0.0721, normalizedTest)
 	assert.EqualValues(t, 3.459, totalPercent)
 	assert.EqualValues(t, 14841, totalValue)
 }

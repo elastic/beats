@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -42,13 +42,13 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 98, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -59,15 +59,20 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -89,8 +94,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -130,14 +135,14 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.100.30, DstIP: 10.0.1.20, ICMPType: Echo Request, ICMPCode: No Code, Protocol: icmp, IngressInterface: output, EgressInterface: input, IngressZone: output-zone, EgressZone: input-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: ICMP client, ApplicationProtocol: ICMP, ConnectionDuration: 0, InitiatorPackets: 1, ResponderPackets: 1, InitiatorBytes: 98, ResponderBytes: 98, NAPPolicy: Balanced Security and Connectivity",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.start": "2019-08-15T16:05:33.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -148,15 +153,20 @@
         "network.iana_number": 1,
         "network.protocol": "icmp",
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -178,8 +188,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -211,6 +221,7 @@
         "destination.bytes": 0,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -228,13 +239,13 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 50074, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, InitiatorPackets: 1, ResponderPackets: 0, InitiatorBytes: 106, ResponderBytes: 0, NAPPolicy: Balanced Security and Connectivity, DNSQuery: eu-central-1.ec2.archive.ubuntu.com, DNSRecordType: a host address",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -245,12 +256,17 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -276,8 +292,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -312,6 +328,7 @@
         "destination.bytes": 314,
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "8.8.8.8",
@@ -331,14 +348,14 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 8.8.8.8, SrcPort: 49264, DstPort: 53, Protocol: udp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, Client: DNS client, ApplicationProtocol: DNS, ConnectionDuration: 0, InitiatorPackets: 2, ResponderPackets: 2, InitiatorBytes: 164, ResponderBytes: 314, NAPPolicy: Balanced Security and Connectivity, DNSQuery: siem-inside, DNSRecordType: a host address, DNSResponseType: Non-Existent Domain, DNS_TTL: 86395",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.start": "2019-08-15T16:07:00.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -349,12 +366,17 @@
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "8.8.8.8"
@@ -380,8 +402,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -410,6 +432,7 @@
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 50.1188,
         "destination.geo.location.lon": 8.6843,
         "destination.geo.region_iso_code": "DE-HE",
@@ -426,13 +449,13 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -441,12 +464,17 @@
         "log.offset": 2515,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -472,8 +500,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -511,6 +539,7 @@
         "destination.geo.city_name": "Frankfurt am Main",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 50.1188,
         "destination.geo.location.lon": 8.6843,
         "destination.geo.region_iso_code": "DE-HE",
@@ -529,14 +558,14 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 52.59.244.233, SrcPort: 43228, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: Debian APT-HTTP/1.3 (1.6.11), Client: Advanced Packaging Tool, ClientVersion: 1.3, ApplicationProtocol: HTTP, WebApplication: Ubuntu, ConnectionDuration: 1, InitiatorPackets: 1359, ResponderPackets: 29001, InitiatorBytes: 97454, ResponderBytes: 41319018, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: eu-central-1.ec2.archive.ubuntu.com, URL: http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.start": "2019-08-15T16:07:18.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -551,12 +580,17 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "52.59.244.233"
@@ -575,7 +609,10 @@
             "forwarded"
         ],
         "url.domain": "eu-central-1.ec2.archive.ubuntu.com",
+        "url.extension": "deb",
         "url.original": "http://eu-central-1.ec2.archive.ubuntu.com/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.path": "/ubuntu/pool/main/m/manpages/manpages-dev_4.15-1_all.deb",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "Debian APT-HTTP/1.3 (1.6.11)"
@@ -585,8 +622,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -615,6 +652,7 @@
         "destination.geo.city_name": "Magdeburg",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 52.1333,
         "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
@@ -631,13 +669,13 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430002: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, InitiatorPackets: 2, ResponderPackets: 1, InitiatorBytes: 140, ResponderBytes: 74, NAPPolicy: Balanced Security and Connectivity",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "start",
-            "allowed"
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -646,12 +684,17 @@
         "log.offset": 3919,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -677,8 +720,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Rule-1"
+            "Rule-1",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -715,6 +758,7 @@
         "destination.geo.city_name": "Magdeburg",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "DE",
+        "destination.geo.country_name": "Germany",
         "destination.geo.location.lat": 52.1333,
         "destination.geo.location.lon": 11.6167,
         "destination.geo.region_iso_code": "DE-ST",
@@ -733,14 +777,14 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-1-430003: AccessControlRuleAction: Allow, SrcIP: 10.0.1.20, DstIP: 213.211.198.62, SrcPort: 46000, DstPort: 80, Protocol: tcp, IngressInterface: inside, EgressInterface: outside, IngressZone: input-zone, EgressZone: output-zone, ACPolicy: default, AccessControlRuleName: Rule-1, Prefilter Policy: Default Prefilter Policy, User: No Authentication Required, UserAgent: curl/7.58.0, Client: cURL, ClientVersion: 7.58.0, ApplicationProtocol: HTTP, ConnectionDuration: 0, InitiatorPackets: 6, ResponderPackets: 4, InitiatorBytes: 503, ResponderBytes: 690, NAPPolicy: Balanced Security and Connectivity, HTTPResponse: 200, ReferencedHost: www.eicar.org, URL: http://www.eicar.org/download/eicar_com.zip",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 1,
         "event.start": "2019-08-16T09:33:15.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -752,12 +796,17 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
             "10.0.1.20",
             "213.211.198.62"
@@ -776,7 +825,10 @@
             "forwarded"
         ],
         "url.domain": "www.eicar.org",
+        "url.extension": "zip",
         "url.original": "http://www.eicar.org/download/eicar_com.zip",
+        "url.path": "/download/eicar_com.zip",
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"
@@ -786,8 +838,8 @@
         "cisco.ftd.destination_interface": "input",
         "cisco.ftd.message_id": "430002",
         "cisco.ftd.rule_name": [
-            "default",
-            "Block-inbound-ICMP"
+            "Block-inbound-ICMP",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -827,8 +879,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
-            "start",
-            "denied"
+            "failure",
+            "start"
         ],
         "fileset.name": "ftd",
         "host.hostname": "firepower",
@@ -837,15 +889,20 @@
         "log.offset": 5177,
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "output",
+        "observer.egress.interface.name": "input",
+        "observer.egress.zone": "input-zone",
         "observer.hostname": "firepower",
-        "observer.ingress.interface.name": "input",
+        "observer.ingress.interface.name": "output",
+        "observer.ingress.zone": "output-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "firepower"
+        ],
         "related.ip": [
-            "10.0.100.30",
-            "10.0.1.20"
+            "10.0.1.20",
+            "10.0.100.30"
         ],
         "related.user": [
             "No Authentication Required"
@@ -867,8 +924,8 @@
         "cisco.ftd.destination_interface": "output",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Block",
@@ -923,7 +980,7 @@
         "event.type": [
             "connection",
             "end",
-            "denied"
+            "failure"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -935,12 +992,17 @@
         "network.iana_number": 6,
         "network.protocol": "http",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "input",
+        "observer.egress.interface.name": "output",
+        "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "output",
+        "observer.ingress.interface.name": "input",
+        "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "siem-ftd"
+        ],
         "related.ip": [
             "10.0.1.20",
             "10.0.100.30"
@@ -958,8 +1020,15 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.domain": "10.0.100.30:8000",
+        "url.domain": [
+            "10.0.100.30",
+            "10.0.100.30:8000"
+        ],
+        "url.extension": "zip",
         "url.original": "http://10.0.100.30:8000/eicar_com.zip",
+        "url.path": "/eicar_com.zip",
+        "url.port": 8000,
+        "url.scheme": "http",
         "user.id": "No Authentication Required",
         "user.name": "No Authentication Required",
         "user_agent.original": "curl/7.58.0"

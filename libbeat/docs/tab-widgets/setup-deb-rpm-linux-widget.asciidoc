@@ -28,7 +28,7 @@
        aria-labelledby="deb-setup">
 ++++
 
-include::setup.asciidoc[tag=mac]
+include::setup.asciidoc[tag=deb]
 
 ++++
   </div>
@@ -39,7 +39,7 @@ include::setup.asciidoc[tag=mac]
        hidden="">
 ++++
 
-include::setup.asciidoc[tag=linux]
+include::setup.asciidoc[tag=rpm]
 
 ++++
   </div>
@@ -50,7 +50,7 @@ include::setup.asciidoc[tag=linux]
        hidden="">
 ++++
 
-include::setup.asciidoc[tag=win]
+include::setup.asciidoc[tag=linux]
 
 ++++
   </div>

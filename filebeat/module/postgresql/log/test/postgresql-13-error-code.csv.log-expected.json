@@ -1,0 +1,147 @@
+[
+    {
+        "@timestamp": "2021-02-14T10:45:33.257Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "SET idle_in_transaction_session_timeout = 50;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.backend_type": "client backend",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 48978,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "6028ff3a.56",
+        "postgresql.log.session_start_time": "2021-02-14T10:45:14.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-02-14 10:45:33.257 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/3",
+        "process.pid": "86",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-02-14T10:45:48.113Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 224,
+        "message": "BEGIN;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.backend_type": "client backend",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 48978,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "6028ff3a.56",
+        "postgresql.log.session_start_time": "2021-02-14T10:45:14.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-02-14 10:45:48.113 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/4",
+        "process.pid": "86",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-02-14T10:45:48.164Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "FATAL",
+        "log.offset": 409,
+        "message": "terminating connection due to idle-in-transaction timeout",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.backend_type": "client backend",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 48978,
+        "postgresql.log.command_tag": "idle in transaction",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "6028ff3a.56",
+        "postgresql.log.session_start_time": "2021-02-14T10:45:14.000Z",
+        "postgresql.log.sql_state_code": "25P03",
+        "postgresql.log.timestamp": "2021-02-14 10:45:48.164 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/4",
+        "process.pid": "86",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-02-14T10:45:48.164Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 651,
+        "message": "disconnection: session time: 0:00:33.289 user=postgres database=postgres host=172.24.0.1 port=48978",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.backend_type": "client backend",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 48978,
+        "postgresql.log.command_tag": "idle in transaction",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "6028ff3a.56",
+        "postgresql.log.session_start_time": "2021-02-14T10:45:14.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-02-14 10:45:48.164 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "86",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    }
+]

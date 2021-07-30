@@ -18,11 +18,13 @@
 package state_deployment
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -57,9 +59,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_deployment", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_deployment", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -70,6 +72,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -80,10 +83,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewResourceMetadataEnricher(base, &kubernetes.Deployment{}, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -93,7 +101,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
+	if err != nil {
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)
@@ -104,21 +118,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 
 	for _, event := range events {
 
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
+		e, err := util.CreateEvent(event, "kubernetes.deployment")
+		if err != nil {
+			m.Logger().Error(err)
 		}
-		delete(event, mb.ModuleDataKey)
 
-		if reported := reporter.Event(mb.Event{
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.deployment",
-		}); !reported {
+		if reported := reporter.Event(e); !reported {
 			m.Logger().Debug("error trying to emit event")
 			return
 		}

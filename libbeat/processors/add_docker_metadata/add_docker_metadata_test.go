@@ -16,6 +16,7 @@
 // under the License.
 
 // +build linux darwin windows
+// +build !integration
 
 package add_docker_metadata
 

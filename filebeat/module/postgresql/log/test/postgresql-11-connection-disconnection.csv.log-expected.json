@@ -1,0 +1,671 @@
+[
+    {
+        "@timestamp": "2021-01-04T00:04:50.554Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "database system was shut down at 2021-01-03 20:01:08 UTC",
+        "postgresql.log.session_id": "5ff25ba2.1b",
+        "postgresql.log.session_start_time": "2021-01-04T00:04:50.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:04:50.554 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "27",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:04:50.568Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 156,
+        "message": "database system is ready to accept connections",
+        "postgresql.log.session_id": "5ff25ba2.1",
+        "postgresql.log.session_start_time": "2021-01-04T00:04:50.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:04:50.568 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "1",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:06.011Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 300,
+        "message": "connection received: host=172.24.0.1 port=42304",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:06.011 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "34",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:06.086Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 467,
+        "message": "connection authorized: user=postgres database=postgres",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "authentication",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:06.086 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/1",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:12.999Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 678,
+        "message": "SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,10)='log_connec'\nLIMIT 1000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:12.999 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/2",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:17.146Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1035,
+        "message": "ALTER SYSTEM SET log_connections = on;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:17.146 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/3",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:23.242Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 1235,
+        "message": "ALTER SYSTEM SET log_disconnections = on;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:23.242 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/4",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:28.166Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 1438,
+        "message": "SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,3)='log'\nLIMIT 1000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:28.166 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/5",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:29.434Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 1787,
+        "message": "SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,6)='log_mi'\nLIMIT 1000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:29.434 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/6",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:31.342Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 2139,
+        "message": "SELECT name FROM  (SELECT pg_catalog.lower(name) AS name FROM pg_catalog.pg_settings   WHERE context != 'internal'   UNION ALL SELECT 'all') ss  WHERE substring(name,1,12)='log_min_dura'\nLIMIT 1000",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:31.342 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/7",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:37.670Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2498,
+        "message": "alter system set log_min_duration_statement = 0;",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:37.670 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/8",
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:51.418Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2708,
+        "message": "disconnection: session time: 0:00:45.407 user=postgres database=postgres host=172.24.0.1 port=42304",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42304,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "5ff25bb2.22",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:06.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:51.418 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "34",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:58.207Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 2956,
+        "message": "connection received: host=172.24.0.1 port=42326",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42326,
+        "postgresql.log.session_id": "5ff25be6.24",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:58.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:58.207 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "36",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:58.232Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "FATAL",
+        "log.offset": 3123,
+        "message": "password authentication failed for user \"azlev\"",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42326,
+        "postgresql.log.command_tag": "authentication",
+        "postgresql.log.database": "azlev",
+        "postgresql.log.detail": "Role \"azlev\" does not exist.\nConnection matched pg_hba.conf line 95: \"host all all all md5\"",
+        "postgresql.log.session_id": "5ff25be6.24",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:58.000Z",
+        "postgresql.log.sql_state_code": "28P01",
+        "postgresql.log.timestamp": "2021-01-04 00:05:58.232 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/9",
+        "process.pid": "36",
+        "related.user": [
+            "azlev"
+        ],
+        "service.type": "postgresql",
+        "user.name": "azlev"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:59.807Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3422,
+        "message": "connection received: host=172.24.0.1 port=42330",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42330,
+        "postgresql.log.session_id": "5ff25be7.25",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:59.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:05:59.807 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "37",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:05:59.833Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "FATAL",
+        "log.offset": 3589,
+        "message": "password authentication failed for user \"azlev\"",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42330,
+        "postgresql.log.command_tag": "authentication",
+        "postgresql.log.database": "azlev",
+        "postgresql.log.detail": "Role \"azlev\" does not exist.\nConnection matched pg_hba.conf line 95: \"host all all all md5\"",
+        "postgresql.log.session_id": "5ff25be7.25",
+        "postgresql.log.session_start_time": "2021-01-04T00:05:59.000Z",
+        "postgresql.log.sql_state_code": "28P01",
+        "postgresql.log.timestamp": "2021-01-04 00:05:59.833 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/10",
+        "process.pid": "37",
+        "related.user": [
+            "azlev"
+        ],
+        "service.type": "postgresql",
+        "user.name": "azlev"
+    },
+    {
+        "@timestamp": "2021-01-04T00:06:03.347Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 3889,
+        "message": "connection received: host=172.24.0.1 port=42336",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42336,
+        "postgresql.log.session_id": "5ff25beb.26",
+        "postgresql.log.session_start_time": "2021-01-04T00:06:03.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:06:03.347 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "38",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:06:03.370Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "FATAL",
+        "log.offset": 4056,
+        "message": "password authentication failed for user \"azlev\"",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42336,
+        "postgresql.log.command_tag": "authentication",
+        "postgresql.log.database": "azlev",
+        "postgresql.log.detail": "Role \"azlev\" does not exist.\nConnection matched pg_hba.conf line 95: \"host all all all md5\"",
+        "postgresql.log.session_id": "5ff25beb.26",
+        "postgresql.log.session_start_time": "2021-01-04T00:06:03.000Z",
+        "postgresql.log.sql_state_code": "28P01",
+        "postgresql.log.timestamp": "2021-01-04 00:06:03.370 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/11",
+        "process.pid": "38",
+        "related.user": [
+            "azlev"
+        ],
+        "service.type": "postgresql",
+        "user.name": "azlev"
+    },
+    {
+        "@timestamp": "2021-01-04T00:06:04.765Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 4356,
+        "message": "connection received: host=172.24.0.1 port=42340",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42340,
+        "postgresql.log.session_id": "5ff25bec.27",
+        "postgresql.log.session_start_time": "2021-01-04T00:06:04.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:06:04.765 UTC",
+        "postgresql.log.transaction_id": 0,
+        "process.pid": "39",
+        "service.type": "postgresql"
+    },
+    {
+        "@timestamp": "2021-01-04T00:06:04.799Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "FATAL",
+        "log.offset": 4523,
+        "message": "password authentication failed for user \"azlev\"",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42340,
+        "postgresql.log.command_tag": "authentication",
+        "postgresql.log.database": "azlev",
+        "postgresql.log.detail": "Role \"azlev\" does not exist.\nConnection matched pg_hba.conf line 95: \"host all all all md5\"",
+        "postgresql.log.session_id": "5ff25bec.27",
+        "postgresql.log.session_start_time": "2021-01-04T00:06:04.000Z",
+        "postgresql.log.sql_state_code": "28P01",
+        "postgresql.log.timestamp": "2021-01-04 00:06:04.799 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/12",
+        "process.pid": "39",
+        "related.user": [
+            "azlev"
+        ],
+        "service.type": "postgresql",
+        "user.name": "azlev"
+    }
+]

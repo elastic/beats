@@ -39,8 +39,10 @@ func TestConversion(t *testing.T) {
 				sdjournal.SD_JOURNAL_FIELD_BOOT_ID: "123456",
 			},
 			want: common.MapStr{
-				"host": common.MapStr{
-					"boot_id": "123456",
+				"journald": common.MapStr{
+					"host": common.MapStr{
+						"boot_id": "123456",
+					},
 				},
 			},
 		},

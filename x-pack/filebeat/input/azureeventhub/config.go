@@ -33,7 +33,7 @@ func (conf *azureInputConfig) Validate() error {
 		return errors.New("no event hub name configured")
 	}
 	if conf.SAName == "" || conf.SAKey == "" {
-		return errors.New("missing storage account information")
+		return errors.New("no storage account or storage account key configured")
 	}
 	if conf.SAContainer == "" {
 		conf.SAContainer = fmt.Sprintf("%s-%s", ephContainerName, conf.EventHubName)

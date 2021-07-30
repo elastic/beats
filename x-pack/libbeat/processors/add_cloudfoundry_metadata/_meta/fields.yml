@@ -11,29 +11,63 @@
         - name: app.id
           type: keyword
           description: >
-            Cloud Foundry application ID
+            Cloud Foundry application identifier.
 
         - name: app.name
           type: keyword
           description: >
-            Cloud Foundry application name
+            Cloud Foundry application name.
 
         - name: space.id
           type: keyword
           description: >
-            Cloud Foundry space name
+            Cloud Foundry space identifier.
 
         - name: space.name
           type: keyword
           description: >
-            Cloud Foundry space name
+            Cloud Foundry space name.
 
         - name: org.id
           type: keyword
           description: >
-            Cloud Foundry organization ID
+            Cloud Foundry organization identifier.
 
         - name: org.name
           type: keyword
           description: >
-            Cloud Foundry organization name
+            Cloud Foundry organization name.
+
+        - name: tags.*
+          type: object
+          object_type: keyword
+          description: >
+            Cloud Foundry tags.
+
+        - name: envelope
+          type: group
+          fields:
+            - name: deployment
+              type: keyword
+              description: >
+                Identifier of the Cloud Foundry deployment where this event was created.
+
+            - name: index
+              type: keyword
+              description: >
+                Envelope index.
+
+            - name: ip
+              type: ip
+              description: >
+                IP address of the node where the job that created this event is running.
+
+            - name: job
+              type: keyword
+              description: >
+                Job name.
+
+            - name: origin
+              type: keyword
+              description: >
+                Name of the deployment that created this event.

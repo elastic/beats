@@ -2,10 +2,16 @@
   {
     "@timestamp": "2019-03-18T16:57:37.933Z",
     "event": {
-      "code": 16,
+      "category": [
+        "configuration"
+      ],
+      "code": "16",
       "kind": "event",
       "module": "sysmon",
-      "provider": "Microsoft-Windows-Sysmon"
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
     },
     "host": {
       "name": "vagrant-2012-r2"
@@ -20,7 +26,7 @@
       "event_data": {
         "Configuration": "C:\\Users\\vagrant\\Downloads\\\"C:\\Users\\vagrant\\Downloads\\Sysmon.exe\"  -i -n"
       },
-      "event_id": 16,
+      "event_id": "16",
       "process": {
         "pid": 4616,
         "thread": {
@@ -42,7 +48,7 @@
       "category": [
         "process"
       ],
-      "code": 4,
+      "code": "4",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -65,7 +71,7 @@
         "State": "Started",
         "Version": "9.01"
       },
-      "event_id": 4,
+      "event_id": "4",
       "process": {
         "pid": 4860,
         "thread": {
@@ -76,10 +82,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 2,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -90,7 +93,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -126,6 +129,12 @@
         "name": "services.exe",
         "pid": 488
       },
+      "pe": {
+        "company": "Sysinternals - www.sysinternals.com",
+        "description": "System activity monitor",
+        "file_version": "9.01",
+        "product": "Sysinternals Sysmon"
+      },
       "pid": 4860,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -135,6 +144,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -151,7 +161,7 @@
         "Product": "Sysinternals Sysmon",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -162,10 +172,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 3,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -176,7 +183,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -215,6 +222,12 @@
         "name": "svchost.exe",
         "pid": 560
       },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "Sink to receive asynchronous callbacks for WMI client application",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
+      },
       "pid": 5028,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -224,6 +237,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -240,7 +254,7 @@
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -251,10 +265,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 4,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -265,7 +276,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -290,7 +301,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -301,10 +312,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 5,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -315,7 +323,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -340,7 +348,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -351,10 +359,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 6,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -365,7 +370,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -404,6 +409,12 @@
         "name": "svchost.exe",
         "pid": 560
       },
+      "pe": {
+        "company": "Microsoft Corporation",
+        "description": "WMI Provider Host",
+        "file_version": "6.3.9600.16384 (winblue_rtm.130821-1623)",
+        "product": "Microsoft® Windows® Operating System"
+      },
       "pid": 4508,
       "working_directory": "C:\\Windows\\system32\\"
     },
@@ -413,6 +424,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -429,7 +441,7 @@
         "Product": "Microsoft® Windows® Operating System",
         "TerminalSessionId": "0"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 4860,
         "thread": {
@@ -440,10 +452,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 7,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -458,7 +467,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -476,7 +485,7 @@
     },
     "network": {
       "community_id": "1:EQDBfI6vAylArTBQHY8kNmaweOA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv6"
@@ -500,13 +509,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -517,10 +527,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 8,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -535,7 +542,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -553,7 +560,7 @@
     },
     "network": {
       "community_id": "1:TXczQujzvcGYSvZ/CKEBu1p2riE=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "domain",
       "transport": "udp",
       "type": "ipv4"
@@ -578,13 +585,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -595,10 +603,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 9,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -613,7 +618,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -631,7 +636,7 @@
     },
     "network": {
       "community_id": "1:W2ZbP8nXMY+YAGYw2h/3Sa8Gu/w=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -656,13 +661,14 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -673,10 +679,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 10,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -691,7 +694,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -709,7 +712,7 @@
     },
     "network": {
       "community_id": "1:5MsyqYltV9KkhIFGPWiByzQqHDo=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "https",
       "transport": "tcp",
       "type": "ipv4"
@@ -734,13 +737,14 @@
     },
     "user": {
       "domain": "VAGRANT-2012-R2",
+      "id": "S-1-5-18",
       "name": "vagrant"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -751,10 +755,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 11,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -769,7 +770,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -787,7 +788,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -812,6 +813,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -821,7 +823,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -832,10 +834,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 12,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -851,7 +850,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -869,7 +868,7 @@
     },
     "network": {
       "community_id": "1:0p51df9oGzNph3fcneX2H8jXsag=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -893,6 +892,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -902,7 +902,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -913,10 +913,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 13,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -931,7 +928,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -949,7 +946,7 @@
     },
     "network": {
       "community_id": "1:4DSgubObvMEI9IKNWPDqltrux+k=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -974,13 +971,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -991,10 +989,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 14,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1009,7 +1004,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1027,7 +1022,7 @@
     },
     "network": {
       "community_id": "1:sejGGvgk92xTvKdzlFitndKqdWw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1051,13 +1046,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1068,10 +1064,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 15,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1086,7 +1079,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1104,7 +1097,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1128,6 +1121,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1137,7 +1131,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1148,10 +1142,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 16,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1166,7 +1157,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1184,7 +1175,7 @@
     },
     "network": {
       "community_id": "1:yP71IXofOTWmF1LG760//yXa4Rk=",
-      "direction": "inbound",
+      "direction": "ingress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1208,6 +1199,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1217,7 +1209,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1228,10 +1220,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 17,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1246,7 +1235,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1264,7 +1253,7 @@
     },
     "network": {
       "community_id": "1:Zt/ImHlMNf4MciHXlRDkivgw2jY=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1288,13 +1277,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1305,10 +1295,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 18,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1323,7 +1310,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1341,7 +1328,7 @@
     },
     "network": {
       "community_id": "1:SHkoHfPFDYWai8qQBwIiRxvCPZw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "llmnr",
       "transport": "udp",
       "type": "ipv6"
@@ -1365,13 +1352,14 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "NETWORK SERVICE"
     },
     "winlog": {
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1382,10 +1370,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 19,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1400,7 +1385,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1418,7 +1403,7 @@
     },
     "network": {
       "community_id": "1:DI+g4BImhWaUwPmLEjdMMQVYPLs=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1443,6 +1428,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1452,7 +1438,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1463,10 +1449,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 20,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1481,7 +1464,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1499,7 +1482,7 @@
     },
     "network": {
       "community_id": "1:okFVyky/zOY2Q0BATy37YsbiveA=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1524,6 +1507,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1533,7 +1517,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1544,10 +1528,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 21,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1562,7 +1543,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1580,7 +1561,7 @@
     },
     "network": {
       "community_id": "1:ZHyFuF2PjubLSbAh4zRQIZHOZK8=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1605,6 +1586,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1614,7 +1596,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1625,10 +1607,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 22,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1643,7 +1622,7 @@
       "category": [
         "network"
       ],
-      "code": 3,
+      "code": "3",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1661,7 +1640,7 @@
     },
     "network": {
       "community_id": "1:r3C/WjbATNIislTQ0M+ySzwnuiw=",
-      "direction": "outbound",
+      "direction": "egress",
       "protocol": "netbios-ns",
       "transport": "udp",
       "type": "ipv4"
@@ -1686,6 +1665,7 @@
     },
     "user": {
       "domain": "NT AUTHORITY",
+      "id": "S-1-5-18",
       "name": "SYSTEM"
     },
     "winlog": {
@@ -1695,7 +1675,7 @@
       "event_data": {
         "SourcePortName": "netbios-ns"
       },
-      "event_id": 3,
+      "event_id": "3",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1706,10 +1686,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 23,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 5
     }
@@ -1720,7 +1697,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1745,7 +1722,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1756,10 +1733,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 24,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1770,7 +1744,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1795,7 +1769,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1806,10 +1780,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 25,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -1820,7 +1791,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1854,7 +1825,7 @@
         "CreationUtcTime": "2019-03-18 16:52:04.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.387"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1865,10 +1836,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 26,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1879,7 +1847,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1913,7 +1881,7 @@
         "CreationUtcTime": "2019-03-18 16:52:04.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1924,10 +1892,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 27,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1938,7 +1903,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -1972,7 +1937,7 @@
         "CreationUtcTime": "2019-03-18 16:52:05.028",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.402"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -1983,10 +1948,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 28,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -1997,7 +1959,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2031,7 +1993,7 @@
         "CreationUtcTime": "2019-03-18 16:51:54.980",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2042,10 +2004,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 29,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2056,7 +2015,7 @@
       "category": [
         "process"
       ],
-      "code": 5,
+      "code": "5",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2081,7 +2040,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 5,
+      "event_id": "5",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2092,10 +2051,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 30,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 3
     }
@@ -2106,7 +2062,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2140,7 +2096,7 @@
         "CreationUtcTime": "2019-03-18 16:52:08.496",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2151,10 +2107,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 31,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }
@@ -2165,7 +2118,7 @@
       "category": [
         "file"
       ],
-      "code": 2,
+      "code": "2",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -2199,7 +2152,7 @@
         "CreationUtcTime": "2019-03-18 16:52:05.339",
         "PreviousCreationUtcTime": "2019-03-18 16:57:52.417"
       },
-      "event_id": 2,
+      "event_id": "2",
       "process": {
         "pid": 4860,
         "thread": {
@@ -2210,10 +2163,7 @@
       "provider_name": "Microsoft-Windows-Sysmon",
       "record_id": 32,
       "user": {
-        "domain": "NT AUTHORITY",
-        "identifier": "S-1-5-18",
-        "name": "SYSTEM",
-        "type": "Well Known Group"
+        "identifier": "S-1-5-18"
       },
       "version": 4
     }

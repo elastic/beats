@@ -207,9 +207,9 @@ etcd_disk_backend_snapshot_duration_seconds_sum 0
 etcd_disk_backend_snapshot_duration_seconds_count 0
 # HELP etcd_disk_wal_fsync_duration_seconds The latency distributions of fsync called by wal.
 # TYPE etcd_disk_wal_fsync_duration_seconds histogram
-etcd_disk_wal_fsync_duration_seconds_bucket{le="0.001"} 0
-etcd_disk_wal_fsync_duration_seconds_bucket{le="0.002"} 0
-etcd_disk_wal_fsync_duration_seconds_bucket{le="0.004"} 0
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.001"} 1
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.002"} 1
+etcd_disk_wal_fsync_duration_seconds_bucket{le="0.004"} 1
 etcd_disk_wal_fsync_duration_seconds_bucket{le="0.008"} 2
 etcd_disk_wal_fsync_duration_seconds_bucket{le="0.016"} 2
 etcd_disk_wal_fsync_duration_seconds_bucket{le="0.032"} 2

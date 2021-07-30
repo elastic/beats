@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 )
 
@@ -46,7 +47,7 @@ func mongodbModForTests() (*eventStore, *mongodbPlugin) {
 	var mongodb mongodbPlugin
 	results := &eventStore{}
 	config := defaultConfig
-	mongodb.init(results.publish, &config)
+	mongodb.init(results.publish, procs.ProcessesWatcher{}, &config)
 	return results, &mongodb
 }
 

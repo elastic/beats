@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
 type agentinfo struct{}
@@ -34,14 +35,14 @@ func TestCheckin(t *testing.T) {
 	}
 	`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusInternalServerError)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -56,10 +57,10 @@ func TestCheckin(t *testing.T) {
 			raw := `
 	{
 		"actions": [{
-			"type": "CONFIG_CHANGE",
+			"type": "POLICY_CHANGE",
 			"id": "id1",
 			"data": {
-				"config": {
+				"policy": {
 					"id": "policy-id",
 					"outputs": {
 						"default": {
@@ -83,14 +84,14 @@ func TestCheckin(t *testing.T) {
 	}
 	`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -102,7 +103,7 @@ func TestCheckin(t *testing.T) {
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 		},
 	))
 
@@ -112,10 +113,10 @@ func TestCheckin(t *testing.T) {
 	{
 	    "actions": [
 	        {
-	            "type": "CONFIG_CHANGE",
+	            "type": "POLICY_CHANGE",
 	            "id": "id1",
 	            "data": {
-	                "config": {
+	                "policy": {
 	                    "id": "policy-id",
 	                    "outputs": {
 	                        "default": {
@@ -144,14 +145,14 @@ func TestCheckin(t *testing.T) {
 	}
 	`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -163,7 +164,7 @@ func TestCheckin(t *testing.T) {
 
 			// ActionPolicyChange
 			require.Equal(t, "id1", r.Actions[0].ID())
-			require.Equal(t, "CONFIG_CHANGE", r.Actions[0].Type())
+			require.Equal(t, "POLICY_CHANGE", r.Actions[0].Type())
 
 			// UnknownAction
 			require.Equal(t, "id2", r.Actions[1].ID())
@@ -176,14 +177,14 @@ func TestCheckin(t *testing.T) {
 		func(t *testing.T) *http.ServeMux {
 			raw := `{ "actions": [] }`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}
@@ -199,7 +200,7 @@ func TestCheckin(t *testing.T) {
 		func(t *testing.T) *http.ServeMux {
 			raw := `{"actions": []}`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				type Request struct {
 					Metadata *info.ECSMeta `json:"local_metadata"`
@@ -213,11 +214,11 @@ func TestCheckin(t *testing.T) {
 				assert.Equal(t, "linux", req.Metadata.OS.Name)
 
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{Metadata: testMetadata()}
@@ -233,7 +234,7 @@ func TestCheckin(t *testing.T) {
 		func(t *testing.T) *http.ServeMux {
 			raw := `{"actions": []}`
 			mux := http.NewServeMux()
-			path := fmt.Sprintf("/api/ingest_manager/fleet/agents/%s/checkin", agentInfo.AgentID())
+			path := fmt.Sprintf("/api/fleet/agents/%s/checkin", agentInfo.AgentID())
 			mux.HandleFunc(path, authHandler(func(w http.ResponseWriter, r *http.Request) {
 				type Request struct {
 					Metadata *info.ECSMeta `json:"local_metadata"`
@@ -247,11 +248,11 @@ func TestCheckin(t *testing.T) {
 				assert.Nil(t, req.Metadata)
 
 				w.WriteHeader(http.StatusOK)
-				fmt.Fprintf(w, raw)
+				fmt.Fprint(w, raw)
 			}, withAPIKey))
 			return mux
 		}, withAPIKey,
-		func(t *testing.T, client clienter) {
+		func(t *testing.T, client client.Sender) {
 			cmd := NewCheckinCmd(agentInfo, client)
 
 			request := CheckinRequest{}

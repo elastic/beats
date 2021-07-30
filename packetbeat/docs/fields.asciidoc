@@ -35,6 +35,7 @@ grouped in the following categories:
 * <<exported-fields-process>>
 * <<exported-fields-raw>>
 * <<exported-fields-redis>>
+* <<exported-fields-sip>>
 * <<exported-fields-thrift>>
 * <<exported-fields-tls_detailed>>
 * <<exported-fields-trans_event>>
@@ -2127,8 +2128,15 @@ type: object
 [[exported-fields-ecs]]
 == ECS fields
 
-ECS Fields.
 
+This section defines Elastic Common Schema (ECS) fields—a common set of fields
+to be used when storing event data in {es}.
+
+This is an exhaustive list, and fields listed here are not necessarily used by {beatname_uc}.
+The goal of ECS is to enable and encourage users of {es} to normalize their event data,
+so that they can better analyze, visualize, and correlate the data represented in their events.
+
+See the {ecs-ref}[ECS reference] for more information.
 
 *`@timestamp`*::
 +
@@ -2377,6 +2385,17 @@ example: Montreal
 
 --
 
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`client.geo.continent_name`*::
 +
 --
@@ -2434,6 +2453,18 @@ example: boston-dc
 
 --
 
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`client.geo.region_iso_code`*::
 +
 --
@@ -2456,6 +2487,17 @@ example: Quebec
 
 --
 
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`client.ip`*::
 +
 --
@@ -2469,8 +2511,11 @@ type: ip
 +
 --
 MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -2528,6 +2573,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`client.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -2774,6 +2831,18 @@ example: us-east-1
 
 --
 
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
+
+--
+
 [float]
 === code_signature
 
@@ -2788,6 +2857,18 @@ Boolean to capture if a signature is present.
 type: boolean
 
 example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
 
 --
 
@@ -2811,6 +2892,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -2902,10 +2995,60 @@ example: docker
 --
 
 [float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
+
+--
+
+[float]
 === destination
 
-Destination fields describe details about the destination of a packet/event.
-Destination fields are usually populated in conjunction with source fields.
+Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Destination fields are usually populated in conjunction with source fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`destination.address`*::
@@ -2980,6 +3123,17 @@ example: Montreal
 
 --
 
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`destination.geo.continent_name`*::
 +
 --
@@ -3037,6 +3191,18 @@ example: boston-dc
 
 --
 
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`destination.geo.region_iso_code`*::
 +
 --
@@ -3059,6 +3225,17 @@ example: Quebec
 
 --
 
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -3072,8 +3249,11 @@ type: ip
 +
 --
 MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -3131,6 +3311,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`destination.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -3281,6 +3473,18 @@ example: true
 
 --
 
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`dll.code_signature.status`*::
 +
 --
@@ -3301,6 +3505,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -3359,6 +3575,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -3548,7 +3773,7 @@ Expected values are: AA, TC, RD, RA, AD, CD, DO.
 
 type: keyword
 
-example: ['RD', 'RA']
+example: ["RD", "RA"]
 
 --
 
@@ -3653,7 +3878,7 @@ The `answers` array can be difficult to use, because of the variety of data form
 
 type: ip
 
-example: ['10.10.10.10', '10.10.10.11']
+example: ["10.10.10.10", "10.10.10.11"]
 
 --
 
@@ -3920,7 +4145,7 @@ example: apache
 +
 --
 Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
 
 type: keyword
 
@@ -3973,7 +4198,7 @@ example: Terminated an unexpected process
 +
 --
 Reference URL linking to additional information about this event.
-This URL links to a static definition of the this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
+This URL links to a static definition of this event. Alert events, indicated by `event.kind:alert`, are a common use case for this field.
 
 type: keyword
 
@@ -4109,6 +4334,18 @@ example: true
 
 --
 
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`file.code_signature.status`*::
 +
 --
@@ -4129,6 +4366,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -4213,7 +4462,8 @@ example: C
 *`file.extension`*::
 +
 --
-File extension.
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -4274,6 +4524,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -4769,6 +5028,17 @@ example: Montreal
 
 --
 
+*`geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`geo.continent_name`*::
 +
 --
@@ -4826,6 +5096,18 @@ example: boston-dc
 
 --
 
+*`geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`geo.region_iso_code`*::
 +
 --
@@ -4845,6 +5127,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -4885,8 +5178,9 @@ type: keyword
 [float]
 === hash
 
-The hash fields represent different hash algorithms and their values.
+The hash fields represent different bitwise hash algorithms and their values.
 Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+Note that this fieldset is used for common hashes that may be computed over a range of generic bytes. Entity-specific hashes such as ja3 or imphash are placed in the fieldsets to which they relate (tls and pe, respectively).
 
 
 *`hash.md5`*::
@@ -4925,6 +5219,15 @@ type: keyword
 
 --
 
+*`hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 [float]
 === host
 
@@ -4940,6 +5243,35 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1.
+Scaling factor: 1000.
+For example: For a two core host, this value should be the average of the two cores, between 0 and 1.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
 
 --
 
@@ -4963,6 +5295,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`host.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -5023,6 +5366,18 @@ example: boston-dc
 
 --
 
+*`host.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`host.geo.region_iso_code`*::
 +
 --
@@ -5042,6 +5397,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`host.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -5078,9 +5444,12 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac addresses.
+Host MAC addresses.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -5091,6 +5460,42 @@ Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 type: keyword
+
+--
+
+*`host.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.egress.packets`*::
++
+--
+The number of packets (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.packets`*::
++
+--
+The number of packets (gauge) received on all network interfaces by the host since the last metric collection.
+
+type: long
 
 --
 
@@ -5160,6 +5565,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`host.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -5358,6 +5776,18 @@ format: bytes
 
 --
 
+*`http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
+The id may be contained in a non-standard HTTP header, such as `X-Request-ID` or `X-Correlation-ID`.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
+
+--
+
 *`http.request.method`*::
 +
 --
@@ -5369,6 +5799,18 @@ As of ECS 1.6.0, the guidance is deprecated because the original case of the met
 type: keyword
 
 example: GET, POST, PUT, PoST
+
+--
+
+*`http.request.mime_type`*::
++
+--
+Mime type of the body of the request.
+This value must only be populated based on the content of the request body, not on the `Content-Type` header. Comparing the mime type of a request with the request's Content-Type header can be helpful in detecting threats or misconfigured clients.
+
+type: keyword
+
+example: image/gif
 
 --
 
@@ -5424,6 +5866,18 @@ type: long
 example: 1437
 
 format: bytes
+
+--
+
+*`http.response.mime_type`*::
++
+--
+Mime type of the body of the response.
+This value must only be populated based on the content of the response body, not on the `Content-Type` header. Comparing the mime type of a response with the response's Content-Type header can be helpful in detecting misconfigured servers.
+
+type: keyword
+
+example: image/gif
 
 --
 
@@ -5705,14 +6159,17 @@ example: 1:hO+sN4H+MG5MY/8hIrXPqc4ZQz0=
 --
 Direction of the network traffic.
 Recommended values are:
+  * ingress
+  * egress
   * inbound
   * outbound
   * internal
   * external
   * unknown
 
-When mapping events from a host-based monitoring context, populate this field from the host's point of view.
-When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of your network perimeter.
+When mapping events from a host-based monitoring context, populate this field from the host's point of view, using the values "ingress" or "egress".
+When mapping events from a network or perimeter-based monitoring context, populate this field from the point of view of the network perimeter, using the values "inbound", "outbound", "internal" or "external".
+Note that "internal" is not crossing perimeter boundaries, and is meant to describe communication between two hosts within the perimeter. Note also that "external" is meant to describe traffic between two hosts that are external to the perimeter. This could for example be useful for ISPs or VPN service providers.
 
 type: keyword
 
@@ -5745,7 +6202,7 @@ example: 6
 *`network.inner`*::
 +
 --
-Network.inner fields are added in addition to network.vlan fields to describe  the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include  vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
+Network.inner fields are added in addition to network.vlan fields to describe the innermost VLAN when q-in-q VLAN tagging is present. Allowed fields include vlan.id and vlan.name. Inner vlan fields are typically used when sending traffic with multiple 802.1q encapsulations to a network sensor (e.g. Zeek, Wireshark.)
 
 type: object
 
@@ -5864,7 +6321,7 @@ This could be a custom hardware appliance or a server that has been configured t
 *`observer.egress`*::
 +
 --
-Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.egress holds information like interface number and name, vlan, and zone information to classify egress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -5928,7 +6385,7 @@ example: outside
 *`observer.egress.zone`*::
 +
 --
-Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -5944,6 +6401,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`observer.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -6004,6 +6472,18 @@ example: boston-dc
 
 --
 
+*`observer.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`observer.geo.region_iso_code`*::
 +
 --
@@ -6026,6 +6506,17 @@ example: Quebec
 
 --
 
+*`observer.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`observer.hostname`*::
 +
 --
@@ -6038,7 +6529,7 @@ type: keyword
 *`observer.ingress`*::
 +
 --
-Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.ingress holds information like interface number and name, vlan, and zone information to classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -6102,7 +6593,7 @@ example: outside
 *`observer.ingress.zone`*::
 +
 --
-Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress traffic. e.g. internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -6122,9 +6613,12 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC addresses of the observer
+MAC addresses of the observer.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -6210,6 +6704,19 @@ example: darwin
 
 --
 
+*`observer.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
+
+--
+
 *`observer.os.version`*::
 +
 --
@@ -6270,6 +6777,105 @@ example: Symantec
 Observer version.
 
 type: keyword
+
+--
+
+[float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
 
 --
 
@@ -6377,6 +6983,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -6642,7 +7261,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -6669,6 +7288,18 @@ example: true
 
 --
 
+*`process.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.code_signature.status`*::
 +
 --
@@ -6689,6 +7320,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -6814,6 +7457,15 @@ type: keyword
 
 --
 
+*`process.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -6841,7 +7493,7 @@ May be filtered to protect sensitive information.
 
 type: keyword
 
-example: ['/usr/bin/ssh', '-l', 'user', '10.0.0.16']
+example: ["/usr/bin/ssh", "-l", "user", "10.0.0.16"]
 
 --
 
@@ -6868,6 +7520,18 @@ example: true
 
 --
 
+*`process.parent.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.parent.code_signature.status`*::
 +
 --
@@ -6888,6 +7552,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -7008,6 +7684,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -7567,7 +8252,7 @@ Name, organization, or pseudonym of the author or authors who created the rule u
 
 type: keyword
 
-example: ['Star-Lord']
+example: ["Star-Lord"]
 
 --
 
@@ -7751,6 +8436,17 @@ example: Montreal
 
 --
 
+*`server.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`server.geo.continent_name`*::
 +
 --
@@ -7808,6 +8504,18 @@ example: boston-dc
 
 --
 
+*`server.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`server.geo.region_iso_code`*::
 +
 --
@@ -7830,6 +8538,17 @@ example: Quebec
 
 --
 
+*`server.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`server.ip`*::
 +
 --
@@ -7843,8 +8562,11 @@ type: ip
 +
 --
 MAC address of the server.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -7902,6 +8624,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`server.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -8125,8 +8859,8 @@ example: 3.2.4
 [float]
 === source
 
-Source fields describe details about the source of a packet/event.
-Source fields are usually populated in conjunction with destination fields.
+Source fields capture details about the sender of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
+Source fields are usually populated in conjunction with destination fields. The source and destination fields are considered the baseline and should always be filled if an event contains source and destination details from a network transaction. If the event also contains identification of the client and server roles, then the client and server fields should also be populated.
 
 
 *`source.address`*::
@@ -8201,6 +8935,17 @@ example: Montreal
 
 --
 
+*`source.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`source.geo.continent_name`*::
 +
 --
@@ -8258,6 +9003,18 @@ example: boston-dc
 
 --
 
+*`source.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`source.geo.region_iso_code`*::
 +
 --
@@ -8280,6 +9037,17 @@ example: Quebec
 
 --
 
+*`source.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`source.ip`*::
 +
 --
@@ -8293,8 +9061,11 @@ type: ip
 +
 --
 MAC address of the source.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -8352,6 +9123,18 @@ This value can be determined precisely with a list like the public suffix list (
 type: keyword
 
 example: example.com
+
+--
+
+*`source.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
 
 --
 
@@ -8501,55 +9284,55 @@ example: MITRE ATT&CK
 *`threat.tactic.id`*::
 +
 --
-The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The id of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: TA0040
+example: TA0002
 
 --
 
 *`threat.tactic.name`*::
 +
 --
-Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/)
+Name of the type of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/)
 
 type: keyword
 
-example: impact
+example: Execution
 
 --
 
 *`threat.tactic.reference`*::
 +
 --
-The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0040/ )
+The reference url of tactic used by this threat. You can use a MITRE ATT&CK® tactic, for example. (ex. https://attack.mitre.org/tactics/TA0002/ )
 
 type: keyword
 
-example: https://attack.mitre.org/tactics/TA0040/
+example: https://attack.mitre.org/tactics/TA0002/
 
 --
 
 *`threat.technique.id`*::
 +
 --
-The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The id of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: T1499
+example: T1059
 
 --
 
 *`threat.technique.name`*::
 +
 --
-The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/)
+The name of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: Endpoint Denial of Service
+example: Command and Scripting Interpreter
 
 --
 
@@ -8563,11 +9346,51 @@ type: text
 *`threat.technique.reference`*::
 +
 --
-The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1499/ )
+The reference url of technique used by this threat. You can use a MITRE ATT&CK® technique, for example. (ex. https://attack.mitre.org/techniques/T1059/)
 
 type: keyword
 
-example: https://attack.mitre.org/techniques/T1499/
+example: https://attack.mitre.org/techniques/T1059/
+
+--
+
+*`threat.technique.subtechnique.id`*::
++
+--
+The full id of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: T1059.001
+
+--
+
+*`threat.technique.subtechnique.name`*::
++
+--
+The name of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: PowerShell
+
+--
+
+*`threat.technique.subtechnique.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.technique.subtechnique.reference`*::
++
+--
+The reference url of subtechnique used by this threat. You can use a MITRE ATT&CK® subtechnique, for example. (ex. https://attack.mitre.org/techniques/T1059/001/)
+
+type: keyword
+
+example: https://attack.mitre.org/techniques/T1059/001/
 
 --
 
@@ -8606,7 +9429,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -8716,7 +9539,7 @@ Array of ciphers offered by the client during the client hello.
 
 type: keyword
 
-example: ['TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384', 'TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384', '...']
+example: ["TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384", "..."]
 
 --
 
@@ -9042,7 +9865,7 @@ Array of PEM-encoded certificates that make up the certificate chain offered by 
 
 type: keyword
 
-example: ['MII...', 'MII...']
+example: ["MII...", "MII..."]
 
 --
 
@@ -9420,13 +10243,7 @@ example: tls
 
 --
 
-[float]
-=== tracing
-
-Distributed tracing makes it possible to analyze performance throughout a microservice architecture all in one view. This is accomplished by tracing all of the requests - from the initial web request in the front-end service - to queries made through multiple back-end services.
-
-
-*`tracing.span.id`*::
+*`span.id`*::
 +
 --
 Unique identifier of the span within the scope of its trace.
@@ -9438,7 +10255,7 @@ example: 3ff9a8981b7ccd5a
 
 --
 
-*`tracing.trace.id`*::
+*`trace.id`*::
 +
 --
 Unique identifier of the trace.
@@ -9450,7 +10267,7 @@ example: 4bf92f3577b34da6a3ce929d0e0e4736
 
 --
 
-*`tracing.transaction.id`*::
+*`transaction.id`*::
 +
 --
 Unique identifier of the transaction within the scope of its trace.
@@ -9473,6 +10290,7 @@ URL fields provide support for complete or partial URLs, and supports the breaki
 --
 Domain of the url, such as "www.elastic.co".
 In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
 
 type: keyword
 
@@ -9483,9 +10301,10 @@ example: www.elastic.co
 *`url.extension`*::
 +
 --
-The field contains the file extension from the original request url.
+The field contains the file extension from the original request url, excluding the leading dot.
 The file extension is only set if it exists, as not every url has a file extension.
 The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
 
 type: keyword
 
@@ -9607,6 +10426,18 @@ example: https
 
 --
 
+*`url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
 *`url.top_level_domain`*::
 +
 --
@@ -9635,6 +10466,119 @@ The user fields describe information about the user that is relevant to the even
 Fields can have one entry or multiple entries. If a user has more than one id, provide an array that includes all of them.
 
 
+*`user.changes.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.changes.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.changes.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.changes.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.changes.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.changes.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.changes.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.changes.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.changes.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.changes.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
 *`user.domain`*::
 +
 --
@@ -9642,6 +10586,119 @@ Name of the directory the user is a member of.
 For example, an LDAP or Active Directory domain name.
 
 type: keyword
+
+--
+
+*`user.effective.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.effective.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.effective.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.effective.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.effective.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.effective.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.effective.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.effective.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.effective.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.effective.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
 
 --
 
@@ -9738,6 +10795,119 @@ type: text
 --
 
 *`user.roles`*::
++
+--
+Array of user roles at the time of the event.
+
+type: keyword
+
+example: ["kibana_admin", "reporting_user"]
+
+--
+
+*`user.target.domain`*::
++
+--
+Name of the directory the user is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.email`*::
++
+--
+User email address.
+
+type: keyword
+
+--
+
+*`user.target.full_name`*::
++
+--
+User's full name, if available.
+
+type: keyword
+
+example: Albert Einstein
+
+--
+
+*`user.target.full_name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.group.domain`*::
++
+--
+Name of the directory the group is a member of.
+For example, an LDAP or Active Directory domain name.
+
+type: keyword
+
+--
+
+*`user.target.group.id`*::
++
+--
+Unique identifier for the group on the system/platform.
+
+type: keyword
+
+--
+
+*`user.target.group.name`*::
++
+--
+Name of the group.
+
+type: keyword
+
+--
+
+*`user.target.hash`*::
++
+--
+Unique user hash to correlate information for a user in anonymized form.
+Useful if `user.id` or `user.name` contain confidential information and cannot be used.
+
+type: keyword
+
+--
+
+*`user.target.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`user.target.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`user.target.name.text`*::
++
+--
+type: text
+
+--
+
+*`user.target.roles`*::
 +
 --
 Array of user roles at the time of the event.
@@ -9861,6 +11031,19 @@ Operating system platform (such centos, ubuntu, windows).
 type: keyword
 
 example: darwin
+
+--
+
+*`user_agent.os.type`*::
++
+--
+Use the `os.type` field to categorize the operating system into one of the broad commercial families.
+One of these following values should be used (lowercase): linux, macos, unix, windows.
+If the OS you're dealing with is not in the list, the field should not be populated. Please let us know by opening an issue with ECS, to propose its addition.
+
+type: keyword
+
+example: macos
 
 --
 
@@ -10079,7 +11262,9 @@ example: Critical
 [float]
 === x509
 
-This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk. When only a single certificate is logged in an event, it should be nested under `file`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`). For events that contain certificate information for both sides of the connection, the x509 object could be nested under the respective side of the connection information (e.g. `tls.server.x509`).
+This implements the common core fields for x509 certificates. This information is likely logged with TLS sessions, digital signatures found in executable binaries, S/MIME information in email bodies, or analysis of files on disk.
+When the certificate relates to a file, use the fields at `file.x509`. When hashes of the DER-encoded certificate are available, the `hash` data set should be populated as well (e.g. `file.hash.sha256`).
+Events that contain certificate information about network connections, should use the x509 fields under the relevant TLS fields: `tls.server.x509` and/or `tls.client.x509`.
 
 
 *`x509.alternative_names`*::
@@ -10740,6 +11925,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -10760,6 +11955,16 @@ type: keyword
 
 --
 
+*`kubernetes.node.hostname`*::
++
+--
+Kubernetes hostname as reported by the node’s kernel
+
+
+type: keyword
+
+--
+
 *`kubernetes.labels.*`*::
 +
 --
@@ -10774,6 +11979,16 @@ type: object
 +
 --
 Kubernetes annotations map
+
+
+type: object
+
+--
+
+*`kubernetes.selectors.*`*::
++
+--
+Kubernetes selectors map
 
 
 type: object
@@ -10813,7 +12028,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -10826,7 +12041,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -11632,6 +12849,39 @@ alias to: process.executable
 
 --
 
+[float]
+=== owner
+
+Process owner information.
+
+
+*`process.owner.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`process.owner.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`process.owner.name.text`*::
++
+--
+type: text
+
+--
+
 [[exported-fields-raw]]
 == Raw fields
 
@@ -11679,6 +12929,658 @@ The return value of the Redis command in a human readable format.
 --
 If the Redis command has resulted in an error, this field contains the error message returned by the Redis server.
 
+
+--
+
+[[exported-fields-sip]]
+== SIP fields
+
+SIP-specific event fields.
+
+
+[float]
+=== sip
+
+Information about SIP traffic.
+
+
+*`sip.code`*::
++
+--
+Response status code.
+
+type: keyword
+
+--
+
+*`sip.method`*::
++
+--
+Request method.
+
+type: keyword
+
+--
+
+*`sip.status`*::
++
+--
+Response status phrase.
+
+type: keyword
+
+--
+
+*`sip.type`*::
++
+--
+Either request or response.
+
+type: keyword
+
+--
+
+*`sip.version`*::
++
+--
+SIP protocol version.
+
+type: keyword
+
+--
+
+*`sip.uri.original`*::
++
+--
+The original URI.
+
+type: keyword
+
+--
+
+*`sip.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.uri.scheme`*::
++
+--
+The URI scheme.
+
+type: keyword
+
+--
+
+*`sip.uri.username`*::
++
+--
+The URI user name.
+
+type: keyword
+
+--
+
+*`sip.uri.host`*::
++
+--
+The URI host.
+
+type: keyword
+
+--
+
+*`sip.uri.port`*::
++
+--
+The URI port.
+
+type: keyword
+
+--
+
+*`sip.accept`*::
++
+--
+Accept header value.
+
+type: keyword
+
+--
+
+*`sip.allow`*::
++
+--
+Allowed methods.
+
+type: keyword
+
+--
+
+*`sip.call_id`*::
++
+--
+Call ID.
+
+type: keyword
+
+--
+
+*`sip.content_length`*::
++
+--
+type: long
+
+--
+
+*`sip.content_type`*::
++
+--
+type: keyword
+
+--
+
+*`sip.max_forwards`*::
++
+--
+type: long
+
+--
+
+*`sip.supported`*::
++
+--
+Supported methods.
+
+type: keyword
+
+--
+
+*`sip.user_agent.original`*::
++
+--
+type: keyword
+
+--
+
+*`sip.user_agent.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.private.uri.original`*::
++
+--
+Private original URI.
+
+type: keyword
+
+--
+
+*`sip.private.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.private.uri.scheme`*::
++
+--
+Private URI scheme.
+
+type: keyword
+
+--
+
+*`sip.private.uri.username`*::
++
+--
+Private URI user name.
+
+type: keyword
+
+--
+
+*`sip.private.uri.host`*::
++
+--
+Private URI host.
+
+type: keyword
+
+--
+
+*`sip.private.uri.port`*::
++
+--
+Private URI port.
+
+type: keyword
+
+--
+
+*`sip.cseq.code`*::
++
+--
+Sequence code.
+
+type: keyword
+
+--
+
+*`sip.cseq.method`*::
++
+--
+Sequence method.
+
+type: keyword
+
+--
+
+*`sip.via.original`*::
++
+--
+The original Via value.
+
+type: keyword
+
+--
+
+*`sip.via.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.to.display_info`*::
++
+--
+To display info
+
+type: keyword
+
+--
+
+*`sip.to.uri.original`*::
++
+--
+To original URI
+
+type: keyword
+
+--
+
+*`sip.to.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.to.uri.scheme`*::
++
+--
+To URI scheme
+
+type: keyword
+
+--
+
+*`sip.to.uri.username`*::
++
+--
+To URI user name
+
+type: keyword
+
+--
+
+*`sip.to.uri.host`*::
++
+--
+To URI host
+
+type: keyword
+
+--
+
+*`sip.to.uri.port`*::
++
+--
+To URI port
+
+type: keyword
+
+--
+
+*`sip.to.tag`*::
++
+--
+To tag
+
+type: keyword
+
+--
+
+*`sip.from.display_info`*::
++
+--
+From display info
+
+type: keyword
+
+--
+
+*`sip.from.uri.original`*::
++
+--
+From original URI
+
+type: keyword
+
+--
+
+*`sip.from.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.from.uri.scheme`*::
++
+--
+From URI scheme
+
+type: keyword
+
+--
+
+*`sip.from.uri.username`*::
++
+--
+From URI user name
+
+type: keyword
+
+--
+
+*`sip.from.uri.host`*::
++
+--
+From URI host
+
+type: keyword
+
+--
+
+*`sip.from.uri.port`*::
++
+--
+From URI port
+
+type: keyword
+
+--
+
+*`sip.from.tag`*::
++
+--
+From tag
+
+type: keyword
+
+--
+
+*`sip.contact.display_info`*::
++
+--
+Contact display info
+
+type: keyword
+
+--
+
+*`sip.contact.uri.original`*::
++
+--
+Contact original URI
+
+type: keyword
+
+--
+
+*`sip.contact.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.contact.uri.scheme`*::
++
+--
+Contat URI scheme
+
+type: keyword
+
+--
+
+*`sip.contact.uri.username`*::
++
+--
+Contact URI user name
+
+type: keyword
+
+--
+
+*`sip.contact.uri.host`*::
++
+--
+Contact URI host
+
+type: keyword
+
+--
+
+*`sip.contact.uri.port`*::
++
+--
+Contact URI port
+
+type: keyword
+
+--
+
+*`sip.contact.transport`*::
++
+--
+Contact transport
+
+type: keyword
+
+--
+
+*`sip.contact.line`*::
++
+--
+Contact line
+
+type: keyword
+
+--
+
+*`sip.contact.expires`*::
++
+--
+Contact expires
+
+type: keyword
+
+--
+
+*`sip.contact.q`*::
++
+--
+Contact Q
+
+type: keyword
+
+--
+
+*`sip.auth.scheme`*::
++
+--
+Auth scheme
+
+type: keyword
+
+--
+
+*`sip.auth.realm`*::
++
+--
+Auth realm
+
+type: keyword
+
+--
+
+*`sip.auth.uri.original`*::
++
+--
+Auth original URI
+
+type: keyword
+
+--
+
+*`sip.auth.uri.original.text`*::
++
+--
+type: text
+
+--
+
+*`sip.auth.uri.scheme`*::
++
+--
+Auth URI scheme
+
+type: keyword
+
+--
+
+*`sip.auth.uri.host`*::
++
+--
+Auth URI host
+
+type: keyword
+
+--
+
+*`sip.auth.uri.port`*::
++
+--
+Auth URI port
+
+type: keyword
+
+--
+
+*`sip.sdp.version`*::
++
+--
+SDP version
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.username`*::
++
+--
+SDP owner user name
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.session_id`*::
++
+--
+SDP owner session ID
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.version`*::
++
+--
+SDP owner version
+
+type: keyword
+
+--
+
+*`sip.sdp.owner.ip`*::
++
+--
+SDP owner IP
+
+type: ip
+
+--
+
+*`sip.sdp.session.name`*::
++
+--
+SDP session name
+
+type: keyword
+
+--
+
+*`sip.sdp.connection.info`*::
++
+--
+SDP connection info
+
+type: keyword
+
+--
+
+*`sip.sdp.connection.address`*::
++
+--
+SDP connection address
+
+type: keyword
+
+--
+
+*`sip.sdp.body.original`*::
++
+--
+SDP original body
+
+type: keyword
+
+--
+
+*`sip.sdp.body.original.text`*::
++
+--
+type: text
 
 --
 

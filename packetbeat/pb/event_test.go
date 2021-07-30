@@ -57,7 +57,7 @@ func TestComputeValues(t *testing.T) {
 
 	localAddrs := []net.IP{net.ParseIP("127.0.0.1")}
 
-	if err := f.ComputeValues(localAddrs); err != nil {
+	if err := f.ComputeValues(localAddrs, nil); err != nil {
 		t.Fatal(err)
 	}
 
@@ -66,7 +66,7 @@ func TestComputeValues(t *testing.T) {
 	assert.EqualValues(t, f.Network.Bytes, 300)
 	assert.NotZero(t, f.Network.CommunityID)
 	assert.Equal(t, f.Network.Type, "ipv4")
-	assert.Equal(t, f.Network.Direction, "outbound")
+	assert.Equal(t, f.Network.Direction, "ingress")
 }
 
 func TestIsEmptyValue(t *testing.T) {

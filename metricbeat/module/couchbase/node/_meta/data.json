@@ -37,7 +37,7 @@
                 "value": 7303
             },
             "ep_bg_fetched": 0,
-            "get_hits": 0,
+            "get_hits": 1.1,
             "hostname": "172.17.0.2:8091",
             "mcd_memory": {
                 "allocated": {
@@ -58,7 +58,7 @@
                     "bytes": 53962016
                 }
             },
-            "ops": 0,
+            "ops": 1.1,
             "swap": {
                 "total": {
                     "bytes": 4189057024

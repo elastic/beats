@@ -160,6 +160,14 @@ Kafka rebalance settings:
 *`retry_backoff`*:: How long to wait after an unsuccessful rebalance attempt.
 Defaults to 2s.
 
+===== `kerberos`
+
+beta[]
+
+Configuration options for Kerberos authentication.
+
+See <<configuration-kerberos>> for more information.
+
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]
 

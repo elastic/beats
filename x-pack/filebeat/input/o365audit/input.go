@@ -6,6 +6,7 @@ package o365audit
 
 import (
 	"context"
+	"encoding/json"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
@@ -21,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -108,6 +110,34 @@ func (inp *o365input) Run(
 	cursor cursor.Cursor,
 	publisher cursor.Publisher,
 ) error {
+	for ctx.Cancelation.Err() == nil {
+		err := inp.runOnce(ctx, src, cursor, publisher)
+		if err == nil {
+			break
+		}
+		if ctx.Cancelation.Err() != err && err != context.Canceled {
+			msg := common.MapStr{}
+			msg.Put("error.message", err.Error())
+			msg.Put("event.kind", "pipeline_error")
+			event := beat.Event{
+				Timestamp: time.Now(),
+				Fields:    msg,
+			}
+			publisher.Publish(event, nil)
+			ctx.Logger.Errorf("Input failed: %v", err)
+			ctx.Logger.Infof("Restarting in %v", inp.config.API.ErrorRetryInterval)
+			timed.Wait(ctx.Cancelation, inp.config.API.ErrorRetryInterval)
+		}
+	}
+	return nil
+}
+
+func (inp *o365input) runOnce(
+	ctx v2.Context,
+	src cursor.Source,
+	cursor cursor.Cursor,
+	publisher cursor.Publisher,
+) error {
 	stream := src.(*stream)
 	tenantID, contentType := stream.tenantID, stream.contentType
 	log := ctx.Logger.With("tenantID", tenantID, "contentType", contentType)
@@ -156,18 +186,7 @@ func (inp *o365input) Run(
 	}
 
 	log.Infow("Start fetching events", "cursor", start)
-	err = poller.Run(action)
-	if err != nil && ctx.Cancelation.Err() != err && err != context.Canceled {
-		msg := common.MapStr{}
-		msg.Put("error.message", err.Error())
-		msg.Put("event.kind", "pipeline_error")
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields:    msg,
-		}
-		publisher.Publish(event, nil)
-	}
-	return err
+	return poller.Run(action)
 }
 
 func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duration) checkpoint {
@@ -204,9 +223,9 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duratio
 }
 
 // Report returns an action that produces a beat.Event from the given object.
-func (env apiEnvironment) Report(doc common.MapStr, private interface{}) poll.Action {
+func (env apiEnvironment) Report(raw json.RawMessage, doc common.MapStr, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
-		return env.Callback(env.toBeatEvent(doc), private)
+		return env.Callback(env.toBeatEvent(raw, doc), private)
 	}
 }
 
@@ -217,7 +236,7 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	}
 }
 
-func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
+func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc common.MapStr) beat.Event {
 	var errs multierror.Errors
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
@@ -234,6 +253,9 @@ func (env apiEnvironment) toBeatEvent(doc common.MapStr) beat.Event {
 		if id, err := getString(doc, "Id"); err == nil && len(id) > 0 {
 			b.SetID(id)
 		}
+	}
+	if env.Config.PreserveOriginalEvent {
+		b.PutValue("event.original", string(raw))
 	}
 	if len(errs) > 0 {
 		msgs := make([]string, len(errs))

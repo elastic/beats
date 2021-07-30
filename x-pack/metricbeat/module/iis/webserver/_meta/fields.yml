@@ -1,8 +1,231 @@
-- name: webserver.*.*
-  release: beta
-  type: object
-  object_type: float
-  object_type_mapping_type: "*"
+- name: webserver
+  type: group
+  release: ga
   description: >
-    webserver
-
+    Webserver related metrics.
+  fields:
+    - name: process
+      type: group
+      description: >
+        The process related stats.
+      fields:
+        - name: cpu_usage_perc
+          type: float
+          description: >
+            The CPU usage percentage.
+        - name: handle_count
+          type: float
+          description: >
+            The number of handles.
+        - name: virtual_bytes
+          type: float
+          description: >
+            Memory virtual bytes.
+        - name: thread_count
+          type: long
+          description: >
+            The number of threads.
+        - name: working_set
+          type: float
+          description: >
+            Memory working set.
+        - name: private_bytes
+          type: float
+          description: >
+            Memory private bytes.
+        - name: worker_process_count
+          type: float
+          description: >
+            Number of worker processes running.
+        - name: page_faults_per_sec
+          type: float
+          description: >
+            Memory page faults.
+        - name: io_read_operations_per_sec
+          type: float
+          description: >
+            IO read operations per sec.
+        - name: io_write_operations_per_sec
+          type: float
+          description: >
+            IO write operations per sec.
+    - name: asp_net
+      type: group
+      description: >
+        Common Language Runtime overview.
+      fields:
+        - name: application_restarts
+          type: float
+          description: >
+            Number of applications restarts.
+        - name: request_wait_time
+          type: long
+          description: >
+            Request wait time.
+    - name: asp_net_application
+      type: group
+      description: >
+       ASP.NET application overview.
+      fields:
+        - name: errors_total_per_sec
+          type: float
+          description: >
+            Total number of errors per sec.
+        - name: pipeline_instance_count
+          type: float
+          description: >
+           The pipeline instance count.
+        - name: requests_per_sec
+          type: float
+          description: >
+            Number of requests per sec.
+        - name: requests_executing
+          type: float
+          description: >
+            Number of requests executing.
+        - name: requests_in_application_queue
+          type: float
+          description: >
+            Number of requests in the application queue.
+    - name: cache
+      type: group
+      description: >
+        The cache overview.
+      fields:
+        - name: current_file_cache_memory_usage
+          type: float
+          description: >
+            The current file cache memory usage size.
+        - name: current_files_cached
+          type: float
+          description: >
+            The number of current files cached.
+        - name: current_uris_cached
+          type: float
+          description: >
+            The number of current uris cached.
+        - name: file_cache_hits
+          type: float
+          description: >
+            The number of file cache hits.
+        - name: file_cache_misses
+          type: float
+          description: >
+            The number of file cache misses.
+        - name: maximum_file_cache_memory_usage
+          type: float
+          description: >
+            The max file cache size.
+        - name: output_cache_current_items
+          type: float
+          description: >
+            The number of output cache current items.
+        - name: output_cache_current_memory_usage
+          type: float
+          description: >
+            The output cache memory usage size.
+        - name: output_cache_total_hits
+          type: float
+          description: >
+            The output cache total hits count.
+        - name: output_cache_total_misses
+          type: float
+          description: >
+            The output cache total misses count.
+        - name: total_files_cached
+          type: float
+          description: >
+            the total number of files cached.
+        - name: total_uris_cached
+          type: float
+          description: >
+            The total number of URIs cached.
+        - name: uri_cache_hits
+          type: float
+          description: >
+            The number of URIs cached hits.
+        - name: uri_cache_misses
+          type: float
+          description: >
+            The number of URIs cache misses.
+    - name: network
+      type: group
+      description: >
+        The network related stats.
+      fields:
+        - name: anonymous_users_per_sec
+          type: float
+          description: >
+            The number of anonymous users per sec.
+        - name: bytes_received_per_sec
+          type: float
+          description: >
+            The size of bytes received per sec.
+        - name: bytes_sent_per_sec
+          type: float
+          description: >
+            The size of bytes sent per sec.
+        - name: current_anonymous_users
+          type: float
+          description: >
+            The number of current anonymous users.
+        - name: current_connections
+          type: float
+          description: >
+            The number of current connections.
+        - name: current_non_anonymous_users
+          type: float
+          description: >
+            The number of current non anonymous users.
+        - name: delete_requests_per_sec
+          type: float
+          description: >
+            Number of DELETE requests per sec.
+        - name: get_requests_per_sec
+          type: float
+          description: >
+            Number of GET requests per sec.
+        - name: maximum_connections
+          type: float
+          description: >
+            Number of maximum connections.
+        - name: post_requests_per_sec
+          type: float
+          description: >
+            Number of POST requests per sec.
+        - name: service_uptime
+          type: float
+          description: >
+            Service uptime.
+        - name: total_anonymous_users
+          type: float
+          description: >
+            Total number of anonymous users.
+        - name: total_bytes_received
+          type: float
+          description: >
+            Total size of bytes received.
+        - name: total_bytes_sent
+          type: float
+          description: >
+            Total size of bytes sent.
+        - name: total_connection_attempts
+          type: float
+          description: >
+            The total number of connection attempts.
+        - name: total_delete_requests
+          type: float
+          description: >
+            The total number of DELETE requests.
+        - name: total_get_requests
+          type: float
+          description: >
+            The total number of GET requests.
+        - name: total_non_anonymous_users
+          type: float
+          description: >
+            The total number of non anonymous users.
+        - name: total_post_requests
+          type: float
+          description: >
+            The total number of POST requests.

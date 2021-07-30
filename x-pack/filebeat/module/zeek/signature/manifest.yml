@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/signatures.log
+    os.linux:
+      - /var/log/bro/current/signatures.log
+    os.darwin:
+      - /usr/local/var/logs/current/signatures.log
+  - name: tags
+    default: [zeek.signature]
+  - name: internal_networks
+    default: [ private ]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/signature.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

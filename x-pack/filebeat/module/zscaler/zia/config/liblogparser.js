@@ -187,6 +187,29 @@ function match(id, src, pattern, on_success) {
     };
 }
 
+function match_copy(id, src, dst, on_success) {
+    dst = FIELDS_PREFIX + dst;
+    if (dst === FIELDS_PREFIX || dst === src) {
+        return function (evt) {
+            if (debug) {
+                console.debug("noop      OK: " + id + " field:" + src);
+                console.debug("       input: <<" + evt.Get(src) + ">>");
+            }
+            if (on_success != null) on_success(evt);
+        }
+    }
+    return function (evt) {
+        var msg = evt.Get(src);
+        evt.Put(dst, msg);
+        if (debug) {
+            console.debug("copy      OK: " + id + " field:" + src);
+            console.debug("      target: '" + dst + "'");
+            console.debug("       input: <<" + msg + ">>");
+        }
+        if (on_success != null) on_success(evt);
+    }
+}
+
 function cleanup_flags(processor) {
     return function(evt) {
         processor(evt);
@@ -912,6 +935,57 @@ function root(dst, src) {
     return url_wrapper(dst, src, extract_root);
 }
 
+function tagval(id, src, cfg, keys, on_success) {
+    var fail = function(evt) {
+        evt.Put(FLAG_FIELD, "tagval_parsing_error");
+    }
+    if (cfg.kv_separator.length !== 1) {
+        throw("Invalid TAGVALMAP ValueDelimiter (must have 1 character)");
+    }
+    var quotes_len = cfg.open_quote.length > 0 && cfg.close_quote.length > 0?
+        cfg.open_quote.length + cfg.close_quote.length : 0;
+    var kv_regex = new RegExp('^*([^' + cfg.kv_separator + ']*)*' + cfg.kv_separator + '*(.*)*$');
+    return function(evt) {
+        var msg = evt.Get(src);
+        if (msg === undefined) {
+            console.warn("tagval: input field is missing");
+            return fail(evt);
+        }
+        var pairs = msg.split(cfg.pair_separator);
+        var i;
+        var success = false;
+        var prev = "";
+        for (i=0; i<pairs.length; i++) {
+            var m = pairs[i].match(kv_regex);
+            var field;
+            if (m === null || m.length !== 3 || m[1] === undefined || m[2] === undefined) {
+                prev += pairs[i] + cfg.pair_separator;
+                continue;
+            }
+            var key = prev + m[1];
+            prev = "";
+            if ( (field=keys[key]) === undefined && (field=keys[key.trim()])===undefined ) {
+                continue;
+            }
+            var value = m[2].trim();
+            if (quotes_len > 0 &&
+                value.length >= cfg.open_quote.length + cfg.close_quote.length &&
+                value.substr(0, cfg.open_quote.length) === cfg.open_quote &&
+                value.substr(value.length - cfg.close_quote.length) === cfg.close_quote) {
+                value = value.substr(cfg.open_quote.length, value.length - quotes_len);
+            }
+            evt.Put(FIELDS_PREFIX + field, value);
+            success = true;
+        }
+        if (!success) {
+            return fail(evt);
+        }
+        if (on_success != null) {
+            on_success(evt);
+        }
+    }
+}
+
 var ecs_mappings = {
     "_facility": {convert: to_long, to:[{field: "log.syslog.facility.code", setter: fld_set}]},
     "_pri": {convert: to_long, to:[{field: "log.syslog.priority", setter: fld_set}]},
@@ -938,7 +1012,7 @@ var ecs_mappings = {
     "ddomain": {to:[{field: "destination.domain", setter: fld_prio, prio: 0}]},
     "devicehostip": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 2},{field: "related.ip", setter: fld_append}]},
     "devicehostmac": {convert: to_mac, to:[{field: "host.mac", setter: fld_prio, prio: 0}]},
-    "dhost": {to:[{field: "destination.address", setter: fld_set}]},
+    "dhost": {to:[{field: "destination.address", setter: fld_set},{field: "related.hosts", setter: fld_append}]},
     "dinterface": {to:[{field: "observer.egress.interface.name", setter: fld_set}]},
     "direction": {to:[{field: "network.direction", setter: fld_set}]},
     "directory": {to:[{field: "file.directory", setter: fld_set}]},
@@ -946,7 +1020,7 @@ var ecs_mappings = {
     "dns.responsetype": {to:[{field: "dns.answers.type", setter: fld_set}]},
     "dns.resptext": {to:[{field: "dns.answers.name", setter: fld_set}]},
     "dns_querytype": {to:[{field: "dns.question.type", setter: fld_set}]},
-    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0}]},
+    "domain": {to:[{field: "server.domain", setter: fld_prio, prio: 0},{field: "related.hosts", setter: fld_append}]},
     "domain.dst": {to:[{field: "destination.domain", setter: fld_prio, prio: 1}]},
     "domain.src": {to:[{field: "source.domain", setter: fld_prio, prio: 2}]},
     "domain_id": {to:[{field: "user.domain", setter: fld_set}]},
@@ -956,6 +1030,7 @@ var ecs_mappings = {
     "dtransport": {convert: to_long, to:[{field: "destination.nat.port", setter: fld_prio, prio: 0}]},
     "ec_outcome": {to:[{field: "event.outcome", setter: fld_ecs_outcome}]},
     "event_description": {to:[{field: "message", setter: fld_prio, prio: 0}]},
+    "event_source": {to:[{field: "related.hosts", setter: fld_append}]},
     "event_time": {convert: to_date, to:[{field: "@timestamp", setter: fld_set}]},
     "event_type": {to:[{field: "event.action", setter: fld_prio, prio: 1}]},
     "extension": {to:[{field: "file.extension", setter: fld_prio, prio: 1}]},
@@ -964,9 +1039,10 @@ var ecs_mappings = {
     "filename_size": {convert: to_long, to:[{field: "file.size", setter: fld_set}]},
     "filepath": {to:[{field: "file.path", setter: fld_set}]},
     "filetype": {to:[{field: "file.type", setter: fld_set}]},
+    "fqdn": {to:[{field: "related.hosts", setter: fld_append}]},
     "group": {to:[{field: "group.name", setter: fld_set}]},
     "groupid": {to:[{field: "group.id", setter: fld_set}]},
-    "host": {to:[{field: "host.name", setter: fld_prio, prio: 1}]},
+    "host": {to:[{field: "host.name", setter: fld_prio, prio: 1},{field: "related.hosts", setter: fld_append}]},
     "hostip": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 0},{field: "related.ip", setter: fld_append}]},
     "hostip_v6": {convert: to_ip, to:[{field: "host.ip", setter: fld_prio, prio: 1},{field: "related.ip", setter: fld_append}]},
     "hostname": {to:[{field: "host.name", setter: fld_prio, prio: 0}]},
@@ -1020,7 +1096,7 @@ var ecs_mappings = {
     "service.name": {to:[{field: "service.name", setter: fld_prio, prio: 0}]},
     "service_account": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 7}]},
     "severity": {to:[{field: "log.level", setter: fld_set}]},
-    "shost": {to:[{field: "host.hostname", setter: fld_set},{field: "source.address", setter: fld_set}]},
+    "shost": {to:[{field: "host.hostname", setter: fld_set},{field: "source.address", setter: fld_set},{field: "related.hosts", setter: fld_append}]},
     "sinterface": {to:[{field: "observer.ingress.interface.name", setter: fld_set}]},
     "sld": {to:[{field: "url.registered_domain", setter: fld_set}]},
     "smacaddr": {convert: to_mac, to:[{field: "source.mac", setter: fld_set}]},
@@ -1045,9 +1121,10 @@ var ecs_mappings = {
     "user_id": {to:[{field: "user.id", setter: fld_prio, prio: 0}]},
     "username": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 1}]},
     "version": {to:[{field: "observer.version", setter: fld_set}]},
-    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1}]},
+    "web_domain": {to:[{field: "url.domain", setter: fld_prio, prio: 1},{field: "related.hosts", setter: fld_append}]},
     "web_extension": {to:[{field: "file.extension", setter: fld_prio, prio: 0}]},
     "web_query": {to:[{field: "url.query", setter: fld_prio, prio: 1}]},
+    "web_ref_domain": {to:[{field: "related.hosts", setter: fld_append}]},
     "web_referer": {to:[{field: "http.request.referrer", setter: fld_prio, prio: 0}]},
     "web_root": {to:[{field: "url.path", setter: fld_set}]},
     "webpage": {to:[{field: "file.name", setter: fld_prio, prio: 1}]},
@@ -1940,6 +2017,7 @@ function do_populate(evt, base, targets) {
         var mapping = targets[key];
         if (mapping === undefined) continue;
         var value = base[key];
+        if (value === "") continue;
         if (mapping.convert !== undefined) {
             value = mapping.convert(value);
             if (value === undefined) {
@@ -1975,6 +2053,7 @@ function test() {
     test_url();
     test_calls();
     test_assumptions();
+    test_tvm();
     console = saved;
 }
 
@@ -2341,4 +2420,95 @@ function test_assumptions() {
     if (!isNaN(Number(str))) {
         throw("Number conversion accepts extra chars");
     }
+}
+
+// Tests the TAGVALMAP feature.
+function test_tvm() {
+    var tests = [
+        {
+            config: {
+                pair_separator: ',',
+                kv_separator: '=',
+                open_quote: '[',
+                close_quote: ']'
+            },
+            mappings: {
+                "key a": "url",
+                "key_b": "b",
+                "Operation": "operation",
+            },
+            on_success: processor_chain([
+                                setf("d","b")
+                            ]),
+            message: "key_b=value for=B, key a = [http://example.com/] ,Operation=[COPY],other stuff=null,,ignore",
+            expected: {
+                "nwparser.url": "http://example.com/",
+                "nwparser.b": "value for=B",
+                "nwparser.operation": "COPY",
+                "nwparser.d": "value for=B",
+                "log.flags": null,
+            }
+        },
+        {
+            config: {
+                pair_separator: ',',
+                kv_separator: '=',
+                open_quote: '[',
+                close_quote: ']'
+            },
+            mappings: {
+                "key a": "url",
+                "key_b": "b",
+                "Operation": "operation"
+            },
+            on_success: processor_chain([
+                setf("d","b")
+            ]),
+            message: "nothing to see here",
+            expected: {
+                "nwparser.url": null,
+                "nwparser.d": null,
+                "log.flags": "tagval_parsing_error",
+            }
+        },
+        {
+            config: {
+                pair_separator: ' ',
+                kv_separator: ':',
+                open_quote: '"',
+                close_quote: '"'
+            },
+            mappings: {
+                "ICMP Type": "icmp_type",
+                "ICMP Code": "icmp_code",
+                "Operation": "operation",
+            },
+            on_success: processor_chain([
+                setc("success","true")
+            ]),
+            message: "Operation:drop ICMP Type:5 ICMP Code:1 ",
+            expected: {
+                "nwparser.icmp_code": "1",
+                "nwparser.icmp_type": "5",
+                "nwparser.operation": "drop",
+                "nwparser.success": "true",
+                "log.flags": null,
+            }
+        },
+    ];
+    var assertEqual = function(evt, key, expected) {
+        var value = evt.Get(key);
+        if (value !== expected)
+            throw("failed for " + key + ": expected:'" + expected + "' got:'" + value + "'");
+    };
+    tests.forEach(function (test, idx) {
+        var processor = tagval("test", "message", test.config, test.mappings, test.on_success);
+        var evt = new Event({
+            "message": test.message,
+        });
+        processor(evt);
+        for (var key in test.expected) {
+            assertEqual(evt, key, test.expected[key]);
+        }
+    });
 }

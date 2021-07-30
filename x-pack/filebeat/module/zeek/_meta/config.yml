@@ -20,7 +20,7 @@
   http:
     enabled: true
   intel:
-    enabled: true    
+    enabled: true
   irc:
     enabled: true
   kerberos:
@@ -30,6 +30,8 @@
   mysql:
     enabled: true
   notice:
+    enabled: true
+  ntp:
     enabled: true
   ntlm:
     enabled: true
@@ -42,6 +44,8 @@
   rdp:
     enabled: true
   rfb:
+    enabled: true
+  signature:
     enabled: true
   sip:
     enabled: true

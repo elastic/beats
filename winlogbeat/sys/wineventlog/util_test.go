@@ -25,6 +25,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/andrewkroh/sys/windows/svc/eventlog"
 	"github.com/stretchr/testify/assert"
@@ -71,6 +72,20 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	}
 
 	return log, tearDown
+}
+
+func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+	deadline := time.Now().Add(time.Second * 10)
+	for {
+		err := log.Report(etype, eid, msgs)
+		if err == nil {
+			return
+		}
+		if time.Now().After(deadline) {
+			t.Fatal("Failed to write event to event log", err)
+			return
+		}
+	}
 }
 
 // openLog opens an event log or .evtx file for reading.

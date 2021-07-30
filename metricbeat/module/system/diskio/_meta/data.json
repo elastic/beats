@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "system.diskio",
         "duration": 115000,
         "module": "system"
     },
     "metricset": {
-        "name": "diskio"
+        "name": "diskio",
+        "period": 10000
     },
     "service": {
         "type": "system"
@@ -18,7 +15,7 @@
     "system": {
         "diskio": {
             "io": {
-                "time": 656
+                "time": 1296
             },
             "iostat": {
                 "await": 0,
@@ -51,16 +48,16 @@
                     }
                 }
             },
-            "name": "nvme0n1p1",
+            "name": "sda6",
             "read": {
-                "bytes": 8028160,
-                "count": 3290,
-                "time": 130016
+                "bytes": 335872,
+                "count": 82,
+                "time": 1296
             },
             "write": {
-                "bytes": 5120,
-                "count": 3,
-                "time": 12
+                "bytes": 0,
+                "count": 0,
+                "time": 0
             }
         }
     }

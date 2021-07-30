@@ -3,13 +3,17 @@
     "@timestamp": "2019-11-14T21:26:49.4961966Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
-      "code": 4689,
+      "category": [
+        "process"
+      ],
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -41,7 +45,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],
@@ -65,13 +69,17 @@
     "@timestamp": "2019-11-14T21:27:46.9609089Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
-      "code": 4689,
+      "category": [
+        "process"
+      ],
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -103,7 +111,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],
@@ -127,13 +135,17 @@
     "@timestamp": "2019-11-14T21:28:18.4605129Z",
     "event": {
       "action": "exited-process",
-      "category": "process",
-      "code": 4689,
+      "category": [
+        "process"
+      ],
+      "code": "4689",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
-      "type": "end"
+      "type": [
+        "end"
+      ]
     },
     "host": {
       "name": "vagrant"
@@ -165,7 +177,7 @@
         "SubjectUserName": "vagrant",
         "SubjectUserSid": "S-1-5-21-1610636575-2290000098-1654242922-1000"
       },
-      "event_id": 4689,
+      "event_id": "4689",
       "keywords": [
         "Audit Success"
       ],

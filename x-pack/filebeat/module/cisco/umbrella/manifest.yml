@@ -1,0 +1,21 @@
+module_version: "1.0"
+
+var:
+  - name: tags
+    default: [cisco-umbrella, forwarded]
+  - name: visibility_timeout
+    default: 300
+  - name: api_timeout
+    default: 120
+  - name: input
+    default: aws-s3
+  - name: queue_url
+  - name: access_key_id
+  - name: secret_access_key
+  - name: visibility_timeout
+    default: 300s
+  - name: api_timeout
+    default: 120s
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/input.yml

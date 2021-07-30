@@ -33,6 +33,7 @@ type Settings struct {
 	IndexPrefix     string
 	Version         string
 	HasDashboards   bool
+	ElasticLicensed bool
 	Monitoring      report.Settings
 	RunFlags        *pflag.FlagSet
 	ConfigOverrides []cfgfile.ConditionalOverride
@@ -46,4 +47,9 @@ type Settings struct {
 	Processing processing.SupportFactory
 
 	Umask *int
+
+	// InputQueueSize is the size for the internal publisher queue in the
+	// publisher pipeline. This is only useful when the Beat plans to use
+	// beat.DropIfFull PublishMode. Leave as zero for default.
+	InputQueueSize int
 }

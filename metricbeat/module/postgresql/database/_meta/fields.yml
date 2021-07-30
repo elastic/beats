@@ -8,11 +8,11 @@
     - name: oid
       type: long
       description: >
-        OID of the database this backend is connected to.
+        OID of the database this backend is connected to, or 0 for shared resources.
     - name: name
       type: keyword
       description: >
-        Name of the database this backend is connected to.
+        Name of the database this backend is connected to, empty for shared resources.
     - name: number_of_backends
       type: long
       description: >

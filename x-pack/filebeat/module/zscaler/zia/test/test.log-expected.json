@@ -17,6 +17,9 @@
         "observer.product": "Internet",
         "observer.type": "Configuration",
         "observer.vendor": "Zscaler",
+        "related.hosts": [
+            "<hostname>"
+        ],
         "related.user": [
             "<username>"
         ],
@@ -45,8 +48,8 @@
         "rsa.web.fqdn": "<hostname>",
         "service.type": "zscaler",
         "tags": [
-            "zscaler.zia",
-            "forwarded"
+            "forwarded",
+            "zscaler.zia"
         ],
         "url.original": "<url>",
         "user.name": "<username>",

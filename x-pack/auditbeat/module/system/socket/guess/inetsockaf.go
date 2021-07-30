@@ -45,7 +45,7 @@ import (
 const inetSockAfDumpSize = 8 * 16
 
 func init() {
-	if err := Registry.AddGuess(&guessInetSockFamily{}); err != nil {
+	if err := Registry.AddGuess(func() Guesser { return &guessInetSockFamily{} }); err != nil {
 		panic(err)
 	}
 }

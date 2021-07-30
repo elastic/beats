@@ -6,6 +6,7 @@
         "destination.as.organization.name": "Team Cymru Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "38.229.70.20",
@@ -20,13 +21,14 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "irc",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [
@@ -52,6 +54,7 @@
         "destination.as.organization.name": "Team Cymru Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "38.229.70.20",
@@ -66,13 +69,14 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "irc",
         "input.type": "log",
         "log.offset": 206,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [
@@ -103,6 +107,7 @@
         "destination.as.organization.name": "Team Cymru Inc.",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 37.751,
         "destination.geo.location.lon": -97.822,
         "destination.ip": "38.229.70.20",
@@ -117,13 +122,14 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "irc",
         "input.type": "log",
         "log.offset": 432,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [

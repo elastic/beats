@@ -27,6 +27,7 @@ func RunCloudStorage(ctx context.Context, e gcp.StorageEvent) error {
 		ConfigOverrides: config.FunctionOverrides,
 	}
 
+	cfgfile.SetConfigPath("/srv/src/storage")
 	cfgfile.ChangeDefaultCfgfileFlag(settings.Name)
 
 	return instance.Run(settings, initFunctionbeat(ctx, e))

@@ -51,7 +51,7 @@ offset so that datetimes are correctly parsed. Valid values are in the form
 *`var.rsa_fields`*::
 
 Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be are added.
+which causes both ECS and custom fields under `rsa` to be added.
 
 *`var.keep_raw_fields`*::
 

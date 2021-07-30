@@ -54,6 +54,12 @@ func (e agentError) Unwrap() error {
 
 // Error returns a string consisting of a message and originating error.
 func (e agentError) Error() string {
+	if e.err == nil {
+		if e.msg != "" {
+			return e.msg
+		}
+		return "unknown error"
+	}
 	if e.msg != "" {
 		return errors.Wrap(e.err, e.msg).Error()
 	}

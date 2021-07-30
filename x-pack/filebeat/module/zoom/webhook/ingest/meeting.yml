@@ -1,0 +1,175 @@
+description: Pipeline for parsing Zoom meeting webhooks
+processors:
+- append:
+    field: event.type
+    value: info
+    if: ctx?.event?.action != 'meeting.alert'
+- append:
+    field: event.type
+    value: error
+    if: ctx?.event?.action == 'meeting.alert'
+- append:
+    field: event.type
+    value: allowed
+    if: ctx?.event?.action == 'meeting.registration_approved'
+- append:
+    field: event.type
+    value: creation
+    if: "['meeting.registration_created', 'meeting.created'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: deletion
+    if: ctx?.event?.action == 'meeting.deleted'
+- append:
+    field: event.type
+    value: change
+    if: ctx?.event?.action == 'meeting.updated'
+- append:
+    field: event.type
+    value: start
+    if: "['meeting.started', 'meeting.sharing_started'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: end
+    if: "['meeting.ended', 'meeting.sharing_ended'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.object
+    target_field: zoom.meeting
+    ignore_missing: true
+- rename:
+    field: zoom.meeting.join_url
+    target_field: url.original
+    ignore_missing: true
+- rename:
+    field: zoom.registrant.join_url
+    target_field: url.original
+    ignore_missing: true
+    if: ctx?.original?.full == null
+- uri_parts:
+    field: url.original
+    ignore_failure: true
+    if: ctx?.url?.original != null
+- set:
+    field: url.full
+    value: '{{{url.original}}}'
+    ignore_failure: true
+    if: ctx?.url?.original != null
+#
+# Set user.* from participant, if any.
+#
+- remove:
+    field:
+      - user
+    ignore_missing: true
+    if: 'ctx.zoom?.participant != null'
+- set:
+    field: user.id
+    value: '{{zoom.participant.id}}'
+    ignore_empty_value: true
+- set:
+    field: user.full_name
+    value: '{{zoom.participant.user_name}}'
+    ignore_empty_value: true
+
+#
+# Set user.id to be the meeting's host, unless already set.
+#
+- set:
+    field: user.id
+    value: '{{zoom.meeting.host_id}}'
+    ignore_empty_value: true
+    override: false
+
+#
+# Append to related.user
+#
+- append:
+    field: related.user
+    value: "{{zoom.participant.id}}"
+    allow_duplicates: false
+    if: 'ctx.zoom?.participant?.id != null'
+- append:
+    field: related.user
+    value: "{{zoom.meeting.host_id}}"
+    allow_duplicates: false
+    if: 'ctx.zoom?.meeting?.host_id != null'
+
+- date:
+    field: zoom.meeting.start_time
+    target_field: event.start
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'meeting.started'
+    ignore_failure: true
+- date:
+    field: zoom.participant.sharing_details.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'meeting.sharing_started'
+    ignore_failure: true
+- date:
+    field: zoom.participant.date_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: "['meeting.participant_put_in_waiting_room', 'meeting.participant_joined_waiting_room', 'meeting.participant_left_waiting_room'].contains(ctx?.event?.action)"
+    ignore_failure: true
+- date:
+    field: zoom.participant.join_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'meeting.participant_joined'
+    ignore_failure: true
+- date:
+    field: zoom.participant.leave_time
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'meeting.participant_left'
+    ignore_failure: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - ISO_INSTANT
+    if: ctx?.event?.action == 'meeting.updated'
+    ignore_failure: true
+- script:
+    lang: painless
+    if: ctx?.zoom?.meeting?.duration != null
+    source: >-
+      ctx.event.duration = ctx.zoom.meeting.duration * 60L * 1000000000L;
+- remove:
+    field: zoom.meeting.start_time
+    ignore_missing: true
+    if: ctx?.event?.action == 'meeting.started'
+- remove:
+    field: zoom.meeting.duration
+    ignore_missing: true
+    if: ctx?.event?.duration != null
+- remove:
+    field: zoom.participant.sharing_details.date_time
+    ignore_missing: true
+    if: ctx?.event?.action == 'meeting.sharing_started'
+- remove:
+    field: zoom.participant.date_time
+    ignore_missing: true
+    if: "['meeting.participant_put_in_waiting_room', 'meeting.participant_joined_waiting_room', 'meeting.participant_left_waiting_room'].contains(ctx?.event?.action)"
+- remove:
+    field: zoom.participant.join_time
+    ignore_missing: true
+    if: ctx?.event?.action == 'meeting.participant_joined'
+- remove:
+    field: zoom.participant.leave_time
+    ignore_missing: true
+    if: ctx?.event?.action == 'meeting.participant_left'
+- remove:
+    field: zoom.time_stamp
+    ignore_missing: true
+    if: ctx?.event?.action == 'meeting.updated'
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

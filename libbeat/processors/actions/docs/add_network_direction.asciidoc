@@ -1,0 +1,22 @@
+[[add-network-direction]]
+=== Add network direction
+
+++++
+<titleabbrev>add_network_direction</titleabbrev>
+++++
+
+The `add_network_direction` processor attempts to compute the perimeter-based network direction
+given an a source and destination ip address and list of internal networks. The key `internal_networks`
+can contain either CIDR blocks or a list of special values enumerated in the network section of <<conditions>>.
+
+[source,yaml]
+-------
+processors:
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: [ private ]
+-------
+
+See <<conditions>> for a list of supported conditions.

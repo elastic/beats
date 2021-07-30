@@ -21,6 +21,7 @@
 package compat
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -31,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/go-concert"
+	"github.com/elastic/go-concert/ctxtool"
 )
 
 // factory implements the cfgfile.RunnerFactory interface and wraps the
@@ -52,7 +53,7 @@ type runner struct {
 	log       *logp.Logger
 	agent     *beat.Info
 	wg        sync.WaitGroup
-	sig       *concert.OnceSignaler
+	sig       ctxtool.CancelContext
 	input     v2.Input
 	connector beat.PipelineConnector
 }
@@ -92,9 +93,9 @@ func (f *factory) Create(
 
 	return &runner{
 		id:        id,
-		log:       f.log.Named(input.Name()),
+		log:       f.log.Named(input.Name()).With("id", id),
 		agent:     &f.info,
-		sig:       concert.NewOnceSignaler(),
+		sig:       ctxtool.WithCancelContext(context.Background()),
 		input:     input,
 		connector: p,
 	}, nil
@@ -126,7 +127,7 @@ func (r *runner) Start() {
 }
 
 func (r *runner) Stop() {
-	r.sig.Trigger()
+	r.sig.Cancel()
 	r.wg.Wait()
 	r.log.Infof("Input '%v' stopped", r.input.Name())
 }
