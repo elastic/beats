@@ -121,4 +121,39 @@ You can also enable `close_eof` for all inputs created by any of the modules:
 -M "*.*.input.close_eof=true"
 ----------------------------------------------------------------------
 
+==== Processors
+
+As described in <<defining-processors.html#where-valid,Where are processors valid?>> you can define `processors`
+under the input section of the module definition. These processors are run _after_ any processors defined in the
+module.
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: nginx
+  access:
+    input:
+      processors:
+        - drop_event:
+            when:
+              contains:
+                source: "test"
+----------------------------------------------------------------------
+
+Alternatively you can define `preprocessors` which are run after the input but _before_ the processors defined
+in the module. Preprocessors can be useful if we don't retrieve the data directly from the log source and the
+intermediate channel introduces additional 'wrapping'.
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: nginx
+  access:
+    input:
+      preprocessors:
+        - drop_event:
+            when:
+               contains:
+                 source: "test"
+----------------------------------------------------------------------
+
+
 :modulename!:

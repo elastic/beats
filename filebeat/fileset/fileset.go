@@ -373,7 +373,21 @@ func (fs *Fileset) getInputConfig() (*common.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
 		}
+
 		cfg, err = common.MergeConfigsWithOptions([]*common.Config{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldAppendValues("**.processors"))
+		if overrides.HasField("preprocessors") {
+			preprocessors, err := overrides.Child("preprocessors", -1)
+			if err != nil {
+				return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
+			}
+			overrides, err = common.NewConfigFrom(map[string]interface{}{
+				"processors": preprocessors,
+			})
+			if err != nil {
+				return nil, fmt.Errorf("Error creating config from input overrides: %v", err)
+			}
+			cfg, err = common.MergeConfigsWithOptions([]*common.Config{cfg, overrides}, ucfg.FieldReplaceValues("**.paths"), ucfg.FieldPrependValues("**.processors"))
+		}
 		if err != nil {
 			return nil, fmt.Errorf("Error applying config overrides: %v", err)
 		}

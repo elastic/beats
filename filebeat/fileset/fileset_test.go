@@ -234,6 +234,100 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				require.Equal(t, "foobar", v)
 			},
 		},
+		"processors": {
+			map[string]interface{}{
+				"processors": []map[string]interface{}{
+					map[string]interface{}{
+						"drop_event": map[string]interface{}{
+							"when": map[string]interface{}{
+								"contains": map[string]interface{}{
+									"source": "test",
+								},
+							},
+						},
+					},
+				},
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
+
+				require.True(t, c.HasField("processors"))
+				count, _ := c.CountField("processors")
+				require.Equal(t, 3, count)
+				processors, err := c.Child("processors", -1)
+				require.NoError(t, err)
+				dropProcessor, err := processors.Child("", 2)
+				require.NoError(t, err)
+				require.True(t, dropProcessor.HasField("drop_event"), "should contain 'drop_event' last")
+			},
+		},
+		"preprocessors": {
+			map[string]interface{}{
+				"close_eof": true,
+				"preprocessors": []map[string]interface{}{
+					map[string]interface{}{
+						"drop_event": map[string]interface{}{
+							"when": map[string]interface{}{
+								"contains": map[string]interface{}{
+									"source": "test",
+								},
+							},
+						},
+					},
+				},
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
+
+				require.True(t, c.HasField("processors"))
+				count, _ := c.CountField("processors")
+				require.Equal(t, 3, count, "Expecting processors to be merged 2 from module 1 from preprocessor")
+				processors, err := c.Child("processors", -1)
+				require.NoError(t, err)
+				addFieldsProcessor, err := processors.Child("", 2)
+				require.NoError(t, err)
+				require.True(t, addFieldsProcessor.HasField("add_fields"), "should contain 'add_fields' last")
+			},
+		},
+		"combinedProcessors": {
+			map[string]interface{}{
+				"close_eof": true,
+				"processors": []map[string]interface{}{
+					map[string]interface{}{
+						"drop_event": map[string]interface{}{},
+					},
+				},
+				"preprocessors": []map[string]interface{}{
+					map[string]interface{}{
+						"drop_event": map[string]interface{}{},
+					},
+				},
+			},
+			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
+				c, ok := cfg.(*common.Config)
+				if !ok {
+					t.FailNow()
+				}
+
+				require.True(t, c.HasField("processors"))
+				count, _ := c.CountField("processors")
+				require.Equal(t, 4, count, "Expecting processors to be merged: 2 from module, 1 from preprocessor, 1 from processor")
+				processors, err := c.Child("processors", -1)
+				require.NoError(t, err)
+				dropProcessor, err := processors.Child("", 0)
+				require.NoError(t, err)
+				require.True(t, dropProcessor.HasField("drop_event"), "should contain 'drop_event' first")
+				dropProcessor, err = processors.Child("", 3)
+				require.NoError(t, err)
+				require.True(t, dropProcessor.HasField("drop_event"), "should contain 'drop_event' last")
+			},
+		},
 	}
 
 	for name, test := range tests {
