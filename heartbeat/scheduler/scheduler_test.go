@@ -20,16 +20,18 @@ package scheduler
 import (
 	"context"
 	"fmt"
+	"math"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
+	"github.com/elastic/beats/v7/heartbeat/config"
 	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"golang.org/x/sync/semaphore"
 )
 
 // The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
@@ -210,6 +212,9 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			limit := int64(100)
 			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil)
 
+			jobSem := semaphore.NewWeighted(math.MaxInt64)
+			jobSem.Acquire(context.Background(), 1)
+
 			if testCase.overLimit {
 				s.limitSem.Acquire(context.Background(), limit)
 			}
@@ -224,7 +229,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, "http")
+			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, jobSem)
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
 			// for an error value and released an unacquired resource in scheduler.go.
@@ -236,6 +241,74 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 
 			require.Equal(t, testCase.shouldRunTask, executed.Load())
 			require.True(t, startedAt.Equal(beforeStart) || startedAt.After(beforeStart))
+		})
+	}
+}
+
+func makeTasks(num int, callback func()) TaskFunc {
+	return func(ctx context.Context) []TaskFunc {
+		callback()
+		if num < 1 {
+			return nil
+		}
+		return []TaskFunc{makeTasks(num-1, callback)}
+	}
+}
+
+func TestScheduler_runRecursiveJob(t *testing.T) {
+	tests := []struct {
+		name    string
+		numJobs int
+		limit   int64
+		expect  func(events []int)
+	}{
+		{
+			name:    "runs more than 1 with limit of 1",
+			numJobs: 2,
+			limit:   1,
+			expect: func(events []int) {
+				mid := len(events) / 2
+				firstHalf := events[0:mid]
+				lastHalf := events[mid:]
+				for _, ele := range firstHalf {
+					assert.Equal(t, firstHalf[0], ele)
+				}
+				for _, ele := range lastHalf {
+					assert.Equal(t, lastHalf[0], ele)
+				}
+			},
+		},
+		{
+			name:    "runs 50 interleaved without limit",
+			numJobs: 50,
+			limit:   math.MaxInt64,
+			expect: func(events []int) {
+				require.GreaterOrEqual(t, len(events), 200)
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			jobType := "http"
+			jobConfigByType := map[string]config.JobLimit{
+				jobType: {Limit: tt.limit},
+			}
+			s := NewWithLocation(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType)
+			var taskArr []int
+			wg := sync.WaitGroup{}
+			wg.Add(tt.numJobs)
+			for i := 0; i < tt.numJobs; i++ {
+				num := i
+				tf := makeTasks(4, func() {
+					taskArr = append(taskArr, num)
+				})
+				go func(tff TaskFunc) {
+					s.runRecursiveJob(context.Background(), tff, jobType)
+					wg.Done()
+				}(tf)
+			}
+			wg.Wait()
+			tt.expect(taskArr)
 		})
 	}
 }

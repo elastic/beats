@@ -257,8 +257,10 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 // returns the time execution began on its first task
 func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc, jobType string) (startedAt time.Time) {
 	wg := &sync.WaitGroup{}
+	jobSem := s.jobLimitSem[jobType]
+	jobSem.Acquire(jobCtx, 1)
 	wg.Add(1)
-	startedAt = s.runRecursiveTask(jobCtx, task, wg, jobType)
+	startedAt = s.runRecursiveTask(jobCtx, task, wg, jobSem)
 	wg.Wait()
 	return startedAt
 }
@@ -267,13 +269,8 @@ func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc, jobTy
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup, jobType string) (startedAt time.Time) {
+func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup, jobSem *semaphore.Weighted) (startedAt time.Time) {
 	defer wg.Done()
-	jobSem := s.jobLimitSem[jobType]
-	jobSemErr := jobSem.Acquire(jobCtx, 1)
-	if jobSemErr == nil {
-		defer jobSem.Release(1)
-	}
 
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
@@ -306,8 +303,12 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 		wg.Add(len(continuations))
 		for _, cont := range continuations {
 			// Run continuations in parallel, note that these each will acquire their own slots
-			// We can discard the started at times for continuations as those are irrelevant
-			go s.runRecursiveTask(jobCtx, cont, wg, jobType)
+			// We can discard the started at times for continuations as those are
+			// irrelevant
+			go s.runRecursiveTask(jobCtx, cont, wg, jobSem)
+		}
+		if len(continuations) == 0 {
+			jobSem.Release(1)
 		}
 	}
 
