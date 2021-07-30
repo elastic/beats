@@ -17,6 +17,7 @@ projects:
     - "x-pack/heartbeat"
     - "x-pack/libbeat"
     - "x-pack/metricbeat"
+    - "x-pack/osquerybeat"
     - "x-pack/packetbeat"
     - "x-pack/winlogbeat"
     - "dev-tools"

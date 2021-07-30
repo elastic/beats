@@ -50,7 +50,7 @@ func NewController(
 	caps capabilities.Capability,
 	reloadables ...reloadable,
 ) *Controller {
-	init, _ := transpiler.NewVars(map[string]interface{}{})
+	init, _ := transpiler.NewVars(map[string]interface{}{}, nil)
 
 	return &Controller{
 		logger:      log,
@@ -142,7 +142,7 @@ func (e *Controller) update() error {
 		}
 		err = transpiler.Insert(ast, renderedInputs, "inputs")
 		if err != nil {
-			return err
+			return errors.New(err, "inserting rendered inputs failed")
 		}
 	}
 

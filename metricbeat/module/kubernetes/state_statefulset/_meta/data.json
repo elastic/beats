@@ -16,7 +16,8 @@
             "name": "mysql",
             "replicas": {
                 "desired": 5,
-                "observed": 2
+                "observed": 2,
+                "ready": 2
             }
         }
     },

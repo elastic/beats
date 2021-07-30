@@ -21,6 +21,10 @@
           type: long
           description: >
             The number of desired replicas per StatefulSet
+        - name: ready
+          type: long
+          description: >
+            The number of ready replicas per StatefulSet
     - name: generation
       type: group
       description: >

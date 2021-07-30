@@ -5,6 +5,9 @@
 package server
 
 import (
+	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -19,14 +22,46 @@ func init() {
 	mb.Registry.MustAddMetricSet("statsd", "server", New, mb.DefaultMetricSet())
 }
 
+type errInvalidMapping struct {
+	metricLabels []string
+	attrLabels   []string
+}
+
+func (e errInvalidMapping) Error() string {
+	return fmt.Sprintf(
+		"labels in metric (%s) don't match labels attributes (%s)",
+		strings.Join(e.metricLabels, ","),
+		strings.Join(e.attrLabels, ","))
+}
+
+func newErrInvalidMapping(metricLabels []string, attrLabels []Label) error {
+	attrLabelsStringSlice := make([]string, len(attrLabels))
+	for i, attrLabel := range attrLabels {
+		attrLabelsStringSlice[i] = attrLabel.Attr
+	}
+
+	if len(metricLabels) > 0 {
+		metricLabels = metricLabels[1:]
+	} else {
+		metricLabels = []string{}
+	}
+
+	return errInvalidMapping{
+		metricLabels: metricLabels,
+		attrLabels:   attrLabelsStringSlice,
+	}
+}
+
 // Config for the statsd server metricset.
 type Config struct {
-	TTL time.Duration `config:"ttl"`
+	TTL      time.Duration   `config:"ttl"`
+	Mappings []StatsdMapping `config:"statsd.mappings"`
 }
 
 func defaultConfig() Config {
 	return Config{
-		TTL: time.Second * 30,
+		TTL:      time.Second * 30,
+		Mappings: nil,
 	}
 }
 
@@ -38,6 +73,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	server    serverhelper.Server
 	processor *metricProcessor
+	mappings  map[string]StatsdMapping
 }
 
 // New create a new instance of the MetricSet
@@ -55,11 +91,69 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	processor := newMetricProcessor(config.TTL)
+
+	mappings, err := buildMappings(config.Mappings)
+	if err != nil {
+		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mapping`: %w", err)
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		server:        svc,
+		mappings:      mappings,
 		processor:     processor,
 	}, nil
+}
+
+func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
+	mappings := make(map[string]StatsdMapping, len(config))
+	replacer := strings.NewReplacer(".", `\.`, "<", "(?P<", ">", ">[^.]+)")
+	for _, mapping := range config {
+		regexPattern := replacer.Replace(mapping.Metric)
+		var err error
+		mapping.regex, err = regexp.Compile(fmt.Sprintf("^%s$", regexPattern))
+		if err != nil {
+			return nil, fmt.Errorf("invalid pattern %s: %w", mapping.Metric, err)
+		}
+
+		var matchingLabels int
+		names := mapping.regex.SubexpNames()
+		if len(names)-1 != len(mapping.Labels) {
+			return nil, newErrInvalidMapping(names, mapping.Labels)
+		}
+
+		repeatedLabelFields := make([]string, 0)
+		uniqueLabelFields := make(map[string]struct{})
+		for _, label := range mapping.Labels {
+			for _, name := range names {
+				if label.Attr == name {
+					matchingLabels++
+				}
+			}
+
+			if _, ok := uniqueLabelFields[label.Field]; !ok {
+				uniqueLabelFields[label.Field] = struct{}{}
+			} else {
+				repeatedLabelFields = append(repeatedLabelFields, label.Field)
+			}
+
+			if label.Field == mapping.Value.Field {
+				return nil, fmt.Errorf(`collision between label field "%s" and value field "%s"`, label.Field, mapping.Value.Field)
+			}
+		}
+
+		if matchingLabels != len(mapping.Labels) {
+			return nil, newErrInvalidMapping(names, mapping.Labels)
+		}
+
+		if len(uniqueLabelFields) != len(mapping.Labels) {
+			return nil, fmt.Errorf(`repeated label fields "%s"`, strings.Join(repeatedLabelFields, ","))
+		}
+
+		mappings[mapping.Metric] = mapping
+
+	}
+
+	return mappings, nil
 }
 
 func (m *MetricSet) getEvents() []*mb.Event {
@@ -75,13 +169,17 @@ func (m *MetricSet) getEvents() []*mb.Event {
 
 		sanitizedMetrics := common.MapStr{}
 		for k, v := range tagGroup.metrics {
-			sanitizedMetrics[common.DeDot(k)] = v
+			eventMapping(k, v, sanitizedMetrics, m.mappings)
+		}
+
+		if len(sanitizedMetrics) == 0 {
+			continue
 		}
 
 		events[idx] = &mb.Event{
 			MetricSetFields: sanitizedMetrics,
 			RootFields:      common.MapStr{"labels": mapstrTags},
-			Namespace:       "statsd",
+			Namespace:       m.Module().Name(),
 		}
 	}
 	return events
@@ -102,6 +200,10 @@ func (m *MetricSet) Run(reporter mb.PushReporterV2) {
 			return
 		case <-reportPeriod.C:
 			for _, e := range m.getEvents() {
+				if e == nil {
+					continue
+				}
+
 				reporter.Event(*e)
 			}
 		case msg := <-m.server.GetEvents():

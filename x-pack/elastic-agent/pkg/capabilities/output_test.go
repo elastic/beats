@@ -17,7 +17,7 @@ import (
 
 func TestMultiOutput(t *testing.T) {
 	tr := &testReporter{}
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	t.Run("no match", func(t *testing.T) {
 		rd := &ruleDefinitions{
 			Capabilities: []ruler{&outputCapability{
@@ -167,7 +167,7 @@ func TestMultiOutput(t *testing.T) {
 
 func TestOutput(t *testing.T) {
 	tr := &testReporter{}
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &upgradeCapability{}
 		cap, err := newOutputCapability(l, r, tr)

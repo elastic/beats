@@ -12,6 +12,7 @@ json.keys_under_root: false
 fields_under_root: true
 fields:
   network.transport: tcp
+  network.protocol: http
 
 processors:
   - rename:
@@ -91,7 +92,14 @@ processors:
           - info
           - protocol
   - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.8.0
+        ecs.version: 1.10.0

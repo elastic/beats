@@ -11,12 +11,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -26,6 +26,7 @@ type Application interface {
 	Start() error
 	Stop() error
 	AgentInfo() *info.AgentInfo
+	Routes() *sorted.Set
 }
 
 type reexecManager interface {
@@ -62,7 +63,6 @@ func createApplication(
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (Application, error) {
-	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
 

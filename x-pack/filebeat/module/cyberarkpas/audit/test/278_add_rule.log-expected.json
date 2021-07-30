@@ -1,0 +1,46 @@
+[
+    {
+        "@timestamp": "2021-03-11T18:01:14.000Z",
+        "cyberarkpas.audit.action": "Add Rule",
+        "cyberarkpas.audit.desc": "Add Rule",
+        "cyberarkpas.audit.file": "Root\\2",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T18:01:14Z",
+        "cyberarkpas.audit.issuer": "PVWAAppUser",
+        "cyberarkpas.audit.message": "Add Rule",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 10:01:14</Timestamp>\n    <IsoTimestamp>2021-03-11T18:01:14Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>278</MessageID>\n    <Desc>Add Rule</Desc>\n    <Severity>Info</Severity>\n    <Issuer>PVWAAppUser</Issuer>\n    <Action>Add Rule</Action>\n    <SourceUser>Administrator</SourceUser>\n    <TargetUser></TargetUser>\n    <Safe>PSMUnmanagedSessionAccounts</Safe>\n    <File>Root\\2</File>\n    <Station>10.0.1.20</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason>Allow</Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Add Rule</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.reason": "Allow",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PSMUnmanagedSessionAccounts",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.source_user": "Administrator",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 11 10:01:14",
+        "event.action": "add rule",
+        "event.code": "278",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\2",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

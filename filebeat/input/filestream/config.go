@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
@@ -40,6 +41,8 @@ type config struct {
 	CleanRemoved   bool                    `config:"clean_removed"`
 	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
 	IgnoreOlder    time.Duration           `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
+	Rotation       *common.ConfigNamespace `config:"rotation"`
 }
 
 type closerConfig struct {
@@ -69,13 +72,24 @@ type readerConfig struct {
 	MaxBytes       int                     `config:"message_max_bytes" validate:"min=0,nonzero"`
 	Tail           bool                    `config:"seek_to_tail"`
 
-	Parsers []*common.ConfigNamespace `config:"parsers"` // TODO multiline, json, syslog?
+	Parsers parser.Config `config:",inline"`
 }
 
 type backoffConfig struct {
 	Init time.Duration `config:"init" validate:"nonzero"`
 	Max  time.Duration `config:"max" validate:"nonzero"`
 }
+
+type rotationConfig struct {
+	Strategy *common.ConfigNamespace `config:"strategy" validate:"required"`
+}
+
+type commonRotationConfig struct {
+	SuffixRegex string `config:"suffix_regex" validate:"required"`
+	DateFormat  string `config:"dateformat"`
+}
+
+type copyTruncateConfig commonRotationConfig
 
 func defaultConfig() config {
 	return config{
@@ -114,7 +128,6 @@ func defaultReaderConfig() readerConfig {
 		LineTerminator: readfile.AutoLineTerminator,
 		MaxBytes:       10 * humanize.MiByte,
 		Tail:           false,
-		Parsers:        nil,
 	}
 }
 
@@ -122,26 +135,6 @@ func (c *config) Validate() error {
 	if len(c.Paths) == 0 {
 		return fmt.Errorf("no path is configured")
 	}
-	// TODO
-	//if c.CleanInactive != 0 && c.IgnoreOlder == 0 {
-	//	return fmt.Errorf("ignore_older must be enabled when clean_inactive is used")
-	//}
-
-	// TODO
-	//if c.CleanInactive != 0 && c.CleanInactive <= c.IgnoreOlder+c.ScanFrequency {
-	//	return fmt.Errorf("clean_inactive must be > ignore_older + scan_frequency to make sure only files which are not monitored anymore are removed")
-	//}
-
-	// TODO
-	//if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
-	//	c.Multiline != nil {
-	//	return fmt.Errorf("When using the JSON decoder and multiline together, you need to specify a message_key value")
-	//}
-
-	//if c.JSON != nil && len(c.JSON.MessageKey) == 0 &&
-	//	(len(c.IncludeLines) > 0 || len(c.ExcludeLines) > 0) {
-	//	return fmt.Errorf("When using the JSON decoder and line filtering together, you need to specify a message_key value")
-	//}
 
 	return nil
 }

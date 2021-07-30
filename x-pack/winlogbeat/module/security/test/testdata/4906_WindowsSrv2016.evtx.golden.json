@@ -7,7 +7,7 @@
         "iam",
         "configuration"
       ],
-      "code": 4906,
+      "code": "4906",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -30,7 +30,7 @@
       "event_data": {
         "CrashOnAuditFailValue": "1"
       },
-      "event_id": 4906,
+      "event_id": "4906",
       "keywords": [
         "Audit Success"
       ],

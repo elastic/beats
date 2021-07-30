@@ -18,7 +18,16 @@
 package metadata
 
 import (
+	"context"
+	"fmt"
 	"strings"
+
+	"gopkg.in/yaml.v2"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	k8sclient "k8s.io/client-go/kubernetes"
+
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -27,14 +36,34 @@ import (
 
 // MetaGen allows creation of metadata from either Kubernetes resources or their Resource names.
 type MetaGen interface {
-	// Generate generates metadata for a given resource
+	// Generate generates metadata for a given resource.
+	// Metadata map is formed in the following format:
+	// {
+	//    "kubernetes": GenerateK8s(),
+	//    "some.ecs.field": "asdf, // populated by GenerateECS()
+	// }
+	// This method is called in top level and returns the complete map of metadata.
 	Generate(kubernetes.Resource, ...FieldOptions) common.MapStr
 	// GenerateFromName generates metadata for a given resource based on it's name
 	GenerateFromName(string, ...FieldOptions) common.MapStr
+	// GenerateK8s generates kubernetes metadata for a given resource
+	GenerateK8s(kubernetes.Resource, ...FieldOptions) common.MapStr
+	// GenerateECS generates ECS metadata for a given resource
+	GenerateECS(kubernetes.Resource) common.MapStr
 }
 
 // FieldOptions allows additional enrichment to be done on top of existing metadata
 type FieldOptions func(common.MapStr)
+
+type ClusterInfo struct {
+	Url  string
+	Name string
+}
+
+type ClusterConfiguration struct {
+	ControlPlaneEndpoint string `yaml:"controlPlaneEndpoint"`
+	ClusterName          string `yaml:"clusterName"`
+}
 
 // WithFields FieldOption allows adding specific fields into the generated metadata
 func WithFields(key string, value interface{}) FieldOptions {
@@ -62,12 +91,85 @@ func GetPodMetaGen(
 
 	var nodeMetaGen, namespaceMetaGen MetaGen
 	if nodeWatcher != nil && metaConf.Node.Enabled() {
-		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store())
+		nodeMetaGen = NewNodeMetadataGenerator(metaConf.Node, nodeWatcher.Store(), nodeWatcher.Client())
 	}
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
-		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store())
+		namespaceMetaGen = NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), namespaceWatcher.Client())
 	}
 	metaGen := NewPodMetadataGenerator(cfg, podWatcher.Store(), podWatcher.Client(), nodeMetaGen, namespaceMetaGen)
 
 	return metaGen
+}
+
+// GetKubernetesClusterIdentifier returns ClusterInfo for k8s if available
+func GetKubernetesClusterIdentifier(cfg *common.Config, client k8sclient.Interface) (ClusterInfo, error) {
+	// try with kube config file
+	var config Config
+	config.Unmarshal(cfg)
+	clusterInfo, err := getClusterInfoFromKubeConfigFile(config.KubeConfig)
+	if err == nil {
+		return clusterInfo, nil
+	}
+	// try with kubeadm-config configmap
+	clusterInfo, err = getClusterInfoFromKubeadmConfigMap(client)
+	if err == nil {
+		return clusterInfo, nil
+	}
+	return ClusterInfo{}, fmt.Errorf("unable to retrieve cluster identifiers")
+}
+
+func getClusterInfoFromKubeadmConfigMap(client k8sclient.Interface) (ClusterInfo, error) {
+	clusterInfo := ClusterInfo{}
+	if client == nil {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config")
+	}
+	cm, err := client.CoreV1().ConfigMaps("kube-system").Get(context.TODO(), "kubeadm-config", metav1.GetOptions{})
+	if err != nil {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from kubeadm-config: %+v", err)
+	}
+	p, ok := cm.Data["ClusterConfiguration"]
+	if !ok {
+		return clusterInfo, fmt.Errorf("unable to get cluster identifiers from ClusterConfiguration")
+	}
+
+	cc := &ClusterConfiguration{}
+	err = yaml.Unmarshal([]byte(p), cc)
+	if err != nil {
+		return ClusterInfo{}, err
+	}
+	if cc.ClusterName != "" {
+		clusterInfo.Name = cc.ClusterName
+	}
+	if cc.ControlPlaneEndpoint != "" {
+		clusterInfo.Url = cc.ControlPlaneEndpoint
+	}
+
+	return clusterInfo, nil
+}
+
+func getClusterInfoFromKubeConfigFile(kubeconfig string) (ClusterInfo, error) {
+	if kubeconfig == "" {
+		kubeconfig = kubernetes.GetKubeConfigEnvironmentVariable()
+	}
+
+	if kubeconfig == "" {
+		return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config from env")
+	}
+
+	cfg, err := kubernetes.BuildConfig(kubeconfig)
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to build kube config due to error: %+v", err)
+	}
+
+	kube_cfg, err := clientcmd.LoadFromFile(kubeconfig)
+	if err != nil {
+		return ClusterInfo{}, fmt.Errorf("unable to load kube_config due to error: %+v", err)
+	}
+
+	for key, element := range kube_cfg.Clusters {
+		if element.Server == cfg.Host {
+			return ClusterInfo{element.Server, key}, nil
+		}
+	}
+	return ClusterInfo{}, fmt.Errorf("unable to get cluster identifiers from kube_config")
 }

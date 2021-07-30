@@ -43,16 +43,16 @@
         "input.type": "log",
         "log.offset": 0,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -106,16 +106,16 @@
         "input.type": "log",
         "log.offset": 1317,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -169,16 +169,16 @@
         "input.type": "log",
         "log.offset": 2642,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -232,16 +232,16 @@
         "input.type": "log",
         "log.offset": 3967,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -295,16 +295,16 @@
         "input.type": "log",
         "log.offset": 5292,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -358,16 +358,16 @@
         "input.type": "log",
         "log.offset": 6617,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -421,16 +421,16 @@
         "input.type": "log",
         "log.offset": 7942,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -484,16 +484,16 @@
         "input.type": "log",
         "log.offset": 9267,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -547,16 +547,16 @@
         "input.type": "log",
         "log.offset": 10592,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -610,16 +610,16 @@
         "input.type": "log",
         "log.offset": 11917,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -673,16 +673,16 @@
         "input.type": "log",
         "log.offset": 13242,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -736,16 +736,16 @@
         "input.type": "log",
         "log.offset": 14567,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -799,16 +799,16 @@
         "input.type": "log",
         "log.offset": 15892,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -862,16 +862,16 @@
         "input.type": "log",
         "log.offset": 17217,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -925,16 +925,16 @@
         "input.type": "log",
         "log.offset": 18542,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -988,16 +988,16 @@
         "input.type": "log",
         "log.offset": 19867,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1051,16 +1051,16 @@
         "input.type": "log",
         "log.offset": 21191,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1120,8 +1120,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1175,16 +1175,16 @@
         "input.type": "log",
         "log.offset": 23834,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1238,16 +1238,16 @@
         "input.type": "log",
         "log.offset": 25159,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1301,16 +1301,16 @@
         "input.type": "log",
         "log.offset": 26489,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1371,16 +1371,16 @@
         "process.name": "t.exe",
         "process.pid": 2712,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1437,16 +1437,16 @@
         "input.type": "log",
         "log.offset": 29385,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1507,16 +1507,16 @@
         "process.name": "t.exe",
         "process.pid": 2712,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1573,16 +1573,16 @@
         "input.type": "log",
         "log.offset": 32281,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1643,16 +1643,16 @@
         "process.name": "explorer.exe",
         "process.pid": 3164,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1715,8 +1715,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1777,16 +1777,16 @@
         "process.name": "explorer.exe",
         "process.pid": 3164,
         "related.hash": [
-            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "209a288c68207d57e0ce6e60ebf60729",
+            "3372c1edab46837f1e973164fa2d726c5c5e17bcb888828ccd7c4dfcc234a370",
             "e654d39cd13414b5151e8cf0d8f5b166dddd45cb"
         ],
         "related.hosts": [
             "Demo_TeslaCrypt"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1849,8 +1849,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1910,8 +1910,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1966,16 +1966,16 @@
         "input.type": "log",
         "log.offset": 40652,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2031,16 +2031,16 @@
         "input.type": "log",
         "log.offset": 41978,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2098,16 +2098,16 @@
         "input.type": "log",
         "log.offset": 43297,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2165,16 +2165,16 @@
         "input.type": "log",
         "log.offset": 44622,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2230,16 +2230,16 @@
         "input.type": "log",
         "log.offset": 45948,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2297,16 +2297,16 @@
         "input.type": "log",
         "log.offset": 47266,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2369,8 +2369,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2423,16 +2423,16 @@
         "input.type": "log",
         "log.offset": 49910,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2495,8 +2495,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2556,8 +2556,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2617,8 +2617,8 @@
             "Demo_Dyre"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2673,16 +2673,16 @@
         "input.type": "log",
         "log.offset": 55186,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2738,16 +2738,16 @@
         "input.type": "log",
         "log.offset": 56512,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2805,16 +2805,16 @@
         "input.type": "log",
         "log.offset": 57830,
         "related.hash": [
+            "b024546a49bad1bd60fccef0a5d11b55f9a442c4",
             "b1380fd95bc5c0729738dcda2696aa0a7c6ee97a93d992931ce717a0df523967",
-            "b99e0a8c56f963246b6464b9fffbf7a2",
-            "b024546a49bad1bd60fccef0a5d11b55f9a442c4"
+            "b99e0a8c56f963246b6464b9fffbf7a2"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"

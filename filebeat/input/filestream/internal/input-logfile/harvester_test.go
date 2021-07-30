@@ -98,14 +98,15 @@ func TestReaderGroup(t *testing.T) {
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
 	source := &testSource{"/path/to/test"}
 
 	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.True(t, hg.readers.hasID(s.Name()))
+		require.True(t, hg.readers.hasID(hg.identifier.ID(s)))
 	}
 
 	requireSourceRemovedFromBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {
-		require.False(t, hg.readers.hasID(s.Name()))
+		require.False(t, hg.readers.hasID(hg.identifier.ID(s)))
 	}
 
 	t.Run("assert a harvester is started in a goroutine", func(t *testing.T) {
@@ -132,6 +133,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 	})
 
 	t.Run("assert a harvester can be stopped and removed from bookkeeper", func(t *testing.T) {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25805")
 		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun}
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 
@@ -164,7 +166,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		gorountineChecker.WaitUntilIncreased(2)
 		// error is expected as a harvester group was expected to start twice for the same source
-		for !hg.readers.hasID(source.Name()) {
+		for !hg.readers.hasID(hg.identifier.ID(source)) {
 		}
 		time.Sleep(3 * time.Millisecond)
 
@@ -222,7 +224,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		hg := testDefaultHarvesterGroup(t, mockHarvester)
 		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
 
-		r, err := lock(inputCtx, hg.store, source.Name())
+		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
 			t.Fatalf("cannot lock source")
 		}
@@ -236,7 +238,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		ok := false
 		for !ok {
 			// wait until harvester is added to the bookeeper
-			ok = hg.readers.hasID(source.Name())
+			ok = hg.readers.hasID(hg.identifier.ID(source))
 			if ok {
 				releaseResource(r)
 			}
@@ -258,7 +260,7 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 		gorountineChecker := resources.NewGoroutinesChecker()
 		defer gorountineChecker.WaitUntilOriginalCount()
 
-		r, err := lock(inputCtx, hg.store, source.Name())
+		r, err := lock(inputCtx, hg.store, hg.identifier.ID(source))
 		if err != nil {
 			t.Fatalf("cannot lock source")
 		}
@@ -271,15 +273,43 @@ func TestDefaultHarvesterGroup(t *testing.T) {
 
 		require.Equal(t, 0, mockHarvester.getRunCount())
 	})
+
+	t.Run("assert harvester can be restarted", func(t *testing.T) {
+		var wg sync.WaitGroup
+		mockHarvester := &mockHarvester{onRun: blockUntilCancelOnRun, wg: &wg}
+		hg := testDefaultHarvesterGroup(t, mockHarvester)
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: context.Background()}
+
+		gorountineChecker := resources.NewGoroutinesChecker()
+		defer gorountineChecker.WaitUntilOriginalCount()
+
+		wg.Add(2)
+		hg.Start(inputCtx, source)
+		hasRun := mockHarvester.getRunCount()
+		for hasRun == 0 {
+			hasRun = mockHarvester.getRunCount()
+		}
+		hg.Restart(inputCtx, source)
+
+		for hasRun != 2 {
+			hasRun = mockHarvester.getRunCount()
+		}
+		require.NoError(t, hg.StopGroup())
+
+		wg.Wait()
+
+		require.Equal(t, 2, mockHarvester.getRunCount())
+	})
 }
 
 func testDefaultHarvesterGroup(t *testing.T, mockHarvester Harvester) *defaultHarvesterGroup {
 	return &defaultHarvesterGroup{
-		readers:   newReaderGroup(),
-		pipeline:  &pipelinemock.MockPipelineConnector{},
-		harvester: mockHarvester,
-		store:     testOpenStore(t, "test", nil),
-		tg:        unison.TaskGroup{},
+		readers:    newReaderGroup(),
+		pipeline:   &pipelinemock.MockPipelineConnector{},
+		harvester:  mockHarvester,
+		store:      testOpenStore(t, "test", nil),
+		identifier: &sourceIdentifier{"filestream::.global::", false},
+		tg:         unison.TaskGroup{},
 	}
 }
 

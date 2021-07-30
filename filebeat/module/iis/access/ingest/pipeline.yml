@@ -4,42 +4,65 @@ processors:
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- grok:
+- rename:
     field: message
+    target_field: event.original
+- grok:
+    field: event.original
     patterns:
     - '%{TIMESTAMP_ISO8601:iis.access.time} (?:-|%{IPORHOST:destination.address}) (?:-|%{WORD:http.request.method})
-      (?:-|%{NOTSPACE:url.path}) (?:-|%{NOTSPACE:url.query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
+      (?:-|%{NOTSPACE:_tmp.url_path}) (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
       (?:-|%{IPORHOST:source.address}) (?:-|%{NOTSPACE:user_agent.original}) (?:-|%{NOTSPACE:http.request.referrer})
       (?:-|%{NUMBER:http.response.status_code:long}) (?:-|%{NUMBER:iis.access.sub_status:long})
       (?:-|%{NUMBER:iis.access.win32_status:long}) (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     - '%{TIMESTAMP_ISO8601:iis.access.time} (?:-|%{NOTSPACE:iis.access.site_name}) (?:-|%{WORD:http.request.method})
-      (?:-|%{NOTSPACE:url.path}) (?:-|%{NOTSPACE:url.query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
+      (?:-|%{NOTSPACE:_tmp.url_path}) (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
       (?:-|%{IPORHOST:source.address}) (?:-|%{NOTSPACE:user_agent.original}) (?:-|%{NOTSPACE:iis.access.cookie})
       (?:-|%{NOTSPACE:http.request.referrer}) (?:-|%{NOTSPACE:destination.domain}) (?:-|%{NUMBER:http.response.status_code:long})
       (?:-|%{NUMBER:iis.access.sub_status:long}) (?:-|%{NUMBER:iis.access.win32_status:long})
       (?:-|%{NUMBER:http.response.body.bytes:long}) (?:-|%{NUMBER:http.request.body.bytes:long})
       (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     - '%{TIMESTAMP_ISO8601:iis.access.time} (?:-|%{NOTSPACE:iis.access.site_name}) (?:-|%{NOTSPACE:iis.access.server_name})
-      (?:-|%{IPORHOST:destination.address}) (?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:url.path})
-      (?:-|%{NOTSPACE:url.query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
+      (?:-|%{IPORHOST:destination.address}) (?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:_tmp.url_path})
+      (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
       (?:-|%{IPORHOST:source.address}) (?:-|HTTP/%{NUMBER:http.version}) (?:-|%{NOTSPACE:user_agent.original})
       (?:-|%{NOTSPACE:iis.access.cookie}) (?:-|%{NOTSPACE:http.request.referrer}) (?:-|%{NOTSPACE:destination.domain})
       (?:-|%{NUMBER:http.response.status_code:long}) (?:-|%{NUMBER:iis.access.sub_status:long})
       (?:-|%{NUMBER:iis.access.win32_status:long}) (?:-|%{NUMBER:http.response.body.bytes:long})
       (?:-|%{NUMBER:http.request.body.bytes:long}) (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     - '%{TIMESTAMP_ISO8601:iis.access.time} \[%{IPORHOST:destination.address}\]\(http://%{IPORHOST:destination.address}\)
-      (?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:url.path}) (?:-|%{NOTSPACE:url.query}) (?:-|%{NUMBER:destination.port:long})
+      (?:-|%{WORD:http.request.method}) (?:-|%{NOTSPACE:_tmp.url_path}) (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long})
       (?:-|%{NOTSPACE:user.name}) \[%{IPORHOST:source.address}\]\(http://%{IPORHOST:source.address}\)
       (?:-|%{NOTSPACE:user_agent.original}) (?:-|%{NUMBER:http.response.status_code:long}) (?:-|%{NUMBER:iis.access.sub_status:long})
       (?:-|%{NUMBER:iis.access.win32_status:long}) (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     - '%{TIMESTAMP_ISO8601:iis.access.time} (?:-|%{IPORHOST:destination.address}) (?:-|%{WORD:http.request.method})
-      (?:-|%{NOTSPACE:url.path}) (?:-|%{NOTSPACE:url.query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
+      (?:-|%{NOTSPACE:_tmp.url_path}) (?:-|%{NOTSPACE:_tmp.url_query}) (?:-|%{NUMBER:destination.port:long}) (?:-|%{NOTSPACE:user.name})
       (?:-|%{IPORHOST:source.address}) (?:-|%{NOTSPACE:user_agent.original}) (?:-|%{NUMBER:http.response.status_code:long})
       (?:-|%{NUMBER:iis.access.sub_status:long}) (?:-|%{NUMBER:iis.access.win32_status:long})
       (?:-|%{NUMBER:temp.duration:long})( (?:-|%{IPORHOST:network.forwarded_ip}))?'
     ignore_missing: true
+- uri_parts:
+    field: _tmp.url_path
+    ignore_failure: true
+- set:
+    field: url.original
+    value: "{{_tmp.url_path}}"
+    ignore_failure: true
+    if: ctx?._tmp?.url_path != null && ctx?.url?.original == null
+- urldecode:
+    field: _tmp.url_query
+    target_field: url.query
+    ignore_missing: true
+    ignore_failure: true
+    if: ctx.url?.query == null
+- set:
+    field: url.domain
+    value: "{{destination.domain}}"
+    if: ctx.url?.domain == null && ctx.destination?.domain != null
 - remove:
-    field: message
+    field:
+      - _tmp
+    ignore_missing: true
 - rename:
     field: '@timestamp'
     target_field: event.created
@@ -133,6 +156,30 @@ processors:
     field: event.outcome
     value: failure
     if: "ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400"
+- script:
+    lang: painless
+    description: This script processor iterates over the whole document to remove fields with null values.
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+        map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
 on_failure:
 - set:
     field: error.message

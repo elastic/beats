@@ -1,0 +1,2 @@
+10.0.1.195 - - [24/Sep/2020:16:45:00 +0000] "GET /config/getuser?index=0 HTTP/1.1" 404 153 "-" "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:76.0) Gecko/20100101 Firefox/76.0" "45.148.10.28"
+10.0.1.195 - - [24/Sep/2020:16:45:19 +0000] "GET / HTTP/1.1" 200 612 "-" "ELB-HealthChecker/2.0" "-"

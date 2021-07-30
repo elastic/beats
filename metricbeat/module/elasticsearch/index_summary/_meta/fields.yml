@@ -29,6 +29,39 @@
           format: bytes
           description: >
             Total number of memory used by the segments in bytes.
+        - name: indexing
+          type: group
+          fields:
+            - name: index.count
+              type: long
+            - name: index.time.ms
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: query
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+        - name: bulk
+          type: group
+          fields:
+            - name: operations.count
+              type: long
+            - name: size.bytes
+              type: long
+            - name: time
+              type: group
+              fields:
+                - name: count.ms
+                  type: long
+                - name: avg.ms
+                  type: long
+                - name: avg.bytes
+                  type: long
     - name: total
       type: group
       fields:
@@ -54,3 +87,38 @@
           format: bytes
           description: >
             Total number of memory used by the segments in bytes.
+        - name: indexing
+          type: group
+          fields:
+            - name: index.count
+              type: long
+            - name: is_throttled
+              type: boolean
+            - name: throttle_time.ms
+              type: long
+            - name: index.time.ms
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: query
+              type: group
+              fields:
+                - name: count
+                  type: long
+                - name: time.ms
+                  type: long
+        - name: bulk
+          type: group
+          fields:
+            - name: operations.count
+              type: long
+            - name: size.bytes
+              type: long
+            - name: time
+              type: group
+              fields:
+                - name: avg.ms
+                  type: long
+                - name: avg.bytes
+                  type: long

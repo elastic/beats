@@ -15,7 +15,7 @@ import (
 
 func TestUpgrade(t *testing.T) {
 	tr := &testReporter{}
-	l, _ := logger.New("test")
+	l, _ := logger.New("test", false)
 	t.Run("invalid rule", func(t *testing.T) {
 		r := &inputCapability{}
 		cap, err := newUpgradeCapability(l, r, tr)

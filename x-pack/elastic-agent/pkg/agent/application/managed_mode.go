@@ -43,6 +43,7 @@ import (
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	logreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/log"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 type stateStore interface {
@@ -83,12 +84,12 @@ func newManaged(
 		return nil, err
 	}
 
-	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Kibana)
+	client, err := client.NewAuthWithConfig(log, cfg.Fleet.AccessAPIKey, cfg.Fleet.Client)
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to create API client",
 			errors.TypeNetwork,
-			errors.M(errors.MetaKeyURI, cfg.Fleet.Kibana.Host))
+			errors.M(errors.MetaKeyURI, cfg.Fleet.Client.Host))
 	}
 
 	sysInfo, err := sysinfo.Host()
@@ -192,11 +193,6 @@ func newManaged(
 		storeSaver,
 	)
 
-	if cfg.Fleet.Server == nil {
-		// setters only set when not running a local Fleet Server
-		policyChanger.AddSetter(acker)
-	}
-
 	actionDispatcher.MustRegister(
 		&fleetapi.ActionPolicyChange{},
 		policyChanger,
@@ -243,7 +239,7 @@ func newManaged(
 	)
 
 	actions := stateStore.Actions()
-
+	stateRestored := false
 	if len(actions) > 0 && !managedApplication.wasUnenrolled() {
 		// TODO(ph) We will need an improvement on fleet, if there is an error while dispatching a
 		// persisted action on disk we should be able to ask Fleet to get the latest configuration.
@@ -251,6 +247,7 @@ func newManaged(
 		if err := store.ReplayActions(log, actionDispatcher, actionAcker, actions...); err != nil {
 			log.Errorf("could not recover state, error %+v, skipping...", err)
 		}
+		stateRestored = true
 	}
 
 	gateway, err := fleetgateway.New(
@@ -267,16 +264,25 @@ func newManaged(
 	if err != nil {
 		return nil, err
 	}
-	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit)
+	gateway, err = localgateway.New(managedApplication.bgContext, log, cfg.Fleet, rawConfig, gateway, emit, !stateRestored)
 	if err != nil {
 		return nil, err
 	}
-	// add the gateway to setters, so the gateway can be updated
-	// when the hosts for Kibana are updated by the policy.
-	policyChanger.AddSetter(gateway)
+	// add the acker and gateway to setters, so the they can be updated
+	// when the hosts for Fleet Server are updated by the policy.
+	if cfg.Fleet.Server == nil {
+		// setters only set when not running a local Fleet Server
+		policyChanger.AddSetter(gateway)
+		policyChanger.AddSetter(acker)
+	}
 
 	managedApplication.gateway = gateway
 	return managedApplication, nil
+}
+
+// Routes returns a list of routes handled by agent.
+func (m *Managed) Routes() *sorted.Set {
+	return m.router.Routes()
 }
 
 // Start starts a managed elastic-agent.

@@ -113,5 +113,5 @@ func loadFleetConfig(cfg *config.Config) (map[string]interface{}, error) {
 }
 
 func newErrorLogger() (*logger.Logger, error) {
-	return logger.NewWithLogpLevel("", logp.ErrorLevel)
+	return logger.NewWithLogpLevel("", logp.ErrorLevel, false)
 }

@@ -46,15 +46,15 @@
         "log.offset": 0,
         "related.hash": [
             "12081e6ca366ad7d08368fbc7d4107605a9b75d27c671e7e0a58588f94be5837",
-            "c877b67a5733c59d0d8ed8d519df0c91",
-            "128aa78059540cf0cdae2a3cea30cd80e00f2046"
+            "128aa78059540cf0cdae2a3cea30cd80e00f2046",
+            "c877b67a5733c59d0d8ed8d519df0c91"
         ],
         "related.hosts": [
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -97,8 +97,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -159,16 +159,16 @@
         "process.name": "svchost.exe",
         "process.pid": 896,
         "related.hash": [
-            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
             "0fe5be3811a98ee6a9c997d3812d911a",
+            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
             "cf162622e29bca072d01b274fbbc3ceaacdd13c7"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -223,8 +223,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -278,8 +278,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -340,16 +340,16 @@
         "process.name": "svchost.exe",
         "process.pid": 896,
         "related.hash": [
-            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
             "0fe5be3811a98ee6a9c997d3812d911a",
+            "a78c29d1fa05c2b23d1dc9b75da8c053399143682fe3779bc466f10e1a997850",
             "cf162622e29bca072d01b274fbbc3ceaacdd13c7"
         ],
         "related.hosts": [
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -417,8 +417,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -473,8 +473,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -532,8 +532,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -591,8 +591,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -650,8 +650,8 @@
             "Demo_AMP_Threat_Quarantined"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -709,8 +709,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -768,8 +768,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -828,8 +828,8 @@
             "Demo_Low_Prev_Retro"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -880,8 +880,8 @@
             "Demo_BP_WMIPRVSE"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -945,8 +945,8 @@
             "Demo_BP_WMIPRVSE"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1007,8 +1007,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1060,16 +1060,16 @@
         "input.type": "log",
         "log.offset": 30050,
         "related.hash": [
-            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
             "41476df3138717868118d8542cf3d1d6",
-            "5ca4bef8de6def53519d4b22632675bb4c1e470b"
+            "5ca4bef8de6def53519d4b22632675bb4c1e470b",
+            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86"
         ],
         "related.hosts": [
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1127,8 +1127,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1181,8 +1181,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1234,16 +1234,16 @@
         "input.type": "log",
         "log.offset": 34132,
         "related.hash": [
-            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86",
             "41476df3138717868118d8542cf3d1d6",
-            "5ca4bef8de6def53519d4b22632675bb4c1e470b"
+            "5ca4bef8de6def53519d4b22632675bb4c1e470b",
+            "6a37d750f02de99767770a2d1274c3a4e0259e98d38bd8a801949ae3972eef86"
         ],
         "related.hosts": [
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1286,8 +1286,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1341,8 +1341,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1394,8 +1394,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1453,8 +1453,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1509,15 +1509,15 @@
         "log.offset": 39856,
         "related.hash": [
             "0b965ca8afea0638749b71ec6ad53f94e8bd9f9b359f1cb2e707dbe52f5d3960",
-            "84b6f7be5370c1998886214790c6892b",
-            "5faebef3bb880489195e80e6656ccf442ff7123b"
+            "5faebef3bb880489195e80e6656ccf442ff7123b",
+            "84b6f7be5370c1998886214790c6892b"
         ],
         "related.hosts": [
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1668,8 +1668,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1712,8 +1712,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1771,8 +1771,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1830,8 +1830,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1883,8 +1883,8 @@
             "Demo_AMP"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1942,8 +1942,8 @@
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1986,8 +1986,8 @@
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2048,16 +2048,16 @@
         "process.name": "explorer.exe",
         "process.pid": 2632,
         "related.hash": [
-            "edb1ff2521fb4bf748111f92786d260d40407a2e8463dcd24bb09f908ee13eb9",
+            "26de43cc558a4e0e60eddd4dc9321bcb5a0a181c",
             "cfdd16225e67471f5ef54cab9b3a5558",
-            "26de43cc558a4e0e60eddd4dc9321bcb5a0a181c"
+            "edb1ff2521fb4bf748111f92786d260d40407a2e8463dcd24bb09f908ee13eb9"
         ],
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2112,8 +2112,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2174,16 +2174,16 @@
         "process.name": "powershell.exe",
         "process.pid": 4868,
         "related.hash": [
-            "f2863a775c7faa85aefa3814530d9356ff700ae8bf534584652c2b4b720ee117",
+            "7d9518ea3f98d037745352b23861fab05d3777dc",
             "c624d61b8f076c3ef05f74eeb96c8954",
-            "7d9518ea3f98d037745352b23861fab05d3777dc"
+            "f2863a775c7faa85aefa3814530d9356ff700ae8bf534584652c2b4b720ee117"
         ],
         "related.hosts": [
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2238,8 +2238,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2297,8 +2297,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2356,8 +2356,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2430,8 +2430,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2504,8 +2504,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2546,16 +2546,21 @@
         "cisco.amp.timestamp_nanoseconds": 0,
         "cisco.amp.vulnerabilities": [
             {
+                "cve": "CVE-2017-11774",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11774"
+            },
+            {
+                "cve": "CVE-2017-8571",
+                "score": "6.8",
+                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8571"
+            },
+            {
                 "cve": "CVE-2017-0106",
                 "name": "Microsoft Office",
                 "score": "9.3",
                 "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-0106",
                 "version": "2016"
-            },
-            {
-                "cve": "CVE-2017-11774",
-                "score": "6.8",
-                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-11774"
             },
             {
                 "cve": "CVE-2017-8506",
@@ -2566,11 +2571,6 @@
                 "cve": "CVE-2017-8507",
                 "score": "9.3",
                 "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8507"
-            },
-            {
-                "cve": "CVE-2017-8571",
-                "score": "6.8",
-                "url": "https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2017-8571"
             },
             {
                 "cve": "CVE-2017-8663",
@@ -2608,8 +2608,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2652,8 +2652,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2702,8 +2702,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2747,8 +2747,8 @@
             "Demo_AMP_Intel"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [

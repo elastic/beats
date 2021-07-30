@@ -13,9 +13,9 @@
         ],
         "ibmmq.errorlog.code": "AMQ6287I",
         "ibmmq.errorlog.commentinsert": [
-            "Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit)",
+            "9.1.0.0 (p910-L180709.TRIAL)",
             "C:\\\\Program Files\\\\IBM\\\\MQ (Installation1)",
-            "9.1.0.0 (p910-L180709.TRIAL)"
+            "Windows 10 Professional x64 Edition, Build 17134 (MQ Windows (x64 platform) 64-bit)"
         ],
         "ibmmq.errorlog.explanation": "Systeminformationen zu IBM",
         "ibmmq.errorlog.installation": "Installation1",
@@ -46,9 +46,9 @@
         ],
         "ibmmq.errorlog.code": "AMQ8576I",
         "ibmmq.errorlog.commentinsert": [
-            "Installation1",
+            "",
             "C:\\\\Program Files\\\\IBM\\\\MQ",
-            ""
+            "Installation1"
         ],
         "ibmmq.errorlog.explanation": "Alle Tasks, die zur Festlegung der Installation 'Installation1' als prim\ufffdre Installation erforderlich sind, wurden ausgef\ufffdhrt. Wenn die Installation noch nicht als prim\ufffdre Installation festgelegt wurde, dann wurde auch die Konfiguration der Installation aktualisiert, um die Installation 'Installation1' als prim\ufffdre Installation zu identifizieren. Damit die Aktualisierungen systemweit wirksam werden, m\ufffdssen Sie das Betriebssystem erneut starten.",
         "ibmmq.errorlog.installation": "Installation1",
@@ -74,8 +74,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "90",
-            ""
+            "",
+            "90"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -140,14 +140,14 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert": [
-            "8480",
-            ""
+            "",
+            "8480"
         ],
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
-            "QM1",
             "",
-            ""
+            "",
+            "QM1"
         ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 8480.",
         "ibmmq.errorlog.installation": "Installation1",
@@ -173,8 +173,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Keine.",
         "ibmmq.errorlog.arithinsert": [
-            "84",
-            ""
+            "",
+            "84"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -206,8 +206,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Keine.",
         "ibmmq.errorlog.arithinsert": [
-            "84",
-            ""
+            "",
+            "84"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -239,8 +239,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Keine.",
         "ibmmq.errorlog.arithinsert": [
-            "83",
-            ""
+            "",
+            "83"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -272,8 +272,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "73",
-            ""
+            "",
+            "73"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -305,8 +305,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "73",
-            ""
+            "",
+            "73"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -371,14 +371,14 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert": [
-            "7360",
-            ""
+            "",
+            "7360"
         ],
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
-            "QM1",
             "",
-            ""
+            "",
+            "QM1"
         ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7360.",
         "ibmmq.errorlog.installation": "Installation1",
@@ -404,8 +404,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "71",
-            ""
+            "",
+            "71"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -437,8 +437,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "71",
-            ""
+            "",
+            "71"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -503,14 +503,14 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert": [
-            "7660",
-            ""
+            "",
+            "7660"
         ],
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
-            "QM1",
             "",
-            ""
+            "",
+            "QM1"
         ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 7660.",
         "ibmmq.errorlog.installation": "Installation1",
@@ -536,8 +536,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "71",
-            ""
+            "",
+            "71"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -569,8 +569,8 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "None.",
         "ibmmq.errorlog.arithinsert": [
-            "71",
-            ""
+            "",
+            "71"
         ],
         "ibmmq.errorlog.code": "AMQ7125I",
         "ibmmq.errorlog.commentinsert": [
@@ -635,14 +635,14 @@
         "host.hostname": "FELIX-ELASTIC",
         "ibmmq.errorlog.action": "Use the standard facilities supplied with your system to record the problem identifier and to save any generated output files. Use either the MQ Support site: http://www.ibm.com/software/integration/wmq/support/, or IBM Support Assistant (ISA): http://www.ibm.com/software/support/isa/, to see whether a solution is already available. If you are unable to find a match, contact your IBM support center. Do not discard these files until the problem has been resolved.",
         "ibmmq.errorlog.arithinsert": [
-            "6780",
-            ""
+            "",
+            "6780"
         ],
         "ibmmq.errorlog.code": "AMQ6184W",
         "ibmmq.errorlog.commentinsert": [
-            "QM1",
             "",
-            ""
+            "",
+            "QM1"
         ],
         "ibmmq.errorlog.explanation": "An error has been detected, and the IBM MQ error recording routine has been called. The failing process is process 6780.",
         "ibmmq.errorlog.installation": "Installation1",

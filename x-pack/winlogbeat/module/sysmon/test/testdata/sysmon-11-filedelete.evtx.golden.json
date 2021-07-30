@@ -5,7 +5,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -62,7 +62,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 664,
         "thread": {
@@ -84,7 +84,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -135,7 +135,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 664,
         "thread": {
@@ -157,7 +157,7 @@
       "category": [
         "file"
       ],
-      "code": 23,
+      "code": "23",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -207,7 +207,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-Sysmon/Operational",
       "computer_name": "vagrant-2012-r2",
-      "event_id": 23,
+      "event_id": "23",
       "process": {
         "pid": 1188,
         "thread": {

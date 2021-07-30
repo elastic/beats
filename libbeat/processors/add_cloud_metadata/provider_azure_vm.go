@@ -33,6 +33,7 @@ var azureVMMetadataFetcher = provider{
 		azMetadataURI := "/metadata/instance/compute?api-version=2017-04-02"
 		azHeaders := map[string]string{"Metadata": "true"}
 		azSchema := func(m map[string]interface{}) common.MapStr {
+			m["serviceName"] = "Virtual Machines"
 			out, _ := s.Schema{
 				"account": s.Object{
 					"id": c.Str("subscriptionId"),
@@ -44,9 +45,12 @@ var azureVMMetadataFetcher = provider{
 				"machine": s.Object{
 					"type": c.Str("vmSize"),
 				},
+				"service": s.Object{
+					"name": c.Str("serviceName"),
+				},
 				"region": c.Str("location"),
 			}.Apply(m)
-			return out
+			return common.MapStr{"cloud": out}
 		}
 
 		fetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azSchema, azMetadataURI)

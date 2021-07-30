@@ -151,5 +151,9 @@ func GitAdd() error {
 
 // Update updates the generated files (aka make update).
 func Update() error {
-	return sh.Run("make", "update")
+	err := sh.Run("make", "update")
+	if err != nil {
+		return err
+	}
+	return gotool.Mod.Tidy()
 }

@@ -20,8 +20,8 @@
         "event.original": "type=ADD_GROUP msg=audit(1610903553.686:584): pid=2940 uid=0 auid=1000 ses=14 msg='op=adding group to /etc/group id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
         "event.outcome": "success",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "log",
         "group.id": "1004",
@@ -58,8 +58,8 @@
         "event.original": "type=ADD_GROUP msg=audit(1610903553.710:586): pid=2940 uid=0 auid=1000 ses=14 msg='op=adding group to /etc/gshadow id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
         "event.outcome": "success",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "log",
         "group.id": "1004",
@@ -95,8 +95,8 @@
         "event.original": "type=ADD_GROUP msg=audit(1610903553.710:587): pid=2940 uid=0 auid=1000 ses=14 msg='op= id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
         "event.outcome": "success",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "log",
         "group.id": "1004",
@@ -133,8 +133,8 @@
         "event.original": "type=ADD_USER msg=audit(1610903553.730:591): pid=2945 uid=0 auid=1000 ses=14 msg='op=adding user id=1004 exe=\"/usr/sbin/useradd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
         "event.outcome": "success",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "log",
         "input.type": "log",
@@ -207,8 +207,8 @@
         "event.original": "type=USER_CHAUTHTOK msg=audit(1610903558.174:594): pid=2953 uid=0 auid=1000 ses=14 msg='op=PAM:chauthtok acct=\"charlie\" exe=\"/usr/bin/passwd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
         "event.outcome": "success",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "log",
         "input.type": "log",

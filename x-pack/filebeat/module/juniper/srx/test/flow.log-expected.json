@@ -21,9 +21,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -57,8 +57,8 @@
         "source.nat.port": 594,
         "source.port": 594,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -80,8 +80,8 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -113,8 +113,8 @@
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -142,8 +142,8 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -180,8 +180,8 @@
         "source.ip": "1.2.3.4",
         "source.port": 56639,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -219,9 +219,9 @@
         "event.start": "2014-05-01T06:28:10.933-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -268,8 +268,8 @@
         "source.packets": 1,
         "source.port": 63456,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -298,9 +298,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -319,8 +319,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "50.0.0.100",
-            "30.0.0.100"
+            "30.0.0.100",
+            "50.0.0.100"
         ],
         "rule.name": "alg-policy",
         "server.ip": "30.0.0.100",
@@ -337,8 +337,8 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -367,9 +367,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -388,9 +388,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "18.51.100.12",
             "192.0.2.1",
-            "198.51.100.12",
-            "18.51.100.12"
+            "198.51.100.12"
         ],
         "rule.name": "policy1",
         "server.ip": "198.51.100.12",
@@ -402,8 +402,8 @@
         "source.nat.port": 1,
         "source.port": 1,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -439,9 +439,9 @@
         "event.start": "2010-09-30T04:55:07.188-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -463,9 +463,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "18.51.100.12",
             "192.0.2.1",
-            "198.51.100.12",
-            "18.51.100.12"
+            "198.51.100.12"
         ],
         "rule.name": "policy1",
         "server.bytes": 84,
@@ -481,8 +481,8 @@
         "source.packets": 1,
         "source.port": 1,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -521,9 +521,9 @@
         "event.start": "2019-04-12T12:29:06.576-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -553,9 +553,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "10.3.136.49",
             "10.3.255.203",
-            "8.23.224.110",
-            "10.3.136.49"
+            "8.23.224.110"
         ],
         "rule.name": "permit_all",
         "server.bytes": 535,
@@ -571,8 +571,8 @@
         "source.packets": 6,
         "source.port": 47776,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -603,9 +603,9 @@
         "event.start": "2019-04-13T12:33:06.576-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -627,8 +627,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "192.168.2.164",
-            "172.16.1.19"
+            "172.16.1.19",
+            "192.168.2.164"
         ],
         "rule.name": "35",
         "server.bytes": 1575,
@@ -644,8 +644,8 @@
         "source.packets": 13,
         "source.port": 53232,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -683,9 +683,9 @@
         "event.start": "2018-10-06T23:32:20.898-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -737,8 +737,8 @@
         "source.packets": 1,
         "source.port": 52890,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -776,9 +776,9 @@
         "event.start": "2018-06-30T00:17:22.753-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -802,9 +802,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "192.168.0.47",
             "192.168.255.2",
-            "8.8.8.8",
-            "192.168.0.47"
+            "8.8.8.8"
         ],
         "rule.name": "trust-to-untrust-001",
         "server.bytes": 116,
@@ -820,8 +820,8 @@
         "source.packets": 1,
         "source.port": 62047,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -852,9 +852,9 @@
         "event.start": "2015-09-25T12:19:53.846-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -879,10 +879,10 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "10.164.110.223",
             "10.104.12.161",
-            "10.9.1.150",
-            "10.12.70.1"
+            "10.12.70.1",
+            "10.164.110.223",
+            "10.9.1.150"
         ],
         "rule.name": "FW-FTP",
         "server.bytes": 0,
@@ -898,8 +898,8 @@
         "source.packets": 0,
         "source.port": 9057,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -930,9 +930,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -951,9 +951,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "173.167.224.7",
             "192.168.224.30",
-            "207.17.137.56",
-            "173.167.224.7"
+            "207.17.137.56"
         ],
         "rule.name": "General-Outbound",
         "server.ip": "207.17.137.56",
@@ -975,8 +975,8 @@
         "source.nat.port": 14406,
         "source.port": 3129,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1014,9 +1014,9 @@
         "event.start": "2013-01-19T15:18:17.040-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1037,9 +1037,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "173.167.224.7",
             "192.168.224.30",
-            "207.17.137.56",
-            "173.167.224.7"
+            "207.17.137.56"
         ],
         "rule.name": "General-Outbound",
         "server.bytes": 0,
@@ -1065,8 +1065,8 @@
         "source.packets": 1,
         "source.port": 3129,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1104,9 +1104,9 @@
         "event.start": "2013-01-19T15:18:17.040-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1129,9 +1129,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "173.167.224.7",
             "192.168.224.30",
-            "207.17.137.56",
-            "173.167.224.7"
+            "207.17.137.56"
         ],
         "rule.name": "General-Outbound",
         "server.bytes": 104,
@@ -1157,8 +1157,8 @@
         "source.packets": 3,
         "source.port": 3129,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1196,9 +1196,9 @@
         "event.start": "2013-01-19T15:18:18.040-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1252,8 +1252,8 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1284,9 +1284,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1337,8 +1337,8 @@
         "source.port": 33040,
         "source.user.name": "user1",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1376,9 +1376,9 @@
         "event.start": "2013-01-19T15:18:20.040-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1431,8 +1431,8 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1461,9 +1461,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1482,8 +1482,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "50.0.0.100",
-            "30.0.0.100"
+            "30.0.0.100",
+            "50.0.0.100"
         ],
         "rule.name": "alg-policy",
         "server.ip": "30.0.0.100",
@@ -1500,8 +1500,8 @@
         "source.nat.port": 24065,
         "source.port": 24065,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1523,8 +1523,8 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1556,8 +1556,8 @@
         "source.ip": "10.0.0.26",
         "source.port": 37233,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1595,9 +1595,9 @@
         "event.start": "2020-01-19T15:18:20.040-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1650,8 +1650,8 @@
         "source.port": 48873,
         "source.user.name": "user1",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1692,9 +1692,9 @@
         "event.start": "2020-07-14T12:17:11.928-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1718,8 +1718,8 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "10.1.1.100",
-            "46.165.154.241",
-            "172.19.34.100"
+            "172.19.34.100",
+            "46.165.154.241"
         ],
         "rule.name": "default-permit",
         "server.bytes": 2132,
@@ -1735,8 +1735,8 @@
         "source.packets": 42,
         "source.port": 58943,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1778,9 +1778,9 @@
         "event.start": "2020-07-13T14:43:05.041-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1813,8 +1813,8 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "10.1.1.100",
-            "91.228.167.172",
-            "172.19.34.100"
+            "172.19.34.100",
+            "91.228.167.172"
         ],
         "rule.name": "default-permit",
         "server.bytes": 9670,
@@ -1830,8 +1830,8 @@
         "source.packets": 161,
         "source.port": 64720,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1863,9 +1863,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
             "allowed",
-            "connection"
+            "connection",
+            "start"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1889,8 +1889,8 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "10.1.1.100",
-            "8.8.8.8",
-            "172.19.34.100"
+            "172.19.34.100",
+            "8.8.8.8"
         ],
         "rule.name": "default-permit",
         "server.ip": "8.8.8.8",
@@ -1902,8 +1902,8 @@
         "source.nat.port": 30838,
         "source.port": 49583,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -1941,9 +1941,9 @@
         "event.start": "2020-07-13T14:12:05.530-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "end",
             "allowed",
-            "connection"
+            "connection",
+            "end"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -1971,8 +1971,8 @@
         "observer.vendor": "Juniper",
         "related.ip": [
             "10.1.1.100",
-            "8.8.8.8",
-            "172.19.34.100"
+            "172.19.34.100",
+            "8.8.8.8"
         ],
         "rule.name": "default-permit",
         "server.bytes": 82,
@@ -1988,8 +1988,8 @@
         "source.packets": 1,
         "source.port": 63381,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     }
 ]

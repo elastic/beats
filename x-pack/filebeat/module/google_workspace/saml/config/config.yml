@@ -28,6 +28,7 @@ response.pagination:
   - set:
       target: url.params.pageToken
       value: "[[.last_response.body.nextPageToken]]"
+      fail_on_template_error: true
 cursor:
   last_execution_datetime:
     value: "[[formatDate now]]"
@@ -48,7 +49,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.8.0
+        ecs.version: 1.10.0
   - script:
       lang: javascript
       id: gworkspace-common

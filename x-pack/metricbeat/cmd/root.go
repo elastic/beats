@@ -16,9 +16,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	mbcmd "github.com/elastic/beats/v7/metricbeat/cmd"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
 
 	// Register the includes.
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/include"
 
 	// Import OSS modules.
@@ -31,7 +31,7 @@ const (
 	Name = "metricbeat"
 
 	// ecsVersion specifies the version of ECS that this beat is implementing.
-	ecsVersion = "1.8.0"
+	ecsVersion = "1.10.0"
 )
 
 // RootCmd to handle beats cli
@@ -57,5 +57,4 @@ func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
-	xpackcmd.AddXPack(RootCmd, Name)
 }

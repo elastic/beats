@@ -1,6 +1,6 @@
 BUILD_DIR=$(CURDIR)/build
 COVERAGE_DIR=$(BUILD_DIR)/coverage
-BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent
+BEATS?=auditbeat filebeat heartbeat journalbeat metricbeat packetbeat winlogbeat x-pack/functionbeat x-pack/elastic-agent x-pack/osquerybeat
 PROJECTS=libbeat $(BEATS)
 PROJECTS_ENV=libbeat filebeat metricbeat
 PYTHON_ENV?=$(BUILD_DIR)/python-env
@@ -102,6 +102,16 @@ check:
 	@$(MAKE) check-go
 	@$(MAKE) check-no-changes
 
+## check : Run some checks similar to what the default check validation runs in the CI.
+.PHONY: check-default
+check-default:
+	@$(MAKE) check-python
+	@echo "The update goal is skipped to speed up the checks in the CI on a PR basis."
+	@$(MAKE) notice
+	@$(MAKE) check-headers
+	@$(MAKE) check-go
+	@$(MAKE) check-no-changes
+
 ## ccheck-go : Check there is no changes in Go modules.
 .PHONY: check-go
 check-go:
@@ -110,6 +120,7 @@ check-go:
 ## ccheck-no-changes : Check there is no local changes.
 .PHONY: check-no-changes
 check-no-changes:
+	@go mod tidy
 	@git diff | cat
 	@git update-index --refresh
 	@git diff-index --exit-code HEAD --

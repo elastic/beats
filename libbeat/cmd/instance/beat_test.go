@@ -114,3 +114,31 @@ func TestEmptyMetaJson(t *testing.T) {
 	assert.Equal(t, nil, err, "Unable to load meta file properly")
 	assert.NotEqual(t, uuid.Nil, b.Info.ID, "Beats UUID is not set")
 }
+
+func TestMetaJsonWithTimestamp(t *testing.T) {
+	firstBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	if err != nil {
+		panic(err)
+	}
+	firstStart := firstBeat.Info.FirstStart
+
+	metaFile, err := ioutil.TempFile("../test", "meta.json")
+	assert.Equal(t, nil, err, "Unable to create temporary meta file")
+
+	metaPath := metaFile.Name()
+	metaFile.Close()
+	defer os.Remove(metaPath)
+
+	err = firstBeat.loadMeta(metaPath)
+	assert.Equal(t, nil, err, "Unable to load meta file properly")
+
+	secondBeat, err := NewBeat("filebeat", "testidx", "0.9", false)
+	if err != nil {
+		panic(err)
+	}
+	assert.False(t, firstStart.Equal(secondBeat.Info.FirstStart), "Before meta.json is loaded, first start must be different")
+	secondBeat.loadMeta(metaPath)
+
+	assert.Equal(t, nil, err, "Unable to load meta file properly")
+	assert.True(t, firstStart.Equal(secondBeat.Info.FirstStart), "Cannot load first start")
+}

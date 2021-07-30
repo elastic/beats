@@ -68,10 +68,10 @@ func TestGetProcess(t *testing.T) {
 	assert.True(t, (process.Mem.Share >= 0))
 
 	// CPU Checks
-	assert.True(t, (process.Cpu.StartTime > 0))
-	assert.True(t, (process.Cpu.Total >= 0))
-	assert.True(t, (process.Cpu.User >= 0))
-	assert.True(t, (process.Cpu.Sys >= 0))
+	assert.True(t, (process.CPU.StartTime > 0))
+	assert.True(t, (process.CPU.Total >= 0))
+	assert.True(t, (process.CPU.User >= 0))
+	assert.True(t, (process.CPU.Sys >= 0))
 
 	assert.True(t, (process.SampleTime.Unix() <= time.Now().Unix()))
 
@@ -143,7 +143,7 @@ func TestProcMemPercentage(t *testing.T) {
 
 func TestProcCpuPercentage(t *testing.T) {
 	p1 := &Process{
-		Cpu: gosigar.ProcTime{
+		CPU: gosigar.ProcTime{
 			User:  11345,
 			Sys:   37,
 			Total: 11382,
@@ -152,7 +152,7 @@ func TestProcCpuPercentage(t *testing.T) {
 	}
 
 	p2 := &Process{
-		Cpu: gosigar.ProcTime{
+		CPU: gosigar.ProcTime{
 			User:  14794,
 			Sys:   47,
 			Total: 14841,

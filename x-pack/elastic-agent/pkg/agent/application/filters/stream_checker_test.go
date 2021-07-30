@@ -249,7 +249,7 @@ func TestStreamCheck(t *testing.T) {
 		},
 	}
 
-	log, err := logger.New("")
+	log, err := logger.New("", false)
 	assert.NoError(t, err)
 
 	for _, tc := range testCases {

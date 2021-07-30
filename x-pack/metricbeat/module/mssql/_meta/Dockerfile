@@ -1,5 +1,5 @@
 ARG MSSQL_VERSION
-FROM microsoft/mssql-server-linux:${MSSQL_VERSION}
+FROM mcr.microsoft.com/mssql/server:${MSSQL_VERSION}
 
 ENV ACCEPT_EULA='Y'
 ENV SA_PASSWORD='1234_asdf'

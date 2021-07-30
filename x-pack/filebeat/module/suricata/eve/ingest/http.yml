@@ -1,0 +1,83 @@
+---
+description: Pipeline for Suricata DNS Events
+
+processors:
+  - set:
+      value: "{{suricata.eve.http.http_method}}"
+      field: http.request.method
+      if: "ctx?.suricata?.eve?.http?.http_method != null"
+  - rename:
+      field: suricata.eve.http.status
+      target_field: http.response.status_code
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.hostname
+      target_field: destination.domain
+      ignore_missing: true
+  # - grok:
+  #     field: suricata.eve.http.url
+  #     patterns:
+  #       - '%{PATH:url.path}(?:\?%{QUERY:url.query})?(?:#%{ANY:url.fragment})?'
+  #     ignore_missing: true
+  #     pattern_definitions:
+  #       PATH: '[^?#]*'
+  #       QUERY: '[^#]*'
+  #       ANY: '.*'
+  - rename:
+      field: suricata.eve.http.url
+      target_field: url.original
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.http_port
+      target_field: url.port
+      ignore_missing: true
+
+  # URL
+  - uri_parts:
+      field: url.original
+      target_field: _temp_.url
+      ignore_failure: true
+      if: ctx?.url?.original != null
+  - script:
+      lang: painless
+      description: Updates the URL ECS fields from the results of the URI parts processor to not overwrite the RSA mappings
+      if: ctx?._temp_?.url != null
+      source: |
+        for (entry in ctx._temp_.url.entrySet()) {
+          if (entry != null && entry.getValue() != null) {
+            if(ctx.url[entry.getKey()] == null) {
+              ctx.url[entry.getKey()] = entry.getValue();
+            } else if (!ctx.url[entry.getKey()].contains(entry.getValue())) {
+              ctx.url[entry.getKey()] = [ctx.url[entry.getKey()]];
+              ctx.url[entry.getKey()].add(entry.getValue());
+            }
+          }
+        }
+  - set:
+      field: url.domain
+      value: '{{destination.domain}}'
+      ignore_empty_value: true
+      if: ctx?.url?.domain == null && ctx?.destination?.domain != null
+  - remove:
+      field: _temp_
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.http_refer
+      target_field: http.request.referrer
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.http.length
+      target_field: http.response.body.bytes
+      ignore_missing: true
+  - user_agent:
+      field: suricata.eve.http.http_user_agent
+      ignore_missing: true
+
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in HTTP pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}

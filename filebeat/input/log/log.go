@@ -29,6 +29,8 @@ import (
 
 // Log contains all log related data
 type Log struct {
+	logger *logp.Logger
+
 	fs           harvester.Source
 	offset       int64
 	config       LogConfig
@@ -39,6 +41,7 @@ type Log struct {
 
 // NewLog creates a new log instance to read log sources
 func NewLog(
+	logger *logp.Logger,
 	fs harvester.Source,
 	config LogConfig,
 ) (*Log, error) {
@@ -52,6 +55,7 @@ func NewLog(
 	}
 
 	return &Log{
+		logger:       logger,
 		fs:           fs,
 		offset:       offset,
 		config:       config,
@@ -104,7 +108,7 @@ func (f *Log) Read(buf []byte) (int, error) {
 			return totalN, err
 		}
 
-		logp.Debug("harvester", "End of file reached: %s; Backoff now.", f.fs.Name())
+		f.logger.Debugf("End of file reached: %s; Backoff now.", f.fs.Name())
 		f.wait()
 	}
 }
@@ -113,7 +117,7 @@ func (f *Log) Read(buf []byte) (int, error) {
 // based on the config options.
 func (f *Log) errorChecks(err error) error {
 	if err != io.EOF {
-		logp.Err("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
+		f.logger.Errorf("Unexpected state reading from %s; error: %s", f.fs.Name(), err)
 		return err
 	}
 
@@ -121,7 +125,7 @@ func (f *Log) errorChecks(err error) error {
 
 	// Stdin is not continuable
 	if !f.fs.Continuable() {
-		logp.Debug("harvester", "Source is not continuable: %s", f.fs.Name())
+		f.logger.Debugf("Source is not continuable: %s", f.fs.Name())
 		return err
 	}
 
@@ -134,14 +138,13 @@ func (f *Log) errorChecks(err error) error {
 	// calling the stat function
 	info, statErr := f.fs.Stat()
 	if statErr != nil {
-		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
+		f.logger.Errorf("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
 		return statErr
 	}
 
 	// check if file was truncated
 	if info.Size() < f.offset {
-		logp.Debug("harvester",
-			"File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
+		f.logger.Debugf("File was truncated as offset (%d) > size (%d): %s", f.offset, info.Size(), f.fs.Name())
 		return ErrFileTruncate
 	}
 
@@ -167,14 +170,14 @@ func (f *Log) checkFileDisappearedErrors() error {
 	// calling the stat function
 	info, statErr := f.fs.Stat()
 	if statErr != nil {
-		logp.Err("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
+		f.logger.Errorf("Unexpected error reading from %s; error: %s", f.fs.Name(), statErr)
 		return statErr
 	}
 
 	if f.config.CloseRenamed {
 		// Check if the file can still be found under the same path
 		if !file.IsSameFile(f.fs.Name(), info) {
-			logp.Debug("harvester", "close_renamed is enabled and file %s has been renamed", f.fs.Name())
+			f.logger.Debugf("close_renamed is enabled and file %s has been renamed", f.fs.Name())
 			return ErrRenamed
 		}
 	}
@@ -182,7 +185,7 @@ func (f *Log) checkFileDisappearedErrors() error {
 	if f.config.CloseRemoved {
 		// Check if the file name exists. See https://github.com/elastic/filebeat/issues/93
 		if f.fs.Removed() {
-			logp.Debug("harvester", "close_removed is enabled and file %s has been removed", f.fs.Name())
+			f.logger.Debugf("close_removed is enabled and file %s has been removed", f.fs.Name())
 			return ErrRemoved
 		}
 	}

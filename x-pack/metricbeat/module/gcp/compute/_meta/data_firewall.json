@@ -6,16 +6,13 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "2843342272811583081",
-            "name": "instance-1"
-        },
-        "machine": {
-            "type": "n1-standard-8"
+            "id": "8825965883407652424",
+            "name": "heartbeat-los-angeles"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
-    "cloud.region": "us-central1",
+    "cloud.availability_zone": "us-west2-a",
+    "cloud.region": "us-west2",
     "event": {
         "dataset": "gcp.compute",
         "duration": 115000,
@@ -25,38 +22,22 @@
         "compute": {
             "firewall": {
                 "dropped_bytes_count": {
-                    "value": 608
+                    "value": 1048
                 },
                 "dropped_packets_count": {
-                    "value": 5
+                    "value": 11
                 }
             },
             "instance": {
                 "cpu": {
                     "reserved_cores": {
-                        "value": 0.25
+                        "value": 0.2
                     },
                     "usage_time": {
-                        "value": 7.160390726436162
+                        "value": 0.6634917643386871
                     },
                     "utilization": {
-                        "value": 0.47735938176241083
-                    }
-                },
-                "memory": {
-                    "balloon": {
-                        "ram_size": {
-                            "value": 1035751424
-                        },
-                        "ram_used": {
-                            "value": 504037376
-                        },
-                        "swap_in_bytes_count": {
-                            "value": 0
-                        },
-                        "swap_out_bytes_count": {
-                            "value": 0
-                        }
+                        "value": 0.05529098036155725
                     }
                 },
                 "uptime": {
@@ -68,10 +49,10 @@
     },
     "host": {
         "cpu": {
-            "pct": 0.47735938176241083
+            "usage": 0.05529098036155725
         },
-        "id": "2843342272811583081",
-        "name": "instance-1"
+        "id": "8825965883407652424",
+        "name": "heartbeat-los-angeles"
     },
     "metricset": {
         "name": "compute",

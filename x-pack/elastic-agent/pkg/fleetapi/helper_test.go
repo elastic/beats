@@ -14,7 +14,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func authHandler(handler http.HandlerFunc, apiKey string) http.HandlerFunc {
@@ -46,8 +46,8 @@ func withServerWithAuthClient(
 ) func(t *testing.T) {
 
 	return withServer(m, func(t *testing.T, host string) {
-		log, _ := logger.New("")
-		cfg := &kibana.Config{
+		log, _ := logger.New("", false)
+		cfg := remote.Config{
 			Host: host,
 		}
 

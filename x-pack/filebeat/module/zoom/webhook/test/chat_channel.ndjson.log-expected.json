@@ -16,14 +16,14 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
+            "sdfdsfdsKIrrCYw",
             "z8dfgdfguQrdfgdf",
-            "z8dfgdfguQrdfgdf",
-            "sdfdsfdsKIrrCYw"
+            "z8dfgdfguQrdfgdf"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",
@@ -55,8 +55,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",
@@ -88,8 +88,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",
@@ -117,13 +117,13 @@
         "observer.product": "Webhook",
         "observer.vendor": "Zoom",
         "related.user": [
-            "z8dfgdfguQrdfgdf",
-            "s0hhFOCYw"
+            "s0hhFOCYw",
+            "z8dfgdfguQrdfgdf"
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",
@@ -155,8 +155,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",
@@ -188,8 +188,8 @@
         ],
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "user.email": "somememai@gmtsffjdfhail.com",
         "user.id": "z8dfgdfguQrdfgdf",

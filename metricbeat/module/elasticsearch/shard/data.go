@@ -19,6 +19,9 @@ package shard
 
 import (
 	"encoding/json"
+	"strconv"
+
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -65,12 +68,10 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 	for _, index := range stateData.RoutingTable.Indices {
 		for _, shards := range index.Shards {
 			for _, shard := range shards {
-				event := mb.Event{}
+				event := mb.Event{
+					ModuleFields: common.MapStr{},
+				}
 
-				event.RootFields = common.MapStr{}
-				event.RootFields.Put("service.name", elasticsearch.ModuleName)
-
-				event.ModuleFields = common.MapStr{}
 				event.ModuleFields.Put("cluster.state.id", stateData.StateID)
 				event.ModuleFields.Put("cluster.id", stateData.ClusterID)
 				event.ModuleFields.Put("cluster.name", stateData.ClusterName)
@@ -95,22 +96,94 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 					continue
 				}
 
-				event.ModuleFields.Put("node.name", fields["node"])
-				delete(fields, "node")
+				event.ID, err = generateHashForEvent(stateData.StateID, fields)
+				if err != nil {
+					errs = append(errs, errors.Wrap(err, "failure getting event ID"))
+					continue
+				}
+
+				event.MetricSetFields = fields
+
+				nodeID, ok := shard["node"]
+				if !ok {
+					continue
+				}
+				if nodeID != nil { // shard has not been allocated yet
+					event.ModuleFields.Put("node.id", nodeID)
+					delete(fields, "node")
+
+					sourceNode, err := getSourceNode(nodeID.(string), stateData)
+					if err != nil {
+						errs = append(errs, errors.Wrap(err, "failure getting source node information"))
+						continue
+					}
+					event.MetricSetFields.Put("source_node", sourceNode)
+				}
 
 				event.ModuleFields.Put("index.name", fields["index"])
 				delete(fields, "index")
 
-				event.MetricSetFields = fields
 				event.MetricSetFields.Put("number", fields["shard"])
 				delete(event.MetricSetFields, "shard")
 
 				delete(event.MetricSetFields, "relocating_node")
-				event.MetricSetFields.Put("relocating_node.name", fields["relocating_node"])
+				relocatingNode := fields["relocating_node"]
+				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
+				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
 
 				r.Event(event)
 			}
 		}
 	}
+
 	return errs.Err()
+}
+
+func getSourceNode(nodeID string, stateData *stateStruct) (common.MapStr, error) {
+	nodeInfo, ok := stateData.Nodes[nodeID]
+	if !ok {
+		return nil, elastic.MakeErrorForMissingField("nodes."+nodeID, elastic.Elasticsearch)
+	}
+
+	return common.MapStr{
+		"uuid": nodeID,
+		"name": nodeInfo.Name,
+	}, nil
+}
+
+func generateHashForEvent(stateID string, shard common.MapStr) (string, error) {
+	var nodeID string
+	if shard["node"] == nil {
+		nodeID = "_na"
+	} else {
+		var ok bool
+		nodeID, ok = shard["node"].(string)
+		if !ok {
+			return "", elastic.MakeErrorForMissingField("node", elastic.Elasticsearch)
+		}
+	}
+
+	indexName, ok := shard["index"].(string)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("index", elastic.Elasticsearch)
+	}
+
+	shardNumberInt, ok := shard["shard"].(int64)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("shard", elastic.Elasticsearch)
+	}
+	shardNumberStr := strconv.FormatInt(shardNumberInt, 10)
+
+	isPrimary, ok := shard["primary"].(bool)
+	if !ok {
+		return "", elastic.MakeErrorForMissingField("primary", elastic.Elasticsearch)
+	}
+	var shardType string
+	if isPrimary {
+		shardType = "p"
+	} else {
+		shardType = "r"
+	}
+
+	return stateID + ":" + nodeID + ":" + indexName + ":" + shardNumberStr + ":" + shardType, nil
 }

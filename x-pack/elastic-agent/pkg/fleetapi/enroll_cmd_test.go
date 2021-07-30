@@ -16,7 +16,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func TestEnroll(t *testing.T) {
@@ -38,7 +38,6 @@ func TestEnroll(t *testing.T) {
 				require.NoError(t, err)
 
 				require.Equal(t, PermanentEnroll, req.Type)
-				require.Equal(t, "im-a-beat", req.SharedID)
 				require.Equal(t, make(map[string]interface{}), req.Metadata.UserProvided)
 				require.Equal(t, "linux", req.Metadata.Local.OS.Name)
 
@@ -67,13 +66,12 @@ func TestEnroll(t *testing.T) {
 				"host": host,
 			})
 
-			client, err := kibana.NewWithRawConfig(nil, cfg, nil)
+			client, err := remote.NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
 
 			req := &EnrollRequest{
 				Type:         PermanentEnroll,
 				EnrollAPIKey: "my-enrollment-api-key",
-				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),
@@ -103,13 +101,12 @@ func TestEnroll(t *testing.T) {
 				"host": host,
 			})
 
-			client, err := kibana.NewWithRawConfig(nil, cfg, nil)
+			client, err := remote.NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
 
 			req := &EnrollRequest{
 				Type:         PermanentEnroll,
 				EnrollAPIKey: "my-enrollment-api-key",
-				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),

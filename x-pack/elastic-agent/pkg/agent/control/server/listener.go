@@ -21,10 +21,7 @@ import (
 func createListener(log *logger.Logger) (net.Listener, error) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		err = os.Remove(path)
-		if err != nil && !os.IsNotExist(err) {
-			log.Errorf("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
-		}
+		cleanupListener(log)
 	}
 	dir := filepath.Dir(path)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -48,7 +45,7 @@ func createListener(log *logger.Logger) (net.Listener, error) {
 
 func cleanupListener(log *logger.Logger) {
 	path := strings.TrimPrefix(control.Address(), "unix://")
-	if err := os.Remove(path); err != nil {
-		log.Errorf("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
+	if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+		log.Debug("%s", errors.New(err, fmt.Sprintf("Failed to cleanup %s", path), errors.TypeFilesystem, errors.M("path", path)))
 	}
 }

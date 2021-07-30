@@ -360,6 +360,12 @@
             logged. The category used by the Event Logging API (on pre Windows Vista
             operating systems) is written to this field.
 
+        - name: time_created
+          type: date
+          required: false
+          description: >
+            The event creation time.
+
         - name: process.thread.id
           type: long
           required: false

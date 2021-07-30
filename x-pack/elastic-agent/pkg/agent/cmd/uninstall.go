@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
 
-func newUninstallCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+func newUninstallCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "uninstall",
 		Short: "Uninstall permanent Elastic Agent from this system",
@@ -26,7 +26,7 @@ func newUninstallCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IO
 Unless -f is used this command will ask confirmation before performing removal.
 `,
 		Run: func(c *cobra.Command, args []string) {
-			if err := uninstallCmd(streams, c, flags, args); err != nil {
+			if err := uninstallCmd(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n", err)
 				os.Exit(1)
 			}
@@ -38,7 +38,7 @@ Unless -f is used this command will ask confirmation before performing removal.
 	return cmd
 }
 
-func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags, args []string) error {
+func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	isAdmin, err := install.HasRoot()
 	if err != nil {
 		return fmt.Errorf("unable to perform command while checking for administrator rights, %v", err)
@@ -78,7 +78,7 @@ func uninstallCmd(streams *cli.IOStreams, cmd *cobra.Command, flags *globalFlags
 		}
 	}
 
-	err = install.Uninstall(flags.Config())
+	err = install.Uninstall(paths.ConfigFile())
 	if err != nil {
 		return err
 	}

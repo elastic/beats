@@ -104,7 +104,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 	tr := transformable{}
 	tr.setHeader(resp.Header)
 
-	remaining := r.remaining.Execute(emptyTransformContext(), tr, nil, r.log)
+	remaining, _ := r.remaining.Execute(emptyTransformContext(), tr, nil, r.log)
 	if remaining == "" {
 		return 0, errors.New("remaining value is empty")
 	}
@@ -122,7 +122,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 		return 0, nil
 	}
 
-	reset := r.reset.Execute(emptyTransformContext(), tr, nil, r.log)
+	reset, _ := r.reset.Execute(emptyTransformContext(), tr, nil, r.log)
 	if reset == "" {
 		return 0, errors.New("reset value is empty")
 	}

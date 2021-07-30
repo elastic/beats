@@ -63,6 +63,28 @@ function Audit(keep_original_message) {
         fail_on_error: false,
     });
 
+    var setOrchestratorMetadata = function(evt) {
+          if (evt.Get("json.resource.type") === "k8s_cluster") {
+            evt.Put("orchestrator.type", "kubernetes");
+            var convert_processor = new processor.Convert({
+                fields: [
+                    {
+                        from: "json.resource.labels.cluster_name",
+                        to: "orchestrator.cluster.name",
+                        type: "string"
+                    },
+                    {
+                        from: "json.protoPayload.resourceName",
+                        to: "orchestrator.resource.type_temp",
+                        type: "string"
+                    }
+                ],
+                ignore_missing: true,
+                fail_on_error: false,
+            }).Run(evt);
+        }
+    };
+
     // The log includes a protoPayload field.
     // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
     var convertLogEntry = new processor.Convert({
@@ -79,121 +101,121 @@ function Audit(keep_original_message) {
         fields: [
             {
                 from: "json.@type",
-                to: "googlecloud.audit.type",
+                to: "gcp.audit.type",
                 type: "string"
             },
             {
                 from: "json.authenticationInfo.principalEmail",
-                to: "googlecloud.audit.authentication_info.principal_email",
+                to: "gcp.audit.authentication_info.principal_email",
                 type: "string"
             },
             {
                 from: "json.authenticationInfo.authoritySelector",
-                to: "googlecloud.audit.authentication_info.authority_selector",
+                to: "gcp.audit.authentication_info.authority_selector",
                 type: "string"
             },
             {
                 from: "json.authorizationInfo",
-                to: "googlecloud.audit.authorization_info"
+                to: "gcp.audit.authorization_info"
                 // Type is an array of objects.
             },
             {
                 from: "json.methodName",
-                to: "googlecloud.audit.method_name",
+                to: "gcp.audit.method_name",
                 type: "string",
             },
             {
                 from: "json.numResponseItems",
-                to: "googlecloud.audit.num_response_items",
+                to: "gcp.audit.num_response_items",
                 type: "long"
             },
             {
                 from: "json.request.@type",
-                to: "googlecloud.audit.request.proto_name",
+                to: "gcp.audit.request.proto_name",
                 type: "string"
             },
             // The values in the request object will depend on the proto type.
             // So be very careful about making any assumptions about data shape.
             {
                 from: "json.request.filter",
-                to: "googlecloud.audit.request.filter",
+                to: "gcp.audit.request.filter",
                 type: "string"
             },
             {
                 from: "json.request.name",
-                to: "googlecloud.audit.request.name",
+                to: "gcp.audit.request.name",
                 type: "string"
             },
             {
                 from: "json.request.resourceName",
-                to: "googlecloud.audit.request.resource_name",
+                to: "gcp.audit.request.resource_name",
                 type: "string"
             },
             {
                 from: "json.requestMetadata.callerIp",
-                to: "googlecloud.audit.request_metadata.caller_ip",
+                to: "gcp.audit.request_metadata.caller_ip",
                 type: "ip"
             },
             {
                 from: "json.requestMetadata.callerSuppliedUserAgent",
-                to: "googlecloud.audit.request_metadata.caller_supplied_user_agent",
+                to: "gcp.audit.request_metadata.caller_supplied_user_agent",
                 type: "string",
             },
             {
                 from: "json.response.@type",
-                to: "googlecloud.audit.response.proto_name",
+                to: "gcp.audit.response.proto_name",
                 type: "string"
             },
             // The values in the response object will depend on the proto type.
             // So be very careful about making any assumptions about data shape.
             {
                 from: "json.response.status",
-                to: "googlecloud.audit.response.status",
+                to: "gcp.audit.response.status",
                 type: "string"
             },
             {
                 from: "json.response.details.group",
-                to: "googlecloud.audit.response.details.group",
+                to: "gcp.audit.response.details.group",
                 type: "string"
             },
             {
                 from: "json.response.details.kind",
-                to: "googlecloud.audit.response.details.kind",
+                to: "gcp.audit.response.details.kind",
                 type: "string"
             },
             {
                 from: "json.response.details.name",
-                to: "googlecloud.audit.response.details.name",
+                to: "gcp.audit.response.details.name",
                 type: "string"
             },
             {
                 from: "json.response.details.uid",
-                to: "googlecloud.audit.response.details.uid",
+                to: "gcp.audit.response.details.uid",
                 type: "string",
             },
             {
                 from: "json.resourceName",
-                to: "googlecloud.audit.resource_name",
+                to: "gcp.audit.resource_name",
                 type: "string",
             },
             {
                 from: "json.resourceLocation.currentLocations",
-                to: "googlecloud.audit.resource_location.current_locations"
+                to: "gcp.audit.resource_location.current_locations"
                 // Type is a string array.
             },
             {
                 from: "json.serviceName",
-                to: "googlecloud.audit.service_name",
+                to: "gcp.audit.service_name",
                 type: "string",
             },
             {
                 from: "json.status.code",
-                to: "googlecloud.audit.status.code",
+                to: "gcp.audit.status.code",
                 type: "integer",
             },
             {
                 from: "json.status.message",
-                to: "googlecloud.audit.status.message",
+                to: "gcp.audit.status.message",
                 type: "string"
             },
         ],
@@ -206,27 +228,27 @@ function Audit(keep_original_message) {
     var copyFields = new processor.Convert({
         fields: [
             {
-                from: "googlecloud.audit.request_metadata.caller_ip",
+                from: "gcp.audit.request_metadata.caller_ip",
                 to: "source.ip",
                 type: "ip"
             },
             {
-                from: "googlecloud.audit.authentication_info.principal_email",
+                from: "gcp.audit.authentication_info.principal_email",
                 to: "user.email",
                 type: "string"
             },
             {
-                from: "googlecloud.audit.service_name",
+                from: "gcp.audit.service_name",
                 to: "service.name",
                 type: "string"
             },
             {
-                from: "googlecloud.audit.request_metadata.caller_supplied_user_agent",
+                from: "gcp.audit.request_metadata.caller_supplied_user_agent",
                 to: "user_agent.original",
                 type: "string"
             },
             {
-                from: "googlecloud.audit.method_name",
+                from: "gcp.audit.method_name",
                 to: "event.action",
                 type: "string"
             },
@@ -242,7 +264,7 @@ function Audit(keep_original_message) {
 
     // Rename nested fields.
     var renameNestedFields = function(evt) {
-        var arr = evt.Get("googlecloud.audit.authorization_info");
+        var arr = evt.Get("gcp.audit.authorization_info");
         if (Array.isArray(arr)) {
             for (var i = 0; i < arr.length; i++) {
                 if (arr[i].resourceAttributes) {
@@ -259,14 +281,14 @@ function Audit(keep_original_message) {
         evt.Put("event.kind", "event");
 
         // google.rpc.Code value for OK is 0.
-        if (evt.Get("googlecloud.audit.status.code") === 0) {
+        if (evt.Get("gcp.audit.status.code") === 0) {
             evt.Put("event.outcome", "success");
             return;
         }
 
         // Try to use authorization_info.granted when there was no status code.
-        if (evt.Get("googlecloud.audit.status.code") == null) {
-            var authorization_info = evt.Get("googlecloud.audit.authorization_info");
+        if (evt.Get("gcp.audit.status.code") == null) {
+            var authorization_info = evt.Get("gcp.audit.authorization_info");
             if (Array.isArray(authorization_info) && authorization_info.length === 1) {
                 if (authorization_info[0].granted === true) {
                     evt.Put("event.outcome", "success");
@@ -290,6 +312,7 @@ function Audit(keep_original_message) {
         .Add(dropPubSubFields)
         .Add(saveMetadata)
         .Add(setCloudMetadata)
+        .Add(setOrchestratorMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
         .Add(copyFields)

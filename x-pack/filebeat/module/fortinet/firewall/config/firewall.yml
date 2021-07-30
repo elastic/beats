@@ -25,10 +25,11 @@ tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
 processors:
+  - add_locale: ~
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.8.0
+        ecs.version: 1.10.0
 
 {{ if .external_interfaces }}
   - add_fields:

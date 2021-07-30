@@ -26,6 +26,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -201,7 +202,7 @@ func TestStore_UpdateTTL(t *testing.T) {
 
 		// create pending update operation
 		res := store.Get("test::key")
-		op, err := createUpdateOp(store, res, "test-state-update")
+		op, err := createUpdateOp(res, "test-state-update")
 		require.NoError(t, err)
 		defer op.done(1)
 
@@ -224,6 +225,101 @@ func TestStore_UpdateTTL(t *testing.T) {
 		checkEqualStoreState(t, map[string]state{"test::key": wantMemoryState}, storeMemorySnapshot(store))
 		checkEqualStoreState(t, map[string]state{"test::key": wantInSyncState}, storeInSyncSnapshot(store))
 		checkEqualStoreState(t, map[string]state{"test::key": wantInSyncState}, backend.snapshot())
+	})
+}
+
+func TestStore_ResetCursor(t *testing.T) {
+	type cur struct {
+		Offset int
+	}
+	t.Run("reset cursor empty and lock it", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL: 60 * time.Second,
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+		require.Equal(t, uint(0), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, nil, res.cursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
+
+		store.resetCursor("test::key", cur{Offset: 10})
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(10)}, res.cursor)
+
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(1), res.lockedVersion)
+	})
+
+	t.Run("reset cursor with no pending updates", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL:    60 * time.Second,
+				Cursor: cur{Offset: 6},
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+		require.Equal(t, uint(0), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(6)}, res.cursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
+
+		store.resetCursor("test::key", cur{Offset: 0})
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(1), res.lockedVersion)
+	})
+
+	t.Run("reset cursor with pending updates", func(t *testing.T) {
+		store := testOpenStore(t, "test", createSampleStore(t, map[string]state{
+			"test::key": {
+				TTL:    60 * time.Second,
+				Cursor: cur{Offset: 6},
+			},
+		}))
+		defer store.Release()
+
+		res := store.Get("test::key")
+
+		// lock before creating a new update operation
+		res, err := lock(input.Context{}, store, "test::key")
+		require.NoError(t, err)
+		op, err := createUpdateOp(res, cur{Offset: 42})
+		require.NoError(t, err)
+
+		store.resetCursor("test::key", cur{Offset: 0})
+
+		// try to update cursor after it has been reset
+		op.Execute(store, 1)
+		releaseResource(res)
+
+		res = store.Get("test::key")
+		require.Equal(t, uint(1), res.version)
+		require.Equal(t, uint(0), res.lockedVersion)
+		require.Equal(t, uint(0), res.activeCursorOperations)
+		require.Equal(t, map[string]interface{}{"offset": int64(0)}, res.cursor)
+		require.Equal(t, nil, res.pendingCursorValue)
+		require.Equal(t, nil, res.pendingUpdate)
+
 	})
 }
 

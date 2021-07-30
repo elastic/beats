@@ -91,6 +91,10 @@ jenkins_setup() {
 
   # Workaround for Python virtualenv path being too long.
   export TEMP_PYTHON_ENV=$(mktemp -d)
+
+  # Workaround for cryptography package (pip dependency) relying on rust
+  export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+
   export PYTHON_ENV="${TEMP_PYTHON_ENV}/python-env"
 
   # Write cached magefile binaries to workspace to ensure
@@ -102,6 +106,9 @@ docker_setup() {
   OS="$(uname)"
   case $OS in
     'Darwin')
+      if ! command -v docker-machine ; then
+        echo "docker-machine is not installed but most likely docker desktop"
+      fi
       # Start the docker machine VM (ignore error if it's already running).
       docker-machine start default || true
       eval $(docker-machine env default)

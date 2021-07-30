@@ -42,21 +42,9 @@ var (
 	}
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
-	event := mb.Event{}
+func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
 	event.RootFields = common.MapStr{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
-
-	var data map[string]interface{}
-	err := json.Unmarshal(content, &data)
-	if err != nil {
-		return errors.Wrap(err, "failure parsing Logstash Node API response")
-	}
-
-	fields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure applying node schema")
-	}
 
 	// Set service ID
 	serviceID, err := fields.GetValue("id")
@@ -90,8 +78,114 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event.RootFields.Put("process.pid", pid)
 	fields.Delete("jvm.pid")
 
-	event.MetricSetFields = fields
-
-	r.Event(event)
 	return nil
+}
+
+func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.PipelineState, overrideClusterUUID string) error {
+	var data map[string]interface{}
+	err := json.Unmarshal(content, &data)
+	if err != nil {
+		return errors.Wrap(err, "failure parsing Logstash Node API response")
+	}
+
+	fields, err := schema.Apply(data)
+	if err != nil {
+		return errors.Wrap(err, "failure applying node schema")
+	}
+
+	pipelines = getUserDefinedPipelines(pipelines)
+	clusterToPipelinesMap := makeClusterToPipelinesMap(pipelines, overrideClusterUUID)
+
+	for clusterUUID, pipelines := range clusterToPipelinesMap {
+		for _, pipeline := range pipelines {
+			removeClusterUUIDsFromPipeline(pipeline)
+
+			// Rename key: graph -> representation
+			pipeline.Representation = pipeline.Graph
+			pipeline.Graph = nil
+
+			logstashState := map[string]logstash.PipelineState{
+				"pipeline": pipeline,
+			}
+
+			event := mb.Event{
+				MetricSetFields: common.MapStr{
+					"state": logstashState,
+				},
+				ModuleFields: common.MapStr{},
+			}
+			event.MetricSetFields.Update(fields)
+
+			if err = commonFieldsMapping(&event, fields); err != nil {
+				return err
+			}
+
+			if clusterUUID != "" {
+				event.ModuleFields.Put("cluster.id", clusterUUID)
+			}
+
+			event.ID = pipeline.EphemeralID
+
+			r.Event(event)
+		}
+	}
+
+	return nil
+}
+
+func makeClusterToPipelinesMap(pipelines []logstash.PipelineState, overrideClusterUUID string) map[string][]logstash.PipelineState {
+	var clusterToPipelinesMap map[string][]logstash.PipelineState
+	clusterToPipelinesMap = make(map[string][]logstash.PipelineState)
+
+	if overrideClusterUUID != "" {
+		clusterToPipelinesMap[overrideClusterUUID] = pipelines
+		return clusterToPipelinesMap
+	}
+
+	for _, pipeline := range pipelines {
+		clusterUUIDs := common.StringSet{}
+		for _, vertex := range pipeline.Graph.Graph.Vertices {
+			clusterUUID := logstash.GetVertexClusterUUID(vertex, overrideClusterUUID)
+			if clusterUUID != "" {
+				clusterUUIDs.Add(clusterUUID)
+			}
+		}
+
+		// If no cluster UUID was found in this pipeline, assign it a blank one
+		if len(clusterUUIDs) == 0 {
+			clusterUUIDs.Add("")
+		}
+
+		for clusterUUID := range clusterUUIDs {
+			clusterPipelines := clusterToPipelinesMap[clusterUUID]
+			if clusterPipelines == nil {
+				clusterToPipelinesMap[clusterUUID] = []logstash.PipelineState{}
+			}
+
+			clusterToPipelinesMap[clusterUUID] = append(clusterPipelines, pipeline)
+		}
+	}
+
+	return clusterToPipelinesMap
+}
+
+func getUserDefinedPipelines(pipelines []logstash.PipelineState) []logstash.PipelineState {
+	userDefinedPipelines := []logstash.PipelineState{}
+	for _, pipeline := range pipelines {
+		if pipeline.ID[0] != '.' {
+			userDefinedPipelines = append(userDefinedPipelines, pipeline)
+		}
+	}
+	return userDefinedPipelines
+}
+
+func removeClusterUUIDsFromPipeline(pipeline logstash.PipelineState) {
+	for _, vertex := range pipeline.Graph.Graph.Vertices {
+		_, exists := vertex["cluster_uuid"]
+		if !exists {
+			continue
+		}
+
+		delete(vertex, "cluster_uuid")
+	}
 }

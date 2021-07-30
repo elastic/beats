@@ -6,7 +6,7 @@
       "category": [
         "configuration"
       ],
-      "code": 4716,
+      "code": "4716",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -46,7 +46,7 @@
         "TdoDirection": "3",
         "TdoType": "3"
       },
-      "event_id": 4716,
+      "event_id": "4716",
       "keywords": [
         "Audit Success"
       ],

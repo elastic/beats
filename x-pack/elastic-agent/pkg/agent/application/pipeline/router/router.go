@@ -26,12 +26,16 @@ type router struct {
 func New(log *logger.Logger, factory pipeline.StreamFunc) (pipeline.Router, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New("router")
+		log, err = logger.New("router", false)
 		if err != nil {
 			return nil, err
 		}
 	}
 	return &router{log: log, streamFactory: factory, routes: sorted.NewSet()}, nil
+}
+
+func (r *router) Routes() *sorted.Set {
+	return r.routes
 }
 
 func (r *router) Route(id string, grpProg map[pipeline.RoutingKey][]program.Program) error {

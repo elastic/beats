@@ -74,7 +74,7 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v)
 }
 
-// EnrollRequest is the data required to enroll the elastic-agent into Fleet.
+// EnrollRequest is the data required to enroll the elastic-agent into Fleet Server.
 //
 // Example:
 // POST /api/fleet/agents/enroll
@@ -88,7 +88,6 @@ func (p EnrollType) MarshalJSON() ([]byte, error) {
 type EnrollRequest struct {
 	EnrollAPIKey string     `json:"-"`
 	Type         EnrollType `json:"type"`
-	SharedID     string     `json:"sharedId,omitempty"`
 	Metadata     Metadata   `json:"metadata"`
 }
 
@@ -167,12 +166,12 @@ func (e *EnrollResponse) Validate() error {
 	return err
 }
 
-// EnrollCmd is the command to be executed to enroll an elastic-agent into Fleet.
+// EnrollCmd is the command to be executed to enroll an elastic-agent into Fleet Server.
 type EnrollCmd struct {
 	client client.Sender
 }
 
-// Execute enroll the Agent in the Fleet.
+// Execute enroll the Agent in the Fleet Server.
 func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollResponse, error) {
 	const p = "/api/fleet/agents/enroll"
 	const key = "Authorization"

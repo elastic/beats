@@ -150,7 +150,7 @@ class Test(BaseTest):
                              bufsize=0).wait()
 
         # List of errors to check in filebeat output logs
-        errors = ["Error loading pipeline for fileset"]
+        errors = ["error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
         contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
         assert contains_error is False, "Error found in log:{}".format(error_line)
@@ -194,6 +194,9 @@ class Test(BaseTest):
                 for k, obj in enumerate(objects):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
+                    for key in objects[k].keys():
+                        if isinstance(objects[k][key], list):
+                            objects[k][key].sort(key=str)
 
                 json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
 
@@ -202,6 +205,15 @@ class Test(BaseTest):
 
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
+
+        # Do not perform a comparison between the resulting and expected documents
+        # if the TESTING_FILEBEAT_SKIP_DIFF flag is set.
+        #
+        # This allows to run a basic check with older versions of ES that can lead
+        # to slightly different documents without maintaining multiple sets of
+        # golden files.
+        if os.getenv("TESTING_FILEBEAT_SKIP_DIFF"):
+            return
 
         for idx in range(len(expected)):
             ev = expected[idx]
@@ -274,7 +286,12 @@ def clean_keys(obj):
         "threatintel.abuseurl",
         "threatintel.abusemalware",
         "threatintel.anomali",
-        "snyk.vulnerabilities"
+        "threatintel.anomalithreatstream",
+        "threatintel.malwarebazaar",
+        "threatintel.recordedfuture",
+        "snyk.vulnerabilities",
+        "snyk.audit",
+        "awsfargate.log",
     }
     # dataset + log file pairs for which @timestamp is kept as an exception from above
     remove_timestamp_exception = {

@@ -17,8 +17,8 @@
         "destination.port": 80,
         "event.action": "malware_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -28,9 +28,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -68,8 +68,8 @@
         "source.port": 57116,
         "source.user.name": "user1",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ],
         "url.domain": "www.mytest.com"
     },
@@ -77,8 +77,8 @@
         "@timestamp": "2016-09-20T15:43:30.330-02:00",
         "event.action": "malware_detected",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -88,9 +88,9 @@
         "event.severity": 14,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -121,15 +121,15 @@
         "source.ip": "192.0.2.0",
         "source.user.name": "admin",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
         "@timestamp": "2016-09-20T15:40:30.050-02:00",
         "event.category": [
-            "network",
-            "malware"
+            "malware",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -170,8 +170,8 @@
         "source.domain": "host.example.com",
         "source.ip": "192.0.2.0",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -239,8 +239,8 @@
         "source.ip": "1.1.1.1",
         "source.port": 60148,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     }
 ]

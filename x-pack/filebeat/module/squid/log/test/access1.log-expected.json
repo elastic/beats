@@ -37,8 +37,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -57,8 +57,8 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
@@ -97,8 +97,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -129,12 +129,14 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
+        "url.path": "/",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -170,8 +172,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -182,8 +184,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -202,12 +204,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "css",
         "url.original": "http://www.goonernews.com/styles.css",
+        "url.path": "/styles.css",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -261,12 +266,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "css",
         "url.original": "http://www.goonernews.com/styles.css",
+        "url.path": "/styles.css",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -300,8 +308,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/javascript",
         "rsa.misc.result_code": "200",
@@ -320,12 +328,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.google-analytics.com",
+        "url.extension": "js",
         "url.original": "http://www.google-analytics.com/urchin.js",
+        "url.path": "/urchin.js",
         "url.registered_domain": "google-analytics.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -372,8 +383,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -392,12 +403,14 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
         "url.original": "http://www.goonernews.com/",
+        "url.path": "/",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -430,8 +443,8 @@
             "www.google-analytics.com"
         ],
         "related.ip": [
-            "66.102.9.147",
-            "10.105.21.199"
+            "10.105.21.199",
+            "66.102.9.147"
         ],
         "related.user": [
             "badeyek"
@@ -462,12 +475,16 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.google-analytics.com",
+        "url.extension": "gif",
         "url.original": "http://www.google-analytics.com/__utm.gif?",
+        "url.path": "/__utm.gif",
+        "url.query": "",
         "url.registered_domain": "google-analytics.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -535,12 +552,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/graphics/newslogo.gif",
+        "url.path": "/graphics/newslogo.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -588,8 +608,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -608,12 +628,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "jpg",
         "url.original": "http://www.goonernews.com/shop/arsenal_shop_ad.jpg",
+        "url.path": "/shop/arsenal_shop_ad.jpg",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -681,12 +704,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/flags/FUS.gif",
+        "url.path": "/flags/FUS.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -720,8 +746,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -740,12 +766,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/flags/FGB.gif",
+        "url.path": "/flags/FGB.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -813,12 +842,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "as.casalemedia.com",
         "url.original": "http://as.casalemedia.com/s?",
+        "url.path": "/s",
+        "url.query": "",
         "url.registered_domain": "casalemedia.com",
+        "url.scheme": "http",
         "url.subdomain": "as",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -859,8 +891,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -879,8 +911,8 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "us.bc.yahoo.com:443",
@@ -929,8 +961,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -949,12 +981,14 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "impgb.tradedoubler.com",
         "url.original": "http://impgb.tradedoubler.com/imp/img/16349696/992098",
+        "url.path": "/imp/img/16349696/992098",
         "url.registered_domain": "tradedoubler.com",
+        "url.scheme": "http",
         "url.subdomain": "impgb",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1022,12 +1056,16 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "4.adbrite.com",
+        "url.extension": "php",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
+        "url.path": "/mb/text_group.php",
+        "url.query": "",
         "url.registered_domain": "adbrite.com",
+        "url.scheme": "http",
         "url.subdomain": "4",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1061,8 +1099,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1081,12 +1119,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/flags/FFR.gif",
+        "url.path": "/flags/FFR.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1122,8 +1163,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -1134,8 +1175,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -1154,12 +1195,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/flags/FAU.gif",
+        "url.path": "/flags/FAU.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1195,8 +1239,8 @@
             "www.goonernews.com"
         ],
         "related.ip": [
-            "207.58.145.61",
-            "10.105.21.199"
+            "10.105.21.199",
+            "207.58.145.61"
         ],
         "related.user": [
             "badeyek"
@@ -1227,12 +1271,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.goonernews.com",
+        "url.extension": "gif",
         "url.original": "http://www.goonernews.com/graphics/spacer.gif",
+        "url.path": "/graphics/spacer.gif",
         "url.registered_domain": "goonernews.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1263,8 +1310,8 @@
             "4.adbrite.com"
         ],
         "related.ip": [
-            "64.127.126.178",
-            "10.105.21.199"
+            "10.105.21.199",
+            "64.127.126.178"
         ],
         "related.user": [
             "badeyek"
@@ -1275,8 +1322,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -1295,12 +1342,16 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "4.adbrite.com",
+        "url.extension": "php",
         "url.original": "http://4.adbrite.com/mb/text_group.php?",
+        "url.path": "/mb/text_group.php",
+        "url.query": "",
         "url.registered_domain": "adbrite.com",
+        "url.scheme": "http",
         "url.subdomain": "4",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1348,8 +1399,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "302",
@@ -1368,12 +1419,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "ff.connextra.com",
         "url.original": "http://ff.connextra.com/Ladbrokes/selector/image?",
+        "url.path": "/Ladbrokes/selector/image",
+        "url.query": "",
         "url.registered_domain": "connextra.com",
+        "url.scheme": "http",
         "url.subdomain": "ff",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1421,8 +1475,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -1441,12 +1495,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "dd.connextra.com",
         "url.original": "http://dd.connextra.com/servlet/controller?",
+        "url.path": "/servlet/controller",
+        "url.query": "",
         "url.registered_domain": "connextra.com",
+        "url.scheme": "http",
         "url.subdomain": "dd",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -1479,8 +1536,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1498,12 +1555,14 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.path": "/",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.top_level_domain": "com",
         "user.name": "-"
     },
@@ -1545,8 +1604,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -1565,8 +1624,8 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
@@ -1624,12 +1683,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "update.messenger.yahoo.com",
+        "url.extension": "html",
         "url.original": "http://update.messenger.yahoo.com/msgrcli7.html",
+        "url.path": "/msgrcli7.html",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "update.messenger",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -1661,8 +1723,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -1692,12 +1754,14 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.path": "/notify/",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "shttp.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -1732,8 +1796,8 @@
             "hi5.com"
         ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1763,12 +1827,14 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.path": "/",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
@@ -1803,8 +1869,8 @@
             "hi5.com"
         ],
         "related.ip": [
-            "204.13.51.238",
-            "10.105.47.218"
+            "10.105.47.218",
+            "204.13.51.238"
         ],
         "related.user": [
             "nazsoau"
@@ -1834,12 +1900,15 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "hi5.com",
+        "url.extension": "css",
         "url.original": "http://hi5.com/friend/styles/homepage.css",
+        "url.path": "/friend/styles/homepage.css",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
@@ -1881,8 +1950,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -1901,12 +1970,14 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.path": "/notify/",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "shttp.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -1940,8 +2011,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -1960,12 +2031,15 @@
             "10.105.37.58"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "rms.adobe.com",
+        "url.extension": "xml",
         "url.original": "http://rms.adobe.com/read/0600/win_/ENU/read0600win_ENUadbe0000.xml",
+        "url.path": "/read/0600/win_/ENU/read0600win_ENUadbe0000.xml",
         "url.registered_domain": "adobe.com",
+        "url.scheme": "http",
         "url.subdomain": "rms",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -2019,12 +2093,15 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "images.hi5.com",
+        "url.extension": "css",
         "url.original": "http://images.hi5.com/styles/style.css",
+        "url.path": "/styles/style.css",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.subdomain": "images",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
@@ -2078,12 +2155,15 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "images.hi5.com",
+        "url.extension": "css",
         "url.original": "http://images.hi5.com/friend/styles/buttons_en_us.css",
+        "url.path": "/friend/styles/buttons_en_us.css",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.subdomain": "images",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
@@ -2149,12 +2229,14 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "hi5.com",
         "url.original": "http://hi5.com/",
+        "url.path": "/",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
@@ -2220,12 +2302,15 @@
             "10.105.47.218"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "hi5.com",
+        "url.extension": "css",
         "url.original": "http://hi5.com/friend/styles/headernav.css",
+        "url.path": "/friend/styles/headernav.css",
         "url.registered_domain": "hi5.com",
+        "url.scheme": "http",
         "url.top_level_domain": "com",
         "user.name": "nazsoau"
     },
@@ -2267,8 +2352,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2287,12 +2372,14 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.path": "/notify/",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "shttp.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2334,8 +2421,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2354,12 +2441,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/?",
+        "url.path": "/",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "insider.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2404,8 +2494,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -2424,12 +2514,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/play/playmessenger.asp",
+        "url.path": "/radio/play/playmessenger.asp",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2461,8 +2554,8 @@
             "shttp.msg.yahoo.com"
         ],
         "related.ip": [
-            "216.155.194.239",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.155.194.239"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2472,8 +2565,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/plain",
         "rsa.misc.result_code": "200",
@@ -2492,12 +2585,14 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.path": "/notify/",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "shttp.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2560,12 +2655,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "address.yahoo.com",
         "url.original": "http://address.yahoo.com/yab/us?",
+        "url.path": "/yab/us",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "address",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2601,8 +2699,8 @@
             "fxfeeds.mozilla.org"
         ],
         "related.ip": [
-            "63.245.209.21",
-            "10.105.21.199"
+            "10.105.21.199",
+            "63.245.209.21"
         ],
         "related.user": [
             "badeyek"
@@ -2613,8 +2711,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -2633,12 +2731,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "fxfeeds.mozilla.org",
+        "url.extension": "xml",
         "url.original": "http://fxfeeds.mozilla.org/rss20.xml",
+        "url.path": "/rss20.xml",
         "url.registered_domain": "mozilla.org",
+        "url.scheme": "http",
         "url.subdomain": "fxfeeds",
         "url.top_level_domain": "org",
         "user.name": "badeyek"
@@ -2670,8 +2771,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "68.142.231.252",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.231.252"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -2682,8 +2783,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -2702,12 +2803,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/?",
+        "url.path": "/ycontent/",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "insider.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2769,12 +2873,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "insider.msg.yahoo.com",
         "url.original": "http://insider.msg.yahoo.com/ycontent/?",
+        "url.path": "/ycontent/",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "insider.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -2826,8 +2933,8 @@
             "10.105.37.17"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
@@ -2864,8 +2971,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2884,12 +2991,15 @@
             "10.105.37.17"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
+        "url.extension": "asp",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
+        "url.path": "/apps/agent/submgr/appinstru.asp",
         "url.registered_domain": "mcafee.com",
+        "url.scheme": "http",
         "url.subdomain": "us",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -2922,8 +3032,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -2942,12 +3052,15 @@
             "10.105.37.17"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
+        "url.extension": "asp",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
+        "url.path": "/apps/agent/submgr/appsync.asp",
         "url.registered_domain": "mcafee.com",
+        "url.scheme": "http",
         "url.subdomain": "us",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -2999,8 +3112,8 @@
             "10.105.37.17"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
@@ -3037,8 +3150,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3049,8 +3162,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3069,12 +3182,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations.gif",
+        "url.path": "/radio/clientdata/538/images/btn_stations.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3106,8 +3222,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3126,8 +3242,8 @@
             "10.105.37.17"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
         "url.original": "us.mcafee.com:443",
@@ -3164,8 +3280,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3196,12 +3312,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_stations_over.gif",
+        "url.path": "/radio/clientdata/538/images/btn_stations_over.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3264,12 +3383,14 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "shttp.msg.yahoo.com",
         "url.original": "http://shttp.msg.yahoo.com/notify/",
+        "url.path": "/notify/",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "shttp.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3302,8 +3423,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3314,8 +3435,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3334,12 +3455,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_left.gif",
+        "url.path": "/radio/clientdata/538/skins/1/images/bg_left.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3404,12 +3528,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/launchcast_radio.gif",
+        "url.path": "/radio/clientdata/538/images/launchcast_radio.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3442,8 +3569,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "POST"
+            "POST",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -3462,12 +3589,15 @@
             "10.105.47.191"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
+        "url.extension": "asp",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appinstru.asp",
+        "url.path": "/apps/agent/submgr/appinstru.asp",
         "url.registered_domain": "mcafee.com",
+        "url.scheme": "http",
         "url.subdomain": "us",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -3520,12 +3650,15 @@
             "10.105.47.191"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
+        "url.extension": "asp",
         "url.original": "http://us.mcafee.com/apps/agent/submgr/appsync.asp",
+        "url.path": "/apps/agent/submgr/appsync.asp",
         "url.registered_domain": "mcafee.com",
+        "url.scheme": "http",
         "url.subdomain": "us",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -3558,8 +3691,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3590,12 +3723,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_right.gif",
+        "url.path": "/radio/clientdata/538/skins/1/images/bg_right.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3628,8 +3764,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3660,12 +3796,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_center.gif",
+        "url.path": "/radio/clientdata/538/skins/1/images/bg_center.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3710,8 +3849,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_REFRESH_HIT",
-            "GET"
+            "GET",
+            "TCP_REFRESH_HIT"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -3730,12 +3869,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_off.gif",
+        "url.path": "/radio/clientdata/538/skins/1/images/bg_controls_off.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3768,8 +3910,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -3800,12 +3942,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
+        "url.path": "/radio/common_radio/resources/images/t.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3859,12 +4004,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/images/btn_off_state_station.gif",
+        "url.path": "/radio/clientdata/538/images/btn_off_state_station.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3898,8 +4046,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -3918,12 +4066,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "gif",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/538/skins/1/images/bg_controls_fill.gif",
+        "url.path": "/radio/clientdata/538/skins/1/images/bg_controls_fill.gif",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -3977,12 +4128,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.i1.yimg.com",
+        "url.extension": "gif",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/toolbar50x50.gif",
+        "url.path": "/us.yimg.com/i/us/toolbar50x50.gif",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.i1",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4015,8 +4169,8 @@
             "newsrss.bbc.co.uk"
         ],
         "related.ip": [
-            "212.58.226.33",
-            "10.105.21.199"
+            "10.105.21.199",
+            "212.58.226.33"
         ],
         "related.user": [
             "badeyek"
@@ -4047,12 +4201,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "newsrss.bbc.co.uk",
+        "url.extension": "xml",
         "url.original": "http://newsrss.bbc.co.uk/rss/newsonline_world_edition/front_page/rss.xml",
+        "url.path": "/rss/newsonline_world_edition/front_page/rss.xml",
         "url.registered_domain": "bbc.co.uk",
+        "url.scheme": "http",
         "url.subdomain": "newsrss",
         "url.top_level_domain": "co.uk",
         "user.name": "badeyek"
@@ -4097,8 +4254,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -4117,12 +4274,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "insider.msg.yahoo.com",
+        "url.extension": "php",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php",
+        "url.path": "/ycontent/beacon.php",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "insider.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4156,8 +4316,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "304",
@@ -4176,12 +4336,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.ent1.yimg.com",
+        "url.extension": "jpg",
         "url.original": "http://us.ent1.yimg.com/images.launch.yahoo.com/000/032/457/32457654.jpg",
+        "url.path": "/images.launch.yahoo.com/000/032/457/32457654.jpg",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.ent1",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4235,12 +4398,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.news1.yimg.com",
+        "url.extension": "jpg",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060906/thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
+        "url.path": "/us.yimg.com/p/ap/20060906/thumb.71d29ded334347c48ac88433d033c9a9.pakistan_bin_laden_nyol440.jpg",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.news1",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4284,8 +4450,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "POST"
+            "POST",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "302",
@@ -4304,12 +4470,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp",
+        "url.path": "/radio/play/authplay.asp",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4345,8 +4514,8 @@
             "us.news1.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4377,12 +4546,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.news1.yimg.com",
+        "url.extension": "jpg",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060908/thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
+        "url.path": "/us.yimg.com/p/ap/20060908/thumb.443f57762d7349669f609fbf0c97a5f1.academy_awards_host_cacp101.jpg",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.news1",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4427,8 +4599,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/xml",
         "rsa.misc.result_code": "200",
@@ -4447,12 +4619,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.music.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
+        "url.path": "/radio/player/ymsgr/initstationfeed.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.music",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4485,8 +4661,8 @@
             "radio.music.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4517,12 +4693,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.music.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.music.yahoo.com/radio/player/ymsgr/initstationfeed.asp?",
+        "url.path": "/radio/player/ymsgr/initstationfeed.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.music",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4567,8 +4747,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -4587,12 +4767,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/play/authplay.asp?",
+        "url.path": "/radio/play/authplay.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4626,8 +4810,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -4646,12 +4830,16 @@
             "10.105.37.65"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/iesocks?",
+        "url.path": "/iesocks",
+        "url.port": 5288,
+        "url.query": "",
         "url.registered_domain": "kmip.net",
+        "url.scheme": "http",
         "url.subdomain": "natrocket",
         "url.top_level_domain": "net",
         "user.name": "-"
@@ -4685,8 +4873,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "GET"
+            "GET",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -4705,12 +4893,16 @@
             "10.105.37.65"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "natrocket.kmip.net",
         "url.original": "http://natrocket.kmip.net:5288/return?",
+        "url.path": "/return",
+        "url.port": 5288,
+        "url.query": "",
         "url.registered_domain": "kmip.net",
+        "url.scheme": "http",
         "url.subdomain": "natrocket",
         "url.top_level_domain": "net",
         "user.name": "-"
@@ -4746,8 +4938,8 @@
             "us.news1.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4758,8 +4950,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/jpeg",
         "rsa.misc.result_code": "200",
@@ -4778,12 +4970,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.news1.yimg.com",
+        "url.extension": "jpg",
         "url.original": "http://us.news1.yimg.com/us.yimg.com/p/ap/20060907/thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
+        "url.path": "/us.yimg.com/p/ap/20060907/thumb.1caf18e56db54eafb16da58356eb3382.amazon_com_online_video_watw101.jpg",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.news1",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4848,12 +5043,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/clientdata/515/starter.asp?",
+        "url.path": "/radio/clientdata/515/starter.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4886,8 +5085,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4918,12 +5117,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/player/default.asp?",
+        "url.path": "/radio/player/default.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -4959,8 +5162,8 @@
             "us.a2.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.152",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.152"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -4971,8 +5174,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-shockwave-flash",
         "rsa.misc.result_code": "200",
@@ -4991,12 +5194,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.a2.yimg.com",
+        "url.extension": "swf",
         "url.original": "http://us.a2.yimg.com/us.yimg.com/a/ya/yahoo_messenger/081106_lrec_msgr_interophitchhiker.swf?",
+        "url.path": "/us.yimg.com/a/ya/yahoo_messenger/081106_lrec_msgr_interophitchhiker.swf",
+        "url.query": "",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.a2",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -5029,8 +5236,8 @@
             "radio.launch.yahoo.com"
         ],
         "related.ip": [
-            "68.142.219.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.219.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5041,8 +5248,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -5061,12 +5268,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "radio.launch.yahoo.com",
+        "url.extension": "asp",
         "url.original": "http://radio.launch.yahoo.com/radio/player/stickwall.asp?",
+        "url.path": "/radio/player/stickwall.asp",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "radio.launch",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -5097,8 +5308,8 @@
             "us.bc.yahoo.com"
         ],
         "related.ip": [
-            "68.142.213.132",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.213.132"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5109,8 +5320,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5129,12 +5340,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.bc.yahoo.com",
         "url.original": "http://us.bc.yahoo.com/b?",
+        "url.path": "/b",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "us.bc",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -5165,8 +5379,8 @@
             "insider.msg.yahoo.com"
         ],
         "related.ip": [
-            "68.142.194.14",
-            "10.105.33.214"
+            "10.105.33.214",
+            "68.142.194.14"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5177,8 +5391,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -5197,12 +5411,16 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "insider.msg.yahoo.com",
+        "url.extension": "php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw",
         "url.original": "http://insider.msg.yahoo.com/ycontent/beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw?",
+        "url.path": "/ycontent/beacon.php;_ylc=X1MDNTcwMzAyODMEX3IDMgRldnQDdDAEaW50bAN1cwR2ZXIDNywwLDIsMTIw",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "insider.msg",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -5232,8 +5450,8 @@
             "pclick.internal.yahoo.com"
         ],
         "related.ip": [
-            "216.109.124.55",
-            "10.105.33.214"
+            "10.105.33.214",
+            "216.109.124.55"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5243,8 +5461,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "CONNECT"
+            "CONNECT",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "200",
@@ -5263,8 +5481,8 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "pclick.internal.yahoo.com",
         "url.original": "pclick.internal.yahoo.com:443",
@@ -5322,12 +5540,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "js",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20051025184124/radio.launch.yahoo.com/radioapi/includes/js/compVersionedJS/rapiBridge_1_4.js",
+        "url.path": "/7/1568/1600/20051025184124/radio.launch.yahoo.com/radioapi/includes/js/compVersionedJS/rapiBridge_1_4.js",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5363,8 +5584,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.159",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.159"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5375,8 +5596,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "304",
@@ -5395,12 +5616,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "css",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222754/radio.launch.yahoo.com/radio/clientdata/515/other.css",
+        "url.path": "/7/1568/1600/20040405222754/radio.launch.yahoo.com/radio/clientdata/515/other.css",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5468,12 +5692,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_left.gif",
+        "url.path": "/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_left.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5536,8 +5763,8 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "login.yahoo.com",
         "url.original": "login.yahoo.com:443",
@@ -5577,8 +5804,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.167",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.167"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5589,8 +5816,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "-",
         "rsa.misc.result_code": "304",
@@ -5609,12 +5836,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20050829181418/radio.launch.yahoo.com/radio/common_radio/resources/images/noaccess_msgr_uk.gif",
+        "url.path": "/7/1568/1600/20050829181418/radio.launch.yahoo.com/radio/common_radio/resources/images/noaccess_msgr_uk.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5662,8 +5892,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5682,12 +5912,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_right.gif",
+        "url.path": "/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_right.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5721,8 +5954,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_IMS_HIT",
-            "GET"
+            "GET",
+            "TCP_IMS_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "304",
@@ -5741,12 +5974,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222807/radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
+        "url.path": "/7/1568/1600/20040405222807/radio.launch.yahoo.com/radio/common_radio/resources/images/t.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5782,8 +6018,8 @@
             "a1568.g.akamai.net"
         ],
         "related.ip": [
-            "213.160.98.167",
-            "10.105.33.214"
+            "10.105.33.214",
+            "213.160.98.167"
         ],
         "related.user": [
             "adeolaegbedokun"
@@ -5814,12 +6050,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_off.gif",
+        "url.path": "/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_off.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5887,12 +6126,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222756/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_center.gif",
+        "url.path": "/7/1568/1600/20040405222756/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_center.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -5960,12 +6202,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "a1568.g.akamai.net",
+        "url.extension": "gif",
         "url.original": "http://a1568.g.akamai.net/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_fill.gif",
+        "url.path": "/7/1568/1600/20040405222757/radio.launch.yahoo.com/radio/clientdata/515/skins/1/images/bg_controls_fill.gif",
         "url.registered_domain": "akamai.net",
+        "url.scheme": "http",
         "url.subdomain": "a1568.g",
         "url.top_level_domain": "net",
         "user.name": "adeolaegbedokun"
@@ -6019,12 +6264,14 @@
             "10.105.37.180"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "www.google.com",
         "url.original": "http://www.google.com/supported_domains",
+        "url.path": "/supported_domains",
         "url.registered_domain": "google.com",
+        "url.scheme": "http",
         "url.subdomain": "www",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -6078,12 +6325,16 @@
             "10.105.47.191"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.mcafee.com",
+        "url.extension": "asp",
         "url.original": "http://us.mcafee.com/apps/agent/en-us/agent5/chknews.asp?",
+        "url.path": "/apps/agent/en-us/agent5/chknews.asp",
+        "url.query": "",
         "url.registered_domain": "mcafee.com",
+        "url.scheme": "http",
         "url.subdomain": "us",
         "url.top_level_domain": "com",
         "user.name": "-"
@@ -6126,8 +6377,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -6146,12 +6397,15 @@
             "10.105.33.214"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "launch.adserver.yahoo.com",
         "url.original": "http://launch.adserver.yahoo.com/l?",
+        "url.path": "/l",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "launch.adserver",
         "url.top_level_domain": "com",
         "user.name": "adeolaegbedokun"
@@ -6196,8 +6450,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "200",
@@ -6216,12 +6470,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "uk.f250.mail.yahoo.com",
         "url.original": "http://uk.f250.mail.yahoo.com/dc/launch?",
+        "url.path": "/dc/launch",
+        "url.query": "",
         "url.registered_domain": "yahoo.com",
+        "url.scheme": "http",
         "url.subdomain": "uk.f250.mail",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6253,8 +6510,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_DENIED",
-            "CONNECT"
+            "CONNECT",
+            "TCP_DENIED"
         ],
         "rsa.misc.content_type": "text/html",
         "rsa.misc.result_code": "407",
@@ -6273,8 +6530,8 @@
             "10.105.37.180"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "login.live.com",
         "url.original": "login.live.com:443",
@@ -6314,8 +6571,8 @@
             "us.js2.yimg.com"
         ],
         "related.ip": [
-            "213.160.98.169",
-            "10.105.21.199"
+            "10.105.21.199",
+            "213.160.98.169"
         ],
         "related.user": [
             "badeyek"
@@ -6346,12 +6603,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.js2.yimg.com",
+        "url.extension": "js",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/77cf3e56414f974dfd8616f56f0f632c_1.js",
+        "url.path": "/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/77cf3e56414f974dfd8616f56f0f632c_1.js",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.js2",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6385,8 +6645,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "text/css",
         "rsa.misc.result_code": "200",
@@ -6405,12 +6665,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.js1.yimg.com",
+        "url.extension": "css",
         "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/hdr/ygma5.css",
+        "url.path": "/us.yimg.com/lib/hdr/ygma5.css",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.js1",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6458,8 +6721,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_MISS",
-            "GET"
+            "GET",
+            "TCP_MISS"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -6478,12 +6741,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.js2.yimg.com",
+        "url.extension": "js",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/f7fc76100697c9c2d25dd0ec35e563b0_1.js",
+        "url.path": "/us.js.yimg.com/lib/pim/r/dclient/d/js/uk/f7fc76100697c9c2d25dd0ec35e563b0_1.js",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.js2",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6537,12 +6803,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.js1.yimg.com",
+        "url.extension": "js",
         "url.original": "http://us.js1.yimg.com/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js",
+        "url.path": "/us.yimg.com/lib/pim/r/medici/13_15/mail/ac.js",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.js1",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6576,8 +6845,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "application/x-javascript",
         "rsa.misc.result_code": "200",
@@ -6596,12 +6865,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.js2.yimg.com",
+        "url.extension": "js",
         "url.original": "http://us.js2.yimg.com/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js",
+        "url.path": "/us.js.yimg.com/lib/common/utils/2/yahoo_2.0.0-b4.js",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.js2",
         "url.top_level_domain": "com",
         "user.name": "badeyek"
@@ -6635,8 +6907,8 @@
         "rsa.investigations.ec_subject": "NetworkComm",
         "rsa.investigations.ec_theme": "ALM",
         "rsa.misc.action": [
-            "TCP_HIT",
-            "GET"
+            "GET",
+            "TCP_HIT"
         ],
         "rsa.misc.content_type": "image/gif",
         "rsa.misc.result_code": "200",
@@ -6655,12 +6927,15 @@
             "10.105.21.199"
         ],
         "tags": [
-            "squid.log",
-            "forwarded"
+            "forwarded",
+            "squid.log"
         ],
         "url.domain": "us.i1.yimg.com",
+        "url.extension": "gif",
         "url.original": "http://us.i1.yimg.com/us.yimg.com/i/us/pim/dclient/d/img/liam_ball_1.gif",
+        "url.path": "/us.yimg.com/i/us/pim/dclient/d/img/liam_ball_1.gif",
         "url.registered_domain": "yimg.com",
+        "url.scheme": "http",
         "url.subdomain": "us.i1",
         "url.top_level_domain": "com",
         "user.name": "badeyek"

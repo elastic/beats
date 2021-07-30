@@ -35,6 +35,10 @@ processors:
     field: zoom.object
     target_field: zoom.recording
     ignore_missing: true
+- uri_parts:
+    field: zoom.recording.share_url
+    ignore_failure: true
+    if: ctx?.zoom?.recording?.share_url != null
 - rename:
     field: zoom.recording.share_url
     target_field: url.full

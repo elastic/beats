@@ -180,17 +180,6 @@
         "azure.signinlogs.properties.app_id": "89bee1f7-5e6e-4d8a-9f3d-ecd601259da7",
         "azure.signinlogs.properties.applied_conditional_access_policies": [
             {
-                "conditionsNotSatisfied": 2,
-                "conditionsSatisfied": 1,
-                "displayName": "On-Prem Access Only",
-                "enforcedGrantControls": [
-                    "Block"
-                ],
-                "enforcedSessionControls": [],
-                "id": "123ebbf1-e868-4a77-bfd9-b59bd6c2412e",
-                "result": "notApplied"
-            },
-            {
                 "conditionsNotSatisfied": 0,
                 "conditionsSatisfied": 0,
                 "displayName": "ForceMFAfor B2C",
@@ -198,28 +187,6 @@
                 "enforcedSessionControls": [],
                 "id": "0dff3d49-001e-413f-86eb-2800e789674c",
                 "result": "notEnabled"
-            },
-            {
-                "conditionsNotSatisfied": 2,
-                "conditionsSatisfied": 1,
-                "displayName": "Baseline policy: Require MFA for admins",
-                "enforcedGrantControls": [
-                    "Mfa"
-                ],
-                "enforcedSessionControls": [],
-                "id": "a5527e71-9da1-41d0-859b-7ca84dae03a7",
-                "result": "notApplied"
-            },
-            {
-                "conditionsNotSatisfied": 2,
-                "conditionsSatisfied": 1,
-                "displayName": "Baseline Policy: Blocks legacy authentication",
-                "enforcedGrantControls": [
-                    "Block"
-                ],
-                "enforcedSessionControls": [],
-                "id": "c1311105-97ac-4ebd-a866-5b215d066765",
-                "result": "notApplied"
             },
             {
                 "conditionsNotSatisfied": 1,
@@ -235,16 +202,36 @@
                 "result": "notApplied"
             },
             {
-                "conditionsNotSatisfied": 8,
-                "conditionsSatisfied": 19,
-                "displayName": "Enforce Verification on External Access",
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "Baseline Policy: Blocks legacy authentication",
+                "enforcedGrantControls": [
+                    "Block"
+                ],
+                "enforcedSessionControls": [],
+                "id": "c1311105-97ac-4ebd-a866-5b215d066765",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "On-Prem Access Only",
+                "enforcedGrantControls": [
+                    "Block"
+                ],
+                "enforcedSessionControls": [],
+                "id": "123ebbf1-e868-4a77-bfd9-b59bd6c2412e",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 2,
+                "conditionsSatisfied": 1,
+                "displayName": "Baseline policy: Require MFA for admins",
                 "enforcedGrantControls": [
                     "Mfa"
                 ],
-                "enforcedSessionControls": [
-                    "SignInFrequency"
-                ],
-                "id": "913f5adc-cd20-4b35-93b8-fbe145f68444",
+                "enforcedSessionControls": [],
+                "id": "a5527e71-9da1-41d0-859b-7ca84dae03a7",
                 "result": "notApplied"
             },
             {
@@ -256,6 +243,19 @@
                 ],
                 "enforcedSessionControls": [],
                 "id": "cf0d2cec-b974-4fd3-a1d3-da4ae1e896fa",
+                "result": "notApplied"
+            },
+            {
+                "conditionsNotSatisfied": 8,
+                "conditionsSatisfied": 19,
+                "displayName": "Enforce Verification on External Access",
+                "enforcedGrantControls": [
+                    "Mfa"
+                ],
+                "enforcedSessionControls": [
+                    "SignInFrequency"
+                ],
+                "id": "913f5adc-cd20-4b35-93b8-fbe145f68444",
                 "result": "notApplied"
             }
         ],
@@ -272,24 +272,24 @@
         ],
         "azure.signinlogs.properties.authentication_processing_details": [
             {
-                "key": "Domain Hint Present",
-                "value": "True"
-            },
-            {
-                "key": "Login Hint Present",
-                "value": "True"
-            },
-            {
                 "key": "Private Link Id",
                 "value": "0"
+            },
+            {
+                "key": "IsCAEToken",
+                "value": "False"
             },
             {
                 "key": "Azure AD App Authentication Library",
                 "value": "Family: ADAL Library: ADAL.Js 1.0.15 Platform: JS"
             },
             {
-                "key": "IsCAEToken",
-                "value": "False"
+                "key": "Domain Hint Present",
+                "value": "True"
+            },
+            {
+                "key": "Login Hint Present",
+                "value": "True"
             }
         ],
         "azure.signinlogs.properties.authentication_requirement": "singleFactorAuthentication",

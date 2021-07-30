@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4749,
+      "code": "4749",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2904",
         "TargetUserName": "testglobal"
       },
-      "event_id": 4749,
+      "event_id": "4749",
       "keywords": [
         "Audit Success"
       ],

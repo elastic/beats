@@ -4,6 +4,11 @@
     `rds` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS RDS.
   release: ga
   fields:
+    - name: burst_balance.pct
+      type: scaled_float
+      format: percent
+      description: >
+        The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
     - name: cpu.total.pct
       type: scaled_float
       format: percent

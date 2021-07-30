@@ -43,6 +43,9 @@ type StateMetadataUpdater interface {
 	UpdateMetadata(s Source, v interface{}) error
 	// Remove marks a state for deletion of a given Source.
 	Remove(s Source) error
+	// ResetCursor resets the cursor in the registry and drops previous state
+	// updates that are not yet ACKed.
+	ResetCursor(s Source, cur interface{}) error
 }
 
 // ProspectorCleaner cleans the state store before it starts running.

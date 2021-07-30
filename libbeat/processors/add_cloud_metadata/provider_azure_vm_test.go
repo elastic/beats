@@ -91,6 +91,9 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			"account": common.MapStr{
 				"id": "5tfb04c3-63de-4709-a9f9-9ab8c0411d5e",
 			},
+			"service": common.MapStr{
+				"name": "Virtual Machines",
+			},
 			"region": "eastus2",
 		},
 	}

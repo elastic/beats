@@ -23,6 +23,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
 )
 
 // Core metric types.
@@ -38,25 +39,29 @@ type Config struct {
 }
 
 // Validate validates the core config.
-func (c Config) Validate() error {
+func (c Config) Validate() (metrics.MetricOpts, error) {
+	opts := metrics.MetricOpts{}
 	if c.CPUTicks != nil {
 		cfgwarn.Deprecate("6.1.0", "cpu_ticks is deprecated. Add 'ticks' to the core.metrics list.")
 	}
 
 	if len(c.Metrics) == 0 {
-		return errors.New("core.metrics cannot be empty")
+		return opts, errors.New("core.metrics cannot be empty")
 	}
 
 	for _, metric := range c.Metrics {
 		switch strings.ToLower(metric) {
-		case percentages, ticks:
+		case percentages:
+			opts.Percentages = true
+		case ticks:
+			opts.Ticks = true
 		default:
-			return errors.Errorf("invalid core.metrics value '%v' (valid "+
+			return opts, errors.Errorf("invalid core.metrics value '%v' (valid "+
 				"options are %v and %v)", metric, percentages, ticks)
 		}
 	}
 
-	return nil
+	return opts, nil
 }
 
 var defaultConfig = Config{

@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4760,
+      "code": "4760",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -51,7 +51,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2905",
         "TargetUserName": "testuni2"
       },
-      "event_id": 4760,
+      "event_id": "4760",
       "keywords": [
         "Audit Success"
       ],

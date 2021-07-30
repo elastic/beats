@@ -82,7 +82,7 @@ type Record struct {
 func (e Record) ToEvent() beat.Event {
 	win := e.Fields()
 
-	win.Delete("keywords_raw")
+	win.Delete("time_created")
 	win.Put("api", e.API)
 
 	m := common.MapStr{
@@ -92,8 +92,9 @@ func (e Record) ToEvent() beat.Event {
 	// ECS data
 	m.Put("event.created", time.Now())
 
+	eventCode, _ := win.GetValue("event_id")
+	m.Put("event.code", eventCode)
 	m.Put("event.kind", "event")
-	m.Put("event.code", e.EventIdentifier.ID)
 	m.Put("event.provider", e.Provider.Name)
 
 	rename(m, "winlog.outcome", "event.outcome")

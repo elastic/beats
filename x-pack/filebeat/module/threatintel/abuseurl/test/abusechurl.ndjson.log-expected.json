@@ -11,16 +11,16 @@
         "log.offset": 0,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961548",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -30,6 +30,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "103.72.223.103",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://103.72.223.103:34613/Mozi.m",
         "threatintel.indicator.url.original": "http://103.72.223.103:34613/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 34613,
@@ -47,16 +48,16 @@
         "log.offset": 359,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961546",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -66,6 +67,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "112.30.97.184",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://112.30.97.184:44941/Mozi.m",
         "threatintel.indicator.url.original": "http://112.30.97.184:44941/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 44941,
@@ -83,16 +85,16 @@
         "log.offset": 716,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961547",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -102,6 +104,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "113.110.198.53",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://113.110.198.53:37173/Mozi.m",
         "threatintel.indicator.url.original": "http://113.110.198.53:37173/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 37173,
@@ -119,16 +122,16 @@
         "log.offset": 1075,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961545",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -138,6 +141,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "101.20.183.170",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://101.20.183.170:47545/Mozi.m",
         "threatintel.indicator.url.original": "http://101.20.183.170:47545/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 47545,
@@ -155,16 +159,16 @@
         "log.offset": 1434,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961544",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -174,6 +178,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "59.8.35.22",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://59.8.35.22:44782/Mozi.a",
         "threatintel.indicator.url.original": "http://59.8.35.22:44782/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 44782,
@@ -191,16 +196,16 @@
         "log.offset": 1784,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961543",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -210,6 +215,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "59.96.37.35",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://59.96.37.35:44359/Mozi.a",
         "threatintel.indicator.url.original": "http://59.96.37.35:44359/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 44359,
@@ -227,16 +233,16 @@
         "log.offset": 2136,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961540",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -246,6 +252,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.239.233.17",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.239.233.17:56507/Mozi.m",
         "threatintel.indicator.url.original": "http://42.239.233.17:56507/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 56507,
@@ -263,16 +270,16 @@
         "log.offset": 2492,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961541",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -282,6 +289,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "58.252.178.20",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://58.252.178.20:57562/Mozi.m",
         "threatintel.indicator.url.original": "http://58.252.178.20:57562/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 57562,
@@ -299,16 +307,16 @@
         "log.offset": 2848,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961542",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -318,6 +326,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "45.176.111.95",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://45.176.111.95:48845/Mozi.m",
         "threatintel.indicator.url.original": "http://45.176.111.95:48845/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 48845,
@@ -335,16 +344,16 @@
         "log.offset": 3204,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961539",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -354,6 +363,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.224.68.97",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.224.68.97:58245/Mozi.m",
         "threatintel.indicator.url.original": "http://42.224.68.97:58245/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 58245,
@@ -371,16 +381,16 @@
         "log.offset": 3558,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961538",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -390,6 +400,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "222.81.144.207",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://222.81.144.207:37198/Mozi.m",
         "threatintel.indicator.url.original": "http://222.81.144.207:37198/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 37198,
@@ -407,16 +418,16 @@
         "log.offset": 3916,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961537",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -426,6 +437,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.127.185.137",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://182.127.185.137:33524/Mozi.m",
         "threatintel.indicator.url.original": "http://182.127.185.137:33524/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 33524,
@@ -443,16 +455,16 @@
         "log.offset": 4276,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961531",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -462,6 +474,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "39.84.175.185",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://39.84.175.185:48261/Mozi.a",
         "threatintel.indicator.url.original": "http://39.84.175.185:48261/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 48261,
@@ -479,16 +492,16 @@
         "log.offset": 4632,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961532",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -498,6 +511,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "27.41.11.238",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://27.41.11.238:34478/Mozi.m",
         "threatintel.indicator.url.original": "http://27.41.11.238:34478/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 34478,
@@ -515,16 +529,16 @@
         "log.offset": 4986,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961533",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -534,6 +548,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.127.133.68",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://182.127.133.68:35703/Mozi.a",
         "threatintel.indicator.url.original": "http://182.127.133.68:35703/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 35703,
@@ -551,16 +566,16 @@
         "log.offset": 5344,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961534",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -570,6 +585,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "27.46.44.102",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://27.46.44.102:48666/Mozi.m",
         "threatintel.indicator.url.original": "http://27.46.44.102:48666/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 48666,
@@ -587,16 +603,16 @@
         "log.offset": 5698,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961535",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -606,6 +622,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "39.70.88.65",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://39.70.88.65:53923/Mozi.m",
         "threatintel.indicator.url.original": "http://39.70.88.65:53923/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 53923,
@@ -623,16 +640,16 @@
         "log.offset": 6050,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961536",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -642,6 +659,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.224.136.237",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.224.136.237:52794/Mozi.m",
         "threatintel.indicator.url.original": "http://42.224.136.237:52794/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 52794,
@@ -659,16 +677,16 @@
         "log.offset": 6408,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961530",
         "threatintel.abuseurl.larted": false,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "offline",
@@ -678,6 +696,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "117.208.135.63",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://117.208.135.63:49312/Mozi.a",
         "threatintel.indicator.url.original": "http://117.208.135.63:49312/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 49312,
@@ -695,16 +714,16 @@
         "log.offset": 6768,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961525",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -714,6 +733,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "125.47.66.60",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://125.47.66.60:38961/Mozi.m",
         "threatintel.indicator.url.original": "http://125.47.66.60:38961/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 38961,
@@ -731,16 +751,16 @@
         "log.offset": 7122,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961526",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -750,6 +770,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.117.95.148",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://182.117.95.148:50420/Mozi.a",
         "threatintel.indicator.url.original": "http://182.117.95.148:50420/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 50420,
@@ -767,16 +788,16 @@
         "log.offset": 7480,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961527",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -786,6 +807,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "117.202.71.48",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://117.202.71.48:55007/Mozi.m",
         "threatintel.indicator.url.original": "http://117.202.71.48:55007/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 55007,
@@ -803,16 +825,16 @@
         "log.offset": 7836,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961528",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -822,6 +844,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "125.99.132.118",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://125.99.132.118:51143/Mozi.m",
         "threatintel.indicator.url.original": "http://125.99.132.118:51143/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 51143,
@@ -839,16 +862,16 @@
         "log.offset": 8194,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961529",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -858,6 +881,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.114.123.69",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://182.114.123.69:41003/Mozi.m",
         "threatintel.indicator.url.original": "http://182.114.123.69:41003/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 41003,
@@ -875,8 +899,8 @@
         "log.offset": 8552,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -893,6 +917,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "116.19.127.37",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://116.19.127.37:35739/Mozi.m",
         "threatintel.indicator.url.original": "http://116.19.127.37:35739/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 35739,
@@ -910,8 +935,8 @@
         "log.offset": 8903,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -928,6 +953,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.239.253.55",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.239.253.55:45653/Mozi.m",
         "threatintel.indicator.url.original": "http://42.239.253.55:45653/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 45653,
@@ -945,8 +971,8 @@
         "log.offset": 9254,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -963,6 +989,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "103.217.121.228",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://103.217.121.228:41349/Mozi.m",
         "threatintel.indicator.url.original": "http://103.217.121.228:41349/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 41349,
@@ -980,8 +1007,8 @@
         "log.offset": 9609,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -998,6 +1025,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "111.92.81.255",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://111.92.81.255:48586/Mozi.m",
         "threatintel.indicator.url.original": "http://111.92.81.255:48586/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 48586,
@@ -1015,8 +1043,8 @@
         "log.offset": 9960,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1033,6 +1061,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "45.229.55.75",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://45.229.55.75:38111/Mozi.m",
         "threatintel.indicator.url.original": "http://45.229.55.75:38111/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 38111,
@@ -1050,8 +1079,8 @@
         "log.offset": 10309,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1068,6 +1097,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.121.242.148",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://182.121.242.148:34556/Mozi.m",
         "threatintel.indicator.url.original": "http://182.121.242.148:34556/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 34556,
@@ -1085,16 +1115,16 @@
         "log.offset": 10662,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961519",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1104,6 +1134,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "106.115.189.249",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://106.115.189.249:59815/Mozi.m",
         "threatintel.indicator.url.original": "http://106.115.189.249:59815/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 59815,
@@ -1121,8 +1152,8 @@
         "log.offset": 11022,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1141,6 +1172,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.117.93.110",
         "threatintel.indicator.url.extension": "sh",
+        "threatintel.indicator.url.full": "http://182.117.93.110:50587/bin.sh",
         "threatintel.indicator.url.original": "http://182.117.93.110:50587/bin.sh",
         "threatintel.indicator.url.path": "/bin.sh",
         "threatintel.indicator.url.port": 50587,
@@ -1158,16 +1190,16 @@
         "log.offset": 11386,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961517",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1177,6 +1209,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "110.251.5.169",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://110.251.5.169:48322/Mozi.m",
         "threatintel.indicator.url.original": "http://110.251.5.169:48322/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 48322,
@@ -1194,8 +1227,8 @@
         "log.offset": 11742,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1212,6 +1245,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "101.51.117.186",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://101.51.117.186:33317/Mozi.m",
         "threatintel.indicator.url.original": "http://101.51.117.186:33317/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 33317,
@@ -1229,8 +1263,8 @@
         "log.offset": 12093,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1247,6 +1281,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "121.151.78.166",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://121.151.78.166:41516/Mozi.m",
         "threatintel.indicator.url.original": "http://121.151.78.166:41516/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 41516,
@@ -1264,8 +1299,8 @@
         "log.offset": 12444,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1282,6 +1317,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "116.72.92.97",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://116.72.92.97:57798/Mozi.m",
         "threatintel.indicator.url.original": "http://116.72.92.97:57798/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 57798,
@@ -1299,8 +1335,8 @@
         "log.offset": 12791,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1317,6 +1353,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "27.218.15.209",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://27.218.15.209:47671/Mozi.m",
         "threatintel.indicator.url.original": "http://27.218.15.209:47671/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 47671,
@@ -1334,8 +1371,8 @@
         "log.offset": 13140,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1352,6 +1389,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "120.85.171.210",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://120.85.171.210:57690/Mozi.m",
         "threatintel.indicator.url.original": "http://120.85.171.210:57690/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 57690,
@@ -1369,8 +1407,8 @@
         "log.offset": 13491,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1388,6 +1426,7 @@
         "threatintel.indicator.provider": "geenensp",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "117.251.59.53",
+        "threatintel.indicator.url.full": "http://117.251.59.53:50611/i",
         "threatintel.indicator.url.original": "http://117.251.59.53:50611/i",
         "threatintel.indicator.url.path": "/i",
         "threatintel.indicator.url.port": 50611,
@@ -1405,8 +1444,8 @@
         "log.offset": 13848,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1423,6 +1462,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "115.58.83.167",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://115.58.83.167:34141/Mozi.m",
         "threatintel.indicator.url.original": "http://115.58.83.167:34141/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 34141,
@@ -1440,16 +1480,16 @@
         "log.offset": 14197,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961507",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1459,6 +1499,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "94.178.124.83",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://94.178.124.83:44399/Mozi.m",
         "threatintel.indicator.url.original": "http://94.178.124.83:44399/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 44399,
@@ -1476,16 +1517,16 @@
         "log.offset": 14553,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961508",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1495,6 +1536,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "182.122.75.232",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://182.122.75.232:49120/Mozi.m",
         "threatintel.indicator.url.original": "http://182.122.75.232:49120/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 49120,
@@ -1512,16 +1554,16 @@
         "log.offset": 14911,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961506",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1531,6 +1573,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "115.63.202.43",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://115.63.202.43:51136/Mozi.m",
         "threatintel.indicator.url.original": "http://115.63.202.43:51136/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 51136,
@@ -1548,16 +1591,16 @@
         "log.offset": 15267,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961504",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1567,6 +1610,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "59.99.40.204",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://59.99.40.204:45773/Mozi.m",
         "threatintel.indicator.url.original": "http://59.99.40.204:45773/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 45773,
@@ -1584,16 +1628,16 @@
         "log.offset": 15621,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961505",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1603,6 +1647,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "117.247.128.213",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://117.247.128.213:56528/Mozi.m",
         "threatintel.indicator.url.original": "http://117.247.128.213:56528/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 56528,
@@ -1620,16 +1665,16 @@
         "log.offset": 15981,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961500",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1639,6 +1684,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "14.137.219.132",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://14.137.219.132:44427/Mozi.a",
         "threatintel.indicator.url.original": "http://14.137.219.132:44427/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 44427,
@@ -1656,16 +1702,16 @@
         "log.offset": 16339,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961501",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1675,6 +1721,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.224.40.14",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.224.40.14:36134/Mozi.m",
         "threatintel.indicator.url.original": "http://42.224.40.14:36134/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 36134,
@@ -1692,16 +1739,16 @@
         "log.offset": 16693,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961502",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1711,6 +1758,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "186.33.104.107",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://186.33.104.107:43973/Mozi.m",
         "threatintel.indicator.url.original": "http://186.33.104.107:43973/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 43973,
@@ -1728,16 +1776,16 @@
         "log.offset": 17051,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961503",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1747,6 +1795,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "85.105.16.154",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://85.105.16.154:41319/Mozi.m",
         "threatintel.indicator.url.original": "http://85.105.16.154:41319/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 41319,
@@ -1764,16 +1813,16 @@
         "log.offset": 17407,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961496",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1783,6 +1832,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "178.141.73.115",
         "threatintel.indicator.url.extension": "a",
+        "threatintel.indicator.url.full": "http://178.141.73.115:51847/Mozi.a",
         "threatintel.indicator.url.original": "http://178.141.73.115:51847/Mozi.a",
         "threatintel.indicator.url.path": "/Mozi.a",
         "threatintel.indicator.url.port": 51847,
@@ -1800,16 +1850,16 @@
         "log.offset": 17765,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961497",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1819,6 +1869,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "186.33.104.135",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://186.33.104.135:54469/Mozi.m",
         "threatintel.indicator.url.original": "http://186.33.104.135:54469/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 54469,
@@ -1836,16 +1887,16 @@
         "log.offset": 18123,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961498",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1855,6 +1906,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "115.56.159.43",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://115.56.159.43:34547/Mozi.m",
         "threatintel.indicator.url.original": "http://115.56.159.43:34547/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 34547,
@@ -1872,16 +1924,16 @@
         "log.offset": 18479,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
         "threatintel.abuseurl.id": "961499",
         "threatintel.abuseurl.larted": true,
         "threatintel.abuseurl.tags": [
-            "elf",
-            "Mozi"
+            "Mozi",
+            "elf"
         ],
         "threatintel.abuseurl.threat": "malware_download",
         "threatintel.abuseurl.url_status": "online",
@@ -1891,6 +1943,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "42.230.138.170",
         "threatintel.indicator.url.extension": "m",
+        "threatintel.indicator.url.full": "http://42.230.138.170:33932/Mozi.m",
         "threatintel.indicator.url.original": "http://42.230.138.170:33932/Mozi.m",
         "threatintel.indicator.url.path": "/Mozi.m",
         "threatintel.indicator.url.port": 33932,
@@ -1908,8 +1961,8 @@
         "log.offset": 18837,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1926,6 +1979,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/02478080035/blank.jpg",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/02478080035/blank.jpg",
         "threatintel.indicator.url.path": "/viro/02478080035/blank.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -1942,8 +1996,8 @@
         "log.offset": 19207,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1960,6 +2014,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/FRRNDR77C25D325O/map.png",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/FRRNDR77C25D325O/map.png",
         "threatintel.indicator.url.path": "/viro/FRRNDR77C25D325O/map.png",
         "threatintel.indicator.url.scheme": "https"
@@ -1976,8 +2031,8 @@
         "log.offset": 19580,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -1994,6 +2049,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/CNNSRG83H04F158R/blank.jpg",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/CNNSRG83H04F158R/blank.jpg",
         "threatintel.indicator.url.path": "/ladi/CNNSRG83H04F158R/blank.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2010,8 +2066,8 @@
         "log.offset": 19961,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2028,6 +2084,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "letonguesc.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://letonguesc.com/leto/02328510512/logo.css",
         "threatintel.indicator.url.original": "https://letonguesc.com/leto/02328510512/logo.css",
         "threatintel.indicator.url.path": "/leto/02328510512/logo.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2044,8 +2101,8 @@
         "log.offset": 20332,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2062,6 +2119,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/MLILSN74B21E507L/uk.png",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/MLILSN74B21E507L/uk.png",
         "threatintel.indicator.url.path": "/minu/MLILSN74B21E507L/uk.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2078,8 +2136,8 @@
         "log.offset": 20702,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2096,6 +2154,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/12875710159/blank.css",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/12875710159/blank.css",
         "threatintel.indicator.url.path": "/minu/12875710159/blank.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2112,8 +2171,8 @@
         "log.offset": 21070,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2130,6 +2189,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/CPNLNZ65M20A200N/maps.gif",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/CPNLNZ65M20A200N/maps.gif",
         "threatintel.indicator.url.path": "/minu/CPNLNZ65M20A200N/maps.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -2146,8 +2206,8 @@
         "log.offset": 21442,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2164,6 +2224,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/DLPCMN64D02D789E/logo.png",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/DLPCMN64D02D789E/logo.png",
         "threatintel.indicator.url.path": "/bella/DLPCMN64D02D789E/logo.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2180,8 +2241,8 @@
         "log.offset": 21831,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2198,6 +2259,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/01844510469/1x1.jpg",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/01844510469/1x1.jpg",
         "threatintel.indicator.url.path": "/bella/01844510469/1x1.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2214,8 +2276,8 @@
         "log.offset": 22214,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2232,6 +2294,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/FRRDNI52M71E522D/logo.css",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/FRRDNI52M71E522D/logo.css",
         "threatintel.indicator.url.path": "/ladi/FRRDNI52M71E522D/logo.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2248,8 +2311,8 @@
         "log.offset": 22594,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2266,6 +2329,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "letonguesc.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://letonguesc.com/leto/CPPMRC65E04H980Q/it.gif",
         "threatintel.indicator.url.original": "https://letonguesc.com/leto/CPPMRC65E04H980Q/it.gif",
         "threatintel.indicator.url.path": "/leto/CPPMRC65E04H980Q/it.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -2282,8 +2346,8 @@
         "log.offset": 22968,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2300,6 +2364,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/06389650018/it.css",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/06389650018/it.css",
         "threatintel.indicator.url.path": "/viro/06389650018/it.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2316,8 +2381,8 @@
         "log.offset": 23335,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2334,6 +2399,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/CRSRRT61E15H501H/logo.png",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/CRSRRT61E15H501H/logo.png",
         "threatintel.indicator.url.path": "/bella/CRSRRT61E15H501H/logo.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2350,8 +2416,8 @@
         "log.offset": 23724,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2368,6 +2434,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/SMPMSM67P05F205U/it.jpg",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/SMPMSM67P05F205U/it.jpg",
         "threatintel.indicator.url.path": "/minu/SMPMSM67P05F205U/it.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2384,8 +2451,8 @@
         "log.offset": 24094,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2402,6 +2469,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/SBNPQL78A24A783E/uk.png",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/SBNPQL78A24A783E/uk.png",
         "threatintel.indicator.url.path": "/viro/SBNPQL78A24A783E/uk.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2418,8 +2486,8 @@
         "log.offset": 24466,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2436,6 +2504,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/15578761007/maps.jpg",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/15578761007/maps.jpg",
         "threatintel.indicator.url.path": "/minu/15578761007/maps.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2452,8 +2521,8 @@
         "log.offset": 24833,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2470,6 +2539,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/03079590133/1x1.png",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/03079590133/1x1.png",
         "threatintel.indicator.url.path": "/viro/03079590133/1x1.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2486,8 +2556,8 @@
         "log.offset": 25201,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2504,6 +2574,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/BNCLNR77T56M082U/it.gif",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/BNCLNR77T56M082U/it.gif",
         "threatintel.indicator.url.path": "/ladi/BNCLNR77T56M082U/it.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -2520,8 +2591,8 @@
         "log.offset": 25579,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2538,6 +2609,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/JNKMTJ64B29L424O/uk.css",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/JNKMTJ64B29L424O/uk.css",
         "threatintel.indicator.url.path": "/minu/JNKMTJ64B29L424O/uk.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2554,8 +2626,8 @@
         "log.offset": 25949,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2572,6 +2644,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/PGNMRA64S22I608Z/en.png",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/PGNMRA64S22I608Z/en.png",
         "threatintel.indicator.url.path": "/bella/PGNMRA64S22I608Z/en.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2588,8 +2661,8 @@
         "log.offset": 26336,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2606,6 +2679,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/RZKDRD77T23Z229T/logo.jpg",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/RZKDRD77T23Z229T/logo.jpg",
         "threatintel.indicator.url.path": "/minu/RZKDRD77T23Z229T/logo.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2622,8 +2696,8 @@
         "log.offset": 26708,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2640,6 +2714,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "fhivelifestyle.online",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://fhivelifestyle.online/nhbrwvdffsgt/adf/maps.jpg",
         "threatintel.indicator.url.original": "https://fhivelifestyle.online/nhbrwvdffsgt/adf/maps.jpg",
         "threatintel.indicator.url.path": "/nhbrwvdffsgt/adf/maps.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2656,8 +2731,8 @@
         "log.offset": 27093,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2674,6 +2749,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/05739900487/1x1.css",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/05739900487/1x1.css",
         "threatintel.indicator.url.path": "/bella/05739900487/1x1.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2690,8 +2766,8 @@
         "log.offset": 27476,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2708,6 +2784,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/01767180597/map.css",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/01767180597/map.css",
         "threatintel.indicator.url.path": "/bella/01767180597/map.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2724,8 +2801,8 @@
         "log.offset": 27859,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2742,6 +2819,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/BRNGRG55D21F394K/map.css",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/BRNGRG55D21F394K/map.css",
         "threatintel.indicator.url.path": "/bella/BRNGRG55D21F394K/map.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2758,8 +2836,8 @@
         "log.offset": 28247,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2776,6 +2854,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/DLLTZN67L20L157J/1x1.css",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/DLLTZN67L20L157J/1x1.css",
         "threatintel.indicator.url.path": "/minu/DLLTZN67L20L157J/1x1.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2792,8 +2871,8 @@
         "log.offset": 28618,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2810,6 +2889,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/08035410722/logo.jpg",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/08035410722/logo.jpg",
         "threatintel.indicator.url.path": "/minu/08035410722/logo.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2826,8 +2906,8 @@
         "log.offset": 28985,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2844,6 +2924,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/GRNZEI60M13G346L/en.css",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/GRNZEI60M13G346L/en.css",
         "threatintel.indicator.url.path": "/viro/GRNZEI60M13G346L/en.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2860,8 +2941,8 @@
         "log.offset": 29357,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2878,6 +2959,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "letonguesc.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://letonguesc.com/leto/03253350239/1x1.png",
         "threatintel.indicator.url.original": "https://letonguesc.com/leto/03253350239/1x1.png",
         "threatintel.indicator.url.path": "/leto/03253350239/1x1.png",
         "threatintel.indicator.url.scheme": "https"
@@ -2894,8 +2976,8 @@
         "log.offset": 29727,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2912,6 +2994,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/10582470158/uk.css",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/10582470158/uk.css",
         "threatintel.indicator.url.path": "/ladi/10582470158/uk.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2928,8 +3011,8 @@
         "log.offset": 30100,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2946,6 +3029,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/BTTLNZ68A56D325C/map.css",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/BTTLNZ68A56D325C/map.css",
         "threatintel.indicator.url.path": "/ladi/BTTLNZ68A56D325C/map.css",
         "threatintel.indicator.url.scheme": "https"
@@ -2962,8 +3046,8 @@
         "log.offset": 30479,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -2980,6 +3064,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "letonguesc.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://letonguesc.com/leto/NNTLRT68P28A717L/en.jpg",
         "threatintel.indicator.url.original": "https://letonguesc.com/leto/NNTLRT68P28A717L/en.jpg",
         "threatintel.indicator.url.path": "/leto/NNTLRT68P28A717L/en.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -2996,8 +3081,8 @@
         "log.offset": 30853,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3014,6 +3099,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/CTTNDR89A19B149W/maps.png",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/CTTNDR89A19B149W/maps.png",
         "threatintel.indicator.url.path": "/viro/CTTNDR89A19B149W/maps.png",
         "threatintel.indicator.url.scheme": "https"
@@ -3030,8 +3116,8 @@
         "log.offset": 31227,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3048,6 +3134,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/DRSNTN77B16I197U/logo.css",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/DRSNTN77B16I197U/logo.css",
         "threatintel.indicator.url.path": "/minu/DRSNTN77B16I197U/logo.css",
         "threatintel.indicator.url.scheme": "https"
@@ -3064,8 +3151,8 @@
         "log.offset": 31599,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3082,6 +3169,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/02941830735/uk.css",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/02941830735/uk.css",
         "threatintel.indicator.url.path": "/viro/02941830735/uk.css",
         "threatintel.indicator.url.scheme": "https"
@@ -3098,8 +3186,8 @@
         "log.offset": 31966,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3116,6 +3204,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/MNSGCM91A04G240K/it.css",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/MNSGCM91A04G240K/it.css",
         "threatintel.indicator.url.path": "/bella/MNSGCM91A04G240K/it.css",
         "threatintel.indicator.url.scheme": "https"
@@ -3132,8 +3221,8 @@
         "log.offset": 32353,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3150,6 +3239,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ladiesincode.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://ladiesincode.com/ladi/03108100615/it.jpg",
         "threatintel.indicator.url.original": "https://ladiesincode.com/ladi/03108100615/it.jpg",
         "threatintel.indicator.url.path": "/ladi/03108100615/it.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -3166,8 +3256,8 @@
         "log.offset": 32726,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3184,6 +3274,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/PTACSM56A31F604X/en.png",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/PTACSM56A31F604X/en.png",
         "threatintel.indicator.url.path": "/minu/PTACSM56A31F604X/en.png",
         "threatintel.indicator.url.scheme": "https"
@@ -3200,8 +3291,8 @@
         "log.offset": 33096,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3218,6 +3309,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/00183050368/en.gif",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/00183050368/en.gif",
         "threatintel.indicator.url.path": "/viro/00183050368/en.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -3234,8 +3326,8 @@
         "log.offset": 33463,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3252,6 +3344,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/TSNLSN58H30G912H/uk.gif",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/TSNLSN58H30G912H/uk.gif",
         "threatintel.indicator.url.path": "/minu/TSNLSN58H30G912H/uk.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -3268,8 +3361,8 @@
         "log.offset": 33833,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3286,6 +3379,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "letonguesc.com",
         "threatintel.indicator.url.extension": "gif",
+        "threatintel.indicator.url.full": "https://letonguesc.com/leto/08658331007/blank.gif",
         "threatintel.indicator.url.original": "https://letonguesc.com/leto/08658331007/blank.gif",
         "threatintel.indicator.url.path": "/leto/08658331007/blank.gif",
         "threatintel.indicator.url.scheme": "https"
@@ -3302,8 +3396,8 @@
         "log.offset": 34205,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3320,6 +3414,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cxminute.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://cxminute.com/minu/01098910324/blank.png",
         "threatintel.indicator.url.original": "https://cxminute.com/minu/01098910324/blank.png",
         "threatintel.indicator.url.path": "/minu/01098910324/blank.png",
         "threatintel.indicator.url.scheme": "https"
@@ -3336,8 +3431,8 @@
         "log.offset": 34573,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3354,6 +3449,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/02794390233/uk.css",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/02794390233/uk.css",
         "threatintel.indicator.url.path": "/viro/02794390233/uk.css",
         "threatintel.indicator.url.scheme": "https"
@@ -3370,8 +3466,8 @@
         "log.offset": 34940,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3388,6 +3484,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "css",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/CSTDNT69D63F754D/en.css",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/CSTDNT69D63F754D/en.css",
         "threatintel.indicator.url.path": "/viro/CSTDNT69D63F754D/en.css",
         "threatintel.indicator.url.scheme": "https"
@@ -3404,8 +3501,8 @@
         "log.offset": 35312,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3422,6 +3519,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/GSTGNE91B06L219W/1x1.jpg",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/GSTGNE91B06L219W/1x1.jpg",
         "threatintel.indicator.url.path": "/viro/GSTGNE91B06L219W/1x1.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -3438,8 +3536,8 @@
         "log.offset": 35685,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3456,6 +3554,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "univirtek.com",
         "threatintel.indicator.url.extension": "jpg",
+        "threatintel.indicator.url.full": "https://univirtek.com/viro/03610140125/map.jpg",
         "threatintel.indicator.url.original": "https://univirtek.com/viro/03610140125/map.jpg",
         "threatintel.indicator.url.path": "/viro/03610140125/map.jpg",
         "threatintel.indicator.url.scheme": "https"
@@ -3472,8 +3571,8 @@
         "log.offset": 36053,
         "service.type": "threatintel",
         "tags": [
-            "threatintel-abuseurls",
-            "forwarded"
+            "forwarded",
+            "threatintel-abuseurls"
         ],
         "threatintel.abuseurl.blacklists.spamhaus_dbl": "not listed",
         "threatintel.abuseurl.blacklists.surbl": "not listed",
@@ -3490,6 +3589,7 @@
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "belfetproduction.com",
         "threatintel.indicator.url.extension": "png",
+        "threatintel.indicator.url.full": "https://belfetproduction.com/bella/CRRLRD74E09A462T/blank.png",
         "threatintel.indicator.url.original": "https://belfetproduction.com/bella/CRRLRD74E09A462T/blank.png",
         "threatintel.indicator.url.path": "/bella/CRRLRD74E09A462T/blank.png",
         "threatintel.indicator.url.scheme": "https"

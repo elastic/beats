@@ -100,14 +100,14 @@ include::{libbeat-dir}/shared/config-check.asciidoc[]
 [[configurelocation]]
 === Step 4: Configure the Heartbeat location
 
-Heartbeat can be deployed in multiple locations so that you can detect 
+Heartbeat can be deployed in multiple locations so that you can detect
 differences in availability and response times across those locations.
 Configure the Heartbeat location to allow {kib} to display location-specific
 information on Uptime maps and perform Uptime anomaly detection based
 on location.
 
-To configure the location of a Heartbeat instance, modify the 
-`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following 
+To configure the location of a Heartbeat instance, modify the
+`add_observer_metadata` processor in +{beatname_lc}.yml+.  The following
 example specifies the `geo.name` of the `add_observer_metadata` processor as
 `us-east-1a`:
 
@@ -148,7 +148,7 @@ include::{libbeat-dir}/tab-widgets/setup-widget.asciidoc[]
 +
 `-e` is optional and sends output to standard error instead of the configured log output.
 
-This step loads the recommended {ref}/indices-templates.html[index template] for writing to {es}.
+This step loads the recommended {ref}/index-templates.html[index template] for writing to {es}.
 It does not install {beatname_uc} dashboards.  Heartbeat dashboards and
 installation steps are available in the
 https://github.com/elastic/uptime-contrib[uptime-contrib] GitHub repository.

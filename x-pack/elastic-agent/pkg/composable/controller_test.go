@@ -75,7 +75,7 @@ func TestController(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	log, err := logger.New("")
+	log, err := logger.New("", false)
 	require.NoError(t, err)
 	c, err := composable.New(log, cfg)
 	require.NoError(t, err)

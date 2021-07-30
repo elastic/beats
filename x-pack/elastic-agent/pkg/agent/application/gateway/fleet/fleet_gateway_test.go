@@ -118,13 +118,14 @@ func withGateway(agentInfo agentInfo, settings *fleetGatewaySettings, fn withGat
 		client := newTestingClient()
 		dispatcher := newTestingDispatcher()
 
-		log, _ := logger.New("fleet_gateway")
+		log, _ := logger.New("fleet_gateway", false)
 		rep := getReporter(agentInfo, log, t)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, diskStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -252,8 +253,10 @@ func TestFleetGateway(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		log, _ := logger.New("tst")
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		log, _ := logger.New("tst", false)
+
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, diskStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(
@@ -342,9 +345,10 @@ func TestFleetGateway(t *testing.T) {
 		dispatcher := newTestingDispatcher()
 
 		ctx, cancel := context.WithCancel(context.Background())
-		log, _ := logger.New("tst")
+		log, _ := logger.New("tst", false)
 
-		stateStore, err := store.NewStateStore(log, storage.NewDiskStore(paths.AgentStateStoreFile()))
+		diskStore := storage.NewDiskStore(paths.AgentStateStoreFile())
+		stateStore, err := store.NewStateStore(log, diskStore)
 		require.NoError(t, err)
 
 		gateway, err := newFleetGatewayWithScheduler(

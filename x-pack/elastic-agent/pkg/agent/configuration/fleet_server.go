@@ -33,16 +33,21 @@ type FleetServerOutputConfig struct {
 
 // Elasticsearch is the configuration for elasticsearch.
 type Elasticsearch struct {
-	Protocol string            `config:"protocol" yaml:"protocol"`
-	Hosts    []string          `config:"hosts" yaml:"hosts"`
-	Path     string            `config:"path" yaml:"path,omitempty"`
-	Username string            `config:"username" yaml:"username"`
-	Password string            `config:"password" yaml:"password"`
-	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
+	Protocol      string            `config:"protocol" yaml:"protocol"`
+	Hosts         []string          `config:"hosts" yaml:"hosts"`
+	Path          string            `config:"path" yaml:"path,omitempty"`
+	Username      string            `config:"username" yaml:"username,omitempty"`
+	Password      string            `config:"password" yaml:"password,omitempty"`
+	ServiceToken  string            `config:"service_token" yaml:"service_token,omitempty"`
+	TLS           *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
+	Headers       map[string]string `config:"headers" yaml:"headers,omitempty"`
+	ProxyURL      string            `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	ProxyDisabled bool              `config:"proxy_disabled" yaml:"proxy_disabled"`
+	ProxyHeaders  map[string]string `config:"proxy_headers" yaml:"proxy_headers"`
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.
-func ElasticsearchFromConnStr(conn string) (Elasticsearch, error) {
+func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, error) {
 	u, err := url.Parse(conn)
 	if err != nil {
 		return Elasticsearch{}, err
@@ -53,19 +58,24 @@ func ElasticsearchFromConnStr(conn string) (Elasticsearch, error) {
 	if u.Host == "" {
 		return Elasticsearch{}, errors.New("invalid connection string: must include a host")
 	}
-	if u.User == nil || u.User.Username() == "" {
-		return Elasticsearch{}, errors.New("invalid connection string: must include a username")
-	}
-	password, ok := u.User.Password()
-	if !ok {
-		return Elasticsearch{}, errors.New("invalid connection string: must include a password")
-	}
-	return Elasticsearch{
+	cfg := Elasticsearch{
 		Protocol: u.Scheme,
 		Hosts:    []string{u.Host},
 		Path:     u.Path,
-		Username: u.User.Username(),
-		Password: password,
 		TLS:      nil,
-	}, nil
+	}
+	if serviceToken != "" {
+		cfg.ServiceToken = serviceToken
+		return cfg, nil
+	}
+	if u.User == nil || u.User.Username() == "" {
+		return Elasticsearch{}, errors.New("invalid connection string: must include a username unless a service token is provided")
+	}
+	password, ok := u.User.Password()
+	if !ok {
+		return Elasticsearch{}, errors.New("invalid connection string: must include a password unless a service token is provided")
+	}
+	cfg.Username = u.User.Username()
+	cfg.Password = password
+	return cfg, nil
 }

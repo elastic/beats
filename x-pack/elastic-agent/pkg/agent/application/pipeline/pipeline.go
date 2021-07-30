@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 // ConfigHandler is capable of handling configrequest.
@@ -23,13 +24,14 @@ type ConfigHandler interface {
 }
 
 // DefaultRK default routing keys until we implement the routing key / config matrix.
-var DefaultRK = "DEFAULT"
+var DefaultRK = "default"
 
 // RoutingKey is used for routing as pipeline id.
 type RoutingKey = string
 
 // Router is an interace routes programs to correspongind stream
 type Router interface {
+	Routes() *sorted.Set
 	Route(id string, grpProg map[RoutingKey][]program.Program) error
 	Shutdown()
 }

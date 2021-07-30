@@ -113,8 +113,8 @@ func (p *darwinPidProvider) piderFromCmd(ctx context.Context, name string, args 
 	}
 }
 
-func invokeCmd() *exec.Cmd {
-	homeExePath := filepath.Join(paths.Home(), agentName)
+func invokeCmd(topPath string) *exec.Cmd {
+	homeExePath := filepath.Join(topPath, agentName)
 
 	cmd := exec.Command(homeExePath, watcherSubcommand,
 		"--path.config", paths.Config(),

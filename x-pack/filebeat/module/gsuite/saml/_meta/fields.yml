@@ -18,10 +18,10 @@
       description: >
           User orgunit.
     - name: status_code
-      type: long
+      type: keyword
       description: >
         SAML status code.
     - name: second_level_status_code
-      type: long
+      type: keyword
       description: >
         SAML second level status code.

@@ -1,45 +1,123 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "cluster": {
-            "id": "3LbUkLkURz--FR-YO0wLNA",
-            "name": "es1"
+            "id": "w3oo88LcQ1i-7K4f-wrEgQ",
+            "name": "docker-cluster"
         },
         "node": {
-            "id": "FMRmkE3HTU6xxxoFK-06Ww",
-            "name": "es1_1",
+            "id": "EjV2AqqvQNq5ZF5cVlaPDQ",
+            "master": true,
+            "mlockall": false,
+            "name": "foo",
             "stats": {
                 "fs": {
+                    "io_stats": {},
                     "summary": {
                         "available": {
-                            "bytes": 350828584960
+                            "bytes": 45897547776
                         },
                         "free": {
-                            "bytes": 354770468864
+                            "bytes": 49114263552
                         },
                         "total": {
-                            "bytes": 499963170816
+                            "bytes": 62725623808
                         }
                     }
                 },
                 "indices": {
                     "docs": {
-                        "count": 30880,
-                        "deleted": 124
+                        "count": 9207,
+                        "deleted": 43
+                    },
+                    "fielddata": {
+                        "memory": {
+                            "bytes": 0
+                        }
+                    },
+                    "indexing": {
+                        "index_time": {
+                            "ms": 21
+                        },
+                        "index_total": {
+                            "count": 4
+                        },
+                        "throttle_time": {
+                            "ms": 0
+                        }
+                    },
+                    "query_cache": {
+                        "memory": {
+                            "bytes": 0
+                        }
+                    },
+                    "request_cache": {
+                        "memory": {
+                            "bytes": 3736
+                        }
+                    },
+                    "search": {
+                        "query_time": {
+                            "ms": 83
+                        },
+                        "query_total": {
+                            "count": 18
+                        }
                     },
                     "segments": {
-                        "count": 39,
+                        "count": 63,
+                        "doc_values": {
+                            "memory": {
+                                "bytes": 117620
+                            }
+                        },
+                        "fixed_bit_set": {
+                            "memory": {
+                                "bytes": 3912
+                            }
+                        },
+                        "index_writer": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
                         "memory": {
-                            "bytes": 300797
+                            "bytes": 330956
+                        },
+                        "norms": {
+                            "memory": {
+                                "bytes": 2688
+                            }
+                        },
+                        "points": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
+                        "stored_fields": {
+                            "memory": {
+                                "bytes": 31000
+                            }
+                        },
+                        "term_vectors": {
+                            "memory": {
+                                "bytes": 0
+                            }
+                        },
+                        "terms": {
+                            "memory": {
+                                "bytes": 179648
+                            }
+                        },
+                        "version_map": {
+                            "memory": {
+                                "bytes": 0
+                            }
                         }
                     },
                     "store": {
                         "size": {
-                            "bytes": 15205991
+                            "bytes": 18049725
                         }
                     }
                 },
@@ -48,76 +126,114 @@
                         "collectors": {
                             "old": {
                                 "collection": {
-                                    "count": 3,
-                                    "ms": 219
+                                    "count": 0,
+                                    "ms": 0
                                 }
                             },
                             "young": {
                                 "collection": {
-                                    "count": 505,
-                                    "ms": 2439
+                                    "count": 10,
+                                    "ms": 290
                                 }
                             }
                         }
                     },
                     "mem": {
-                        "pools": {
-                            "old": {
-                                "max": {
-                                    "bytes": 715849728
-                                },
-                                "peak": {
-                                    "bytes": 543519960
-                                },
-                                "peak_max": {
-                                    "bytes": 715849728
-                                },
-                                "used": {
-                                    "bytes": 382281744
+                        "heap": {
+                            "max": {
+                                "bytes": 1073741824
+                            },
+                            "used": {
+                                "bytes": 177654272,
+                                "pct": 16
+                            }
+                        }
+                    }
+                },
+                "os": {
+                    "cgroup": {
+                        "cpu": {
+                            "cfs": {
+                                "quota": {
+                                    "us": -1
                                 }
                             },
-                            "survivor": {
-                                "max": {
-                                    "bytes": 35782656
+                            "stat": {
+                                "elapsed_periods": {
+                                    "count": 0
                                 },
-                                "peak": {
-                                    "bytes": 35782656
-                                },
-                                "peak_max": {
-                                    "bytes": 35782656
-                                },
-                                "used": {
-                                    "bytes": 6418816
-                                }
-                            },
-                            "young": {
-                                "max": {
-                                    "bytes": 286326784
-                                },
-                                "peak": {
-                                    "bytes": 286326784
-                                },
-                                "peak_max": {
-                                    "bytes": 286326784
-                                },
-                                "used": {
-                                    "bytes": 118870448
+                                "times_throttled": {
+                                    "count": 0
                                 }
                             }
+                        },
+                        "cpuacct": {
+                            "usage": {
+                                "ns": 57724017512
+                            }
+                        },
+                        "memory": {
+                            "control_group": "/",
+                            "limit": {
+                                "bytes": "9223372036854771712"
+                            },
+                            "usage": {
+                                "bytes": "1508503552"
+                            }
+                        }
+                    },
+                    "cpu": {
+                        "load_avg": {
+                            "1m": 2.06
+                        }
+                    }
+                },
+                "process": {
+                    "cpu": {
+                        "pct": 32
+                    }
+                },
+                "thread_pool": {
+                    "get": {
+                        "queue": {
+                            "count": 0
+                        },
+                        "rejected": {
+                            "count": 0
+                        }
+                    },
+                    "search": {
+                        "queue": {
+                            "count": 0
+                        },
+                        "rejected": {
+                            "count": 0
+                        }
+                    },
+                    "write": {
+                        "queue": {
+                            "count": 0
+                        },
+                        "rejected": {
+                            "count": 0
                         }
                     }
                 }
             }
         }
     },
+    "event": {
+        "dataset": "elasticsearch.node.stats",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "node_stats",
-        "namespace": "elasticsearch.node.stats",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "localhost:9200",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }

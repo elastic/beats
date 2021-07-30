@@ -34,6 +34,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -55,6 +57,7 @@ type registryEntry struct {
 	Cursor struct {
 		Offset int `json:"offset"`
 	} `json:"cursor"`
+	Meta interface{} `json:"meta,omitempty"`
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
@@ -176,9 +179,64 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename string, expec
 		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
 	}
 
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
-	entry := e.getRegistryState(src.Name())
+	id := getIDFromPath(filepath, fi)
+	entry, err := e.getRegistryState(id)
+	if err != nil {
+		e.t.Fatalf(err.Error())
+	}
+
+	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+}
+
+// requireMetaInRegistry checks if the expected metadata is saved to the registry.
+func (e *inputTestingEnvironment) waitUntilMetaInRegistry(filename string, expectedMeta fileMeta) {
+	for {
+		filepath := e.abspath(filename)
+		fi, err := os.Stat(filepath)
+		if err != nil {
+			continue
+		}
+
+		id := getIDFromPath(filepath, fi)
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			continue
+		}
+
+		if entry.Meta == nil {
+			continue
+		}
+
+		var meta fileMeta
+		err = typeconv.Convert(&meta, entry.Meta)
+		if err != nil {
+			e.t.Fatalf("cannot convert: %+v", err)
+		}
+
+		if requireMetadataEquals(expectedMeta, meta) {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func requireMetadataEquals(one, other fileMeta) bool {
+	return one == other
+}
+
+// waitUntilOffsetInRegistry waits for the expected offset is set for a file.
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename string, expectedOffset int) {
+	filepath := e.abspath(filename)
+	fi, err := os.Stat(filepath)
+	if err != nil {
+		e.t.Fatalf("cannot stat file when cheking for offset: %+v", err)
+	}
+
+	id := getIDFromPath(filepath, fi)
+	entry, err := e.getRegistryState(id)
+	for err != nil || entry.Cursor.Offset != expectedOffset {
+		entry, err = e.getRegistryState(id)
+	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
@@ -191,43 +249,47 @@ func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename string) {
 	}
 
 	inputStore, _ := e.stateStore.Access()
-
-	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	id := getIDFromPath(filepath, fi)
 
 	var entry registryEntry
-	err = inputStore.Get(src.Name(), &entry)
+	err = inputStore.Get(id, &entry)
 	if err == nil {
-		e.t.Fatalf("key is not expected to be present '%s'", src.Name())
+		e.t.Fatalf("key is not expected to be present '%s'", id)
 	}
 }
 
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistryByID(key string, expectedOffset int) {
-	entry := e.getRegistryState(key)
+	entry, err := e.getRegistryState(key)
+	if err != nil {
+		e.t.Fatalf(err.Error())
+	}
 
 	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
 }
 
-func (e *inputTestingEnvironment) getRegistryState(key string) registryEntry {
+func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, error) {
 	inputStore, _ := e.stateStore.Access()
 
 	var entry registryEntry
 	err := inputStore.Get(key, &entry)
 	if err != nil {
-		e.t.Fatalf("error when getting expected key '%s' from store: %+v", key, err)
+		return registryEntry{}, fmt.Errorf("error when getting expected key '%s' from store: %+v", key, err)
 	}
 
-	return entry
+	return entry, nil
+}
+
+func getIDFromPath(filepath string, fi os.FileInfo) string {
+	identifier, _ := newINodeDeviceIdentifier(nil)
+	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	return "filestream::.global::" + src.Name()
 }
 
 // waitUntilEventCount waits until total count events arrive to the client.
 func (e *inputTestingEnvironment) waitUntilEventCount(count int) {
 	for {
-		sum := 0
-		for _, c := range e.pipeline.clients {
-			sum += len(c.GetEvents())
-		}
+		sum := len(e.pipeline.GetAllEvents())
 		if sum == count {
 			return
 		}
@@ -283,6 +345,43 @@ func (e *inputTestingEnvironment) getOutputMessages() []string {
 	return messages
 }
 
+func (e *inputTestingEnvironment) requireEventContents(nr int, key, value string) {
+	events := make([]beat.Event, 0)
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			events = append(events, evt)
+		}
+	}
+
+	selectedEvent := events[nr]
+	v, err := selectedEvent.Fields.GetValue(key)
+	if err != nil {
+		e.t.Fatalf("cannot find key %s in event %+v", key, selectedEvent)
+	}
+
+	val, ok := v.(string)
+	if !ok {
+		e.t.Fatalf("value is not string %+v", v)
+	}
+	require.Equal(e.t, value, val)
+}
+
+func (e *inputTestingEnvironment) requireEventTimestamp(nr int, ts string) {
+	tm, err := time.Parse("2006-01-02T15:04:05.999", ts)
+	if err != nil {
+		e.t.Fatal(err)
+	}
+	events := make([]beat.Event, 0)
+	for _, c := range e.pipeline.clients {
+		for _, evt := range c.GetEvents() {
+			events = append(events, evt)
+		}
+	}
+
+	selectedEvent := events[nr]
+	require.True(e.t, selectedEvent.Timestamp.Equal(tm), "got: %s, expected: %s", selectedEvent.Timestamp.String(), tm.String())
+}
+
 type testInputStore struct {
 	registry *statestore.Registry
 }
@@ -306,10 +405,12 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 }
 
 type mockClient struct {
-	publishes  []beat.Event
+	publishing []beat.Event
+	published  []beat.Event
 	ackHandler beat.ACKer
 	closed     bool
 	mtx        sync.Mutex
+	canceler   context.CancelFunc
 }
 
 // GetEvents returns the published events
@@ -317,7 +418,7 @@ func (c *mockClient) GetEvents() []beat.Event {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
-	return c.publishes
+	return c.published
 }
 
 // Publish mocks the Client Publish method
@@ -330,11 +431,21 @@ func (c *mockClient) PublishAll(events []beat.Event) {
 	c.mtx.Lock()
 	defer c.mtx.Unlock()
 
+	c.publishing = append(c.publishing, events...)
 	for _, event := range events {
-		c.publishes = append(c.publishes, event)
 		c.ackHandler.AddEvent(event, true)
 	}
 	c.ackHandler.ACKEvents(len(events))
+
+	for _, event := range events {
+		c.published = append(c.published, event)
+	}
+}
+
+func (c *mockClient) waitUntilPublishingHasStarted() {
+	for len(c.publishing) == 0 {
+		time.Sleep(10 * time.Millisecond)
+	}
 }
 
 // Close mocks the Client Close method
@@ -352,12 +463,16 @@ func (c *mockClient) Close() error {
 
 // mockPipelineConnector mocks the PipelineConnector interface
 type mockPipelineConnector struct {
-	clients []*mockClient
-	mtx     sync.Mutex
+	blocking bool
+	clients  []*mockClient
+	mtx      sync.Mutex
 }
 
 // GetAllEvents returns all events associated with a pipeline
 func (pc *mockPipelineConnector) GetAllEvents() []beat.Event {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
 	var evList []beat.Event
 	for _, clientEvents := range pc.clients {
 		evList = append(evList, clientEvents.GetEvents()...)
@@ -376,11 +491,64 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
 
+	ctx, cancel := context.WithCancel(context.Background())
 	c := &mockClient{
-		ackHandler: config.ACKHandler,
+		canceler:   cancel,
+		ackHandler: newMockACKHandler(ctx, pc.blocking, config),
 	}
 
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
+
+}
+
+func (pc *mockPipelineConnector) cancelAllClients() {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	for _, client := range pc.clients {
+		client.canceler()
+	}
+}
+
+func (pc *mockPipelineConnector) cancelClient(i int) {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	if len(pc.clients) < i+1 {
+		return
+	}
+
+	pc.clients[i].canceler()
+}
+
+func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.ACKer {
+	if !blocking {
+		return config.ACKHandler
+	}
+
+	return acker.Combine(blockingACKer(starter), config.ACKHandler)
+
+}
+
+func blockingACKer(starter context.Context) beat.ACKer {
+	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
+		for starter.Err() == nil {
+		}
+	})
+}
+
+func (pc *mockPipelineConnector) clientsCount() int {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	return len(pc.clients)
+}
+
+func (pc *mockPipelineConnector) invertBlocking() {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	pc.blocking = !pc.blocking
 }

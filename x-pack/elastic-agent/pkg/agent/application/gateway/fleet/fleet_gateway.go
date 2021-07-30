@@ -25,6 +25,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/scheduler"
 )
 
+// Max number of times an invalid API Key is checked
 const maxUnauthCounter int = 6
 
 // Default Configuration for the Fleet Gateway.
@@ -158,13 +159,13 @@ func (f *fleetGateway) worker() {
 		case <-f.scheduler.WaitTick():
 			f.log.Debug("FleetGateway calling Checkin API")
 
-			// Execute the checkin call and for any errors returned by the fleet API
-			// the function will retry to communicate with fleet with an exponential delay and some
+			// Execute the checkin call and for any errors returned by the fleet-server API
+			// the function will retry to communicate with fleet-server with an exponential delay and some
 			// jitter to help better distribute the load from a fleet of agents.
 			resp, err := f.doExecute()
 			if err != nil {
 				f.log.Error(err)
-				f.statusReporter.Update(state.Failed, err.Error())
+				f.statusReporter.Update(state.Failed, err.Error(), nil)
 				continue
 			}
 
@@ -177,14 +178,14 @@ func (f *fleetGateway) worker() {
 			if err := f.dispatcher.Dispatch(f.acker, actions...); err != nil {
 				errMsg = fmt.Sprintf("failed to dispatch actions, error: %s", err)
 				f.log.Error(errMsg)
-				f.statusReporter.Update(state.Failed, errMsg)
+				f.statusReporter.Update(state.Failed, errMsg, nil)
 			}
 
 			f.log.Debugf("FleetGateway is sleeping, next update in %s", f.settings.Duration)
 			if errMsg != "" {
-				f.statusReporter.Update(state.Failed, errMsg)
+				f.statusReporter.Update(state.Failed, errMsg, nil)
 			} else {
-				f.statusReporter.Update(state.Healthy, "")
+				f.statusReporter.Update(state.Healthy, "", nil)
 			}
 
 		case <-f.bgContext.Done():
@@ -198,9 +199,10 @@ func (f *fleetGateway) doExecute() (*fleetapi.CheckinResponse, error) {
 	f.backoff.Reset()
 	for f.bgContext.Err() == nil {
 		// TODO: wrap with timeout context
+		f.log.Debugf("Checking started")
 		resp, err := f.execute(f.bgContext)
 		if err != nil {
-			f.log.Errorf("Could not communicate with Checking API will retry, error: %s", err)
+			f.log.Errorf("Could not communicate with fleet-server Checking API will retry, error: %s", err)
 			if !f.backoff.Wait() {
 				return nil, errors.New(
 					"execute retry loop was stopped",
@@ -244,8 +246,8 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	if isUnauth(err) {
 		f.unauthCounter++
 
-		if f.shouldUnroll() {
-			f.log.Warnf("retrieved unauthorized for '%d' times. Unrolling.", f.unauthCounter)
+		if f.shouldUnenroll() {
+			f.log.Warnf("retrieved an invalid api key error '%d' times. Starting to unenroll the elastic agent.", f.unauthCounter)
 			return &fleetapi.CheckinResponse{
 				Actions: []fleetapi.Action{&fleetapi.ActionUnenroll{ActionID: "", ActionType: "UNENROLL", IsDetected: true}},
 			}, nil
@@ -273,8 +275,9 @@ func (f *fleetGateway) execute(ctx context.Context) (*fleetapi.CheckinResponse, 
 	return resp, nil
 }
 
-func (f *fleetGateway) shouldUnroll() bool {
-	return f.unauthCounter >= maxUnauthCounter
+// shouldUnenroll checks if the max number of trying an invalid key is reached
+func (f *fleetGateway) shouldUnenroll() bool {
+	return f.unauthCounter > maxUnauthCounter
 }
 
 func isUnauth(err error) bool {

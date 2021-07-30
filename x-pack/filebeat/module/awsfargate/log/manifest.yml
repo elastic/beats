@@ -1,0 +1,25 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: aws-cloudwatch
+  - name: shared_credential_file
+  - name: credential_profile_name
+  - name: endpoint
+  - name: access_key_id
+  - name: secret_access_key
+  - name: session_token
+  - name: role_arn
+  - name: log_group_arn
+  - name: log_group_name
+  - name: region_name
+  - name: log_streams
+  - name: log_stream_prefix
+  - name: start_position
+    default: beginning
+  - name: scan_frequency
+  - name: api_timeout
+  - name: api_sleep
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/{{.input}}.yml
