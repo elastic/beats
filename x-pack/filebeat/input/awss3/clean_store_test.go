@@ -96,13 +96,19 @@ func TestGcFind(t *testing.T) {
 			states := NewStates()
 			state := testCase.stateFn()
 			states.Update(state)
-			keys := gcFind(states, started, now)
+			var expectedLatestStoredTime time.Time
+			keys, latestStoredTime := gcFind(states, started, now)
 			expected := map[string]struct{}{}
 			if testCase.expected {
 				expected[state.Id] = struct{}{}
+
+				if state.Stored {
+					expectedLatestStoredTime = state.LastModified
+				}
 			}
 
 			assert.Equal(t, expected, keys)
+			assert.Equal(t, expectedLatestStoredTime, latestStoredTime)
 		})
 	}
 }

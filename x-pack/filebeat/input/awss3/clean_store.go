@@ -33,7 +33,7 @@ func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, st
 	logger.Debugf("Start store cleanup")
 	defer logger.Debugf("Done store cleanup")
 
-	keys := gcFind(states, started, time.Now())
+	keys, latestStoredTime := gcFind(states, started, time.Now())
 	if len(keys) == 0 {
 		logger.Debugf("No entries to remove were found")
 		return
@@ -43,7 +43,7 @@ func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, st
 		logger.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
 
-	if err := store.Set(awsS3WriteCommitStateKey, commitWriteState{time.Now()}); err != nil {
+	if err := store.Set(awsS3WriteCommitStateKey, commitWriteState{latestStoredTime}); err != nil {
 		logger.Errorf("Failed to write commit time to the registry: %+v", err)
 	}
 }
@@ -52,7 +52,8 @@ func gcStore(logger *logp.Logger, started time.Time, store *statestore.Store, st
 // if the state is marked as stored it will be purged. If the state is not marked as stored
 // it will be purged if state.LastModified or the time of when the cleaner started
 // (whichever is the latest) is in the past.
-func gcFind(states *States, started, now time.Time) map[string]struct{} {
+func gcFind(states *States, started, now time.Time) (map[string]struct{}, time.Time) {
+	var latestStoredTime time.Time
 	keys := map[string]struct{}{}
 	for _, state := range states.GetStates() {
 		reference := state.LastModified
@@ -68,10 +69,13 @@ func gcFind(states *States, started, now time.Time) map[string]struct{} {
 		// it is stored, forget
 		if state.Stored {
 			keys[state.Id] = struct{}{}
+			if state.LastModified.After(latestStoredTime) {
+				latestStoredTime = state.LastModified
+			}
 		}
 	}
 
-	return keys
+	return keys, latestStoredTime
 }
 
 // gcClean removes key value pairs in the removeSet from the store.
