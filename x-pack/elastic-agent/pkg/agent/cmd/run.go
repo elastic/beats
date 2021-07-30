@@ -7,14 +7,14 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"path/filepath"
 	"syscall"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
@@ -36,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
 	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	monitoringServer "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -74,36 +75,29 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 
 	// register as a service
 	stop := make(chan bool)
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	var stopBeat = func() {
 		close(stop)
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	pathConfigFile := paths.ConfigFile()
-	rawConfig, err := config.LoadFile(pathConfigFile)
+	cfg, err := loadConfig(override)
 	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
+		return err
 	}
 
-	if err := getOverwrites(rawConfig); err != nil {
-		return errors.New(err, "could not read overwrites")
-	}
-
-	cfg, err := configuration.NewFromConfig(rawConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
+		return err
 	}
 
-	if override != nil {
-		override(cfg)
+	cfg, err = tryDelayEnroll(ctx, logger, cfg, override)
+	if err != nil {
+		err = errors.New(err, "failed to perform delayed enrollment")
+		logger.Error(err)
+		return err
 	}
+	pathConfigFile := paths.AgentConfigFile()
 
 	// agent ID needs to stay empty in bootstrap mode
 	createAgentID := true
@@ -118,15 +112,10 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
-	if err != nil {
-		return err
-	}
-
 	// initiate agent watcher
 	if err := upgrade.InvokeWatcher(logger); err != nil {
 		// we should not fail because watcher is not working
-		logger.Error("failed to invoke rollback watcher", err)
+		logger.Error(errors.New(err, "failed to invoke rollback watcher"))
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
@@ -199,6 +188,35 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 	}
 	rex.ShutdownComplete()
 	return err
+}
+
+func loadConfig(override cfgOverrider) (*configuration.Configuration, error) {
+	pathConfigFile := paths.ConfigFile()
+	rawConfig, err := config.LoadFile(pathConfigFile)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	if err := getOverwrites(rawConfig); err != nil {
+		return nil, errors.New(err, "could not read overwrites")
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	if override != nil {
+		override(cfg)
+	}
+
+	return cfg, nil
 }
 
 func reexecPath() (string, error) {
@@ -295,4 +313,53 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 
 func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
 	return cfg != nil && cfg.Enabled
+}
+
+func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configuration.Configuration, override cfgOverrider) (*configuration.Configuration, error) {
+	enrollPath := paths.AgentEnrollFile()
+	if _, err := os.Stat(enrollPath); err != nil {
+		// no enrollment file exists or failed to stat it; nothing to do
+		return cfg, nil
+	}
+	contents, err := ioutil.ReadFile(enrollPath)
+	if err != nil {
+		return nil, errors.New(
+			err,
+			"failed to read delay enrollment file",
+			errors.TypeFilesystem,
+			errors.M("path", enrollPath))
+	}
+	var options enrollCmdOption
+	err = yaml.Unmarshal(contents, &options)
+	if err != nil {
+		return nil, errors.New(
+			err,
+			"failed to parse delay enrollment file",
+			errors.TypeConfig,
+			errors.M("path", enrollPath))
+	}
+	options.DelayEnroll = false
+	options.FleetServer.SpawnAgent = false
+	c, err := newEnrollCmd(
+		logger,
+		&options,
+		paths.ConfigFile(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	err = c.Execute(ctx, cli.NewIOStreams())
+	if err != nil {
+		return nil, err
+	}
+	err = os.Remove(enrollPath)
+	if err != nil {
+		logger.Warn(errors.New(
+			err,
+			"failed to remove delayed enrollment file",
+			errors.TypeFilesystem,
+			errors.M("path", enrollPath)))
+	}
+	logger.Info("Successfully performed delayed enrollment of this Elastic Agent.")
+	return loadConfig(override)
 }
