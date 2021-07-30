@@ -123,7 +123,7 @@ You can also enable `close_eof` for all inputs created by any of the modules:
 
 ==== Processors
 
-As described in <<defining-processors.html#where-valid,Where are processors valid?>> you can define `processors`
+As described in <<where-valid,Where are processors valid?>> you can define `processors`
 under the input section of the module definition. These processors are run _after_ any processors defined in the
 module.
 
