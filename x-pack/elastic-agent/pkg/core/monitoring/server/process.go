@@ -123,7 +123,11 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 		)
 	}
 
-	resp, err := client.Do(req.WithContext(ctx))
+	req.Close = true
+	cctx, cancelFn := context.WithCancel(ctx)
+	defer cancelFn()
+
+	resp, err := client.Do(req.WithContext(cctx))
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if errors.Is(err, syscall.ENOENT) {

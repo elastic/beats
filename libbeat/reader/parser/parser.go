@@ -49,6 +49,8 @@ type CommonConfig struct {
 }
 
 type Config struct {
+	Suffix string
+
 	pCfg    CommonConfig
 	parsers []common.ConfigNamespace
 }
@@ -79,6 +81,7 @@ func (c *Config) Unpack(cc *common.Config) error {
 }
 
 func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+	var suffix string
 	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
@@ -103,12 +106,19 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
 			}
+			if config.Stream != readjson.All {
+				if suffix != "" {
+					return nil, fmt.Errorf("only one stream selection is allowed")
+				}
+				suffix = config.Stream.String()
+			}
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
 	}
 
 	return &Config{
+		Suffix:  suffix,
 		pCfg:    pCfg,
 		parsers: parsers,
 	}, nil

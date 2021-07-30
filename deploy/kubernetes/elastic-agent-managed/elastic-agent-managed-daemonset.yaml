@@ -22,7 +22,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: elastic-agent
-          image: docker.elastic.co/beats/elastic-agent:8.0.0
+          image: docker.elastic.co/beats/elastic-agent:%VERSION%
           env:
             - name: FLEET_ENROLL
               value: "1"
@@ -40,7 +40,7 @@ spec:
             - name: KIBANA_FLEET_USERNAME
               value: "elastic"
             - name: KIBANA_FLEET_PASSWORD
-              value: ""
+              value: "changeme"
             - name: NODE_NAME
               valueFrom:
                 fieldRef:
