@@ -28,8 +28,8 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Metricbeat*
 
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
-- Add replicas.ready field to state_statefulset in Kubernetes module{pull}26088[26088]
-- Recover service.address field in vsphere module {issue}26902[26902] {pull}26904[26904]
+- Add `replicas.ready` field to state_statefulset in Kubernetes module{pull}26088[26088]
+- Recover `service.address` field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 ==== Bugfixes
 
@@ -50,14 +50,13 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 *Filebeat*
 
-- Fix mapping of fortinet.firewall.mem as integer. {pull}19335[19335]
-- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
+- Fix mapping of `fortinet.firewall.mem` as integer. {pull}19335[19335]
+- Add `shared_credential_file` to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Fix integer overflow in S3 offsets when collecting very large files. {pull}22523[22523]
 - Fix issue with m365_defender, when parsing incidents that has no alerts attached: {pull}25421[25421]
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
 - Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
 - Change type of max_bytes in all configs to be cfgtype.ByteSize {pull}26699[26699]
-- Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
 - Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
 - Fix incorrect field name appending to `related.hash` in `threatintel.abusechmalware` ingest pipeline. {issue}25151[25151] {pull}25674[25674]
@@ -85,7 +84,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 *Winlogbeat*
 
-- Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
+- Fix `related.ip` field in renameCommonAuthFields {pull}24892[24892]
 
 *Functionbeat*
 
@@ -146,7 +145,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 *Metricbeat*
 
-- Refactor state_* metricsets to share response from endpoint. {pull}25640[25640]
+- Refactor `state_*` metricsets to share response from endpoint. {pull}25640[25640]
 - Add server id to zookeeper events. {pull}25550[25550]
 - Add additional network metrics to docker/network {pull}25354[25354]
 - Migrate ec2 metricsets to use cloudwatch input. {pull}25924[25924]
