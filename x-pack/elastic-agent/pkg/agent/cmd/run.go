@@ -216,7 +216,7 @@ func loadConfig(override cfgOverrider) (*configuration.Configuration, error) {
 		override(cfg)
 	}
 
-	return cfg, err
+	return cfg, nil
 }
 
 func reexecPath() (string, error) {
@@ -317,8 +317,8 @@ func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
 
 func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configuration.Configuration, override cfgOverrider) (*configuration.Configuration, error) {
 	enrollPath := paths.AgentEnrollFile()
-	if _, err := os.Stat(enrollPath); os.IsNotExist(err) {
-		// no enrollment file exists; nothing to do
+	if _, err := os.Stat(enrollPath); err != nil {
+		// no enrollment file exists or failed to stat it; nothing to do
 		return cfg, nil
 	}
 	contents, err := ioutil.ReadFile(enrollPath)
