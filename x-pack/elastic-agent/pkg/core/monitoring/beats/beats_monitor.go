@@ -32,10 +32,11 @@ type Monitor struct {
 }
 
 // NewMonitor creates a beats monitor.
-func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig) *Monitor {
+func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig, logMetrics bool) *Monitor {
 	if monitoringCfg == nil {
 		monitoringCfg = monitoringConfig.DefaultConfig()
 	}
+	monitoringCfg.LogMetrics = logMetrics
 
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
@@ -55,6 +56,11 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 		b.config = monitoringConfig.DefaultConfig()
 	} else {
 		b.config = cfg.Settings.MonitoringConfig
+		logMetrics := true
+		if cfg.Settings.LoggingConfig != nil {
+			logMetrics = cfg.Settings.LoggingConfig.Metrics.Enabled
+		}
+		b.config.LogMetrics = logMetrics
 	}
 
 	return nil

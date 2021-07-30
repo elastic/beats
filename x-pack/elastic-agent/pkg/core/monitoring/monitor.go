@@ -31,5 +31,9 @@ type Monitor interface {
 
 // NewMonitor creates a monitor based on a process configuration.
 func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
-	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig), nil
+	logMetrics := true
+	if cfg.LoggingConfig != nil {
+		logMetics = cfg.LoggingConfig.Metrics.Enabled
+	}
+	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig, logMetrics), nil
 }

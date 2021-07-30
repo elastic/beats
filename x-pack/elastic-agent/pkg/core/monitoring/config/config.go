@@ -12,7 +12,7 @@ type MonitoringConfig struct {
 	Enabled        bool                  `yaml:"enabled" config:"enabled"`
 	MonitorLogs    bool                  `yaml:"logs" config:"logs"`
 	MonitorMetrics bool                  `yaml:"metrics" config:"metrics"`
-	LogMetrics     bool                  `yaml:"log_metrics" config:"log_metrics"`
+	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
 	Namespace      string                `yaml:"namespace" config:"namespace"`
 }
