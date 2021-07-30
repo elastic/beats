@@ -30,8 +30,11 @@ stages:
                 - "arm"
             parameters:
                 - "armTest"
-    build:
-        mage: "mage build test && GO_VERSION=1.13.1 mage testGCPFunctions"
+    unitTest:
+        mage: "mage build unitTest && GO_VERSION=1.13.1 mage testGCPFunctions"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
         stage: mandatory
     macos:
         mage: "mage build unitTest"
