@@ -83,20 +83,13 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 - Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
 
-*Packetbeat*
-
-
-
 *Winlogbeat*
 
 - Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
 
 *Functionbeat*
 
-- Expose region in AWS configuration so Functionbeat can deploy the Lamba in the correct place. {pull}26523[26523]
-
-*Elastic Logging Plugin*
-
+- Expose region in AWS configuration so Functionbeat can deploy the Lambda in the correct place. {pull}26523[26523]
 
 ==== Added
 
@@ -108,11 +101,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
 - Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
 
-*Auditbeat*
-
-
 *Filebeat*
-
 
 - Update PanOS module to parse Global Protect & User ID logs. {issue}24722[24722] {issue}24724[24724] {pull}24927[24927]
 - Add HMAC signature validation support for http_endpoint input. {pull}24918[24918]
@@ -153,14 +142,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 - Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
 - Add `proxy_headers` to HTTP monitor. {pull}25219[25219]
-
-*Heartbeat*
-
 - Suppress too many bad message error logs when reading from corrupted journal for 5 seconds. {pull}26224[26224]
-
-*Heartbeat*
-
-*Journalbeat*
 
 *Metricbeat*
 
@@ -178,48 +160,17 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 
 *Packetbeat*
 
-
 - Add `url.extension` to HTTP events {issue}25990[25990] {pull}25999[25999]
-
-*Functionbeat*
-
-
-*Heartbeat*
-
 
 *Winlogbeat*
 
 - Changed the log level of the "Successfully published events" message from `info` to `debug` to reduce verbosity of the `info` logging level. To track event log reader activity use the `published_events` metric. {pull}25617[25617]
 
-*Elastic Log Driver*
-
-
 ==== Deprecated
-
-*Affecting all Beats*
-
 
 *Filebeat*
 
 - Deprecate the MISP module. The Threat Intel module should be used instead. {issue}25240[25240]
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
 
 
 [[release-notes-7.13.4]]

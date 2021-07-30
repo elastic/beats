@@ -24,9 +24,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
 
-
-*Auditbeat*
-
 *Filebeat*
 
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
@@ -287,7 +284,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Filebeat*
 
-
 - `container` and `docker` inputs now support reading of labels and env vars written by docker JSON file logging driver. {issue}8358[8358]
 - Add `index` option to all inputs to directly set a per-input index value. {pull}14010[14010]
 - Add ECS tls fields to zeek:smtp,rdp,ssl and aws:s3access,elb {issue}15757[15757] {pull}15935[15936]
@@ -367,20 +363,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added DNS response IP addresses to `related.ip` in Suricata module. {pull}22291[22291]
 - Added support for first_event context in filebeat httpjson input {pull}23437[23437]
 - Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
-removing unsupported processors. {pull}23763[23763]
 - Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
 - Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
 - Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 
-
 *Heartbeat*
 
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
-
-*Heartbeat*
-
-
-*Heartbeat*
 
 *Journalbeat*
 
@@ -443,13 +432,7 @@ removing unsupported processors. {pull}23763[23763]
 *Packetbeat*
 
 
-`host` metadata fields when processing network data from network tap or mirror
-port. {pull}19209[19209]
-
 *Functionbeat*
-
-
-*Heartbeat*
 
 
 *Winlogbeat*
