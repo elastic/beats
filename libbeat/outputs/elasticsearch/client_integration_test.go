@@ -210,8 +210,10 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 
 	output, client := connectTestEsWithoutStats(t, obj{
 		"index": index,
-		"non_indexable_policy": DeadLetterIndexPolicy{
-			Index: deadletterIndex,
+		"non_indexable_policy": map[string]interface{}{
+			"dead_letter_index": map[string]interface{}{
+				"index": deadletterIndex,
+			},
 		},
 	})
 	client.conn.Delete(index, "", "", nil)
