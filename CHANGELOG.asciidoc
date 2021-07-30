@@ -57,9 +57,6 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Fix default config template values for paths on oracle module: {pull}26276[26276]
 - Fix Elasticsearch compatibility for modules that use `copy_from` in `set` processors. {issue}26629[26629]
 - Change type of max_bytes in all configs to be cfgtype.ByteSize {pull}26699[26699]
-
-*Filebeat*
-
 - Add shared_credential_file to cloudtrail config {issue}15652[15652] {pull}15656[15656]
 - Change `checkpoint.source_object` from Long to Keyword. {issue}25124[25124] {pull}25145[25145]
 - Fix Nginx module pipelines. {issue}19088[19088] {pull}24699[24699]
@@ -77,9 +74,6 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Heartbeat*
 
 - Add Context to otherwise ambiguous HTTP body read errors. {pull}25499[25499]
-
-*Journalbeat*
-
 
 *Metricbeat*
 
