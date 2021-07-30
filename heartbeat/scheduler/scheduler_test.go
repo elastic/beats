@@ -26,12 +26,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/heartbeat/config"
-	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/semaphore"
+
+	"github.com/elastic/beats/v7/heartbeat/config"
+	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 // The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
