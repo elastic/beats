@@ -1,6 +1,7 @@
 package cfgload
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"io"
@@ -10,7 +11,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/timed"
-	"github.com/elastic/go-concert/unison"
 )
 
 // Watcher monitors the paths given in Files for changes.
@@ -26,7 +26,7 @@ type Reader interface {
 
 // Run executes the watchers main loop. It blocks until the watcher is shut down.
 // The handler function is called with the merged configuration if the watcher detects any file changes.
-func (w *Watcher) Run(cancel unison.Canceler, handler func(*common.Config) error) error {
+func (w *Watcher) Run(cancel context.Context, handler func(*common.Config) error) error {
 	lastHash, err := hashFiles(w.Files)
 	if err != nil {
 		w.Log.Errorf("Hashing configuration files failed with: %v", err)

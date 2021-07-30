@@ -242,20 +242,17 @@ func (app *app) Run(sigContext context.Context) error {
 	// App internal jobs that are required for the app to run correctly are
 	// registered with the appTaskGroup.  The app is forced to shut down if an
 	// essential subsystem fails.
-	appTaskGroup := unison.TaskGroup{StopOnError: func(err error) bool {
-		// XXX: the check can be removed after updating go-concert to 0.0.4
+	appTaskGroup := unison.TaskGroupWithCancel(sigContext)
+	appTaskGroup.OnQuit = func(err error) (unison.TaskGroupStopAction, error) {
 		if err == context.Canceled {
-			return false
+			return unison.TaskGroupStopActionContinue, nil
 		}
 
 		debug.PrintStack()
 		app.log.Errorf("Critical error, forcing shutdown: %+v", err)
 		autoCancel.Cancel()
-		return true
-	}}
-	sigContext = autoCancel.With(ctxtool.WithFunc(sigContext, func() {
-		appTaskGroup.Stop()
-	}))
+		return unison.TaskGroupStopActionShutdown, err
+	}
 
 	// Start inputs and input managers. Input managers are essential to inputs. If an Input Manager fails,
 	// all inputs are stopped and the task returns an error, which is finally propagate to other
@@ -263,39 +260,26 @@ func (app *app) Run(sigContext context.Context) error {
 	// Inputs are not  allowed to be active if the inputs managers are not
 	// running. This requires us to propage to wait for all inputs/outputs to be stopped, before we can propagate the
 	// the shutdown signal to the input managers.
-	appTaskGroup.Go(func(cancel unison.Canceler) error {
-		pipeCtx, pipeCancel := context.WithCancel(ctxtool.FromCanceller(cancel))
-		defer pipeCancel()
-
-		inputManagerTaskGroup := unison.TaskGroup{StopOnError: func(_ error) bool {
-			pipeCancel()
-			return false
-		}}
+	appTaskGroup.Go(func(cancel context.Context) error {
+		inputManagerTaskGroup := unison.TaskGroupWithCancel(cancel)
+		inputManagerTaskGroup.OnQuit = unison.StopOnError
+		defer inputManagerTaskGroup.Stop()
 
 		// Start input managers in background. We shutdown if any background task failed
 		app.log.Info("Starting input managers...")
-		if err := app.inputsRegistry.Init(&inputManagerTaskGroup, v2.ModeRun); err != nil {
+		if err := app.inputsRegistry.Init(inputManagerTaskGroup, v2.ModeRun); err != nil {
 			logp.Err("Failed to initialize the input managers: %v", err)
 			return err
 		}
 		app.log.Info("Input management active...")
-		if pipeCtx.Err() != nil {
-			return inputManagerTaskGroup.Stop()
-		}
-
-		pipeErr := app.pipelines.Run(pipeCtx)
-		managerErr := inputManagerTaskGroup.Stop()
-		if pipeErr == nil || errors.Is(pipeErr, context.Canceled) {
-			return managerErr
-		}
-		return pipeErr
+		return app.pipelines.Run(inputManagerTaskGroup.Context())
 	})
 
 	// esatblish connection with agent for status reporing and dynamic configuration updates.
 	// the manager should be the last subsystem that is shutdown.
 	if app.agentManager != nil {
-		appTaskGroup.Go(func(cancel unison.Canceler) error {
-			return app.agentManager.Run(ctxtool.FromCanceller(cancel), management.EventHandler{
+		appTaskGroup.Go(func(cancel context.Context) error {
+			return app.agentManager.Run(cancel, management.EventHandler{
 				OnStop:   autoCancel.Cancel,
 				OnConfig: app.onConfig,
 			})
@@ -303,7 +287,7 @@ func (app *app) Run(sigContext context.Context) error {
 	}
 
 	if app.configWatcher != nil {
-		appTaskGroup.Go(func(cancel unison.Canceler) error {
+		appTaskGroup.Go(func(cancel context.Context) error {
 			return app.configWatcher.Run(cancel, app.onConfig)
 		})
 	}
