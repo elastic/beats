@@ -34,6 +34,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removed beats central management {pull}25696[25696], {issue}23908[23908]
 - MacOSX minimum supported version set to 10.14 {issue}24193{24193}
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
+- Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 
 *Auditbeat*
 
@@ -80,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change source field for `event.action` in `fortinet.firewall` module to `fortinet.firewall.action` instead of `fortinet.firewall.eventtype`. {pull}24816[24816]
 - Release Filebeat Stack Monitoring modules as GA {pull}26226[26226]
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
+- Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
 
 *Heartbeat*
 - Add support for screenshot blocks and use newer synthetics flags that only works in newer synthetics betas. {pull}25808[25808]
@@ -399,6 +401,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 - Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
+- Allow metric prefix override per service in gcp module. {pull}26960[26960]
 
 *Packetbeat*
 
@@ -464,6 +467,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
 - Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
+- Add proxy support for AWS functions. {pull}26832[26832]
 
 *Auditbeat*
 
@@ -627,6 +631,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use default add_locale for fortinet.firewall {issue}20300[20300] {pull}26524[26524]
 - Add new template functions and `value_type` parameter to `httpjson` transforms. {pull}26847[26847]
 - Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
+- Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
 
 *Heartbeat*
 

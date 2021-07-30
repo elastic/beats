@@ -99,7 +99,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
+	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.4
@@ -121,7 +121,7 @@ require (
 	github.com/mattn/go-colorable v0.1.6
 	github.com/mattn/go-ieproxy v0.0.0-20191113090002-7c0f6868bffe // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.2-0.20181231171920-c182affec369 // indirect
-	github.com/miekg/dns v1.1.15
+	github.com/miekg/dns v1.1.25
 	github.com/mitchellh/gox v1.0.1
 	github.com/mitchellh/hashstructure v0.0.0-20170116052023-ab25296c0f51
 	github.com/mitchellh/mapstructure v1.3.3
@@ -156,7 +156,7 @@ require (
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
-	go.elastic.co/apm v1.8.1-0.20200909061013-2aef45b9cf4b
+	go.elastic.co/apm v1.11.0
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
 	go.elastic.co/apm/module/apmhttp v1.7.2
 	go.elastic.co/ecszap v0.3.0
