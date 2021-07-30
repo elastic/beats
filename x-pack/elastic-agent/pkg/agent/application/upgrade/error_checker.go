@@ -49,10 +49,12 @@ func NewErrorChecker(ch chan error, log *logger.Logger) (*ErrorChecker, error) {
 func (ch *ErrorChecker) Run(ctx context.Context) {
 	ch.log.Debug("Error checker started")
 	for {
+		t := time.NewTimer(statusCheckPeriod)
 		select {
 		case <-ctx.Done():
+			t.Stop()
 			return
-		case <-time.After(statusCheckPeriod):
+		case <-t.C:
 			err := ch.agentClient.Connect(ctx)
 			if err != nil {
 				ch.failuresCounter++

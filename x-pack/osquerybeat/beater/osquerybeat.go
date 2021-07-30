@@ -46,6 +46,8 @@ const (
 	// The interval in second for configuration refresh;
 	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
 	configurationRefreshIntervalSecs = 60
+
+	osqueryTimeout = 60 * time.Second
 )
 
 const (
@@ -176,7 +178,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// Create osqueryd client
 	cli := osqdcli.New(socketPath,
 		osqdcli.WithLogger(bt.log),
-		osqdcli.WithTimeout(3*time.Second),
+		osqdcli.WithTimeout(osqueryTimeout),
 		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
 	)
 
@@ -201,7 +203,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Start osquery extensions for logger and configuration
 	g.Go(func() error {
-		return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin)
+		return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
 	})
 
 	// Register action handler
@@ -246,9 +248,9 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	return g.Wait()
 }
 
-func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin) (err error) {
+func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
 	// Register config and logger extensions
-	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath)
+	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
 	if err != nil {
 		return
 	}

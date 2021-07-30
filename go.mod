@@ -19,6 +19,7 @@ require (
 	github.com/Azure/go-autorest/autorest/adal v0.8.2
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.2.0
+	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
 	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
@@ -61,7 +62,7 @@ require (
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.2.1-0.20200121105743-0d940dd29fd2
 	github.com/elastic/ecs v1.10.0
-	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210308165121-7dd05ee2b5a5
+	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
 	github.com/elastic/go-concert v0.1.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
 	github.com/elastic/go-licenser v0.3.1
@@ -98,7 +99,7 @@ require (
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/gorilla/mux v1.7.2
 	github.com/grpc-ecosystem/grpc-gateway v1.13.0 // indirect
-	github.com/h2non/filetype v1.1.1-0.20201130172452-f60988ab73d5
+	github.com/h2non/filetype v1.1.1
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hashicorp/go-retryablehttp v0.6.6
 	github.com/hashicorp/golang-lru v0.5.4

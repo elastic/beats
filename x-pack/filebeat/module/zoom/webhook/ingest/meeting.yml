@@ -51,7 +51,7 @@ processors:
     if: ctx?.url?.original != null
 - set:
     field: url.full
-    copy_from: url.original
+    value: '{{{url.original}}}'
     ignore_failure: true
     if: ctx?.url?.original != null
 #

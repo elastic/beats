@@ -156,7 +156,7 @@ processors:
       path: elasticsearch.audit
   - set:
       field: http.request.id
-      copy_from: elasticsearch.audit.request.id
+      value: '{{{elasticsearch.audit.request.id}}}'
       ignore_empty_value: true
   - dot_expander:
       field: cluster.name
