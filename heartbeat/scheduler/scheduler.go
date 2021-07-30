@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
+	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/timerqueue"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -46,14 +47,15 @@ var ErrInvalidTransition = fmt.Errorf("invalid state transition")
 
 // Scheduler represents our async timer based scheduler.
 type Scheduler struct {
-	limit      int64
-	limitSem   *semaphore.Weighted
-	state      atomic.Int
-	location   *time.Location
-	timerQueue *timerqueue.TimerQueue
-	ctx        context.Context
-	cancelCtx  context.CancelFunc
-	stats      schedulerStats
+	limit       int64
+	limitSem    *semaphore.Weighted
+	state       atomic.Int
+	location    *time.Location
+	timerQueue  *timerqueue.TimerQueue
+	ctx         context.Context
+	cancelCtx   context.CancelFunc
+	stats       schedulerStats
+	jobLimitSem map[string]*semaphore.Weighted
 }
 
 type schedulerStats struct {
@@ -77,13 +79,33 @@ type Schedule interface {
 	RunOnInit() bool
 }
 
+func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semaphore.Weighted {
+	jc := map[string]config.JobLimit{
+		"http":    {Limit: math.MaxInt64},
+		"icmp":    {Limit: math.MaxInt64},
+		"tcp":     {Limit: math.MaxInt64},
+		"browser": {Limit: math.MaxInt64},
+	}
+	for jobType, jobLimit := range jobLimitByType {
+		if jobLimit.Limit > 0 {
+			jc[jobType] = jobLimit
+		}
+	}
+
+	jobLimitSem := map[string]*semaphore.Weighted{}
+	for jobType, jobLimit := range jc {
+		jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
+	}
+	return jobLimitSem
+}
+
 // New creates a new Scheduler
 func New(limit int64, registry *monitoring.Registry) *Scheduler {
-	return NewWithLocation(limit, registry, time.Local)
+	return NewWithLocation(limit, registry, time.Local, nil)
 }
 
 // NewWithLocation creates a new Scheduler using the given runAt zone.
-func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location) *Scheduler {
+func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.Location, jobLimitByType map[string]config.JobLimit) *Scheduler {
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
 	if limit < 1 {
@@ -96,14 +118,14 @@ func NewWithLocation(limit int64, registry *monitoring.Registry, location *time.
 	waitingTasksGauge := monitoring.NewUint(registry, "tasks.waiting")
 
 	sched := &Scheduler{
-		limit:     limit,
-		location:  location,
-		state:     atomic.MakeInt(statePreRunning),
-		ctx:       ctx,
-		cancelCtx: cancelCtx,
-		limitSem:  semaphore.NewWeighted(limit),
-
-		timerQueue: timerqueue.NewTimerQueue(ctx),
+		limit:       limit,
+		location:    location,
+		state:       atomic.MakeInt(statePreRunning),
+		ctx:         ctx,
+		cancelCtx:   cancelCtx,
+		limitSem:    semaphore.NewWeighted(limit),
+		jobLimitSem: getJobLimitSem(jobLimitByType),
+		timerQueue:  timerqueue.NewTimerQueue(ctx),
 
 		stats: schedulerStats{
 			activeJobs:         activeJobsGauge,
@@ -174,7 +196,7 @@ var ErrAlreadyStopped = errors.New("attempted to add job to already stopped sche
 
 // Add adds the given TaskFunc to the current scheduler. Will return an error if the scheduler
 // is done.
-func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeFn context.CancelFunc, err error) {
+func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType string) (removeFn context.CancelFunc, err error) {
 	if s.state.Load() == stateStopped {
 		return nil, ErrAlreadyStopped
 	}
@@ -195,7 +217,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc) (removeF
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint)
+		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint, jobType)
 		s.stats.activeJobs.Dec()
 		s.runOnce(sched.Next(lastRanAt), taskFn)
 		debugf("Job '%v' returned at %v", id, time.Now())
@@ -233,10 +255,10 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 // runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
 // Subtasks are run in separate goroutines.
 // returns the time execution began on its first task
-func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) (startedAt time.Time) {
+func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc, jobType string) (startedAt time.Time) {
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
-	startedAt = s.runRecursiveTask(jobCtx, task, wg)
+	startedAt = s.runRecursiveTask(jobCtx, task, wg, jobType)
 	wg.Wait()
 	return startedAt
 }
@@ -245,8 +267,13 @@ func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc) (star
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup) (startedAt time.Time) {
+func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup, jobType string) (startedAt time.Time) {
 	defer wg.Done()
+	jobSem := s.jobLimitSem[jobType]
+	jobSemErr := jobSem.Acquire(jobCtx, 1)
+	if jobSemErr == nil {
+		defer jobSem.Release(1)
+	}
 
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
@@ -280,7 +307,7 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 		for _, cont := range continuations {
 			// Run continuations in parallel, note that these each will acquire their own slots
 			// We can discard the started at times for continuations as those are irrelevant
-			go s.runRecursiveTask(jobCtx, cont, wg)
+			go s.runRecursiveTask(jobCtx, cont, wg, jobType)
 		}
 	}
 

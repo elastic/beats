@@ -50,7 +50,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestNewWithLocation(t *testing.T) {
-	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime())
+	scheduler := NewWithLocation(123, monitoring.NewRegistry(), tarawaTime(), nil)
 	assert.Equal(t, int64(123), scheduler.limit)
 	assert.Equal(t, tarawaTime(), scheduler.location)
 }
@@ -85,7 +85,7 @@ func testTaskTimes(limit uint32, fn TaskFunc) TaskFunc {
 func TestScheduler_Start(t *testing.T) {
 	// We use tarawa runAt because it could expose some weird runAt math if by accident some code
 	// relied on the local TZ.
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
 	defer s.Stop()
 
 	executed := make(chan string)
@@ -98,7 +98,7 @@ func TestScheduler_Start(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}))
+	}), "http")
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
@@ -113,7 +113,7 @@ func TestScheduler_Start(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn))
+	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http")
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
@@ -128,7 +128,7 @@ func TestScheduler_Start(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}))
+	}), "http")
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
@@ -160,7 +160,7 @@ func TestScheduler_Start(t *testing.T) {
 }
 
 func TestScheduler_Stop(t *testing.T) {
-	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime())
+	s := NewWithLocation(10, monitoring.NewRegistry(), tarawaTime(), nil)
 
 	executed := make(chan struct{})
 
@@ -170,7 +170,7 @@ func TestScheduler_Stop(t *testing.T) {
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
-	}))
+	}), "http")
 
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
@@ -208,7 +208,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			limit := int64(100)
-			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime())
+			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil)
 
 			if testCase.overLimit {
 				s.limitSem.Acquire(context.Background(), limit)
@@ -224,7 +224,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg)
+			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, "http")
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
 			// for an error value and released an unacquired resource in scheduler.go.
@@ -241,7 +241,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 }
 
 func BenchmarkScheduler(b *testing.B) {
-	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime())
+	s := NewWithLocation(0, monitoring.NewRegistry(), tarawaTime(), nil)
 
 	sched := testSchedule{0}
 
@@ -250,7 +250,7 @@ func BenchmarkScheduler(b *testing.B) {
 		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
-		})
+		}, "http")
 		assert.NoError(b, err)
 	}
 
@@ -260,9 +260,7 @@ func BenchmarkScheduler(b *testing.B) {
 
 	count := 0
 	for count < b.N {
-		select {
-		case <-executed:
-			count++
-		}
+		<-executed
+		count++
 	}
 }
