@@ -44,6 +44,13 @@ setup.template.fields: "path/to/fields.yml"
 If the template already exists, it’s not overwritten unless you configure
 {beatname_uc} to do so.
 
+Also make sure to disable the index Index Lifecycle Management(ILM) feature in Elasticsearch. ILM is used to manage your Filebeat indices and ```output.elasticsearch.index``` setting that allows to override the index name used for Beats events doesn't work when ILM is enabled.
+
+-----
+setup.ilm.enabled: false
+-----
+
+
 [float]
 [[overwrite-template]]
 === Overwrite an existing index template
