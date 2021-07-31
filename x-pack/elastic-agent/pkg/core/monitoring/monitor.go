@@ -33,7 +33,7 @@ type Monitor interface {
 func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
 	logMetrics := true
 	if cfg.LoggingConfig != nil {
-		logMetics = cfg.LoggingConfig.Metrics.Enabled
+		logMetrics = cfg.LoggingConfig.Metrics.Enabled
 	}
 	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig, logMetrics), nil
 }
