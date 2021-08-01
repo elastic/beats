@@ -20,8 +20,8 @@ package timestamp
 import (
 	"fmt"
 	"time"
+	_ "time/tzdata" // Imported to embed the timezone database.
 
-	"4d63.com/tz"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -96,7 +96,7 @@ func loadLocation(timezone string) (*time.Location, error) {
 	}
 
 	// Rest of location formats
-	return tz.LoadLocation(timezone)
+	return time.LoadLocation(timezone)
 }
 
 func (p *processor) String() string {
