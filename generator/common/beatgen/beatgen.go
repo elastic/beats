@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package beatgen provides functions used by the root beats magefile to
+// generate custom beats.
 package beatgen
 
 import (
@@ -88,7 +90,7 @@ var configList = []ConfigItem{
 	},
 }
 
-// Generate generates a new custom beat
+// Generate generates a new custom beat.
 func Generate() error {
 	cfg, err := getConfig()
 	if err != nil {
@@ -153,7 +155,7 @@ func getConfiguredBeatsRevision(beatsModule, revision string) error {
 	)
 }
 
-// VendorUpdate updates the vendor directory if used
+// VendorUpdate updates the vendor directory if it is used.
 func VendorUpdate() error {
 	err := sh.Rm("./vendor/github.com/elastic/beats")
 	if err != nil {
@@ -164,7 +166,7 @@ func VendorUpdate() error {
 	return setup.CopyVendor()
 }
 
-// returns a "compleated" config object with everything we need
+// getConfig returns a "completed" config object with everything we need.
 func getConfig() (map[string]string, error) {
 	userCfg := make(map[string]string)
 	for _, cfgVal := range configList {
@@ -210,7 +212,7 @@ func getValFromUser(help, def string) (string, error) {
 	return strings.TrimSpace(str), nil
 }
 
-// getAbsoluteBeatsPath tries to infer the "real" non-vendor beats path
+// getAbsoluteBeatsPath returns an inferred "real" non-vendor beats path.
 func getAbsoluteBeatsPath() string {
 	beatsImportPath := "github.com/elastic/beats"
 	gopath := os.Getenv("GOPATH")

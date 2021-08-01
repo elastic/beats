@@ -33,8 +33,8 @@ import (
 // CfgPrefix specifies the env variable prefix used to configure the beat
 const CfgPrefix = "NEWBEAT"
 
-// GenNewBeat generates a new custom beat
-// We assume our config object is populated and valid here
+// GenNewBeat generates a new custom beat.
+// We assume our config object is populated and valid here.
 func GenNewBeat(config map[string]string) error {
 	if config["type"] != "beat" && config["type"] != "metricbeat" {
 		return fmt.Errorf("%s is not a valid custom beat type. Valid types are 'beat' and 'metricbeat'", config["type"])
@@ -54,10 +54,10 @@ func GenNewBeat(config map[string]string) error {
 			}
 		} else {
 
-			// dump original source file
+			// Dump original source file.
 			tmplFile, err := ioutil.ReadFile(path)
 			if err != nil {
-				return errors.Wrap(err, "error reading source templatse file")
+				return errors.Wrap(err, "error reading source template file")
 			}
 			newFile := replaceVars(config, string(tmplFile))
 
@@ -73,8 +73,8 @@ func GenNewBeat(config map[string]string) error {
 	return err
 }
 
-// replaceVars replaces any template vars in a target file
-// We're not using the golang template engine as it seems a tad heavy-handed for this use case
+// replaceVars replaces any template vars in a target file.
+// We're not using the golang template engine as it seems a tad heavy-handed for this use case.
 // We have a dozen or so files across various languages (go, make, etc) and most just need one or two vars replaced.
 func replaceVars(config map[string]string, fileBody string) string {
 	newBody := fileBody

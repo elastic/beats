@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// Package setup provides git repository and module initialization, and
+// source population functions for generating custom beats.
 package setup
 
 import (
@@ -29,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
+// InitModule performs a Go module initialization.
 func InitModule() error {
 	err := gotool.Mod.Init()
 	if err != nil {
@@ -99,7 +102,7 @@ func copyReplacedModules() error {
 	return w.Flush()
 }
 
-// CopyVendor copies a new version of the dependencies to the vendor folder
+// CopyVendor copies a new version of the dependencies to the vendor folder.
 func CopyVendor() error {
 	err := gotool.Mod.Vendor()
 	if err != nil {
@@ -135,12 +138,12 @@ func CopyVendor() error {
 	return nil
 }
 
-// GitInit initializes a new git repo in the current directory
+// GitInit initializes a new git repo in the current directory.
 func GitInit() error {
 	return sh.Run("git", "init")
 }
 
-// GitAdd adds the current working directory to git and does an initial commit
+// GitAdd adds the current working directory to git and does an initial commit.
 func GitAdd() error {
 	err := sh.Run("git", "add", "-A")
 	if err != nil {
