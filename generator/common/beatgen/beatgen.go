@@ -62,9 +62,7 @@ var configList = []ConfigItem{
 		Key:  "beat_path",
 		Help: "Enter the beat path",
 		Default: func(cfg map[string]string) string {
-			ghName, _ := cfg["github_name"]
-			beatName, _ := cfg["project_name"]
-			return "github.com/" + ghName + "/" + strings.ToLower(beatName)
+			return "github.com/" + cfg["github_name"] + "/" + strings.ToLower(cfg["project_name"])
 		},
 	},
 	{
