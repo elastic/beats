@@ -48,20 +48,20 @@ func GenNewBeat(config map[string]string) error {
 		writePath := strings.Replace(replacePath, "{beat}", config["project_name"], -1)
 		writePath = strings.Replace(writePath, ".go.tmpl", ".go", -1)
 		if info.IsDir() {
-			err := os.MkdirAll(writePath, 0755)
+			err := os.MkdirAll(writePath, 0o755)
 			if err != nil {
 				return errors.Wrapf(err, "error creating directory %s", writePath)
 			}
 		} else {
 
-			//dump original source file
+			// dump original source file
 			tmplFile, err := ioutil.ReadFile(path)
 			if err != nil {
 				return errors.Wrap(err, "error reading source templatse file")
 			}
 			newFile := replaceVars(config, string(tmplFile))
 
-			err = ioutil.WriteFile(writePath, []byte(newFile), 0644)
+			err = ioutil.WriteFile(writePath, []byte(newFile), 0o644)
 			if err != nil {
 				return errors.Wrap(err, "error writing beat file")
 			}
@@ -77,7 +77,7 @@ func GenNewBeat(config map[string]string) error {
 // We're not using the golang template engine as it seems a tad heavy-handed for this use case
 // We have a dozen or so files across various languages (go, make, etc) and most just need one or two vars replaced.
 func replaceVars(config map[string]string, fileBody string) string {
-	var newBody = fileBody
+	newBody := fileBody
 	config["beat"] = strings.ToLower(config["project_name"])
 	for tmplName, tmplValue := range config {
 		tmplStr := fmt.Sprintf("{%s}", tmplName)

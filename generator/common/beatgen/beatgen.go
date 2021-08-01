@@ -129,7 +129,7 @@ func Generate() error {
 	mg.Deps(setup.GitInit)
 
 	if cfg["type"] == "metricbeat" {
-		//This is runV because it'll ask for user input, so we need stdout.
+		// This is runV because it'll ask for user input, so we need stdout.
 		err = sh.RunV("make", "create-metricset")
 		if err != nil {
 			return errors.Wrap(err, "error running create-metricset")
@@ -183,7 +183,6 @@ func getConfig() (map[string]string, error) {
 	}
 
 	return userCfg, nil
-
 }
 
 func getEnvConfig(cfgKey string) (string, bool) {
@@ -211,7 +210,6 @@ func getValFromUser(help, def string) (string, error) {
 		return def, nil
 	}
 	return strings.TrimSpace(str), nil
-
 }
 
 // getAbsoluteBeatsPath tries to infer the "real" non-vendor beats path
@@ -222,5 +220,4 @@ func getAbsoluteBeatsPath() string {
 		return filepath.Join(gopath, "src", beatsImportPath)
 	}
 	return filepath.Join(build.Default.GOPATH, "src", beatsImportPath)
-
 }

@@ -82,7 +82,7 @@ func copyReplacedModules() error {
 		}
 	}
 
-	outMod, err := os.OpenFile(goModPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0640)
+	outMod, err := os.OpenFile(goModPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o640)
 	if err != nil {
 		return errors.Wrap(err, "error opening the go.mod file of the generated Beat")
 	}
@@ -109,7 +109,7 @@ func CopyVendor() error {
 	err = devtools.CopyFilesToVendor(
 		"./vendor",
 		[]devtools.CopyModule{
-			devtools.CopyModule{
+			{
 				Name: "github.com/elastic/beats/v7",
 				FilesToCopy: []string{
 					"dev-tools",
@@ -120,7 +120,7 @@ func CopyVendor() error {
 					".go-version",
 				},
 			},
-			devtools.CopyModule{
+			{
 				Name: "github.com/tsg/go-daemon",
 				FilesToCopy: []string{
 					"src",
