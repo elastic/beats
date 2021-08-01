@@ -43,10 +43,10 @@ func GenNewBeat(config map[string]string) error {
 	genPath := devtools.OSSBeatDir("generator", "_templates", config["type"], "{beat}")
 	err := filepath.Walk(genPath, func(path string, info os.FileInfo, err error) error {
 		newBase := filepath.Join(build.Default.GOPATH, "src", config["beat_path"])
-		replacePath := strings.Replace(path, genPath, newBase, -1)
+		replacePath := strings.ReplaceAll(path, genPath, newBase)
 
-		writePath := strings.Replace(replacePath, "{beat}", config["project_name"], -1)
-		writePath = strings.Replace(writePath, ".go.tmpl", ".go", -1)
+		writePath := strings.ReplaceAll(replacePath, "{beat}", config["project_name"])
+		writePath = strings.ReplaceAll(writePath, ".go.tmpl", ".go")
 		if info.IsDir() {
 			err := os.MkdirAll(writePath, 0o755)
 			if err != nil {
