@@ -291,6 +291,38 @@ func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func (client *Client) GetDashboard(id string) (common.MapStr, error) {
+	var response []byte
+	var err error
+	if client.Version.Major > 7 && client.Version.Minor > 14 {
+		response, err = client.getDashboardLegacy(id)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		response, err = client.getDashboard(id)
+		if err != nil {
+			return nil, err
+		}
+	}
+	result, err := RemoveIndexPattern(response)
+	if err != nil {
+		return nil, fmt.Errorf("error removing index pattern: %+v", err)
+	}
+	return result, nil
+}
+
+func (client *Client) getDashboard(id string) ([]byte, error) {
+	body := `{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true}`
+	body = fmt.Sprintf(body, id)
+	_, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
+	if err != nil {
+		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
+	}
+
+	return response, nil
+}
+
+func (client *Client) getDashboardLegacy(id string) ([]byte, error) {
 	params := url.Values{}
 	params.Add("dashboard", id)
 	_, response, err := client.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
@@ -298,12 +330,7 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
 	}
 
-	result, err := RemoveIndexPattern(response)
-	if err != nil {
-		return nil, fmt.Errorf("error removing index pattern: %+v", err)
-	}
-
-	return result, nil
+	return response, nil
 }
 
 // truncateString returns a truncated string if the length is greater than 250

@@ -33,7 +33,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var importAPI = "/api/kibana/dashboards/import"
+var importAPILegacy = "/api/kibana/dashboards/import"
+var importAPI = "/api/saved_objects/_import"
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
