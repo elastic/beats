@@ -23,11 +23,13 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
 	"testing"
@@ -124,6 +126,13 @@ func TLSChecks(chainIndex, certIndex int, certificate *x509.Certificate) validat
 	}, time.Duration(1))
 
 	expected.Put("tls.rtt.handshake.us", isdef.IsDuration)
+
+	// Generally, the exact cipher will match, but on windows 7 32bit this is not true!
+	// We don't actually care about the exact cipher matching, since we're not testing the TLS
+	// implementation, we trust go there, just that most of the metadata is present
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		expected.Put("tls.cipher", isdef.IsString)
+	}
 
 	return lookslike.MustCompile(expected)
 }
