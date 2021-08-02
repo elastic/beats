@@ -7,6 +7,7 @@ package cef
 import (
 	"net"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -93,11 +94,38 @@ func toIP(v string) (string, error) {
 func toMACAddress(v string) (string, error) {
 	// CEF specifies that MAC addresses are colon separated, but this will be a
 	// little more liberal.
-	hw, err := net.ParseMAC(v)
+	hw, err := net.ParseMAC(insertMACSeparators(v))
 	if err != nil {
 		return "", err
 	}
 	return hw.String(), nil
+}
+
+// insertMACSeparators adds colon separators to EUI-48 and EUI-64 addresses that
+// have no separators.
+func insertMACSeparators(v string) string {
+	const (
+		eui48HexLength                 = 48 / 4
+		eui64HexLength                 = 64 / 4
+		eui64HexWithSeparatorMaxLength = eui64HexLength + eui64HexLength/2 - 1
+	)
+
+	// Check that the length is correct for a MAC address without separators.
+	// And check that there isn't already a separator in the string.
+	if len(v) != eui48HexLength && len(v) != eui64HexLength || v[2] == ':' || v[2] == '-' || v[4] == '.' {
+		return v
+	}
+
+	var sb strings.Builder
+	sb.Grow(eui64HexWithSeparatorMaxLength)
+
+	for i := 0; i < len(v); i++ {
+		sb.WriteByte(v[i])
+		if i < len(v)-1 && i%2 != 0 {
+			sb.WriteByte(':')
+		}
+	}
+	return sb.String()
 }
 
 var timeLayouts = []string{
