@@ -50,9 +50,9 @@ type s3Input struct {
 }
 
 func newInput(config config) (*s3Input, error) {
-	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get AWS credentials: %w", err)
+		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
 	regionName, err := getRegionFromQueueURL(config.QueueURL, config.AWSConfig.Endpoint)
