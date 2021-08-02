@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 )
 
@@ -27,9 +28,6 @@ type Config struct {
 	// TargetDirectory: path to the directory containing downloaded packages
 	TargetDirectory string `json:"targetDirectory" config:"target_directory"`
 
-	// Timeout: timeout for downloading package
-	Timeout time.Duration `json:"timeout" config:"timeout"`
-
 	// InstallPath: path to the directory containing installed packages
 	InstallPath string `yaml:"installPath" config:"install_path"`
 
@@ -39,16 +37,23 @@ type Config struct {
 	// local or network disk.
 	// If not provided FileSystem Downloader will fallback to /beats subfolder of elastic-agent directory.
 	DropPath string `yaml:"dropPath" config:"drop_path"`
+
+	httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"` // Note: use anonymous struct for json inline
 }
 
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
 	homePath := paths.Home()
+	transport := httpcommon.DefaultHTTPTransportSettings()
+
+	// binaries are a getting bit larger it might take >30s to download them
+	transport.Timeout = 120 * time.Second
+
 	return &Config{
-		SourceURI:       "https://artifacts.elastic.co/downloads/",
-		TargetDirectory: filepath.Join(homePath, "downloads"),
-		Timeout:         120 * time.Second, // binaries are a getting bit larger it might take >30s to download them
-		InstallPath:     filepath.Join(homePath, "install"),
+		SourceURI:             "https://artifacts.elastic.co/downloads/",
+		TargetDirectory:       filepath.Join(homePath, "downloads"),
+		InstallPath:           filepath.Join(homePath, "install"),
+		HTTPTransportSettings: transport,
 	}
 }
 

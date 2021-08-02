@@ -158,6 +158,13 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:3000"]
 
+#------------------------------- Airflow Module -------------------------------
+- module: airflow
+  host: "localhost"
+  port: "8126"
+  #ttl: "30s"
+  metricsets: [ 'statsd' ]
+
 #-------------------------------- Apache Module --------------------------------
 - module: apache
   metricsets: ["status"]
@@ -565,6 +572,20 @@ metricbeat.modules:
 
 - module: gcp
   metricsets:
+    - metrics
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  metrics:
+    - aligner: ALIGN_NONE
+      service: kubernetes
+      service_metric_prefix: kubernetes.io/
+      metric_types:
+        - "container/cpu/core_usage_time"
+
+- module: gcp
+  metricsets:
     - billing
   period: 24h
   project_id: "your project id"
@@ -864,6 +885,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -1352,6 +1374,18 @@ metricbeat.modules:
   port: "8125"
   enabled: false
   #ttl: "30s"
+
+#----------------------------- SyncGateway Module -----------------------------
+- module: syncgateway
+  metricsets:
+    - db
+#    - memory
+#    - replication
+#    - resources
+  period: 10s
+
+  # SyncGateway hosts
+  hosts: ["127.0.0.1:4985"]
 
 #-------------------------------- Tomcat Module --------------------------------
 - module: tomcat

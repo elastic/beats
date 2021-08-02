@@ -1,0 +1,76 @@
+{
+    "interface": ":4984",
+    "logging": {
+        "log_file_path": "/var/tmp/sglogs",
+        "console": {
+            "log_level": "debug",
+            "log_keys": [
+                "*"
+            ]
+        },
+        "error": {
+            "enabled": true,
+            "rotation": {
+                "max_size": 20,
+                "max_age": 180
+            }
+        },
+        "warn": {
+            "enabled": true,
+            "rotation": {
+                "max_size": 20,
+                "max_age": 90
+            }
+        },
+        "info": {
+            "enabled": false
+        },
+        "debug": {
+            "enabled": false
+        }
+    },
+    "databases": {
+        "beer-sample": {
+            "import_docs": "continuous",
+            "enable_shared_bucket_access": true,
+            "bucket": "beer-sample",
+            "server": "http://172.17.0.2:8091",
+            "username": "admin",
+            "password": "123456",
+            "num_index_replicas": 0,
+            "users": {
+                "GUEST": {
+                    "disabled": true
+                },
+                "admin": {
+                    "password": "123456",
+                    "admin_channels": [
+                        "*"
+                    ]
+                }
+            },
+            "revs_limit": 20
+        },
+        "travel-sample": {
+            "import_docs": "continuous",
+            "enable_shared_bucket_access": true,
+            "bucket": "travel-sample",
+            "server": "http://172.17.0.2:8091",
+            "username": "admin",
+            "password": "123456",
+            "num_index_replicas": 0,
+            "users": {
+                "GUEST": {
+                    "disabled": true
+                },
+                "admin": {
+                    "password": "123456",
+                    "admin_channels": [
+                        "*"
+                    ]
+                }
+            },
+            "revs_limit": 20
+        }
+    }
+}

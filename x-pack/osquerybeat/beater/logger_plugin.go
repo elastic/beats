@@ -22,6 +22,62 @@ type SnapshotResult struct {
 	Hits         []map[string]string `json:"snapshot"`
 }
 
+type osqueryLogMessage struct {
+	Severity     int    `json:"s"`
+	Filename     string `json:"f"`
+	Line         int    `json:"i"`
+	Message      string `json:"m"`
+	CalendarTime string `json:"c"`
+	UnixTime     uint64 `json:"u"`
+}
+
+const osqueryLogMessageFieldsCount = 6
+
+type osqLogSeverity int
+
+const (
+	severityEmerg osqLogSeverity = iota
+	severityAlert
+	severityCrit
+	severityErr
+	severityWarn
+	severityNotice
+	severityInfo
+	severityDebug
+)
+
+func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
+	if log == nil {
+		return
+	}
+	args := make([]interface{}, 0, osqueryLogMessageFieldsCount*2)
+	args = append(args, "osquery.log_type")
+	args = append(args, typ)
+	args = append(args, "osquery.severity")
+	args = append(args, m.Severity)
+	args = append(args, "osquery.filename")
+	args = append(args, m.Filename)
+	args = append(args, "osquery.line")
+	args = append(args, m.Line)
+	args = append(args, "osquery.cal_time")
+	args = append(args, m.CalendarTime)
+	args = append(args, "osquery.time")
+	args = append(args, m.UnixTime)
+
+	switch osqLogSeverity(m.Severity) {
+	case severityEmerg, severityAlert, severityCrit:
+		log.Errorw(m.Message, args...)
+	case severityWarn, severityNotice:
+		log.Warnw(m.Message, args...)
+	case severityInfo:
+		log.Infow(m.Message, args...)
+	case severityDebug:
+		log.Debugw(m.Message, args...)
+	default:
+		log.Debugw(m.Message, args...)
+	}
+}
+
 type HandleSnapshotResultFunc func(res SnapshotResult)
 
 type LoggerPlugin struct {
@@ -47,8 +103,16 @@ func (p *LoggerPlugin) Log(ctx context.Context, typ logger.LogType, logText stri
 			p.logSnapshotFn(res)
 		}
 	} else {
-		raw := []byte(logText)
-		p.log.Debugf("log type: %s, %s", typ, string(raw))
+		if typ == logger.LogTypeStatus {
+			var m osqueryLogMessage
+			if err := json.Unmarshal([]byte(logText), &m); err != nil {
+				p.log.Errorf("failed to unmarshal osquery log message: %v", err)
+				return err
+			}
+			m.Log(typ, p.log)
+		} else {
+			p.log.Debug(logText)
+		}
 	}
 
 	return nil
