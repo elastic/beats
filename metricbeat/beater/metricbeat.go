@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/adapter/mba"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// include all metricbeat specific builders
@@ -172,8 +173,9 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
 
-	var runnerFactory cfgfile.RunnerFactory
-	runnerFactory = module.NewFactory(b.Info, moduleOptions...)
+	var runnerFactory, modulesRunnerFactory cfgfile.RunnerFactory
+	modulesRunnerFactory = module.NewFactory(b.Info, moduleOptions...)
+	runnerFactory = modulesRunnerFactory
 	if metricbeat.pluginFactory != nil {
 		inputsLogger := logp.NewLogger("input")
 		v2Inputs := metricbeat.pluginFactory(b.Info, inputsLogger, b.StateStore)
@@ -185,6 +187,7 @@ func newMetricbeat(b *beat.Beat, c *common.Config, options ...Option) (*Metricbe
 		v2InputFactory := compat.RunnerFactory(inputsLogger, b.Info, v2InputLoader)
 		runnerFactory = compat.Combine(runnerFactory, v2InputFactory)
 	}
+	runnerFactory = compat.Combine(runnerFactory, mba.MetricsetRunnerFactory(modulesRunnerFactory))
 
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {

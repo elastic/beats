@@ -2,6 +2,8 @@ package mba
 
 import "github.com/elastic/beats/v7/metricbeat/mb"
 
+// ModuleAdapter creates a shared module instance for creating custom inputs based on
+// metricsets.
 type ModuleAdapter struct {
 	Name      string
 	Factory   mb.ModuleFactory
