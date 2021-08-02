@@ -33,7 +33,7 @@
             "panelRefName": "panel_1",
             "title": "Database Connections",
             "type": "visualization",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -50,7 +50,7 @@
             "panelRefName": "panel_5",
             "title": "Transaction Blocked",
             "type": "visualization",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -68,7 +68,7 @@
             "panelRefName": "panel_6",
             "title": "AWS Region Filter",
             "type": "visualization",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -86,7 +86,7 @@
             "panelRefName": "panel_4d89e43f-299c-4f43-bde2-0ada0983ff23",
             "title": "Free Storage",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -104,7 +104,7 @@
             "panelRefName": "panel_d409ab5d-84b5-4ecc-86ae-1f79a882b626",
             "title": "Read Latency",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -259,7 +259,7 @@
             "panelRefName": "panel_1abf12dc-d009-4a02-acd4-463383d32a63",
             "title": "Write Latency",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -277,7 +277,7 @@
             "panelRefName": "panel_c5476b0e-6a44-43e5-8bb4-0795c4d097c1",
             "title": "Insert Throughput",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -295,7 +295,7 @@
             "panelRefName": "panel_bf74bb77-3503-4682-9f0e-6df0994dce5d",
             "title": "Select Throughput",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -449,7 +449,7 @@
             "panelRefName": "panel_249ff0a6-3fd3-4935-85c3-0c3222d3c498",
             "title": "CPU Total Pct",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -604,7 +604,7 @@
             "panelRefName": "panel_c28488ce-a20e-447f-9a68-ba49b542ab0a",
             "title": "Disk Queue Depth",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -622,7 +622,7 @@
             "panelRefName": "panel_29549114-6ebf-4047-aa56-bc035f66d3b4",
             "title": "Write IOPS",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           },
           {
             "embeddableConfig": {
@@ -761,17 +761,17 @@
             "panelRefName": "panel_addd441f-fa2b-4725-8015-619ee176ed0a",
             "title": "Read IOPS",
             "type": "lens",
-            "version": "7.12.0"
+            "version": "7.11.0"
           }
         ],
         "timeRestore": false,
         "title": "[Metricbeat AWS] RDS Overview",
         "version": 1
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "3367c170-921f-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "dashboard": "7.12.0"
+        "dashboard": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -949,10 +949,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "17fcda50-921b-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1049,10 +1049,10 @@
           "type": "metrics"
         }
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "00b29040-921d-11e9-aa19-159bf182e06f",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1120,10 +1120,10 @@
           "type": "input_control_vis"
         }
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "b5308940-7347-11e9-816b-07687310a99a",
       "migrationVersion": {
-        "visualization": "7.12.0"
+        "visualization": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1378,10 +1378,10 @@
         "title": "RDS Read Latency in Milliseconds [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "f9ff3450-f094-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1528,10 +1528,10 @@
         "title": "RDS Write Latency in Milliseconds [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "8560b400-f096-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1662,10 +1662,10 @@
         "title": "RDS Insert Throughput [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "b0077d10-f09b-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1812,10 +1812,10 @@
         "title": "RDS Select Throughput[Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "41e37710-f09d-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -1962,10 +1962,10 @@
         "title": "RDS CPU Total Pct [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "c4419a90-f091-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -2112,10 +2112,10 @@
         "title": "RDS Disk Queue Depth [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "bbc80900-f09e-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -2262,10 +2262,10 @@
         "title": "RDS Write IOPS [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "30fd4e40-f0a1-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -2396,10 +2396,10 @@
         "title": "RDS Read IOPS [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
-      "coreMigrationVersion": "7.12.0",
+      "coreMigrationVersion": "7.11.0",
       "id": "f757eba0-f0a0-11eb-b61f-a53cb4913361",
       "migrationVersion": {
-        "lens": "7.12.0"
+        "lens": "7.11.0"
       },
       "namespaces": [
         "default"
@@ -2421,5 +2421,5 @@
       "version": "WzI2MjMsMV0="
     }
   ],
-  "version": "7.12.0"
+  "version": "7.11.0"
 }
