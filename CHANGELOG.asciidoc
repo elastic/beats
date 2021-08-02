@@ -28,7 +28,6 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Metricbeat*
 
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
-- Recover `service.address` field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 ==== Bugfixes
 
@@ -80,6 +79,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Fix memory leak in SQL module when database is not available. {issue}25840[25840] {pull}26607[26607]
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 - Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
+- Recover `service.address` field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 *Winlogbeat*
 
