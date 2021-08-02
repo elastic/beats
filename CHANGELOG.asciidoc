@@ -28,7 +28,6 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Metricbeat*
 
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
-- Add `replicas.ready` field to state_statefulset in Kubernetes module {pull}26088[26088]
 - Recover `service.address` field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 ==== Bugfixes
@@ -142,6 +141,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Add support for `copytruncate` method when rotating input logs with an external tool in `filestream` input. {pull}23457[23457]
 - Add `proxy_headers` to HTTP monitor. {pull}25219[25219]
 - Suppress too many bad message error logs when reading from corrupted journal for 5 seconds. {pull}26224[26224]
+- Add `replicas.ready` field to state_statefulset in Kubernetes module {pull}26088[26088]
 
 *Metricbeat*
 
