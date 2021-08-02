@@ -114836,6 +114836,39 @@ alias to: process.executable
 
 --
 
+[float]
+=== owner
+
+Process owner information.
+
+
+*`process.owner.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`process.owner.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`process.owner.name.text`*::
++
+--
+type: text
+
+--
+
 [[exported-fields-proofpoint]]
 == Proofpoint Email Security fields
 

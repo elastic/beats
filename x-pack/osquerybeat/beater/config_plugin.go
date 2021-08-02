@@ -11,6 +11,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 )
 
 const (
@@ -27,6 +28,9 @@ type ConfigPlugin struct {
 
 	// A map that allows to look up the original query by name for the column types resolution
 	queryMap map[string]query
+
+	// A map for the query ECS mapping lookups
+	ecsMap map[string]ecs.Mapping
 
 	// Packs
 	packs map[string]pack
@@ -60,6 +64,13 @@ func (p *ConfigPlugin) ResolveName(name string) (sql string, ok bool) {
 	sc, ok := p.queryMap[name]
 
 	return sc.Query, ok
+}
+
+func (p *ConfigPlugin) LookupECSMapping(name string) (m ecs.Mapping, ok bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	m, ok = p.ecsMap[name]
+	return m, ok
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -124,6 +135,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) {
 	p.configString = ""
 	queriesCount := 0
 	p.queryMap = make(map[string]query)
+	p.ecsMap = make(map[string]ecs.Mapping)
 	p.packs = make(map[string]pack)
 	for _, input := range inputs {
 		pack := pack{
@@ -139,6 +151,9 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) {
 				Snapshot: true, // enforce snapshot for all queries
 			}
 			p.queryMap[id] = query
+			if len(stream.ECSMapping) > 0 {
+				p.ecsMap[id] = stream.ECSMapping
+			}
 			pack.Queries[stream.ID] = query
 			queriesCount++
 		}

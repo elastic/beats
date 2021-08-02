@@ -1,14 +1,17 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "beat": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
+    "event": {
+        "dataset": "vsphere.host",
+        "duration": 115000,
+        "module": "vsphere"
     },
     "metricset": {
-        "host": "http://127.0.0.1:43843/sdk",
-        "module": "vsphere",
         "name": "host",
-        "rtt": 115
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:38517",
+        "type": "vsphere"
     },
     "vsphere": {
         "host": {
