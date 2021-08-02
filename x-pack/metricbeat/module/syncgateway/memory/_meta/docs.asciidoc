@@ -1,0 +1,1 @@
+SyncGateway `memory` metriset contains detailed information about the memory usage of the SyncGateway Go's process.
