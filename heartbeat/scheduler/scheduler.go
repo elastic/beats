@@ -258,7 +258,9 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc, jobType string) (startedAt time.Time) {
 	wg := &sync.WaitGroup{}
 	jobSem := s.jobLimitSem[jobType]
-	jobSem.Acquire(jobCtx, 1)
+	if jobSem != nil {
+		jobSem.Acquire(jobCtx, 1)
+	}
 	wg.Add(1)
 	startedAt = s.runRecursiveTask(jobCtx, task, wg, jobSem)
 	wg.Wait()
@@ -307,7 +309,7 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 			// irrelevant
 			go s.runRecursiveTask(jobCtx, cont, wg, jobSem)
 		}
-		if len(continuations) == 0 {
+		if jobSem != nil && len(continuations) == 0 {
 			jobSem.Release(1)
 		}
 	}

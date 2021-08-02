@@ -284,7 +284,7 @@ func TestScheduler_runRecursiveJob(t *testing.T) {
 			numJobs: 50,
 			limit:   math.MaxInt64,
 			expect: func(events []int) {
-				require.GreaterOrEqual(t, len(events), 200)
+				require.GreaterOrEqual(t, len(events), 50)
 			},
 		},
 	}
