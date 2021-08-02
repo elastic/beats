@@ -162,6 +162,77 @@ func TestFlattenECSMappingEdges(t *testing.T) {
 	}
 }
 
+func TestFlattenECSMappingMoreEdges(t *testing.T) {
+
+	keys := map[string]string{
+		"empty key":             "",
+		"key with whitespaces":  "   ",
+		"key with escaped dots": "foo\\.bar",
+	}
+
+	values := map[string]struct {
+		m   interface{}
+		err error
+	}{
+		"empty field": {
+			map[string]interface{}{
+				"field": "",
+			},
+			ErrECSMappingIsInvalid,
+		},
+		"empty field with whitespaces": {
+			map[string]interface{}{
+				"field": "   ",
+			},
+			ErrECSMappingIsInvalid,
+		},
+		"nil field": {
+			map[string]interface{}{
+				"field": nil,
+			},
+			ErrECSMappingIsInvalid,
+		},
+		"empty string value": {
+			map[string]interface{}{
+				"value": "",
+			},
+			nil,
+		},
+		"empty string value with whitespaces": {
+			map[string]interface{}{
+				"value": "   ",
+			},
+			nil,
+		},
+		"nil value": {
+			map[string]interface{}{
+				"value": nil,
+			},
+			nil,
+		},
+	}
+
+	for depth := 1; depth < maxECSMappingDepth; depth++ {
+		for keyname, key := range keys {
+			for valname, val := range values {
+				name := keyname + " " + valname
+				t.Run(name, func(t *testing.T) {
+					m := generateTestMapping(depth, key, val.m)
+					_, err := flattenECSMapping(m)
+
+					expectErr := val.err
+					if strings.TrimSpace(key) == "" {
+						expectErr = ErrECSMappingIsInvalid
+					}
+					if !errors.Is(err, expectErr) {
+						t.Fatalf("want error: %v, got: %v", expectErr, err)
+					}
+				})
+			}
+		}
+	}
+}
+
 func TestSet(t *testing.T) {
 	logger := logp.NewLogger("config_test")
 
