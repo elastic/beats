@@ -123,21 +123,22 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
-	}
 
-	err = in.grp.Go(func(canceler unison.Canceler) error {
-		interval := in.store.CleanupInterval()
-		if interval <= 0 {
-			interval = 5 * time.Minute
+		err = in.grp.Go(func(canceler unison.Canceler) error {
+			interval := in.store.CleanupInterval()
+			if interval <= 0 {
+				interval = 5 * time.Minute
+			}
+
+			interval = 1 * time.Minute
+			cleanStore(canceler, ctx.Logger, persistentStore, states, interval)
+			return nil
+		})
+
+		if err != nil {
+			return fmt.Errorf("Can not start store cleanup process: %w", err)
 		}
 
-		interval = 1 * time.Minute
-		cleanStore(canceler, ctx.Logger, persistentStore, states, interval)
-		return nil
-	})
-
-	if err != nil {
-		return fmt.Errorf("Can not start store cleanup process: %w", err)
 	}
 
 	defer persistentStore.Close()
