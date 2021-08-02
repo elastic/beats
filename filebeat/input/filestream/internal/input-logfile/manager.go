@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -128,7 +129,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 
 	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
-	err := group.Go(func(canceler unison.Canceler) error {
+	err := group.Go(func(canceler context.Context) error {
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
