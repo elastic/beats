@@ -1233,6 +1233,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1265,6 +1266,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1282,6 +1284,7 @@ func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.Li
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1314,6 +1317,7 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1345,6 +1349,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
