@@ -56,7 +56,7 @@ func init() {
 				"field", "target_field",
 				"overwrite_keys", "document_id",
 				"to_lower", "ignore_missing",
-				"ignore_failure",
+				"ignore_failure", "when",
 			)))
 	jsprocessor.RegisterPlugin("DecodeXML", New)
 }
