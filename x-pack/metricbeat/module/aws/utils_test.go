@@ -76,6 +76,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -120,6 +121,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
