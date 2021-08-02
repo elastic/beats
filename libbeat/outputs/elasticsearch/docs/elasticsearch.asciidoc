@@ -698,6 +698,9 @@ output.elasticsearch:
 ------------------------------------------------------------------------------
 
 ====== `dead_letter_index`
+
+beta[]
+
 On an explicit rejection, this policy will retry the event in the next batch. However, the target index will change
 to index specified. In addition, the structure of the event will be change to the following fields:
 

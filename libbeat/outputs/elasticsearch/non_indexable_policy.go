@@ -19,6 +19,7 @@ package elasticsearch
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -64,6 +65,7 @@ var (
 )
 
 func newDeadLetterIndexPolicy(config *common.Config) (nonIndexablePolicy, error) {
+	cfgwarn.Beta("The non_indexable_policy dead_letter_index is beta.")
 	policy := DeadLetterIndexPolicy{}
 	err := config.Unpack(&policy)
 	if policy.index() == "" {
