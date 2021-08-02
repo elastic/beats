@@ -21,7 +21,6 @@ import (
 	"context"
 	"sync"
 
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -62,8 +61,8 @@ func newUpdateWriter(store *store, ch *updateChan) *updateWriter {
 		store: store,
 		ch:    ch,
 	}
-	w.tg.Go(func(ctx unison.Canceler) error {
-		w.run(ctxtool.FromCanceller(ctx))
+	w.tg.Go(func(ctx context.Context) error {
+		w.run(ctx)
 		return nil
 	})
 
