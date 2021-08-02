@@ -105,6 +105,7 @@ func TestAST(t *testing.T) {
 		"support integers": {
 			hashmap: map[string]interface{}{
 				"timeout": 12,
+				"zero":    int64(0),
 				"range":   []int{20, 30, 40},
 			},
 			ast: &AST{
@@ -121,6 +122,7 @@ func TestAST(t *testing.T) {
 							),
 						},
 						&Key{name: "timeout", value: &IntVal{value: 12}},
+						&Key{name: "zero", value: &IntVal{value: 0}},
 					},
 				},
 			},
@@ -1791,6 +1793,50 @@ func TestHash(t *testing.T) {
 			assert.Equal(t, test.match, test.c1.HashStr() == test.c2.HashStr())
 		})
 	}
+}
+
+func TestLookupString(t *testing.T) {
+	t.Run("when the selector exist with a string value", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "/var/log/log1", s)
+		assert.True(t, ok)
+	})
+
+	t.Run("when the selector doesn't exist", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "Weee!", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
+
+	t.Run("when the node is not a StrVal will fail", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &FloatVal{value: 4.2}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
 }
 
 func mustMakeVars(mapping map[string]interface{}) *Vars {

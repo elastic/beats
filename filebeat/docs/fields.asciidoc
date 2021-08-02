@@ -2675,30 +2675,13 @@ type: keyword
 
 --
 
-[float]
-=== properties
-
+*`azure.activitylogs.properties`*::
++
+--
 Properties
 
 
-
-*`azure.activitylogs.properties.service_request_id`*::
-+
---
-Service Request Id
-
-
-type: keyword
-
---
-
-*`azure.activitylogs.properties.status_code`*::
-+
---
-Status code
-
-
-type: keyword
+type: flattened
 
 --
 
@@ -3198,13 +3181,13 @@ type: keyword
 
 --
 
-*`azure.platformlogs.properties.*`*::
+*`azure.platformlogs.properties`*::
 +
 --
-Properties
+Event inner properties
 
 
-type: object
+type: flattened
 
 --
 
@@ -62904,6 +62887,16 @@ type: keyword
 
 --
 
+*`fortinet.firewall.eventtype`*::
++
+--
+UTM Event Type
+
+
+type: keyword
+
+--
+
 *`fortinet.firewall.exch`*::
 +
 --
@@ -65378,6 +65371,16 @@ type: integer
 +
 --
 Security action performed by UTM
+
+
+type: keyword
+
+--
+
+*`fortinet.firewall.utmref`*::
++
+--
+Reference to UTM
 
 
 type: keyword
@@ -95772,6 +95775,18 @@ alias to: message
 
 --
 
+*`mongodb.log.id`*::
++
+--
+Integer representing the unique identifier of the log statement
+
+
+type: long
+
+example: 4615611
+
+--
+
 [[exported-fields-mssql]]
 == mssql fields
 
@@ -113115,6 +113130,133 @@ type: keyword
 --
 
 [float]
+=== suspicious_activity
+
+The suspicious activity fields from the debug data.
+
+
+
+*`okta.debug_context.debug_data.suspicious_activity.browser`*::
++
+--
+The browser used.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_city`*::
++
+--
+The city where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_country`*::
++
+--
+The country where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_id`*::
++
+--
+The event ID.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_ip`*::
++
+--
+The IP of the suspicious event.
+
+
+type: ip
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_latitude`*::
++
+--
+The latitude where the suspicious activity took place.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_longitude`*::
++
+--
+The longitude where the suspicious activity took place.
+
+
+type: float
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_state`*::
++
+--
+The state where the suspicious activity took place.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_transaction_id`*::
++
+--
+The event transaction ID.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.event_type`*::
++
+--
+The event type.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.os`*::
++
+--
+The OS of the system from where the suspicious activity occured.
+
+
+type: keyword
+
+--
+
+*`okta.debug_context.debug_data.suspicious_activity.timestamp`*::
++
+--
+The timestamp of when the activity occurred.
+
+
+type: date
+
+--
+
+[float]
 === authentication_context
 
 Fields that let you store information about authentication context.
@@ -114691,6 +114833,39 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[float]
+=== owner
+
+Process owner information.
+
+
+*`process.owner.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`process.owner.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`process.owner.name.text`*::
++
+--
+type: text
 
 --
 
@@ -125714,7 +125889,7 @@ S3 fields from s3 input.
 
 
 
-*`bucket_name`*::
+*`bucket.name`*::
 +
 --
 Name of the S3 bucket that this log retrieved from.
@@ -125724,13 +125899,32 @@ type: keyword
 
 --
 
-*`object_key`*::
+*`bucket.arn`*::
++
+--
+ARN of the S3 bucket that this log retrieved from.
+
+
+type: keyword
+
+--
+
+*`object.key`*::
 +
 --
 Name of the S3 object that this log retrieved from.
 
 
 type: keyword
+
+--
+
+*`metadata`*::
++
+--
+AWS S3 object metadata values.
+
+type: flattened
 
 --
 
@@ -149958,15 +150152,6 @@ type: keyword
 
 --
 
-*`suricata.eve.fileinfo.filename`*::
-+
---
-type: alias
-
-alias to: file.path
-
---
-
 *`suricata.eve.fileinfo.tx_id`*::
 +
 --
@@ -150009,15 +150194,6 @@ type: keyword
 
 --
 
-*`suricata.eve.fileinfo.size`*::
-+
---
-type: alias
-
-alias to: file.size
-
---
-
 *`suricata.eve.icmp_type`*::
 +
 --
@@ -150025,46 +150201,10 @@ type: long
 
 --
 
-*`suricata.eve.dest_port`*::
-+
---
-type: alias
-
-alias to: destination.port
-
---
-
-*`suricata.eve.src_port`*::
-+
---
-type: alias
-
-alias to: source.port
-
---
-
-*`suricata.eve.proto`*::
-+
---
-type: alias
-
-alias to: network.transport
-
---
-
 *`suricata.eve.pcap_cnt`*::
 +
 --
 type: long
-
---
-
-*`suricata.eve.src_ip`*::
-+
---
-type: alias
-
-alias to: source.ip
 
 --
 
@@ -150140,15 +150280,6 @@ type: keyword
 
 --
 
-*`suricata.eve.dest_ip`*::
-+
---
-type: alias
-
-alias to: destination.ip
-
---
-
 *`suricata.eve.icmp_code`*::
 +
 --
@@ -150157,15 +150288,6 @@ type: long
 --
 
 
-*`suricata.eve.http.status`*::
-+
---
-type: alias
-
-alias to: http.response.status_code
-
---
-
 *`suricata.eve.http.redirect`*::
 +
 --
@@ -150173,64 +150295,10 @@ type: keyword
 
 --
 
-*`suricata.eve.http.http_user_agent`*::
-+
---
-type: alias
-
-alias to: user_agent.original
-
---
-
 *`suricata.eve.http.protocol`*::
 +
 --
 type: keyword
-
---
-
-*`suricata.eve.http.http_refer`*::
-+
---
-type: alias
-
-alias to: http.request.referrer
-
---
-
-*`suricata.eve.http.url`*::
-+
---
-type: alias
-
-alias to: url.original
-
---
-
-*`suricata.eve.http.hostname`*::
-+
---
-type: alias
-
-alias to: url.domain
-
---
-
-*`suricata.eve.http.length`*::
-+
---
-type: alias
-
-alias to: http.response.body.bytes
-
---
-
-*`suricata.eve.http.http_method`*::
-+
---
-type: alias
-
-alias to: http.request.method
 
 --
 
@@ -150265,15 +150333,6 @@ type: keyword
 
 --
 
-*`suricata.eve.alert.severity`*::
-+
---
-type: alias
-
-alias to: event.severity
-
---
-
 *`suricata.eve.alert.rev`*::
 +
 --
@@ -150295,19 +150354,185 @@ type: keyword
 
 --
 
-*`suricata.eve.alert.action`*::
-+
---
-type: alias
-
-alias to: event.outcome
-
---
-
 *`suricata.eve.alert.signature_id`*::
 +
 --
 type: long
+
+--
+
+*`suricata.eve.alert.protocols`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.attack_target`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.capec_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cwe_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.malware`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cve`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v2_base`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v2_temporal`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v3_base`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.cvss_v3_temporal`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.priority`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.hostile`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.infected`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.created_at`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.alert.updated_at`*::
++
+--
+type: date
+
+--
+
+*`suricata.eve.alert.classtype`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.rule_source`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.sid`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.affected_product`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.deployment`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.former_category`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.mitre_tool_id`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.performance_impact`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.signature_severity`*::
++
+--
+type: keyword
+
+--
+
+*`suricata.eve.alert.tag`*::
++
+--
+type: keyword
 
 --
 
@@ -151275,33 +151500,6 @@ type: keyword
 --
 
 
-*`suricata.eve.flow.bytes_toclient`*::
-+
---
-type: alias
-
-alias to: destination.bytes
-
---
-
-*`suricata.eve.flow.start`*::
-+
---
-type: alias
-
-alias to: event.start
-
---
-
-*`suricata.eve.flow.pkts_toclient`*::
-+
---
-type: alias
-
-alias to: destination.packets
-
---
-
 *`suricata.eve.flow.age`*::
 +
 --
@@ -151316,15 +151514,6 @@ type: keyword
 
 --
 
-*`suricata.eve.flow.bytes_toserver`*::
-+
---
-type: alias
-
-alias to: source.bytes
-
---
-
 *`suricata.eve.flow.reason`*::
 +
 --
@@ -151332,28 +151521,10 @@ type: keyword
 
 --
 
-*`suricata.eve.flow.pkts_toserver`*::
-+
---
-type: alias
-
-alias to: source.packets
-
---
-
 *`suricata.eve.flow.alerted`*::
 +
 --
 type: boolean
-
---
-
-*`suricata.eve.app_proto`*::
-+
---
-type: alias
-
-alias to: network.protocol
 
 --
 
@@ -151781,7 +151952,7 @@ Fields from the threatintel Filebeat module.
 The date and time when intelligence source first reported sighting this indicator.
 
 
-type: keyword
+type: date
 
 --
 
@@ -152064,6 +152235,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`threatintel.indicator.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
 
 --
 
@@ -152745,6 +152927,191 @@ type: keyword
 --
 
 [float]
+=== anomalithreatstream
+
+Fields for Anomali ThreatStream
+
+
+
+*`threatintel.anomalithreatstream.classification`*::
++
+--
+Indicates whether an indicator is private or from a public feed and available publicly. Possible values: private, public.
+
+
+type: keyword
+
+example: private
+
+--
+
+*`threatintel.anomalithreatstream.confidence`*::
++
+--
+The measure of the accuracy (from 0 to 100) assigned by ThreatStream's predictive analytics technology to indicators.
+
+
+type: short
+
+--
+
+*`threatintel.anomalithreatstream.detail2`*::
++
+--
+Detail text for indicator.
+
+
+type: text
+
+example: Imported by user 42.
+
+--
+
+*`threatintel.anomalithreatstream.id`*::
++
+--
+The ID of the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.import_session_id`*::
++
+--
+ID of the import session that created the indicator on ThreatStream.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.itype`*::
++
+--
+Indicator type. Possible values: "apt_domain", "apt_email", "apt_ip", "apt_url", "bot_ip", "c2_domain", "c2_ip", "c2_url", "i2p_ip", "mal_domain", "mal_email", "mal_ip", "mal_md5", "mal_url", "parked_ip", "phish_email", "phish_ip", "phish_url", "scan_ip", "spam_domain", "ssh_ip", "suspicious_domain", "tor_ip" and "torrent_tracker_url".
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.maltype`*::
++
+--
+Information regarding a malware family, a CVE ID, or another attack or threat, associated with the indicator.
+
+
+type: wildcard
+
+--
+
+*`threatintel.anomalithreatstream.md5`*::
++
+--
+Hash for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.resource_uri`*::
++
+--
+Relative URI for the indicator details.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.severity`*::
++
+--
+Criticality associated with the threat feed that supplied the indicator. Possible values: low, medium, high, very-high.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.source`*::
++
+--
+Source for the indicator.
+
+
+type: keyword
+
+example: Analyst
+
+--
+
+*`threatintel.anomalithreatstream.source_feed_id`*::
++
+--
+ID for the integrator source.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.state`*::
++
+--
+State for this indicator.
+
+
+type: keyword
+
+example: active
+
+--
+
+*`threatintel.anomalithreatstream.trusted_circle_ids`*::
++
+--
+ID of the trusted circle that imported the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.update_id`*::
++
+--
+Update ID.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.url`*::
++
+--
+URL for the indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.anomalithreatstream.value_type`*::
++
+--
+Data type of the indicator. Possible values: ip, domain, url, email, md5.
+
+
+type: keyword
+
+--
+
+[float]
 === malwarebazaar
 
 Fields for Malware Bazaar Threat Intel
@@ -153314,6 +153681,166 @@ The indicator type, can for example be "domain, email, FileHash-SHA256".
 
 
 type: keyword
+
+--
+
+[float]
+=== recordedfuture
+
+Fields for Recorded Future Threat Intel
+
+
+
+[float]
+=== entity
+
+Entity that represents a threat.
+
+
+
+*`threatintel.recordedfuture.entity.id`*::
++
+--
+Entity ID.
+
+
+type: keyword
+
+example: ip:192.0.2.13
+
+--
+
+*`threatintel.recordedfuture.entity.name`*::
++
+--
+Entity name. Value for the entity.
+
+
+type: keyword
+
+example: 192.0.2.13
+
+--
+
+*`threatintel.recordedfuture.entity.type`*::
++
+--
+Entity type.
+
+
+type: keyword
+
+example: IpAddress
+
+--
+
+*`threatintel.recordedfuture.intelCard`*::
++
+--
+Link to the Recorded Future Intelligence Card for to this indicator.
+
+
+type: keyword
+
+--
+
+*`threatintel.recordedfuture.ip_range`*::
++
+--
+Range of IPs for this indicator.
+
+
+type: ip_range
+
+example: 192.0.2.0/16
+
+--
+
+[float]
+=== risk
+
+Risk fields.
+
+
+
+*`threatintel.recordedfuture.risk.criticality`*::
++
+--
+Risk criticality (0-4).
+
+
+type: byte
+
+--
+
+*`threatintel.recordedfuture.risk.criticalityLabel`*::
++
+--
+Risk criticality label. One of None, Unusual, Suspicious, Malicious, Very Malicious.
+
+
+type: keyword
+
+--
+
+*`threatintel.recordedfuture.risk.evidenceDetails`*::
++
+--
+Risk's evidence details.
+
+
+type: flattened
+
+--
+
+*`threatintel.recordedfuture.risk.score`*::
++
+--
+Risk score (0-99).
+
+
+type: short
+
+--
+
+*`threatintel.recordedfuture.risk.riskString`*::
++
+--
+Number of Risk Rules observed as a factor of total number of rules.
+
+
+type: keyword
+
+example: 1/54
+
+--
+
+*`threatintel.recordedfuture.risk.riskSummary`*::
++
+--
+Risk summary.
+
+
+type: keyword
+
+example: 1 of 54 Risk Rules currently observed.
+
+--
+
+*`threatintel.recordedfuture.risk.riskSummary.text`*::
++
+--
+type: text
+
+--
+
+*`threatintel.recordedfuture.risk.rules`*::
++
+--
+Number of rules observed.
+
+
+type: long
 
 --
 
@@ -158892,15 +159419,6 @@ alias to: user_agent.original
 
 --
 
-
-*`traefik.access.user_agent.device`*::
-+
---
-type: alias
-
-alias to: user_agent.device.name
-
---
 
 *`traefik.access.user_agent.name`*::
 +

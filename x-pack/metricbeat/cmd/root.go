@@ -18,11 +18,6 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
-const (
-	// Name of the beat
-	Name = "metricbeat"
-)
-
 // RootCmd to handle beats cli
 func RootCmd(opts ...beater.Option) *cmd.BeatsRootCmd {
 	settings := mbcmd.MetricbeatSettings()

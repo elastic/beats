@@ -33,8 +33,8 @@
         "panw.panos.virtual_sys": "vsys1",
         "panw.panos.vsys_id": "1",
         "related.hosts": [
-            "de-firewall",
-            "PC12345"
+            "PC12345",
+            "de-firewall"
         ],
         "related.ip": [
             "10.20.30.40"
@@ -48,8 +48,8 @@
         "source.user.domain": "domain",
         "source.user.name": "mustermanm",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.domain": "domain",
         "user.name": "mustermanm"
@@ -113,8 +113,8 @@
         "source.ip": "67.240.185.235",
         "source.user.name": "ira",
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "user.name": "ira"
     }

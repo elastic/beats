@@ -71,6 +71,11 @@ we've provided a migration tool to help you migrate your configurations from
 version 6.6 to 6.7 or later. For more information, see the
 https://www.elastic.co/blog/beats-6-7-0-released[Beats 6.7.0 release blog].
 
+NOTE: {beats} central management has been removed starting in version 7.14.0.
+Looking for a replacement? Refer to the
+{fleet-guide}/index.html[Fleet User Guide] to learn how to deploy and centrally
+manage a single {agent} to monitor and secure each host. 
+
 ==== Upgrade {beats} binaries to 7.0
 
 Before upgrading:

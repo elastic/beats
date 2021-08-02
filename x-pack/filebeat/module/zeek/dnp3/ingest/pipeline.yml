@@ -10,6 +10,7 @@ processors:
     field: zeek.dnp3.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.dnp3.ts
 - set:

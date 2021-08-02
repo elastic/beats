@@ -50,8 +50,9 @@ func init() {
 				"field", "target_field",
 				"overwrite_keys", "map_ecs_fields",
 				"ignore_missing", "ignore_failure",
+				"when",
 			)))
-	jsprocessor.RegisterPlugin(procName, New)
+	jsprocessor.RegisterPlugin("DecodeXMLWineventlog", New)
 }
 
 type processor struct {

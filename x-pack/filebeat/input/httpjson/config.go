@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 // config contains information about httpjson configuration
@@ -35,9 +35,10 @@ type config struct {
 	RetryMax             int               `config:"retry.max_attempts"`
 	RetryWaitMin         time.Duration     `config:"retry.wait_min"`
 	RetryWaitMax         time.Duration     `config:"retry.wait_max"`
-	TLS                  *tlscommon.Config `config:"ssl"`
 	URL                  *urlConfig        `config:"url" validate:"required"`
 	DateCursor           *dateCursorConfig `config:"date_cursor"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 // Pagination contains information about httpjson pagination settings

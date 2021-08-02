@@ -80,3 +80,14 @@ func DefaultConfig(environment Environment) Config {
 		addCaller:   true,
 	}
 }
+
+// LogFilename returns the base filename to which logs will be written for
+// the "files" log output. If another log output is used, or `logging.files.name`
+// is unspecified, then the beat name will be returned.
+func (cfg Config) LogFilename() string {
+	name := cfg.Beat
+	if cfg.Files.Name != "" {
+		name = cfg.Files.Name
+	}
+	return name
+}

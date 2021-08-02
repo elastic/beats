@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"addonmanager_kubernetes_io_mode": "Reconcile",
@@ -28,7 +28,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"k8s_app": "kube-dns",
@@ -55,7 +55,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"component": "apiserver",
@@ -81,7 +81,7 @@
 		"DisableTimeSeries": false
 	},
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": {
 			"labels": {
 				"k8s_app": "kube-state-metrics"

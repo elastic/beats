@@ -138,7 +138,11 @@ pipeline {
                     'linux/amd64',
                     'linux/386',
                     'linux/arm64',
-                    'linux/armv7',
+                    // armv7 packaging isn't working, and we don't currently
+                    // need it for release. Do not re-enable it without
+                    // confirming it is fixed, you will break the packaging
+                    // pipeline!
+                    //'linux/armv7',
                     // The platforms above are disabled temporarly as crossbuild images are
                     // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
                     //'linux/ppc64le',
@@ -212,7 +216,6 @@ pipeline {
                   'x-pack/filebeat',
                   'x-pack/heartbeat',
                   'x-pack/metricbeat',
-                  'x-pack/osquerybeat',
                   'x-pack/packetbeat'
                 )
               }
@@ -426,11 +429,13 @@ def triggerE2ETests(String suite) {
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+  def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
 
   def parameters = [
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'BEAT_VERSION', value: beatVersion),
     booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),

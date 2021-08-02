@@ -386,6 +386,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-elb,elb>>
 
+* <<metricbeat-metricset-aws-kinesis,kinesis>>
+
 * <<metricbeat-metricset-aws-lambda,lambda>>
 
 * <<metricbeat-metricset-aws-natgateway,natgateway>>
@@ -417,6 +419,8 @@ include::aws/ebs.asciidoc[]
 include::aws/ec2.asciidoc[]
 
 include::aws/elb.asciidoc[]
+
+include::aws/kinesis.asciidoc[]
 
 include::aws/lambda.asciidoc[]
 

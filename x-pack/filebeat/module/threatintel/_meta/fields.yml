@@ -11,7 +11,7 @@
         Fields from the threatintel Filebeat module.
       fields:
         - name: indicator.first_seen
-          type: keyword
+          type: date
           description: >
             The date and time when intelligence source first reported sighting this indicator.
         - name: indicator.last_seen
@@ -167,6 +167,11 @@
             ignore_above: 1024
             description: City name.
             example: Montreal
+          - name: continent_name
+            type: keyword
+            ignore_above: 1024
+            description: Name of the continent.
+            example: North America
           - name: country_iso_code
             type: keyword
             ignore_above: 1024

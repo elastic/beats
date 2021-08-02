@@ -5,6 +5,7 @@ input:
   defaults:
     metrics:
       - namespace: AWS/EC2
+        resource_type: ec2:instance
         statistic: ["Average"]
         name:
           - CPUUtilization
@@ -16,6 +17,7 @@ input:
           - StatusCheckFailed_Instance
           - StatusCheckFailed_System
       - namespace: AWS/EC2
+        resource_type: ec2:instance
         statistic: ["Sum" ]
         name:
           - DiskReadBytes

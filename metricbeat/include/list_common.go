@@ -126,6 +126,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/nats/subscriptions"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nginx"
 	_ "github.com/elastic/beats/v7/metricbeat/module/nginx/stubstatus"
+	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics"
+	_ "github.com/elastic/beats/v7/metricbeat/module/openmetrics/collector"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm/pool"
 	_ "github.com/elastic/beats/v7/metricbeat/module/php_fpm/process"

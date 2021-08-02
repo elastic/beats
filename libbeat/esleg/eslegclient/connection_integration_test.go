@@ -111,14 +111,14 @@ func connectTestEs(t *testing.T, cfg interface{}) (*Connection, error) {
 		URL:              hosts,
 		Username:         username,
 		Password:         password,
-		Timeout:          time.Duration(timeout) * time.Second,
 		CompressionLevel: 3,
 	}
+	s.Transport.Timeout = time.Duration(timeout) * time.Second
 
 	if proxy != "" {
 		p, err := url.Parse(proxy)
 		require.NoError(t, err)
-		s.Proxy = p
+		s.Transport.Proxy.URL = p
 	}
 
 	return NewConnection(s)
@@ -130,9 +130,10 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *Connection {
 		URL:              eslegtest.GetURL(),
 		Username:         eslegtest.GetUser(),
 		Password:         eslegtest.GetPass(),
-		Timeout:          60 * time.Second,
 		CompressionLevel: 3,
 	})
+	conn.Transport.Timeout = 60 * time.Second
+
 	eslegtest.InitConnection(t, conn, err)
 	return conn
 }

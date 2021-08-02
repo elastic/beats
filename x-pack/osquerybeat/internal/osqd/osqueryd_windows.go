@@ -13,8 +13,9 @@ import (
 
 	"github.com/gofrs/uuid"
 )
+
 const (
-	extensionName   = "osquery-extension.exe"
+	extensionName = "osquery-extension.exe"
 )
 
 func CreateSocketPath() (string, func(), error) {

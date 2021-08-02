@@ -86,10 +86,14 @@ func defaultTestConfig() *common.Config {
 			{
 				"regex":     strings.Replace(fileName2, ".", "\\.", -1),
 				"max_bytes": 4096,
-				"multiline": common.MapStr{
-					"pattern": "^<Event",
-					"negate":  true,
-					"match":   "after",
+				"parsers": []common.MapStr{
+					{
+						"multiline": common.MapStr{
+							"pattern": "^<Event",
+							"negate":  true,
+							"match":   "after",
+						},
+					},
 				},
 			},
 		},
@@ -134,9 +138,9 @@ func setupCollector(t *testing.T, cfg *common.Config, mock bool) (*s3Collector, 
 	}
 
 	config := getConfigForTest(t)
-	awsConfig, err := awscommon.GetAWSCredentials(config.AWSConfig)
+	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 	if err != nil {
-		t.Fatal("failed GetAWSCredentials with AWS Config: ", err)
+		t.Fatal("failed InitializeAWSConfig with AWS Config: ", err)
 	}
 
 	s3BucketRegion := os.Getenv("S3_BUCKET_REGION")

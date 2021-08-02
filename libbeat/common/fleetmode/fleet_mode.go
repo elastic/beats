@@ -25,11 +25,10 @@ import (
 
 // Enabled checks to see if filebeat/metricbeat is running under Agent
 // The management setting is stored in the main Beat runtime object, but we can't see that from a module
-// So instead we check the CLI flags, since Agent starts filebeat/metricbeat with "-E", "management.mode=x-pack-fleet", "-E", "management.enabled=true"
+// So instead we check the CLI flags, since Agent starts filebeat/metricbeat with "-E", "management.enabled=true"
 func Enabled() bool {
 	type management struct {
-		Mode    string `config:"management.mode"`
-		Enabled bool   `config:"management.enabled"`
+		Enabled bool `config:"management.enabled"`
 	}
 	var managementSettings management
 
@@ -46,8 +45,5 @@ func Enabled() bool {
 		return false
 	}
 
-	if managementSettings.Enabled == true && managementSettings.Mode == "x-pack-fleet" {
-		return true
-	}
-	return false
+	return managementSettings.Enabled
 }
