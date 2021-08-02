@@ -27,12 +27,13 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	ucfg "github.com/elastic/go-ucfg"
 	"github.com/elastic/go-ucfg/cfgutil"
 	"github.com/elastic/go-ucfg/yaml"
-	"github.com/mitchellh/hashstructure"
 )
 
 var flagStrictPerms = flag.Bool("strict.perms", true, "Strict permission checking on config files")
