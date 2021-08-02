@@ -12,7 +12,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Affecting all Beats*
 
 - Removed beats central management {pull}25696[25696], {issue}23908[23908]
-- MacOSX minimum supported version set to 10.14 {issue}24193{24193}
+- MacOSX minimum supported version set to 10.14 {issue}24193[24193]
 
 *Filebeat*
 
@@ -28,7 +28,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 *Metricbeat*
 
 - Adjust host fields to adopt new names from 1.9.0 ECS. {pull}24312[24312]
-- Add `replicas.ready` field to state_statefulset in Kubernetes module{pull}26088[26088]
+- Add `replicas.ready` field to state_statefulset in Kubernetes module {pull}26088[26088]
 - Recover `service.address` field in vsphere module {issue}26902[26902] {pull}26904[26904]
 
 ==== Bugfixes
@@ -98,7 +98,7 @@ https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
 - Improve ES output error insights. {pull}25825[25825]
 - Add orchestrator.cluster.name/url fields as k8s metadata {pull}26056[26056]
 - Libbeat: report beat version to monitoring. {pull}26214[26214]
-- Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
+- Ensure common proxy settings support in HTTP clients: `proxy_disabled`, `proxy_url`, `proxy_headers` and typical environment variables `HTTP_PROXY`, `HTTPS_PROXY`, `NOPROXY`. {pull}25219[25219]
 
 *Filebeat*
 
