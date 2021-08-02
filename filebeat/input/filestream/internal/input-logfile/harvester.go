@@ -158,10 +158,10 @@ func (hg *defaultHarvesterGroup) Restart(ctx input.Context, s Source) {
 	hg.tg.Go(startHarvester(ctx, hg, s, true))
 }
 
-func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, restart bool) func(canceler unison.Canceler) error {
+func startHarvester(ctx input.Context, hg *defaultHarvesterGroup, s Source, restart bool) func(context.Context) error {
 	srcID := hg.identifier.ID(s)
 
-	return func(canceler unison.Canceler) error {
+	return func(canceler context.Context) error {
 		defer func() {
 			if v := recover(); v != nil {
 				err := fmt.Errorf("harvester panic with: %+v\n%s", v, debug.Stack())
@@ -226,7 +226,7 @@ func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Sour
 	prevID := hg.identifier.ID(previous)
 	nextID := hg.identifier.ID(next)
 
-	hg.tg.Go(func(canceler unison.Canceler) error {
+	hg.tg.Go(func(canceler context.Context) error {
 		previousResource, err := lock(ctx, hg.store, prevID)
 		if err != nil {
 			return fmt.Errorf("error while locking previous resource: %v", err)
@@ -252,7 +252,7 @@ func (hg *defaultHarvesterGroup) Continue(ctx input.Context, previous, next Sour
 
 // Stop stops the running Harvester for a given Source.
 func (hg *defaultHarvesterGroup) Stop(s Source) {
-	hg.tg.Go(func(_ unison.Canceler) error {
+	hg.tg.Go(func(_ context.Context) error {
 		hg.readers.remove(hg.identifier.ID(s))
 		return nil
 	})
