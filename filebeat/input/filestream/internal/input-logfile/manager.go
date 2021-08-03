@@ -18,6 +18,7 @@
 package input_logfile
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -66,9 +67,11 @@ type InputManager struct {
 	// that will be used to collect events from each source.
 	Configure func(cfg *common.Config) (Prospector, Harvester, error)
 
-	initOnce sync.Once
-	initErr  error
-	store    *store
+	initOnce   sync.Once
+	initErr    error
+	store      *store
+	ackUpdater *updateWriter
+	ackCH      *updateChan
 }
 
 // Source describe a source the input can collect data from.
@@ -104,6 +107,8 @@ func (cim *InputManager) init() error {
 		}
 
 		cim.store = store
+		cim.ackCH = newUpdateChan()
+		cim.ackUpdater = newUpdateWriter(store, cim.ackCH)
 	})
 
 	return cim.initErr
@@ -124,7 +129,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 
 	store := cim.getRetainedStore()
 	cleaner := &cleaner{log: log}
-	err := group.Go(func(canceler unison.Canceler) error {
+	err := group.Go(func(canceler context.Context) error {
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -144,6 +149,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 }
 
 func (cim *InputManager) shutdown() {
+	cim.ackUpdater.Close()
 	cim.store.Release()
 }
 
@@ -178,6 +184,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	pStore := cim.getRetainedStore()
 	defer pStore.Release()
+
 	prospectorStore := newSourceStore(pStore, sourceIdentifier)
 	err = prospector.Init(prospectorStore)
 	if err != nil {
@@ -186,6 +193,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 	return &managedInput{
 		manager:          cim,
+		ackCH:            cim.ackCH,
 		userID:           settings.ID,
 		prospector:       prospector,
 		harvester:        harvester,
