@@ -53,7 +53,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"add":                 add,
 			"mul":                 mul,
 			"div":                 div,
-			"hmac":                hmac_string,
+			"hmac":                hmacString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -243,7 +243,7 @@ func div(a, b int64) int64 {
 	return a / b
 }
 
-func hmac_string(hmac_type string, hmac_key string, values ...string) string {
+func hmacString(hmacType string, hmacKey string, values ...string) string {
 	data := strings.Join(values[:], "")
 	if data == "" {
 		return ""
