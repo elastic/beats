@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+// ProxyURI is a URL used for proxy serialized as a string.
 type ProxyURI url.URL
 
 // HTTPClientProxySettings provides common HTTP proxy setup support.
