@@ -247,6 +247,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
 - Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
 - Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
+- Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
 
 *Auditbeat*
 
@@ -514,6 +515,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix aws metric tags with resourcegroupstaggingapi paginator.  {issue}26385[26385] {pull}26443[26443]
 - Fix quoting in GCP billing table name  {issue}26855[26855] {pull}26870[26870]
 - Allow metric prefix override per service in gcp module. {pull}26960[26960]
+- Change `server_status_path` default setting to `nginx_status` for the `nginx` module. {pull}26642[26642]
 
 *Packetbeat*
 
@@ -619,6 +621,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Ensure common proxy settings support in HTTP clients: proxy_disabled, proxy_url, proxy_headers and typical environment variables HTTP_PROXY, HTTPS_PROXY, NOPROXY. {pull}25219[25219]
 - `add_process_metadata` processor enrich process information with owner name and id. {issue}21068[21068] {pull}21111[21111]
 - Add proxy support for AWS functions. {pull}26832[26832]
+- Added policies to the elasticsearch output for non indexible events {pull}26952[26952]
 - Add sha256 digests to RPM packages. {issue}23670[23670]
 
 *Auditbeat*
@@ -866,6 +869,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Use default add_locale for fortinet.firewall {issue}20300[20300] {pull}26524[26524]
 - Add new template functions and `value_type` parameter to `httpjson` transforms. {pull}26847[26847]
 - Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
+- Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
 
 *Heartbeat*

@@ -53,10 +53,10 @@ spec:
             runAsUser: 0
           resources:
             limits:
-              memory: 200Mi
+              memory: 500Mi
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 200Mi
           volumeMounts:
             - name: proc
               mountPath: /hostfs/proc
