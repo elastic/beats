@@ -144,7 +144,11 @@ func (o *Operator) Close() error {
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
-func (o *Operator) HandleConfig(cfg configrequest.Request) error {
+func (o *Operator) HandleConfig(cfg configrequest.Request) (err error) {
+	defer func() {
+		err = filterContextCancelled(err)
+	}()
+
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
 		o.statusReporter.Update(state.Failed, err.Error(), nil)
@@ -351,4 +355,11 @@ func (o *Operator) deleteApp(p Descriptor) {
 
 	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
 	delete(o.apps, id)
+}
+
+func filterContextCancelled(err error) error {
+	if errors.Is(err, context.Canceled) {
+		return nil
+	}
+	return err
 }
