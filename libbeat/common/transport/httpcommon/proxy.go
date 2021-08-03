@@ -24,6 +24,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
+type ProxyURI url.URL
+
 // HTTPClientProxySettings provides common HTTP proxy setup support.
 //
 // Proxy usage will be disabled in general if Disable is set.
@@ -36,7 +38,7 @@ type HTTPClientProxySettings struct {
 	// Proxy URL to use for http connections. If the proxy url is configured,
 	// it is used for all connection attempts. All proxy related environment
 	// variables are ignored.
-	URL string `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	URL *ProxyURI `config:"proxy_url" yaml:"proxy_url,omitempty"`
 
 	// Headers configures additonal headers that are send to the proxy
 	// during CONNECT requests.
@@ -45,8 +47,16 @@ type HTTPClientProxySettings struct {
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
+}
 
-	proxyURI *url.URL
+func (p ProxyURI) MarshalYAML() (interface{}, error) {
+	u := url.URL(p)
+	return u.String(), nil
+}
+
+func (p ProxyURI) URI() *url.URL {
+	uri := url.URL(p)
+	return &uri
 }
 
 func NewHTTPClientProxySettings(url string, headers map[string]string, disable bool) (*HTTPClientProxySettings, error) {
@@ -63,11 +73,16 @@ func NewHTTPClientProxySettings(url string, headers map[string]string, disable b
 		}
 	}
 
+	var uri *ProxyURI
+	if proxyURI != nil {
+		pu := ProxyURI(*proxyURI)
+		uri = &pu
+	}
+
 	return &HTTPClientProxySettings{
-		URL:      url,
-		proxyURI: proxyURI,
-		Headers:  httpHeaders,
-		Disable:  disable,
+		URL:     uri,
+		Headers: httpHeaders,
+		Disable: disable,
 	}, nil
 }
 
@@ -106,9 +121,9 @@ func (settings *HTTPClientProxySettings) ProxyFunc() func(*http.Request) (*url.U
 		return nil
 	}
 
-	if settings.proxyURI == nil {
+	if settings.URL == nil {
 		return http.ProxyFromEnvironment
 	}
 
-	return http.ProxyURL(settings.proxyURI)
+	return http.ProxyURL(settings.URL.URI())
 }
