@@ -138,14 +138,19 @@ func TestDataConfig(t *testing.T) DataConfig {
 }
 
 // TestDataFiles run tests with config from the usual path (`_meta/testdata`)
-func TestDataFiles(t *testing.T, module, metricSet string) {
+func TestDataFiles(t *testing.T, module, metricSet string, contentType ...string) {
 	t.Helper()
 	config := TestDataConfig(t)
-	TestDataFilesWithConfig(t, module, metricSet, config)
+	ct := ""
+	if len(contentType) > 0 {
+		ct = contentType[0]
+	}
+
+	TestDataFilesWithConfig(t, module, metricSet, config, ct)
 }
 
 // TestDataFilesWithConfig run tests for a testdata config
-func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, contentType string) {
 	t.Helper()
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
 	if err != nil {
@@ -166,7 +171,7 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 
 	for _, f := range files {
 		t.Run(filepath.Base(f), func(t *testing.T) {
-			runTest(t, f, module, metricSet, config)
+			runTest(t, f, module, metricSet, config, contentType)
 		})
 	}
 }
@@ -187,9 +192,9 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 
 }
 
-func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
+func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig, contentType string) {
 	// starts a server serving the given file under the given url
-	s := server(t, file, config.URL)
+	s := server(t, file, config.URL, contentType)
 	defer s.Close()
 
 	moduleConfig := getConfig(module, metricSetName, s.URL, config)
@@ -432,7 +437,7 @@ func getConfig(module, metricSet, url string, config DataConfig) map[string]inte
 }
 
 // server starts a server with a mock output
-func server(t *testing.T, path string, url string) *httptest.Server {
+func server(t *testing.T, path string, url string, contentType string) *httptest.Server {
 
 	body, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -447,7 +452,11 @@ func server(t *testing.T, path string, url string) *httptest.Server {
 		}
 
 		if r.URL.Path+query == url {
-			w.Header().Set("Content-Type", "application/json;")
+			if contentType != "" {
+				w.Header().Set("Content-Type", contentType)
+			} else {
+				w.Header().Set("Content-Type", "application/json;")
+			}
 			w.WriteHeader(200)
 			w.Write(body)
 		} else {

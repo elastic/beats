@@ -17,7 +17,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -42,7 +43,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -67,7 +69,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -91,7 +94,8 @@
             },
             "metrics": {
                 "up": 1
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -116,7 +120,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -141,7 +146,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -166,13 +172,14 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
+
         },
         "service": {
             "address": "127.0.0.1:55555",
             "type": "openmetrics"
-        }
-    },
+        }    },
     {
         "event": {
             "dataset": "openmetrics.collector",
@@ -191,13 +198,14 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
+
         },
         "service": {
             "address": "127.0.0.1:55555",
             "type": "openmetrics"
-        }
-    },
+        }    },
     {
         "event": {
             "dataset": "openmetrics.collector",
@@ -216,7 +224,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -241,7 +250,8 @@
             },
             "metrics": {
                 "node_network_carrier": 0
-            }
+            },
+            "type": "gauge"
         },
         "service": {
             "address": "127.0.0.1:55555",

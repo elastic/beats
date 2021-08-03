@@ -45740,10 +45740,50 @@ Openmetrics module
 
 
 
+*`openmetrics.help`*::
++
+--
+Brief description of the MetricFamily
+
+
+type: keyword
+
+--
+
+*`openmetrics.type`*::
++
+--
+metric type
+
+
+type: keyword
+
+--
+
+*`openmetrics.unit`*::
++
+--
+metric unit
+
+
+type: keyword
+
+--
+
+*`openmetrics.created`*::
++
+--
+metric creation time in seconds
+
+
+type: keyword
+
+--
+
 *`openmetrics.labels.*`*::
 +
 --
-Prometheus metric labels
+Openmetrics metric labels
 
 
 type: object
@@ -45753,7 +45793,27 @@ type: object
 *`openmetrics.metrics.*`*::
 +
 --
-Prometheus metric
+Openmetrics metric
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.*`*::
++
+--
+Openmetrics exemplars
+
+
+type: object
+
+--
+
+*`openmetrics.exemplar.labels.*`*::
++
+--
+Openmetrics metric labels
 
 
 type: object
