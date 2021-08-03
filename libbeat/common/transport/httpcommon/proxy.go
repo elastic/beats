@@ -36,7 +36,7 @@ type HTTPClientProxySettings struct {
 	// Proxy URL to use for http connections. If the proxy url is configured,
 	// it is used for all connection attempts. All proxy related environment
 	// variables are ignored.
-	URL *url.URL `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	URL string `config:"proxy_url" yaml:"proxy_url,omitempty"`
 
 	// Headers configures additonal headers that are send to the proxy
 	// during CONNECT requests.
@@ -45,6 +45,30 @@ type HTTPClientProxySettings struct {
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
+
+	proxyURI *url.URL
+}
+
+func NewHTTPClientProxySettings(url string, headers map[string]string, disable bool) (*HTTPClientProxySettings, error) {
+	proxyURI, err := common.ParseURL(url)
+	if err != nil {
+		return nil, err
+	}
+
+	var httpHeaders http.Header
+	if len(headers) > 0 {
+		httpHeaders = http.Header{}
+		for k, v := range headers {
+			httpHeaders.Add(k, v)
+		}
+	}
+
+	return &HTTPClientProxySettings{
+		URL:      url,
+		proxyURI: proxyURI,
+		Headers:  httpHeaders,
+		Disable:  disable,
+	}, nil
 }
 
 // DefaultHTTPClientProxySettings returns the default HTTP proxy setting.
@@ -66,24 +90,12 @@ func (settings *HTTPClientProxySettings) Unpack(cfg *common.Config) error {
 		return err
 	}
 
-	url, err := common.ParseURL(tmp.URL)
+	s, err := NewHTTPClientProxySettings(tmp.URL, tmp.Headers, tmp.Disable)
 	if err != nil {
 		return err
 	}
 
-	var headers http.Header
-	if len(tmp.Headers) > 0 {
-		headers = http.Header{}
-		for k, v := range tmp.Headers {
-			headers.Add(k, v)
-		}
-	}
-
-	*settings = HTTPClientProxySettings{
-		URL:     url,
-		Disable: tmp.Disable,
-		Headers: headers,
-	}
+	*settings = *s
 	return nil
 }
 
@@ -94,9 +106,9 @@ func (settings *HTTPClientProxySettings) ProxyFunc() func(*http.Request) (*url.U
 		return nil
 	}
 
-	if settings.URL == nil {
+	if settings.proxyURI == nil {
 		return http.ProxyFromEnvironment
 	}
 
-	return http.ProxyURL(settings.URL)
+	return http.ProxyURL(settings.proxyURI)
 }

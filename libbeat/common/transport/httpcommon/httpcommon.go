@@ -352,7 +352,7 @@ func WithNOProxy() TransportOption {
 // NO_PROXY envionrment variables. Explicitely configured proxy URLs will still applied.
 func WithoutProxyEnvironmentVariables() TransportOption {
 	return transportOptFunc(func(settings *HTTPTransportSettings, t *http.Transport) {
-		if settings.Proxy.Disable || settings.Proxy.URL == nil {
+		if settings.Proxy.Disable || settings.Proxy.URL == "" {
 			t.Proxy = nil
 		}
 	})
