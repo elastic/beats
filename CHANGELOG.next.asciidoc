@@ -286,6 +286,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add replace_fields config option in add_host_metadata for replacing host fields. {pull}20490[20490] {issue}20464[20464]
 - Add option to select the type of index template to load: legacy, component, index. {pull}21212[21212]
 - Add proxy support for AWS functions. {pull}26832[26832]
+- Added policies to the elasticsearch output for non indexible events {pull}26952[26952]
+- Add sha256 digests to RPM packages. {issue}23670[23670]
 
 *Auditbeat*
 
