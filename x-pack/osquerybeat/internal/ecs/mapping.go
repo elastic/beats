@@ -9,14 +9,25 @@ import "strings"
 const keySeparator = "."
 
 type Doc map[string]interface{}
-type Mapping map[string]string
+
+type MappingInfo struct {
+	Field string      `json:"field,omitempty" config:"field,omitempty"`
+	Value interface{} `json:"value,omitempty" config:"value,omitempty"`
+}
+
+// Mapping is ECS mapping definition where the key is the dotted ECS field name
+type Mapping map[string]MappingInfo
 
 // Map creates the copy of the values from the doc[src] key to the doc[dst] key where the dst can be nested '.' delimited key
 // Source is expected to be a simple key name, the destination could be nested child node
 func (m Mapping) Map(doc Doc) Doc {
 	res := make(Doc)
-	for src, dst := range m {
-		val, ok := doc[src]
+	for dst, mi := range m {
+		if mi.Value != nil {
+			res.Set(dst, mi.Value)
+			continue
+		}
+		val, ok := doc[mi.Field]
 		if !ok {
 			continue
 		}
