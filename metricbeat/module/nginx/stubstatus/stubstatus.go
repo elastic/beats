@@ -33,7 +33,7 @@ const (
 	defaultScheme = "http"
 
 	// defaultPath is the default path to the ngx_http_stub_status_module endpoint on Nginx.
-	defaultPath = "/server-status"
+	defaultPath = "/nginx_status"
 )
 
 var (

@@ -44,6 +44,14 @@ import (
 )
 
 func TestCollectPublishFailsNone(t *testing.T) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
 	N := 100
 	item := `{"create": {"status": 200}},`
 	response := []byte(`{"items": [` + strings.Repeat(item, N) + `]}`)
@@ -54,11 +62,19 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
-	res, _ := bulkCollectPublishFails(logp.L(), response, events)
+	res, _ := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 0, len(res))
 }
 
 func TestCollectPublishFailMiddle(t *testing.T) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
 	response := []byte(`
     { "items": [
       {"create": {"status": 200}},
@@ -71,15 +87,124 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, eventFail, event}
 
-	res, stats := bulkCollectPublishFails(logp.L(), response, events)
+	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
 		assert.Equal(t, eventFail, res[0])
 	}
-	assert.Equal(t, stats, bulkResultStats{acked: 2, fails: 1, tooMany: 1})
+	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
+}
+
+func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "dead_letter_index",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
+	response := []byte(`
+    { "items": [
+      {"create": {"status": 200}},
+      {"create": {
+		  "error" : {
+			"root_cause" : [
+			  {
+				"type" : "mapper_parsing_exception",
+				"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'"
+			  }
+			],
+			"type" : "mapper_parsing_exception",
+			"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'",
+			"caused_by" : {
+			  "type" : "illegal_argument_exception",
+			  "reason" : "For input string: \"bar1\""
+			}
+		  },
+		  "status" : 400
+		}
+      },
+      {"create": {"status": 200}}
+    ]}
+  `)
+
+	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": "bar1"}}}
+	events := []publisher.Event{event, eventFail, event}
+
+	res, stats := client.bulkCollectPublishFails(response, events)
+	assert.Equal(t, 1, len(res))
+	if len(res) == 1 {
+		expected := publisher.Event{
+			Content: beat.Event{
+				Fields: common.MapStr{
+					"message":       "{\"bar\":\"bar1\"}",
+					"error.type":    400,
+					"error.message": "{\n\t\t\t\"root_cause\" : [\n\t\t\t  {\n\t\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\"\n\t\t\t  }\n\t\t\t],\n\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\",\n\t\t\t\"caused_by\" : {\n\t\t\t  \"type\" : \"illegal_argument_exception\",\n\t\t\t  \"reason\" : \"For input string: \\\"bar1\\\"\"\n\t\t\t}\n\t\t  }",
+				},
+				Meta: common.MapStr{
+					dead_letter_marker_field: true,
+				},
+			},
+		}
+		assert.Equal(t, expected, res[0])
+	}
+	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, nonIndexable: 0}, stats)
+}
+
+func TestCollectPublishFailDrop(t *testing.T) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
+	response := []byte(`
+    { "items": [
+      {"create": {"status": 200}},
+      {"create": {
+		  "error" : {
+			"root_cause" : [
+			  {
+				"type" : "mapper_parsing_exception",
+				"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'"
+			  }
+			],
+			"type" : "mapper_parsing_exception",
+			"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'",
+			"caused_by" : {
+			  "type" : "illegal_argument_exception",
+			  "reason" : "For input string: \"bar1\""
+			}
+		  },
+		  "status" : 400
+		}
+      },
+      {"create": {"status": 200}}
+    ]}
+  `)
+
+	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": 1}}}
+	eventFail := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": "bar1"}}}
+	events := []publisher.Event{event, eventFail, event}
+
+	res, stats := client.bulkCollectPublishFails(response, events)
+	assert.Equal(t, 0, len(res))
+	assert.Equal(t, bulkResultStats{acked: 2, fails: 0, nonIndexable: 1}, stats)
 }
 
 func TestCollectPublishFailAll(t *testing.T) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
 	response := []byte(`
     { "items": [
       {"create": {"status": 429, "error": "ups"}},
@@ -91,7 +216,7 @@ func TestCollectPublishFailAll(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event, event, event}
 
-	res, stats := bulkCollectPublishFails(logp.L(), response, events)
+	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 3, len(res))
 	assert.Equal(t, events, res)
 	assert.Equal(t, stats, bulkResultStats{fails: 3, tooMany: 3})
@@ -99,6 +224,14 @@ func TestCollectPublishFailAll(t *testing.T) {
 
 func TestCollectPipelinePublishFail(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
+
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(t, err)
 
 	response := []byte(`{
       "took": 0, "ingest_took": 0, "errors": true,
@@ -132,12 +265,20 @@ func TestCollectPipelinePublishFail(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"field": 2}}}
 	events := []publisher.Event{event}
 
-	res, _ := bulkCollectPublishFails(logp.L(), response, events)
+	res, _ := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, events, res)
 }
 
 func BenchmarkCollectPublishFailsNone(b *testing.B) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(b, err)
+
 	response := []byte(`
     { "items": [
       {"create": {"status": 200}},
@@ -150,7 +291,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 	events := []publisher.Event{event, event, event}
 
 	for i := 0; i < b.N; i++ {
-		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+		res, _ := client.bulkCollectPublishFails(response, events)
 		if len(res) != 0 {
 			b.Fail()
 		}
@@ -158,6 +299,14 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailMiddle(b *testing.B) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(b, err)
+
 	response := []byte(`
     { "items": [
       {"create": {"status": 200}},
@@ -171,7 +320,7 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 	events := []publisher.Event{event, eventFail, event}
 
 	for i := 0; i < b.N; i++ {
-		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+		res, _ := client.bulkCollectPublishFails(response, events)
 		if len(res) != 1 {
 			b.Fail()
 		}
@@ -179,6 +328,14 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 }
 
 func BenchmarkCollectPublishFailAll(b *testing.B) {
+	client, err := NewClient(
+		ClientSettings{
+			NonIndexableAction: "drop",
+		},
+		nil,
+	)
+	assert.NoError(b, err)
+
 	response := []byte(`
     { "items": [
       {"creatMiddlee": {"status": 429, "error": "ups"}},
@@ -191,7 +348,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
 	events := []publisher.Event{event, event, event}
 
 	for i := 0; i < b.N; i++ {
-		res, _ := bulkCollectPublishFails(logp.L(), response, events)
+		res, _ := client.bulkCollectPublishFails(response, events)
 		if len(res) != 3 {
 			b.Fail()
 		}
@@ -295,7 +452,16 @@ func TestBulkEncodeEvents(t *testing.T) {
 				}
 			}
 
-			encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(test.version), index, pipeline, events)
+			client, err := NewClient(
+				ClientSettings{
+					Index:    index,
+					Pipeline: pipeline,
+				},
+				nil,
+			)
+			assert.NoError(t, err)
+
+			encoded, bulkItems := client.bulkEncodePublishRequest(*common.MustNewVersion(test.version), events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
 			assert.Equal(t, 2*len(events), len(bulkItems), "incomplete bulk")
 
@@ -361,7 +527,15 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 		}
 	}
 
-	encoded, bulkItems := bulkEncodePublishRequest(logp.L(), *common.MustNewVersion(version.GetDefaultVersion()), index, pipeline, events)
+	client, err := NewClient(
+		ClientSettings{
+			Index:    index,
+			Pipeline: pipeline,
+		},
+		nil,
+	)
+
+	encoded, bulkItems := client.bulkEncodePublishRequest(*common.MustNewVersion(version.GetDefaultVersion()), events)
 	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
 	require.Equal(t, 9, len(bulkItems), "incomplete bulk")
 
