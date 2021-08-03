@@ -278,7 +278,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 				bt.log.Info("context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputCh:
-				configPlugin.Set(inputConfigs)
+				err = configPlugin.Set(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("failed to set configuration from inputs: %v", err)
+					return err
+				}
 				cache.Resize(configPlugin.Count())
 			}
 		}
