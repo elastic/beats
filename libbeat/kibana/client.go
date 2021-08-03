@@ -29,7 +29,6 @@ import (
 	"net/textproto"
 	"net/url"
 	"path"
-	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -274,48 +273,24 @@ func (client *Client) readVersion() error {
 // IgnoreVersion was set when creating the client.
 func (client *Client) GetVersion() common.Version { return client.Version }
 
-func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
-
-	body, err := json.Marshal(jsonBody)
-	if err != nil {
-		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
-		return fmt.Errorf("fail to marshal the json content: %v", err)
-	}
-
-	statusCode, response, err := client.Connection.Request("POST", url, params, nil, bytes.NewBuffer(body))
-	if err != nil || statusCode >= 300 {
-		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
-	}
-
-	client.log.Debugf("Imported JSON to %s with params %v", url, params)
-	return nil
-}
-
-func (client *Client) ImportMultiPartFromFile(url string, params url.Values, path string) error {
-	contents, err := ioutil.ReadFile(path)
-	if err != nil {
-		return fmt.Errorf("cannot read source file: %+v", err)
-	}
-
+func (client *Client) ImportMultiPartFromFile(url string, params url.Values, filename string, contents string) error {
 	buf := &bytes.Buffer{}
 	w := multipart.NewWriter(buf)
 
 	pHeader := textproto.MIMEHeader{}
-	pHeader.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filepath.Base(path)))
+	pHeader.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
 	pHeader.Add("Content-Type", "application/ndjson")
 
 	p, err := w.CreatePart(pHeader)
 	if err != nil {
 		return fmt.Errorf("failed to create multipart writer for payload: %+v", err)
 	}
-	fmt.Println("=================")
-	_, err = io.Copy(p, bytes.NewReader(contents))
+	_, err = io.Copy(p, strings.NewReader(contents))
 	if err != nil {
 		return fmt.Errorf("failed to copy contents of the file: %+v", err)
 	}
 	w.Close()
 
-	fmt.Println("=================")
 	headers := http.Header{}
 	headers.Add("Content-Type", w.FormDataContentType())
 
@@ -323,7 +298,6 @@ func (client *Client) ImportMultiPartFromFile(url string, params url.Values, pat
 	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
 	}
-	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~`")
 
 	client.log.Debugf("Imported multipart file to %s with params %v", url, params)
 	return nil
@@ -337,17 +311,17 @@ func (client *Client) GetDashboard(id string) (common.MapStr, error) {
 		return nil, fmt.Errorf("Kibana version must be newer than 7.14")
 	}
 
-	body := `{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true}`
-	body = fmt.Sprintf(body, id)
-	_, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
-	if err != nil {
-		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
+	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true}`, id)
+	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
+	if err != nil || statusCode >= 300 {
+		return nil, fmt.Errorf("error exporting dashboard: %+v, resp: %+v, code: %d", err, response, statusCode)
 	}
 
 	result, err := RemoveIndexPattern(response)
 	if err != nil {
 		return nil, fmt.Errorf("error removing index pattern: %+v", err)
 	}
+
 	return result, nil
 }
 

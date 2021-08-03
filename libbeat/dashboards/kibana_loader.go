@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
 	"path/filepath"
 	"time"
 
@@ -130,18 +129,7 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
 	}
 
-	dir, err := ioutil.TempDir("", "setup")
-	if err != nil {
-		errs = append(errs, errors.Wrap(err, "creating temp file for index pattern"))
-	}
-	defer os.Remove(dir)
-
-	path := filepath.Join(dir, "index-template.ndjson")
-	if err := ioutil.WriteFile(path, []byte(pattern.String()), 0655); err != nil {
-		errs = append(errs, errors.Wrap(err, "error writing temp file for index pattern"))
-	}
-
-	if err := loader.client.ImportMultiPartFromFile(importAPI, params, path); err != nil {
+	if err := loader.client.ImportMultiPartFromFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
 		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
 	}
 	return errs.Err()
@@ -176,23 +164,10 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
 	}
 
-	var errs multierror.Errors
-	dir, err := ioutil.TempDir("", "setup")
-	if err != nil {
-		errs = append(errs, errors.Wrap(err, "creating temp file for dashboard"))
+	if err := loader.client.ImportMultiPartFromFile(importAPI, params, filepath.Base(file), dashboard.String()); err != nil {
+		return fmt.Errorf("error loading index pattern: %+v", err)
 	}
-	defer os.Remove(dir)
-
-	path := filepath.Join(dir, filepath.Base(file))
-	if err := ioutil.WriteFile(path, []byte(dashboard.String()), 0655); err != nil {
-		errs = append(errs, errors.Wrap(err, "error writing temp file for index pattern"))
-	}
-	loader.statusMsg("Done creating temporary file for dashboard.")
-
-	if err := loader.client.ImportMultiPartFromFile(importAPI, params, path); err != nil {
-		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
-	}
-	return errs.Err()
+	return nil
 }
 
 // Close closes the client
