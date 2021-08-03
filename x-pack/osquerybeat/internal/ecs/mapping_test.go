@@ -4,7 +4,11 @@
 
 package ecs
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
 
 var testOsqueryResult = Doc{
 	"uid":         275,
@@ -23,42 +27,64 @@ var testOsqueryResult = Doc{
 
 func TestMap(t *testing.T) {
 	mapping := Mapping{
-		"uid":         "user.id",
-		"gid":         "user.group.id",
-		"username":    "user.name",
-		"description": "description",
-		"uuid":        "a.b.c.d.e.f",
-		"uid_signed":  "a.b.c.d.g",
+		"user.id":       {Field: "uid"},
+		"user.group.id": {Field: "gid"},
+		"user.name":     {Field: "username"},
+		"description":   {Field: "description"},
+		"a.b.c.d.e.f":   {Field: "uuid"},
+		"a.b.c.d.g":     {Field: "uid_signed"},
 	}
 
 	doc := mapping.Map(testOsqueryResult)
 
-	for src, dst := range mapping {
+	for dst, mi := range mapping {
 		val, ok := doc.Get(dst)
 		if !ok {
 			t.Errorf("key [%v] not found", dst)
 			break
 		}
-		if testOsqueryResult[src] != val {
-			t.Errorf("key [%v]=[%v], expected [%v]", src, val, testOsqueryResult[src])
+		if testOsqueryResult[mi.Field] != val {
+			t.Errorf("key [%v]=[%v], expected [%v]", mi.Field, val, testOsqueryResult[mi.Field])
 		}
 	}
 }
 
 func TestMapBadKeys(t *testing.T) {
 	mapping := Mapping{
-		"":           "",
-		"foo":        "",
-		"test":       "..",
-		"uid_signed": "",
+		"":   {Field: ""},
+		"..": {Field: "test"},
 	}
 
 	doc := mapping.Map(testOsqueryResult)
 
-	for _, dst := range mapping {
-		_, ok := doc.Get(dst)
+	for _, mi := range mapping {
+		_, ok := doc.Get(mi.Field)
 		if ok {
-			t.Errorf("key [%v] is expected to be not found", dst)
+			t.Errorf("key [%v] is expected to be not found", mi.Field)
+		}
+	}
+}
+
+func TestMapValue(t *testing.T) {
+	mapping := Mapping{
+		"value.empty":  {Value: ""},
+		"value.zero":   {Value: 0},
+		"value.number": {Value: 42},
+		"value.map":    {Value: map[string]interface{}{"foo": "bar"}},
+		"value.array":  {Value: []interface{}{"1234", "test", 42}},
+	}
+
+	doc := mapping.Map(testOsqueryResult)
+
+	for dst, mi := range mapping {
+		val, ok := doc.Get(dst)
+		if !ok {
+			t.Errorf("key [%v] not found", dst)
+			break
+		}
+		diff := cmp.Diff(mi.Value, val)
+		if diff != "" {
+			t.Errorf("key [%v]=[%v], expected [%v]", dst, val, mi.Value)
 		}
 	}
 }
