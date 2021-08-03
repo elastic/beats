@@ -23,6 +23,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -33,7 +35,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var importAPILegacy = "/api/kibana/dashboards/import"
 var importAPI = "/api/saved_objects/_import"
 
 // KibanaLoader loads Kibana files
@@ -91,6 +92,12 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
+	if loader.version.LessThanOrEqual(true, common.MustNewVersion("7.14.0")) {
+		return fmt.Errorf("Kibana version must be newer than 7.14")
+	}
+
+	loader.statusMsg("Importing index file from %s", file)
+
 	// read json file
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -108,15 +115,33 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
+	if loader.version.LessThanOrEqual(true, common.MustNewVersion("7.14.0")) {
+		return fmt.Errorf("Kibana version must be newer than 7.14")
+	}
+
+	loader.statusMsg("Importing index payload")
+
 	var errs multierror.Errors
 
 	params := url.Values{}
-	params.Set("force", "true") //overwrite the existing dashboards
+	params.Set("overwrite", "true")
 
 	if err := ReplaceIndexInIndexPattern(loader.config.Index, pattern); err != nil {
 		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
 	}
-	if err := loader.client.ImportJSON(importAPI, params, pattern); err != nil {
+
+	dir, err := ioutil.TempDir("", "setup")
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "creating temp file for index pattern"))
+	}
+	defer os.Remove(dir)
+
+	path := filepath.Join(dir, "index-template.ndjson")
+	if err := ioutil.WriteFile(path, []byte(pattern.String()), 0655); err != nil {
+		errs = append(errs, errors.Wrap(err, "error writing temp file for index pattern"))
+	}
+
+	if err := loader.client.ImportMultiPartFromFile(importAPI, params, path); err != nil {
 		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
 	}
 	return errs.Err()
@@ -124,9 +149,14 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
+	if loader.version.LessThanOrEqual(true, common.MustNewVersion("7.14.0")) {
+		return fmt.Errorf("Kibana version must be newer than 7.14")
+	}
+
+	loader.statusMsg("Importing dashboard from %s", file)
+
 	params := url.Values{}
-	params.Set("force", "true")            //overwrite the existing dashboards
-	params.Add("exclude", "index-pattern") //don't import the index pattern from the dashboards
+	params.Set("overwrite", "true")
 
 	// read json file
 	reader, err := ioutil.ReadFile(file)
@@ -141,12 +171,28 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 
-	content, err = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+	dashboard, err := ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 	if err != nil {
 		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
 	}
 
-	return loader.client.ImportJSON(importAPI, params, content)
+	var errs multierror.Errors
+	dir, err := ioutil.TempDir("", "setup")
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "creating temp file for dashboard"))
+	}
+	defer os.Remove(dir)
+
+	path := filepath.Join(dir, filepath.Base(file))
+	if err := ioutil.WriteFile(path, []byte(dashboard.String()), 0655); err != nil {
+		errs = append(errs, errors.Wrap(err, "error writing temp file for index pattern"))
+	}
+	loader.statusMsg("Done creating temporary file for dashboard.")
+
+	if err := loader.client.ImportMultiPartFromFile(importAPI, params, path); err != nil {
+		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
+	}
+	return errs.Err()
 }
 
 // Close closes the client

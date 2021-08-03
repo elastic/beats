@@ -24,9 +24,12 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -200,7 +203,9 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	addHeaders(req.Header, conn.Headers)
 	addHeaders(req.Header, headers)
-	req.Header.Set("Content-Type", "application/json")
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Set("Content-Type", "application/json")
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
@@ -278,12 +283,49 @@ func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[str
 	}
 
 	statusCode, response, err := client.Connection.Request("POST", url, params, nil, bytes.NewBuffer(body))
-	if err != nil {
-		return fmt.Errorf("%v. Response: %s", err, truncateString(response))
-	}
-	if statusCode >= 300 {
+	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
 	}
+
+	client.log.Debugf("Imported JSON to %s with params %v", url, params)
+	return nil
+}
+
+func (client *Client) ImportMultiPartFromFile(url string, params url.Values, path string) error {
+	contents, err := ioutil.ReadFile(path)
+	if err != nil {
+		return fmt.Errorf("cannot read source file: %+v", err)
+	}
+
+	buf := &bytes.Buffer{}
+	w := multipart.NewWriter(buf)
+
+	pHeader := textproto.MIMEHeader{}
+	pHeader.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filepath.Base(path)))
+	pHeader.Add("Content-Type", "application/ndjson")
+
+	p, err := w.CreatePart(pHeader)
+	if err != nil {
+		return fmt.Errorf("failed to create multipart writer for payload: %+v", err)
+	}
+	fmt.Println("=================")
+	_, err = io.Copy(p, bytes.NewReader(contents))
+	if err != nil {
+		return fmt.Errorf("failed to copy contents of the file: %+v", err)
+	}
+	w.Close()
+
+	fmt.Println("=================")
+	headers := http.Header{}
+	headers.Add("Content-Type", w.FormDataContentType())
+
+	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
+	if err != nil || statusCode >= 300 {
+		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
+	}
+	fmt.Println("~~~~~~~~~~~~~~~~~~~~~~~~~`")
+
+	client.log.Debugf("Imported multipart file to %s with params %v", url, params)
 	return nil
 }
 
@@ -291,27 +333,10 @@ func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func (client *Client) GetDashboard(id string) (common.MapStr, error) {
-	var response []byte
-	var err error
-	if client.Version.Major > 7 && client.Version.Minor > 14 {
-		response, err = client.getDashboardLegacy(id)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		response, err = client.getDashboard(id)
-		if err != nil {
-			return nil, err
-		}
+	if client.Version.LessThanOrEqual(true, common.MustNewVersion("v7.14")) {
+		return nil, fmt.Errorf("Kibana version must be newer than 7.14")
 	}
-	result, err := RemoveIndexPattern(response)
-	if err != nil {
-		return nil, fmt.Errorf("error removing index pattern: %+v", err)
-	}
-	return result, nil
-}
 
-func (client *Client) getDashboard(id string) ([]byte, error) {
 	body := `{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true}`
 	body = fmt.Sprintf(body, id)
 	_, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
@@ -319,18 +344,11 @@ func (client *Client) getDashboard(id string) ([]byte, error) {
 		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
 	}
 
-	return response, nil
-}
-
-func (client *Client) getDashboardLegacy(id string) ([]byte, error) {
-	params := url.Values{}
-	params.Add("dashboard", id)
-	_, response, err := client.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
+	result, err := RemoveIndexPattern(response)
 	if err != nil {
-		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
+		return nil, fmt.Errorf("error removing index pattern: %+v", err)
 	}
-
-	return response, nil
+	return result, nil
 }
 
 // truncateString returns a truncated string if the length is greater than 250
