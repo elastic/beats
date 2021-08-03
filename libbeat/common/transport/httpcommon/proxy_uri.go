@@ -81,9 +81,8 @@ func (p *ProxyURI) UnmarshalYAML(unmarshal func(interface{}) error) error {
 }
 
 // URI returns conventional url.URL structure.
-func (p ProxyURI) URI() *url.URL {
-	uri := url.URL(p)
-	return &uri
+func (p *ProxyURI) URI() *url.URL {
+	return (*url.URL)(p)
 }
 
 func stringToProxyURI(s string) (ProxyURI, error) {
