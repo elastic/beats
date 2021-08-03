@@ -24,9 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// ProxyURI is a URL used for proxy serialized as a string.
-type ProxyURI url.URL
-
 // HTTPClientProxySettings provides common HTTP proxy setup support.
 //
 // Proxy usage will be disabled in general if Disable is set.
@@ -48,18 +45,6 @@ type HTTPClientProxySettings struct {
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
-}
-
-// MarshalYAML serializes URI as a string.
-func (p ProxyURI) MarshalYAML() (interface{}, error) {
-	u := url.URL(p)
-	return u.String(), nil
-}
-
-// URI returns conventional url.URL structure.
-func (p ProxyURI) URI() *url.URL {
-	uri := url.URL(p)
-	return &uri
 }
 
 // NewHTTPClientProxySettings creates a new proxy settings based on provided proxy information.
