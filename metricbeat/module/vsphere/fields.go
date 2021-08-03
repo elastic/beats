@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetVsphere returns asset data.
-// This is the base64 encoded gzipped contents of module/vsphere.
+// This is the base64 encoded zlib format compressed contents of module/vsphere.
 func AssetVsphere() string {
 	return "eJzsl8+OmzAQxu95itHedx+AQ6Vqq20vaSttt9fIgSG4MQyyh6zo01e2IeKP002KaS/1ASnYfN8PzHxD7uGIbQInUxeocQPAkhUmcHd6dmfuNgAZmlTLmiVVCbzbAAB0s1BS1ih7mUaFwmACB7EByCWqzCRu6T1UosShhR3c1naxpqbuzgRcxkJDsUywMExnubDkRdluKiAyvo9+TDGGKPY4muhJjti+ks4mc7/hseNDzzTX7Q1zY/XjWT5JhaY1jCXMhHvPVNQildw+MLFQD/uW0QQJFFWH2+y/WUVwikA5cIHBjbEjJ10KTmBuP+PMNWJUzCeNGJ2yMZhFpXwxmK1DWaccZDSpUJjtckViuuAa1hp1ihVfS9stP8/OgqEgw0syYXL9v46DT2T4chKkdeM3pyx+xnyBHr++gKxgO1Ed2vociOfrU+AKY1fY8XxdWb9hW2JJeq1i3Tpxax+SfrtKO7i1cjkS3jpxvBSuQn4lfdzZX2GwPyraz14WxrLn7yCpuRGqFGkhq0XfLxeVbk8tG3sPcnqfS4NrIjgys4eVsrJvJpMsXyujv/ttgK3fh8txTRHfsanplxq1YFkd4Nl/yv1vGus1jfcnIZXYq5s6x6FBw6v1D8rhozVYnNSO1VXoiqg+HaK0vPiPddT4oj1X9wrGhx32weWsaWOYyp3vFEFC2v/A2T8Bf3K3IM4enTEEjP9qr/4VAAD//9YITTs="
 }

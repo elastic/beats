@@ -66,10 +66,13 @@ func (ch *CrashChecker) Run(ctx context.Context) {
 	ch.log.Debug("Crash checker started")
 	for {
 		ch.log.Debugf("watcher having PID: %d", os.Getpid())
+		t := time.NewTimer(ch.checkPeriod)
+
 		select {
 		case <-ctx.Done():
+			t.Stop()
 			return
-		case <-time.After(ch.checkPeriod):
+		case <-t.C:
 			pid, err := ch.sc.PID(ctx)
 			if err != nil {
 				ch.log.Error(err)
