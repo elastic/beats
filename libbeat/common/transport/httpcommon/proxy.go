@@ -50,16 +50,19 @@ type HTTPClientProxySettings struct {
 	Disable bool `config:"proxy_disable" yaml:"proxy_disable,omitempty"`
 }
 
+// MarshalYAML serializes URI as a string.
 func (p ProxyURI) MarshalYAML() (interface{}, error) {
 	u := url.URL(p)
 	return u.String(), nil
 }
 
+// URI returns conventional url.URL structure.
 func (p ProxyURI) URI() *url.URL {
 	uri := url.URL(p)
 	return &uri
 }
 
+// NewHTTPClientProxySettings creates a new proxy settings based on provided proxy information.
 func NewHTTPClientProxySettings(url string, headers map[string]string, disable bool) (*HTTPClientProxySettings, error) {
 	proxyURI, err := common.ParseURL(url)
 	if err != nil {
