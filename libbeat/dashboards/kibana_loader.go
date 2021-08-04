@@ -118,8 +118,6 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 		return fmt.Errorf("Kibana version must be newer than 7.14")
 	}
 
-	loader.statusMsg("Importing index payload")
-
 	var errs multierror.Errors
 
 	params := url.Values{}
@@ -129,7 +127,7 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
 	}
 
-	if err := loader.client.ImportMultiPartFromFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
 		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
 	}
 	return errs.Err()
@@ -159,12 +157,12 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 
-	dashboard, err := ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+	content, err = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 	if err != nil {
 		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
 	}
 
-	if err := loader.client.ImportMultiPartFromFile(importAPI, params, filepath.Base(file), dashboard.String()); err != nil {
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, filepath.Base(file), content.String()); err != nil {
 		return fmt.Errorf("error loading index pattern: %+v", err)
 	}
 	return nil

@@ -82,7 +82,7 @@ func (i *IndexPatternGenerator) generatePattern(attrs common.MapStr) common.MapS
 	out := common.MapStr{
 		"type":       "index-pattern",
 		"id":         i.indexName,
-		"version":    "1",
+		"version":    i.beatVersion,
 		"attributes": attrs,
 	}
 

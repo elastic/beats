@@ -273,21 +273,21 @@ func (client *Client) readVersion() error {
 // IgnoreVersion was set when creating the client.
 func (client *Client) GetVersion() common.Version { return client.Version }
 
-func (client *Client) ImportMultiPartFromFile(url string, params url.Values, filename string, contents string) error {
+func (client *Client) ImportMultiPartFormFile(url string, params url.Values, filename string, contents string) error {
 	buf := &bytes.Buffer{}
 	w := multipart.NewWriter(buf)
 
-	pHeader := textproto.MIMEHeader{}
-	pHeader.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
-	pHeader.Add("Content-Type", "application/ndjson")
+	pHeaders := textproto.MIMEHeader{}
+	pHeaders.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
+	pHeaders.Add("Content-Type", "application/ndjson")
 
-	p, err := w.CreatePart(pHeader)
+	p, err := w.CreatePart(pHeaders)
 	if err != nil {
 		return fmt.Errorf("failed to create multipart writer for payload: %+v", err)
 	}
 	_, err = io.Copy(p, strings.NewReader(contents))
 	if err != nil {
-		return fmt.Errorf("failed to copy contents of the file: %+v", err)
+		return fmt.Errorf("failed to copy contents of the object: %+v", err)
 	}
 	w.Close()
 
