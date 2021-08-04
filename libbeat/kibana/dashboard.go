@@ -18,6 +18,8 @@
 package kibana
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -25,40 +27,29 @@ import (
 )
 
 // RemoveIndexPattern removes the index pattern entry from a given dashboard export
-func RemoveIndexPattern(data []byte) (common.MapStr, error) {
-
-	var kbResult struct {
-		// Has to be defined as interface instead of Type directly as it has to be assigned again
-		// and otherwise would not contain the full content.
-		Objects []common.MapStr
-	}
-
-	var result common.MapStr
-	// Full struct need to not loose any data
-	err := json.Unmarshal(data, &result)
-	if err != nil {
-		return nil, err
-	}
-
-	// For easier handling, unmarshal into predefined struct
-	err = json.Unmarshal(data, &kbResult)
-	if err != nil {
-		return nil, err
-	}
-
-	var objs []interface{}
-
-	for _, obj := range kbResult.Objects {
-		v, err := obj.GetValue("type")
+func RemoveIndexPattern(data []byte) ([]byte, error) {
+	result := make([]byte, 0)
+	scanner := bufio.NewScanner(bytes.NewReader(data))
+	for scanner.Scan() {
+		var r common.MapStr
+		bytes := scanner.Bytes()
+		// Full struct need to not loose any data
+		err := json.Unmarshal(bytes, &r)
+		if err != nil {
+			return nil, err
+		}
+		v, err := r.GetValue("type")
 		if err != nil {
 			return nil, fmt.Errorf("type key not found or not string")
 		}
 		if v != "index-pattern" {
-			objs = append(objs, obj)
+			result = append(result, bytes...)
+			result = append(result, []byte("\n")...)
 		}
 	}
-
-	result["objects"] = objs
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
 
 	return result, nil
 }

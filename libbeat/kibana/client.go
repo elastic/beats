@@ -308,7 +308,7 @@ func (client *Client) ImportMultiPartFormFile(url string, params url.Values, fil
 func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
-func (client *Client) GetDashboard(id string) (common.MapStr, error) {
+func (client *Client) GetDashboard(id string) ([]byte, error) {
 	if client.Version.LessThanOrEqual(true, common.MustNewVersion("v7.14")) {
 		return nil, fmt.Errorf("Kibana version must be newer than 7.14")
 	}
