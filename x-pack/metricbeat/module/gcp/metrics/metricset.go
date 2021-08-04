@@ -165,7 +165,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc.ServiceName)
+		events, err := m.eventMapping(ctx, responses, sdc)
 		if err != nil {
 			err = errors.Wrap(err, "eventMapping failed")
 			m.Logger().Error(err)
@@ -180,14 +180,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, serviceName string) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger())
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	e := newIncomingFieldExtractor(m.Logger(), sdc)
 
 	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, serviceName); err != nil {
+		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
@@ -212,7 +212,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
 		}
 
-		if serviceName == "compute" {
+		if sdc.ServiceName == "compute" {
 			event.RootFields = addHostFields(groupedEvents)
 		} else {
 			event.RootFields = groupedEvents[0].ECS
