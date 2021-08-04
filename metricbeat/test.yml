@@ -2,6 +2,7 @@ metricbeat.modules:
 - module: system.cpu
 - module: system.process_summary
 - module: system.fsstat
+- module: filestream # filestream input from filebeat
 
 output.console:
   pretty: true
