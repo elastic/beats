@@ -35,4 +35,5 @@ rules:
         - output
         - fleet
   - inject_headers: {}
-when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
+when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
+  'kafka', 'logstash')
