@@ -217,7 +217,7 @@ class Test(BaseTest):
         version = self.get_version()
         kibana_semver = semver.VersionInfo.parse(version)
         exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
-                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
+                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.ndjson")
 
         with open(exported_dashboard_path) as f:
             content = f.read()

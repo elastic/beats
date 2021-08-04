@@ -202,7 +202,9 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	addHeaders(req.Header, conn.Headers)
 	addHeaders(req.Header, headers)
-	if req.Header.Get("Content-Type") == "" {
+
+	contentType := req.Header.Get("Content-Type")
+	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
 		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Accept", "application/json")
