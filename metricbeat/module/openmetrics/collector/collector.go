@@ -18,7 +18,6 @@
 package collector
 
 import (
-	//"github.com/elastic/beats/v7/metricbeat/module/prometheus/collector"
 	"regexp"
 
 	"github.com/pkg/errors"
@@ -179,9 +178,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 			if promEvent.Unit != "" {
 				eventList[promEvent.Type][labelsHash]["unit"] = promEvent.Unit
-			}
-			if promEvent.Created > 0 {
-				eventList[promEvent.Type][labelsHash]["created"] = promEvent.Created
 			}
 
 			if len(promEvent.Exemplars) > 0 {

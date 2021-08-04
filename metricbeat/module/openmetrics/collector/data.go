@@ -36,7 +36,6 @@ type OpenMetricEvent struct {
 	Help      string
 	Type      textparse.MetricType
 	Unit      string
-	Created   int64
 	Exemplars common.MapStr
 }
 
@@ -97,25 +96,13 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 			}
 		}
 
-		created := int64(0)
-		if metric.CreatedMs != nil {
-			created = *metric.CreatedMs
-		}
-
-		// TODO: where is timestamp used?
-		//timestamp := int64(0)
-		//if metric.TimestampMs != nil {
-		//	timestamp = *metric.TimestampMs
-		//}
-
 		counter := metric.GetCounter()
 		if counter != nil {
 			if !math.IsNaN(counter.GetValue()) && !math.IsInf(counter.GetValue(), 0) {
 				events = append(events, OpenMetricEvent{
-					Created: created,
-					Type:    textparse.MetricTypeCounter,
-					Help:    help,
-					Unit:    unit,
+					Type: textparse.MetricTypeCounter,
+					Help: help,
+					Unit: unit,
 					Data: common.MapStr{
 						"metrics": common.MapStr{
 							*mn: counter.GetValue(),
@@ -178,10 +165,9 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 		if summary != nil {
 			if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 				events = append(events, OpenMetricEvent{
-					Created: created,
-					Type:    textparse.MetricTypeSummary,
-					Help:    help,
-					Unit:    unit,
+					Type: textparse.MetricTypeSummary,
+					Help: help,
+					Unit: unit,
 					Data: common.MapStr{
 						"metrics": common.MapStr{
 							name + "_sum":   summary.GetSampleSum(),
@@ -223,10 +209,9 @@ func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFam
 				}
 
 				events = append(events, OpenMetricEvent{
-					Created: created,
-					Type:    typ,
-					Help:    help,
-					Unit:    unit,
+					Type: typ,
+					Help: help,
+					Unit: unit,
 					Data: common.MapStr{
 						"metrics": common.MapStr{
 							name + sum:   histogram.GetSampleSum(),

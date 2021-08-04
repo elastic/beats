@@ -216,7 +216,6 @@ type OpenMetric struct {
 	Summary     *Summary
 	Unknown     *Unknown
 	Histogram   *Histogram
-	CreatedMs   *int64
 	TimestampMs *int64
 }
 
