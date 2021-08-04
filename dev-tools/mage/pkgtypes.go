@@ -721,7 +721,10 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"--architecture", spec.Arch,
 	)
 	if packageType == RPM {
-		args = append(args, "--rpm-rpmbuild-define", "_build_id_links none")
+		args = append(args,
+			"--rpm-rpmbuild-define", "_build_id_links none",
+			"--rpm-digest", "sha256",
+		)
 	}
 	if spec.Version != "" {
 		args = append(args, "--version", spec.Version)
