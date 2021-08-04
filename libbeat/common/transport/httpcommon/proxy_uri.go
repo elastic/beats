@@ -28,6 +28,20 @@ import (
 // ProxyURI is a URL used for proxy serialized as a string.
 type ProxyURI url.URL
 
+func NewProxyURIFromString(s string) (*ProxyURI, error) {
+	u, err := url.Parse(s)
+	if err != nil {
+		return &ProxyURI{}, err
+	}
+
+	return NewProxyURIFromURL(*u), nil
+}
+
+func NewProxyURIFromURL(u url.URL) *ProxyURI {
+	p := ProxyURI(u)
+	return &p
+}
+
 // MarshalYAML serializes URI as a string.
 func (p ProxyURI) MarshalYAML() (interface{}, error) {
 	u := url.URL(p)
