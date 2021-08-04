@@ -145,7 +145,7 @@ occurs on every start of the container set FLEET_FORCE to 1.
 }
 
 func logError(streams *cli.IOStreams, err error) {
-	fmt.Fprintf(streams.Err, "Error: %v\n", err)
+	fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
