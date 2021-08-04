@@ -203,6 +203,7 @@ Some built-in helper functions are provided to work with the input state inside 
 - `add`: adds a list of integers and returns their sum.
 - `mul`: multiplies two integers.
 - `div`: does the integer division of two integer values.
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
