@@ -250,11 +250,11 @@ func hmacString(hmacType string, hmacKey string, values ...string) string {
 	}
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	var mac hash.Hash
-	switch hmac_type {
+	switch hmacType {
 	case "sha256":
-		mac = hmac.New(sha256.New, []byte(hmac_key))
+		mac = hmac.New(sha256.New, []byte(hmacKey))
 	case "sha1":
-		mac = hmac.New(sha1.New, []byte(hmac_key))
+		mac = hmac.New(sha1.New, []byte(hmacKey))
 	default:
 		// Upstream config validation prevents this from happening.
 		return ""
