@@ -53,6 +53,12 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
+	policy, err := newNonIndexablePolicy(config.NonIndexablePolicy)
+	if err != nil {
+		log.Errorf("error while creating file identifier: %v", err)
+		return outputs.Fail(err)
+	}
+
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
 		return outputs.Fail(err)
@@ -65,6 +71,13 @@ func makeES(
 	params := config.Params
 	if len(params) == 0 {
 		params = nil
+	}
+
+	if policy.action() == dead_letter_index {
+		index = DeadLetterSelector{
+			Selector:        index,
+			DeadLetterIndex: policy.index(),
+		}
 	}
 
 	clients := make([]outputs.NetworkClient, len(hosts))
@@ -90,9 +103,10 @@ func makeES(
 				EscapeHTML:       config.EscapeHTML,
 				Transport:        config.Transport,
 			},
-			Index:    index,
-			Pipeline: pipeline,
-			Observer: observer,
+			Index:              index,
+			Pipeline:           pipeline,
+			Observer:           observer,
+			NonIndexableAction: policy.action(),
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)
