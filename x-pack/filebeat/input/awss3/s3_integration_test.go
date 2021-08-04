@@ -14,11 +14,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-	"time"
-
-	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3/ftest"
-
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -32,14 +27,16 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3/ftest"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/go-concert/unison"
+
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
 const (
-	fileName1         = "sample1.txt"
-	fileName2         = "sample2.txt"
-	visibilityTimeout = 300 * time.Second
+	fileName1 = "sample1.txt"
+	fileName2 = "sample2.txt"
 )
 
 func defaultTestConfigSQSCollector() *common.Config {
@@ -379,12 +376,28 @@ func TestMockS3InputBucketCollector(t *testing.T) {
 		defer collector.cancellation.Done()
 		defer collector.publisher.Close()
 
-		output, err := collector.getS3Objects()
-		assert.NoError(t, err)
+		s3InfoChan := make(chan *s3Info, 1)
+		errChan := make(chan error)
+		collector.getS3Objects(s3InfoChan, errChan)
 
-		errC := make(chan error)
-		defer close(errC)
-		err = handleS3Objects(collector.s3, output, errC, collector.cancellation, collector.config.APITimeout, collector.publisher, collector.metrics, collector.logger)
+	processingLoop:
+		for {
+			select {
+			case info := <-s3InfoChan:
+				if info == nil {
+					break processingLoop
+				}
+
+				errC := make(chan error)
+				defer close(errC)
+				err := handleS3Objects(collector.s3, []s3Info{*info}, errC, collector.cancellation, collector.config.APITimeout, collector.publisher, collector.metrics, collector.logger)
+				assert.NoError(t, err)
+				break processingLoop
+
+			case err := <-errChan:
+				assert.NoError(t, err)
+			}
+		}
 
 		event := <-receiver
 		bucketName, err := event.GetValue("aws.s3.bucket.name")

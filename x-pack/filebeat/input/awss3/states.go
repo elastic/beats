@@ -19,14 +19,16 @@ import (
 // instances can add update operations to be executed after already pending
 // update operations from older inputs instances that have been shutdown.
 type storedOp struct {
-	states *States
-	store  *statestore.Store
+	states  *States
+	store   *statestore.Store
+	lockMap *sync.Map
 }
 
-func newStoredOp(states *States, store *statestore.Store) *storedOp {
+func newStoredOp(states *States, store *statestore.Store, lockMap *sync.Map) *storedOp {
 	return &storedOp{
-		states: states,
-		store:  store,
+		states:  states,
+		store:   store,
+		lockMap: lockMap,
 	}
 }
 
@@ -39,9 +41,21 @@ func (op *storedOp) execute(info s3Info) {
 	state := op.states.FindPreviousByID(id)
 	if !state.IsEmpty() {
 		state.MarkAsStored()
-		op.states.Update(state)
+		op.states.Update(state, info.listingID)
 		op.states.writeStates(op.store)
 	}
+
+	if op.states.IsListingFullyStored(info.listingID) {
+		// lock map is shared with the collector, locked there
+		// we unlock when all the object were stored (ie: acked)
+		lock, _ := op.lockMap.Load(info.listingID)
+		lock.(*sync.Mutex).Unlock()
+	}
+}
+
+type listingInfo struct {
+	totObjects    int
+	storedObjects int
 }
 
 // States handles list of s3 object state. One must use NewStates to instantiate a
@@ -54,13 +68,20 @@ type States struct {
 
 	// idx maps state IDs to state indexes for fast lookup and modifications.
 	idx map[string]int
+
+	listingIDs        map[string]struct{}
+	listingInfo       *sync.Map
+	statesByListingID map[string][]State
 }
 
 // NewStates generates a new states registry.
 func NewStates() *States {
 	return &States{
-		states: nil,
-		idx:    map[string]int{},
+		states:            nil,
+		idx:               map[string]int{},
+		listingInfo:       new(sync.Map),
+		listingIDs:        map[string]struct{}{},
+		statesByListingID: map[string][]State{},
 	}
 }
 
@@ -81,8 +102,31 @@ func (s *States) Delete(id string) {
 	}
 }
 
+// IsListingFullyStored check if listing if fully stored
+func (s *States) IsListingFullyStored(listingID string) bool {
+	info, _ := s.listingInfo.Load(listingID)
+	return info.(listingInfo).storedObjects == info.(listingInfo).totObjects
+}
+
+// AddListing add listing info
+func (s *States) AddListing(listingID string, listingInfo listingInfo) {
+	s.Lock()
+	defer s.Unlock()
+	s.listingIDs[listingID] = struct{}{}
+	s.listingInfo.Store(listingID, listingInfo)
+}
+
+// DeleteListing delete listing info
+func (s *States) DeleteListing(listingID string) {
+	s.Lock()
+	defer s.Unlock()
+	delete(s.listingIDs, listingID)
+	delete(s.statesByListingID, listingID)
+	s.listingInfo.Delete(listingID)
+}
+
 // Update updates a state. If previous state didn't exist, new one is created
-func (s *States) Update(newState State) {
+func (s *States) Update(newState State, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -97,6 +141,23 @@ func (s *States) Update(newState State) {
 		s.states = append(s.states, newState)
 		logp.Debug("input", "New state added for %s", newState.Key)
 	}
+
+	if listingID == "" || !newState.Stored {
+		return
+	}
+
+	// listing map is shared with the collector
+	// here we increase the number of stored object
+	info, _ := s.listingInfo.Load(listingID)
+	listingInfo := info.(listingInfo)
+	listingInfo.storedObjects++
+	s.listingInfo.Store(listingID, listingInfo)
+
+	if _, ok := s.statesByListingID[listingID]; !ok {
+		s.statesByListingID[listingID] = make([]State, 0)
+	}
+
+	s.statesByListingID[listingID] = append(s.statesByListingID[listingID], newState)
 }
 
 // FindPrevious lookups a registered state, that matching the new state.
@@ -157,6 +218,32 @@ func (s *States) GetStates() []State {
 	return newStates
 }
 
+// GetListingIDs return a of the listing IDs
+func (s *States) GetListingIDs() []string {
+	s.RLock()
+	defer s.RUnlock()
+	listingIDs := make([]string, 0, len(s.listingIDs))
+	for listingID := range s.listingIDs {
+		listingIDs = append(listingIDs, listingID)
+	}
+
+	return listingIDs
+}
+
+// GetStatesByListingID return a copy of the states by listing ID
+func (s *States) GetStatesByListingID(listingID string) []State {
+	s.RLock()
+	defer s.RUnlock()
+
+	if _, ok := s.statesByListingID[listingID]; !ok {
+		return nil
+	}
+
+	newStates := make([]State, len(s.statesByListingID[listingID]))
+	copy(newStates, s.statesByListingID[listingID])
+	return newStates
+}
+
 func (s *States) readStatesFrom(store *statestore.Store) error {
 	var states []State
 
@@ -186,7 +273,7 @@ func (s *States) readStatesFrom(store *statestore.Store) error {
 	states = fixStates(states)
 
 	for _, state := range states {
-		s.Update(state)
+		s.Update(state, "")
 	}
 
 	return nil

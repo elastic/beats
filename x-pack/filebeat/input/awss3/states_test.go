@@ -30,7 +30,7 @@ func TestStatesDelete(t *testing.T) {
 		"delete not existing state": {
 			states: func() *States {
 				states := NewStates()
-				states.Update(NewState("bucket", "key", 100, lastModified))
+				states.Update(NewState("bucket", "key", 100, lastModified), "")
 				return states
 			},
 			deleteID: "an id",
@@ -47,7 +47,7 @@ func TestStatesDelete(t *testing.T) {
 		"delete only one existing": {
 			states: func() *States {
 				states := NewStates()
-				states.Update(NewState("bucket", "key", 100, lastModified))
+				states.Update(NewState("bucket", "key", 100, lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey",
@@ -56,9 +56,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete first": {
 			states: func() *States {
 				states := NewStates()
-				states.Update(NewState("bucket", "key1", 100, lastModified))
-				states.Update(NewState("bucket", "key2", 100, lastModified))
-				states.Update(NewState("bucket", "key3", 100, lastModified))
+				states.Update(NewState("bucket", "key1", 100, lastModified), "")
+				states.Update(NewState("bucket", "key2", 100, lastModified), "")
+				states.Update(NewState("bucket", "key3", 100, lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey1",
@@ -82,9 +82,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete last": {
 			states: func() *States {
 				states := NewStates()
-				states.Update(NewState("bucket", "key1", 100, lastModified))
-				states.Update(NewState("bucket", "key2", 100, lastModified))
-				states.Update(NewState("bucket", "key3", 100, lastModified))
+				states.Update(NewState("bucket", "key1", 100, lastModified), "")
+				states.Update(NewState("bucket", "key2", 100, lastModified), "")
+				states.Update(NewState("bucket", "key3", 100, lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey3",
@@ -108,9 +108,9 @@ func TestStatesDelete(t *testing.T) {
 		"delete any": {
 			states: func() *States {
 				states := NewStates()
-				states.Update(NewState("bucket", "key1", 100, lastModified))
-				states.Update(NewState("bucket", "key2", 100, lastModified))
-				states.Update(NewState("bucket", "key3", 100, lastModified))
+				states.Update(NewState("bucket", "key1", 100, lastModified), "")
+				states.Update(NewState("bucket", "key2", 100, lastModified), "")
+				states.Update(NewState("bucket", "key3", 100, lastModified), "")
 				return states
 			},
 			deleteID: "bucketkey2",

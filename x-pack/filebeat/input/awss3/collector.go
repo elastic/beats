@@ -21,6 +21,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/gofrs/uuid"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -39,9 +41,18 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-// The duration for which the SQS ReceiveMessage call waits for a message to
-// arrive in the queue before returning.
-const sqsLongPollWaitTime = 10 * time.Second
+const (
+	// The duration for which the SQS ReceiveMessage call waits for a message to
+	// arrive in the queue before returning.
+	sqsLongPollWaitTime = 10 * time.Second
+
+	awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
+	awsS3WriteCommitPrefix = "filebeat::aws-s3::writeCommit::"
+)
+
+type commitWriteState struct {
+	time.Time
+}
 
 type s3Collector interface {
 	run()
@@ -72,15 +83,21 @@ type s3BucketCollector struct {
 	publisher beat.Client
 	states    *States
 	store     *statestore.Store
+
+	workersProcessingMap *sync.Map
+	workersListingMap    *sync.Map
 }
 
 type s3Info struct {
-	name   string
-	key    string
-	region string
-	arn    string
-	meta   map[string]interface{} // S3 object metadata.
+	name         string
+	key          string
+	region       string
+	arn          string
+	meta         map[string]interface{} // S3 object metadata.
+	size         int64
+	lastModified time.Time
 	readerConfig
+	listingID string
 }
 
 type bucket struct {
@@ -118,8 +135,10 @@ type logEvent struct {
 	offset int64
 }
 
-func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
-	var s3Infos []s3Info
+func (c *s3BucketCollector) getS3Objects(s3InfoChan chan<- *s3Info, errChan chan<- error) {
+	defer close(s3InfoChan)
+	defer close(errChan)
+
 	bucketMetadata := strings.Split(c.config.S3Bucket, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 
@@ -131,80 +150,218 @@ func (c *s3BucketCollector) getS3Objects() ([]s3Info, error) {
 	paginator := s3.NewListObjectsPaginator(req)
 
 	for paginator.Next(c.cancellation) {
+		lock := new(sync.Mutex)
+		listingID, err := uuid.NewV4()
+		if err != nil {
+			errChan <- errors.Wrap(err, "error generating UUID for listing page")
+			continue
+		}
+
+		// lock for the listing page and state in workersListingMap
+		// this map is shared with the storedOp and will be unlocked there
+		lock.Lock()
+		c.workersListingMap.Store(listingID.String(), lock)
+
+		s3Infos := make([]*s3Info, 0)
 		page := paginator.CurrentPage()
 		for _, object := range page.Contents {
 			// Unescape substrings from s3 log name. For example, convert "%3D" back to "="
 			filename := url.PathEscape(*object.Key)
 
-			state := NewState(bucketName, *object.Key, *object.Size, *object.LastModified)
+			s3Info := &s3Info{
+				name:         bucketName,
+				key:          filename,
+				arn:          c.config.S3Bucket,
+				size:         *object.Size,
+				lastModified: *object.LastModified,
+				readerConfig: c.config.ReaderConfig,
+				listingID:    listingID.String(),
+			}
+
+			state := NewState(s3Info.name, s3Info.key, s3Info.size, s3Info.lastModified)
 			if !c.states.IsNew(state) {
+				// here we should purge from the store
+				c.states.Delete(state.Id)
+				c.states.writeStates(c.store)
 				continue
 			}
+
+			previousState := c.states.FindPrevious(state)
 
 			// status is forget. if there is no previous state and
 			// the state.LastModified is before the last cleanStore
 			// write commit we can remove
-			previousState := c.states.FindPrevious(state)
 			var commitWriteState commitWriteState
-			err := c.store.Get(awsS3WriteCommitStateKey, &commitWriteState)
-			if err == nil && previousState.IsEmpty() && state.LastModified.Before(commitWriteState.Time) {
+			err := c.store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+			if err == nil && previousState.IsEmpty() &&
+				(state.LastModified.Before(commitWriteState.Time) || state.LastModified.Equal(commitWriteState.Time)) {
 				continue
 			}
 
-			c.states.Update(state)
-
-			info := s3Info{
-				name:         bucketName,
-				key:          filename,
-				arn:          c.config.S3Bucket,
-				readerConfig: c.config.ReaderConfig,
+			// we have no previous state or the previous state
+			// is not stored: refresh the state
+			if previousState.IsEmpty() || !previousState.Stored {
+				c.states.Update(state, "")
 			}
 
 			if len(c.config.FileSelectors) == 0 {
-				s3Infos = append(s3Infos, info)
+				s3Infos = append(s3Infos, s3Info)
 				continue
 			}
 
 			for _, fs := range c.config.FileSelectors {
 				if fs.Regex != nil && fs.Regex.MatchString(filename) {
-					s3Infos = append(s3Infos, info)
-
+					s3Infos = append(s3Infos, s3Info)
 					break
 				}
 			}
 		}
-	}
 
-	if err := paginator.Err(); err != nil {
-		return nil, errors.Wrap(err, "error FilterLogEvents with Paginator")
-	}
-
-	return s3Infos, nil
-}
-
-func (c *s3BucketCollector) run() {
-	defer c.logger.Info("s3 input worker has stopped.")
-	c.logger.Info("s3 input worker has started.")
-	for c.cancellation.Err() == nil {
-		// "sleep" for S3BucketPollInterval duration to reduce list operations
-		<-time.After(c.config.S3BucketPollInterval)
-		s3Infos, err := c.getS3Objects()
-		if err != nil {
-			c.logger.Error("S3 get objects failed: ", err)
-			continue
+		listingInfo := listingInfo{totObjects: len(s3Infos)}
+		c.states.AddListing(listingID.String(), listingInfo)
+		for _, s3Info := range s3Infos {
+			s3InfoChan <- s3Info
 		}
 
 		if len(s3Infos) == 0 {
-			c.logger.Debug("no object found in the bucket")
-			continue
+			// nothing to be acked, unlock here
+			lock.Unlock()
+		}
+	}
+
+	if err := paginator.Err(); err != nil {
+		errChan <- errors.Wrap(err, "error FilterLogEvents with Paginator")
+	}
+
+	return
+}
+
+func (c *s3BucketCollector) process(s3InfoChan <-chan *s3Info, errChan <-chan error) {
+processingLoop:
+	for {
+		select {
+		case info := <-s3InfoChan:
+			if info == nil {
+				break processingLoop
+			}
+
+			state := NewState(info.name, info.key, info.size, info.lastModified)
+			//check if another worker already is on it
+			dummyValue := struct{}{}
+			_, loaded := c.workersProcessingMap.LoadOrStore(state.Id, dummyValue)
+			if loaded {
+				continue
+			} else {
+				defer c.workersProcessingMap.Delete(state.Id)
+			}
+
+			errC := make(chan error, 1)
+			err := handleS3Objects(c.s3, []s3Info{*info}, errC, c.cancellation, c.config.APITimeout, c.publisher, c.metrics, c.logger)
+			if err != nil {
+				c.logger.Error(fmt.Errorf("handleS3Objects failed: %w", err))
+				break processingLoop
+			}
+		case err := <-errChan:
+			if err != nil {
+				c.logger.Error("S3 get objects failed: ", err)
+				break processingLoop
+			}
+		}
+	}
+
+	return
+}
+
+func (c *s3BucketCollector) purge() {
+	for _, listingID := range c.states.GetListingIDs() {
+		// workersListingMap map is shared with the storedop
+		// we lock on listing page and unlock when full listing page
+		// objects are stored (ie: acked)
+		// we lock here in order to process the purge only after
+		// full listing page acked
+		lock, _ := c.workersListingMap.Load(listingID)
+		lock.(*sync.Mutex).Lock()
+
+		keys := map[string]struct{}{}
+		latestStoredTimeByBucket := make(map[string]time.Time, 0)
+
+		for _, state := range c.states.GetStatesByListingID(listingID) {
+			// it is not stored, keep
+			if !state.Stored {
+				continue
+			}
+
+			var latestStoredTime time.Time
+			keys[state.Id] = struct{}{}
+			latestStoredTime, ok := latestStoredTimeByBucket[state.Bucket]
+			if !ok {
+				var commitWriteState commitWriteState
+				err := c.store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+				if err == nil {
+					// we have no entry in the map and we have no entry in the store
+					// set zero time
+					latestStoredTime = time.Time{}
+				}
+
+				latestStoredTime = commitWriteState.Time
+
+			}
+
+			if state.LastModified.After(latestStoredTime) {
+				latestStoredTimeByBucket[state.Bucket] = state.LastModified
+			}
+
 		}
 
-		errC := make(chan error, 1)
-		err = handleS3Objects(c.s3, s3Infos, errC, c.cancellation, c.config.APITimeout, c.publisher, c.metrics, c.logger)
-		if err != nil {
-			c.logger.Error(fmt.Errorf("handleS3Objects failed: %w", err))
-			return
+		for key := range keys {
+			c.states.Delete(key)
 		}
+
+		c.states.writeStates(c.store)
+
+		for bucket, latestStoredTime := range latestStoredTimeByBucket {
+			if err := c.store.Set(awsS3WriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {
+				c.logger.Errorf("Failed to write commit time to the registry: %+v", err)
+			}
+		}
+
+		// workersListingMap map is shared with the storedop
+		// purge is done, we can unlock and clean
+		lock.(*sync.Mutex).Unlock()
+		c.workersListingMap.Delete(listingID)
+		c.states.DeleteListing(listingID)
+	}
+
+	return
+}
+
+func (c *s3BucketCollector) run() {
+	defer c.logger.Info("s3 input workers have stopped.")
+	c.logger.Info("s3 input workers have started.")
+	for c.cancellation.Err() == nil {
+		// "sleep" for S3BucketPollInterval duration to reduce list operations
+		<-time.After(c.config.S3BucketPollInterval)
+		wg := new(sync.WaitGroup)
+
+		s3InfoChan := make(chan *s3Info)
+		errChan := make(chan error)
+
+		wg.Add(1)
+		go func(wg *sync.WaitGroup, s3InfoChan chan<- *s3Info, errChan chan<- error) {
+			defer wg.Done()
+			c.getS3Objects(s3InfoChan, errChan)
+		}(wg, s3InfoChan, errChan)
+
+		for i := 0; i < c.config.S3BucketNumberOfWorkers; i++ {
+			wg.Add(1)
+			go func(wg *sync.WaitGroup, s3InfoChan <-chan *s3Info, errChan <-chan error) {
+				defer wg.Done()
+				c.process(s3InfoChan, errChan)
+				c.purge()
+			}(wg, s3InfoChan, errChan)
+		}
+
+		wg.Wait()
 
 		c.logger.Debugf("handleS3Objects succeed")
 	}

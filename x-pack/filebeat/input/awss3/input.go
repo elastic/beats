@@ -7,7 +7,7 @@ package awss3
 import (
 	"context"
 	"fmt"
-	"time"
+	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
@@ -26,9 +26,7 @@ import (
 )
 
 const (
-	inputName                = "aws-s3"
-	awsS3ObjectStatePrefix   = "filebeat::aws-s3::state::"
-	awsS3WriteCommitStateKey = "filebeat::aws-s3::writeCommit::"
+	inputName = "aws-s3"
 )
 
 func Plugin(store beater.StateStore) v2.Plugin {
@@ -123,22 +121,6 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		if err != nil {
 			return fmt.Errorf("cannot create S3 bucket collector: %w", err)
 		}
-
-		err = in.grp.Go(func(canceler unison.Canceler) error {
-			interval := in.store.CleanupInterval()
-			if interval <= 0 {
-				interval = 5 * time.Minute
-			}
-
-			interval = 1 * time.Minute
-			cleanStore(canceler, ctx.Logger, persistentStore, states, interval)
-			return nil
-		})
-
-		if err != nil {
-			return fmt.Errorf("Can not start store cleanup process: %w", err)
-		}
-
 	}
 
 	defer persistentStore.Close()
@@ -154,7 +136,9 @@ func (in *s3Input) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipeline, metrics *inputMetrics, states *States, store *statestore.Store) (*s3BucketCollector, error) {
-	storedOp := newStoredOp(states, store)
+	listingLockMap := new(sync.Map)
+	storedOp := newStoredOp(states, store, listingLockMap)
+
 	publisher, err := pipeline.ConnectWith(beat.ClientConfig{
 		CloseRef:   ctx.Cancelation,
 		ACKHandler: newACKHandler(storedOp),
@@ -177,17 +161,20 @@ func (in *s3Input) createS3BucketCollector(ctx v2.Context, pipeline beat.Pipelin
 
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config s3_bucket_poll_interval = ", in.config.S3BucketPollInterval)
+	log.Debug("s3 input config s3_bucket_number_of_workers = ", in.config.S3BucketNumberOfWorkers)
 	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
 
 	return &s3BucketCollector{
-		cancellation: ctxtool.FromCanceller(ctx.Cancelation),
-		logger:       log,
-		config:       &in.config,
-		publisher:    publisher,
-		s3:           s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, awsConfig.Region, awsConfig)),
-		metrics:      metrics,
-		states:       states,
-		store:        store,
+		cancellation:         ctxtool.FromCanceller(ctx.Cancelation),
+		logger:               log,
+		config:               &in.config,
+		publisher:            publisher,
+		s3:                   s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, awsConfig.Region, awsConfig)),
+		metrics:              metrics,
+		states:               states,
+		store:                store,
+		workersProcessingMap: new(sync.Map),
+		workersListingMap:    listingLockMap,
 	}, nil
 }
 

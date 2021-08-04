@@ -19,7 +19,7 @@ func TestStateIsEqual(t *testing.T) {
 
 	lastModifed := time.Now()
 	tests := map[string]stateTestCase{
-		"two states pointing to the same key with same size and same last modified": {
+		"two states pointing to the same key with same size and same last modified not stored": {
 			[2]State{
 				State{
 					Bucket:       "bucket a",
@@ -35,6 +35,24 @@ func TestStateIsEqual(t *testing.T) {
 				},
 			},
 			true,
+		},
+		"two states pointing to the same key with same size and same last modified stored": {
+			[2]State{
+				State{
+					Bucket:       "bucket a",
+					Key:          "/key/to/this/file/1",
+					Size:         100,
+					LastModified: lastModifed,
+					Stored:       true,
+				},
+				State{
+					Bucket:       "bucket a",
+					Key:          "/key/to/this/file/1",
+					Size:         100,
+					LastModified: lastModifed,
+				},
+			},
+			false,
 		},
 		"two states pointing to the same key with different size and same last modified": {
 			[2]State{
@@ -87,7 +105,7 @@ func TestStateIsEqual(t *testing.T) {
 			},
 			false,
 		},
-		"two states pointing to different bcuket": {
+		"two states pointing to different bucket": {
 			[2]State{
 				State{
 					Bucket:       "bucket b",
