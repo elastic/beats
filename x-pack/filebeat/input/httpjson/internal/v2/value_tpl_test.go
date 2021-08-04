@@ -252,6 +252,30 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "4",
 		},
+		{
+			name:        "func sha1 hmac",
+			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "87eca1e7cba012b2dd4a907c2ad4345a252a38f4",
+		},
+		{
+			name:        "func sha256 hmac",
+			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			teardown:    func() { timeNow = time.Now },
+			value:       `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "adc61cd206e146f2d1337504e760ea70f3d2e34bedf28d07802e0e776568a06b",
+		},
+		{
+			name:          "func invalid hmac",
+			value:         `[[hmac "md5" "secret" "string1" "string2"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
 	}
 
 	for _, tc := range cases {
