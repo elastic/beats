@@ -27,6 +27,10 @@ import (
 type ProxyURI url.URL
 
 func NewProxyURIFromString(s string) (*ProxyURI, error) {
+	if s == "" {
+		return nil, nil
+	}
+
 	u, err := url.Parse(s)
 	if err != nil || u == nil {
 		return nil, err
@@ -36,6 +40,10 @@ func NewProxyURIFromString(s string) (*ProxyURI, error) {
 }
 
 func NewProxyURIFromURL(u url.URL) *ProxyURI {
+	if u == (url.URL{}) {
+		return nil
+	}
+
 	p := ProxyURI(u)
 	return &p
 }
