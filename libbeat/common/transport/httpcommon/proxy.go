@@ -40,7 +40,7 @@ type HTTPClientProxySettings struct {
 
 	// Headers configures additonal headers that are send to the proxy
 	// during CONNECT requests.
-	Headers http.Header `config:"proxy_headers" yaml:"proxy_headers,omitempty"`
+	Headers ProxyHeaders `config:"proxy_headers" yaml:"proxy_headers,omitempty"`
 
 	// Disable HTTP proxy support. Configured URLs and environment variables
 	// are ignored.
@@ -54,14 +54,6 @@ func NewHTTPClientProxySettings(url string, headers map[string]string, disable b
 		return nil, err
 	}
 
-	var httpHeaders http.Header
-	if len(headers) > 0 {
-		httpHeaders = http.Header{}
-		for k, v := range headers {
-			httpHeaders.Add(k, v)
-		}
-	}
-
 	var uri *ProxyURI
 	if proxyURI != nil {
 		pu := ProxyURI(*proxyURI)
@@ -70,7 +62,7 @@ func NewHTTPClientProxySettings(url string, headers map[string]string, disable b
 
 	return &HTTPClientProxySettings{
 		URL:     uri,
-		Headers: httpHeaders,
+		Headers: ProxyHeaders(headers),
 		Disable: disable,
 	}, nil
 }
