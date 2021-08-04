@@ -18,11 +18,9 @@
 package httpcommon
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/url"
 	"strings"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // ProxyURI is a URL used for proxy serialized as a string.
@@ -43,38 +41,36 @@ func NewProxyURIFromURL(u url.URL) *ProxyURI {
 }
 
 // MarshalYAML serializes URI as a string.
-func (p ProxyURI) MarshalYAML() (interface{}, error) {
-	u := url.URL(p)
+func (p *ProxyURI) MarshalYAML() (interface{}, error) {
+	u := url.URL(*p)
 	return u.String(), nil
 }
 
 // MarshalJSON serializes URI as a string.
-func (p ProxyURI) MarshalJSON() ([]byte, error) {
-	u := url.URL(p)
-	fmt.Println(u.String())
-	return []byte(fmt.Sprintf("\"%s\"", u.String())), nil
+func (p *ProxyURI) MarshalJSON() ([]byte, error) {
+	return json.Marshal(p.String())
 }
 
 // Unpack unpacks string into an proxy URI.
 func (p *ProxyURI) Unpack(s string) error {
-	uri, err := stringToProxyURI(s)
+	uri, err := NewProxyURIFromString(s)
 	if err != nil {
 		return err
 	}
 
-	*p = uri
+	*p = *uri
 	return nil
 }
 
 // UnmarshalJSON unpacks string into an proxy URI.
 func (p *ProxyURI) UnmarshalJSON(b []byte) error {
 	unqoted := strings.Trim(string(b), `"`)
-	uri, err := stringToProxyURI(unqoted)
+	uri, err := NewProxyURIFromString(unqoted)
 	if err != nil {
 		return err
 	}
 
-	*p = uri
+	*p = *uri
 	return nil
 }
 
@@ -85,12 +81,12 @@ func (p *ProxyURI) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		return err
 	}
 
-	uri, err := stringToProxyURI(rawURI)
+	uri, err := NewProxyURIFromString(rawURI)
 	if err != nil {
 		return err
 	}
 
-	*p = uri
+	*p = *uri
 	return nil
 }
 
@@ -99,11 +95,7 @@ func (p *ProxyURI) URI() *url.URL {
 	return (*url.URL)(p)
 }
 
-func stringToProxyURI(s string) (ProxyURI, error) {
-	proxyURI, err := common.ParseURL(s)
-	if err != nil {
-		return ProxyURI{}, err
-	}
-
-	return ProxyURI(*proxyURI), nil
+// MarshalJSON serializes URI as a string.
+func (p *ProxyURI) String() string {
+	return p.URI().String()
 }

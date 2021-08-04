@@ -49,19 +49,13 @@ type HTTPClientProxySettings struct {
 
 // NewHTTPClientProxySettings creates a new proxy settings based on provided proxy information.
 func NewHTTPClientProxySettings(url string, headers map[string]string, disable bool) (*HTTPClientProxySettings, error) {
-	proxyURI, err := common.ParseURL(url)
+	proxyURI, err := NewProxyURIFromString(url)
 	if err != nil {
 		return nil, err
 	}
 
-	var uri *ProxyURI
-	if proxyURI != nil {
-		pu := ProxyURI(*proxyURI)
-		uri = &pu
-	}
-
 	return &HTTPClientProxySettings{
-		URL:     uri,
+		URL:     proxyURI,
 		Headers: ProxyHeaders(headers),
 		Disable: disable,
 	}, nil

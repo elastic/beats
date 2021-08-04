@@ -27,7 +27,7 @@ import (
 
 func TestYamlSerializeDeserialize(t *testing.T) {
 	raw := "http://localhost:8080/path\n"
-	var proxyURI ProxyURI
+	var proxyURI *ProxyURI
 	err := yaml.Unmarshal([]byte(raw), &proxyURI)
 	require.NoError(t, err)
 
@@ -38,10 +38,10 @@ func TestYamlSerializeDeserialize(t *testing.T) {
 
 func TestJSONSerializeDeserialize(t *testing.T) {
 	raw := `{"proxy_uri":"http://localhost:8080/path"}`
-	proxyURI, err := stringToProxyURI("http://localhost:8080/path")
+	proxyURI, err := NewProxyURIFromString("http://localhost:8080/path")
 	require.NoError(t, err)
 	s := struct {
-		P ProxyURI `json:"proxy_uri"`
+		P *ProxyURI `json:"proxy_uri"`
 	}{
 		P: proxyURI,
 	}
