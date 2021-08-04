@@ -28,8 +28,8 @@ type ProxyURI url.URL
 
 func NewProxyURIFromString(s string) (*ProxyURI, error) {
 	u, err := url.Parse(s)
-	if err != nil {
-		return &ProxyURI{}, err
+	if err != nil || u == nil {
+		return nil, err
 	}
 
 	return NewProxyURIFromURL(*u), nil
