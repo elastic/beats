@@ -94,7 +94,7 @@ func TestReaderGetStatsHierarchyOverride(t *testing.T) {
 
 	reader, err := NewReaderOptions(ReaderOptions{
 		RootfsMountpoint:         "testdata/docker",
-		IgnoreRootCgroups:        true,
+		IgnoreRootCgroups:        false,
 		CgroupsHierarchyOverride: "/",
 	})
 	if err != nil {

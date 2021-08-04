@@ -195,10 +195,10 @@ func TestProcessCgroupPathsV2(t *testing.T) {
 		t.Fatalf("error in ProcessCgroupPaths: %s", err)
 	}
 
-	assert.Equal(t, "testdata/docker/testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope/cgroup.stat", paths["cgroup"].FullPath)
-	assert.Equal(t, "testdata/docker/testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope/cpu.stat", paths["cpu"].FullPath)
-	assert.Equal(t, "testdata/docker/testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope/io.stat", paths["io"].FullPath)
-	assert.Equal(t, "testdata/docker/testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope/memory.stat", paths["memory"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["cgroup"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["cpu"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["io"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["memory"].FullPath)
 }
 
 func assertContains(t testing.TB, m map[string]struct{}, key string) {

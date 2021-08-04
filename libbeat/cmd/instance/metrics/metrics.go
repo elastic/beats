@@ -386,6 +386,19 @@ func reportBeatCgroups(_ monitoring.Mode, V monitoring.Visitor) {
 			})
 		}
 
+		if memory := selfStats.Memory; memory != nil {
+			monitoring.ReportNamespace(V, "memory", func() {
+				if memory.ID != "" {
+					monitoring.ReportString(V, "id", memory.ID)
+				}
+				monitoring.ReportNamespace(V, "mem", func() {
+					monitoring.ReportNamespace(V, "usage", func() {
+						monitoring.ReportInt(V, "bytes", int64(memory.Mem.Usage.Bytes))
+					})
+				})
+			})
+		}
+
 	}
 
 }
