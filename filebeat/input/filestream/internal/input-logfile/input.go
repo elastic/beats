@@ -70,7 +70,9 @@ func (inp *managedInput) Run(
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
-		tg:           unison.TaskGroup{},
+		tg: unison.TaskGroup{
+			OnQuit: unison.ContinueOnErrors, // harvester should keep running if a single harvester errored
+		},
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
