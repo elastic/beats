@@ -52,3 +52,19 @@ func TestJSONSerializeDeserialize(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, raw, string(out))
 }
+
+func TestYamlSerializeDeserializeSettings(t *testing.T) {
+	raw := `proxy_url: http://localhost:8080/path
+proxy_headers:
+  key: val
+proxy_disable: true
+`
+
+	s := &HTTPClientProxySettings{}
+	err := yaml.Unmarshal([]byte(raw), &s)
+	require.NoError(t, err)
+
+	out, err := yaml.Marshal(s)
+	require.NoError(t, err)
+	require.Equal(t, raw, string(out))
+}
