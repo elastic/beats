@@ -50,3 +50,8 @@ func init() {
 // Update is an alias for update:all. This is a workaround for
 // https://github.com/magefile/mage/issues/217.
 func Update() { mg.Deps(winlogbeat.Update.All) }
+
+// Dashboards collects all the dashboards and generates index patterns.
+func Dashboards() error {
+	return devtools.KibanaDashboards()
+}
