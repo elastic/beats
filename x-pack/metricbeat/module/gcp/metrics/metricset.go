@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"path"
+	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -53,7 +54,7 @@ type MetricSet struct {
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
-	// MetricPrefix allows to specify the prefix string for MetricTypes
+	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
 	// Stackdriver requires metrics to be prefixed with a common prefix.
 	// This prefix changes based on the services the metrics belongs to.
 	ServiceMetricPrefix string   `config:"service_metric_prefix"`
@@ -61,7 +62,9 @@ type metricsConfig struct {
 	Aligner             string   `config:"aligner"`
 }
 
-func (mc metricsConfig) AddPrefixTo(metric string) string {
+// prefix returns the service metric prefix, falling back to the Google Cloud
+// monitoring service prefix when not specified.
+func (mc metricsConfig) prefix() string {
 	prefix := mc.ServiceMetricPrefix
 	// NOTE: fallback to Google Cloud prefix for backward compatibility
 	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
@@ -70,7 +73,17 @@ func (mc metricsConfig) AddPrefixTo(metric string) string {
 		prefix = mc.ServiceName + ".googleapis.com"
 	}
 
-	return path.Join(prefix, metric)
+	return prefix
+}
+
+// AddPrefixTo adds the required service metric prefix to the given metric
+func (mc metricsConfig) AddPrefixTo(metric string) string {
+	return path.Join(mc.prefix(), metric)
+}
+
+// RemovePrefixFrom removes service metric prefix from the given metric
+func (mc metricsConfig) RemovePrefixFrom(metric string) string {
+	return strings.TrimPrefix(metric, mc.prefix())
 }
 
 type metricMeta struct {
