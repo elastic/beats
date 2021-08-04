@@ -12,6 +12,7 @@ import (
 // AgentInfo is a collection of information about agent.
 type AgentInfo struct {
 	agentID  string
+	hostID   string
 	logLevel string
 	headers  map[string]string
 }
@@ -28,8 +29,14 @@ func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
 		return nil, err
 	}
 
+	hostID, err := loadHostID()
+	if err != nil {
+		return nil, err
+	}
+
 	return &AgentInfo{
 		agentID:  agentInfo.ID,
+		hostID:   hostID,
 		logLevel: agentInfo.LogLevel,
 		headers:  agentInfo.Headers,
 	}, nil
@@ -75,6 +82,11 @@ func (i *AgentInfo) ReloadID() error {
 // AgentID returns an agent identifier.
 func (i *AgentInfo) AgentID() string {
 	return i.agentID
+}
+
+// HostID returns a host identifier.
+func (i *AgentInfo) HostID() string {
+	return i.hostID
 }
 
 // Version returns the version for this Agent.

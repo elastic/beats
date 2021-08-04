@@ -127,3 +127,4 @@
 - Support Node and Service autodiscovery in kubernetes dynamic provider. {pull}26801[26801]
 - Increase Agent's mem limits in k8s. {pull}27153[27153]
 - Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
+- Add `host_id` to application info to allow the persistent identification for underlying hosts. {issue}26572[26572]
