@@ -32,9 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sigar "github.com/elastic/gosigar"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 // ProcsMap is a map where the keys are the names of processes and the value is the Process with that name
@@ -65,8 +65,7 @@ type Process struct {
 	cpuTotalPctNorm float64
 
 	// cgroup stats
-	RawStats *cgroup.Stats
-	PctStats CgroupPctStats
+	RawStats cgroup.CGStats
 }
 
 // CgroupPctStats stores rendered percent values from cgroup CPU data
@@ -369,9 +368,12 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 	}
 
 	if procStats.EnableCgroups {
-		if statsMap := cgroupStatsToMap(process); statsMap != nil {
-			proc["cgroup"] = statsMap
+		statsMap, err := process.RawStats.Format()
+		if err != nil {
+			fmt.Printf("error in Format: %s\n", err)
 		}
+		proc["cgroup"] = statsMap
+
 	}
 
 	return proc
@@ -409,45 +411,45 @@ func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64
 // totals are reported in nanoseconds. Because of this, any math that mixes the two might be slightly off,
 // as USER_HZ is less precise value that will get rounded up to nanseconds.
 // Because of that, `user` and `system` metrics reflect a precentage of overall CPU time, but can't be compared to the total pct values.
-func GetCgroupPercentage(s0, s1 *Process) CgroupPctStats {
-	if s0 == nil || s1 == nil || s0.RawStats == nil || s1.RawStats == nil || s0.RawStats.CPUAccounting == nil || s1.RawStats.CPUAccounting == nil {
-		return CgroupPctStats{}
-	}
-	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(s1.RawStats.CPUAccounting.TotalNanos - s0.RawStats.CPUAccounting.TotalNanos)
+// func GetCgroupPercentage(s0, s1 *Process) CgroupPctStats {
+// 	if s0 == nil || s1 == nil || s0.RawStats == nil || s1.RawStats == nil || s0.RawStats.CPUAccounting == nil || s1.RawStats.CPUAccounting == nil {
+// 		return CgroupPctStats{}
+// 	}
+// 	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
+// 	timeDeltaNanos := timeDelta / time.Nanosecond
+// 	totalCPUDeltaNanos := int64(s1.RawStats.CPUAccounting.TotalNanos - s0.RawStats.CPUAccounting.TotalNanos)
 
-	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
-	// Avoid using NumCPU unless we need to; the values in UsagePerCPU are more likely to reflect the running conditions of the cgroup
-	// NumCPU can vary based on the conditions of the running metricbeat process, as it uses Affinity Masks, not hardware data.
-	var cpuCount int
-	if len(s1.RawStats.CPUAccounting.UsagePerCPU) > 0 {
-		cpuCount = len(s1.RawStats.CPUAccounting.UsagePerCPU)
-	} else {
-		cpuCount = runtime.NumCPU()
-	}
+// 	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
+// 	// Avoid using NumCPU unless we need to; the values in UsagePerCPU are more likely to reflect the running conditions of the cgroup
+// 	// NumCPU can vary based on the conditions of the running metricbeat process, as it uses Affinity Masks, not hardware data.
+// 	var cpuCount int
+// 	if len(s1.RawStats.CPUAccounting.UsagePerCPU) > 0 {
+// 		cpuCount = len(s1.RawStats.CPUAccounting.UsagePerCPU)
+// 	} else {
+// 		cpuCount = runtime.NumCPU()
+// 	}
 
-	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
-	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.UserNanos - s0.RawStats.CPUAccounting.Stats.UserNanos)
-	systemCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.SystemNanos - s0.RawStats.CPUAccounting.Stats.SystemNanos)
+// 	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
+// 	normalizedPct := pct / float64(cpuCount)
+// 	userCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.UserNanos - s0.RawStats.CPUAccounting.Stats.UserNanos)
+// 	systemCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.SystemNanos - s0.RawStats.CPUAccounting.Stats.SystemNanos)
 
-	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
-	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
+// 	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
+// 	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
 
-	normalizedUser := userPct / float64(cpuCount)
-	normalizedSystem := systemPct / float64(cpuCount)
+// 	normalizedUser := userPct / float64(cpuCount)
+// 	normalizedSystem := systemPct / float64(cpuCount)
 
-	pctValues := CgroupPctStats{
-		CPUTotalPct:      common.Round(pct, common.DefaultDecimalPlacesCount),
-		CPUTotalPctNorm:  common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
-		CPUUserPct:       common.Round(userPct, common.DefaultDecimalPlacesCount),
-		CPUUserPctNorm:   common.Round(normalizedUser, common.DefaultDecimalPlacesCount),
-		CPUSystemPct:     common.Round(systemPct, common.DefaultDecimalPlacesCount),
-		CPUSystemPctNorm: common.Round(normalizedSystem, common.DefaultDecimalPlacesCount),
-	}
-	return pctValues
-}
+// 	pctValues := CgroupPctStats{
+// 		CPUTotalPct:      common.Round(pct, common.DefaultDecimalPlacesCount),
+// 		CPUTotalPctNorm:  common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
+// 		CPUUserPct:       common.Round(userPct, common.DefaultDecimalPlacesCount),
+// 		CPUUserPctNorm:   common.Round(normalizedUser, common.DefaultDecimalPlacesCount),
+// 		CPUSystemPct:     common.Round(systemPct, common.DefaultDecimalPlacesCount),
+// 		CPUSystemPctNorm: common.Round(normalizedSystem, common.DefaultDecimalPlacesCount),
+// 	}
+// 	return pctValues
+// }
 
 // matchProcess checks if the provided process name matches any of the process regexes
 func (procStats *Stats) matchProcess(name string) bool {
@@ -576,19 +578,23 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		procStats.logger.Debugf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
+		procStats.logger.Errorf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
 		return nil
 	}
 
 	if procStats.EnableCgroups {
-		cgStats, err := procStats.cgroups.GetStatsForProcess(pid)
+		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
-			procStats.logger.Debug("Error fetching cgroup data for process %s with pid=%d: %v", process.Name, process.Pid, err)
+			fmt.Printf("Error fetching cgroup data for process %s with pid=%d: %v\n", process.Name, process.Pid, err)
+			procStats.logger.Errorf("Error fetching cgroup data for process %s with pid=%d: %v", process.Name, process.Pid, err)
 			return nil
 		}
 		process.RawStats = cgStats
 		last := procStats.ProcsMap[process.Pid]
-		process.PctStats = GetCgroupPercentage(last, process)
+		if last != nil {
+			process.RawStats.FillPercentages(last.RawStats, process.SampleTime, last.SampleTime)
+		}
+
 	}
 
 	newProcs[process.Pid] = process

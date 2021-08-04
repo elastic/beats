@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 
 	// Do a first fetch to have percentages
 	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(1 * time.Second)
+	time.Sleep(10 * time.Second)
 
 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
 	if err != nil {
@@ -57,5 +57,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"process"},
+		"processes":  []string{".*metricbeat.*"},
 	}
 }

@@ -27,12 +27,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 var debugf = logp.MakeDebug("system.process")

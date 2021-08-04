@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 )
 
 const (
@@ -38,7 +39,7 @@ type gosigarCidProvider struct {
 	hostPath           string
 	cgroupPrefixes     []string
 	cgroupRegex        string
-	processCgroupPaths func(string, int) (map[string]string, error)
+	processCgroupPaths func(string, int) (map[string]cgroup.ControllerPath, error)
 	pidCidCache        *common.Cache
 }
 
@@ -70,7 +71,7 @@ func (p gosigarCidProvider) GetCid(pid int) (result string, err error) {
 	return cid, nil
 }
 
-func newCidProvider(hostPath string, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(string, int) (map[string]string, error), pidCidCache *common.Cache) gosigarCidProvider {
+func newCidProvider(hostPath string, cgroupPrefixes []string, cgroupRegex string, processCgroupPaths func(string, int) (map[string]cgroup.ControllerPath, error), pidCidCache *common.Cache) gosigarCidProvider {
 	return gosigarCidProvider{
 		log:                logp.NewLogger(providerName),
 		hostPath:           hostPath,
@@ -83,9 +84,9 @@ func newCidProvider(hostPath string, cgroupPrefixes []string, cgroupRegex string
 
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
-func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error) {
+func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]cgroup.ControllerPath, error) {
 
-	var cgroup map[string]string
+	var cgroup map[string]cgroup.ControllerPath
 
 	cgroup, err := p.processCgroupPaths(p.hostPath, pid)
 	switch err.(type) {
@@ -106,25 +107,35 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (map[string]string, error
 // ID is found then an empty string is returned.
 // Example:
 // /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
-func (p gosigarCidProvider) getCid(cgroups map[string]string) string {
+func (p gosigarCidProvider) getCid(cgroups map[string]cgroup.ControllerPath) string {
 	// if regex defined use it to find cid
 	if len(p.cgroupRegex) != 0 {
 		re := regexp.MustCompile(p.cgroupRegex)
 		for _, path := range cgroups {
-			rs := re.FindStringSubmatch(path)
+			rs := re.FindStringSubmatch(path.ControllerPath)
 			if rs != nil {
 				return rs[1]
 			}
 		}
 	} else {
-		// use string prefix to find cid
+		// else, fall back to a hardcoded regex
+		// In an attempt to not break the user-facing config interface for this processor,
+		// fall back to the config'ed prefixes if we have cgv1, otherwise use regex
+		// This should work with k8s on cgroupsV2, as we're still trying to extract the same container ID
 		for _, path := range cgroups {
-			for _, prefix := range p.cgroupPrefixes {
-				if strings.HasPrefix(path, prefix) {
-					return filepath.Base(path)
+			if path.IsV2 {
+				re := regexp.MustCompile(`[\w]{64}`)
+				rs := re.FindStringSubmatch(path.ControllerPath)
+				if rs != nil {
+					return rs[0]
+				}
+			} else {
+				for _, prefix := range p.cgroupPrefixes {
+					if strings.HasPrefix(path.ControllerPath, prefix) {
+						return filepath.Base(path.ControllerPath)
+					}
 				}
 			}
-
 		}
 	}
 	return ""
