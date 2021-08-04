@@ -701,7 +701,7 @@ def tearDown() {
 */
 def fixPermissions(location) {
   if(isUnix()) {
-    catchError(message: 'There were some failures when fixing the permissions', buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    try {
       timeout(5) {
         sh(label: 'Fix permissions', script: """#!/usr/bin/env bash
           set +x
@@ -710,6 +710,8 @@ def fixPermissions(location) {
           docker_setup
           script/fix_permissions.sh ${location}""", returnStatus: true)
       }
+    } catch (Throwable e) {
+      echo "There were some failures when fixing the permissions. ${e.toString()}"
     }
   }
 }

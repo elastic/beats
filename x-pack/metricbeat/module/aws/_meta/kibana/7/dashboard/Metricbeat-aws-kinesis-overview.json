@@ -122,7 +122,7 @@
             },
             "panelIndex": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
             "panelRefName": "panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
-            "title": "PutRecord Bytes",
+            "title": "PutRecords Bytes",
             "type": "lens",
             "version": "7.11.0"
           },
@@ -264,8 +264,8 @@
         }
       ],
       "type": "dashboard",
-      "updated_at": "2021-06-29T18:23:18.412Z",
-      "version": "WzEzOTgwLDFd"
+      "updated_at": "2021-07-29T03:39:57.152Z",
+      "version": "WzEwODAsMV0="
     },
     {
       "attributes": {
@@ -346,8 +346,8 @@
         }
       ],
       "type": "visualization",
-      "updated_at": "2021-06-29T17:55:48.582Z",
-      "version": "WzEzNjQ1LDFd"
+      "updated_at": "2021-07-29T03:35:27.478Z",
+      "version": "WzEyNCwxXQ=="
     },
     {
       "attributes": {
@@ -474,8 +474,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T17:59:42.533Z",
-      "version": "WzEzNjk2LDFd"
+      "updated_at": "2021-07-29T03:35:27.478Z",
+      "version": "WzEyNSwxXQ=="
     },
     {
       "attributes": {
@@ -498,7 +498,7 @@
                       "label": "PutRecords Latency",
                       "operationType": "average",
                       "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecords.Latency.avg"
+                      "sourceField": "aws.kinesis.metrics.PutRecords_Bytes.avg"
                     },
                     "19e03939-49d0-48f7-b76c-d70142001365": {
                       "dataType": "date",
@@ -602,8 +602,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:01:15.961Z",
-      "version": "WzEzODA1LDFd"
+      "updated_at": "2021-07-29T03:51:29.546Z",
+      "version": "WzExNzUsMV0="
     },
     {
       "attributes": {
@@ -626,7 +626,7 @@
                       "label": "PutRecord Latency",
                       "operationType": "average",
                       "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Latency.avg"
+                      "sourceField": "aws.kinesis.metrics.PutRecord_Latency.avg"
                     },
                     "19e03939-49d0-48f7-b76c-d70142001365": {
                       "dataType": "date",
@@ -730,8 +730,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:01:38.259Z",
-      "version": "WzEzODQyLDFd"
+      "updated_at": "2021-07-29T03:51:47.064Z",
+      "version": "WzExOTAsMV0="
     },
     {
       "attributes": {
@@ -858,8 +858,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:00:11.026Z",
-      "version": "WzEzNzIzLDFd"
+      "updated_at": "2021-07-29T03:35:27.478Z",
+      "version": "WzEyOCwxXQ=="
     },
     {
       "attributes": {
@@ -893,7 +893,7 @@
                       "label": "PutRecord Bytes",
                       "operationType": "average",
                       "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Bytes.avg"
+                      "sourceField": "aws.kinesis.metrics.PutRecords_Bytes.avg"
                     },
                     "7cd103e8-3dd3-4fa2-8c13-bc9f80617367": {
                       "dataType": "string",
@@ -962,7 +962,7 @@
             "valueLabels": "hide"
           }
         },
-        "title": "AWS PutRecord Bytes [Metricbeat AWS]",
+        "title": "AWS PutRecords Bytes [Metricbeat AWS]",
         "visualizationType": "lnsXY"
       },
       "coreMigrationVersion": "7.11.0",
@@ -986,8 +986,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:01:45.819Z",
-      "version": "WzEzODU1LDFd"
+      "updated_at": "2021-07-29T03:52:01.268Z",
+      "version": "WzEyMTIsMV0="
     },
     {
       "attributes": {
@@ -1114,8 +1114,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:00:17.123Z",
-      "version": "WzEzNzMzLDFd"
+      "updated_at": "2021-07-29T03:35:27.478Z",
+      "version": "WzEzMCwxXQ=="
     },
     {
       "attributes": {
@@ -1149,7 +1149,7 @@
                       "label": "PutRecords Success",
                       "operationType": "average",
                       "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecords.Success.avg"
+                      "sourceField": "aws.kinesis.metrics.PutRecords_Success.avg"
                     },
                     "a077ea8a-21dd-4bfe-b146-6d6425f7a14f": {
                       "dataType": "string",
@@ -1242,8 +1242,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:01:31.839Z",
-      "version": "WzEzODMwLDFd"
+      "updated_at": "2021-07-29T03:52:24.015Z",
+      "version": "WzEyMzYsMV0="
     },
     {
       "attributes": {
@@ -1277,7 +1277,7 @@
                       "label": "PutRecord Success",
                       "operationType": "average",
                       "scale": "ratio",
-                      "sourceField": "aws.kinesis.metrics.PutRecord.Success.avg"
+                      "sourceField": "aws.kinesis.metrics.PutRecord_Success.avg"
                     },
                     "a077ea8a-21dd-4bfe-b146-6d6425f7a14f": {
                       "dataType": "string",
@@ -1370,8 +1370,8 @@
         }
       ],
       "type": "lens",
-      "updated_at": "2021-06-29T18:01:53.731Z",
-      "version": "WzEzODY5LDFd"
+      "updated_at": "2021-07-29T03:52:37.365Z",
+      "version": "WzEyNDgsMV0="
     }
   ],
   "version": "7.11.0"
