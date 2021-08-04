@@ -127,4 +127,4 @@
 - Support Node and Service autodiscovery in kubernetes dynamic provider. {pull}26801[26801]
 - Increase Agent's mem limits in k8s. {pull}27153[27153]
 - Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
-- Add link to troubleshooting guide on fatal exits. {issue}26367[26367]
+- Add link to troubleshooting guide on fatal exits. {issue}26367[26367] {pull}27236[27236]
