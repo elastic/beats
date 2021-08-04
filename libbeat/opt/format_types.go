@@ -51,3 +51,8 @@ type Pct struct {
 type PctOpt struct {
 	Pct Float `json:"pct" struct:"pct"`
 }
+
+// IsZero returns true if the underlying value nil
+func (opt PctOpt) IsZero() bool {
+	return opt.Pct.IsZero()
+}
