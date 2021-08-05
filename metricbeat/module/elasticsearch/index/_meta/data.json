@@ -7,27 +7,27 @@
         },
         "index": {
             "hidden": false,
-            "name": ".kibana_1",
+            "name": ".kibana-event-log-8.0.0-000001",
             "primaries": {
                 "docs": {
-                    "count": 9
+                    "count": 2
                 },
                 "indexing": {
-                    "index_time_in_millis": 7,
-                    "index_total": 2,
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
                     "throttle_time_in_millis": 0
                 },
                 "merges": {
                     "total_size_in_bytes": 0
                 },
                 "refresh": {
-                    "total_time_in_millis": 64
+                    "total_time_in_millis": 366
                 },
                 "segments": {
-                    "count": 6
+                    "count": 2
                 },
                 "store": {
-                    "size_in_bytes": 10908899
+                    "size_in_bytes": 11301
                 }
             },
             "shards": {
@@ -36,45 +36,45 @@
             "status": "green",
             "total": {
                 "docs": {
-                    "count": 9
+                    "count": 2
                 },
                 "fielddata": {
                     "memory_size_in_bytes": 0
                 },
                 "indexing": {
-                    "index_time_in_millis": 7,
-                    "index_total": 2,
+                    "index_time_in_millis": 109,
+                    "index_total": 1,
                     "throttle_time_in_millis": 0
                 },
                 "merges": {
                     "total_size_in_bytes": 0
                 },
                 "refresh": {
-                    "total_time_in_millis": 64
+                    "total_time_in_millis": 366
                 },
                 "search": {
-                    "fetch_total": 257,
-                    "query_time_in_millis": 436,
-                    "query_total": 257
+                    "query_time_in_millis": 0,
+                    "query_total": 1,
+                    "fetch_total": 257
                 },
                 "segments": {
-                    "count": 6,
-                    "doc_values_memory_in_bytes": 504,
-                    "fixed_bit_set_memory_in_bytes": 288,
+                    "count": 2,
+                    "doc_values_memory_in_bytes": 152,
+                    "fixed_bit_set_memory_in_bytes": 96,
                     "index_writer_memory_in_bytes": 0,
-                    "memory_in_bytes": 14280,
-                    "norms_memory_in_bytes": 832,
+                    "memory_in_bytes": 4392,
+                    "norms_memory_in_bytes": 0,
                     "points_memory_in_bytes": 0,
-                    "stored_fields_memory_in_bytes": 2928,
+                    "stored_fields_memory_in_bytes": 976,
                     "term_vectors_memory_in_bytes": 0,
-                    "terms_memory_in_bytes": 10016,
+                    "terms_memory_in_bytes": 3264,
                     "version_map_memory_in_bytes": 0
                 },
                 "store": {
-                    "size_in_bytes": 10908899
+                    "size_in_bytes": 11301
                 }
             },
-            "uuid": "NaCTvQRUSECDi-bpH6jM9A"
+            "uuid": "3765e_aCRh28_UoF-iWnuQ"
         }
     },
     "event": {
@@ -87,7 +87,7 @@
         "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:46207",
+        "address": "127.0.0.1:35043",
         "type": "elasticsearch"
     }
 }
