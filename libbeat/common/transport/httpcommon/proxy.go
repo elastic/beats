@@ -63,7 +63,9 @@ func NewHTTPClientProxySettings(url string, headers map[string]string, disable b
 
 // DefaultHTTPClientProxySettings returns the default HTTP proxy setting.
 func DefaultHTTPClientProxySettings() HTTPClientProxySettings {
-	return HTTPClientProxySettings{}
+	return HTTPClientProxySettings{
+		Headers: make(ProxyHeaders),
+	}
 }
 
 // Unpack sets the proxy settings from a config object.
