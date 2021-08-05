@@ -123,36 +123,12 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 
 	cfg.Transport.TLS = &tlsCfg
 
-<<<<<<< HEAD
-	var proxyURL *url.URL
-	if e.FleetServer.ProxyURL != "" {
-		proxyURL, err = common.ParseURL(e.FleetServer.ProxyURL)
-		if err != nil {
-			return remote.Config{}, err
-		}
-	}
-
-	var headers http.Header
-	if len(e.FleetServer.ProxyHeaders) > 0 {
-		headers = http.Header{}
-		for k, v := range e.FleetServer.ProxyHeaders {
-			headers.Add(k, v)
-		}
-	}
-
-	cfg.Transport.Proxy = httpcommon.HTTPClientProxySettings{
-		URL:     proxyURL,
-		Disable: e.FleetServer.ProxyDisabled,
-		Headers: headers,
-	}
-=======
-	proxySettings, err := httpcommon.NewHTTPClientProxySettings(e.ProxyURL, e.ProxyHeaders, e.ProxyDisabled)
+	proxySettings, err := httpcommon.NewHTTPClientProxySettings(e.FleetServer.ProxyURL, e.FleetServer.ProxyHeaders, e.FleetServer.ProxyDisabled)
 	if err != nil {
 		return remote.Config{}, err
 	}
 
 	cfg.Transport.Proxy = *proxySettings
->>>>>>> 82fe7804b (Fix serialization/deserialization of proxy URI (#27215))
 
 	return cfg, nil
 }
