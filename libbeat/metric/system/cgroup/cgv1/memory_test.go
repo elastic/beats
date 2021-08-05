@@ -24,8 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const memoryPath = "testdata/docker/sys/fs/cgroup/memory/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
-const pathV2 = "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
+const memoryPath = "../testdata/docker/sys/fs/cgroup/memory/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 
 func TestMemoryStat(t *testing.T) {
 	mem := MemorySubsystem{}

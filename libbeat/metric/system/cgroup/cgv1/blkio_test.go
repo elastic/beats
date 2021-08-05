@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const blkioPath = "testdata/docker/sys/fs/cgroup/blkio/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
+const blkioPath = "../testdata/docker/sys/fs/cgroup/blkio/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 
 func TestParseBlkioValueWithOp(t *testing.T) {
 	line := `253:1 Async 1638912`
@@ -58,7 +58,6 @@ func TestBlkioThrottle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	assert.Equal(t, uint64(46), blkio.Throttle.TotalIOs)
 	assert.Equal(t, uint64(1648128), blkio.Throttle.TotalBytes)
 	assert.Len(t, blkio.Throttle.Devices, 3)

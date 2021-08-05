@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const cpuacctPath = "testdata/docker/sys/fs/cgroup/cpuacct/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
+const cpuacctPath = "../testdata/docker/sys/fs/cgroup/cpuacct/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 
 func TestCPUAccountingStats(t *testing.T) {
 	cpuacct := CPUAccountingSubsystem{}
@@ -32,8 +32,8 @@ func TestCPUAccountingStats(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, uint64(61950000000), cpuacct.Stats.User)
-	assert.Equal(t, uint64(7730000000), cpuacct.Stats.System)
+	assert.Equal(t, uint64(61950000000), cpuacct.Stats.User.NS)
+	assert.Equal(t, uint64(7730000000), cpuacct.Stats.System.NS)
 }
 
 func TestCpuacctUsage(t *testing.T) {
@@ -42,7 +42,7 @@ func TestCpuacctUsage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, uint64(95996653175), cpuacct.Total)
+	assert.Equal(t, uint64(95996653175), cpuacct.Total.NS)
 }
 
 func TestCpuacctUsagePerCPU(t *testing.T) {
@@ -51,7 +51,7 @@ func TestCpuacctUsagePerCPU(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, []uint64{26571825468, 23185259690, 24300973729, 21937433730}, cpuacct.UsagePerCPU)
+	assert.Equal(t, map[string]uint64{"1": 0x62fcde13c, "2": 0x565f2fcaa, "3": 0x5a8736ea1, "4": 0x51b92ac82}, cpuacct.UsagePerCPU)
 }
 
 func TestCPUAccountingSubsystem_Get(t *testing.T) {
@@ -60,8 +60,8 @@ func TestCPUAccountingSubsystem_Get(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, uint64(61950000000), cpuacct.Stats.User)
-	assert.Equal(t, uint64(95996653175), cpuacct.Total)
+	assert.Equal(t, uint64(61950000000), cpuacct.Stats.User.NS)
+	assert.Equal(t, uint64(95996653175), cpuacct.Total.NS)
 	assert.Len(t, cpuacct.UsagePerCPU, 4)
 }
 
