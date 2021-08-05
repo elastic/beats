@@ -167,7 +167,7 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
-		logp.Info("using proxy URL: %s", proxyURL)
+		logp.Info("using proxy URL: %s", proxyURL.URI().String())
 	}
 
 	params := config.Params
