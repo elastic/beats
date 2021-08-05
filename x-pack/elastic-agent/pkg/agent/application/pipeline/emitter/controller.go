@@ -75,6 +75,7 @@ func (e *Controller) Update(c *config.Config) error {
 	if err != nil {
 		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
 	}
+
 	rawAst, err := transpiler.NewAST(m)
 	if err != nil {
 		return errors.New(err, "could not create the AST from the configuration", errors.TypeConfig)
