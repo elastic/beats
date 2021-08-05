@@ -1,10 +1,10 @@
 dashboards:
 - id: 26309570-2419-11e7-a83b-d5f4cebac9ff
-  file: Filebeat-icinga-debug-log.json
+  file: Filebeat-icinga-debug-log.ndjson
 
 - id: b9163ea0-2417-11e7-a83b-d5f4cebac9ff
-  file: Filebeat-icinga-startup-errors.json
+  file: Filebeat-icinga-startup-errors.ndjson
 
 - id: f693d260-2417-11e7-a83b-d5f4cebac9ff
-  file: Filebeat-icinga-main-log.json
+  file: Filebeat-icinga-main-log.ndjson
 
