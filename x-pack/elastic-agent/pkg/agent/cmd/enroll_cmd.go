@@ -10,15 +10,12 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"time"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -126,6 +123,7 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 
 	cfg.Transport.TLS = &tlsCfg
 
+<<<<<<< HEAD
 	var proxyURL *url.URL
 	if e.FleetServer.ProxyURL != "" {
 		proxyURL, err = common.ParseURL(e.FleetServer.ProxyURL)
@@ -147,6 +145,14 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		Disable: e.FleetServer.ProxyDisabled,
 		Headers: headers,
 	}
+=======
+	proxySettings, err := httpcommon.NewHTTPClientProxySettings(e.ProxyURL, e.ProxyHeaders, e.ProxyDisabled)
+	if err != nil {
+		return remote.Config{}, err
+	}
+
+	cfg.Transport.Proxy = *proxySettings
+>>>>>>> 82fe7804b (Fix serialization/deserialization of proxy URI (#27215))
 
 	return cfg, nil
 }
