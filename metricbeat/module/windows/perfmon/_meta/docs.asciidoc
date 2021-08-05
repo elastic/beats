@@ -63,6 +63,8 @@ event. In the above example, this will cause the physical_disk.write.per_sec
 and physical_disk.write.time.pct measurements to be sent as a single event.
 The default behaviour is for all measurements to be sent as separate events.
 
+*`refresh_wildcard_counters`*:: A boolean option to refresh the counter list at each fetch. By default, the counter list will be retrieved at the starting time, to refresh the list at each fetch, users will have to enable this setting.
+
 *`counters`*:: Counters specifies a list of queries to perform. Each individual
 counter requires three config options - `instance_label`, `measurement_label`,
 and `query`.
