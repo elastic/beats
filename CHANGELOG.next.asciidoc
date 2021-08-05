@@ -191,17 +191,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix index template loading when the new index format is selected. {issue}22482[22482] {pull}22682[22682]
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
-- Use PROGRAMDATA environment variable instead of C:\ProgramData for windows install service {pull}22874[22874]
-- Fix reporting of cgroup metrics when running under Docker {pull}22879[22879]
-- Fix typo in config docs {pull}23185[23185]
-- Add FAQ entry for madvdontneed variable {pull}23429[23429]
-- Fix panic due to unhandled DeletedFinalStateUnknown in k8s OnDelete {pull}23419[23419]
-- Fix error loop with runaway CPU use when the Kafka output encounters some connection errors {pull}23484[23484]
-- Fix issue discovering docker containers and metadata after reconnections {pull}24318[24318]
-- Fix ILM alias creation when write alias exists and initial index does not exist {pull}26143[26143]
-- Omit full index template from errors that occur while loading the template. {pull}25743[25743]
-- In the script processor, the `decode_xml` and `decode_xml_wineventlog` processors are now available as `DecodeXML` and `DecodeXMLWineventlog` respectively.
-- Fix encoding errors when using the disk queue on nested data with multi-byte characters {pull}26484[26484]
 - Improve `perfmon` metricset performance. {pull}26886[26886]
 - Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
 - Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
