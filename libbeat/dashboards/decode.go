@@ -18,6 +18,8 @@
 package dashboards
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
 
@@ -36,11 +38,16 @@ var (
 )
 
 // DecodeExported decodes an exported dashboard
-func DecodeExported(result common.MapStr) common.MapStr {
+func DecodeExported(exported []byte) []byte {
 	// remove unsupported chars
-	objects := result["objects"].([]interface{})
-	for _, obj := range objects {
-		o := obj.(common.MapStr)
+	result := make([]byte, 0)
+	scanner := bufio.NewScanner(bytes.NewReader(exported))
+	for scanner.Scan() {
+		o := common.MapStr{}
+		err := json.Unmarshal(scanner.Bytes(), &o)
+		if err != nil {
+			continue
+		}
 		for _, key := range responseToDecode {
 			// All fields are optional, so errors are not caught
 			err := decodeValue(o, key)
@@ -48,9 +55,9 @@ func DecodeExported(result common.MapStr) common.MapStr {
 				logger := logp.NewLogger("dashboards")
 				logger.Debugf("Error while decoding dashboard objects: %+v", err)
 			}
+			result = append(result, []byte(o.String())...)
 		}
 	}
-	result["objects"] = objects
 	return result
 }
 

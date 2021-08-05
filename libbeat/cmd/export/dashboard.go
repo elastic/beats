@@ -37,6 +37,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
+			decode, _ := cmd.Flags().GetBool("decode")
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
@@ -66,6 +67,10 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
 				for i, r := range results {
+					if decode {
+						r = dashboards.DecodeExported(r)
+					}
+
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
 						fatalf("Error saving dashboard '%s' to file '%s' : %+v.\n",
@@ -82,6 +87,9 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboard: %+v.\n", err)
 				}
 
+				if decode {
+					result = dashboards.DecodeExported(result)
+				}
 				fmt.Println(string(result))
 			}
 		},
@@ -89,6 +97,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
 	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
+	genTemplateConfigCmd.Flags().Bool("decode", false, "Decode exported dashboard")
 
 	return genTemplateConfigCmd
 }
