@@ -48,6 +48,8 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout = 60 * time.Second
+
+	eventModule = "osquery_manager"
 )
 
 const (
@@ -439,6 +441,11 @@ func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []
 			fields = ecsFields[i]
 		} else {
 			fields = common.MapStr{}
+		}
+
+		// Add event.module for ECS
+		fields["event"] = map[string]string{
+			"module": eventModule,
 		}
 
 		fields["type"] = bt.b.Info.Name
