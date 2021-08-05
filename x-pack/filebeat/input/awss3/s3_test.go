@@ -13,6 +13,7 @@ import (
 	"strings"
 	"testing"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -193,4 +194,68 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	}
 
 	return events
+}
+
+// TestNewMockS3Pager verifies that newMockS3Pager is behaving similar to
+// the AWS S3 Pager.
+func TestNewMockS3Pager(t *testing.T) {
+	fakeObjects := []s3.Object{
+		{Key: awssdk.String("foo")},
+		{Key: awssdk.String("bar")},
+		{Key: awssdk.String("baz")},
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+	defer cancel()
+
+	ctrl, ctx := gomock.WithContext(ctx, t)
+	defer ctrl.Finish()
+	mockS3Pager := newMockS3Pager(ctrl, 1, fakeObjects)
+	mockS3API := NewMockS3API(ctrl)
+	mockS3API.EXPECT().ListObjectsPaginator(gomock.Any()).Return(mockS3Pager)
+
+	// Test the mock.
+	var keys []string
+	pager := mockS3API.ListObjectsPaginator("nombre")
+	for pager.Next(ctx) {
+		for _, s3Obj := range pager.CurrentPage().Contents {
+			keys = append(keys, *s3Obj.Key)
+		}
+	}
+	if err := pager.Err(); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, []string{"foo", "bar", "baz"}, keys)
+}
+
+// newMockS3Pager returns a s3Pager that paginates the given s3Objects based on
+// the specified page size. It never returns an error.
+func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []s3.Object) *MockS3Pager {
+	mockS3Pager := NewMockS3Pager(ctrl)
+
+	currentPage := -1
+	numPages := len(s3Objects) / pageSize
+	if len(s3Objects)%pageSize != 0 {
+		numPages++
+	}
+
+	mockS3Pager.EXPECT().Next(gomock.Any()).Times(numPages + 1).DoAndReturn(func(_ context.Context) interface{} {
+		currentPage++
+		next := currentPage*pageSize < len(s3Objects)
+		return next
+	})
+	mockS3Pager.EXPECT().CurrentPage().AnyTimes().DoAndReturn(func() *s3.ListObjectsOutput {
+		startIdx := currentPage * pageSize
+		endIdx := currentPage + 1*pageSize
+		if endIdx > len(s3Objects) {
+			endIdx = len(s3Objects)
+		}
+		return &s3.ListObjectsOutput{
+			Contents: s3Objects[startIdx:endIdx],
+		}
+	})
+	mockS3Pager.EXPECT().Err().Return(nil)
+
+	return mockS3Pager
 }

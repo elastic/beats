@@ -273,6 +273,160 @@ func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*MockS3API)(nil).GetObject), ctx, bucket, key)
 }
 
+// ListObjectsPaginator mocks base method.
+func (m *MockS3API) ListObjectsPaginator(bucket string) s3Pager {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket)
+	ret0, _ := ret[0].(s3Pager)
+	return ret0
+}
+
+// ListObjectsPaginator indicates an expected call of ListObjectsPaginator.
+func (mr *MockS3APIMockRecorder) ListObjectsPaginator(bucket interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*MockS3API)(nil).ListObjectsPaginator), bucket)
+}
+
+// Mocks3Getter is a mock of s3Getter interface.
+type Mocks3Getter struct {
+	ctrl     *gomock.Controller
+	recorder *Mocks3GetterMockRecorder
+}
+
+// Mocks3GetterMockRecorder is the mock recorder for Mocks3Getter.
+type Mocks3GetterMockRecorder struct {
+	mock *Mocks3Getter
+}
+
+// NewMocks3Getter creates a new mock instance.
+func NewMocks3Getter(ctrl *gomock.Controller) *Mocks3Getter {
+	mock := &Mocks3Getter{ctrl: ctrl}
+	mock.recorder = &Mocks3GetterMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *Mocks3Getter) EXPECT() *Mocks3GetterMockRecorder {
+	return m.recorder
+}
+
+// GetObject mocks base method.
+func (m *Mocks3Getter) GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetObject", ctx, bucket, key)
+	ret0, _ := ret[0].(*s3.GetObjectResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetObject indicates an expected call of GetObject.
+func (mr *Mocks3GetterMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetObject", reflect.TypeOf((*Mocks3Getter)(nil).GetObject), ctx, bucket, key)
+}
+
+// Mocks3Lister is a mock of s3Lister interface.
+type Mocks3Lister struct {
+	ctrl     *gomock.Controller
+	recorder *Mocks3ListerMockRecorder
+}
+
+// Mocks3ListerMockRecorder is the mock recorder for Mocks3Lister.
+type Mocks3ListerMockRecorder struct {
+	mock *Mocks3Lister
+}
+
+// NewMocks3Lister creates a new mock instance.
+func NewMocks3Lister(ctrl *gomock.Controller) *Mocks3Lister {
+	mock := &Mocks3Lister{ctrl: ctrl}
+	mock.recorder = &Mocks3ListerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *Mocks3Lister) EXPECT() *Mocks3ListerMockRecorder {
+	return m.recorder
+}
+
+// ListObjectsPaginator mocks base method.
+func (m *Mocks3Lister) ListObjectsPaginator(bucket string) s3Pager {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket)
+	ret0, _ := ret[0].(s3Pager)
+	return ret0
+}
+
+// ListObjectsPaginator indicates an expected call of ListObjectsPaginator.
+func (mr *Mocks3ListerMockRecorder) ListObjectsPaginator(bucket interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*Mocks3Lister)(nil).ListObjectsPaginator), bucket)
+}
+
+// MockS3Pager is a mock of s3Pager interface.
+type MockS3Pager struct {
+	ctrl     *gomock.Controller
+	recorder *MockS3PagerMockRecorder
+}
+
+// MockS3PagerMockRecorder is the mock recorder for MockS3Pager.
+type MockS3PagerMockRecorder struct {
+	mock *MockS3Pager
+}
+
+// NewMockS3Pager creates a new mock instance.
+func NewMockS3Pager(ctrl *gomock.Controller) *MockS3Pager {
+	mock := &MockS3Pager{ctrl: ctrl}
+	mock.recorder = &MockS3PagerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockS3Pager) EXPECT() *MockS3PagerMockRecorder {
+	return m.recorder
+}
+
+// CurrentPage mocks base method.
+func (m *MockS3Pager) CurrentPage() *s3.ListObjectsOutput {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CurrentPage")
+	ret0, _ := ret[0].(*s3.ListObjectsOutput)
+	return ret0
+}
+
+// CurrentPage indicates an expected call of CurrentPage.
+func (mr *MockS3PagerMockRecorder) CurrentPage() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CurrentPage", reflect.TypeOf((*MockS3Pager)(nil).CurrentPage))
+}
+
+// Err mocks base method.
+func (m *MockS3Pager) Err() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Err")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Err indicates an expected call of Err.
+func (mr *MockS3PagerMockRecorder) Err() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Err", reflect.TypeOf((*MockS3Pager)(nil).Err))
+}
+
+// Next mocks base method.
+func (m *MockS3Pager) Next(ctx context.Context) bool {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Next", ctx)
+	ret0, _ := ret[0].(bool)
+	return ret0
+}
+
+// Next indicates an expected call of Next.
+func (mr *MockS3PagerMockRecorder) Next(ctx interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Next", reflect.TypeOf((*MockS3Pager)(nil).Next), ctx)
+}
+
 // MockS3ObjectHandlerFactory is a mock of s3ObjectHandlerFactory interface.
 type MockS3ObjectHandlerFactory struct {
 	ctrl     *gomock.Controller

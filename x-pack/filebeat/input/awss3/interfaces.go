@@ -19,7 +19,7 @@ import (
 
 // Run 'go generate' to create mocks that are used in tests.
 //go:generate go install github.com/golang/mock/mockgen@v1.6.0
-//go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
+//go:generate mockgen -source=interfaces.go -destination=mock_interfaces_test.go -package awss3 -mock_names=sqsAPI=MockSQSAPI,sqsProcessor=MockSQSProcessor,s3API=MockS3API,s3Pager=MockS3Pager,s3ObjectHandlerFactory=MockS3ObjectHandlerFactory,s3ObjectHandler=MockS3ObjectHandler
 //go:generate mockgen -destination=mock_publisher_test.go -package=awss3 -mock_names=Client=MockBeatClient github.com/elastic/beats/v7/libbeat/beat Client
 
 // ------
@@ -57,7 +57,22 @@ type sqsProcessor interface {
 // ------
 
 type s3API interface {
+	s3Getter
+	s3Lister
+}
+
+type s3Getter interface {
 	GetObject(ctx context.Context, bucket, key string) (*s3.GetObjectResponse, error)
+}
+
+type s3Lister interface {
+	ListObjectsPaginator(bucket string) s3Pager
+}
+
+type s3Pager interface {
+	Next(ctx context.Context) bool
+	CurrentPage() *s3.ListObjectsOutput
+	Err() error
 }
 
 type s3ObjectHandlerFactory interface {
@@ -182,4 +197,13 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	}
 
 	return resp, nil
+}
+
+func (a *awsS3API) ListObjectsPaginator(bucket string) s3Pager {
+	req := a.client.ListObjectsRequest(&s3.ListObjectsInput{
+		Bucket: awssdk.String(bucket),
+	})
+
+	pager := s3.NewListObjectsPaginator(req)
+	return &pager
 }

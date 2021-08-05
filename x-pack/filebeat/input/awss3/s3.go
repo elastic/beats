@@ -40,12 +40,12 @@ const (
 type s3ObjectProcessorFactory struct {
 	log           *logp.Logger
 	metrics       *inputMetrics
-	s3            s3API
+	s3            s3Getter
 	publisher     beat.Client
 	fileSelectors []fileSelectorConfig
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}

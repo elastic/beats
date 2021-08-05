@@ -60,7 +60,7 @@ type constantS3 struct {
 	contentType string
 }
 
-var _ s3API = (*constantS3)(nil)
+var _ s3Getter = (*constantS3)(nil)
 
 func newConstantS3(t testing.TB) *constantS3 {
 	data, err := ioutil.ReadFile(cloudtrailTestFile)
