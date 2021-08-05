@@ -200,6 +200,70 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	assert.Equal(t, 1, getCount("testfield:0")) // no pipeline
 }
 
+func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
+	type obj map[string]interface{}
+
+	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
+
+	index := "beat-int-test-dli-index"
+	deadletterIndex := "beat-int-test-dli-dead-letter-index"
+
+	output, client := connectTestEsWithoutStats(t, obj{
+		"index": index,
+		"non_indexable_policy": map[string]interface{}{
+			"dead_letter_index": map[string]interface{}{
+				"index": deadletterIndex,
+			},
+		},
+	})
+	client.conn.Delete(index, "", "", nil)
+	client.conn.Delete(deadletterIndex, "", "", nil)
+
+	err := output.Publish(context.Background(), outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 1",
+			"testfield": 0,
+		},
+	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	batch := outest.NewBatch(beat.Event{
+		Timestamp: time.Now(),
+		Fields: common.MapStr{
+			"type":      "libbeat",
+			"message":   "Test message 2",
+			"testfield": "foo0",
+		},
+	})
+	err = output.Publish(context.Background(), batch)
+	if err == nil {
+		t.Fatal("Expecting mapping conflict")
+	}
+	_, _, err = client.conn.Refresh(deadletterIndex)
+	if err == nil {
+		t.Fatal("expecting index to not exist yet")
+	}
+	err = output.Publish(context.Background(), batch)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, _, err = client.conn.Refresh(index)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, _, err = client.conn.Refresh(deadletterIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+}
+
 func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	type obj map[string]interface{}
 
