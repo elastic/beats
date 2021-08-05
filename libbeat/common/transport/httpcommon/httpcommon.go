@@ -241,7 +241,7 @@ func (settings *HTTPTransportSettings) httpRoundTripper(
 	t.TLSClientConfig = tls.ToConfig()
 	t.ForceAttemptHTTP2 = false
 	t.Proxy = settings.Proxy.ProxyFunc()
-	t.ProxyConnectHeader = settings.Proxy.Headers
+	t.ProxyConnectHeader = settings.Proxy.Headers.Headers()
 
 	//  reset some internal timeouts to not change old Beats defaults
 	t.TLSHandshakeTimeout = 0
