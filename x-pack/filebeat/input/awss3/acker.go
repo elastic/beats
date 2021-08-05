@@ -61,7 +61,7 @@ func (a *eventACKTracker) Wait() {
 	<-a.ctx.Done()
 }
 
-// newEventACKHandler returns a beat ACKer that can receive callbacks when a
+// newEventACKHandler returns a beat ACKer that can receive callbacks when
 // an event has been ACKed an output. If the event contains a private metadata
 // pointing to an eventACKTracker then it will invoke the trackers ACK() method
 // to decrement the number of pending ACKs.

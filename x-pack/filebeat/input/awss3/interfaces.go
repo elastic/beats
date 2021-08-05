@@ -45,6 +45,10 @@ type sqsVisibilityChanger interface {
 }
 
 type sqsProcessor interface {
+	// ProcessSQS processes and SQS message. It takes fully ownership of the
+	// given message and is responsible for updating the message's visibility
+	// timeout while it is being processed and for deleting it when processing
+	// completes successfully.
 	ProcessSQS(ctx context.Context, msg *sqs.Message) error
 }
 
@@ -57,10 +61,18 @@ type s3API interface {
 }
 
 type s3ObjectHandlerFactory interface {
+	// Create returns a new s3ObjectHandler that can be used to process the
+	// specified S3 object. If the handler is not configured to process the
+	// given S3 object (based on key name) then it will return nil.
 	Create(ctx context.Context, log *logp.Logger, acker *eventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
+	// ProcessS3Object downloads the S3 object, parses it, creates events, and
+	// publishes them. It returns when processing finishes or when it encounters
+	// an unrecoverable error. It does not wait for the events to be ACKed by
+	// the publisher before returning (use eventACKTracker's Wait() method to
+	// determine this).
 	ProcessS3Object() error
 }
 
@@ -85,7 +97,7 @@ func (a *awsSQSAPI) ReceiveMessage(ctx context.Context, maxMessages int) ([]sqs.
 			MaxNumberOfMessages: awssdk.Int64(int64(min(maxMessages, sqsMaxNumberOfMessagesLimit))),
 			VisibilityTimeout:   awssdk.Int64(int64(a.visibilityTimeout.Seconds())),
 			WaitTimeSeconds:     awssdk.Int64(int64(a.longPollWaitTime.Seconds())),
-			AttributeNames:      []sqs.QueueAttributeName{"ApproximateReceiveCount"},
+			AttributeNames:      []sqs.QueueAttributeName{sqsApproximateReceiveCountAttribute},
 		})
 
 	ctx, cancel := context.WithTimeout(ctx, a.apiTimeout)
