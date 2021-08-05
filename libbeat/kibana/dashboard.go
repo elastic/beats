@@ -54,6 +54,4 @@ func RemoveIndexPattern(data []byte) ([]byte, error) {
 			result = append(result, line...)
 		}
 	}
-
-	return result, nil
 }
