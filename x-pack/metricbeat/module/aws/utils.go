@@ -29,9 +29,11 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 		endTime = endTime.Add(latency * -1)
 	}
 
-	// Set startTime double the period earlier than the endtime in order to
-	// make sure GetMetricDataRequest gets the latest data point for each metric.
-	return endTime.Add(period * -2), endTime
+	// Set startTime double the period plus one second earlier than the endTime in order to
+	// make sure GetMetricDataRequest gets the latest data point for each metric. The plus
+	// one second is to make sure the startTime of the next collect period is one second later
+	// than the endTime of last collection period. This is to avoid collecting duplicate data.
+	return endTime.Add(period*-2 + time.Second), endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
