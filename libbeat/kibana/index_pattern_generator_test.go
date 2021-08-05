@@ -245,7 +245,6 @@ func readNdJson(path string) ([]map[string]interface{}, error) {
 		}
 		data = append(data, dd)
 	}
-	return data, nil
 }
 
 func tmpPath(t testing.TB) string {
