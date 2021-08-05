@@ -89,6 +89,7 @@ type total struct {
 	Search struct {
 		QueryTotal        int `json:"query_total"`
 		QueryTimeInMillis int `json:"query_time_in_millis"`
+		FetchTotal        int `json:"fetch_total"`
 	} `json:"search"`
 	Segments struct {
 		Count                     int `json:"count"`

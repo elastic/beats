@@ -92,7 +92,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			input, _ := ioutil.ReadFile("./_meta/test/stats.800.snapshot.20201118.json")
 			w.Write(input)
 			return
-		} else if r.URL.Path != "/" {
+		} else if r.URL.Path == "/*/_settings" {
 			input, _ := ioutil.ReadFile("./_meta/test/settings.json")
 			w.Write(input)
 			return
@@ -118,7 +118,7 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 			w.Write(input)
 		}))
 
-	mux.Handle("/_cluster/state/metadata,routing_table", http.HandlerFunc(
+	mux.Handle("/_cluster/state/routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
 			w.Write(input)
