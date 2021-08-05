@@ -52,12 +52,15 @@ func (a *eventACKTracker) ACK() {
 
 // Wait waits for the number of pending ACKs to be zero.
 func (a *eventACKTracker) Wait() {
+	// If there were never any pending ACKs then cancel the context. (This can
+	// happen when a document contains no events or cannot be read due to an error).
 	a.Lock()
 	if a.pendingACKs == 0 {
 		a.cancel()
 	}
 	a.Unlock()
 
+	// Wait.
 	<-a.ctx.Done()
 }
 
