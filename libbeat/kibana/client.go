@@ -31,7 +31,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -62,19 +62,25 @@ func addToURL(_url, _path string, params url.Values) string {
 
 func extractError(result []byte) error {
 	var kibanaResult struct {
-		Objects []struct {
-			Error struct {
-				Message string
+		Message    string
+		Attributes struct {
+			Objects []struct {
+				Id    string
+				Error struct {
+					Message string
+				}
 			}
 		}
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return errors.Wrap(err, "parsing kibana response")
+		return nil
 	}
-	for _, o := range kibanaResult.Objects {
-		if o.Error.Message != "" {
-			return errors.New(kibanaResult.Objects[0].Error.Message)
+	var errs multierror.Errors
+	if kibanaResult.Message != "" {
+		for _, err := range kibanaResult.Attributes.Objects {
+			errs = append(errs, fmt.Errorf("id: %s, message: %s", err.Id, err.Error.Message))
 		}
+		return fmt.Errorf("%s: %+v", kibanaResult.Message, errs.Err())
 	}
 	return nil
 }
@@ -309,14 +315,14 @@ func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
 func (client *Client) GetDashboard(id string) ([]byte, error) {
-	if client.Version.LessThanOrEqual(true, common.MustNewVersion("v7.14")) {
+	if client.Version.LessThanOrEqual(true, common.MustNewVersion("7.14.0")) {
 		return nil, fmt.Errorf("Kibana version must be newer than 7.14")
 	}
 
-	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true}`, id)
+	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true, "excludeExportDetails": true}`, id)
 	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
 	if err != nil || statusCode >= 300 {
-		return nil, fmt.Errorf("error exporting dashboard: %+v, resp: %+v, code: %d", err, response, statusCode)
+		return nil, fmt.Errorf("error exporting dashboard: %+v, code: %d", err, statusCode)
 	}
 
 	result, err := RemoveIndexPattern(response)

@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/pkg/errors"
 
@@ -175,11 +176,18 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	}
 
 	result := make([]byte, 0)
-	scanner := bufio.NewScanner(bytes.NewReader(content))
-	for scanner.Scan() {
-		line := scanner.Bytes()
+	r := bufio.NewReader(bytes.NewReader(content))
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return result
+			}
+			logger.Error("Error reading bytes from raw dashboard object: %+v", err)
+			return content
+		}
 		objectMap := make(map[string]interface{}, 0)
-		err := json.Unmarshal(line, &objectMap)
+		err = json.Unmarshal(line, &objectMap)
 		if err != nil {
 			result = append(result, append(line, newline...)...)
 			continue
@@ -207,8 +215,6 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 
 		result = append(result, append(b, newline...)...)
 	}
-
-	return result
 }
 
 // ReplaceStringInDashboard replaces a string field in a dashboard

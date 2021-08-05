@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -29,12 +30,19 @@ import (
 // RemoveIndexPattern removes the index pattern entry from a given dashboard export
 func RemoveIndexPattern(data []byte) ([]byte, error) {
 	result := make([]byte, 0)
-	scanner := bufio.NewScanner(bytes.NewReader(data))
-	for scanner.Scan() {
+	r := bufio.NewReader(bytes.NewReader(data))
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return result, nil
+			}
+			return data, err
+		}
+
 		var r common.MapStr
-		bytes := scanner.Bytes()
 		// Full struct need to not loose any data
-		err := json.Unmarshal(bytes, &r)
+		err = json.Unmarshal(line, &r)
 		if err != nil {
 			return nil, err
 		}
@@ -43,12 +51,8 @@ func RemoveIndexPattern(data []byte) ([]byte, error) {
 			return nil, fmt.Errorf("type key not found or not string")
 		}
 		if v != "index-pattern" {
-			result = append(result, bytes...)
-			result = append(result, []byte("\n")...)
+			result = append(result, line...)
 		}
-	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
 	}
 
 	return result, nil
