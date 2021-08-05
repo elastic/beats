@@ -145,24 +145,16 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	params.Set("overwrite", "true")
 
 	// read json file
-	reader, err := ioutil.ReadFile(file)
+	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
-	}
-	var content common.MapStr
-	err = json.Unmarshal(reader, &content)
-	if err != nil {
-		return fmt.Errorf("fail to unmarshal the dashboard content from file %s: %v", file, err)
 	}
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 
-	content, err = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
-	if err != nil {
-		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
-	}
+	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 
-	if err := loader.client.ImportMultiPartFormFile(importAPI, params, filepath.Base(file), content.String()); err != nil {
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, filepath.Base(file), string(content)); err != nil {
 		return fmt.Errorf("error loading index pattern: %+v", err)
 	}
 	return nil

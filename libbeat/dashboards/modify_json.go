@@ -18,6 +18,7 @@
 package dashboards
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -26,6 +27,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+)
+
+var (
+	newline = []byte("\n")
 )
 
 // JSONObjectAttribute contains the attributes for a Kibana json object
@@ -123,6 +128,10 @@ func ReplaceIndexInSavedObject(logger *logp.Logger, index string, kibanaSavedObj
 		}
 		kibanaSavedObject["searchSourceJSON"] = searchSourceJSON
 	}
+	if visStateJSON, ok := kibanaSavedObject["visState"].(string); ok {
+		visStateJSON = ReplaceIndexInVisState(logger, index, visStateJSON)
+		kibanaSavedObject["visState"] = visStateJSON
+	}
 
 	return kibanaSavedObject
 }
@@ -159,25 +168,26 @@ func ReplaceIndexInVisState(logger *logp.Logger, index string, visStateJSON stri
 }
 
 // ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
-func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.MapStr {
+func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	logger := logp.NewLogger("dashboards")
 	if index == "" {
 		return content
 	}
 
-	objects, ok := content["objects"].([]interface{})
-	if !ok {
-		return content
-	}
-
-	for i, object := range objects {
-		objectMap, ok := object.(map[string]interface{})
-		if !ok {
+	result := make([]byte, 0)
+	scanner := bufio.NewScanner(bytes.NewReader(content))
+	for scanner.Scan() {
+		line := scanner.Bytes()
+		objectMap := make(map[string]interface{}, 0)
+		err := json.Unmarshal(line, &objectMap)
+		if err != nil {
+			result = append(result, append(line, newline...)...)
 			continue
 		}
 
 		attributes, ok := objectMap["attributes"].(map[string]interface{})
 		if !ok {
+			result = append(result, append(line, newline...)...)
 			continue
 		}
 
@@ -189,23 +199,19 @@ func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.M
 			attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
 		}
 
-		objects[i] = objectMap
-	}
-	content["objects"] = objects
+		b, err := json.Marshal(objectMap)
+		if err != nil {
+			logger.Error("Error marshaling modified dashboard: %+v", err)
+			result = append(result, append(line, newline...)...)
+		}
 
-	return content
+		result = append(result, append(b, newline...)...)
+	}
+
+	return result
 }
 
 // ReplaceStringInDashboard replaces a string field in a dashboard
-func ReplaceStringInDashboard(old, new string, content common.MapStr) (common.MapStr, error) {
-	marshaled, err := json.Marshal(content)
-	if err != nil {
-		return nil, fmt.Errorf("fail to marshal dashboard object: %v", content)
-	}
-
-	replaced := bytes.Replace(marshaled, []byte(old), []byte(new), -1)
-
-	var result common.MapStr
-	err = json.Unmarshal(replaced, &result)
-	return result, nil
+func ReplaceStringInDashboard(old, new string, content []byte) []byte {
+	return bytes.Replace(content, []byte(old), []byte(new), -1)
 }
