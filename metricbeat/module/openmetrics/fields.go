@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetOpenmetrics returns asset data.
-// This is the base64 encoded gzipped contents of module/openmetrics.
+// This is the base64 encoded zlib format compressed contents of module/openmetrics.
 func AssetOpenmetrics() string {
 	return "eJzMlD9v1EAQxXt/iidTRIouoXdBQUGH8gEQSva8Y3vI/tPsnI779sheO9gxFIQTYhpLs7vv/eat7Ts806VBTBQ8qXCbK0BZHTW4efjZvakAIUcmU4MjqakAS7kVTsoxNPhQAcDqBHy0J0cVkEmVQ58bfKkH1VQfUOfs6q8V0DE5m5vp8B2C8fQaZiy9JGrQSzylufOuPDZI73szr/6CbKynlfIT2hjUcMhYgDuJHhRsihw0QwejMELoonPxzKHfjNdF8UbvZ/H1HIXvQSwJOIN9iqImKAYSOsCZI7mMMzsHb7Qd0LFkPUAHglAupjaejlN6pZZsBnLppbkE80yXcxS76v8mgLE+ClO33oDYTdafp8E+Gc/usvMdjf7Ot+S2FVrUT4H1KuoboUW9FTJK9ioGk9YYmrIncECmNgabd6bllu9vd67x+I3a9bSl8fgGps3XVviK7Y5m3vXHOK/ews3qozcpcejnrfVt/VbqHS59J5+ckX8X3+K4j+6F5X+50e1v+EcAAAD//y1RpoM="
 }
