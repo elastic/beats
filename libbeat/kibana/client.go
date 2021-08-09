@@ -73,7 +73,7 @@ func extractError(result []byte) error {
 		}
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return nil
+		return err
 	}
 	var errs multierror.Errors
 	if kibanaResult.Message != "" {
