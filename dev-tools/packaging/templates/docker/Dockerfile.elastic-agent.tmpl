@@ -6,6 +6,10 @@
 # the final image because of permission changes.
 FROM {{ .buildFrom }} AS home
 
+# Contains the elastic agent image variant, an empty string for the standard variant
+# or "offline" for the offline one.
+ENV ELASTIC_AGENT_IMAGE_VARIANT={{.Variant}}
+
 COPY beat {{ $beatHome }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/logs && \

@@ -1000,8 +1000,8 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        // This image gets an 'offline' variant for synthetics and other large
-        // packages too big to fit in the main image
+        # This image gets an 'offline' variant for synthetics and other large
+        # packages too big to fit in the main image
         variants: ["offline"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
@@ -1026,8 +1026,8 @@ specs:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        // This image gets an 'offline' variant for synthetics and other large
-        // packages too big to fit in the main image
+        # This image gets an 'offline' variant for synthetics and other large
+        # packages too big to fit in the main image
         variants: ["offline"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
