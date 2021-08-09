@@ -547,6 +547,13 @@
                 The number of times that the memory limit (kmem_tcp.limit.bytes)
                 was reached.
 
+            - name: stats.*
+              type: nested
+              description: detailed memory IO stats
+            - name: stats.*.*
+              type: nested
+              description: detailed memory IO stats
+
             - name: stats.active_anon.bytes
               type: long
               format: bytes
@@ -627,10 +634,6 @@
               description: >
                 Anonymous and swap cache (includes transparent hugepages), not
                 including tmpfs (shmem), in bytes.
-            - name: stats.*
-              type: group
-              description: detailed memory IO stats
-              fields:
 
             - name: stats.rss_huge.bytes
               type: long
@@ -688,9 +691,13 @@
               description: >
                 Path to the cgroup relative to the cgroup subsystems mountpoint.
             - name: stats.*
-              type: group
+              type: nested
               description: per-device IO usage stats
-              fields: 
+            - name: stats.*.*
+              type: nested
+            - name: stats.*.*.*
+              type: nested
+              description: per-device IO usage stats
             - name: pressure
               type: group
               description: Pressure (resource contention) stats.
@@ -698,6 +705,22 @@
                 - name: full
                   type: group
                   description: Share of time in which at least some tasks are stalled on a given resource
+                  fields:
+                    - name: 10.pct
+                      type: float
+                      description: Pressure over 10 seconds
+                    - name: 60.pct
+                      type: float
+                      description: Pressure over 60 seconds
+                    - name: 300.pct
+                      type: float
+                      description: Pressure over 300 seconds
+                    - name: total
+                      type: long
+                      description: total Some pressure time
+                - name: some
+                  type: group
+                  description: Share of time in which all tasks are stalled on a given resource
                   fields:
                     - name: 10.pct
                       type: float

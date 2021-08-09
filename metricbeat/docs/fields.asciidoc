@@ -53928,6 +53928,24 @@ type: long
 
 --
 
+*`system.process.cgroup.memory.stats.*`*::
++
+--
+detailed memory IO stats
+
+type: nested
+
+--
+
+*`system.process.cgroup.memory.stats.*.*`*::
++
+--
+detailed memory IO stats
+
+type: nested
+
+--
+
 *`system.process.cgroup.memory.stats.active_anon.bytes`*::
 +
 --
@@ -54074,11 +54092,6 @@ format: bytes
 
 --
 
-[float]
-=== stats.*
-
-detailed memory IO stats
-
 *`system.process.cgroup.memory.stats.rss_huge.bytes`*::
 +
 --
@@ -54187,10 +54200,30 @@ type: keyword
 
 --
 
-[float]
-=== stats.*
-
+*`system.process.cgroup.io.stats.*`*::
++
+--
 per-device IO usage stats
+
+type: nested
+
+--
+
+*`system.process.cgroup.io.stats.*.*`*::
++
+--
+type: nested
+
+--
+
+*`system.process.cgroup.io.stats.*.*.*`*::
++
+--
+per-device IO usage stats
+
+type: nested
+
+--
 
 [float]
 === pressure
@@ -54232,6 +54265,48 @@ type: float
 --
 
 *`system.process.cgroup.io.pressure.full.total`*::
++
+--
+total Some pressure time
+
+type: long
+
+--
+
+[float]
+=== some
+
+Share of time in which all tasks are stalled on a given resource
+
+
+*`system.process.cgroup.io.pressure.some.10.pct`*::
++
+--
+Pressure over 10 seconds
+
+type: float
+
+--
+
+*`system.process.cgroup.io.pressure.some.60.pct`*::
++
+--
+Pressure over 60 seconds
+
+type: float
+
+--
+
+*`system.process.cgroup.io.pressure.some.300.pct`*::
++
+--
+Pressure over 300 seconds
+
+type: float
+
+--
+
+*`system.process.cgroup.io.pressure.some.total`*::
 +
 --
 total Some pressure time
