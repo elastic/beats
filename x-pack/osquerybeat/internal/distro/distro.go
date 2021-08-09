@@ -27,14 +27,14 @@ const (
 	osqueryName            = "osquery"
 	osqueryDName           = "osqueryd"
 	osqueryPath            = "usr/local/bin"
-	osqueryVersion         = "4.8.0"
+	osqueryVersion         = "4.9.0"
 	osqueryMSIExt          = ".msi"
 	osqueryPkgExt          = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "10b02b55b4f1465df7a7b8c46c6072b859e172809c4838c8a65dc148f056b821"
-	osqueryDistroLinuxSHA256    = "4f84f5e79f32030e739def7f95a37b839952c6225449226e6200dcd311a0191c"
-	osqueryDistroLinuxARMSHA256 = "61fbd2b5e2f8fd2e65dec91955499eee8639efff289c3279b5ffa2786741a8c4"
-	osqueryDistroWindowsSHA256  = "5a88aaeb9bf2cd52071817be9a8124fa0c4fd9188ca1730ee77058a1449b8ab9"
+	osqueryDistroDarwinSHA256   = "3f9ab772596f4da69687a2d7db9a382535b5eabf2346abd452b24666b8f25102"
+	osqueryDistroLinuxSHA256    = "4187f5b76e21ce96f765e509f96cb04708c43596b7609eba0e5a10ab5fdf58c5"
+	osqueryDistroLinuxARMSHA256 = "f3f5f3d6d81d727aad52a50b9f252aea3d7200add643eca06e9f462e66daeb18"
+	osqueryDistroWindowsSHA256  = "ae5e8b5948f3e2783aadc66e8b9d5d417b8606b39abf79f06af466c3455ce249"
 )
 
 type OSArch struct {
