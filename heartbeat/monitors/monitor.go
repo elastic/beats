@@ -18,8 +18,6 @@
 package monitors
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"sync"
 
@@ -31,7 +29,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
-	"github.com/elastic/beats/v7/heartbeat/watcher"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -55,10 +52,6 @@ type Monitor struct {
 	internalsMtx sync.Mutex
 	close        func() error
 
-	// Watch related fields
-	watchPollTasks []*configuredJob
-	watch          watcher.Watch
-
 	pipelineConnector beat.PipelineConnector
 
 	// stats is the countersRecorder used to record lifecycle events
@@ -72,16 +65,13 @@ func (m *Monitor) String() string {
 	return fmt.Sprintf("Monitor<pluginName: %s, enabled: %t>", m.stdFields.Name, m.enabled)
 }
 
-func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg, allowWatches bool) error {
-	m, err := newMonitor(config, registrar, nil, nil, allowWatches)
+func checkMonitorConfig(config *common.Config, registrar *plugin.PluginsReg) error {
+	m, err := newMonitor(config, registrar, nil, nil)
 	if m != nil {
 		m.Stop() // Stop the monitor to free up the ID from uniqueness checks
 	}
 	return err
 }
-
-// ErrWatchesDisabled is returned when the user attempts to declare a watch poll file in a
-var ErrWatchesDisabled = errors.New("watch poll files are only allowed in heartbeat.yml, not dynamic configs")
 
 // uniqueMonitorIDs is used to keep track of explicitly configured monitor IDs and ensure no duplication within a
 // given heartbeat instance.
@@ -100,9 +90,8 @@ func newMonitor(
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
-	allowWatches bool,
 ) (*Monitor, error) {
-	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler, allowWatches)
+	m, err := newMonitorUnsafe(config, registrar, pipelineConnector, scheduler)
 	if m != nil && err != nil {
 		m.Stop()
 	}
@@ -116,7 +105,6 @@ func newMonitorUnsafe(
 	registrar *plugin.PluginsReg,
 	pipelineConnector beat.PipelineConnector,
 	scheduler *scheduler.Scheduler,
-	allowWatches bool,
 ) (*Monitor, error) {
 	// Extract just the Id, Type, and Enabled fields from the config
 	// We'll parse things more precisely later once we know what exact type of
@@ -137,7 +125,6 @@ func newMonitorUnsafe(
 		scheduler:         scheduler,
 		configuredJobs:    []*configuredJob{},
 		pipelineConnector: pipelineConnector,
-		watchPollTasks:    []*configuredJob{},
 		internalsMtx:      sync.Mutex{},
 		config:            config,
 		stats:             pluginFactory.Stats,
@@ -169,20 +156,6 @@ func newMonitorUnsafe(
 	m.configuredJobs, err = m.makeTasks(config, wrappedJobs)
 	if err != nil {
 		return m, err
-	}
-
-	err = m.makeWatchTasks(pluginFactory)
-	if err != nil {
-		return m, err
-	}
-
-	if len(m.watchPollTasks) > 0 {
-		if !allowWatches {
-			return m, ErrWatchesDisabled
-		}
-
-		logp.Info(`Obsolete option 'watch.poll_file' declared. This will be removed in a future release.
-See https://www.elastic.co/guide/en/beats/heartbeat/current/configuration-heartbeat-options.html for more info`)
 	}
 
 	return m, nil
@@ -227,84 +200,12 @@ func (m *Monitor) makeTasks(config *common.Config, jobs []jobs.Job) ([]*configur
 	return mTasks, nil
 }
 
-func (m *Monitor) makeWatchTasks(pluginFactory plugin.PluginFactory) error {
-	watchCfg := watcher.DefaultWatchConfig
-	err := m.config.Unpack(&watchCfg)
-	if err != nil {
-		return err
-	}
-
-	if len(watchCfg.Path) > 0 {
-		m.watch, err = watcher.NewFilePoller(watchCfg.Path, watchCfg.Poll, func(content []byte) {
-			var newTasks []*configuredJob
-
-			dec := json.NewDecoder(bytes.NewBuffer(content))
-			for dec.More() {
-				var obj map[string]interface{}
-				err = dec.Decode(&obj)
-				if err != nil {
-					logp.Err("Failed parsing JSON object: %v", err)
-					return
-				}
-
-				cfg, err := common.NewConfigFrom(obj)
-				if err != nil {
-					logp.Err("Failed normalizing JSON input: %v", err)
-					return
-				}
-
-				merged, err := common.MergeConfigs(m.config, cfg)
-				if err != nil {
-					logp.Err("Could not merge config: %v", err)
-					return
-				}
-
-				p, err := pluginFactory.Create(merged)
-				m.close = p.Close
-				m.endpoints = p.Endpoints
-				if err != nil {
-					logp.Err("Could not create job from watch file: %v", err)
-				}
-
-				watchTasks, err := m.makeTasks(merged, p.Jobs)
-				if err != nil {
-					logp.Err("Could not make configuredJob for config: %v", err)
-					return
-				}
-
-				newTasks = append(newTasks, watchTasks...)
-			}
-
-			m.internalsMtx.Lock()
-			defer m.internalsMtx.Unlock()
-
-			for _, t := range m.watchPollTasks {
-				t.Stop()
-			}
-			m.watchPollTasks = newTasks
-			for _, t := range m.watchPollTasks {
-				t.Start()
-			}
-		})
-
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
 // Start starts the monitor's execution using its configured scheduler.
 func (m *Monitor) Start() {
 	m.internalsMtx.Lock()
 	defer m.internalsMtx.Unlock()
 
 	for _, t := range m.configuredJobs {
-		t.Start()
-	}
-
-	for _, t := range m.watchPollTasks {
 		t.Start()
 	}
 
@@ -319,10 +220,6 @@ func (m *Monitor) Stop() {
 	defer m.freeID()
 
 	for _, t := range m.configuredJobs {
-		t.Stop()
-	}
-
-	for _, t := range m.watchPollTasks {
 		t.Stop()
 	}
 
