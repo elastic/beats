@@ -48,6 +48,8 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout = 60 * time.Second
+
+	eventModule = "osquery_manager"
 )
 
 const (
@@ -278,7 +280,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 				bt.log.Info("context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputCh:
-				configPlugin.Set(inputConfigs)
+				err = configPlugin.Set(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("failed to set configuration from inputs: %v", err)
+					return err
+				}
 				cache.Resize(configPlugin.Count())
 			}
 		}
@@ -435,6 +441,11 @@ func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []
 			fields = ecsFields[i]
 		} else {
 			fields = common.MapStr{}
+		}
+
+		// Add event.module for ECS
+		fields["event"] = map[string]string{
+			"module": eventModule,
 		}
 
 		fields["type"] = bt.b.Info.Name

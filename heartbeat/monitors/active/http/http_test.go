@@ -402,9 +402,6 @@ func runHTTPSServerCheck(
 }
 
 func TestHTTPSServer(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
 	runHTTPSServerCheck(t, server, nil)
 }

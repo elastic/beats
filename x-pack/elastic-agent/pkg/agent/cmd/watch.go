@@ -143,6 +143,9 @@ func watch(ctx context.Context, tilGrace time.Duration, log *logger.Logger) erro
 	signals := make(chan os.Signal, 1)
 	signal.Notify(signals, syscall.SIGINT, syscall.SIGKILL, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 
+	t := time.NewTimer(tilGrace)
+	defer t.Stop()
+
 WATCHLOOP:
 	for {
 		select {
@@ -152,7 +155,7 @@ WATCHLOOP:
 		case <-ctx.Done():
 			break WATCHLOOP
 		// grace period passed, agent is considered stable
-		case <-time.After(tilGrace):
+		case <-t.C:
 			log.Info("Grace period passed, not watching")
 			break WATCHLOOP
 		// Agent in degraded state.

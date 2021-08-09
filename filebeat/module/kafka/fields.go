@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetKafka returns asset data.
-// This is the base64 encoded gzipped contents of module/kafka.
+// This is the base64 encoded zlib format compressed contents of module/kafka.
 func AssetKafka() string {
 	return "eJykkztywyAQhnud4h/31gFUpEmXTDpfYMdayYwQMLB24ttngPhF8GtMZ9Z8/6eFXWLifYeJhokaQJRo7rD4jL8XDdBzWHvlRFnT4a0BgFTDbPut5gYYFOs+dKm0hKGZT7i4ZO+4w+jt1v3tVJiXmHOUtuNxrwa7Cswry2o7QivDoT0rlokXqbxjfVE5ZJNWFIqKI9kk07Z2blajp+wmfsvVvJlDoJGfTKyfupZXDV7b2VnDRqrRE++/re+L2o12x/V+QEI2nFqvQsxRZsTg7dzWRTSF8itfkPigHWXmUxay8Uxl1Asaq8RL8Oc8PK3rr6F8+w9IAKuIgzJHhzgMbfHH2jzgzg3da89Ddv9uS7LujT7h7uyczIR/ytf9oBbwldlw5AV2ONm1zW8AAAD//95/TD8="
 }

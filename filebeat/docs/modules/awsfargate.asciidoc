@@ -46,8 +46,8 @@ Example config:
 
 [source,yaml]
 ----
-- module: aws
-  fargate:
+- module: awsfargate
+  log:
     enabled: true
     var.credential_profile_name: test-filebeat
     var.log_group_arn: arn:aws:logs:us-east-1:1234567890:log-group:/ecs/test-log-group:*
