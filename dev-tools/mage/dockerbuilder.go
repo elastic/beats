@@ -69,8 +69,6 @@ func (b *dockerBuilder) Build() error {
 	// We always have at least one default variant
 	variants := append([]string{""}, b.PackageSpec.Variants...)
 	for _, variant := range variants {
-		fmt.Printf("\nVARIANT: %s\n\n\n", variant)
-
 		if err := b.prepareBuild(variant); err != nil {
 			return errors.Wrap(err, "failed to prepare build")
 		}
