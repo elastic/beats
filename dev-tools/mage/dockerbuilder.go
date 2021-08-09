@@ -25,7 +25,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -59,11 +58,6 @@ func newDockerBuilder(spec PackageSpec) (*dockerBuilder, error) {
 }
 
 func (b *dockerBuilder) Build() error {
-	variants := []string{""}
-	if os.Getenv("OFFLINE_DOCKER_IMAGE") == "true" || b.ServiceName == "elastic-agent" {
-		variants = append(variants, "offline")
-	}
-
 	if err := os.RemoveAll(b.buildDir); err != nil {
 		return errors.Wrapf(err, "failed to clean existing build directory %s", b.buildDir)
 	}
@@ -72,11 +66,10 @@ func (b *dockerBuilder) Build() error {
 		return err
 	}
 
+	// We always have at least one default variant
+	variants := append([]string{""}, b.PackageSpec.Variants...)
 	for _, variant := range variants {
-		// There is no UBI editition of the offline agent, so we skip this
-		if variant == "offline" && regexp.MustCompile("-ubi\\d+$").MatchString(b.imageName) {
-			continue
-		}
+		fmt.Printf("\nVARIANT: %s\n\n\n", variant)
 
 		if err := b.prepareBuild(variant); err != nil {
 			return errors.Wrap(err, "failed to prepare build")
