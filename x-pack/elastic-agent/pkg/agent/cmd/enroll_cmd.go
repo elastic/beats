@@ -10,15 +10,12 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"net/http"
-	"net/url"
 	"os"
 	"os/exec"
 	"time"
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
@@ -126,27 +123,12 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 
 	cfg.Transport.TLS = &tlsCfg
 
-	var proxyURL *url.URL
-	if e.FleetServer.ProxyURL != "" {
-		proxyURL, err = common.ParseURL(e.FleetServer.ProxyURL)
-		if err != nil {
-			return remote.Config{}, err
-		}
+	proxySettings, err := httpcommon.NewHTTPClientProxySettings(e.FleetServer.ProxyURL, e.FleetServer.ProxyHeaders, e.FleetServer.ProxyDisabled)
+	if err != nil {
+		return remote.Config{}, err
 	}
 
-	var headers http.Header
-	if len(e.FleetServer.ProxyHeaders) > 0 {
-		headers = http.Header{}
-		for k, v := range e.FleetServer.ProxyHeaders {
-			headers.Add(k, v)
-		}
-	}
-
-	cfg.Transport.Proxy = httpcommon.HTTPClientProxySettings{
-		URL:     proxyURL,
-		Disable: e.FleetServer.ProxyDisabled,
-		Headers: headers,
-	}
+	cfg.Transport.Proxy = *proxySettings
 
 	return cfg, nil
 }
