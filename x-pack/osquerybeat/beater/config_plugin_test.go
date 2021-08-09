@@ -19,11 +19,14 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func renderFullConfig(inputs []config.InputConfig) (map[string]string, error) {
+func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 	packs := make(map[string]pack)
 	for _, input := range inputs {
 		pack := pack{
-			Queries: make(map[string]query),
+			Platform:  input.Platform,
+			Version:   input.Version,
+			Discovery: input.Discovery,
+			Queries:   make(map[string]query),
 		}
 		for _, stream := range input.Streams {
 			query := query{
@@ -39,12 +42,10 @@ func renderFullConfig(inputs []config.InputConfig) (map[string]string, error) {
 	}
 	raw, err := newOsqueryConfig(packs).render()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	return map[string]string{
-		configName: string(raw),
-	}, nil
+	return string(raw), nil
 }
 
 func TestConfigPluginNew(t *testing.T) {
@@ -241,23 +242,45 @@ func TestSet(t *testing.T) {
         "schedule_splay_percent": 10
     }
 }`
+	oneInputConfig := []config.InputConfig{
+		{
+			Name:     "osquery-manager-1",
+			Type:     "osquery",
+			Platform: "posix",
+			Version:  "4.7.0",
+			Discovery: []string{
+				"SELECT pid FROM processes WHERE name = 'foobar';",
+				"SELECT 1 FROM users WHERE username like 'www%';",
+			},
+			Streams: []config.StreamConfig{
+				{
+					ID:       "users",
+					Query:    "select * from users limit 2",
+					Interval: 60,
+					ECSMapping: map[string]interface{}{
+						"user": map[string]interface{}{
+							"custom": map[string]interface{}{
+								"shoeSize": map[string]interface{}{
+									"value": 45,
+								},
+							},
+							"id": map[string]interface{}{
+								"field": "uid",
+							},
+							"name": map[string]interface{}{
+								"field": "username",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
-	const oneInputConfig = `{
-    "options": {
-        "schedule_splay_percent": 10
-    },
-    "packs": {
-        "osquery-manager-1": {
-            "queries": {
-                "users": {
-                    "query": "select * from users limit 2",
-                    "interval": 60,
-                    "snapshot": true
-                }
-            }
-        }
-    }
-}`
+	oneInputPackConfig, err := renderFullConfigJSON(oneInputConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	tests := []struct {
 		name   string
@@ -276,36 +299,9 @@ func TestSet(t *testing.T) {
 			scfg:   noQueriesConfig,
 		},
 		{
-			name: "one input",
-			inputs: []config.InputConfig{
-				{
-					Name: "osquery-manager-1",
-					Type: "osquery",
-					Streams: []config.StreamConfig{
-						{
-							ID:       "users",
-							Query:    "select * from users limit 2",
-							Interval: 60,
-							ECSMapping: map[string]interface{}{
-								"user": map[string]interface{}{
-									"custom": map[string]interface{}{
-										"shoeSize": map[string]interface{}{
-											"value": 45,
-										},
-									},
-									"id": map[string]interface{}{
-										"field": "uid",
-									},
-									"name": map[string]interface{}{
-										"field": "username",
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-			scfg: oneInputConfig,
+			name:   "one input",
+			inputs: oneInputConfig,
+			scfg:   oneInputPackConfig,
 			ecsm: ecs.Mapping{
 				"user.custom.shoeSize": ecs.MappingInfo{
 					Value: 45,
