@@ -30,8 +30,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/gosigar"
 )
 
@@ -46,14 +44,6 @@ func TestPids(t *testing.T) {
 
 	// Assuming at least 2 processes are running
 	assert.True(t, (len(pids) > 1))
-}
-
-func TestConvert(t *testing.T) {
-	stat := cgcommon.CPUUsage{NS: 100}
-	to := common.MapStr{}
-	err := typeconv.Convert(&to, &stat)
-	assert.NoError(t, err, "error in convert")
-	t.Logf("%#v", to)
 }
 
 func TestGetProcess(t *testing.T) {
