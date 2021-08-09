@@ -175,7 +175,7 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		return content
 	}
 
-	result := make([]byte, 0)
+	var result []byte
 	r := bufio.NewReader(bytes.NewReader(content))
 	for {
 		line, err := r.ReadBytes('\n')

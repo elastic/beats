@@ -76,7 +76,7 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([][]byte, ListYML,
 
 // ExportAll exports all dashboards from an opened and parsed dashboards YML.
 func ExportAll(client *kibana.Client, list ListYML) ([][]byte, error) {
-	results := make([][]byte, 0)
+	var results [][]byte
 	for _, e := range list.Dashboards {
 		result, err := Export(client, e.ID)
 		if err != nil {

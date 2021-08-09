@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -40,11 +41,18 @@ var (
 // DecodeExported decodes an exported dashboard
 func DecodeExported(exported []byte) []byte {
 	// remove unsupported chars
-	result := make([]byte, 0)
-	scanner := bufio.NewScanner(bytes.NewReader(exported))
-	for scanner.Scan() {
+	var result []byte
+	r := bufio.NewReader(bytes.NewReader(exported))
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return result
+			}
+			return exported
+		}
 		o := common.MapStr{}
-		err := json.Unmarshal(scanner.Bytes(), &o)
+		err = json.Unmarshal(line, &o)
 		if err != nil {
 			continue
 		}
@@ -58,7 +66,6 @@ func DecodeExported(exported []byte) []byte {
 			result = append(result, []byte(o.String())...)
 		}
 	}
-	return result
 }
 
 func decodeValue(data common.MapStr, key string) error {

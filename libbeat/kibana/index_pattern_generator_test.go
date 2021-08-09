@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -146,7 +145,7 @@ func TestGenerateExtensive(t *testing.T) {
 func testGenerate(t *testing.T, tests []compare, sourceFilters bool) {
 	for _, test := range tests {
 		// compare default
-		existing, err := readNdJson(test.existing)
+		existing, err := readNDJSON(test.existing)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -226,7 +225,7 @@ func find(a []map[string]interface{}, key, val string) int {
 	return -1
 }
 
-func readNdJson(path string) ([]map[string]interface{}, error) {
+func readNDJSON(path string) ([]map[string]interface{}, error) {
 	f, err := ioutil.ReadFile(path)
 	if err != nil {
 		return nil, err
@@ -234,17 +233,15 @@ func readNdJson(path string) ([]map[string]interface{}, error) {
 
 	data := make([]map[string]interface{}, 0)
 	d := json.NewDecoder(bytes.NewReader(f))
-	for {
+	for d.More() {
 		var dd map[string]interface{}
 		err = d.Decode(&dd)
 		if err != nil {
-			if err != io.EOF {
-				return nil, fmt.Errorf("error reading ndjson: %+v", err)
-			}
-			return data, nil
+			return nil, fmt.Errorf("error reading ndjson: %+v", err)
 		}
 		data = append(data, dd)
 	}
+	return data, nil
 }
 
 func tmpPath(t testing.TB) string {
