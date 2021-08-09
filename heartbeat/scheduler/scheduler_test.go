@@ -28,7 +28,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/sync/semaphore"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -213,9 +212,6 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			limit := int64(100)
 			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil)
 
-			jobSem := semaphore.NewWeighted(math.MaxInt64)
-			jobSem.Acquire(context.Background(), 1)
-
 			if testCase.overLimit {
 				s.limitSem.Acquire(context.Background(), limit)
 			}
@@ -230,7 +226,7 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, jobSem)
+			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, nil)
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
 			// for an error value and released an unacquired resource in scheduler.go.

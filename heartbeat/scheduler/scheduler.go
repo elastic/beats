@@ -80,21 +80,11 @@ type Schedule interface {
 }
 
 func getJobLimitSem(jobLimitByType map[string]config.JobLimit) map[string]*semaphore.Weighted {
-	jc := map[string]config.JobLimit{
-		"http":    {Limit: math.MaxInt64},
-		"icmp":    {Limit: math.MaxInt64},
-		"tcp":     {Limit: math.MaxInt64},
-		"browser": {Limit: math.MaxInt64},
-	}
+	jobLimitSem := map[string]*semaphore.Weighted{}
 	for jobType, jobLimit := range jobLimitByType {
 		if jobLimit.Limit > 0 {
-			jc[jobType] = jobLimit
+			jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 		}
-	}
-
-	jobLimitSem := map[string]*semaphore.Weighted{}
-	for jobType, jobLimit := range jc {
-		jobLimitSem[jobType] = semaphore.NewWeighted(jobLimit.Limit)
 	}
 	return jobLimitSem
 }
