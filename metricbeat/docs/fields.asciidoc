@@ -53937,7 +53937,7 @@ type: nested
 
 --
 
-*`system.process.cgroup.memory.stats.*.*`*::
+*`system.process.cgroup.memory.stats.*.bytes`*::
 +
 --
 detailed memory IO stats
@@ -54216,7 +54216,16 @@ type: nested
 
 --
 
-*`system.process.cgroup.io.stats.*.*.*`*::
+*`system.process.cgroup.io.stats.*.*.bytes`*::
++
+--
+per-device IO usage stats
+
+type: nested
+
+--
+
+*`system.process.cgroup.io.stats.*.*.ios`*::
 +
 --
 per-device IO usage stats
