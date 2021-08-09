@@ -47,18 +47,18 @@ type MemoryData struct {
 	Events Events       `json:"events" struct:"events"`
 	Usage  opt.Bytes    `json:"usage" struct:"usage"`
 	Low    opt.Bytes    `json:"low" struct:"low"`
-	High   opt.BytesOpt `json:"high" struct:"high,omitempty"`
-	Max    opt.BytesOpt `json:"max" struct:"max,omitempty"`
+	High   opt.BytesOpt `json:"high,omitempty" struct:"high,omitempty"`
+	Max    opt.BytesOpt `json:"max,omitempty" struct:"max,omitempty"`
 }
 
 // Events contains the data from *.events in the memory controller
 type Events struct {
-	Low     opt.Uint `json:"low" struct:"low,omitempty"`
+	Low     opt.Uint `json:"low,omitempty" struct:"low,omitempty"`
 	High    uint64   `json:"high" struct:"high"`
 	Max     uint64   `json:"max" struct:"max"`
-	OOM     opt.Uint `json:"oom" struct:"oom,omitempty"`
-	OOMKill opt.Uint `json:"oom_kill" struct:"oom_kill,omitempty"`
-	Fail    opt.Uint `json:"fail" struct:"fail,omitempty"`
+	OOM     opt.Uint `json:"oom,omitempty" struct:"oom,omitempty"`
+	OOMKill opt.Uint `json:"oom_kill,omitempty" struct:"oom_kill,omitempty"`
+	Fail    opt.Uint `json:"fail,omitempty" struct:"fail,omitempty"`
 }
 
 // MemoryStat holds detailed stats for the memory controller

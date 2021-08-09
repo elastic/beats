@@ -27,7 +27,7 @@
             "-E",
             "http.enabled=true",
             "-E",
-            "http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock",
+            "http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor",
             "-E",
             "logging.json=true",
             "-E",
@@ -35,7 +35,7 @@
             "-E",
             "logging.files.path=/usr/share/elastic-agent/data/logs/default",
             "-E",
-            "logging.files.name=metricbeat-json.log",
+            "logging.files.name=metricbeat_monitor-json.log",
             "-E",
             "logging.files.keepfiles=7",
             "-E",
@@ -43,21 +43,21 @@
             "-E",
             "logging.files.interval=1h",
             "-E",
-            "path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT"
+            "path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635"
         ],
-        "command_line": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT",
+        "command_line": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat_monitor-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635",
         "cpu": {
-            "pct": 0.0005,
-            "start_time": "2021-07-27T01:43:28.000Z"
+            "pct": 0.0001,
+            "start_time": "2021-08-05T20:26:34.000Z"
         },
         "executable": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat",
         "memory": {
             "pct": 0.0023
         },
         "name": "metricbeat",
-        "pgid": 2311959,
-        "pid": 2312955,
-        "ppid": 2311959,
+        "pgid": 201795,
+        "pid": 205480,
+        "ppid": 201795,
         "state": "sleeping",
         "working_directory": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64"
     },
@@ -68,10 +68,8 @@
         "process": {
             "cgroup": {
                 "cpu": {
-                    "metadata": {
-                        "id": "docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope",
-                        "path": "/system.slice/docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope"
-                    },
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
                     "pressure": {
                         "some": {
                             "10": {
@@ -83,7 +81,7 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 202854762
+                            "total": 116311671
                         }
                     },
                     "stats": {
@@ -92,34 +90,33 @@
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 13697896644,
+                            "ns": 2326558931,
                             "pct": 0
                         },
                         "throttled": {
-                            "period": 0,
+                            "periods": 0,
                             "us": 0
                         },
                         "usage": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 47358334902,
-                            "pct": 0.0002
+                            "ns": 6762215052,
+                            "pct": 0
                         },
                         "user": {
                             "norm": {
                                 "pct": 0
                             },
-                            "ns": 33660438258,
-                            "pct": 0.0001
+                            "ns": 4435656121,
+                            "pct": 0
                         }
                     }
                 },
+                "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
                 "io": {
-                    "metadata": {
-                        "id": "docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope",
-                        "path": "/system.slice/docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope"
-                    },
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
                     "pressure": {
                         "full": {
                             "10": {
@@ -131,7 +128,7 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 328941
+                            "total": 109140
                         },
                         "some": {
                             "10": {
@@ -143,7 +140,7 @@
                             "60": {
                                 "pct": 0
                             },
-                            "total": 330016
+                            "total": 109825
                         }
                     },
                     "stats": {
@@ -153,12 +150,12 @@
                                 "ios": 0
                             },
                             "read": {
-                                "bytes": 234364928,
-                                "ios": 1817
+                                "bytes": 85557248,
+                                "ios": 663
                             },
                             "write": {
-                                "bytes": 533306368,
-                                "ios": 53596
+                                "bytes": 603985920,
+                                "ios": 38339
                             }
                         },
                         "sda": {
@@ -167,17 +164,18 @@
                                 "ios": 0
                             },
                             "read": {
-                                "bytes": 234364928,
-                                "ios": 1817
+                                "bytes": 85557248,
+                                "ios": 663
                             },
                             "write": {
-                                "bytes": 533306368,
-                                "ios": 55841
+                                "bytes": 603985920,
+                                "ios": 40720
                             }
                         }
                     }
                 },
                 "memory": {
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
                     "mem": {
                         "events": {
                             "high": 0,
@@ -190,100 +188,10 @@
                             "bytes": 0
                         },
                         "usage": {
-                            "bytes": 649527296
+                            "bytes": 602411008
                         }
                     },
-                    "metadata": {
-                        "id": "docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope",
-                        "path": "/system.slice/docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope"
-                    },
-                    "stats": {
-                        "active_anon": {
-                            "bytes": 135168
-                        },
-                        "active_file": {
-                            "bytes": 0
-                        },
-                        "anon": {
-                            "bytes": 305614848
-                        },
-                        "anon_thp": {
-                            "bytes": 12582912
-                        },
-                        "file": {
-                            "bytes": 324538368
-                        },
-                        "file_dirty": {
-                            "bytes": 0
-                        },
-                        "file_mapped": {
-                            "bytes": 169906176
-                        },
-                        "file_thp": {
-                            "bytes": 0
-                        },
-                        "file_writeback": {
-                            "bytes": 0
-                        },
-                        "htp_collapse_alloc": 0,
-                        "inactive_anon": {
-                            "bytes": 307634176
-                        },
-                        "inactive_file": {
-                            "bytes": 324673536
-                        },
-                        "kernel_stack": {
-                            "bytes": 2801664
-                        },
-                        "major_page_faults": 0,
-                        "page_activate": 56793,
-                        "page_deactivate": 0,
-                        "page_faults": 1686729066,
-                        "page_lazy_free": 156519,
-                        "page_lazy_freed": 0,
-                        "page_refill": 0,
-                        "page_scan": 0,
-                        "page_steal": 0,
-                        "page_tables": {
-                            "bytes": 2838528
-                        },
-                        "per_cpu": {
-                            "bytes": 263904
-                        },
-                        "shmem": {
-                            "bytes": 0
-                        },
-                        "shmem_thp": {
-                            "bytes": 0
-                        },
-                        "slab": {
-                            "bytes": 8574240
-                        },
-                        "slab_reclaimable": {
-                            "bytes": 5997296
-                        },
-                        "slab_unreclaimable": {
-                            "bytes": 2576944
-                        },
-                        "sock": {
-                            "bytes": 0
-                        },
-                        "swap_cached": {
-                            "bytes": 0
-                        },
-                        "thp_fault_alloc": 33,
-                        "unevictable": {
-                            "bytes": 0
-                        },
-                        "workingset_activate_anon": 0,
-                        "workingset_activate_file": 0,
-                        "workingset_node_reclaim": 0,
-                        "workingset_refault_anon": 0,
-                        "workingset_refault_file": 0,
-                        "workingset_restore_anon": 0,
-                        "workingset_restore_file": 0
-                    },
-                    "swap": {
+                    "memsw": {
                         "events": {
                             "fail": 0,
                             "high": 0,
@@ -295,22 +203,106 @@
                         "usage": {
                             "bytes": 0
                         }
+                    },
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 270336
+                        },
+                        "active_file": {
+                            "bytes": 85426176
+                        },
+                        "anon": {
+                            "bytes": 149553152
+                        },
+                        "anon_thp": {
+                            "bytes": 2097152
+                        },
+                        "file": {
+                            "bytes": 440918016
+                        },
+                        "file_dirty": {
+                            "bytes": 0
+                        },
+                        "file_mapped": {
+                            "bytes": 189640704
+                        },
+                        "file_thp": {
+                            "bytes": 0
+                        },
+                        "file_writeback": {
+                            "bytes": 0
+                        },
+                        "htp_collapse_alloc": 0,
+                        "inactive_anon": {
+                            "bytes": 149393408
+                        },
+                        "inactive_file": {
+                            "bytes": 355356672
+                        },
+                        "kernel_stack": {
+                            "bytes": 2310144
+                        },
+                        "major_page_faults": 0,
+                        "page_activate": 31185,
+                        "page_deactivate": 0,
+                        "page_faults": 95703267,
+                        "page_lazy_free": 37059,
+                        "page_lazy_freed": 0,
+                        "page_refill": 0,
+                        "page_scan": 0,
+                        "page_steal": 0,
+                        "page_tables": {
+                            "bytes": 2568192
+                        },
+                        "per_cpu": {
+                            "bytes": 1152
+                        },
+                        "shmem": {
+                            "bytes": 0
+                        },
+                        "shmem_thp": {
+                            "bytes": 0
+                        },
+                        "slab": {
+                            "bytes": 7520472
+                        },
+                        "slab_reclaimable": {
+                            "bytes": 5485736
+                        },
+                        "slab_unreclaimable": {
+                            "bytes": 2034736
+                        },
+                        "sock": {
+                            "bytes": 0
+                        },
+                        "swap_cached": {
+                            "bytes": 0
+                        },
+                        "thp_fault_alloc": 0,
+                        "unevictable": {
+                            "bytes": 0
+                        },
+                        "workingset_activate_anon": 0,
+                        "workingset_activate_file": 0,
+                        "workingset_node_reclaim": 0,
+                        "workingset_refault_anon": 0,
+                        "workingset_refault_file": 0,
+                        "workingset_restore_anon": 0,
+                        "workingset_restore_file": 0
                     }
                 },
-                "metadata": {
-                    "id": "docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope",
-                    "path": "/system.slice/docker-bece7002973d5d4c6435855de612bf7f1b2759fa500613f4a1647af0ebbe2f78.scope"
-                }
+                "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope"
             },
-            "cmdline": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT",
+            "cmdline": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat_monitor-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635",
             "cpu": {
-                "start_time": "2021-07-27T01:43:28.000Z",
+                "start_time": "2021-08-05T20:26:34.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0.0005
+                        "pct": 0.0001
                     },
-                    "pct": 0.0108,
-                    "value": 2716110
+                    "pct": 0.002,
+                    "value": 643010
                 }
             },
             "fd": {
@@ -318,15 +310,15 @@
                     "hard": 1048576,
                     "soft": 1048576
                 },
-                "open": 16
+                "open": 15
             },
             "memory": {
                 "rss": {
-                    "bytes": 155410432,
+                    "bytes": 154263552,
                     "pct": 0.0023
                 },
-                "share": 99520512,
-                "size": 2892025856
+                "share": 98959360,
+                "size": 2219364352
             },
             "state": "sleeping"
         }

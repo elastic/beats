@@ -18,7 +18,6 @@
 package cgroup
 
 import (
-	"fmt"
 	"runtime"
 	"time"
 
@@ -106,6 +105,7 @@ func (stat StatsV2) Format() (common.MapStr, error) {
 	if err != nil {
 		return to, errors.Wrap(err, "error formatting statsV2 object")
 	}
+
 	return to, nil
 }
 
@@ -118,7 +118,6 @@ func (stat StatsV2) CGVersion() CgroupsVersion {
 // in the cgroup metrics. The `prev` object must be from the same process.
 // curTime and Prev time should be time.Time objects that corrispond to the "scrape time" of when the metrics were gathered.
 func (curStat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Time) {
-	fmt.Printf("In FillPercentages for V2\n")
 	if prev != nil && prev.CGVersion() != CgroupsV2 {
 		return
 	}
@@ -127,7 +126,6 @@ func (curStat *StatsV2) FillPercentages(prev CGStats, curTime, prevTime time.Tim
 	if prevStat == nil || curStat == nil || curStat.CPU == nil || prevStat.CPU == nil {
 		return
 	}
-	fmt.Printf("nothing is nil, continuing...\n")
 	timeDelta := curTime.Sub(prevTime)
 	timeDeltaNanos := timeDelta / time.Nanosecond
 	totalCPUDeltaNanos := int64(curStat.CPU.Stats.Usage.NS - prevStat.CPU.Stats.Usage.NS)

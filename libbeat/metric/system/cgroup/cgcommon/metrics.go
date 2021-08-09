@@ -30,8 +30,8 @@ import (
 // CPUUsage wraps the CPU usage time values for the CPU controller metrics
 type CPUUsage struct {
 	NS   uint64     `json:"ns" struct:"ns"`
-	Pct  opt.Float  `json:"pct" struct:"pct"`
-	Norm opt.PctOpt `json:"norm" struct:"norm"`
+	Pct  opt.Float  `json:"pct,omitempty" struct:"pct,omitempty"`
+	Norm opt.PctOpt `json:"norm,omitempty" struct:"norm,omitempty"`
 }
 
 // Pressure contains load metrics for a controller,

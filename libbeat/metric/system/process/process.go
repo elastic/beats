@@ -373,7 +373,6 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 			procStats.logger.Warnf("Getting memory details: %v", err)
 		}
 		proc["cgroup"] = statsMap
-
 	}
 
 	return proc

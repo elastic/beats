@@ -43,7 +43,7 @@ type CPUSubsystem struct {
 type CPUStats struct {
 	//The following three metrics are only available when the controller is enabled.
 	Throttled ThrottledField    `json:"throttled" struct:"throttled"`
-	Periods   opt.Uint          `json:"periods" struct:"periods"`
+	Periods   opt.Uint          `json:"periods,omitempty" struct:"periods,omitempty"`
 	Usage     cgcommon.CPUUsage `json:"usage" struct:"usage"`
 	User      cgcommon.CPUUsage `json:"user" struct:"user"`
 	System    cgcommon.CPUUsage `json:"system" struct:"system"`
@@ -51,8 +51,8 @@ type CPUStats struct {
 
 // ThrottledField contains the `throttled` information for the CPU stats
 type ThrottledField struct {
-	Us      opt.Uint `json:"us" struct:"us"`
-	Periods opt.Uint `json:"periods" struct:"periods"`
+	Us      opt.Uint `json:"us,omitempty" struct:"us,omitempty"`
+	Periods opt.Uint `json:"periods,omitempty" struct:"periods,omitempty"`
 }
 
 // Get fetches memory subsystem metrics for V2 cgroups
