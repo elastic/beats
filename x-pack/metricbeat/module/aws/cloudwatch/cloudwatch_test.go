@@ -1614,3 +1614,12 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
 }
+
+func TestGetStartTimeEndTime(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
+	m.logger = logp.NewLogger("test")
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	assert.Equal(t, 9*time.Minute+59*time.Second, endTime.Sub(startTime))
+}
