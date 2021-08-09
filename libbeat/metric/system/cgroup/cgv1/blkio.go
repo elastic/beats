@@ -19,7 +19,6 @@ package cgv1
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -237,7 +236,6 @@ func collectOpValues(values []blkioValue) map[DeviceID]*OperationValues {
 // It expects to read values like "245:1 read 18880" or "254:1 1909". It returns
 // an array containing an entry for each valid line read.
 func readBlkioValues(path ...string) ([]blkioValue, error) {
-	fmt.Printf("opening file %s\n", filepath.Join(path...))
 	f, err := os.Open(filepath.Join(path...))
 	if err != nil {
 		if os.IsNotExist(err) {

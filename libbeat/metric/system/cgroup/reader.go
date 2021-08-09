@@ -164,7 +164,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 		return nil, err
 	}
 	stats := StatsV1{}
-	stats.ID, stats.Path = getCommonCgroupMetadata(paths)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
