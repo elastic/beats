@@ -175,11 +175,6 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 		}
 	}
 
-	// Return nil if no metrics were collected.
-	if stats.BlockIO == nil && stats.CPU == nil && stats.CPUAccounting == nil && stats.Memory == nil {
-		return nil, nil
-	}
-
 	return &stats, nil
 }
 
@@ -191,7 +186,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 		return nil, err
 	}
 	stats := StatsV2{}
-	stats.ID, stats.Path = getCommonCgroupMetadata(paths)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue

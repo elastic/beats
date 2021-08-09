@@ -550,7 +550,7 @@
             - name: stats.*
               type: nested
               description: detailed memory IO stats
-            - name: stats.*.*
+            - name: stats.*.bytes
               type: nested
               description: detailed memory IO stats
 
@@ -695,7 +695,10 @@
               description: per-device IO usage stats
             - name: stats.*.*
               type: nested
-            - name: stats.*.*.*
+            - name: stats.*.*.bytes
+              type: nested
+              description: per-device IO usage stats
+            - name: stats.*.*.ios
               type: nested
               description: per-device IO usage stats
             - name: pressure

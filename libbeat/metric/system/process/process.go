@@ -370,7 +370,7 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 	if procStats.EnableCgroups {
 		statsMap, err := process.RawStats.Format()
 		if err != nil {
-			fmt.Printf("error in Format: %s\n", err)
+			procStats.logger.Warnf("Getting memory details: %v", err)
 		}
 		proc["cgroup"] = statsMap
 
