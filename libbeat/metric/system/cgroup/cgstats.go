@@ -106,7 +106,6 @@ func (stat StatsV2) Format() (common.MapStr, error) {
 	if err != nil {
 		return to, errors.Wrap(err, "error formatting statsV2 object")
 	}
-	fmt.Printf("cpu pct is: %v\n", stat.CPU.Stats.Usage.Pct)
 	return to, nil
 }
 

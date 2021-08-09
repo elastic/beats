@@ -57,6 +57,5 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "system",
 		"metricsets": []string{"process"},
-		"processes":  []string{".*metricbeat.*"},
 	}
 }
