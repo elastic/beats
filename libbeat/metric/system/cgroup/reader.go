@@ -25,14 +25,14 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgcommon"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv1"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup/cgv2"
 )
 
 // StatsV1 contains metrics and limits from each of the cgroup subsystems.
 type StatsV1 struct {
-	cgcommon.Metadata
+	ID            string                       `json:"id,omitempty"`   // ID of the cgroup.
+	Path          string                       `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	CPU           *cgv1.CPUSubsystem           `json:"cpu"`
 	CPUAccounting *cgv1.CPUAccountingSubsystem `json:"cpuacct"`
 	Memory        *cgv1.MemorySubsystem        `json:"memory"`
@@ -41,7 +41,8 @@ type StatsV1 struct {
 
 // StatsV2 contains metrics and limits from each of the cgroup subsystems.
 type StatsV2 struct {
-	cgcommon.Metadata
+	ID     string `json:"id,omitempty"`   // ID of the cgroup.
+	Path   string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	CPU    *cgv2.CPUSubsystem
 	Memory *cgv2.MemorySubsystem
 	IO     *cgv2.IOSubsystem
@@ -162,7 +163,8 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 	if err != nil {
 		return nil, err
 	}
-	stats := StatsV1{Metadata: getCommonCgroupMetadata(paths)}
+	stats := StatsV1{}
+	stats.ID, stats.Path = getCommonCgroupMetadata(paths)
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
@@ -188,7 +190,8 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 	if err != nil {
 		return nil, err
 	}
-	stats := StatsV2{Metadata: getCommonCgroupMetadata(paths)}
+	stats := StatsV2{}
+	stats.ID, stats.Path = getCommonCgroupMetadata(paths)
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
@@ -221,24 +224,24 @@ func getStatsV2(path ControllerPath, name string, stats *StatsV2) error {
 		if err != nil {
 			return errors.Wrap(err, "error fetching CPU stats")
 		}
-		stats.CPU.Metadata.ID = id
-		stats.CPU.Metadata.Path = path.ControllerPath
+		stats.CPU.ID = id
+		stats.CPU.Path = path.ControllerPath
 	case "memory":
 		stats.Memory = &cgv2.MemorySubsystem{}
 		err := stats.Memory.Get(path.FullPath)
 		if err != nil {
 			return errors.Wrap(err, "error fetching Memory stats")
 		}
-		stats.Memory.Metadata.ID = id
-		stats.Memory.Metadata.Path = path.ControllerPath
+		stats.Memory.ID = id
+		stats.Memory.Path = path.ControllerPath
 	case "io":
 		stats.IO = &cgv2.IOSubsystem{}
 		err := stats.IO.Get(path.FullPath, true)
 		if err != nil {
 			return errors.Wrap(err, "error fetching IO stats")
 		}
-		stats.IO.Metadata.ID = id
-		stats.IO.Metadata.Path = path.ControllerPath
+		stats.IO.ID = id
+		stats.IO.Path = path.ControllerPath
 	}
 
 	return nil
@@ -255,32 +258,32 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 		if err != nil {
 			return errors.Wrap(err, "error fetching BlockIO stats")
 		}
-		stats.BlockIO.Metadata.ID = id
-		stats.BlockIO.Metadata.Path = path.ControllerPath
+		stats.BlockIO.ID = id
+		stats.BlockIO.Path = path.ControllerPath
 	case "cpu":
 		stats.CPU = &cgv1.CPUSubsystem{}
 		err := stats.CPU.Get(path.FullPath)
 		if err != nil {
 			return errors.Wrap(err, "error fetching cpu stats")
 		}
-		stats.CPU.Metadata.ID = id
-		stats.CPU.Metadata.Path = path.ControllerPath
+		stats.CPU.ID = id
+		stats.CPU.Path = path.ControllerPath
 	case "cpuacct":
 		stats.CPUAccounting = &cgv1.CPUAccountingSubsystem{}
 		err := stats.CPUAccounting.Get(path.FullPath)
 		if err != nil {
 			return errors.Wrap(err, "error fetching cpuacct stats")
 		}
-		stats.CPUAccounting.Metadata.ID = id
-		stats.CPUAccounting.Metadata.Path = path.ControllerPath
+		stats.CPUAccounting.ID = id
+		stats.CPUAccounting.Path = path.ControllerPath
 	case "memory":
 		stats.Memory = &cgv1.MemorySubsystem{}
 		err := stats.Memory.Get(path.FullPath)
 		if err != nil {
 			return errors.Wrap(err, "error fetching memory stats")
 		}
-		stats.Memory.Metadata.ID = id
-		stats.Memory.Metadata.Path = path.ControllerPath
+		stats.Memory.ID = id
+		stats.Memory.Path = path.ControllerPath
 	}
 
 	return nil
@@ -290,16 +293,16 @@ func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
 // iff all subsystems share a common path and ID. This is common for
 // containerized processes. If there is no common path and ID then the returned
 // values are empty strings.
-func getCommonCgroupMetadata(mounts map[string]ControllerPath) cgcommon.Metadata {
+func getCommonCgroupMetadata(mounts map[string]ControllerPath) (string, string) {
 	var path string
 	for _, m := range mounts {
 		if path == "" {
 			path = m.ControllerPath
 		} else if path != m.ControllerPath {
 			// All paths are not the same.
-			return cgcommon.Metadata{}
+			return "", ""
 		}
 	}
 
-	return cgcommon.Metadata{Path: path, ID: filepath.Base(path)}
+	return path, filepath.Base(path)
 }

@@ -37,7 +37,8 @@ var clockTicks = uint64(linux.GetClockTicks())
 // CPUAccountingSubsystem contains metrics from the "cpuacct" subsystem.
 // Note that percentage values are not taken from cgroup metrics, but derived via FillPercentages()
 type CPUAccountingSubsystem struct {
-	cgcommon.Metadata
+	ID          string            `json:"id,omitempty"`   // ID of the cgroup.
+	Path        string            `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	Total       cgcommon.CPUUsage `json:"total_nanos"`
 	UsagePerCPU map[string]uint64 `json:"percpu" struct:"percpu"`
 	// CPU time statistics for tasks in this cgroup.

@@ -33,7 +33,8 @@ import (
 // when the system is busy. This subsystem does not track CPU usage, for that
 // information see the "cpuacct" subsystem.
 type CPUSubsystem struct {
-	cgcommon.Metadata
+	ID   string `json:"id,omitempty"`   // ID of the cgroup.
+	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	// Completely Fair Scheduler (CFS) settings.
 	CFS CFS `json:"cfs,omitempty"`
 	// Real-time (RT) Scheduler settings.

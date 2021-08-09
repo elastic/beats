@@ -262,7 +262,6 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 				paths[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
 			}
 		}
-
 	}
 
 	if sc.Err() != nil {

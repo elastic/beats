@@ -37,7 +37,8 @@ import (
 //
 // https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt
 type BlockIOSubsystem struct {
-	cgcommon.Metadata
+	ID       string         `json:"id,omitempty"`       // ID of the cgroup.
+	Path     string         `json:"path,omitempty"`     // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	Throttle ThrottlePolicy `json:"throttle,omitempty"` // Throttle limits for upper IO rates and metrics.
 	//CFQ      CFQScheduler   `json:"cfq,omitempty"`      // Completely fair queue scheduler limits and metrics.
 }

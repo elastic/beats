@@ -31,7 +31,8 @@ import (
 // CPUSubsystem contains metrics and limits from the "cpu" subsystem.
 // in cgroupsV2, this merges both the 'cpu' and 'cpuacct' controllers.
 type CPUSubsystem struct {
-	cgcommon.Metadata
+	ID   string `json:"id,omitempty"`   // ID of the cgroup.
+	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	// Shows pressure stall information for CPU.
 	Pressure map[string]cgcommon.Pressure
 	// Stats shows overall counters for the CPU controller
@@ -51,7 +52,7 @@ type CPUStats struct {
 // ThrottledField contains the `throttled` information for the CPU stats
 type ThrottledField struct {
 	Us      opt.Uint `json:"us" struct:"us"`
-	Periods opt.Uint `json:"periods" struct:"period"`
+	Periods opt.Uint `json:"periods" struct:"periods"`
 }
 
 // Get fetches memory subsystem metrics for V2 cgroups

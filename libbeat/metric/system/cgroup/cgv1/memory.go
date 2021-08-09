@@ -30,7 +30,9 @@ import (
 
 // MemorySubsystem contains the metrics and limits from the "memory" subsystem.
 type MemorySubsystem struct {
-	cgcommon.Metadata
+	ID   string `json:"id,omitempty"`   // ID of the cgroup.
+	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
 	Mem       MemoryData `json:"mem"`      // Memory usage by tasks in this cgroup.
 	MemSwap   MemoryData `json:"memsw"`    // Memory plus swap usage by tasks in this cgroup.
 	Kernel    MemoryData `json:"kmem"`     // Kernel memory used by tasks in this cgroup.

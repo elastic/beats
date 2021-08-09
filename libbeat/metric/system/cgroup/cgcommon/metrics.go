@@ -27,12 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
-// Metadata contains metadata associated with cgroup stats.
-type Metadata struct {
-	ID   string `json:"id,omitempty"`   // ID of the cgroup.
-	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-}
-
 // CPUUsage wraps the CPU usage time values for the CPU controller metrics
 type CPUUsage struct {
 	NS   uint64     `json:"ns" struct:"ns"`

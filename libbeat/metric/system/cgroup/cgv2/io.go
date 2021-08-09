@@ -30,7 +30,9 @@ import (
 
 //IOSubsystem is the replacement for the bulkio controller in cgroupsV1
 type IOSubsystem struct {
-	cgcommon.Metadata
+	ID   string `json:"id,omitempty"`   // ID of the cgroup.
+	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+
 	Stats    map[string]IOStat            `json:"stats" struct:"stats"`
 	Pressure map[string]cgcommon.Pressure `json:"pressure" struct:"pressure"`
 }
