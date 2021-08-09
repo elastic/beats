@@ -110,7 +110,10 @@ type query struct {
 }
 
 type pack struct {
-	Queries map[string]query `json:"queries,omitempty"`
+	Discovery []string         `json:"discovery,omitempty"`
+	Platform  string           `json:"platform,omitempty"`
+	Version   string           `json:"version,omitempty"`
+	Queries   map[string]query `json:"queries,omitempty"`
 }
 
 type osqueryConfig struct {
@@ -151,7 +154,10 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 	p.packs = make(map[string]pack)
 	for _, input := range inputs {
 		pack := pack{
-			Queries: make(map[string]query),
+			Queries:   make(map[string]query),
+			Platform:  input.Platform,
+			Version:   input.Version,
+			Discovery: input.Discovery,
 		}
 		for _, stream := range input.Streams {
 			id := "pack_" + input.Name + "_" + stream.ID
