@@ -26,6 +26,9 @@ import (
 	"time"
 )
 
+// This is the maximum waiting time for goroutine shutdown.
+// If the shutdown happens earlier the waiting time will be lower.
+// High maximum waiting time was due to flaky tests on CI workers
 const defaultFinalizationTimeout = 35 * time.Second
 
 // GoroutinesChecker keeps the count of goroutines when it was created
