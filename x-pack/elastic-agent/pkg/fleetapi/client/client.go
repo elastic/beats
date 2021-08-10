@@ -29,7 +29,7 @@ type Sender interface {
 		params url.Values,
 		headers http.Header,
 		body io.Reader,
-	) (*http.Response, remote.CancelFunc, error)
+	) (*http.Response, error)
 
 	URI() string
 }

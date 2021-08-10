@@ -42,7 +42,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -71,7 +71,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			_, _, err = client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			_, err = client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.Error(t, err)
 		},
 	))
@@ -96,7 +96,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -118,7 +118,7 @@ func TestHTTPClient(t *testing.T) {
 		})
 		require.NoError(t, err)
 
-		_, _, err = client.Send(timeoutCtx, "GET", "/echo-hello", nil, nil, nil)
+		_, err = client.Send(timeoutCtx, "GET", "/echo-hello", nil, nil, nil)
 		require.Error(t, err)
 	})
 }

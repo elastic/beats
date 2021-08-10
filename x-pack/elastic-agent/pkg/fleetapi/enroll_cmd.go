@@ -190,7 +190,7 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 		return nil, errors.New(err, "fail to encode the enrollment request")
 	}
 
-	resp, cancelFn, err := e.client.Send(ctx, "POST", p, nil, headers, bytes.NewBuffer(b))
+	resp, err := e.client.Send(ctx, "POST", p, nil, headers, bytes.NewBuffer(b))
 	if err != nil {
 		// connection refused is returned as a clean type
 		switch et := err.(type) {
@@ -203,7 +203,6 @@ func (e *EnrollCmd) Execute(ctx context.Context, r *EnrollRequest) (*EnrollRespo
 		}
 		return nil, err
 	}
-	defer cancelFn()
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusTooManyRequests {

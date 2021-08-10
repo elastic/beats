@@ -92,14 +92,13 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 	}
 
 	cp := fmt.Sprintf(checkingPath, e.info.AgentID())
-	resp, cancelFn, err := e.client.Send(ctx, "POST", cp, nil, nil, bytes.NewBuffer(b))
+	resp, err := e.client.Send(ctx, "POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to checkin to fleet-server",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
-	defer cancelFn()
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {

@@ -97,7 +97,7 @@ func TestHTTPClient(t *testing.T) {
 			client, err := NewWithConfig(l, c, noopWrapper)
 			require.NoError(t, err)
 
-			resp, _, err := client.Send(ctx, "GET", "/nested/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/nested/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -123,7 +123,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -150,7 +150,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -178,7 +178,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -206,7 +206,7 @@ func TestHTTPClient(t *testing.T) {
 
 			client, err := NewWithRawConfig(nil, cfg, nil)
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 		},
@@ -232,7 +232,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, nil)
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)
@@ -264,7 +264,7 @@ func TestHTTPClient(t *testing.T) {
 			})
 
 			require.NoError(t, err)
-			resp, _, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, bytes.NewBuffer([]byte("hello")))
+			resp, err := client.Send(ctx, "GET", "/echo-hello", nil, nil, bytes.NewBuffer([]byte("hello")))
 			require.NoError(t, err)
 
 			body, err := ioutil.ReadAll(resp.Body)

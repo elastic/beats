@@ -22,7 +22,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/fleet"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func TestLazyAcker(t *testing.T) {
@@ -144,12 +143,12 @@ func (t *testingClient) Send(
 	params url.Values,
 	headers http.Header,
 	body io.Reader,
-) (*http.Response, remote.CancelFunc, error) {
+) (*http.Response, error) {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
 	resp, err := t.callback(headers, body)
-	return resp, func() {}, err
+	return resp, err
 }
 
 func (t *testingClient) URI() string {

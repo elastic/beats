@@ -20,7 +20,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func TestAcker_AckCommit(t *testing.T) {
@@ -159,12 +158,11 @@ func (t *testingClient) Send(
 	params url.Values,
 	headers http.Header,
 	body io.Reader,
-) (*http.Response, remote.CancelFunc, error) {
+) (*http.Response, error) {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
-	resp, err := t.callback(headers, body)
-	return resp, func() {}, err
+	return t.callback(headers, body)
 }
 
 func (t *testingClient) URI() string {
@@ -211,11 +209,11 @@ func (t *notCalledClient) Send(
 	params url.Values,
 	headers http.Header,
 	body io.Reader,
-) (*http.Response, remote.CancelFunc, error) {
+) (*http.Response, error) {
 	t.Lock()
 	defer t.Unlock()
 	t.called = true
-	return nil, func() {}, fmt.Errorf("should not have been called")
+	return nil, fmt.Errorf("should not have been called")
 }
 
 func (t *notCalledClient) URI() string {
