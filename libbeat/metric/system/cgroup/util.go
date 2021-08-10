@@ -240,7 +240,8 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 			path = r.cgroupsHierarchyOverride
 		}
 		// cgroup V2
-		if fields[1] == "" && fields[0] == "0" {
+		// cgroup v2 controllers will always start with this string
+		if strings.Contains(line, "0::/") {
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {

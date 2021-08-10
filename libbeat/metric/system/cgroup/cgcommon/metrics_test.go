@@ -37,15 +37,15 @@ func TestPressure(t *testing.T) {
 			Ten:          opt.Pct{Pct: 3.00},
 			Sixty:        opt.Pct{Pct: 2.10},
 			ThreeHundred: opt.Pct{Pct: 4.00},
-			Total:        1154482,
+			Total:        opt.UintWith(1154482),
 		},
 		"full": {
 			Ten:          opt.Pct{Pct: 10},
 			Sixty:        opt.Pct{Pct: 30},
 			ThreeHundred: opt.Pct{Pct: 0.5},
-			Total:        1154482,
+			Total:        opt.UintWith(1154482),
 		},
 	}
 
-	assert.Equal(t, goodP, pressureData, "pressure stats not equals")
+	assert.Equal(t, goodP, pressureData, "pressure stats not equal")
 }

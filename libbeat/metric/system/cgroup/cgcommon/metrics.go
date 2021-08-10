@@ -38,10 +38,17 @@ type CPUUsage struct {
 // Broken apart into 10, 60, and 300 second samples,
 // as well as a total time in US
 type Pressure struct {
-	Ten          opt.Pct `json:"10" struct:"10"`
-	Sixty        opt.Pct `json:"60" struct:"60"`
-	ThreeHundred opt.Pct `json:"300" struct:"300"`
-	Total        uint64  `json:"total" struct:"total"`
+	Ten          opt.Pct  `json:"10,omitempty" struct:"10,omitempty"`
+	Sixty        opt.Pct  `json:"60,omitempty" struct:"60,omitempty"`
+	ThreeHundred opt.Pct  `json:"300,omitempty" struct:"300,omitempty"`
+	Total        opt.Uint `json:"total,omitempty" struct:"total,omitempty"`
+}
+
+// IsZero implements the IsZero interface for Pressure
+// This is "all or nothing", as pressure stats don't exist on certain systems
+// If `total` doesn't exist, that means there's no pressure metrics.
+func (p Pressure) IsZero() bool {
+	return p.Total.IsZero()
 }
 
 // GetPressure takes the path of a *.pressure file and returns a
@@ -53,8 +60,9 @@ func GetPressure(path string) (map[string]Pressure, error) {
 	pressureData := make(map[string]Pressure)
 
 	f, err := os.Open(path)
+	// pass along any OS open errors directly
 	if err != nil {
-		return pressureData, errors.Wrap(err, "error reading cpu.stat")
+		return pressureData, err
 	}
 	defer f.Close()
 
@@ -62,7 +70,8 @@ func GetPressure(path string) (map[string]Pressure, error) {
 	for sc.Scan() {
 		var stallTime string
 		data := Pressure{}
-		matched, err := fmt.Sscanf(sc.Text(), "%s avg10=%f avg60=%f avg300=%f total=%d", &stallTime, &data.Ten.Pct, &data.Sixty.Pct, &data.ThreeHundred.Pct, &data.Total)
+		var total uint64
+		matched, err := fmt.Sscanf(sc.Text(), "%s avg10=%f avg60=%f avg300=%f total=%d", &stallTime, &data.Ten.Pct, &data.Sixty.Pct, &data.ThreeHundred.Pct, &total)
 		if err != nil {
 			return pressureData, errors.Wrapf(err, "error scanning file: %s", path)
 		}
@@ -70,7 +79,7 @@ func GetPressure(path string) (map[string]Pressure, error) {
 		if matched < 3 {
 			return pressureData, fmt.Errorf("Error: only matched %d fields from file %s", matched, path)
 		}
-
+		data.Total = opt.UintWith(total)
 		pressureData[stallTime] = data
 
 	}

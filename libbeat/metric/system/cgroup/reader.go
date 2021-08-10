@@ -31,21 +31,21 @@ import (
 
 // StatsV1 contains metrics and limits from each of the cgroup subsystems.
 type StatsV1 struct {
-	ID            string                       `json:"id,omitempty"`   // ID of the cgroup.
-	Path          string                       `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	CPU           *cgv1.CPUSubsystem           `json:"cpu"`
-	CPUAccounting *cgv1.CPUAccountingSubsystem `json:"cpuacct"`
-	Memory        *cgv1.MemorySubsystem        `json:"memory"`
-	BlockIO       *cgv1.BlockIOSubsystem       `json:"blkio"`
+	ID            string                       `json:"id,omitempty" struct:"id,omitempty"`     // ID of the cgroup.
+	Path          string                       `json:"path,omitempty" struct:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	CPU           *cgv1.CPUSubsystem           `json:"cpu,omitempty" struct:"cpu,omitempty"`
+	CPUAccounting *cgv1.CPUAccountingSubsystem `json:"cpuacct,omitempty" struct:"cpuacct,omitempty"`
+	Memory        *cgv1.MemorySubsystem        `json:"memory,omitempty" struct:"memory,omitempty"`
+	BlockIO       *cgv1.BlockIOSubsystem       `json:"blkio,omitempty" struct:"memory,omitempty"`
 }
 
 // StatsV2 contains metrics and limits from each of the cgroup subsystems.
 type StatsV2 struct {
-	ID     string `json:"id,omitempty"`   // ID of the cgroup.
-	Path   string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	CPU    *cgv2.CPUSubsystem
-	Memory *cgv2.MemorySubsystem
-	IO     *cgv2.IOSubsystem
+	ID     string                `json:"id,omitempty"`   // ID of the cgroup.
+	Path   string                `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	CPU    *cgv2.CPUSubsystem    `json:"cpu,omitempty" struct:"cpu,omitempty"`
+	Memory *cgv2.MemorySubsystem `json:"memory,omitempty" struct:"memory,omitempty"`
+	IO     *cgv2.IOSubsystem     `json:"io,omitempty" struct:"io,omitempty"`
 }
 
 // CgroupsVersion is a version tag that defines what version of cgroups is attached to a process

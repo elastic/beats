@@ -34,7 +34,7 @@ type CPUSubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 	// Shows pressure stall information for CPU.
-	Pressure map[string]cgcommon.Pressure
+	Pressure map[string]cgcommon.Pressure `json:"pressure,omitempty" struct:"pressure,omitempty"`
 	// Stats shows overall counters for the CPU controller
 	Stats CPUStats
 }
@@ -42,7 +42,7 @@ type CPUSubsystem struct {
 // CPUStats carries the information from the cpu.stat cgroup file
 type CPUStats struct {
 	//The following three metrics are only available when the controller is enabled.
-	Throttled ThrottledField    `json:"throttled" struct:"throttled"`
+	Throttled ThrottledField    `json:"throttled,omitempty" struct:"throttled,omitempty"`
 	Periods   opt.Uint          `json:"periods,omitempty" struct:"periods,omitempty"`
 	Usage     cgcommon.CPUUsage `json:"usage" struct:"usage"`
 	User      cgcommon.CPUUsage `json:"user" struct:"user"`
@@ -55,11 +55,20 @@ type ThrottledField struct {
 	Periods opt.Uint `json:"periods,omitempty" struct:"periods,omitempty"`
 }
 
+// IsZero implements the IsZero interface for ThrottledField
+func (t ThrottledField) IsZero() bool {
+	return t.Us.IsZero() && t.Periods.IsZero()
+}
+
 // Get fetches memory subsystem metrics for V2 cgroups
 func (cpu *CPUSubsystem) Get(path string) error {
 
 	var err error
 	cpu.Pressure, err = cgcommon.GetPressure(filepath.Join(path, "cpu.pressure"))
+	// Not all systems have pressure stats. Treat this as a soft error.
+	if os.IsNotExist(err) {
+		return nil
+	}
 	if err != nil {
 		return errors.Wrap(err, "error fetching Pressure data")
 	}
