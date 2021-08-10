@@ -28,6 +28,9 @@ const (
 	retryOnBadConnTimeout = 5 * time.Minute
 )
 
+// CancelFunc needs to be called to release resources.
+type CancelFunc func()
+
 var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
@@ -165,7 +168,7 @@ func (c *Client) Send(
 	params url.Values,
 	headers http.Header,
 	body io.Reader,
-) (*http.Response, error) {
+) (*http.Response, CancelFunc, error) {
 	c.log.Debugf("Request method: %s, path: %s", method, path)
 	c.lock.Lock()
 	defer c.lock.Unlock()
@@ -173,7 +176,7 @@ func (c *Client) Send(
 
 	req, err := requester.request(method, path, params, body)
 	if err != nil {
-		return nil, errors.Wrapf(err, "fail to create HTTP request using method %s to %s", method, path)
+		return nil, func() {}, errors.Wrapf(err, "fail to create HTTP request using method %s to %s", method, path)
 	}
 
 	// Add generals headers to the request, we are dealing exclusively with JSON.
@@ -192,7 +195,6 @@ func (c *Client) Send(
 
 	requester.lastUsed = time.Now().UTC()
 	cctx, cancelFn := context.WithCancel(ctx)
-	defer cancelFn()
 
 	resp, err := requester.client.Do(req.WithContext(cctx))
 	if err != nil {
@@ -202,7 +204,7 @@ func (c *Client) Send(
 		requester.lastErr = nil
 		requester.lastErrOcc = time.Time{}
 	}
-	return resp, err
+	return resp, CancelFunc(cancelFn), err
 }
 
 // URI returns the remote URI.

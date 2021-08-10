@@ -90,13 +90,14 @@ func (e *AckCmd) Execute(ctx context.Context, r *AckRequest) (*AckResponse, erro
 	}
 
 	ap := fmt.Sprintf(ackPath, e.info.AgentID())
-	resp, err := e.client.Send(ctx, "POST", ap, nil, nil, bytes.NewBuffer(b))
+	resp, cancelFn, err := e.client.Send(ctx, "POST", ap, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
 			"fail to ack to fleet",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, ap))
 	}
+	defer cancelFn()
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
