@@ -7,7 +7,6 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"path"
 	"strings"
 	"time"
 
@@ -64,13 +63,21 @@ type metricsConfig struct {
 
 // prefix returns the service metric prefix, falling back to the Google Cloud
 // monitoring service prefix when not specified.
+// The prefix is normalized to always end with '/'.
 func (mc metricsConfig) prefix() string {
 	prefix := mc.ServiceMetricPrefix
+
 	// NOTE: fallback to Google Cloud prefix for backward compatibility
 	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
 	// List: https://cloud.google.com/monitoring/api/metrics_gcp
 	if prefix == "" {
-		prefix = mc.ServiceName + ".googleapis.com"
+		prefix = mc.ServiceName + ".googleapis.com/"
+	}
+
+	// Final slash is part of prefix. Creating a prefix with final slash
+	// normalize the prefix for other use cases
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
 	}
 
 	return prefix
@@ -78,7 +85,7 @@ func (mc metricsConfig) prefix() string {
 
 // AddPrefixTo adds the required service metric prefix to the given metric
 func (mc metricsConfig) AddPrefixTo(metric string) string {
-	return path.Join(mc.prefix(), metric)
+	return mc.prefix() + metric
 }
 
 // RemovePrefixFrom removes service metric prefix from the given metric
