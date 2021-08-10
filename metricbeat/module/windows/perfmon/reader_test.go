@@ -29,9 +29,8 @@ import (
 
 func TestGetCounter(t *testing.T) {
 	reader := Reader{
-		query:    pdh.Query{},
-		executed: true,
-		log:      nil,
+		query: pdh.Query{},
+		log:   nil,
 		counters: []PerfCounter{
 			{
 				QueryField:   "datagrams_sent_per_sec",
