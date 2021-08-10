@@ -25,6 +25,7 @@ import (
 	"runtime"
 	"sort"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -107,7 +108,12 @@ type Ticks struct {
 // are known they should be passed in to avoid re-fetching the information.
 func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	state := sigar.ProcState{}
-	if err := state.Get(pid); err != nil {
+	err := state.Get(pid)
+	// Soft error, the process is now gone. pass along.
+	if err == syscall.ENOENT || err == syscall.ESRCH {
+		return nil, err
+	}
+	if err != nil {
 		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
 	}
 
@@ -470,7 +476,10 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	newProcs := make(ProcsMap, len(pids))
 
 	for _, pid := range pids {
-		process := procStats.getSingleProcess(pid, newProcs)
+		process, err := procStats.getSingleProcess(pid, newProcs)
+		if err != nil {
+			return nil, errors.Wrapf(err, "error fetching stats for pid=%d", pid)
+		}
 		if process == nil {
 			continue
 		}
@@ -497,9 +506,12 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	}
 
 	newProcs := make(ProcsMap, 1)
-	p := procStats.getSingleProcess(pid, newProcs)
-	if p == nil {
+	p, err := procStats.getSingleProcess(pid, newProcs)
+	if err != nil {
 		return nil, fmt.Errorf("cannot find matching process for pid=%d", pid)
+	}
+	if p == nil {
+		return common.MapStr{}, nil
 	}
 
 	e := procStats.getProcessEvent(p)
@@ -508,7 +520,7 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	return e, nil
 }
 
-func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
+func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) (*Process, error) {
 	var cmdline string
 	var env common.MapStr
 	if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
@@ -519,27 +531,27 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	}
 
 	process, err := newProcess(pid, cmdline, env)
+	// The process is now gone. Skip.
+	if err == syscall.ENOENT || err == syscall.ESRCH {
+		return nil, nil
+	}
 	if err != nil {
-		procStats.logger.Debugf("Skip process pid=%d: %v", pid, err)
-		return nil
+		return nil, errors.Wrapf(err, "Skip process pid=%d", pid)
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		procStats.logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
-		return nil
+		return nil, errors.Wrapf(err, "Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		procStats.logger.Errorf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
-		return nil
+		return nil, errors.Wrapf(err, "Error getting details for process %s with pid=%d", process.Name, process.Pid)
 	}
 
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
-			procStats.logger.Errorf("Error fetching cgroup data for process %s with pid=%d: %v", process.Name, process.Pid, err)
-			return nil
+			return nil, errors.Wrapf(err, "Error fetching cgroup data for process %s with pid=%d", process.Name, process.Pid)
 		}
 		process.RawStats = cgStats
 		last := procStats.ProcsMap[process.Pid]
@@ -552,7 +564,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	newProcs[process.Pid] = process
 	last := procStats.ProcsMap[process.Pid]
 	process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
-	return process
+	return process, nil
 }
 
 func (procStats *Stats) includeTopProcesses(processes []Process) []Process {
