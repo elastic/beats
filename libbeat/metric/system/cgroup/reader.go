@@ -37,15 +37,17 @@ type StatsV1 struct {
 	CPUAccounting *cgv1.CPUAccountingSubsystem `json:"cpuacct,omitempty" struct:"cpuacct,omitempty"`
 	Memory        *cgv1.MemorySubsystem        `json:"memory,omitempty" struct:"memory,omitempty"`
 	BlockIO       *cgv1.BlockIOSubsystem       `json:"blkio,omitempty" struct:"memory,omitempty"`
+	Version       CgroupsVersion               `json:"cgroups_version,omitempty" struct:"cgroups_version,omitempty"`
 }
 
 // StatsV2 contains metrics and limits from each of the cgroup subsystems.
 type StatsV2 struct {
-	ID     string                `json:"id,omitempty"`   // ID of the cgroup.
-	Path   string                `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	CPU    *cgv2.CPUSubsystem    `json:"cpu,omitempty" struct:"cpu,omitempty"`
-	Memory *cgv2.MemorySubsystem `json:"memory,omitempty" struct:"memory,omitempty"`
-	IO     *cgv2.IOSubsystem     `json:"io,omitempty" struct:"io,omitempty"`
+	ID      string                `json:"id,omitempty"`   // ID of the cgroup.
+	Path    string                `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	CPU     *cgv2.CPUSubsystem    `json:"cpu,omitempty" struct:"cpu,omitempty"`
+	Memory  *cgv2.MemorySubsystem `json:"memory,omitempty" struct:"memory,omitempty"`
+	IO      *cgv2.IOSubsystem     `json:"io,omitempty" struct:"io,omitempty"`
+	Version CgroupsVersion        `json:"cgroups_version,omitempty" struct:"cgroups_version,omitempty"`
 }
 
 // CgroupsVersion is a version tag that defines what version of cgroups is attached to a process
@@ -185,6 +187,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 	}
 	stats := StatsV1{}
 	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
+	stats.Version = CgroupsV1
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
@@ -207,6 +210,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 	}
 	stats := StatsV2{}
 	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
+	stats.Version = CgroupsV2
 	for conName, cgPath := range paths {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue

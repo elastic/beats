@@ -245,7 +245,7 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {
-				return nil, errors.Wrap(err, "error fetching cgroupV2 controllers")
+				return nil, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
 			}
 			// In order to produce the same kind of data for cgroups V1 and V2 controllers,
 			// We iterate over the group, and look for controllers, since the V2 unified system doesn't list them under the PID

@@ -39,6 +39,7 @@ type gosigarCidProvider struct {
 	hostPath           string
 	cgroupPrefixes     []string
 	cgroupRegex        string
+	cidRegex           *regexp.Regexp
 	processCgroupPaths func(string, int) (map[string]cgroup.ControllerPath, error)
 	pidCidCache        *common.Cache
 }
@@ -77,6 +78,7 @@ func newCidProvider(hostPath string, cgroupPrefixes []string, cgroupRegex string
 		hostPath:           hostPath,
 		cgroupPrefixes:     cgroupPrefixes,
 		cgroupRegex:        cgroupRegex,
+		cidRegex:           regexp.MustCompile(`[\w]{64}`),
 		processCgroupPaths: processCgroupPaths,
 		pidCidCache:        pidCidCache,
 	}
@@ -124,9 +126,8 @@ func (p gosigarCidProvider) getCid(cgroups map[string]cgroup.ControllerPath) str
 		// This should work with k8s on cgroupsV2, as we're still trying to extract the same container ID
 		for _, path := range cgroups {
 			if path.IsV2 {
-				re := regexp.MustCompile(`[\w]{64}`)
-				rs := re.FindStringSubmatch(path.ControllerPath)
-				if rs != nil {
+				rs := p.cidRegex.FindStringSubmatch(path.ControllerPath)
+				if len(rs) > 0 {
 					return rs[0]
 				}
 			} else {

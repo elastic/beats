@@ -377,8 +377,10 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 		statsMap, err := process.RawStats.Format()
 		if err != nil {
 			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
+			proc["cgroup"] = statsMap
 		}
-		proc["cgroup"] = statsMap
+
 	}
 
 	return proc

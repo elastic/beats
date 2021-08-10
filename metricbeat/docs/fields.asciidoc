@@ -53121,6 +53121,15 @@ type: keyword
 
 --
 
+*`system.process.cgroup.cgroups_version`*::
++
+--
+The version of cgroups reported for the process
+
+type: long
+
+--
+
 [float]
 === cpu
 

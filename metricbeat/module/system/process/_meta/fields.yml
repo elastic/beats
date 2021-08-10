@@ -148,6 +148,10 @@
             If there isn't a common path used by all cgroups this field will be
             absent.
 
+        - name: cgroups_version
+          type: long
+          description: The version of cgroups reported for the process
+
         - name: cpu
           type: group
           description: >
