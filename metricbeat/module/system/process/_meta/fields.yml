@@ -552,10 +552,10 @@
                 was reached.
 
             - name: stats.*
-              type: nested
+              type: object
               description: detailed memory IO stats
             - name: stats.*.bytes
-              type: nested
+              type: object
               description: detailed memory IO stats
 
             - name: stats.active_anon.bytes
@@ -695,15 +695,15 @@
               description: >
                 Path to the cgroup relative to the cgroup subsystems mountpoint.
             - name: stats.*
-              type: nested
+              type: object
               description: per-device IO usage stats
             - name: stats.*.*
-              type: nested
+              type: object
             - name: stats.*.*.bytes
-              type: nested
+              type: object
               description: per-device IO usage stats
             - name: stats.*.*.ios
-              type: nested
+              type: object
               description: per-device IO usage stats
             - name: pressure
               type: group

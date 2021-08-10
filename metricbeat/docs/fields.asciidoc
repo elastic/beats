@@ -53942,7 +53942,7 @@ type: long
 --
 detailed memory IO stats
 
-type: nested
+type: object
 
 --
 
@@ -53951,7 +53951,7 @@ type: nested
 --
 detailed memory IO stats
 
-type: nested
+type: object
 
 --
 
@@ -54214,14 +54214,14 @@ type: keyword
 --
 per-device IO usage stats
 
-type: nested
+type: object
 
 --
 
 *`system.process.cgroup.io.stats.*.*`*::
 +
 --
-type: nested
+type: object
 
 --
 
@@ -54230,7 +54230,7 @@ type: nested
 --
 per-device IO usage stats
 
-type: nested
+type: object
 
 --
 
@@ -54239,7 +54239,7 @@ type: nested
 --
 per-device IO usage stats
 
-type: nested
+type: object
 
 --
 
