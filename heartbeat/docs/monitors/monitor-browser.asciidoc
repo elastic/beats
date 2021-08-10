@@ -112,7 +112,7 @@ Example configuration:
 Set this option to add user defined parameters for your scripts. This value takes
 arbitrary YAML that is then converted to JSON which is then passed into synthetics
 via the `--params` option. See {observability-guide}/synthetics-params-secrets.html[Working with Params]
-for more information
+for more information.
 
 Example:
 
