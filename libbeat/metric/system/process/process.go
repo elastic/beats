@@ -538,7 +538,6 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
-			fmt.Printf("Error fetching cgroup data for process %s with pid=%d: %v\n", process.Name, process.Pid, err)
 			procStats.logger.Errorf("Error fetching cgroup data for process %s with pid=%d: %v", process.Name, process.Pid, err)
 			return nil
 		}
