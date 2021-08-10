@@ -26,7 +26,7 @@ import (
 	"time"
 )
 
-const defaultFinalizationTimeout = 5 * time.Second
+const defaultFinalizationTimeout = 35 * time.Second
 
 // GoroutinesChecker keeps the count of goroutines when it was created
 // so later it can check if this number has increased
