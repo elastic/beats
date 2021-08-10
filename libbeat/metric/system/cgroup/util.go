@@ -202,10 +202,6 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 
 		// V2 option
 		if mount.filesystemType == "cgroup2" {
-			if len(mount.mountpoint) < 3 {
-				// Why is this happening? I don't know.
-				return mountInfo, fmt.Errorf("error parsing mountinfo in line '%s', filesystemType is set, but location is invalid", line)
-			}
 			mountInfo.V2Loc = mount.mountpoint
 		}
 
