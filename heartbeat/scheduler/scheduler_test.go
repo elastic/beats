@@ -283,12 +283,23 @@ func TestScheduler_runRecursiveJob(t *testing.T) {
 				require.GreaterOrEqual(t, len(events), 50)
 			},
 		},
+		{
+			name:    "runs 100 with limit not configured",
+			numJobs: 100,
+			limit:   0,
+			expect: func(events []int) {
+				require.GreaterOrEqual(t, len(events), 100)
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			var jobConfigByType = map[string]config.JobLimit{}
 			jobType := "http"
-			jobConfigByType := map[string]config.JobLimit{
-				jobType: {Limit: tt.limit},
+			if tt.limit > 0 {
+				jobConfigByType = map[string]config.JobLimit{
+					jobType: {Limit: tt.limit},
+				}
 			}
 			s := NewWithLocation(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType)
 			var taskArr []int
