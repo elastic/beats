@@ -147,8 +147,7 @@ func (t *testingClient) Send(
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
-	resp, err := t.callback(headers, body)
-	return resp, err
+	return t.callback(headers, body)
 }
 
 func (t *testingClient) URI() string {
