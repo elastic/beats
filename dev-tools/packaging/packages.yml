@@ -1021,7 +1021,7 @@ specs:
 
     - os: linux
       arch: arm64
-      types: [docker] 
+      types: [docker]
       spec:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
