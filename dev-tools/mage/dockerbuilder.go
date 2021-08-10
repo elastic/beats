@@ -202,7 +202,6 @@ func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
-	b.ExtraVars["variant"] = variant
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
 		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
