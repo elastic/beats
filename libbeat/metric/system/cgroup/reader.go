@@ -132,13 +132,33 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 // CgroupsVersion reports if the given PID is attached to a V1 or V2 controller
 func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 	cgPath := filepath.Join(r.rootfsMountpoint, "/proc/", fmt.Sprintf("%d", pid), "cgroup")
-	cgstring, err := ioutil.ReadFile(cgPath)
+	cgraw, err := ioutil.ReadFile(cgPath)
 	if err != nil {
 		return CgroupsV1, errors.Wrapf(err, "error reading %s", cgPath)
 	}
+	cgstring := string(cgraw)
 	//V2 cgroups always begin with 0::/
-	if strings.Contains(string(cgstring), "0::/") {
-		return CgroupsV2, nil
+	// Some distros will "mix" V1 and V2 by adding an unused V2 controller
+	// Check to see if we're actually using V2.
+	// This is cautious code, as different distros seem to mix V2 and V1 events in weird ways.
+	if strings.Contains(cgstring, "0::/") {
+		// This is a V2-only cgroup
+		if len(strings.Split(strings.TrimSpace(cgstring), "\n")) == 1 {
+			return CgroupsV2, nil
+		}
+		// Otherwise, check to see what's in the controllers file
+		controllers, err := readControllerList(cgstring, r.cgroupMountpoints.V2Loc)
+		if err != nil {
+			return CgroupsV1, errors.Wrapf(err, "error fetching cgroup controllers for pid %d", pid)
+		}
+		// The logic here is a tad opinionated. If we're at this point in the code, it's because we have both
+		// V1 and V2 controllers on a cgroup. If the V2 controller has no actual controllers associated with it,
+		// We revert to V1. If it does, report V2. In the future, we may want to "combine" V2 and V1 metrics somehow.
+		if len(controllers) > 0 {
+			fmt.Printf("fetching V2 controller: %#v for pid %d\n", controllers, pid)
+			return CgroupsV2, nil
+		}
+		return CgroupsV1, nil
 	}
 	return CgroupsV1, nil
 }
@@ -300,4 +320,34 @@ func getCommonCgroupMetadata(mounts map[string]ControllerPath) (string, string) 
 	}
 
 	return path, filepath.Base(path)
+}
+
+// Read a cgroup.controllers list from a v2 cgroup
+func readControllerList(cgroupsFile string, v2path string) ([]string, error) {
+	// edge case: There's no V2 controller
+	if v2path == "" {
+		return []string{}, nil
+	}
+	controllers := strings.Split(cgroupsFile, "\n")
+	var cgpath string
+	for _, controller := range controllers {
+		if strings.Contains(controller, "0::/") {
+			fields := strings.Split(controller, ":")
+			cgpath = fields[2]
+		}
+	}
+	// no v2 controllers
+	if cgpath == "" {
+		return []string{}, nil
+	}
+	file := filepath.Join(v2path, cgpath, "cgroup.controllers")
+	controllersRaw, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error reading %s", file)
+	}
+
+	if len(controllersRaw) == 0 {
+		return []string{}, nil
+	}
+	return strings.Split(string(controllersRaw), " "), nil
 }
