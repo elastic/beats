@@ -27,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	noopacker "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/acker/noop"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 	repo "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
 	fleetreporter "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet"
 	fleetreporterConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter/fleet/config"
@@ -48,11 +49,12 @@ func (t *testingClient) Send(
 	params url.Values,
 	headers http.Header,
 	body io.Reader,
-) (*http.Response, error) {
+) (*http.Response, remote.CancelFunc, error) {
 	t.Lock()
 	defer t.Unlock()
 	defer func() { t.received <- struct{}{} }()
-	return t.callback(headers, body)
+	r, err := t.callback(headers, body)
+	return r, func() {}, err
 }
 
 func (t *testingClient) URI() string {
