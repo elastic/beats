@@ -470,6 +470,19 @@ processors:
         def arr = ctx?.okta?.target;
         if (arr != null) {
           for (def i = 0; i < arr.length; i++) {
+            if (arr[i]["type"].toLowerCase().contains("appinstance")) {
+              ctx["okta_target_app"] = arr[i];
+              break;
+            }
+          }
+        }
+      if: ctx?.okta?.event_type != null && ctx?.okta?.event_type.contains("user.authentication")
+  - script:
+      lang: painless
+      source: |
+        def arr = ctx?.okta?.target;
+        if (arr != null) {
+          for (def i = 0; i < arr.length; i++) {
             if (arr[i]["type"].toLowerCase().contains("group")) {
               ctx["okta_target_group"] = arr[i];
               break;
@@ -496,6 +509,22 @@ processors:
   - rename:
       field: okta_target_group.id
       target_field: user.target.group.id
+      ignore_missing: true
+  - rename:
+      field: okta_target_app.display_name
+      target_field: app.target.full_name
+      ignore_missing: true
+  - rename:
+      field: okta_target_app.id
+      target_field: app.target.id
+      ignore_missing: true
+  - rename:
+      field: okta_target_app.type
+      target_field: app.target.type
+      ignore_missing: true
+  - rename:
+      field: okta_target_app.alternate_id
+      target_field: app.target.alternate_id
       ignore_missing: true
   - remove:
       field:
