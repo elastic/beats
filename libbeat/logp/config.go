@@ -64,8 +64,8 @@ type FileConfig struct {
 //
 // Currently these options are not used through this object in beats (as monitoring is setup elsewhere).
 type MetricsConfig struct {
-	Enabled bool          `config:"enabled" yaml:"enabled"`
-	Period  time.Duration `config:"period" yaml:"period"`
+	Enabled bool          `config:"enabled"`
+	Period  time.Duration `config:"period"`
 }
 
 const (
