@@ -55,7 +55,7 @@ func TestCpuRT(t *testing.T) {
 	}
 
 	assert.Equal(t, uint64(1000000), cpu.RT.Period.Us)
-	assert.Equal(t, uint64(0), cpu.RT.Runtime)
+	assert.Equal(t, uint64(0), cpu.RT.Runtime.Us)
 }
 
 func TestCpuSubsystemGet(t *testing.T) {

@@ -36,7 +36,7 @@ type StatsV1 struct {
 	CPU           *cgv1.CPUSubsystem           `json:"cpu,omitempty" struct:"cpu,omitempty"`
 	CPUAccounting *cgv1.CPUAccountingSubsystem `json:"cpuacct,omitempty" struct:"cpuacct,omitempty"`
 	Memory        *cgv1.MemorySubsystem        `json:"memory,omitempty" struct:"memory,omitempty"`
-	BlockIO       *cgv1.BlockIOSubsystem       `json:"blkio,omitempty" struct:"memory,omitempty"`
+	BlockIO       *cgv1.BlockIOSubsystem       `json:"blkio,omitempty" struct:"blockio,omitempty"`
 	Version       CgroupsVersion               `json:"cgroups_version,omitempty" struct:"cgroups_version,omitempty"`
 }
 

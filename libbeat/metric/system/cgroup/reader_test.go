@@ -50,7 +50,7 @@ func TestReaderGetStatsV1(t *testing.T) {
 	assert.NotZero(t, stats.CPU.CFS.PeriodMicros.Us)
 	assert.NotZero(t, stats.CPUAccounting.Total.NS)
 	assert.NotZero(t, stats.Memory.Mem.Usage.Bytes)
-	assert.NotZero(t, stats.BlockIO.Throttle.TotalBytes)
+	assert.NotZero(t, stats.BlockIO.Total.Bytes)
 
 	assert.Equal(t, path, stats.Path)
 	assert.Equal(t, path, stats.BlockIO.Path)

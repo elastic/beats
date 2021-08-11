@@ -36,10 +36,16 @@ import (
 //
 // https://www.kernel.org/doc/Documentation/cgroup-v1/blkio-controller.txt
 type BlockIOSubsystem struct {
-	ID       string         `json:"id,omitempty"`       // ID of the cgroup.
-	Path     string         `json:"path,omitempty"`     // Path to the cgroup relative to the cgroup subsystem's mountpoint.
-	Throttle ThrottlePolicy `json:"throttle,omitempty"` // Throttle limits for upper IO rates and metrics.
+	ID    string   `json:"id,omitempty"`                   // ID of the cgroup.
+	Path  string   `json:"path,omitempty"`                 // Path to the cgroup relative to the cgroup subsystem's mountpoint.
+	Total TotalIOs `json:"total,omitempty" struct:"total"` // Throttle limits for upper IO rates and metrics.
 	//CFQ      CFQScheduler   `json:"cfq,omitempty"`      // Completely fair queue scheduler limits and metrics.
+}
+
+// TotalIOs wraps the totals for blkio
+type TotalIOs struct {
+	Bytes uint64 `json:"bytes,omitrmpty" struct:"bytes,omitempty"`
+	Ios   uint64 `json:"ios,omitrmpty" struct:"ios,omitempty"`
 }
 
 // CFQScheduler contains limits and metrics for the proportional weight time
@@ -67,14 +73,6 @@ type CFQDevice struct {
 	ServiceTimeNanos OperationValues `json:"io_service_time"`  // Amount of time between request dispatch and request completion for the IOs done by this cgroup.
 	WaitTimeNanos    OperationValues `json:"io_wait_time"`     // Amount of time the IOs for this cgroup spent waiting in the scheduler queues for service.
 	Merges           OperationValues `json:"io_merged"`        // Total number of bios/requests merged into requests belonging to this cgroup.
-}
-
-// ThrottlePolicy contains the upper IO limits and metrics for devices used
-// by the cgroup.
-type ThrottlePolicy struct {
-	Devices    []ThrottleDevice `json:"devices,omitempty"`      // Device centric view of limits and metrics.
-	TotalBytes uint64           `json:"total_io_service_bytes"` // Total number of bytes serviced by all devices.
-	TotalIOs   uint64           `json:"total_io_serviced"`      // Total number of IO operations serviced by all devices.
 }
 
 // ThrottleDevice contains throttle limits and metrics associated with a single device.
@@ -196,11 +194,9 @@ func blkioThrottle(path string, blkio *BlockIOSubsystem) error {
 		}
 	}
 
-	blkio.Throttle.Devices = make([]ThrottleDevice, 0, len(devices))
 	for _, dev := range devices {
-		blkio.Throttle.Devices = append(blkio.Throttle.Devices, *dev)
-		blkio.Throttle.TotalBytes += dev.Bytes.Read + dev.Bytes.Write
-		blkio.Throttle.TotalIOs += dev.IOs.Read + dev.IOs.Write
+		blkio.Total.Bytes += dev.Bytes.Read + dev.Bytes.Write
+		blkio.Total.Ios += dev.IOs.Read + dev.IOs.Write
 	}
 	return nil
 }

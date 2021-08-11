@@ -77,7 +77,7 @@ type CPUStats struct {
 // ThrottledField contains the `throttled` information for the CPU stats
 type ThrottledField struct {
 	Us      uint64 `json:"us" struct:"us"`
-	Periods uint64 `json:"periods" struct:"period"`
+	Periods uint64 `json:"periods" struct:"periods"`
 }
 
 // Get reads metrics from the "cpu" subsystem. path is the filepath to the

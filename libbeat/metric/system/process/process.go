@@ -25,7 +25,6 @@ import (
 	"runtime"
 	"sort"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/pkg/errors"
@@ -109,12 +108,13 @@ type Ticks struct {
 func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	state := sigar.ProcState{}
 	err := state.Get(pid)
-	// Soft error, the process is now gone. pass along.
-	if err == syscall.ENOENT || err == syscall.ESRCH {
-		return nil, err
-	}
+	// The function that calls this function used to not return any errors,
+	// so we have to keep up that behavior somewhat, as there are numerous cases where ProcState could "normally" fail
+	// If something has failed this early, assume the PID is bad, invalid, or dead in some way, and just continue.
+	// Instead, log the error.
 	if err != nil {
-		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
+		logp.L().Warnf("Could not fetch info for PID %d: %s", pid, err)
+		return nil, nil
 	}
 
 	exe := sigar.ProcExe{}
@@ -534,11 +534,11 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) (*Process, 
 
 	process, err := newProcess(pid, cmdline, env)
 	// The process is now gone. Skip.
-	if err == syscall.ENOENT || err == syscall.ESRCH {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, errors.Wrapf(err, "Skip process pid=%d", pid)
+	}
+	if process == nil {
+		return nil, nil
 	}
 
 	if !procStats.matchProcess(process.Name) {

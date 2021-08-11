@@ -58,28 +58,9 @@ func TestBlkioThrottle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, uint64(46), blkio.Throttle.TotalIOs)
-	assert.Equal(t, uint64(1648128), blkio.Throttle.TotalBytes)
-	assert.Len(t, blkio.Throttle.Devices, 3)
+	assert.Equal(t, uint64(46), blkio.Total.Ios)
+	assert.Equal(t, uint64(1648128), blkio.Total.Bytes)
 
-	for _, device := range blkio.Throttle.Devices {
-		if device.DeviceID.Major == 7 && device.DeviceID.Minor == 0 {
-			assert.Equal(t, uint64(1000), device.ReadLimitBPS)
-			assert.Equal(t, uint64(2000), device.ReadLimitIOPS)
-			assert.Equal(t, uint64(3000), device.WriteLimitBPS)
-			assert.Equal(t, uint64(4000), device.WriteLimitIOPS)
-
-			assert.Equal(t, uint64(4608), device.Bytes.Read)
-			assert.Equal(t, uint64(0), device.Bytes.Write)
-			assert.Equal(t, uint64(4608), device.Bytes.Async)
-			assert.Equal(t, uint64(0), device.Bytes.Sync)
-
-			assert.Equal(t, uint64(2), device.IOs.Read)
-			assert.Equal(t, uint64(0), device.IOs.Write)
-			assert.Equal(t, uint64(2), device.IOs.Async)
-			assert.Equal(t, uint64(0), device.IOs.Sync)
-		}
-	}
 }
 
 func TestBlockIOSubsystemGet(t *testing.T) {
@@ -87,8 +68,6 @@ func TestBlockIOSubsystemGet(t *testing.T) {
 	if err := blkio.Get(blkioPath); err != nil {
 		t.Fatal(err)
 	}
-
-	assert.True(t, len(blkio.Throttle.Devices) > 0)
 }
 
 func TestBlockIOSubsystemJSON(t *testing.T) {
