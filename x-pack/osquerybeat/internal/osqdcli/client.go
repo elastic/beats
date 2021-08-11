@@ -177,7 +177,7 @@ func (c *Client) withReconnect(ctx context.Context, fn func() error) error {
 		syscall.ECONNRESET)) ||
 		strings.HasSuffix(err.Error(), " broken pipe") {
 
-		c.log.Infof("osquery error: %v, reconnect", err)
+		c.log.Debugf("osquery error: %v, reconnect", err)
 
 		// reconnect && retry
 		err = c.reconnect(ctx)
