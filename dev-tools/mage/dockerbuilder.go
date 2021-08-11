@@ -195,11 +195,18 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 }
 
 func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
+<<<<<<< HEAD
 	imageName := b.imageName
 	if variant != "" {
 		imageName = fmt.Sprintf("%s-%s", imageName, variant)
 	}
 	taggedImageName := fmt.Sprintf("%s:%s", imageName, b.Version)
+=======
+	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
+	if variant != "" {
+		tag = fmt.Sprintf("%s-%s", tag, variant)
+	}
+>>>>>>> 4727470f7 ([Heartbeat] Build elastic agent with synthetics support / offline mode (#27052))
 	if b.Snapshot {
 		taggedImageName = taggedImageName + "-SNAPSHOT"
 	}
