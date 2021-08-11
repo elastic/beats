@@ -65,8 +65,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location)
+	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),

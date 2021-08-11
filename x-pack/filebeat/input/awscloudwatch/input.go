@@ -12,7 +12,6 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/arn"
-	"github.com/aws/aws-sdk-go-v2/aws/awserr"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs/cloudwatchlogsiface"
 	"github.com/pkg/errors"
@@ -167,7 +166,8 @@ func (in *awsCloudWatchInput) run() {
 	for in.inputCtx.Err() == nil {
 		err := in.getLogEventsFromCloudWatch(svc)
 		if err != nil {
-			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+			var aerr *awssdk.RequestCanceledError
+			if errors.As(err, &aerr) {
 				continue
 			}
 			in.logger.Error("getLogEventsFromCloudWatch failed: ", err)
