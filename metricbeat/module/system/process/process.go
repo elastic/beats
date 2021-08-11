@@ -72,7 +72,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 			debugf("process cgroup data collection is enabled, using hostfs='%v'", paths.Paths.Hostfs)
 		}
 	}
-	fmt.Printf("ROOTFS IS: '%s'\n", paths.Paths.Hostfs)
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{

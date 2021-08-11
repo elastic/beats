@@ -20,7 +20,6 @@
 package process
 
 import (
-	"io/ioutil"
 	"testing"
 	"time"
 
@@ -33,13 +32,7 @@ func TestFetch(t *testing.T) {
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
 	events, errs := mbtest.ReportingFetchV2Error(f)
 
-	// help
-	mountinfo, err := ioutil.ReadFile("/proc/self/mountinfo")
-	assert.NoError(t, err)
-	pid1cg, err := ioutil.ReadFile("/proc/1/cgroup")
-	assert.NoError(t, err)
-
-	assert.Empty(t, errs, "failed with: %s, and cgroups %s", string(mountinfo), string(pid1cg))
+	assert.Empty(t, errs)
 	if !assert.NotEmpty(t, events) {
 		t.FailNow()
 	}

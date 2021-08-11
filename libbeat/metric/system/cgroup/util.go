@@ -27,6 +27,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
 var (
@@ -221,7 +224,7 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 	}
 	defer cgroup.Close()
 
-	paths := map[string]ControllerPath{}
+	cPaths := map[string]ControllerPath{}
 	sc := bufio.NewScanner(cgroup)
 	for sc.Scan() {
 		// http://man7.org/linux/man-pages/man7/cgroups.7.html
@@ -242,7 +245,23 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 		// cgroup V2
 		// cgroup v2 controllers will always start with this string
 		if strings.Contains(line, "0::/") {
+			// if you're running inside a container
+			// that's operating with a hybrid cgroups config,
+			// the containerized process won't see the V2 mount
+			// inside /proc/self/mountinfo if docker is using cgroups V1
+			// For this very annoying edge case, revert to the hostfs flag
+			// If it's not set, warn the user that they've hit this.
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
+			if r.cgroupMountpoints.V2Loc == "" && paths.Paths.Hostfs == "" {
+				logp.L().Errorf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
+This may be because metricbeat is running inside a container on a hybrid system.
+To monitor cgroups V2 processess in this way, mount the unified (V2) hierarchy inside
+the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostfs.`, pid, line)
+				continue
+			} else if r.cgroupMountpoints.V2Loc == "" && paths.Paths.Hostfs != "" {
+				controllerPath = filepath.Join(paths.Paths.Hostfs, "/sys/fs/cgroup/unified", path)
+			}
+
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
@@ -252,7 +271,7 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 			for _, singlePath := range cgpaths {
 				if strings.Contains(singlePath.Name(), "stat") {
 					controllerName := strings.TrimSuffix(singlePath.Name(), ".stat")
-					paths[controllerName] = ControllerPath{ControllerPath: path, FullPath: controllerPath, IsV2: true}
+					cPaths[controllerName] = ControllerPath{ControllerPath: path, FullPath: controllerPath, IsV2: true}
 				}
 			}
 			// cgroup v1
@@ -260,14 +279,14 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 			subsystems := strings.Split(fields[1], ",")
 			for _, subsystem := range subsystems {
 				fullPath := filepath.Join(r.cgroupMountpoints.V1Mounts[subsystem], path)
-				paths[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
+				cPaths[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
 			}
 		}
 	}
 
 	if sc.Err() != nil {
-		return paths, errors.Wrap(sc.Err(), "error scanning cgroup file")
+		return cPaths, errors.Wrap(sc.Err(), "error scanning cgroup file")
 	}
 
-	return paths, nil
+	return cPaths, nil
 }
