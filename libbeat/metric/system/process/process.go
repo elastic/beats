@@ -108,12 +108,11 @@ type Ticks struct {
 func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	state := sigar.ProcState{}
 	err := state.Get(pid)
-	// The function that calls this function used to not return any errors,
-	// so we have to keep up that behavior somewhat, as there are numerous cases where ProcState could "normally" fail
+	// we have to keep up that behavior somewhat, as there are numerous cases where ProcState could "normally" fail
 	// If something has failed this early, assume the PID is bad, invalid, or dead in some way, and just continue.
 	// Instead, log the error.
 	if err != nil {
-		logp.L().Warnf("Could not fetch info for PID %d: %s", pid, err)
+		logp.L().Debugf("Could not fetch info for PID %d: %s", pid, err)
 		return nil, nil
 	}
 
@@ -478,10 +477,7 @@ func (procStats *Stats) Get() ([]common.MapStr, error) {
 	newProcs := make(ProcsMap, len(pids))
 
 	for _, pid := range pids {
-		process, err := procStats.getSingleProcess(pid, newProcs)
-		if err != nil {
-			return nil, errors.Wrapf(err, "error fetching stats for pid=%d", pid)
-		}
+		process := procStats.getSingleProcess(pid, newProcs)
 		if process == nil {
 			continue
 		}
@@ -508,10 +504,7 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	}
 
 	newProcs := make(ProcsMap, 1)
-	p, err := procStats.getSingleProcess(pid, newProcs)
-	if err != nil {
-		return nil, fmt.Errorf("cannot find matching process for pid=%d", pid)
-	}
+	p := procStats.getSingleProcess(pid, newProcs)
 	if p == nil {
 		return common.MapStr{}, nil
 	}
@@ -522,9 +515,12 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	return e, nil
 }
 
-func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) (*Process, error) {
+func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	var cmdline string
 	var env common.MapStr
+	// In the future we really should find a better way of distinguishing between serious and non-serious errors
+	// for now, just log and continue
+	logger := logp.L()
 	if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
 		if procStats.CacheCmdLine {
 			cmdline = previousProc.CmdLine
@@ -533,27 +529,27 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) (*Process, 
 	}
 
 	process, err := newProcess(pid, cmdline, env)
-	// The process is now gone. Skip.
 	if err != nil {
-		return nil, errors.Wrapf(err, "Skip process pid=%d", pid)
+		logger.Debugf("Skip process pid=%d; err=%s", pid, err)
 	}
+	// The process is now gone. Skip.
 	if process == nil {
-		return nil, nil
+		return nil
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		return nil, errors.Wrapf(err, "Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
+		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s; err=", pid, process.Name, err)
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Error getting details for process %s with pid=%d", process.Name, process.Pid)
+		logger.Debugf("Error getting details for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
 	}
 
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
-			return nil, errors.Wrapf(err, "Error fetching cgroup data for process %s with pid=%d", process.Name, process.Pid)
+			logger.Debugf("Error fetching cgroup data for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
 		}
 		process.RawStats = cgStats
 		last := procStats.ProcsMap[process.Pid]
@@ -566,7 +562,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) (*Process, 
 	newProcs[process.Pid] = process
 	last := procStats.ProcsMap[process.Pid]
 	process.cpuTotalPctNorm, process.cpuTotalPct, process.cpuSinceStart = GetProcCPUPercentage(last, process)
-	return process, nil
+	return process
 }
 
 func (procStats *Stats) includeTopProcesses(processes []Process) []Process {

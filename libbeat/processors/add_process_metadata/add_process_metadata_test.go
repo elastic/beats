@@ -1029,3 +1029,16 @@ func TestPIDToInt(t *testing.T) {
 		})
 	}
 }
+
+func TestV2CID(t *testing.T) {
+	processCgroupPaths = func(_ string, _ int) (map[string]cgroup.ControllerPath, error) {
+		testMap := map[string]cgroup.ControllerPath{
+			"cpu": {IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
+		}
+		return testMap, nil
+	}
+	provider := newCidProvider("", []string{}, "", processCgroupPaths, nil)
+	result, err := provider.GetCid(1)
+	assert.NoError(t, err)
+	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
+}
