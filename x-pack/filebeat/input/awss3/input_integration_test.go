@@ -125,6 +125,17 @@ func TestInputRun(t *testing.T) {
 	// Ensure SQS is empty before testing.
 	drainSQS(t, tfConfig)
 
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
 	s3Input := createInput(t, makeTestConfig(tfConfig.QueueURL))
 
 	inputCtx, cancel := newV2Context()
@@ -147,15 +158,6 @@ func TestInputRun(t *testing.T) {
 		pipeline := pubtest.PublisherWithClient(client)
 		return s3Input.Run(inputCtx, pipeline)
 	})
-
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/events-array.json")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/invalid.json")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/log.json")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/log.ndjson")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/multiline.json")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/multiline.json.gz")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/multiline.txt")
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, "testdata/log.txt") // Skipped (no match).
 
 	if err := errGroup.Wait(); err != nil {
 		t.Fatal(err)
@@ -182,7 +184,7 @@ func assertMetric(t *testing.T, snapshot common.MapStr, name string, value inter
 	assert.EqualValues(t, value, n, name)
 }
 
-func uploadS3TestFiles(t *testing.T, region, bucket, filename string) {
+func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string) {
 	t.Helper()
 
 	cfg, err := external.LoadDefaultAWSConfig()
@@ -190,26 +192,26 @@ func uploadS3TestFiles(t *testing.T, region, bucket, filename string) {
 		t.Fatal(err)
 	}
 	cfg.Region = region
-	defer cfg.HTTPClient.CloseIdleConnections()
 
 	uploader := s3manager.NewUploader(cfg)
 
-	f, err := os.Open(filename)
-	if err != nil {
-		t.Fatalf("Failed to open file %q, %v", filename, err)
-	}
-	defer f.Close()
+	for _, filename := range filenames {
+		data, err := ioutil.ReadFile(filename)
+		if err != nil {
+			t.Fatalf("Failed to open file %q, %v", filename, err)
+		}
 
-	// Upload the file to S3.
-	result, err := uploader.Upload(&s3manager.UploadInput{
-		Bucket: aws.String(bucket),
-		Key:    aws.String(filepath.Base(filename)),
-		Body:   f,
-	})
-	if err != nil {
-		t.Fatalf("Failed to upload file %q: %v", filename, err)
+		// Upload the file to S3.
+		result, err := uploader.Upload(&s3manager.UploadInput{
+			Bucket: aws.String(bucket),
+			Key:    aws.String(filepath.Base(filename)),
+			Body:   bytes.NewReader(data),
+		})
+		if err != nil {
+			t.Fatalf("Failed to upload file %q: %v", filename, err)
+		}
+		t.Logf("File uploaded to %s", result.Location)
 	}
-	t.Logf("File uploaded to %s", result.Location)
 }
 
 func drainSQS(t *testing.T, tfConfig terraformOutputData) {
