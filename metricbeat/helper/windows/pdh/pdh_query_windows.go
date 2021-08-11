@@ -225,7 +225,11 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 		return UTF16ToStringArray(expdPaths), nil
 	} else {
 		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
-			return nil, err
+			if err == PDH_MORE_DATA {
+				expdPaths, err = PdhExpandWildCardPath(utfPath)
+			} else {
+				return nil, err
+			}
 		}
 		paths := UTF16ToStringArray(expdPaths)
 		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
