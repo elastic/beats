@@ -100,13 +100,11 @@ func newSQSS3EventProcessor(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI,
 func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *sqs.Message) error {
 	log := p.log.With("message_id", *msg.MessageId)
 
-	var keepaliveWg sync.WaitGroup
-	defer keepaliveWg.Wait()
-
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 	defer keepaliveCancel()
 
 	// Start SQS keepalive worker.
+	var keepaliveWg sync.WaitGroup
 	keepaliveWg.Add(1)
 	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
 
