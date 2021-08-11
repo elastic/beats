@@ -226,7 +226,9 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 	} else {
 		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
 			if err == PDH_MORE_DATA {
-				expdPaths, err = PdhExpandWildCardPath(utfPath)
+				if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
+					return nil, err
+				}
 			} else {
 				return nil, err
 			}
