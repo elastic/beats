@@ -35,6 +35,7 @@ var (
 	ErrAlreadyRunning     = errors.New("already running")
 	ErrQueryExecution     = errors.New("failed query execution")
 	ErrActionRequest      = errors.New("invalid action request")
+	ErrOsquerydExited     = errors.New("osqueryd exited")
 )
 
 const (
@@ -158,6 +159,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		err := osq.Run(ctx)
 		if err != nil {
 			bt.log.Errorf("Failed to run osqueryd: %v", err)
+		} else {
+			// When osqueryd is killed for example there is no error returned
+			// but we can't continue running. Exiting.
+			bt.log.Info("osqueryd process exited")
+			err = ErrOsquerydExited
 		}
 		return err
 	})
