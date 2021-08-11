@@ -11,6 +11,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -100,7 +101,8 @@ func (c *s3Collector) run() {
 		// receive messages from sqs
 		output, err := c.receiveMessage(c.sqs, c.visibilityTimeout)
 		if err != nil {
-			if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+			var aerr *awssdk.RequestCanceledError
+			if errors.As(err, &aerr) {
 				continue
 			}
 			c.logger.Error("SQS ReceiveMessageRequest failed: ", err)
@@ -365,14 +367,13 @@ func (c *s3Collector) createEventsFromS3Info(svc s3iface.ClientAPI, info s3Info,
 
 	resp, err := req.Send(ctx)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok {
-			// If the SDK can determine the request or retry delay was canceled
-			// by a context the ErrCodeRequestCanceled error will be returned.
-			if awsErr.Code() == awssdk.ErrCodeRequestCanceled {
-				c.logger.Error(fmt.Errorf("s3 GetObjectRequest canceled for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
-				return err
-			}
+		var aerr *awssdk.RequestCanceledError
+		if errors.As(err, &aerr) {
+			c.logger.Error(fmt.Errorf("s3 GetObjectRequest canceled for '%s' from S3 bucket '%s': %w", info.key, info.name, err))
+			return err
+		}
 
+		if awsErr, ok := err.(awserr.Error); ok {
 			if awsErr.Code() == "NoSuchKey" {
 				c.logger.Warnf("Cannot find s3 file '%s' from S3 bucket '%s'", info.key, info.name)
 				return nil
@@ -579,7 +580,8 @@ func (c *s3Collector) deleteMessage(queueURL string, messagesReceiptHandle strin
 
 	_, err := req.Send(ctx)
 	if err != nil {
-		if awsErr, ok := err.(awserr.Error); ok && awsErr.Code() == awssdk.ErrCodeRequestCanceled {
+		var aerr *awssdk.RequestCanceledError
+		if errors.As(err, &aerr) {
 			return nil
 		}
 		return fmt.Errorf("SQS DeleteMessageRequest failed: %w", err)
