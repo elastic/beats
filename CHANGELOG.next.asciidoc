@@ -290,6 +290,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add proxy support for AWS functions. {pull}26832[26832]
 - Added policies to the elasticsearch output for non indexible events {pull}26952[26952]
 - Add sha256 digests to RPM packages. {issue}23670[23670]
+- Add new 'offline' docker image for Elastic Agent. {pull}27052[27052]
 
 *Auditbeat*
 
