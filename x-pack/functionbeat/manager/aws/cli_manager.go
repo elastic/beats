@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -68,7 +69,7 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 
 	c.log.Debugf("Using cloudformation template:\n%s", templateData.json)
 
-	_, err = c.awsCfg.Credentials.Retrieve()
+	_, err = c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
@@ -150,7 +151,7 @@ func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("Removing function: %s", name)
 	defer c.log.Debugf("Removal of function '%s' complete", name)
 
-	_, err := c.awsCfg.Credentials.Retrieve()
+	_, err := c.awsCfg.Credentials.Retrieve(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
 	}
