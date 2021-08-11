@@ -55,7 +55,7 @@ func (m *mockCloudFormationClient) DescribeStackEventsRequest(
 	}()
 	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudformation.DescribeStackEventsRequest{
-		Request: &aws.Request{Data: &m.Responses[m.Index], HTTPRequest: httpReq},
+		Request: &aws.Request{Data: &m.Responses[m.Index], HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
 	}
 }
 
