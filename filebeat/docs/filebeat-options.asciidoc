@@ -68,6 +68,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-docker>>
+* <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
