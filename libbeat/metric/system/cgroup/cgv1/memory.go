@@ -33,16 +33,16 @@ type MemorySubsystem struct {
 	ID   string `json:"id,omitempty"`   // ID of the cgroup.
 	Path string `json:"path,omitempty"` // Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
-	Mem       MemoryData `json:"mem"`      // Memory usage by tasks in this cgroup.
-	MemSwap   MemoryData `json:"memsw"`    // Memory plus swap usage by tasks in this cgroup.
-	Kernel    MemoryData `json:"kmem"`     // Kernel memory used by tasks in this cgroup.
-	KernelTCP MemoryData `json:"kmem_tcp"` // Kernel TCP buffer memory used by tasks in this cgroup.
-	Stats     MemoryStat `json:"stats"`    // A wide range of memory statistics.
+	Mem       MemoryData `json:"mem" struct:"mem"`           // Memory usage by tasks in this cgroup.
+	MemSwap   MemoryData `json:"memsw" struct:"memsw"`       // Memory plus swap usage by tasks in this cgroup.
+	Kernel    MemoryData `json:"kmem" struct:"kmem"`         // Kernel memory used by tasks in this cgroup.
+	KernelTCP MemoryData `json:"kmem_tcp" struct:"kmem_tcp"` // Kernel TCP buffer memory used by tasks in this cgroup.
+	Stats     MemoryStat `json:"stats" struct:"stats"`       // A wide range of memory statistics.
 }
 
 // MemoryData groups related memory usage metrics and limits.
 type MemoryData struct {
-	Usage    MemSubsystemUsage `json:"usage"`                      // Usage in bytes.
+	Usage    MemSubsystemUsage `json:"usage" struct:"usage"`       // Usage in bytes.
 	Limit    opt.Bytes         `json:"limit" struct:"limit"`       // Limit in bytes.
 	Failures uint64            `json:"failures" struct:"failures"` // Number of times the memory limit has been reached.
 }
