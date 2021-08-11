@@ -49,7 +49,7 @@ processors:
     ignore_empty_value: true
 - rename:
     field: threatintel.abuseurl.urlhaus_reference
-    target_field: indicator.reference
+    target_field: threatintel.indicator.reference
     ignore_missing: true
 
 # Host can be both IP addresses and domain names

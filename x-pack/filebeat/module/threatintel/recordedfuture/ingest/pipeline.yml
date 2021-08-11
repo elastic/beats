@@ -116,7 +116,7 @@ processors:
       ignore_missing: true
 
   - set:
-      field: event.reference
+      field: threatintel.indicator.reference
       value: '{{{ json.intelCard }}}'
       ignore_empty_value: true
 
