@@ -252,13 +252,14 @@ func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
 			// For this very annoying edge case, revert to the hostfs flag
 			// If it's not set, warn the user that they've hit this.
 			controllerPath := filepath.Join(r.cgroupMountpoints.V2Loc, path)
-			if r.cgroupMountpoints.V2Loc == "" && paths.Paths.Hostfs == "" {
+			// Depending on the test environment, Hostfs can either be blank, or `/`
+			if r.cgroupMountpoints.V2Loc == "" && len(paths.Paths.Hostfs) <= 1 {
 				logp.L().Errorf(`PID %d contains a cgroups V2 path (%s) but no V2 mountpoint was found.
 This may be because metricbeat is running inside a container on a hybrid system.
 To monitor cgroups V2 processess in this way, mount the unified (V2) hierarchy inside
 the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostfs.`, pid, line)
 				continue
-			} else if r.cgroupMountpoints.V2Loc == "" && paths.Paths.Hostfs != "" {
+			} else if r.cgroupMountpoints.V2Loc == "" && len(paths.Paths.Hostfs) > 1 {
 				controllerPath = filepath.Join(paths.Paths.Hostfs, "/sys/fs/cgroup/unified", path)
 			}
 

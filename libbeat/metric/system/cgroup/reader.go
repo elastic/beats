@@ -151,7 +151,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 		// Otherwise, check to see what's in the controllers file
 		controllers, err := readControllerList(cgstring, r.cgroupMountpoints.V2Loc)
 		if err != nil {
-			return CgroupsV1, errors.Wrapf(err, "error fetching cgroup controllers for pid %d", pid)
+			return CgroupsV1, errors.Wrapf(err, "error fetching cgroup controller list for pid %d", pid)
 		}
 		// The logic here is a tad opinionated. If we're at this point in the code, it's because we have both
 		// V1 and V2 controllers on a cgroup. If the V2 controller has no actual controllers associated with it,

@@ -50,7 +50,7 @@ type RT struct {
 	Period opt.Us `json:"period" struct:"period"`
 	// Period of time in microseconds for the longest continuous period in which
 	// the tasks in the cgroup have access to CPU resources.
-	Runtime uint64 `json:"runtime" struct:"runtime"`
+	Runtime opt.Us `json:"runtime" struct:"runtime"`
 }
 
 // CFS contains the tunable parameters for the completely fair scheduler.
@@ -156,7 +156,7 @@ func cpuRT(path string, cpu *CPUSubsystem) error {
 		return err
 	}
 
-	cpu.RT.Runtime, err = cgcommon.ParseUintFromFile(path, "cpu.rt_runtime_us")
+	cpu.RT.Runtime.Us, err = cgcommon.ParseUintFromFile(path, "cpu.rt_runtime_us")
 	if err != nil {
 		return err
 	}
