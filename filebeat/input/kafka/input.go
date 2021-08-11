@@ -26,50 +26,65 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
-
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/pkg/errors"
 )
 
-func init() {
-	err := input.Register("kafka", NewInput)
-	if err != nil {
-		panic(err)
+const pluginName = "kafka"
+
+// Plugin creates a new filestream input plugin for creating a stateful input.
+func Plugin() input.Plugin {
+	return input.Plugin{
+		Name:       pluginName,
+		Stability:  feature.Stable,
+		Deprecated: false,
+		Info:       "Kafka input",
+		Doc:        "The Kafka input consumes events from topics by connecting to the configured kafka brokers",
+		Manager:    input.ConfigureWith(configure),
 	}
 }
 
-// Input contains the input and its config
+func configure(cfg *common.Config) (input.Input, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, err
+	}
+
+	saramaConfig, err := newSaramaConfig(config)
+	if err != nil {
+		return nil, errors.Wrap(err, "initializing Sarama config")
+	}
+	return NewInput(config, saramaConfig)
+}
+
+func NewInput(config kafkaInputConfig, saramaConfig *sarama.Config) (*kafkaInput, error) {
+	return &kafkaInput{config: config, saramaConfig: saramaConfig}, nil
+}
+
 type kafkaInput struct {
 	config          kafkaInputConfig
 	saramaConfig    *sarama.Config
-	context         input.Context
-	outlet          channel.Outleter
 	saramaWaitGroup sync.WaitGroup // indicates a sarama consumer group is active
-	log             *logp.Logger
-	runOnce         sync.Once
 }
 
-// NewInput creates a new kafka input
-func NewInput(
-	cfg *common.Config,
-	connector channel.Connector,
-	inputContext input.Context,
-) (input.Input, error) {
+func (input *kafkaInput) Name() string { return pluginName }
 
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading kafka input config")
-	}
+func (input *kafkaInput) Test(_ input.TestContext) error {
+	return nil
+}
 
-	out, err := connector.ConnectWith(cfg, beat.ClientConfig{
+func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
+	log := ctx.Logger.Named("kafka input").With("hosts", input.config.Hosts)
+
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		ACKHandler: acker.ConnectionOnly(
 			acker.EventPrivateReporter(func(_ int, events []interface{}) {
 				for _, event := range events {
@@ -79,96 +94,56 @@ func NewInput(
 				}
 			}),
 		),
-		CloseRef:  doneChannelContext(inputContext.Done),
-		WaitClose: config.WaitClose,
+		CloseRef:  ctx.Cancelation,
+		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	saramaConfig, err := newSaramaConfig(config)
-	if err != nil {
-		return nil, errors.Wrap(err, "initializing Sarama config")
-	}
+	log.Info("Starting Kafka input")
+	defer log.Info("Kafka input stopped")
 
-	input := &kafkaInput{
-		config:       config,
-		saramaConfig: saramaConfig,
-		context:      inputContext,
-		outlet:       out,
-		log:          logp.NewLogger("kafka input").With("hosts", config.Hosts),
-	}
+	// Sarama uses standard go contexts to control cancellation, so we need
+	// to wrap our input context channel in that interface.
+	goContext := doneChannelContext(ctx)
 
-	return input, nil
-}
+	// If the consumer fails to connect, we use exponential backoff with
+	// jitter up to 8 * the initial backoff interval.
+	connectDelay := backoff.NewEqualJitterBackoff(
+		ctx.Cancelation.Done(),
+		input.config.ConnectBackoff,
+		8*input.config.ConnectBackoff,
+	)
 
-func (input *kafkaInput) runConsumerGroup(
-	context context.Context, consumerGroup sarama.ConsumerGroup,
-) {
-	handler := &groupHandler{
-		version: input.config.Version,
-		outlet:  input.outlet,
-		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
-		expandEventListFromField: input.config.ExpandEventListFromField,
-		log:                      input.log,
-	}
-
-	input.saramaWaitGroup.Add(1)
-	defer func() {
-		consumerGroup.Close()
-		input.saramaWaitGroup.Done()
-	}()
-
-	// Listen asynchronously to any errors during the consume process
-	go func() {
-		for err := range consumerGroup.Errors() {
-			input.log.Errorw("Error reading from kafka", "error", err)
+	for goContext.Err() == nil {
+		// Connect to Kafka with a new consumer group.
+		consumerGroup, err := sarama.NewConsumerGroup(
+			input.config.Hosts,
+			input.config.GroupID,
+			input.saramaConfig,
+		)
+		if err != nil {
+			log.Errorw("Error initializing kafka consumer group", "error", err)
+			connectDelay.Wait()
+			continue
 		}
-	}()
+		// We've successfully connected, reset the backoff timer.
+		connectDelay.Reset()
 
-	err := consumerGroup.Consume(context, input.config.Topics, handler)
-	if err != nil {
-		input.log.Errorw("Kafka consume error", "error", err)
+		// We have a connected consumer group now, try to start the main event
+		// loop by calling Consume (which starts an asynchronous consumer).
+		// In an ideal run, this function never returns until shutdown; if it
+		// does, it means the errors have been logged and the consumer group
+		// has been closed, so we try creating a new one in the next iteration.
+		input.runConsumerGroup(log, client, goContext, consumerGroup)
 	}
-}
 
-// Run starts the input by scanning for incoming messages and errors.
-func (input *kafkaInput) Run() {
-	input.runOnce.Do(func() {
-		go func() {
-			// Sarama uses standard go contexts to control cancellation, so we need
-			// to wrap our input context channel in that interface.
-			context := doneChannelContext(input.context.Done)
-
-			// If the consumer fails to connect, we use exponential backoff with
-			// jitter up to 8 * the initial backoff interval.
-			backoff := backoff.NewEqualJitterBackoff(
-				input.context.Done,
-				input.config.ConnectBackoff,
-				8*input.config.ConnectBackoff)
-
-			for context.Err() == nil {
-				// Connect to Kafka with a new consumer group.
-				consumerGroup, err := sarama.NewConsumerGroup(
-					input.config.Hosts, input.config.GroupID, input.saramaConfig)
-				if err != nil {
-					input.log.Errorw(
-						"Error initializing kafka consumer group", "error", err)
-					backoff.Wait()
-					continue
-				}
-				// We've successfully connected, reset the backoff timer.
-				backoff.Reset()
-
-				// We have a connected consumer group now, try to start the main event
-				// loop by calling Consume (which starts an asynchronous consumer).
-				// In an ideal run, this function never returns until shutdown; if it
-				// does, it means the errors have been logged and the consumer group
-				// has been closed, so we try creating a new one in the next iteration.
-				input.runConsumerGroup(context, consumerGroup)
-			}
-		}()
-	})
+	if ctx.Cancelation.Err() == context.Canceled {
+		return nil
+	} else {
+		return ctx.Cancelation.Err()
+	}
 }
 
 // Stop doesn't need to do anything because the kafka consumer group and the
@@ -186,6 +161,35 @@ func (input *kafkaInput) Wait() {
 	input.Stop()
 	// Wait for sarama to shut down
 	input.saramaWaitGroup.Wait()
+}
+
+func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, context context.Context, consumerGroup sarama.ConsumerGroup) {
+	handler := &groupHandler{
+		version: input.config.Version,
+		client:  client,
+		parsers: input.config.Parsers,
+		// expandEventListFromField will be assigned the configuration option expand_event_list_from_field
+		expandEventListFromField: input.config.ExpandEventListFromField,
+		log:                      log,
+	}
+
+	input.saramaWaitGroup.Add(1)
+	defer func() {
+		consumerGroup.Close()
+		input.saramaWaitGroup.Done()
+	}()
+
+	// Listen asynchronously to any errors during the consume process
+	go func() {
+		for err := range consumerGroup.Errors() {
+			log.Errorw("Error reading from kafka", "error", err)
+		}
+	}()
+
+	err := consumerGroup.Consume(context, input.config.Topics, handler)
+	if err != nil {
+		log.Errorw("Kafka consume error", "error", err)
+	}
 }
 
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
@@ -209,25 +213,23 @@ func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
 // channels that are more common in the beats codebase.
 // TODO(faec): Generalize this to a common utility in a shared library
 // (https://github.com/elastic/beats/issues/13125).
-type channelCtx <-chan struct{}
-
-func doneChannelContext(ch <-chan struct{}) context.Context {
-	return channelCtx(ch)
+type channelCtx struct {
+	ctx input.Context
 }
 
-func (c channelCtx) Deadline() (deadline time.Time, ok bool) { return }
+func doneChannelContext(ctx input.Context) context.Context {
+	return channelCtx{ctx}
+}
+func (c channelCtx) Deadline() (deadline time.Time, ok bool) {
+	return
+}
 func (c channelCtx) Done() <-chan struct{} {
-	return (<-chan struct{})(c)
+	return c.ctx.Cancelation.Done()
 }
 func (c channelCtx) Err() error {
-	select {
-	case <-c:
-		return context.Canceled
-	default:
-		return nil
-	}
+	return c.ctx.Cancelation.Err()
 }
-func (c channelCtx) Value(key interface{}) interface{} { return nil }
+func (c channelCtx) Value(_ interface{}) interface{} { return nil }
 
 // The group handler for the sarama consumer group interface. In addition to
 // providing the basic consumption callbacks needed by sarama, groupHandler is
@@ -237,7 +239,8 @@ type groupHandler struct {
 	sync.Mutex
 	version kafka.Version
 	session sarama.ConsumerGroupSession
-	outlet  channel.Outleter
+	client  beat.Client
+	parsers parser.Config
 	// if the fileset using this input expects to receive multiple messages bundled under a specific field then this value is assigned
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
 	expandEventListFromField string
@@ -252,7 +255,7 @@ type eventMeta struct {
 }
 
 func (h *groupHandler) createEvents(
-	sess sarama.ConsumerGroupSession,
+	_ sarama.ConsumerGroupSession,
 	claim sarama.ConsumerGroupClaim,
 	message *sarama.ConsumerMessage,
 ) []beat.Event {
@@ -329,7 +332,7 @@ func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sara
 	for msg := range claim.Messages() {
 		events := h.createEvents(sess, claim, msg)
 		for _, event := range events {
-			h.outlet.OnEvent(event)
+			h.client.Publish(event)
 		}
 	}
 	return nil

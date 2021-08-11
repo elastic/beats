@@ -23,14 +23,13 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 type kafkaInputConfig struct {
@@ -53,6 +52,7 @@ type kafkaInputConfig struct {
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
+	Parsers                  parser.Config     `config:",inline"`
 }
 
 type kafkaFetch struct {
@@ -215,7 +215,6 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
 	return k, nil
