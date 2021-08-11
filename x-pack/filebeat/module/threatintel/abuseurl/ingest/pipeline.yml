@@ -48,19 +48,15 @@ processors:
     value: '{{{threatintel.indicator.url.original}}}'
     ignore_empty_value: true
 - rename:
-    field: threatintel.abuseurl.host
-    target_field: threatintel.indicator.domain
-    ignore_missing: true
-- rename:
     field: threatintel.abuseurl.urlhaus_reference
-    target_field: event.reference
+    target_field: indicator.reference
     ignore_missing: true
 
 # Host can be both IP addresses and domain names
 - grok:
     field: threatintel.abuseurl.host
     patterns:
-      - "(?:%{IP:threatintel.indicator.ip}|%{GREEDYDATA:threatintel.indicator.domain})"
+      - '(?:%{IP:threatintel.indicator.ip})'
     ignore_failure: true
 - rename:
     field: threatintel.abuseurl.reporter

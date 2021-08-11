@@ -54,7 +54,7 @@ processors:
     if: "ctx?.threatintel?.anomali?.modified != null"
 - date:
     field: threatintel.anomali.valid_from
-    target_field: threatintel.anomali.valid_from
+    target_field: threatintel.indicator.first_seen
     formats:
       - "yyyy-MM-dd'T'HH:mm:ss.Sz"
       - "yyyy-MM-dd'T'HH:mm:ss.SZ"
@@ -93,7 +93,7 @@ processors:
     if: ctx?.threatintel?.indicator?.type == 'email-addr'
 - rename:
     field: _tmp.threatvalue
-    target_field: threatintel.indicator.domain
+    target_field: threatintel.indicator.url.domain
     ignore_missing: true
     if: ctx?.threatintel?.indicator?.type == 'domain-name'
 - set:

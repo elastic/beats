@@ -189,11 +189,11 @@ processors:
 # public => White ("Disclosure is not limited.")
 # private => Amber ("Limited disclosure, restricted to participants’ organizations.").
 #
-- set:
+- append:
     field: threatintel.indicator.marking.tlp
     value: Amber
     if: 'ctx.json.classification == "private"'
-- set:
+- append:
     field: threatintel.indicator.marking.tlp
     value: White
     if: 'ctx.json.classification == "public"'
@@ -238,11 +238,6 @@ processors:
     ignore_missing: true
 
 - rename:
-    field: json.domain
-    target_field: threatintel.indicator.domain
-    ignore_missing: true
-
-- rename:
     field: json.email
     target_field: threatintel.indicator.email.address
     ignore_missing: true
@@ -262,12 +257,15 @@ processors:
       - append:
           field: error.message
           value: 'Cannot parse url field `{{{ json.url }}}`: {{{ _ingest.on_failure_message }}}'
-
 - set:
     field: threatintel.indicator.url.full
     value: '{{{threatintel.indicator.url.original}}}'
     ignore_empty_value: true
-
+- rename:
+    field: json.domain
+    target_field: threatintel.indicator.url.domain
+    ignore_missing: true
+    if: ctx.threatintel?.indicator?.url?.domain == null
 - rename:
     field: json.country
     target_field: threatintel.indicator.geo.country_iso_code
@@ -299,7 +297,7 @@ processors:
 
 - rename:
     field: json.source
-    target_field:  threatintel.indicator.provider
+    target_field: threatintel.indicator.provider
     ignore_missing: true
 
 #
