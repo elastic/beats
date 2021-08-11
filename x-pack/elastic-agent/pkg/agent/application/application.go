@@ -73,7 +73,7 @@ func createApplication(
 
 	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file
