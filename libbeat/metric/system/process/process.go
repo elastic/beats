@@ -372,7 +372,7 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 		}
 	}
 
-	if procStats.EnableCgroups {
+	if procStats.EnableCgroups && process.RawStats != nil {
 		statsMap, err := process.RawStats.Format()
 		if err != nil {
 			procStats.logger.Warnf("Getting memory details: %v", err)
@@ -539,22 +539,25 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	if !procStats.matchProcess(process.Name) {
 		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s; err=", pid, process.Name, err)
+		return nil
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
 		logger.Debugf("Error getting details for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
+		return nil
 	}
 
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
 			logger.Debugf("Error fetching cgroup data for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
-		}
-		process.RawStats = cgStats
-		last := procStats.ProcsMap[process.Pid]
-		if last != nil {
-			process.RawStats.FillPercentages(last.RawStats, process.SampleTime, last.SampleTime)
+		} else {
+			process.RawStats = cgStats
+			last := procStats.ProcsMap[process.Pid]
+			if last != nil {
+				process.RawStats.FillPercentages(last.RawStats, process.SampleTime, last.SampleTime)
+			}
 		}
 
 	}
