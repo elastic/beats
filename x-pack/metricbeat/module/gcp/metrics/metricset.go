@@ -245,7 +245,8 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 	for _, sdc := range m.MetricsConfig {
 		for _, mt := range sdc.MetricTypes {
-			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, sdc.AddPrefixTo(mt))
+			id := sdc.AddPrefixTo(mt)
+			req.Filter = fmt.Sprintf(`metric.type = starts_with("%s")`, id)
 			it := client.ListMetricDescriptors(ctx, req)
 
 			for {
@@ -263,6 +264,14 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 				if err == iterator.Done {
 					break
 				}
+
+			}
+
+			// NOTE: if a metric is not added to the metricsWithMeta map is not collected subsequently.
+			// Such a case is an error, as the configuration is explicitly requesting a metric that the beat
+			// is not able to collect, so we provide a logging statement for this behaviour.
+			if _, ok := metricsWithMeta[id]; !ok {
+				m.Logger().Errorf("%s metric descriptor is empty, this metric will not be collected", mt)
 			}
 		}
 	}

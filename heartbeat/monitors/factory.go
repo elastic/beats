@@ -34,9 +34,8 @@ import (
 // RunnerFactory that can be used to create cfg.Runner cast versions of Monitor
 // suitable for config reloading.
 type RunnerFactory struct {
-	info         beat.Info
-	sched        *scheduler.Scheduler
-	allowWatches bool
+	info  beat.Info
+	sched *scheduler.Scheduler
 }
 
 type publishSettings struct {
@@ -59,8 +58,8 @@ type publishSettings struct {
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
-func NewFactory(info beat.Info, sched *scheduler.Scheduler, allowWatches bool) *RunnerFactory {
-	return &RunnerFactory{info, sched, allowWatches}
+func NewFactory(info beat.Info, sched *scheduler.Scheduler) *RunnerFactory {
+	return &RunnerFactory{info, sched}
 }
 
 // Create makes a new Runner for a new monitor with the given Config.
@@ -76,13 +75,13 @@ func (f *RunnerFactory) Create(p beat.Pipeline, c *common.Config) (cfgfile.Runne
 	}
 
 	p = pipetool.WithClientConfigEdit(p, configEditor)
-	monitor, err := newMonitor(c, plugin.GlobalPluginsReg, p, f.sched, f.allowWatches)
+	monitor, err := newMonitor(c, plugin.GlobalPluginsReg, p, f.sched)
 	return monitor, err
 }
 
 // CheckConfig checks to see if the given monitor config is valid.
 func (f *RunnerFactory) CheckConfig(config *common.Config) error {
-	return checkMonitorConfig(config, plugin.GlobalPluginsReg, f.allowWatches)
+	return checkMonitorConfig(config, plugin.GlobalPluginsReg)
 }
 
 func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.ConfigEditor, error) {
