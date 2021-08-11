@@ -13,9 +13,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/kolide/osquery-go"
-	kconfig "github.com/kolide/osquery-go/plugin/config"
-	klogger "github.com/kolide/osquery-go/plugin/logger"
+	"github.com/osquery/osquery-go"
+	kconfig "github.com/osquery/osquery-go/plugin/config"
+	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
