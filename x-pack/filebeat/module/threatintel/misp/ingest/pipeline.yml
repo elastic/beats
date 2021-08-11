@@ -183,9 +183,9 @@ processors:
     if: "ctx?.threatintel?.misp?.attribute?.type != null && ['ip-src', 'ip-src|port', 'ip-dst', 'ip-dst|port'].contains(ctx?.threatintel?.misp?.attribute?.type)"
 - rename:
     field: threatintel.misp.attribute.value
-    target_field: threatintel.indicator.domain
+    target_field: threatintel.indicator.url.domain
     ignore_missing: true
-    if: "ctx?.threatintel?.indicator?.type == 'domain-name' && ctx?.threatintel?.misp?.attribute?.type != 'domain|ip'"
+    if: "ctx?.threatintel?.indicator?.type == 'domain-name' && ctx?.threatintel?.misp?.attribute?.type != 'domain|ip' && ctx.threatintel?.indicator?.url?.domain == null"
 - rename:
     field: threatintel.misp.attribute.value
     target_field: threatintel.indicator.ip
@@ -194,9 +194,9 @@ processors:
 - grok:
     field: threatintel.misp.attribute.value
     patterns:
-      - "%{DATA:threatintel.indicator.domain}\\|%{IP:threatintel.indicator.ip}"
+      - "%{DATA:threatintel.indicator.url.domain}\\|%{IP:threatintel.indicator.ip}"
     ignore_missing: true
-    if: ctx.threatintel?.misp?.attribute?.type == 'domain|ip'
+    if: ctx.threatintel?.misp?.attribute?.type == 'domain|ip' && ctx.threatintel?.indicator?.url?.domain == null
 - grok:
     field: threatintel.misp.attribute.value
     patterns:

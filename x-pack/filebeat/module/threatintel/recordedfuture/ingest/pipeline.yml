@@ -144,9 +144,9 @@ processors:
 
   - rename:
       field: json.entity.name
-      target_field: threatintel.indicator.domain
+      target_field: threatintel.indicator.url.domain
       ignore_missing: true
-      if: 'ctx.threatintel?.indicator?.type == "domain-name"'
+      if: 'ctx.threatintel?.indicator?.type == "domain-name" && ctx.threatintel?.indicator?.url?.domain == null'
 
   - uri_parts:
       field: json.entity.name

@@ -109,9 +109,9 @@ processors:
     if: "ctx?.threatintel?.indicator?.type == null && ['domain', 'hostname'].contains(ctx.threatintel?.otx?.type)"
 - rename:
     field: threatintel.otx.indicator
-    target_field: threatintel.indicator.domain
+    target_field: threatintel.indicator.url.domain
     ignore_missing: true
-    if: "ctx?.threatintel?.indicator?.type == 'domain-name'"
+    if: "ctx?.threatintel?.indicator?.type == 'domain-name' && ctx.threatintel?.indicator?.url?.domain == null"
 
 ######################
 # Cleanup processors #
