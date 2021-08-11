@@ -106,17 +106,28 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
-[[monitor-browser-sandbox]]
-==== `sandbox`
+[[monitor-browser-params]]
+==== `params`
 
-Set this option to `true` to enable the normally disabled chromium sandbox. Defaults to false.
+Set this option to add user defined parameters for your scripts. This value takes
+arbitrary YAML that is then converted to JSON which is then passed into synthetics
+via the `--params` option. See {observability-guide}/synthetics-params-secrets.html[Working with Params]
+for more information.
 
-[float]
-[[monitor-browser-synthetics-args]]
-==== `synthetics_args`
+Example:
 
-Extra arguments to pass to the synthetics agent package. Takes a list of
-strings.
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  source: # Omitted in this example for brevity
+  params:
+    root_url: http://example.net
+    my_custom_object:
+      a_key: ["a value"]
+-------------------------------------------------------------------------------
 
 [float]
 [[monitor-browser-screenshots]]
@@ -145,3 +156,16 @@ Example configuration:
       path: "/path/to/synthetics/journeys"
 -------------------------------------------------------------------------------
 
+[float]
+[[monitor-browser-sandbox]]
+==== `sandbox`
+
+Set this option to `true` to enable the normally disabled chromium sandbox. Defaults to false.
+
+
+[float]
+[[monitor-browser-synthetics-args]]
+==== `synthetics_args`
+
+Extra arguments to pass to the synthetics agent package. Takes a list of
+strings.
