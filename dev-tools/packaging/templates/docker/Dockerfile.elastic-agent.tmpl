@@ -115,6 +115,39 @@ RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user 
 {{- end }}
 USER {{ .user }}
 
+<<<<<<< HEAD
+=======
+{{- if (and (eq .Variant "offline") (not (contains .from "ubi-minimal")))  }}
+# Setup synthetics env vars
+ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV SUITES_DIR={{ $beatHome }}/suites
+ENV NODE_VERSION=14.17.5
+ENV PATH="$NODE_PATH/node/bin:$PATH"
+# Install the latest version of @elastic/synthetics forcefully ignoring the previously
+# cached node_modules, heartbeat then calls the global executable to run test suites
+# Setup node
+RUN cd {{$beatHome}}/.node \
+  && NODE_DOWNLOAD_URL="" \
+  && case "$(arch)" in \
+       x86_64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
+           ;; \
+       aarch64) \
+           NODE_DOWNLOAD_URL=https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-arm64.tar.xz \
+           ;; \
+       *) \
+           echo >&2 ; echo >&2 "Unsupported architecture \$(arch)" ; echo >&2 ; exit 1 ; \
+           ;; \
+     esac \
+  && mkdir -p node \
+  && curl ${NODE_DOWNLOAD_URL} | tar -xJ --strip 1 -C node \
+  && chmod ug+rwX -R $NODE_PATH \
+  && npm i -g -f @elastic/synthetics && chmod ug+rwX -R $NODE_PATH
+{{- end }}
+
+
+
+>>>>>>> f144f6359 ([Synthetics] Upgrade node to latest LTS (#27345))
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
 {{- end }}
