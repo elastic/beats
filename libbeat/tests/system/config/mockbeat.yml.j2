@@ -98,6 +98,9 @@ setup.ilm:
 
 #================================ Logging =====================================
 
+{% if metrics_period -%}
+logging.metrics.period: {{ metrics_period }}
+{%- endif %}
 {% if file_name -%}
 logging.files.name: {{ file_name }}
 {%- endif %}
