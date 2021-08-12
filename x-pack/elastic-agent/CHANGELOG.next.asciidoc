@@ -124,6 +124,7 @@
 - Add proxy support to enroll command. {pull}26514[26514]
 - Enable configuring monitoring namespace {issue}26439[26439]
 - Communicate with Fleet Server over HTTP2. {pull}26474[26474]
+- Pass logging.metrics.enabled to beats to stop beats from adding metrics into their logs. {issue}26758[26758] {pull}26828[26828]
 - Support Node and Service autodiscovery in kubernetes dynamic provider. {pull}26801[26801]
 - Increase Agent's mem limits in k8s. {pull}27153[27153]
 - Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
