@@ -15,49 +15,49 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package metrics
+package opt
 
 import "github.com/elastic/go-structform"
 
 // Uint
 
-// OptUint is a wrapper for "optional" types, with the bool value indicating
+// Uint is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
-type OptUint struct {
+type Uint struct {
 	exists bool
 	value  uint64
 }
 
 // NewUintNone returns a new OptUint wrapper
-func NewUintNone() OptUint {
-	return OptUint{
+func NewUintNone() Uint {
+	return Uint{
 		exists: false,
 		value:  0,
 	}
 }
 
-// OptUintWith returns a new OptUint wrapper with a given int
-func OptUintWith(i uint64) OptUint {
-	return OptUint{
+// UintWith returns a new OptUint wrapper with a given int
+func UintWith(i uint64) Uint {
+	return Uint{
 		exists: true,
 		value:  i,
 	}
 }
 
 // IsZero returns true if the underlying value nil
-func (opt OptUint) IsZero() bool {
+func (opt Uint) IsZero() bool {
 	return !opt.exists
 }
 
 // Exists returns true if the underlying value exists
-func (opt OptUint) Exists() bool {
+func (opt Uint) Exists() bool {
 	return opt.exists
 }
 
 // ValueOr returns the stored value, or a given int
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null
-func (opt OptUint) ValueOr(i uint64) uint64 {
+func (opt Uint) ValueOr(i uint64) uint64 {
 	if opt.exists {
 		return opt.value
 	}
@@ -65,7 +65,7 @@ func (opt OptUint) ValueOr(i uint64) uint64 {
 }
 
 // SumOptUint sums a list of OptUint values
-func SumOptUint(opts ...OptUint) uint64 {
+func SumOptUint(opts ...Uint) uint64 {
 	var sum uint64
 	for _, opt := range opts {
 		sum += opt.ValueOr(0)
@@ -74,7 +74,7 @@ func SumOptUint(opts ...OptUint) uint64 {
 }
 
 // Fold implements the folder interface for OptUint
-func (in *OptUint) Fold(v structform.ExtVisitor) error {
+func (in *Uint) Fold(v structform.ExtVisitor) error {
 	if in.exists {
 		value := in.value
 		v.OnUint64(value)
@@ -86,43 +86,43 @@ func (in *OptUint) Fold(v structform.ExtVisitor) error {
 
 // Float
 
-// OptFloat is a wrapper for "optional" types, with the bool value indicating
+// Float is a wrapper for "optional" types, with the bool value indicating
 // if the stored int is a legitimate value.
-type OptFloat struct {
+type Float struct {
 	exists bool
 	value  float64
 }
 
 // NewFloatNone returns a new uint wrapper
-func NewFloatNone() OptFloat {
-	return OptFloat{
+func NewFloatNone() Float {
+	return Float{
 		exists: false,
 		value:  0,
 	}
 }
 
-// OptFloatWith returns a new uint wrapper for the specified value
-func OptFloatWith(f float64) OptFloat {
-	return OptFloat{
+// FloatWith returns a new uint wrapper for the specified value
+func FloatWith(f float64) Float {
+	return Float{
 		exists: true,
 		value:  f,
 	}
 }
 
 // IsZero returns true if the underlying value nil
-func (opt OptFloat) IsZero() bool {
+func (opt Float) IsZero() bool {
 	return !opt.exists
 }
 
 // Exists returns true if the underlying value exists
-func (opt OptFloat) Exists() bool {
+func (opt Float) Exists() bool {
 	return opt.exists
 }
 
 // ValueOr returns the stored value, or zero
 // Please do not use this for populating reported data,
 // as we actually want to avoid sending zeros where values are functionally null
-func (opt OptFloat) ValueOr(f float64) float64 {
+func (opt Float) ValueOr(f float64) float64 {
 	if opt.exists {
 		return opt.value
 	}
@@ -130,7 +130,7 @@ func (opt OptFloat) ValueOr(f float64) float64 {
 }
 
 // Fold implements the folder interface for OptUint
-func (in *OptFloat) Fold(v structform.ExtVisitor) error {
+func (in *Float) Fold(v structform.ExtVisitor) error {
 	if in.exists {
 		value := in.value
 		v.OnFloat64(value)
