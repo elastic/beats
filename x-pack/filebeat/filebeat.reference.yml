@@ -102,15 +102,6 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-
-    # AWS S3 bucket poll interval
-    #var.s3_bucket_poll_interval: 300s
-
-    # AWS S3 bucket number of workers
-    #var.s3_bucket_number_of_workers: 5
-
     # Process CloudTrail logs
     # default is true, set to false to skip Cloudtrail logs
     # var.process_cloudtrail_logs: false
@@ -760,7 +751,7 @@ filebeat.modules:
 #------------------------------- Coredns Module -------------------------------
 - module: coredns
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -769,7 +760,7 @@ filebeat.modules:
 
 #----------------------------- Crowdstrike Module -----------------------------
 - module: crowdstrike
-
+  
   falcon:
     enabled: true
 
@@ -884,7 +875,7 @@ filebeat.modules:
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   # Fileset for native deployment
-  log:
+  log: 
     enabled: true
 
     # Set custom paths for the log files. If left empty,
@@ -1522,7 +1513,7 @@ filebeat.modules:
 
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
-
+    
     # Related scopes, default should be included
     #var.oauth2.scopes:
     #  - "https://api.security.microsoft.com/.default"
@@ -2798,7 +2789,7 @@ filebeat.inputs:
   #rotation.external.strategy.copytruncate:
   # Regex that matches the rotated files.
   #  suffix_regex: \.\d$
-  # If the rotated filename suffix is a datetime, set it here.
+  # If the rotated filename suffix is a datetime, set it here. 
   #  dateformat: -20060102
 
   ### State options
@@ -3314,14 +3305,14 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-
+  
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-
+    
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -4257,7 +4248,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
