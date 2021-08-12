@@ -10,6 +10,7 @@ import (
 
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -22,21 +23,21 @@ func TestConfig(t *testing.T) {
 	makeConfig := func() config {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
-		cfg := common.MustNewConfigFrom("")
-		c := parser.Config{}
-		err := c.Unpack(cfg)
-		assert.Nil(t, err)
+		parserConf := parser.Config{}
+		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
 			QueueURL:            queueURL,
 			APITimeout:          120 * time.Second,
 			VisibilityTimeout:   300 * time.Second,
+			SQSMaxReceiveCount:  5,
+			SQSWaitTime:         20 * time.Second,
 			FIPSEnabled:         false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
 				BufferSize:     16 * humanize.KiByte,
 				MaxBytes:       10 * humanize.MiByte,
 				LineTerminator: readfile.AutoLineTerminator,
-				Parsers:        c,
+				Parsers:        parserConf,
 			},
 		}
 	}
@@ -84,16 +85,7 @@ func TestConfig(t *testing.T) {
 				"queue_url":   queueURL,
 				"api_timeout": "0",
 			},
-			"api_timeout <0s> must be greater than 0 and less than 1/2 of the visibility_timeout (2m30s)",
-			nil,
-		},
-		{
-			"error on api_timeout less than visibility_timeout/2",
-			common.MapStr{
-				"queue_url":   queueURL,
-				"api_timeout": "3m",
-			},
-			"api_timeout <3m0s> must be greater than 0 and less than 1/2 of the visibility_timeout (2m30s)",
+			"api_timeout <0s> must be greater than the sqs.wait_time",
 			nil,
 		},
 		{
@@ -120,16 +112,7 @@ func TestConfig(t *testing.T) {
 				"queue_url":              queueURL,
 				"max_number_of_messages": "0",
 			},
-			"max_number_of_messages <0> must be greater than 0 and less than or equal to 10",
-			nil,
-		},
-		{
-			"error on max_number_of_messages > 10",
-			common.MapStr{
-				"queue_url":              queueURL,
-				"max_number_of_messages": "11",
-			},
-			"max_number_of_messages <11> must be greater than 0 and less than or equal to 10",
+			"max_number_of_messages <0> must be greater than 0",
 			nil,
 		},
 		{
@@ -139,15 +122,6 @@ func TestConfig(t *testing.T) {
 				"buffer_size": "0",
 			},
 			"buffer_size <0> must be greater than 0",
-			nil,
-		},
-		{
-			"error on max_bytes == 0 ",
-			common.MapStr{
-				"queue_url": queueURL,
-				"max_bytes": "0",
-			},
-			"max_bytes <0> must be greater than 0",
 			nil,
 		},
 		{
