@@ -9,14 +9,16 @@ import (
 	"time"
 )
 
-// state is used to communicate the reading state of a file
+// state is used to communicate the publishing state of a s3 object
 type state struct {
 	Id           string    `json:"id" struct:"id"`
 	Bucket       string    `json:"bucket" struct:"bucket"`
 	Key          string    `json:"key" struct:"key"`
 	Etag         string    `json:"etag" struct:"etag"`
 	LastModified time.Time `json:"last_modified" struct:"last_modifed"`
-	Stored       bool      `json:"stored" struct:"stored"`
+
+	// A state has Stored = true when all events are ACKed.
+	Stored bool `json:"stored" struct:"stored"`
 }
 
 // newState creates a new s3 object state
@@ -39,7 +41,7 @@ func (s *state) MarkAsStored() {
 	s.Stored = true
 }
 
-// IsEqual checks if the two states point to the same file.
+// IsEqual checks if the two states point to the same s3 object.
 func (s *state) IsEqual(c *state) bool {
 	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
 }

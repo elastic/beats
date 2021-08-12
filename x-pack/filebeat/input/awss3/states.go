@@ -18,17 +18,6 @@ const (
 	awsS3WriteCommitPrefix = "filebeat::aws-s3::writeCommit::"
 )
 
-// storedOp keeps track of pending updates that are not written to the persistent store yet.
-// Update operations are ordered. The input manager guarantees that only one
-// input can create update operation for a source, such that new input
-// instances can add update operations to be executed after already pending
-// update operations from older inputs instances that have been shutdown.
-type storedOp struct {
-	states  *states
-	store   *statestore.Store
-	lockMap *sync.Map
-}
-
 type listingInfo struct {
 	totObjects    int
 	storedObjects int
@@ -59,6 +48,36 @@ func newStates() *states {
 		listingIDs:        map[string]struct{}{},
 		statesByListingID: map[string][]state{},
 	}
+}
+
+func (s *states) MustSkip(state state, store *statestore.Store) bool {
+	if !s.IsNew(state) {
+		// here we should purge from the store
+		s.Delete(state.Id)
+		s.writeStates(store)
+
+		return true
+	}
+
+	previousState := s.FindPrevious(state)
+
+	// status is forget. if there is no previous state and
+	// the state.LastModified is before the last cleanStore
+	// write commit we can remove
+	var commitWriteState commitWriteState
+	err := store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+	if err == nil && previousState.IsEmpty() &&
+		(state.LastModified.Before(commitWriteState.Time) || state.LastModified.Equal(commitWriteState.Time)) {
+		return true
+	}
+
+	// we have no previous state or the previous state
+	// is not stored: refresh the state
+	if previousState.IsEmpty() || !previousState.Stored {
+		s.Update(state, "")
+	}
+
+	return false
 }
 
 func (s *states) Delete(id string) {
@@ -115,7 +134,7 @@ func (s *states) Update(newState state, listingID string) {
 		// No existing state found, add new one
 		s.idx[id] = len(s.states)
 		s.states = append(s.states, newState)
-		logp.Debug("input", "New state added for %s", newState.Key)
+		logp.Debug("input", "New state added for %s", newState.Id)
 	}
 
 	if listingID == "" || !newState.Stored {
