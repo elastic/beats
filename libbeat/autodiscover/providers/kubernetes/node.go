@@ -189,6 +189,7 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	kubemetaMap, _ := meta.GetValue("kubernetes")
 	kubemeta, _ := kubemetaMap.(common.MapStr)
 	kubemeta = kubemeta.Clone()
+	orchestrator := genOrchestratorFields(kubemeta, "node")
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range node.GetObjectMeta().GetAnnotations() {
@@ -196,12 +197,13 @@ func (n *node) emit(node *kubernetes.Node, flag string) {
 	}
 	kubemeta["annotations"] = annotations
 	event := bus.Event{
-		"provider":   n.uuid,
-		"id":         eventID,
-		flag:         true,
-		"host":       host,
-		"kubernetes": kubemeta,
-		"meta":       meta,
+		"provider":     n.uuid,
+		"id":           eventID,
+		flag:           true,
+		"host":         host,
+		"kubernetes":   kubemeta,
+		"meta":         meta,
+		"orchestrator": orchestrator,
 	}
 	n.publish([]bus.Event{event})
 }

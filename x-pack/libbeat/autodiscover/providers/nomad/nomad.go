@@ -192,17 +192,20 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 
 	// emit per-task separated events
 	for _, task := range tasks {
+		meta := common.MapStr{
+			"nomad": common.MapStrUnion(allocMeta, common.MapStr{
+				"task": task,
+			}),
+		}
+		orchestrator := genOrchestratorFields(meta)
 		event := bus.Event{
-			"provider": p.uuid,
-			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
-			flag:       true,
-			"host":     nodeName,
-			"nomad":    allocMeta,
-			"meta": common.MapStr{
-				"nomad": common.MapStrUnion(allocMeta, common.MapStr{
-					"task": task,
-				}),
-			},
+			"provider":     p.uuid,
+			"id":           fmt.Sprintf("%s-%s", obj.ID, task["name"]),
+			flag:           true,
+			"host":         nodeName,
+			"nomad":        allocMeta,
+			"meta":         meta,
+			"orchestrator": orchestrator,
 		}
 
 		p.publish(event)
@@ -281,4 +284,34 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	tasks.Delete(prefix)
 
 	return e
+}
+
+func genOrchestratorFields(meta common.MapStr) common.MapStr {
+	fields := common.MapStr{
+		"type": "nomad",
+	}
+	resource := common.MapStr{}
+
+	nomadMap, err := meta.GetValue("nomad")
+	if err != nil {
+		return common.MapStr{}
+	}
+	nomad, _ := nomadMap.(common.MapStr)
+
+	namespace, err := nomad.GetValue("namespace")
+	if err == nil {
+		fields.Put("namespace", namespace)
+	}
+
+	taskMap, err := nomad.GetValue("task")
+	if err == nil {
+		task, _ := taskMap.(common.MapStr)
+		name, err := task.GetValue("name")
+		if err == nil {
+			resource.Put("name", name)
+		}
+		resource.Put("type", "task")
+	}
+	fields.Put("resource", resource)
+	return fields
 }

@@ -383,6 +383,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 	if len(namespaceAnnotations) != 0 {
 		kubemeta["namespace_annotations"] = namespaceAnnotations
 	}
+	orchestrator := genOrchestratorFields(kubemeta, "pod")
 
 	ports := c.spec.Ports
 	if len(ports) == 0 {
@@ -404,7 +405,8 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 			flag:         true,
 			"kubernetes": kubemeta,
 			// Actual metadata that will enrich the event.
-			"meta": meta,
+			"meta":         meta,
+			"orchestrator": orchestrator,
 		}
 		// Include network information only if the container is running,
 		// so templates that need network don't generate a config.
@@ -435,14 +437,16 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 	if len(namespaceAnnotations) != 0 {
 		kubemeta["namespace_annotations"] = namespaceAnnotations
 	}
+	orchestrator := genOrchestratorFields(kubemeta, "pod")
 
 	// Don't set a port on the event
 	event := bus.Event{
-		"provider":   p.uuid,
-		"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
-		flag:         true,
-		"kubernetes": kubemeta,
-		"meta":       meta,
+		"provider":     p.uuid,
+		"id":           fmt.Sprint(pod.GetObjectMeta().GetUID()),
+		flag:           true,
+		"kubernetes":   kubemeta,
+		"meta":         meta,
+		"orchestrator": orchestrator,
 	}
 
 	// Include network information only if the pod has an IP and there is any

@@ -188,6 +188,13 @@ func TestEmitEvent_Node(t *testing.T) {
 						},
 					},
 				},
+				"orchestrator": common.MapStr{
+					"resource": common.MapStr{
+						"name": "metricbeat",
+						"type": "node",
+					},
+					"type": "kubernetes",
+				},
 				"config": []*common.Config{},
 			},
 		},
@@ -238,6 +245,13 @@ func TestEmitEvent_Node(t *testing.T) {
 							"hostname": "node1",
 						},
 					},
+				},
+				"orchestrator": common.MapStr{
+					"resource": common.MapStr{
+						"name": "metricbeat",
+						"type": "node",
+					},
+					"type": "kubernetes",
 				},
 				"config": []*common.Config{},
 			},
@@ -299,6 +313,13 @@ func TestEmitEvent_Node(t *testing.T) {
 							"hostname": "node1",
 						},
 					},
+				},
+				"orchestrator": common.MapStr{
+					"resource": common.MapStr{
+						"name": "metricbeat",
+						"type": "node",
+					},
+					"type": "kubernetes",
 				},
 				"config": []*common.Config{},
 			},

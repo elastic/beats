@@ -423,6 +423,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -468,6 +476,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -551,6 +567,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -596,6 +620,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -641,6 +673,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -720,6 +760,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -763,6 +811,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -806,6 +862,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -931,6 +995,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"stop":     true,
@@ -972,6 +1044,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1035,6 +1115,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"stop":     true,
@@ -1078,6 +1166,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1157,6 +1253,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"stop":     true,
@@ -1200,6 +1304,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"stop":     true,
@@ -1243,6 +1355,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1336,6 +1456,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -1381,6 +1509,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -1424,6 +1560,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1493,6 +1637,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -1538,6 +1690,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1609,6 +1769,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				{
 					"start":    true,
@@ -1654,6 +1822,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
@@ -1756,6 +1932,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				// Container
 				{
@@ -1802,6 +1986,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				// Init container
 				{
@@ -1848,6 +2040,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 				// Ephemeral container
 				{
@@ -1894,6 +2094,14 @@ func TestPod_EmitEvent(t *testing.T) {
 						},
 					},
 					"config": []*common.Config{},
+					"orchestrator": common.MapStr{
+						"namespace": "default",
+						"type":      "kubernetes",
+						"resource": common.MapStr{
+							"name": "filebeat",
+							"type": "pod",
+						},
+					},
 				},
 			},
 		},
