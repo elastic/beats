@@ -216,7 +216,7 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, i := range cur.Ints {
-		if _, found := gauges[k]; found {
+		if isGauge(k) {
 			delta.Ints[k] = i
 		} else {
 			if p := prev.Ints[k]; p != i {
@@ -226,7 +226,7 @@ func makeDeltaSnapshot(prev, cur monitoring.FlatSnapshot) monitoring.FlatSnapsho
 	}
 
 	for k, f := range cur.Floats {
-		if _, found := gauges[k]; found {
+		if isGauge(k) {
 			delta.Floats[k] = f
 		} else if p := prev.Floats[k]; p != f {
 			delta.Floats[k] = f - p
