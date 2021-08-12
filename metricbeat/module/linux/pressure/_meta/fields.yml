@@ -1,0 +1,22 @@
+- name: pressure
+  type: group
+  release: beta
+  description: >
+    Linux pressure stall information metrics for cpu, memory, and io
+  fields:
+    - name: pressure
+      type: group
+      description: Linux pressure stall information
+      fields:
+        - name: cpu.some.10
+          type: float
+          description: cpu pressure stall information
+        - name: cpu.some.60
+          type: float
+          description: cpu pressure stall information
+        - name: cpu.some.300
+          type: float
+          description: cpu pressure stall information
+        - name: cpu.some.total
+          type: float
+          description: cpu pressure stall information

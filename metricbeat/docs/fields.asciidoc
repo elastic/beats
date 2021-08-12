@@ -39019,6 +39019,23 @@ type: object
 
 --
 
+[float]
+=== pressure
+
+pressure
+
+
+
+*`linux.pressure.example`*::
++
+--
+Example field
+
+
+type: keyword
+
+--
+
 [[exported-fields-logstash]]
 == Logstash fields
 
