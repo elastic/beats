@@ -69,9 +69,11 @@ var (
 	procEvtNext                         = modwevtapi.NewProc("EvtNext")
 	procEvtNextChannelPath              = modwevtapi.NewProc("EvtNextChannelPath")
 	procEvtNextEventMetadata            = modwevtapi.NewProc("EvtNextEventMetadata")
+	procEvtNextPublisherId              = modwevtapi.NewProc("EvtNextPublisherId")
 	procEvtOpenChannelEnum              = modwevtapi.NewProc("EvtOpenChannelEnum")
 	procEvtOpenEventMetadataEnum        = modwevtapi.NewProc("EvtOpenEventMetadataEnum")
 	procEvtOpenLog                      = modwevtapi.NewProc("EvtOpenLog")
+	procEvtOpenPublisherEnum            = modwevtapi.NewProc("EvtOpenPublisherEnum")
 	procEvtOpenPublisherMetadata        = modwevtapi.NewProc("EvtOpenPublisherMetadata")
 	procEvtQuery                        = modwevtapi.NewProc("EvtQuery")
 	procEvtRender                       = modwevtapi.NewProc("EvtRender")
@@ -179,6 +181,14 @@ func _EvtNextEventMetadata(enumerator EvtHandle, flags uint32) (handle EvtHandle
 	return
 }
 
+func _EvtNextPublisherId(enumerator EvtHandle, bufferSize uint32, buffer *uint16, bufferUsed *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall6(procEvtNextPublisherId.Addr(), 4, uintptr(enumerator), uintptr(bufferSize), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(bufferUsed)), 0, 0)
+	if r1 == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
 func _EvtOpenChannelEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) {
 	r0, _, e1 := syscall.Syscall(procEvtOpenChannelEnum.Addr(), 2, uintptr(session), uintptr(flags), 0)
 	handle = EvtHandle(r0)
@@ -199,6 +209,15 @@ func _EvtOpenEventMetadataEnum(publisherMetadata EvtHandle, flags uint32) (handl
 
 func _EvtOpenLog(session EvtHandle, path *uint16, flags uint32) (handle EvtHandle, err error) {
 	r0, _, e1 := syscall.Syscall(procEvtOpenLog.Addr(), 3, uintptr(session), uintptr(unsafe.Pointer(path)), uintptr(flags))
+	handle = EvtHandle(r0)
+	if handle == 0 {
+		err = errnoErr(e1)
+	}
+	return
+}
+
+func _EvtOpenPublisherEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) {
+	r0, _, e1 := syscall.Syscall(procEvtOpenPublisherEnum.Addr(), 2, uintptr(session), uintptr(flags), 0)
 	handle = EvtHandle(r0)
 	if handle == 0 {
 		err = errnoErr(e1)
@@ -233,12 +252,10 @@ func _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, buff
 }
 
 func _EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, timeout uint32, flags uint32) (success bool, err error) {
-
 	var (
 		r0 uintptr
 		e1 syscall.Errno
 	)
-
 	if unsafe.Sizeof(uintptr(0)) == unsafe.Sizeof(uint64(0)) {
 		r0, _, e1 = syscall.Syscall6(procEvtSeek.Addr(), 5, uintptr(resultSet), uintptr(position), uintptr(bookmark), uintptr(timeout), uintptr(flags), 0)
 	} else {

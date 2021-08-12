@@ -3117,15 +3117,28 @@ filebeat.inputs:
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-aws-s3-input
 
-  # Queue url (required) to receive queue messages from
+  # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
-  # The duration (in seconds) that the received messages are hidden from subsequent
-  # retrieve requests after being retrieved by a ReceiveMessage request.
-  #visibility_timeout: 300
+  # Maximum number of SQS messages that can be inflight at any time.
+  #max_number_of_messages: 5
+
+  # Maximum duration of an AWS API call (excluding S3 GetObject calls).
+  #api_timeout: 120s
+
+  # Duration that received SQS messages are hidden from subsequent
+  # requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300s
 
   # List of S3 object metadata keys to include in events.
   #include_s3_metadata: []
+
+  # The max number of times an SQS message should be received (retried) before deleting it.
+  #sqs.max_receive_count: 5
+
+  # Maximum duration for which the SQS ReceiveMessage call waits for a message
+  # to arrive in the queue before returning.
+  #sqs.wait_time: 20s
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input

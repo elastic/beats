@@ -7,71 +7,82 @@ package beater
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
-	"os"
-	"path/filepath"
+	"errors"
+	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 )
 
 const (
 	configName           = "osq_config"
-	osqueryConfigFile    = "osquery.conf"
 	scheduleSplayPercent = 10
+	maxECSMappingDepth   = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
+
+	keyField = "field"
+	keyValue = "value"
 )
 
-type QueryConfig struct {
-	Name     string
-	Query    string
-	Interval int
-	Platform string
-	Version  string
-}
+var (
+	ErrECSMappingIsInvalid = errors.New("ECS mapping is invalid")
+	ErrECSMappingIsTooDeep = errors.New("ECS mapping is too deep")
+)
 
 type ConfigPlugin struct {
-	dataPath string
-
 	log *logp.Logger
 
 	mx sync.RWMutex
 
-	newQueryConfigs []QueryConfig
+	queriesCount int
 
-	dirty    bool
-	schedule map[string]osqueryConfigInfo
+	// A map that allows to look up the original query by name for the column types resolution
+	queryMap map[string]query
+
+	// A map for the query ECS mapping lookups
+	ecsMap map[string]ecs.Mapping
+
+	// Packs
+	packs map[string]pack
+
+	// Raw config bytes cached
+	configString string
 }
 
-func NewConfigPlugin(log *logp.Logger, dataPath string) *ConfigPlugin {
+func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
-		dataPath: dataPath,
-		log:      log.With("ctx", "config"),
+		log: log.With("ctx", "config"),
 	}
 
-	// load queries config from the file if it was previously persisted
-	// the errors are logged
-	p.loadConfig()
 	return p
 }
 
-func (p *ConfigPlugin) Set(configs []QueryConfig) {
+func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 	p.mx.Lock()
 	defer p.mx.Unlock()
 
-	p.newQueryConfigs = configs
-	p.dirty = true
+	return p.set(inputs)
 }
 
 func (p *ConfigPlugin) Count() int {
-	return len(p.schedule)
+	return p.queriesCount
 }
 
 func (p *ConfigPlugin) ResolveName(name string) (sql string, ok bool) {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
-	sc, ok := p.schedule[name]
+	sc, ok := p.queryMap[name]
 
 	return sc.Query, ok
+}
+
+func (p *ConfigPlugin) LookupECSMapping(name string) (m ecs.Mapping, ok bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	m, ok = p.ecsMap[name]
+	return m, ok
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -90,7 +101,7 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	}, nil
 }
 
-type osqueryConfigInfo struct {
+type query struct {
 	Query    string `json:"query"`
 	Interval int    `json:"interval,omitempty"`
 	Platform string `json:"platform,omitempty"`
@@ -98,17 +109,24 @@ type osqueryConfigInfo struct {
 	Snapshot bool   `json:"snapshot,omitempty"`
 }
 
-type osqueryConfig struct {
-	Options  map[string]interface{}       `json:"options"`
-	Schedule map[string]osqueryConfigInfo `json:"schedule,omitempty"`
+type pack struct {
+	Discovery []string         `json:"discovery,omitempty"`
+	Platform  string           `json:"platform,omitempty"`
+	Version   string           `json:"version,omitempty"`
+	Queries   map[string]query `json:"queries,omitempty"`
 }
 
-func newOsqueryConfig(schedule map[string]osqueryConfigInfo) osqueryConfig {
+type osqueryConfig struct {
+	Options map[string]interface{} `json:"options"`
+	Packs   map[string]pack        `json:"packs,omitempty"`
+}
+
+func newOsqueryConfig(packs map[string]pack) osqueryConfig {
 	return osqueryConfig{
 		Options: map[string]interface{}{
 			"schedule_splay_percent": scheduleSplayPercent,
 		},
-		Schedule: schedule,
+		Packs: packs,
 	}
 }
 
@@ -117,99 +135,116 @@ func (c osqueryConfig) render() ([]byte, error) {
 }
 
 func (p *ConfigPlugin) render() (string, error) {
-	save := false
-	if p.dirty {
-		save = true
-		p.schedule = make(map[string]osqueryConfigInfo)
-
-		for _, qc := range p.newQueryConfigs {
-			p.schedule[qc.Name] = osqueryConfigInfo{
-				Query:    qc.Query,
-				Interval: qc.Interval,
-				Platform: qc.Platform,
-				Version:  qc.Version,
-				Snapshot: true, // enforce snapshot for all queries
-			}
-		}
-		p.dirty = false
-	}
-
-	raw, err := newOsqueryConfig(p.schedule).render()
-	if err != nil {
-		return "", err
-	}
-	if save {
-		err := p.saveConfig(p.getConfigFilePath(), raw)
+	if p.configString == "" {
+		raw, err := newOsqueryConfig(p.packs).render()
 		if err != nil {
-			p.log.Errorf("failed to persist config file: %v", err)
 			return "", err
 		}
+		p.configString = string(raw)
 	}
-	return string(raw), err
+
+	return p.configString, nil
 }
 
-func (p *ConfigPlugin) loadConfig() {
-	p.log.Debug("try load config from file")
-	f, err := os.Open(p.getConfigFilePath())
-	if err != nil {
-		if os.IsNotExist(err) {
-			p.log.Debug("config file is not found")
-			return
+func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
+	p.configString = ""
+	queriesCount := 0
+	p.queryMap = make(map[string]query)
+	p.ecsMap = make(map[string]ecs.Mapping)
+	p.packs = make(map[string]pack)
+	for _, input := range inputs {
+		pack := pack{
+			Queries:   make(map[string]query),
+			Platform:  input.Platform,
+			Version:   input.Version,
+			Discovery: input.Discovery,
 		}
-		p.log.Errorf("failed to load the config file: %v", err)
-		return
+		for _, stream := range input.Streams {
+			id := "pack_" + input.Name + "_" + stream.ID
+			query := query{
+				Query:    stream.Query,
+				Interval: stream.Interval,
+				Platform: stream.Platform,
+				Version:  stream.Version,
+				Snapshot: true, // enforce snapshot for all queries
+			}
+			p.queryMap[id] = query
+			if len(stream.ECSMapping) > 0 {
+				ecsm, err := flattenECSMapping(stream.ECSMapping)
+				if err != nil {
+					return err
+				}
+				p.ecsMap[id] = ecsm
+			}
+			pack.Queries[stream.ID] = query
+			queriesCount++
+		}
+		p.packs[input.Name] = pack
 	}
-	defer f.Close()
-
-	var c osqueryConfig
-	d := json.NewDecoder(f)
-	err = d.Decode(&c)
-	if err != nil {
-		p.log.Errorf("failed to decode config file: %v", err)
-		return
-	}
-
-	sz := len(c.Schedule)
-	if sz == 0 {
-		return
-	}
-
-	p.newQueryConfigs = make([]QueryConfig, 0, sz)
-	p.dirty = true
-
-	for name, qi := range c.Schedule {
-		p.newQueryConfigs = append(p.newQueryConfigs, QueryConfig{
-			Name:     name,
-			Query:    qi.Query,
-			Interval: qi.Interval,
-			Platform: qi.Platform,
-			Version:  qi.Version,
-		})
-	}
-	return
+	p.queriesCount = queriesCount
+	return nil
 }
 
-func (p *ConfigPlugin) getConfigFilePath() string {
-	return filepath.Join(p.dataPath, osqueryConfigFile)
+// Due to current configuration passing between the agent and beats the keys that contain dots (".")
+// are split into the nested tree-like structure.
+// This converts this dynamic map[string]interface{} tree into strongly typed flat map.
+func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+	ecsm := make(ecs.Mapping)
+	for k, v := range m {
+		if "" == strings.TrimSpace(k) {
+			return nil, fmt.Errorf("empty key at depth 0: %w", ErrECSMappingIsInvalid)
+		}
+		err := traverseTree(0, ecsm, []string{k}, v)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ecsm, nil
 }
 
-func (p *ConfigPlugin) saveConfig(fp string, data []byte) error {
+func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) error {
 
-	tmpFilePath := p.getConfigFilePath() + ".tmp"
-
-	err := ioutil.WriteFile(tmpFilePath, data, 0644)
-	if err != nil {
-		return err
+	if path[len(path)-1] == keyField {
+		if s, ok := v.(string); ok {
+			if len(path) == 1 {
+				return fmt.Errorf("unexpected top level key '%s': %w", keyField, ErrECSMappingIsInvalid)
+			}
+			if "" == strings.TrimSpace(s) {
+				return fmt.Errorf("empty field value: %w", ErrECSMappingIsInvalid)
+			}
+			ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
+				Field: s,
+			}
+		} else {
+			if v == nil {
+				return fmt.Errorf("mapping to nil field: %w", ErrECSMappingIsInvalid)
+			} else {
+				return fmt.Errorf("unexpected field type %T: %w", v, ErrECSMappingIsInvalid)
+			}
+		}
+		return nil
+	} else if path[len(path)-1] == keyValue {
+		if len(path) == 1 {
+			return fmt.Errorf("unexpected top level key '%s': %w", keyValue, ErrECSMappingIsInvalid)
+		}
+		ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
+			Value: v,
+		}
+		return nil
+	} else if m, ok := v.(map[string]interface{}); ok {
+		if depth < maxECSMappingDepth {
+			for k, v := range m {
+				if "" == strings.TrimSpace(k) {
+					return fmt.Errorf("empty key at depth %d: %w", depth+1, ErrECSMappingIsInvalid)
+				}
+				err := traverseTree(depth+1, ecsm, append(path, k), v)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			return ErrECSMappingIsTooDeep
+		}
 	}
-
-	defer func() {
-		os.Remove(tmpFilePath)
-	}()
-
-	err = os.Rename(tmpFilePath, p.getConfigFilePath())
-	if err != nil {
-		return err
-	}
-
 	return nil
 }

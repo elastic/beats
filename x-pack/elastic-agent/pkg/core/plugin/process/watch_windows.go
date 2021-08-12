@@ -26,11 +26,9 @@ func (a *Application) externalProcess(proc *os.Process) {
 	}
 
 	for {
-		select {
-		case <-time.After(1 * time.Second):
-			if isWindowsProcessExited(proc.Pid) {
-				return
-			}
+		<-time.After(1 * time.Second)
+		if isWindowsProcessExited(proc.Pid) {
+			return
 		}
 	}
 }
