@@ -89,6 +89,7 @@ require (
 	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.2
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.3
 	github.com/gomodule/redigo v1.8.3
@@ -124,6 +125,7 @@ require (
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/oklog/ulid v1.3.1
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/opencontainers/image-spec v1.0.2-0.20190823105129-775207bd45b6 // indirect
 	github.com/otiai10/copy v1.2.0
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
@@ -168,7 +170,7 @@ require (
 	golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
 	golang.org/x/text v0.3.5
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
-	golang.org/x/tools v0.1.0
+	golang.org/x/tools v0.1.1
 	google.golang.org/api v0.42.0
 	google.golang.org/genproto v0.0.0-20210312152112-fc591d9ea70f
 	google.golang.org/grpc v1.36.0

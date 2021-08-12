@@ -1,8 +1,0 @@
-<Event><Data>
-	A
-	B
-	C</Data></Event>
-<Event><Data>
-	D
-	E
-	F</Data</Event>
