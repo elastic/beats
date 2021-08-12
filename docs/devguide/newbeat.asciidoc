@@ -175,7 +175,7 @@ To compile the Beat, make sure you are in the Beat directory (`$GOPATH/src/githu
 
 [source,shell]
 ---------
-mage build
+make build
 ---------
 
 NOTE: we don't support the `-j` option for make at the moment.
