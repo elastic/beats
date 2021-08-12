@@ -29,6 +29,6 @@ type config struct {
 func defaultConfig() config {
 	return config{
 		Period:     30 * time.Second,
-		Namespaces: []string{"stats", "dataset"},
+		Namespaces: []string{"stats"},
 	}
 }

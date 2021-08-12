@@ -30,8 +30,10 @@
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
-# A list of metrics namespaces to report in the logs.
-#logging.metrics.namespaces: [stats, dataset]
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
