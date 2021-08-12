@@ -19,8 +19,9 @@ package kafka
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/reader"
+	"io"
 	"strings"
 	"sync"
 	"time"
@@ -243,8 +244,9 @@ type groupHandler struct {
 	parsers parser.Config
 	// if the fileset using this input expects to receive multiple messages bundled under a specific field then this value is assigned
 	// ex. in this case are the azure fielsets where the events are found under the json object "records"
-	expandEventListFromField string
+	expandEventListFromField string // TODO
 	log                      *logp.Logger
+	reader                   reader.Reader
 }
 
 // The metadata attached to incoming events so they can be ACKed once they've
@@ -252,56 +254,6 @@ type groupHandler struct {
 type eventMeta struct {
 	handler *groupHandler
 	message *sarama.ConsumerMessage
-}
-
-func (h *groupHandler) createEvents(
-	_ sarama.ConsumerGroupSession,
-	claim sarama.ConsumerGroupClaim,
-	message *sarama.ConsumerMessage,
-) []beat.Event {
-	timestamp := time.Now()
-	kafkaFields := common.MapStr{
-		"topic":     claim.Topic(),
-		"partition": claim.Partition(),
-		"offset":    message.Offset,
-		"key":       string(message.Key),
-	}
-
-	version, versionOk := h.version.Get()
-	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
-		timestamp = message.Timestamp
-		if !message.BlockTimestamp.IsZero() {
-			kafkaFields["block_timestamp"] = message.BlockTimestamp
-		}
-	}
-	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
-		kafkaFields["headers"] = arrayForKafkaHeaders(message.Headers)
-	}
-
-	// if expandEventListFromField has been set, then a check for the actual json object will be done and a return for multiple messages is executed
-	var events []beat.Event
-	var messages []string
-	if h.expandEventListFromField == "" {
-		messages = []string{string(message.Value)}
-	} else {
-		messages = h.parseMultipleMessages(message.Value)
-	}
-	for _, msg := range messages {
-		event := beat.Event{
-			Timestamp: timestamp,
-			Fields: common.MapStr{
-				"message": msg,
-				"kafka":   kafkaFields,
-			},
-			Private: eventMeta{
-				handler: h,
-				message: message,
-			},
-		}
-		events = append(events, event)
-
-	}
-	return events
 }
 
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
@@ -328,34 +280,73 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 	}
 }
 
-func (h *groupHandler) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	for msg := range claim.Messages() {
-		events := h.createEvents(sess, claim, msg)
-		for _, event := range events {
-			h.client.Publish(event)
+func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
+	reader := messageReader{
+		claim:        claim,
+		groupHandler: h,
+	}
+	parser := h.parsers.Create(reader)
+	for h.session.Context().Err() == nil {
+		message, err := parser.Next()
+		if err == io.EOF {
+			return nil
 		}
+		if err != nil {
+			return err
+		}
+		h.client.Publish(beat.Event{
+			Timestamp: message.Ts,
+			Meta:      message.Meta,
+			Fields:    message.Fields,
+		})
 	}
 	return nil
 }
 
-// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (h *groupHandler) parseMultipleMessages(bMessage []byte) []string {
-	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
-	if err != nil {
-		h.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", h.expandEventListFromField), "error", err)
-		return []string{}
+type messageReader struct {
+	claim        sarama.ConsumerGroupClaim
+	groupHandler *groupHandler
+}
+
+func (m messageReader) Close() error {
+	return nil
+}
+
+func (m messageReader) Next() (reader.Message, error) {
+	msg, ok := <-m.claim.Messages()
+	if !ok {
+		return reader.Message{}, io.EOF
 	}
-	var messages []string
-	if len(obj[h.expandEventListFromField]) > 0 {
-		for _, ms := range obj[h.expandEventListFromField] {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-			} else {
-				h.log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
-			}
+
+	timestamp := time.Now()
+	kafkaFields := common.MapStr{
+		"topic":     m.claim.Topic(),
+		"partition": m.claim.Partition(),
+		"offset":    msg.Offset,
+		"key":       string(msg.Key),
+	}
+
+	version, versionOk := m.groupHandler.version.Get()
+	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
+		timestamp = msg.Timestamp
+		if !msg.BlockTimestamp.IsZero() {
+			kafkaFields["block_timestamp"] = msg.BlockTimestamp
 		}
 	}
-	return messages
+	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
+		kafkaFields["headers"] = arrayForKafkaHeaders(msg.Headers)
+	}
+
+	return reader.Message{
+		Ts:      timestamp,
+		Content: msg.Value,
+		Fields: common.MapStr{
+			"kafka":   kafkaFields,
+			"message": string(msg.Value),
+		},
+		Meta: common.MapStr{
+			"handler": m.groupHandler,
+			"message": msg,
+		},
+	}, nil
 }
