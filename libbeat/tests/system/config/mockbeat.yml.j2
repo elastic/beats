@@ -98,8 +98,8 @@ setup.ilm:
 
 #================================ Logging =====================================
 
-{% if metrics_period -%}
-logging.metrics.period: {{ metrics_period }}
+{% if file_name -%}
+logging.files.name: {{ file_name }}
 {%- endif %}
 
 {% if keystore_path %}
