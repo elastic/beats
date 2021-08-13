@@ -36,6 +36,9 @@ func NewInstaller(i embeddedInstaller) (*Installer, error) {
 // Install performs installation of program in a specific version.
 func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
 	// tar installer uses Dir of installDir to determine location of unpack
+	//
+	// installer is ran inside a tmp directory created in the parent installDir, this is so the atomic
+	// rename always occurs on the same mount path that holds the installation directory
 	tempDir, err := ioutil.TempDir(filepath.Dir(installDir), "tmp")
 	if err != nil {
 		return err
