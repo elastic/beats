@@ -11,6 +11,8 @@ import (
 )
 
 func TestCleanMetricNameString(t *testing.T) {
+	computeMC := metricsConfig{"compute", "", []string{}, ""}
+
 	cases := []struct {
 		title              string
 		metricType         string
@@ -33,7 +35,7 @@ func TestCleanMetricNameString(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			metricName := cleanMetricNameString(c.metricType, c.aligner)
+			metricName := cleanMetricNameString(c.metricType, c.aligner, computeMC)
 			assert.Equal(t, c.expectedMetricName, metricName)
 		})
 	}
