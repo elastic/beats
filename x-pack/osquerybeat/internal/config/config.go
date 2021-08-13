@@ -35,6 +35,9 @@ type InputConfig struct {
 	Type       string                  `config:"type"`
 	Streams    []StreamConfig          `config:"streams"`
 	Processors processors.PluginConfig `config:"processors"`
+	Platform   string                  `config:"iplatform"` // restrict all queries to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
+	Version    string                  `config:"iversion"`  // only run the queries with osquery versions greater than or equal-to this version string
+	Discovery  []string                `config:"discovery"` // a list of discovery queries https://osquery.readthedocs.io/en/stable/deployment/configuration/#discovery-queries
 }
 
 type Config struct {

@@ -191,10 +191,8 @@ func (c *Client) Send(
 	}
 
 	requester.lastUsed = time.Now().UTC()
-	cctx, cancelFn := context.WithCancel(ctx)
-	defer cancelFn()
 
-	resp, err := requester.client.Do(req.WithContext(cctx))
+	resp, err := requester.client.Do(req.WithContext(ctx))
 	if err != nil {
 		requester.lastErr = err
 		requester.lastErrOcc = time.Now().UTC()

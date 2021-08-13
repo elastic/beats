@@ -35,6 +35,7 @@ var (
 	ErrAlreadyRunning     = errors.New("already running")
 	ErrQueryExecution     = errors.New("failed query execution")
 	ErrActionRequest      = errors.New("invalid action request")
+	ErrOsquerydExited     = errors.New("osqueryd exited")
 )
 
 const (
@@ -48,6 +49,8 @@ const (
 	configurationRefreshIntervalSecs = 60
 
 	osqueryTimeout = 60 * time.Second
+
+	eventModule = "osquery_manager"
 )
 
 const (
@@ -232,6 +235,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		err := osq.Run(ctx)
 		if err != nil {
 			bt.log.Errorf("Failed to run osqueryd: %v", err)
+		} else {
+			// When osqueryd is killed for example there is no error returned
+			// but we can't continue running. Exiting.
+			bt.log.Info("osqueryd process exited")
+			err = ErrOsquerydExited
 		}
 		return err
 	})
@@ -439,6 +447,11 @@ func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []
 			fields = ecsFields[i]
 		} else {
 			fields = common.MapStr{}
+		}
+
+		// Add event.module for ECS
+		fields["event"] = map[string]string{
+			"module": eventModule,
 		}
 
 		fields["type"] = bt.b.Info.Name
