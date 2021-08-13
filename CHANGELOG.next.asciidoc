@@ -869,6 +869,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add AWS Kinesis metricset. {pull}25989[25989]
+- Enable `journald` input type in Filebeat. {issue}7955[7955] {pull}27351[27351]
 - Move openmetrics module to oss. {pull}26561[26561]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 

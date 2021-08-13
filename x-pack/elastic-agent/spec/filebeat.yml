@@ -75,6 +75,7 @@ rules:
     - gcp-pubsub
     - http_endpoint
     - httpjson
+    - journald
     - kafka
     - log
     - mqtt
