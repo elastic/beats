@@ -13,7 +13,6 @@ import (
 
 	"github.com/hashicorp/go-multierror"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
@@ -37,7 +36,7 @@ func NewInstaller(i embeddedInstaller) (*Installer, error) {
 // Install performs installation of program in a specific version.
 func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
 	// tar installer uses Dir of installDir to determine location of unpack
-	tempDir, err := ioutil.TempDir(paths.TempDir(), "elastic-agent-install")
+	tempDir, err := ioutil.TempDir(filepath.Dir(installDir), "tmp")
 	if err != nil {
 		return err
 	}
