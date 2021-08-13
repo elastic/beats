@@ -20,7 +20,9 @@ write the `outputs.yml`.
 
     `terraform apply`
 
-2. (Optional) View the output configuration.
+
+2. View the output configuration and assure the region match in the aws profile used to run
+the test or to set the environment variable `AWS_REGION` to the value in the output.
 
    ```yaml
    "aws_region": "us-east-1"
@@ -28,14 +30,14 @@ write the `outputs.yml`.
    "queue_url": "https://sqs.us-east-1.amazonaws.com/144492464627/filebeat-s3-integtest-8iok1h"
    ```
 
-2. Execute the integration test.
+4. Execute the integration test.
 
     ```
     cd x-pack/filebeat/inputs/awss3
-    go test -tags aws,integration -run TestInputRun -v .
+    go test -tags aws,integration -run TestInputRun.+ -v .
     ```
 
-3. Cleanup AWS resources. Execute terraform to remove the SQS queue and delete
+5. Cleanup AWS resources. Execute terraform to remove the SQS queue and delete
 the S3 bucket and its contents.
 
     `terraform destroy`
