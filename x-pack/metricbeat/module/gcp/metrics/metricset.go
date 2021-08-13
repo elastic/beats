@@ -7,6 +7,7 @@ package metrics
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3"
@@ -51,9 +52,45 @@ type MetricSet struct {
 
 //metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
-	ServiceName string   `config:"service"  validate:"required"`
-	MetricTypes []string `config:"metric_types" validate:"required"`
-	Aligner     string   `config:"aligner"`
+	ServiceName string `config:"service"  validate:"required"`
+	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
+	// Stackdriver requires metrics to be prefixed with a common prefix.
+	// This prefix changes based on the services the metrics belongs to.
+	ServiceMetricPrefix string   `config:"service_metric_prefix"`
+	MetricTypes         []string `config:"metric_types" validate:"required"`
+	Aligner             string   `config:"aligner"`
+}
+
+// prefix returns the service metric prefix, falling back to the Google Cloud
+// monitoring service prefix when not specified.
+// The prefix is normalized to always end with '/'.
+func (mc metricsConfig) prefix() string {
+	prefix := mc.ServiceMetricPrefix
+
+	// NOTE: fallback to Google Cloud prefix for backward compatibility
+	// Prefix <service>.googleapis.com/ works only for Google Cloud metrics
+	// List: https://cloud.google.com/monitoring/api/metrics_gcp
+	if prefix == "" {
+		prefix = mc.ServiceName + ".googleapis.com/"
+	}
+
+	// Final slash is part of prefix. Creating a prefix with final slash
+	// normalize the prefix for other use cases
+	if !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
+
+	return prefix
+}
+
+// AddPrefixTo adds the required service metric prefix to the given metric
+func (mc metricsConfig) AddPrefixTo(metric string) string {
+	return mc.prefix() + metric
+}
+
+// RemovePrefixFrom removes service metric prefix from the given metric
+func (mc metricsConfig) RemovePrefixFrom(metric string) string {
+	return strings.TrimPrefix(metric, mc.prefix())
 }
 
 type metricMeta struct {
@@ -135,7 +172,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc.ServiceName)
+		events, err := m.eventMapping(ctx, responses, sdc)
 		if err != nil {
 			err = errors.Wrap(err, "eventMapping failed")
 			m.Logger().Error(err)
@@ -150,14 +187,14 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, serviceName string) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger())
+func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	e := newIncomingFieldExtractor(m.Logger(), sdc)
 
 	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, serviceName); err != nil {
+		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, errors.Wrap(err, "error trying to create metadata service")
 		}
 	}
@@ -182,7 +219,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
 		}
 
-		if serviceName == "compute" {
+		if sdc.ServiceName == "compute" {
 			event.RootFields = addHostFields(groupedEvents)
 		} else {
 			event.RootFields = groupedEvents[0].ECS
