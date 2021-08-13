@@ -293,6 +293,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
+- Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
 
 *Heartbeat*
 
