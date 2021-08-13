@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -20,7 +21,9 @@ import (
 )
 
 func troubleshootMessage() string {
-	return fmt.Sprintf("For help, please see our troubleshooting guide at https://www.elastic.co/guide/en/fleet/%s/fleet-troubleshooting.html", release.Version())
+	v := strings.Split(release.Version(), ".")
+	version := strings.Join(v[:2], ".")
+	return fmt.Sprintf("For help, please see our troubleshooting guide at https://www.elastic.co/guide/en/fleet/%s/fleet-troubleshooting.html", version)
 }
 
 // NewCommand returns the default command for the agent.
