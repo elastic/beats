@@ -10,83 +10,23 @@
         "name":"pressure",
         "rtt":44269
     },
-    "linux":{
-        "pressure":{
-            "example": "pressure"
+    "linux": {
+        "pressure": {
+          "io": {
+            "some": {
+              "10": 30.33,
+              "60": 9.48,
+              "300": 2.19,
+              "total": 175225414
+            },
+            "full": {
+              "10": 28.71,
+              "60": 8.87,
+              "300": 2.04,
+              "total": 164343466
+            }
+          }
         }
-    },
+      },
     "type":"metricsets"
-}
-
-
-{
-  "@timestamp": "2021-08-12T06:16:57.057Z",
-  "@metadata": {
-    "beat": "metricbeat",
-    "type": "_doc",
-    "version": "8.0.0"
-  },
-  "metricset": {
-    "name": "pressure",
-    "period": 10000
-  },
-  "service": {
-    "type": "linux"
-  },
-  "ecs": {
-    "version": "1.10.0"
-  },
-  "host": {
-    "ip": [
-      "10.0.2.15",
-      "fe80::30:6ff:fee0:ff78"
-    ],
-    "mac": [
-      "02:30:06:e0:ff:78"
-    ],
-    "name": "ubuntu-focal",
-    "hostname": "ubuntu-focal",
-    "architecture": "x86_64",
-    "os": {
-      "name": "Ubuntu",
-      "kernel": "5.4.0-80-generic",
-      "codename": "focal",
-      "type": "linux",
-      "platform": "ubuntu",
-      "version": "20.04.2 LTS (Focal Fossa)",
-      "family": "debian"
-    },
-    "id": "a69be1f9fdda4e348cb3e682eb1085f1",
-    "containerized": false
-  },
-  "agent": {
-    "ephemeral_id": "7afcb844-d7bb-46fa-82bd-738e69a16991",
-    "id": "715455b0-aacd-43b3-8a12-48c8fec62d2c",
-    "name": "ubuntu-focal",
-    "type": "metricbeat",
-    "version": "8.0.0"
-  },
-  "linux": {
-    "pressure": {
-      "io": {
-        "some": {
-          "10": 0,
-          "60": 0,
-          "300": 0,
-          "total": 163773245
-        },
-        "full": {
-          "total": 154202053,
-          "10": 0,
-          "60": 0,
-          "300": 0
-        }
-      }
-    }
-  },
-  "event": {
-    "duration": 204672,
-    "dataset": "linux.pressure",
-    "module": "linux"
-  }
 }

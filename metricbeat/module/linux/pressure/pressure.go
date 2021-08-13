@@ -21,7 +21,7 @@ const (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("linux", "pressure", New)
+	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New)
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -36,15 +36,10 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The linux pressure metricset is beta.")
+	cfgwarn.Beta(fmt.Sprintf("The %s %s metricset is beta.", moduleName, metricsetName))
 
 	if runtime.GOOS != "linux" {
 		return nil, fmt.Errorf("the %v/%v metricset is only supported on Linux", moduleName, metricsetName)
-	}
-
-	config := struct{}{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, err
 	}
 
 	fs, err := procfs.NewFS("/proc")
@@ -82,7 +77,7 @@ func FetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
 	for _, resource := range resources {
 		psiMetric, err := m.fs.PSIStatsForResource(resource)
 		if err != nil {
-			return nil, errors.Wrap(err, "could not retrieve PSI stats for"+resource)
+			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
 		}
 
 		event := common.MapStr{
