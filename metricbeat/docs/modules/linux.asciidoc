@@ -26,7 +26,7 @@ metricbeat.modules:
     # - ksm
     # - conntrack
     # - iostat
-    - "pressure"
+    # - pressure
   enabled: true
   #hostfs: /hostfs
 
