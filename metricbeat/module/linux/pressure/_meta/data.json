@@ -1,32 +1,27 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
-    },
-    "metricset":{
-        "host":"localhost",
-        "module":"linux",
-        "name":"pressure",
-        "rtt":44269
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.pressure",
+        "duration": 115000,
+        "module": "linux"
     },
     "linux": {
         "pressure": {
-          "io": {
-            "some": {
-              "10": 30.33,
-              "60": 9.48,
-              "300": 2.19,
-              "total": 175225414
-            },
-            "full": {
-              "10": 28.71,
-              "60": 8.87,
-              "300": 2.04,
-              "total": 164343466
+            "cpu": {
+                "some": {
+                    "10": 1.63,
+                    "300": 0.06,
+                    "60": 0.29,
+                    "total": 155911207
+                }
             }
-          }
         }
-      },
-    "type":"metricsets"
+    },
+    "metricset": {
+        "name": "pressure",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
 }
