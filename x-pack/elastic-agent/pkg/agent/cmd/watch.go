@@ -41,7 +41,7 @@ func newWatchCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command 
 		Long:  `Watch watches Elastic Agent for failures and initiates rollback.`,
 		Run: func(c *cobra.Command, args []string) {
 			if err := watchCmd(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
