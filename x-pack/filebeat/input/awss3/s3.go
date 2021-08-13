@@ -11,14 +11,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/go-concert/timed"
 )
 
 type commitWriteState struct {
@@ -347,7 +347,8 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 		}
 
-		<-time.After(p.bucketPollInterval)
+		timed.Wait(ctx, p.bucketPollInterval)
+
 	}
 
 	// Wait for all workers to finish.
