@@ -283,7 +283,10 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	kubeMeta.Delete("kubernetes.container.id")
 	kubeMeta.Delete("kubernetes.container.runtime")
 	kubeMeta.Delete("kubernetes.container.image")
+
+	orchestrator := genOrchestratorFields(kubeMeta)
 	event.Fields.DeepUpdate(kubeMeta)
+	event.Fields.DeepUpdate(orchestrator)
 
 	return event, nil
 }
@@ -327,4 +330,18 @@ func (k *kubernetesAnnotator) removePod(pod *kubernetes.Pod) {
 
 func (*kubernetesAnnotator) String() string {
 	return "add_kubernetes_metadata"
+}
+
+func genOrchestratorFields(root common.MapStr) common.MapStr {
+	orchestrator := common.MapStr{
+		"orchestrator": common.MapStr{},
+	}
+	orchestrator.Put("orchestrator.type", "kubernetes")
+
+	namespace, err := root.GetValue("kubernetes.namespace")
+	if err == nil {
+		orchestrator.Put("orchestrator.namespace", namespace)
+	}
+
+	return orchestrator
 }

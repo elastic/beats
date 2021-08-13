@@ -287,31 +287,20 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 }
 
 func genOrchestratorFields(meta common.MapStr) common.MapStr {
-	fields := common.MapStr{
+	orchestrator := common.MapStr{
 		"type": "nomad",
 	}
-	resource := common.MapStr{}
 
-	nomadMap, err := meta.GetValue("nomad")
-	if err != nil {
-		return common.MapStr{}
-	}
-	nomad, _ := nomadMap.(common.MapStr)
-
-	namespace, err := nomad.GetValue("namespace")
+	namespace, err := meta.GetValue("nomad.namespace")
 	if err == nil {
-		fields.Put("namespace", namespace)
+		orchestrator.Put("namespace", namespace)
 	}
 
-	taskMap, err := nomad.GetValue("task")
+	taskName, err := meta.GetValue("nomad.task.name")
 	if err == nil {
-		task, _ := taskMap.(common.MapStr)
-		name, err := task.GetValue("name")
-		if err == nil {
-			resource.Put("name", name)
-		}
-		resource.Put("type", "task")
+		orchestrator.Put("resource.name", taskName)
+		orchestrator.Put("resource.type", "task")
 	}
-	fields.Put("resource", resource)
-	return fields
+
+	return orchestrator
 }

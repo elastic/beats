@@ -22,25 +22,19 @@ import (
 )
 
 func genOrchestratorFields(kubemeta common.MapStr, kind string) common.MapStr {
-	fields := common.MapStr{
+	orchestrator := common.MapStr{
 		"type": "kubernetes",
 	}
-	resource := common.MapStr{
-		"type": kind,
-	}
+
 	namespace, err := kubemeta.GetValue("namespace")
 	if err == nil {
-		fields.Put("namespace", namespace)
+		orchestrator.Put("namespace", namespace)
 	}
 
-	nodeMap, err := kubemeta.GetValue(kind)
+	name, err := kubemeta.GetValue(kind + ".name")
 	if err == nil {
-		node, _ := nodeMap.(common.MapStr)
-		name, err := node.GetValue("name")
-		if err == nil {
-			resource.Put("name", name)
-		}
+		orchestrator.Put("resource.name", name)
+		orchestrator.Put("resource.type", kind)
 	}
-	fields.Put("resource", resource)
-	return fields
+	return orchestrator
 }

@@ -152,8 +152,10 @@ func (n *nomadAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
+	orchestrator := genOrchestratorFields(metadata)
 	event.Fields.DeepUpdate(common.MapStr{
-		"nomad": metadata.Clone(),
+		"nomad":        metadata.Clone(),
+		"orchestrator": orchestrator,
 	})
 
 	return event, nil
@@ -177,4 +179,17 @@ func (n *nomadAnnotator) removeAllocation(alloc *nomad.Resource) {
 
 func (n *nomadAnnotator) String() string {
 	return "add_nomad_metadata"
+}
+
+func genOrchestratorFields(nomad common.MapStr) common.MapStr {
+	orchestrator := common.MapStr{
+		"type": "nomad",
+	}
+
+	namespace, err := nomad.GetValue("namespace")
+	if err == nil {
+		orchestrator.Put("namespace", namespace)
+	}
+
+	return orchestrator
 }

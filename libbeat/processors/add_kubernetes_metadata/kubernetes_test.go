@@ -91,6 +91,9 @@ func TestAnnotatorDeepUpdate(t *testing.T) {
 				},
 			},
 		},
+		"orchestrator": common.MapStr{
+			"type": "kubernetes",
+		},
 	}, event.Fields)
 }
 
