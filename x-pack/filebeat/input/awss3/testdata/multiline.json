@@ -1,0 +1,10 @@
+{
+    "@timestamp": "2021-05-25T17:25:42.806Z",
+    "log.level": "error",
+    "message": "error making http request"
+}
+{
+    "@timestamp": "2021-05-25T17:25:51.391Z",
+    "log.level": "info",
+    "message": "available disk space 44.3gb"
+}
