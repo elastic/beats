@@ -181,40 +181,49 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return result
+				return append(result, replaceInNDJSON(logger, index, line)...)
 			}
 			logger.Error("Error reading bytes from raw dashboard object: %+v", err)
 			return content
 		}
-		objectMap := make(map[string]interface{}, 0)
-		err = json.Unmarshal(line, &objectMap)
-		if err != nil {
-			result = append(result, append(line, newline...)...)
-			continue
-		}
-
-		attributes, ok := objectMap["attributes"].(map[string]interface{})
-		if !ok {
-			result = append(result, append(line, newline...)...)
-			continue
-		}
-
-		if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-			attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(logger, index, kibanaSavedObject)
-		}
-
-		if visState, ok := attributes["visState"].(string); ok {
-			attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
-		}
-
-		b, err := json.Marshal(objectMap)
-		if err != nil {
-			logger.Error("Error marshaling modified dashboard: %+v", err)
-			result = append(result, append(line, newline...)...)
-		}
-
-		result = append(result, append(b, newline...)...)
+		result = append(result, replaceInNDJSON(logger, index, line)...)
 	}
+}
+
+func replaceInNDJSON(logger *logp.Logger, index string, line []byte) []byte {
+	if len(line) == 0 {
+		return line
+	}
+
+	objectMap := make(map[string]interface{}, 0)
+	err := json.Unmarshal(line, &objectMap)
+	if err != nil {
+		logger.Errorf("Failed to convert bytes to map[string]interface: %+v", err)
+		return line
+	}
+
+	attributes, ok := objectMap["attributes"].(map[string]interface{})
+	if !ok {
+		logger.Errorf("Object does not have attributes key")
+		return line
+	}
+
+	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+		attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(logger, index, kibanaSavedObject)
+	}
+
+	if visState, ok := attributes["visState"].(string); ok {
+		attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
+	}
+
+	b, err := json.Marshal(objectMap)
+	if err != nil {
+		logger.Error("Error marshaling modified dashboard: %+v", err)
+		return line
+	}
+
+	return append(b, newline...)
+
 }
 
 // ReplaceStringInDashboard replaces a string field in a dashboard

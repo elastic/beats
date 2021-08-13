@@ -47,25 +47,31 @@ func DecodeExported(exported []byte) []byte {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return result
+				return append(result, decodeLine(line)...)
 			}
 			return exported
 		}
-		o := common.MapStr{}
-		err = json.Unmarshal(line, &o)
-		if err != nil {
-			continue
-		}
-		for _, key := range responseToDecode {
-			// All fields are optional, so errors are not caught
-			err := decodeValue(o, key)
-			if err != nil {
-				logger := logp.NewLogger("dashboards")
-				logger.Debugf("Error while decoding dashboard objects: %+v", err)
-			}
-			result = append(result, []byte(o.String())...)
-		}
+		result = append(result, decodeLine(line)...)
 	}
+}
+
+func decodeLine(line []byte) []byte {
+	o := common.MapStr{}
+	err := json.Unmarshal(line, &o)
+	if err != nil {
+		return line
+	}
+	var result []byte
+	for _, key := range responseToDecode {
+		// All fields are optional, so errors are not caught
+		err := decodeValue(o, key)
+		if err != nil {
+			logger := logp.NewLogger("dashboards")
+			logger.Debugf("Error while decoding dashboard objects: %+v", err)
+		}
+		result = append(result, []byte(o.String())...)
+	}
+	return result
 }
 
 func decodeValue(data common.MapStr, key string) error {

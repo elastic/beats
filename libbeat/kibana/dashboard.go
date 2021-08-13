@@ -35,23 +35,37 @@ func RemoveIndexPattern(data []byte) ([]byte, error) {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return result, nil
+				res, removeErr := removeLineIfIndexPattern(line)
+				if removeErr != nil {
+					return data, removeErr
+				}
+				return append(result, res...), nil
 			}
 			return data, err
 		}
 
-		var r common.MapStr
-		// Full struct need to not loose any data
-		err = json.Unmarshal(line, &r)
+		res, err := removeLineIfIndexPattern(line)
 		if err != nil {
-			return nil, err
+			return data, err
 		}
-		v, err := r.GetValue("type")
-		if err != nil {
-			return nil, fmt.Errorf("type key not found or not string")
-		}
-		if v != "index-pattern" {
-			result = append(result, line...)
-		}
+		result = append(result, res...)
 	}
+}
+
+func removeLineIfIndexPattern(line []byte) ([]byte, error) {
+	var r common.MapStr
+	// Full struct need to not loose any data
+	err := json.Unmarshal(line, &r)
+	if err != nil {
+		return nil, err
+	}
+	v, err := r.GetValue("type")
+	if err != nil {
+		return nil, fmt.Errorf("type key not found or not string")
+	}
+	if v != "index-pattern" {
+		return line, nil
+	}
+
+	return nil, nil
 }
