@@ -81,7 +81,28 @@ func newS3Poller(log *logp.Logger,
 	}
 }
 
-func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload, workerN int) error {
+func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
+	id := info.name + info.key
+	previousState := p.states.FindPreviousByID(id)
+	if !previousState.IsEmpty() {
+		if isStored {
+			previousState.MarkAsStored()
+		} else {
+			previousState.MarkAsError()
+		}
+
+		p.states.Update(previousState, info.listingID)
+	}
+
+	// Manage locks for purging.
+	if p.states.IsListingFullyStored(info.listingID) {
+		// locked on processing we unlock when all the object were ACKed
+		lock, _ := p.workersListingMap.Load(info.listingID)
+		lock.(*sync.Mutex).Unlock()
+	}
+}
+
+func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
 	var errs []error
 
 processingLoop:
@@ -98,30 +119,20 @@ processingLoop:
 			// Wait for all events to be ACKed before proceeding.
 			s3ObjectPayload.s3ObjectHandler.Wait()
 
+			info := s3ObjectPayload.s3ObjectInfo
+
 			if err != nil {
 				event := s3ObjectPayload.s3ObjectEvent
 				errs = append(errs, errors.Wrapf(err,
 					"failed processing S3 event for object key %q in bucket %q",
 					event.S3.Object.Key, event.S3.Bucket.Name))
 
+				p.handlePurgingLock(info, false)
 				continue
 
 			}
 
-			info := s3ObjectPayload.s3ObjectInfo
-			id := info.name + info.key
-			previousState := p.states.FindPreviousByID(id)
-			if !previousState.IsEmpty() {
-				previousState.MarkAsStored()
-				p.states.Update(previousState, info.listingID)
-			}
-
-			// Manage locks for purging.
-			if p.states.IsListingFullyStored(info.listingID) {
-				// locked on processing we unlock when all the object were ACKed
-				lock, _ := p.workersListingMap.Load(info.listingID)
-				lock.(*sync.Mutex).Unlock()
-			}
+			p.handlePurgingLock(info, true)
 
 			// Metrics
 			p.metrics.s3ObjectsAckedTotal.Inc()
@@ -315,7 +326,9 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 
 		workerWg.Add(1)
 		go func() {
-			defer workerWg.Done()
+			defer func() {
+				workerWg.Done()
+			}()
 
 			p.GetS3Objects(ctx, s3ObjectPayloadChan)
 			p.Purge()
@@ -323,15 +336,15 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 
 		workerWg.Add(workers)
 		for i := 0; i < workers; i++ {
-			go func(i int) {
+			go func() {
 				defer func() {
 					workerWg.Done()
 					p.workerSem.Release(1)
 				}()
-				if err := p.ProcessObject(s3ObjectPayloadChan, i); err != nil {
+				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
 					p.log.Warnw("Failed processing S3 listing.", "error", err)
 				}
-			}(i)
+			}()
 		}
 
 		<-time.After(p.bucketPollInterval)

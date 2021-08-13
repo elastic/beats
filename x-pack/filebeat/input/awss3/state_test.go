@@ -54,6 +54,24 @@ func TestStateIsEqual(t *testing.T) {
 			},
 			true,
 		},
+		"two states pointing to the same key with same etag and same last modified error": {
+			[2]state{
+				state{
+					Bucket:       "bucket a",
+					Key:          "/key/to/this/file/1",
+					Etag:         "etag",
+					LastModified: lastModifed,
+					Error:        true,
+				},
+				state{
+					Bucket:       "bucket a",
+					Key:          "/key/to/this/file/1",
+					Etag:         "etag",
+					LastModified: lastModifed,
+				},
+			},
+			true,
+		},
 		"two states pointing to the same key with different etag and same last modified": {
 			[2]state{
 				state{

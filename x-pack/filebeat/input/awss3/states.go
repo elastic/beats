@@ -21,6 +21,7 @@ const (
 type listingInfo struct {
 	totObjects    int
 	storedObjects int
+	errorObjects  int
 	finalCheck    bool
 }
 
@@ -70,7 +71,7 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 
 	// we have no previous state or the previous state
 	// is not stored: refresh the state
-	if previousState.IsEmpty() || !previousState.Stored {
+	if previousState.IsEmpty() || (!previousState.Stored && !previousState.Error) {
 		s.Update(state, "")
 	}
 
@@ -103,7 +104,7 @@ func (s *states) IsListingFullyStored(listingID string) bool {
 		return false
 	}
 
-	listingInfo.finalCheck = listingInfo.storedObjects == listingInfo.totObjects
+	listingInfo.finalCheck = (listingInfo.storedObjects + listingInfo.errorObjects) == listingInfo.totObjects
 	return listingInfo.finalCheck
 }
 
@@ -141,14 +142,20 @@ func (s *states) Update(newState state, listingID string) {
 		logp.Debug("input", "New state added for %s", newState.Id)
 	}
 
-	if listingID == "" || !newState.Stored {
+	if listingID == "" || (!newState.Stored && !newState.Error) {
 		return
 	}
 
 	// here we increase the number of stored object
 	info, _ := s.listingInfo.Load(listingID)
 	listingInfo := info.(*listingInfo)
-	listingInfo.storedObjects++
+	if newState.Stored {
+		listingInfo.storedObjects++
+	}
+
+	if newState.Error {
+		listingInfo.errorObjects++
+	}
 
 	if _, ok := s.statesByListingID[listingID]; !ok {
 		s.statesByListingID[listingID] = make([]state, 0)

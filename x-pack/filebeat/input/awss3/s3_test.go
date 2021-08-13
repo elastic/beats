@@ -27,8 +27,8 @@ func TestS3Poller(t *testing.T) {
 	logp.TestingSetup()
 	const bucket = "bucket"
 	const numberOfWorkers = 5
-	const pollInterval = 10 * time.Second
-	const testTimeout = 5 * time.Millisecond
+	const pollInterval = 2 * time.Second
+	const testTimeout = 1 * time.Second
 
 	t.Run("Poll success", func(t *testing.T) {
 		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())

@@ -19,6 +19,8 @@ type state struct {
 
 	// A state has Stored = true when all events are ACKed.
 	Stored bool `json:"stored" struct:"stored"`
+	// A state has Error = true when ProcessS3Object returned an error
+	Error bool `json:"error" struct:"error"`
 }
 
 // newState creates a new s3 object state
@@ -29,6 +31,7 @@ func newState(bucket, key, etag string, lastModified time.Time) state {
 		LastModified: lastModified,
 		Etag:         etag,
 		Stored:       false,
+		Error:        false,
 	}
 
 	s.Id = s.Bucket + s.Key + s.Etag + s.LastModified.String()
@@ -39,6 +42,11 @@ func newState(bucket, key, etag string, lastModified time.Time) state {
 // MarkAsStored set the stored flag to true
 func (s *state) MarkAsStored() {
 	s.Stored = true
+}
+
+// MarkAsStored set the error flag to true
+func (s *state) MarkAsError() {
+	s.Error = true
 }
 
 // IsEqual checks if the two states point to the same s3 object.
