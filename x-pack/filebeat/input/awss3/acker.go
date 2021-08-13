@@ -28,8 +28,8 @@ func newEventACKTracker(ctx context.Context) *eventACKTracker {
 	return &eventACKTracker{ctx: ctx, cancel: cancel}
 }
 
-// Add increments the number of pending ACKs by the specified amount.
-func (a *eventACKTracker) Add(messageCount int64) {
+// Add increments the number of pending ACKs
+func (a *eventACKTracker) Add() {
 	a.Lock()
 	a.pendingACKs++
 	a.Unlock()

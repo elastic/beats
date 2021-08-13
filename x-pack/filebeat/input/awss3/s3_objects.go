@@ -303,7 +303,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 }
 
 func (p *s3ObjectProcessor) publish(ack *eventACKTracker, event *beat.Event) {
-	ack.Add(1)
+	ack.Add()
 	event.Private = ack
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)

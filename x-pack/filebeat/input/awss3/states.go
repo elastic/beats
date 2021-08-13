@@ -21,6 +21,7 @@ const (
 type listingInfo struct {
 	totObjects    int
 	storedObjects int
+	finalCheck    bool
 }
 
 // states handles list of s3 object state. One must use newStates to instantiate a
@@ -52,10 +53,6 @@ func newStates() *states {
 
 func (s *states) MustSkip(state state, store *statestore.Store) bool {
 	if !s.IsNew(state) {
-		// here we should purge from the store
-		s.Delete(state.Id)
-		s.writeStates(store)
-
 		return true
 	}
 
@@ -89,22 +86,29 @@ func (s *states) Delete(id string) {
 		last := len(s.states) - 1
 		s.states[last], s.states[index] = s.states[index], s.states[last]
 		s.states = s.states[:last]
-	}
 
-	s.idx = map[string]int{}
-	for i, state := range s.states {
-		s.idx[state.Id] = i
+		s.idx = map[string]int{}
+		for i, state := range s.states {
+			s.idx[state.Id] = i
+		}
 	}
 }
 
 // IsListingFullyStored check if listing if fully stored
+// After first time the condition is met it will always return false
 func (s *states) IsListingFullyStored(listingID string) bool {
 	info, _ := s.listingInfo.Load(listingID)
-	return info.(listingInfo).storedObjects == info.(listingInfo).totObjects
+	listingInfo := info.(*listingInfo)
+	if listingInfo.finalCheck {
+		return false
+	}
+
+	listingInfo.finalCheck = listingInfo.storedObjects == listingInfo.totObjects
+	return listingInfo.finalCheck
 }
 
 // AddListing add listing info
-func (s *states) AddListing(listingID string, listingInfo listingInfo) {
+func (s *states) AddListing(listingID string, listingInfo *listingInfo) {
 	s.Lock()
 	defer s.Unlock()
 	s.listingIDs[listingID] = struct{}{}
@@ -141,12 +145,10 @@ func (s *states) Update(newState state, listingID string) {
 		return
 	}
 
-	// listing map is shared with the collector
 	// here we increase the number of stored object
 	info, _ := s.listingInfo.Load(listingID)
-	listingInfo := info.(listingInfo)
+	listingInfo := info.(*listingInfo)
 	listingInfo.storedObjects++
-	s.listingInfo.Store(listingID, listingInfo)
 
 	if _, ok := s.statesByListingID[listingID]; !ok {
 		s.statesByListingID[listingID] = make([]state, 0)

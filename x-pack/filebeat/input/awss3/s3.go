@@ -81,7 +81,7 @@ func newS3Poller(log *logp.Logger,
 	}
 }
 
-func (p *s3Poller) process(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
+func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload, workerN int) error {
 	var errs []error
 
 processingLoop:
@@ -92,18 +92,9 @@ processingLoop:
 				break processingLoop
 			}
 
-			info := s3ObjectPayload.s3ObjectInfo
-			state := newState(info.name, info.key, info.etag, info.lastModified)
-			//check if another worker already is on it
-			dummyValue := struct{}{}
-			_, loaded := p.workersProcessingMap.LoadOrStore(state.Id, dummyValue)
-			if loaded {
-				// another worker is processing the state
-				continue
-			}
-
 			// Process S3 object (download, parse, create events).
 			err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
+
 			// Wait for all events to be ACKed before proceeding.
 			s3ObjectPayload.s3ObjectHandler.Wait()
 
@@ -113,57 +104,63 @@ processingLoop:
 					"failed processing S3 event for object key %q in bucket %q",
 					event.S3.Object.Key, event.S3.Bucket.Name))
 
-				// Manage locks for processing.
-				p.workersProcessingMap.Delete(state.Id)
-
 				continue
 
 			}
 
-			// Manage locks for purging.
+			info := s3ObjectPayload.s3ObjectInfo
 			id := info.name + info.key
 			previousState := p.states.FindPreviousByID(id)
 			if !previousState.IsEmpty() {
-				state.MarkAsStored()
-				p.states.Update(state, info.listingID)
-				p.states.writeStates(p.store)
+				previousState.MarkAsStored()
+				p.states.Update(previousState, info.listingID)
 			}
 
+			// Manage locks for purging.
 			if p.states.IsListingFullyStored(info.listingID) {
 				// locked on processing we unlock when all the object were ACKed
 				lock, _ := p.workersListingMap.Load(info.listingID)
 				lock.(*sync.Mutex).Unlock()
 			}
 
-			// Manage locks for processing.
-			p.workersProcessingMap.Delete(state.Id)
+			// Metrics
+			p.metrics.s3ObjectsAckedTotal.Inc()
 		}
 	}
 
 	return multierr.Combine(errs...)
 }
 
-func (p *s3Poller) getS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
-	defer close(s3ObjectPayloadChan)
+func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
+	defer func() {
+		close(s3ObjectPayloadChan)
+	}()
+
 	bucketMetadata := strings.Split(p.bucket, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 
 	paginator := p.s3.ListObjectsPaginator(bucketName)
 	for paginator.Next(ctx) {
-		lock := new(sync.Mutex)
 		listingID, err := uuid.NewV4()
 		if err != nil {
 			p.log.Warnw("Error generating UUID for listing page.", "error", err)
 			continue
 		}
+
 		// lock for the listing page and state in workersListingMap
 		// this map is shared with the storedOp and will be unlocked there
+		lock := new(sync.Mutex)
 		lock.Lock()
 		p.workersListingMap.Store(listingID.String(), lock)
 
-		totProcessableObjects := 0
 		page := paginator.CurrentPage()
-		s3ObjectPayloadChanByPage := make(chan *s3ObjectPayload, len(page.Contents))
+
+		totProcessableObjects := 0
+		totListedObjects := len(page.Contents)
+		s3ObjectPayloadChanByPage := make(chan *s3ObjectPayload, totListedObjects)
+
+		// Metrics
+		p.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			// Unescape s3 key name. For example, convert "%3D" back to "=".
 			filename, err := url.QueryUnescape(*object.Key)
@@ -206,11 +203,16 @@ func (p *s3Poller) getS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			}
 		}
 
-		listingInfo := listingInfo{totObjects: totProcessableObjects}
-		p.states.AddListing(listingID.String(), listingInfo)
 		if totProcessableObjects == 0 {
 			// nothing to be ACKed, unlock here
+			p.states.DeleteListing(listingID.String())
 			lock.Unlock()
+		} else {
+			listingInfo := &listingInfo{totObjects: totProcessableObjects}
+			p.states.AddListing(listingID.String(), listingInfo)
+
+			// Metrics
+			p.metrics.s3ObjectsProcessedTotal.Add(uint64(totProcessableObjects))
 		}
 
 		close(s3ObjectPayloadChanByPage)
@@ -226,11 +228,19 @@ func (p *s3Poller) getS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	return
 }
 
-func (p *s3Poller) purge() {
-	for _, listingID := range p.states.GetListingIDs() {
+func (p *s3Poller) Purge() {
+	listingIDs := p.states.GetListingIDs()
+	for _, listingID := range listingIDs {
 		// we lock here in order to process the purge only after
 		// full listing page is ACKed by all the workers
-		lock, _ := p.workersListingMap.Load(listingID)
+		lock, loaded := p.workersListingMap.Load(listingID)
+		if !loaded {
+			// purge calls can overlap, GetListingIDs can return
+			// an outdated snapshot with listing already purged
+			p.states.DeleteListing(listingID)
+			continue
+		}
+
 		lock.(*sync.Mutex).Lock()
 
 		keys := map[string]struct{}{}
@@ -276,7 +286,6 @@ func (p *s3Poller) purge() {
 			}
 		}
 
-		// workersListingMap map is shared with the storedop
 		// purge is done, we can unlock and clean
 		lock.(*sync.Mutex).Unlock()
 		p.workersListingMap.Delete(listingID)
@@ -292,11 +301,14 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 	//  listing, sequentially processes every object and then does another listing
 	workerWg := new(sync.WaitGroup)
 	for ctx.Err() == nil {
-
 		// Determine how many S3 workers are available.
 		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
 		if err != nil {
 			break
+		}
+
+		if workers == 0 {
+			continue
 		}
 
 		s3ObjectPayloadChan := make(chan *s3ObjectPayload)
@@ -304,23 +316,23 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 		workerWg.Add(1)
 		go func() {
 			defer workerWg.Done()
-			p.getS3Objects(ctx, s3ObjectPayloadChan)
+
+			p.GetS3Objects(ctx, s3ObjectPayloadChan)
+			p.Purge()
 		}()
 
 		workerWg.Add(workers)
 		for i := 0; i < workers; i++ {
-			go func() {
+			go func(i int) {
 				defer func() {
 					workerWg.Done()
 					p.workerSem.Release(1)
 				}()
-				if err := p.process(s3ObjectPayloadChan); err != nil {
+				if err := p.ProcessObject(s3ObjectPayloadChan, i); err != nil {
 					p.log.Warnw("Failed processing S3 listing.", "error", err)
 				}
-			}()
+			}(i)
 		}
-
-		p.purge()
 
 		<-time.After(p.bucketPollInterval)
 	}

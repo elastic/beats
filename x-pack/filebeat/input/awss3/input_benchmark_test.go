@@ -14,6 +14,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
@@ -24,9 +28,12 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
+const totListingObjects = 10000
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -54,13 +61,62 @@ func (_ *constantSQS) ChangeMessageVisibility(ctx context.Context, msg *sqs.Mess
 	return nil
 }
 
-type constantS3 struct {
-	filename    string
-	data        []byte
-	contentType string
+type s3PagerConstant struct {
+	objects      []s3.Object
+	currentIndex int
 }
 
-var _ s3Getter = (*constantS3)(nil)
+var _ s3Pager = (*s3PagerConstant)(nil)
+
+func (c *s3PagerConstant) Next(ctx context.Context) bool {
+	return c.currentIndex < len(c.objects)
+}
+
+func (c *s3PagerConstant) CurrentPage() *s3.ListObjectsOutput {
+	ret := &s3.ListObjectsOutput{}
+	pageSize := 1000
+	if len(c.objects) < c.currentIndex+pageSize {
+		pageSize = len(c.objects) - c.currentIndex
+	}
+
+	ret.Contents = c.objects[c.currentIndex : c.currentIndex+pageSize]
+	c.currentIndex = c.currentIndex + pageSize
+
+	return ret
+}
+
+func (c *s3PagerConstant) Err() error {
+	if c.currentIndex >= len(c.objects) {
+		c.currentIndex = 0
+	}
+	return nil
+}
+
+func newS3PagerConstant() *s3PagerConstant {
+	lastModified := time.Now()
+	ret := &s3PagerConstant{
+		currentIndex: 0,
+	}
+
+	for i := 0; i < totListingObjects; i++ {
+		ret.objects = append(ret.objects, s3.Object{
+			Key:          aws.String(fmt.Sprintf("key-%d.json.gz", i)),
+			ETag:         aws.String(fmt.Sprintf("etag-%d", i)),
+			LastModified: aws.Time(lastModified),
+		})
+	}
+
+	return ret
+}
+
+type constantS3 struct {
+	filename      string
+	data          []byte
+	contentType   string
+	pagerConstant s3Pager
+}
+
+var _ s3API = (*constantS3)(nil)
 
 func newConstantS3(t testing.TB) *constantS3 {
 	data, err := ioutil.ReadFile(cloudtrailTestFile)
@@ -79,6 +135,10 @@ func (c constantS3) GetObject(ctx context.Context, bucket, key string) (*s3.GetO
 	return newS3GetObjectResponse(c.filename, c.data, c.contentType), nil
 }
 
+func (c constantS3) ListObjectsPaginator(bucket string) s3Pager {
+	return c.pagerConstant
+}
+
 func makeBenchmarkConfig(t testing.TB) config {
 	cfg := common.MustNewConfigFrom(`---
 queue_url: foo
@@ -95,7 +155,7 @@ file_selectors:
 	return inputConfig
 }
 
-func benchmarkInput(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
+func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
 		log := logp.NewLogger(inputName)
 		metricRegistry := monitoring.NewRegistry()
@@ -151,21 +211,21 @@ func benchmarkInput(t *testing.T, maxMessagesInflight int) testing.BenchmarkResu
 	})
 }
 
-func TestBenchmarkInput(t *testing.T) {
+func TestBenchmarkInputSQS(t *testing.T) {
 	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
-		benchmarkInput(t, 1),
-		benchmarkInput(t, 2),
-		benchmarkInput(t, 4),
-		benchmarkInput(t, 8),
-		benchmarkInput(t, 16),
-		benchmarkInput(t, 32),
-		benchmarkInput(t, 64),
-		benchmarkInput(t, 128),
-		benchmarkInput(t, 256),
-		benchmarkInput(t, 512),
-		benchmarkInput(t, 1024),
+		benchmarkInputSQS(t, 1),
+		benchmarkInputSQS(t, 2),
+		benchmarkInputSQS(t, 4),
+		benchmarkInputSQS(t, 8),
+		benchmarkInputSQS(t, 16),
+		benchmarkInputSQS(t, 32),
+		benchmarkInputSQS(t, 64),
+		benchmarkInputSQS(t, 128),
+		benchmarkInputSQS(t, 256),
+		benchmarkInputSQS(t, 512),
+		benchmarkInputSQS(t, 1024),
 	}
 
 	headers := []string{
@@ -179,6 +239,122 @@ func TestBenchmarkInput(t *testing.T) {
 	for _, r := range results {
 		data = append(data, []string{
 			fmt.Sprintf("%v", r.Extra["max_messages_inflight"]),
+			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
+			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
+			fmt.Sprintf("%v", r.Extra["sec"]),
+			fmt.Sprintf("%v", runtime.GOMAXPROCS(0)),
+		})
+	}
+
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader(headers)
+	table.AppendBulk(data)
+	table.Render()
+}
+
+func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult {
+	return testing.Benchmark(func(b *testing.B) {
+		log := logp.NewLogger(inputName)
+		metricRegistry := monitoring.NewRegistry()
+		metrics := newInputMetrics(metricRegistry, "test_id")
+		s3API := newConstantS3(t)
+		s3API.pagerConstant = newS3PagerConstant()
+		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
+			event.Private.(*eventACKTracker).ACK()
+		})
+
+		defer close(client.Channel)
+		conf := makeBenchmarkConfig(t)
+
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		store, err := storeReg.Get("test")
+		if err != nil {
+			t.Fatalf("Failed to access store: %v", err)
+		}
+
+		err = store.Set(awsS3WriteCommitPrefix+"bucket", &commitWriteState{time.Time{}})
+		if err != nil {
+			t.Fatalf("Failed to reset store: %v", err)
+		}
+
+		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
+		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(), store, "bucket", numberOfWorkers, time.Second)
+
+		ctx, cancel := context.WithCancel(context.Background())
+		b.Cleanup(cancel)
+
+		go func() {
+			for metrics.s3ObjectsAckedTotal.Get() < totListingObjects {
+				time.Sleep(5 * time.Millisecond)
+			}
+			cancel()
+		}()
+
+		b.ResetTimer()
+		start := time.Now()
+		if err := s3Poller.Poll(ctx); err != nil {
+			if !errors.Is(err, context.DeadlineExceeded) {
+				t.Fatal(err)
+			}
+		}
+		b.StopTimer()
+		elapsed := time.Since(start)
+
+		b.ReportMetric(float64(numberOfWorkers), "number_of_workers")
+		b.ReportMetric(elapsed.Seconds(), "sec")
+
+		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get()), "events")
+		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
+
+		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
+		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
+
+		b.ReportMetric(float64(metrics.s3ObjectsListedTotal.Get()), "objects_listed")
+		b.ReportMetric(float64(metrics.s3ObjectsListedTotal.Get())/elapsed.Seconds(), "objects_listed_per_sec")
+
+		b.ReportMetric(float64(metrics.s3ObjectsProcessedTotal.Get()), "objects_processed")
+		b.ReportMetric(float64(metrics.s3ObjectsProcessedTotal.Get())/elapsed.Seconds(), "objects_processed_per_sec")
+
+		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get()), "objects_acked")
+		b.ReportMetric(float64(metrics.s3ObjectsAckedTotal.Get())/elapsed.Seconds(), "objects_acked_per_sec")
+
+	})
+}
+
+func TestBenchmarkInputS3(t *testing.T) {
+	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+
+	results := []testing.BenchmarkResult{
+		benchmarkInputS3(t, 1),
+		benchmarkInputS3(t, 2),
+		benchmarkInputS3(t, 4),
+		benchmarkInputS3(t, 8),
+		benchmarkInputS3(t, 16),
+		benchmarkInputS3(t, 32),
+		benchmarkInputS3(t, 64),
+		benchmarkInputS3(t, 128),
+		benchmarkInputS3(t, 256),
+		benchmarkInputS3(t, 512),
+		benchmarkInputS3(t, 1024),
+	}
+
+	headers := []string{
+		"Number of workers",
+		"Objects listed per sec",
+		"Objects processed per sec",
+		"Objects acked per sec",
+		"Events per sec",
+		"S3 Bytes per sec",
+		"Time (sec)",
+		"CPUs",
+	}
+	var data [][]string
+	for _, r := range results {
+		data = append(data, []string{
+			fmt.Sprintf("%v", r.Extra["number_of_workers"]),
+			fmt.Sprintf("%v", r.Extra["objects_listed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_processed_per_sec"]),
+			fmt.Sprintf("%v", r.Extra["objects_acked_per_sec"]),
 			fmt.Sprintf("%v", r.Extra["events_per_sec"]),
 			fmt.Sprintf("%v", humanize.Bytes(uint64(r.Extra["s3_bytes_per_sec"]))),
 			fmt.Sprintf("%v", r.Extra["sec"]),
