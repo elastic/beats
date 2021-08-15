@@ -56,6 +56,7 @@ func GetAWSCredentials(config ConfigAWS) (awssdk.Config, error) {
 	if config.AccessKeyID != "" || config.SecretAccessKey != "" || config.SessionToken != "" {
 		return getAccessKeys(config), nil
 	}
+
 	return getSharedCredentialProfile(config)
 }
 
@@ -84,7 +85,6 @@ func getAccessKeys(config ConfigAWS) awssdk.Config {
 		return getRoleArn(config, awsConfig)
 	}
 
-	logger.Debug("Using access keys for AWS credential")
 	return awsConfig
 }
 
