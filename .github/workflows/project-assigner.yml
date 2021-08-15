@@ -15,6 +15,7 @@ jobs:
         with:
           issue-mappings: |
             [
+              {"label": "needs_team", "projectNumber": "556", "columnName": "Inbox", "projectScope": "org"},
               {"label": "Team:Agent", "projectNumber": "478", "columnName": "Inbox", "projectScope": "org"}
             ]
 
