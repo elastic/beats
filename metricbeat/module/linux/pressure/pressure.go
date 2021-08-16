@@ -19,6 +19,7 @@ package pressure
 
 import (
 	"fmt"
+	"path/filepath"
 	"runtime"
 
 	"github.com/pkg/errors"
@@ -27,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/linux"
 )
 
 const (
@@ -48,7 +50,8 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	fs procfs.FS
+	fs     string
+	procfs procfs.FS
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -60,14 +63,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("the %v/%v metricset is only supported on Linux", moduleName, metricsetName)
 	}
 
-	fs, err := procfs.NewFS("/proc")
+	linuxModule, ok := base.Module().(*linux.Module)
+	if !ok {
+		return nil, errors.New("unexpected module type")
+	}
+
+	path := filepath.Join(linuxModule.HostFS, "proc")
+	procfs, err := procfs.NewFS(path)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting procfs")
+		return nil, errors.Wrapf(err, "error creating new Host FS at %s", path)
 	}
 
 	return &MetricSet{
 		BaseMetricSet: base,
-		fs:            fs,
+		fs:            linuxModule.HostFS,
+		procfs:        procfs,
 	}, nil
 }
 
@@ -75,7 +85,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	events, err := FetchLinuxPSIStats(m)
+	events, err := fetchLinuxPSIStats(m)
 	if err != nil {
 		return errors.Wrap(err, "error fetching PSI stats")
 	}
@@ -88,12 +98,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func FetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
+func fetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
 	resources := []string{"cpu", "memory", "io"}
 	events := []common.MapStr{}
 
 	for _, resource := range resources {
-		psiMetric, err := m.fs.PSIStatsForResource(resource)
+		psiMetric, err := m.procfs.PSIStatsForResource(resource)
 		if err != nil {
 			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
 		}
@@ -101,19 +111,30 @@ func FetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
 		event := common.MapStr{
 			resource: common.MapStr{
 				"some": common.MapStr{
-					"10":    psiMetric.Some.Avg10,
-					"60":    psiMetric.Some.Avg60,
-					"300":   psiMetric.Some.Avg300,
-					"total": psiMetric.Some.Total,
+					"10": common.MapStr{
+						"pct": psiMetric.Some.Avg10,
+					},
+					"60": common.MapStr{
+						"pct": psiMetric.Some.Avg60,
+					},
+					"300": common.MapStr{
+						"pct": psiMetric.Some.Avg300,
+					},
+					"total": common.MapStr{
+						"time": common.MapStr{
+							"us": psiMetric.Some.Total,
+						},
+					},
 				},
 			},
 		}
+
 		// /proc/pressure/cpu does not contain 'full' metrics
 		if resource != "cpu" {
-			event.Put(resource+".full.10", psiMetric.Full.Avg10)
-			event.Put(resource+".full.60", psiMetric.Full.Avg60)
-			event.Put(resource+".full.300", psiMetric.Full.Avg300)
-			event.Put(resource+".full.total", psiMetric.Full.Total)
+			event.Put(resource+".full.10.pct", psiMetric.Full.Avg10)
+			event.Put(resource+".full.60.pct", psiMetric.Full.Avg60)
+			event.Put(resource+".full.300.pct", psiMetric.Full.Avg300)
+			event.Put(resource+".full.total.time.us", psiMetric.Full.Total)
 		}
 
 		events = append(events, event)

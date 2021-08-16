@@ -20,9 +20,12 @@
 package pressure
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -37,6 +40,47 @@ func TestFetch(t *testing.T) {
 	}
 	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 		events[0].BeatEvent("linux", "pressure").Fields.StringToPrint())
+
+	resources := []string{"cpu", "memory", "io"}
+	for i, _ := range events {
+		resource := resources[i]
+		fmt.Println("######")
+		fmt.Println(resources[i])
+		fmt.Println(events[i].BeatEvent("linux", "pressure").Fields["linux"].(common.MapStr)["pressure"])
+		fmt.Println("######")
+
+		testEvent := common.MapStr{
+			resource: common.MapStr{
+				"some": common.MapStr{
+					"10": common.MapStr{
+						"pct": 5.86,
+					},
+					"60": common.MapStr{
+						"pct": 1.10,
+					},
+					"300": common.MapStr{
+						"pct": 0.23,
+					},
+					"total": common.MapStr{
+						"time": common.MapStr{
+							"us": uint64(9895236),
+						},
+					},
+				},
+			},
+		}
+		// /proc/pressure/cpu does not contain 'full' metrics
+		if resource != "cpu" {
+			testEvent.Put(resource+".full.10.pct", 6.86)
+			testEvent.Put(resource+".full.60.pct", 2.10)
+			testEvent.Put(resource+".full.300.pct", 1.23)
+			testEvent.Put(resource+".full.total.time.us", uint64(10895236))
+		}
+
+		rawEvent := events[i].BeatEvent("linux", "pressure").Fields["linux"].(common.MapStr)["pressure"]
+		assert.Equal(t, testEvent, rawEvent)
+
+	}
 }
 
 func TestData(t *testing.T) {
@@ -51,5 +95,6 @@ func getConfig() map[string]interface{} {
 	return map[string]interface{}{
 		"module":     "linux",
 		"metricsets": []string{"pressure"},
+		"hostfs":     "./_meta/testdata",
 	}
 }
