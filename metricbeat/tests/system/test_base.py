@@ -1,6 +1,8 @@
 import os
 import pytest
 import re
+import requests
+import semver
 import shutil
 import sys
 import unittest
@@ -62,6 +64,10 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
         Test that the dashboards can be loaded with `setup --dashboards`
         """
+        if self.is_saved_object_api_available():
+            raise unittest.SkipTest(
+                "Kibana Saved Objects API is used since 7.15")
+
         shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
 
         es = Elasticsearch([self.get_elasticsearch_url()])
@@ -112,3 +118,16 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
     def kibana_dir(self):
         return os.path.join(self.beat_path, "build", "kibana")
+
+    def is_saved_object_api_available(self):
+        kibana_semver = semver.VersionInfo.parse(self.get_version())
+        return kibana_semver.major == 7 and kibana_semver.minor < 15 or kibana_semver.major >= 8
+
+    def get_version(self):
+        url = self.get_kibana_url() + "/api/status"
+
+        r = requests.get(url)
+        body = r.json()
+        version = body["version"]["number"]
+
+        return version

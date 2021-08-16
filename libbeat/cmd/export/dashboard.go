@@ -84,7 +84,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 				if decode {
 					result = dashboards.DecodeExported(result)
 				}
-				fmt.Println(result.StringToPrint())
+				fmt.Println(string(result))
 			}
 		},
 	}
