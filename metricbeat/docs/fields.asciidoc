@@ -53121,10 +53121,19 @@ type: keyword
 
 --
 
+*`system.process.cgroup.cgroups_version`*::
++
+--
+The version of cgroups reported for the process
+
+type: long
+
+--
+
 [float]
 === cpu
 
-The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period.
+The cpu subsystem schedules CPU access for tasks in the cgroup. Access can be controlled by two separate schedulers, CFS and RT. CFS stands for completely fair scheduler which proportionally divides the CPU time between cgroups based on weight. RT stands for real time scheduler which sets a maximum amount of CPU time that processes in the cgroup can consume during a given period. In CPU under cgroups V2, the cgroup is merged with many of the metrics from cpuacct. In addition, per-scheduler metrics are gone in V2.
 
 
 
@@ -53144,6 +53153,93 @@ Path to the cgroup relative to the cgroup subsystem's mountpoint.
 
 
 type: keyword
+
+--
+
+[float]
+=== stats
+
+cgroupv2 stats
+
+
+*`system.process.cgroup.cpu.stats.usage.ns`*::
++
+--
+cgroups v2 usage in nanoseconds
+
+type: long
+
+--
+
+*`system.process.cgroup.cpu.stats.usage.pct`*::
++
+--
+cgroups v2 usage
+
+type: float
+
+--
+
+*`system.process.cgroup.cpu.stats.usage.norm.pct`*::
++
+--
+cgroups v2 normalized usage
+
+type: float
+
+--
+
+*`system.process.cgroup.cpu.stats.user.ns`*::
++
+--
+cgroups v2 cpu user time in nanoseconds
+
+type: long
+
+--
+
+*`system.process.cgroup.cpu.stats.user.pct`*::
++
+--
+cgroups v2 cpu user time
+
+type: float
+
+--
+
+*`system.process.cgroup.cpu.stats.user.norm.pct`*::
++
+--
+cgroups v2 normalized cpu user time
+
+type: float
+
+--
+
+*`system.process.cgroup.cpu.stats.system.ns`*::
++
+--
+cgroups v2 system time in nanoseconds
+
+type: long
+
+--
+
+*`system.process.cgroup.cpu.stats.system.pct`*::
++
+--
+cgroups v2 system time
+
+type: float
+
+--
+
+*`system.process.cgroup.cpu.stats.system.norm.pct`*::
++
+--
+cgroups v2 normalized system time
+
+type: float
 
 --
 
@@ -53217,11 +53313,125 @@ type: long
 
 --
 
+*`system.process.cgroup.cpu.stats.throttled.us`*::
++
+--
+The total time duration (in microseconds) for which tasks in a cgroup have been throttled, as reported by cgroupsv2
+
+
+type: long
+
+--
+
 *`system.process.cgroup.cpu.stats.throttled.ns`*::
 +
 --
 The total time duration (in nanoseconds) for which tasks in a cgroup have been throttled.
 
+
+type: long
+
+--
+
+[float]
+=== pressure
+
+Pressure (resource contention) stats.
+
+
+[float]
+=== some
+
+Share of time in which at least some tasks are stalled on a given resource
+
+
+*`system.process.cgroup.cpu.pressure.some.10.pct`*::
++
+--
+Pressure over 10 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.some.60.pct`*::
++
+--
+Pressure over 60 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.some.300.pct`*::
++
+--
+Pressure over 300 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.some.total`*::
++
+--
+total Some pressure time
+
+type: long
+
+format: percent
+
+--
+
+[float]
+=== full
+
+Share of time in which all non-idle tasks are stalled on a given resource simultaneously
+
+
+*`system.process.cgroup.cpu.pressure.full.10.pct`*::
++
+--
+Pressure over 10 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.full.60.pct`*::
++
+--
+Pressure over 60 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.full.300.pct`*::
++
+--
+Pressure over 300 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.cpu.pressure.full.total`*::
++
+--
+total Full pressure time
 
 type: long
 
@@ -53417,6 +53627,99 @@ type: long
 
 --
 
+*`system.process.cgroup.memory.mem.low.bytes`*::
++
+--
+memory low threshhold
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.cgroup.memory.mem.high.bytes`*::
++
+--
+memory high threshhold
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.cgroup.memory.mem.max.bytes`*::
++
+--
+memory max threshhold
+
+type: long
+
+format: bytes
+
+--
+
+[float]
+=== mem.events
+
+number of times the controller tripped a given usage level
+
+
+*`system.process.cgroup.memory.mem.events.low`*::
++
+--
+low threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.mem.events.high`*::
++
+--
+high threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.mem.events.max`*::
++
+--
+max threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.mem.events.oom`*::
++
+--
+oom threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.mem.events.oom_kill`*::
++
+--
+oom killer threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.mem.events.fail`*::
++
+--
+failed threshold
+
+type: long
+
+--
+
 *`system.process.cgroup.memory.memsw.usage.bytes`*::
 +
 --
@@ -53453,11 +53756,104 @@ format: bytes
 
 --
 
+*`system.process.cgroup.memory.memsw.low.bytes`*::
++
+--
+memory low threshhold
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.cgroup.memory.memsw.high.bytes`*::
++
+--
+memory high threshhold
+
+type: long
+
+format: bytes
+
+--
+
+*`system.process.cgroup.memory.memsw.max.bytes`*::
++
+--
+memory max threshhold
+
+type: long
+
+format: bytes
+
+--
+
 *`system.process.cgroup.memory.memsw.failures`*::
 +
 --
 The number of times that the memory plus swap space limit (memsw.limit.bytes) was reached.
 
+
+type: long
+
+--
+
+[float]
+=== memsw.events
+
+number of times the controller tripped a given usage level
+
+
+*`system.process.cgroup.memory.memsw.events.low`*::
++
+--
+low threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.memsw.events.high`*::
++
+--
+high threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.memsw.events.max`*::
++
+--
+max threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.memsw.events.oom`*::
++
+--
+oom threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.memsw.events.oom_kill`*::
++
+--
+oom killer threshold
+
+type: long
+
+--
+
+*`system.process.cgroup.memory.memsw.events.fail`*::
++
+--
+failed threshold
 
 type: long
 
@@ -53552,6 +53948,24 @@ The number of times that the memory limit (kmem_tcp.limit.bytes) was reached.
 
 
 type: long
+
+--
+
+*`system.process.cgroup.memory.stats.*`*::
++
+--
+detailed memory IO stats
+
+type: object
+
+--
+
+*`system.process.cgroup.memory.stats.*.bytes`*::
++
+--
+detailed memory IO stats
+
+type: object
 
 --
 
@@ -53779,6 +54193,165 @@ format: bytes
 --
 Total number of I/O operations performed on all devices by processes in the cgroup as seen by the throttling policy.
 
+
+type: long
+
+--
+
+[float]
+=== io
+
+cgroup V2 IO Metrics, replacing blkio.
+
+
+*`system.process.cgroup.io.id`*::
++
+--
+ID of the cgroup.
+
+type: keyword
+
+--
+
+*`system.process.cgroup.io.path`*::
++
+--
+Path to the cgroup relative to the cgroup subsystems mountpoint.
+
+
+type: keyword
+
+--
+
+*`system.process.cgroup.io.stats.*`*::
++
+--
+per-device IO usage stats
+
+type: object
+
+--
+
+*`system.process.cgroup.io.stats.*.*`*::
++
+--
+type: object
+
+--
+
+*`system.process.cgroup.io.stats.*.*.bytes`*::
++
+--
+per-device IO usage stats
+
+type: object
+
+--
+
+*`system.process.cgroup.io.stats.*.*.ios`*::
++
+--
+per-device IO usage stats
+
+type: object
+
+--
+
+[float]
+=== pressure
+
+Pressure (resource contention) stats.
+
+
+[float]
+=== full
+
+Share of time in which at least some tasks are stalled on a given resource
+
+
+*`system.process.cgroup.io.pressure.full.10.pct`*::
++
+--
+Pressure over 10 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.io.pressure.full.60.pct`*::
++
+--
+Pressure over 60 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.io.pressure.full.300.pct`*::
++
+--
+Pressure over 300 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.io.pressure.full.total`*::
++
+--
+total Some pressure time
+
+type: long
+
+--
+
+[float]
+=== some
+
+Share of time in which all tasks are stalled on a given resource
+
+
+*`system.process.cgroup.io.pressure.some.10.pct`*::
++
+--
+Pressure over 10 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.io.pressure.some.60.pct`*::
++
+--
+Pressure over 60 seconds
+
+type: float
+
+format: percent
+
+--
+
+*`system.process.cgroup.io.pressure.some.300.pct`*::
++
+--
+Pressure over 300 seconds
+
+type: float
+
+--
+
+*`system.process.cgroup.io.pressure.some.total`*::
++
+--
+total Some pressure time
 
 type: long
 

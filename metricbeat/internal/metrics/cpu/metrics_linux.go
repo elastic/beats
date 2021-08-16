@@ -25,7 +25,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
@@ -39,12 +39,12 @@ func scanStatFile(scanner *bufio.Scanner) (CPUMetrics, error) {
 func parseCPULine(line string) (CPU, error) {
 
 	var errs multierror.Errors
-	tryParseUint := func(name, field string) (v metrics.OptUint) {
+	tryParseUint := func(name, field string) (v opt.Uint) {
 		u, err := touint(field)
 		if err != nil {
 			errs = append(errs, fmt.Errorf("failed to parse %v: %s", name, field))
 		} else {
-			v = metrics.OptUintWith(u)
+			v = opt.UintWith(u)
 		}
 		return v
 	}

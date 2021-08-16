@@ -1,4 +1,4 @@
 dashboards:
 - id: Filebeat-Apache-Dashboard
-  file: Filebeat-apache.json
+  file: Filebeat-apache.ndjson
 
