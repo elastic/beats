@@ -105,38 +105,29 @@ func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
 func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
 	var errs []error
 
-processingLoop:
-	for {
-		select {
-		case s3ObjectPayload := <-s3ObjectPayloadChan:
-			if s3ObjectPayload == nil {
-				break processingLoop
-			}
+	for s3ObjectPayload := range s3ObjectPayloadChan {
+		// Process S3 object (download, parse, create events).
+		err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
 
-			// Process S3 object (download, parse, create events).
-			err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
+		// Wait for all events to be ACKed before proceeding.
+		s3ObjectPayload.s3ObjectHandler.Wait()
 
-			// Wait for all events to be ACKed before proceeding.
-			s3ObjectPayload.s3ObjectHandler.Wait()
+		info := s3ObjectPayload.s3ObjectInfo
 
-			info := s3ObjectPayload.s3ObjectInfo
+		if err != nil {
+			event := s3ObjectPayload.s3ObjectEvent
+			errs = append(errs, errors.Wrapf(err,
+				"failed processing S3 event for object key %q in bucket %q",
+				event.S3.Object.Key, event.S3.Bucket.Name))
 
-			if err != nil {
-				event := s3ObjectPayload.s3ObjectEvent
-				errs = append(errs, errors.Wrapf(err,
-					"failed processing S3 event for object key %q in bucket %q",
-					event.S3.Object.Key, event.S3.Bucket.Name))
-
-				p.handlePurgingLock(info, false)
-				continue
-
-			}
-
-			p.handlePurgingLock(info, true)
-
-			// Metrics
-			p.metrics.s3ObjectsAckedTotal.Inc()
+			p.handlePurgingLock(info, false)
+			continue
 		}
+
+		p.handlePurgingLock(info, true)
+
+		// Metrics
+		p.metrics.s3ObjectsAckedTotal.Inc()
 	}
 
 	return multierr.Combine(errs...)
