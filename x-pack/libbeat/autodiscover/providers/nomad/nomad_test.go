@@ -215,14 +215,6 @@ func TestEmitEvent(t *testing.T) {
 						},
 					},
 				},
-				"orchestrator": common.MapStr{
-					"type":      "nomad",
-					"namespace": "default",
-					"resource": common.MapStr{
-						"name": "task1",
-						"type": "task",
-					},
-				},
 			},
 		},
 		{

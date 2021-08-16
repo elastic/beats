@@ -299,14 +299,6 @@ func TestEmitEvent_Service(t *testing.T) {
 					},
 				},
 				"config": []*common.Config{},
-				"orchestrator": common.MapStr{
-					"namespace": "default",
-					"type":      "kubernetes",
-					"resource": common.MapStr{
-						"name": "metricbeat",
-						"type": "service",
-					},
-				},
 			},
 		},
 		{
@@ -394,14 +386,6 @@ func TestEmitEvent_Service(t *testing.T) {
 					},
 				},
 				"config": []*common.Config{},
-				"orchestrator": common.MapStr{
-					"namespace": "default",
-					"type":      "kubernetes",
-					"resource": common.MapStr{
-						"name": "metricbeat",
-						"type": "service",
-					},
-				},
 			},
 		},
 	}

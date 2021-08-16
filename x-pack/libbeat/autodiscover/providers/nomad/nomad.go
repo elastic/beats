@@ -192,20 +192,17 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 
 	// emit per-task separated events
 	for _, task := range tasks {
-		meta := common.MapStr{
-			"nomad": common.MapStrUnion(allocMeta, common.MapStr{
-				"task": task,
-			}),
-		}
-		orchestrator := genOrchestratorFields(meta)
 		event := bus.Event{
-			"provider":     p.uuid,
-			"id":           fmt.Sprintf("%s-%s", obj.ID, task["name"]),
-			flag:           true,
-			"host":         nodeName,
-			"nomad":        allocMeta,
-			"meta":         meta,
-			"orchestrator": orchestrator,
+			"provider": p.uuid,
+			"id":       fmt.Sprintf("%s-%s", obj.ID, task["name"]),
+			flag:       true,
+			"host":     nodeName,
+			"nomad":    allocMeta,
+			"meta": common.MapStr{
+				"nomad": common.MapStrUnion(allocMeta, common.MapStr{
+					"task": task,
+				}),
+			},
 		}
 
 		p.publish(event)
@@ -284,23 +281,4 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	tasks.Delete(prefix)
 
 	return e
-}
-
-func genOrchestratorFields(meta common.MapStr) common.MapStr {
-	orchestrator := common.MapStr{
-		"type": "nomad",
-	}
-
-	namespace, err := meta.GetValue("nomad.namespace")
-	if err == nil {
-		orchestrator.Put("namespace", namespace)
-	}
-
-	taskName, err := meta.GetValue("nomad.task.name")
-	if err == nil {
-		orchestrator.Put("resource.name", taskName)
-		orchestrator.Put("resource.type", "task")
-	}
-
-	return orchestrator
 }

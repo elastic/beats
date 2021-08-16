@@ -196,7 +196,6 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	kubemetaMap, _ := meta.GetValue("kubernetes")
 	kubemeta, _ := kubemetaMap.(common.MapStr)
 	kubemeta = kubemeta.Clone()
-	orchestrator := genOrchestratorFields(kubemeta, "service")
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range svc.GetObjectMeta().GetAnnotations() {
@@ -220,14 +219,13 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 	var events []bus.Event
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
-			"provider":     s.uuid,
-			"id":           eventID,
-			flag:           true,
-			"host":         host,
-			"port":         int(port.Port),
-			"kubernetes":   kubemeta,
-			"meta":         meta,
-			"orchestrator": orchestrator,
+			"provider":   s.uuid,
+			"id":         eventID,
+			flag:         true,
+			"host":       host,
+			"port":       int(port.Port),
+			"kubernetes": kubemeta,
+			"meta":       meta,
 		}
 		events = append(events, event)
 	}
