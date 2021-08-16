@@ -60,7 +60,8 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("index-pattern")
         js = json.loads(output)
-        assert "objects" in js
+        assert "attributes" in js
+        assert "index-pattern" == js["type"]
         size = len(output.encode('utf-8'))
         assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
             "to keep the Beat setup request size below " \
@@ -72,7 +73,8 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("index-pattern", extra=['-E', 'migration.6_to_7.enabled=true'])
         js = json.loads(output)
-        assert "objects" in js
+        assert "attributes" in js
+        assert "index-pattern" == js["type"]
         size = len(output.encode('utf-8'))
         assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
             "to keep the Beat setup request size below " \
