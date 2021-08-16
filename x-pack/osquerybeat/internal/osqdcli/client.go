@@ -17,8 +17,8 @@ import (
 
 	"golang.org/x/sync/semaphore"
 
-	"github.com/kolide/osquery-go"
-	genosquery "github.com/kolide/osquery-go/gen/osquery"
+	"github.com/osquery/osquery-go"
+	genosquery "github.com/osquery/osquery-go/gen/osquery"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
