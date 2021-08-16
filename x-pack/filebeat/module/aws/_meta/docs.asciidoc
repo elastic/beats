@@ -44,7 +44,7 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -61,7 +61,7 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -78,7 +78,7 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -95,7 +95,7 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -112,7 +112,7 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -129,7 +129,7 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
