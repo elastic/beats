@@ -126,12 +126,9 @@ def beatsUpdate() {
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
-<<<<<<< HEAD
-=======
         go mod tidy
         echo '{"name": "${GOPATH}/src/github.com/elastic/beats-local", "licenceType": "Elastic"}' >> \${GOPATH}/src/github.com/elastic/beats-local/dev-tools/notice/overrides.json
 
->>>>>>> d03b56fa8 (Fix go mod in apm beats update CI job (#27392))
         make update
         git commit -a -m beats-update
 
