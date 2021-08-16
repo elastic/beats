@@ -45,6 +45,7 @@ func init() {
 	fs.BoolVar(&unversionedHome, "path.home.unversioned", unversionedHome, "Agent root path is not versioned based on build")
 	fs.StringVar(&configPath, "path.config", configPath, "Config path is the directory Agent looks for its config file")
 	fs.StringVar(&configFilePath, "c", DefaultConfigName, "Configuration file, relative to path.config")
+	fs.StringVar(&logsPath, "path.logs", logsPath, "Logs path contains Agent log output")
 	fs.StringVar(&downloadsPath, "path.downloads", downloadsPath, "Downloads path contains binaries Agent downloads")
 	fs.StringVar(&installPath, "path.install", installPath, "Install path contains binaries Agent extracts")
 }
