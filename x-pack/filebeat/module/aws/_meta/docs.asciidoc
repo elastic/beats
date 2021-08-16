@@ -44,8 +44,9 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -60,8 +61,9 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -76,8 +78,9 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -92,8 +95,9 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -108,8 +112,9 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -124,8 +129,9 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.s3_bucket: 'arn:aws:s3:::mybucket
-    #var.s3_bucket_poll_interval: 300s
+    #var.bucket: 'arn:aws:s3:::mybucket
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -140,7 +146,7 @@ Example config:
 
 *`var.queue_url`*::
 
-AWS SQS queue url (Required when `var.s3_bucket` is not set).
+AWS SQS queue url (Required when `var.bucket` is not set).
 
 *`var.visibility_timeout`*::
 
@@ -151,18 +157,18 @@ Default to be 300 seconds.
 
 Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
 
-*`var.s3_bucket`*::
+*`var.bucket`*::
 
 AWS S3 bucket ARN (Required when `var.queue_url` is not set).
 
-*`var.s3_bucket_number_of_workers`*::
+*`var.number_of_workers`*::
 
-Number of workers that will process the S3 objects listed (Required when `var.s3_bucket` is set).
+Number of workers that will process the S3 objects listed (Required when `var.bucket` is set).
 Use to vertically scale the input.
 
-*`var.s3_bucket_poll_interval`*::
+*`var.bucket_list_interval`*::
 
-Interval between list requests to the S3 bucket. Default to be 120 seconds.
+Wait interval between completion of a list request to the S3 bucket and beginning of the nest one. Default to be 120 seconds.
 
 *`var.endpoint`*::
 

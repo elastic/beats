@@ -16,13 +16,13 @@ before running Terraform or the integration tests. The AWS key must be
 authorized to create and destroy S3 buckets and SQS queues.
 
 1. Execute terraform in this directory to create the resources. This will also
-write the `outputs.yml`.
+write the `outputs.yml`. You can use `export TF_VAR_aws_region=NNNNN` in order
+to match the AWS region of the profile you are using.
 
     `terraform apply`
 
 
-2. View the output configuration and assure the region match in the aws profile used to run
-the test or to set the environment variable `AWS_REGION` to the value in the output.
+2. (Optional) View the output configuration.
 
    ```yaml
    "aws_region": "us-east-1"

@@ -28,15 +28,15 @@ func TestConfig(t *testing.T) {
 		parserConf := parser.Config{}
 		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
-			QueueURL:             quequeURL,
-			S3Bucket:             s3Bucket,
-			APITimeout:           120 * time.Second,
-			VisibilityTimeout:    300 * time.Second,
-			SQSMaxReceiveCount:   5,
-			SQSWaitTime:          20 * time.Second,
-			S3BucketPollInterval: 120 * time.Second,
-			FIPSEnabled:          false,
-			MaxNumberOfMessages:  5,
+			QueueURL:            quequeURL,
+			Bucket:              s3Bucket,
+			APITimeout:          120 * time.Second,
+			VisibilityTimeout:   300 * time.Second,
+			SQSMaxReceiveCount:  5,
+			SQSWaitTime:         20 * time.Second,
+			BucketListInterval:  120 * time.Second,
+			FIPSEnabled:         false,
+			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
 				BufferSize:     16 * humanize.KiByte,
 				MaxBytes:       10 * humanize.MiByte,
@@ -69,13 +69,13 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"s3_bucket":                   s3Bucket,
-				"s3_bucket_number_of_workers": 5,
+				"s3_bucket":         s3Bucket,
+				"number_of_workers": 5,
 			},
 			"",
 			func(queueURL, s3Bucket string) config {
 				c := makeConfig("", s3Bucket)
-				c.S3BucketNumberOfWorkers = 5
+				c.NumberOfWorkers = 5
 				return c
 			},
 		},
@@ -160,36 +160,25 @@ func TestConfig(t *testing.T) {
 			nil,
 		},
 		{
-			"error on s3_bucket_poll_interval == 0",
+			"error on bucket_list_interval == 0",
 			"",
 			s3Bucket,
 			common.MapStr{
-				"s3_bucket":               s3Bucket,
-				"s3_bucket_poll_interval": "0",
+				"s3_bucket":            s3Bucket,
+				"bucket_list_interval": "0",
 			},
-			"s3_bucket_poll_interval <0s> must be greater than 0 and less than or equal to 12h",
+			"bucket_list_interval <0s> must be greater than 0",
 			nil,
 		},
 		{
-			"error on s3_bucket_poll_interval > 12h",
+			"error on number_of_workers == 0",
 			"",
 			s3Bucket,
 			common.MapStr{
-				"s3_bucket":               s3Bucket,
-				"s3_bucket_poll_interval": "12h1ns",
+				"s3_bucket":         s3Bucket,
+				"number_of_workers": "0",
 			},
-			"s3_bucket_poll_interval <12h0m0.000000001s> must be greater than 0 and less than or equal to 12h",
-			nil,
-		},
-		{
-			"error on s3_bucket_number_of_workers == 0",
-			"",
-			s3Bucket,
-			common.MapStr{
-				"s3_bucket":                   s3Bucket,
-				"s3_bucket_number_of_workers": "0",
-			},
-			"s3_bucket_number_of_workers <0> must be greater than 0",
+			"number_of_workers <0> must be greater than 0",
 			nil,
 		},
 		{

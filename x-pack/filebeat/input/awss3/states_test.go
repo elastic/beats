@@ -5,11 +5,20 @@
 package awss3
 
 import (
+	"context"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+var inputCtx = v2.Context{
+	Logger:      logp.NewLogger("test"),
+	Cancelation: context.Background(),
+}
 
 func TestStatesDelete(t *testing.T) {
 	type stateTestCase struct {
@@ -22,21 +31,21 @@ func TestStatesDelete(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"delete empty states": {
 			states: func() *states {
-				return newStates()
+				return newStates(inputCtx)
 			},
 			deleteID: "an id",
 			expected: []state{},
 		},
 		"delete not existing state": {
 			states: func() *states {
-				states := newStates()
+				states := newStates(inputCtx)
 				states.Update(newState("bucket", "key", "etag", lastModified), "")
 				return states
 			},
 			deleteID: "an id",
 			expected: []state{
 				{
-					Id:           "bucketkeyetag" + lastModified.String(),
+					ID:           "bucketkeyetag" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key",
 					Etag:         "etag",
@@ -46,7 +55,7 @@ func TestStatesDelete(t *testing.T) {
 		},
 		"delete only one existing": {
 			states: func() *states {
-				states := newStates()
+				states := newStates(inputCtx)
 				states.Update(newState("bucket", "key", "etag", lastModified), "")
 				return states
 			},
@@ -55,7 +64,7 @@ func TestStatesDelete(t *testing.T) {
 		},
 		"delete first": {
 			states: func() *states {
-				states := newStates()
+				states := newStates(inputCtx)
 				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
 				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
 				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
@@ -64,14 +73,14 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey1",
 			expected: []state{
 				{
-					Id:           "bucketkey3etag3" + lastModified.String(),
+					ID:           "bucketkey3etag3" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",
 					LastModified: lastModified,
 				},
 				{
-					Id:           "bucketkey2etag2" + lastModified.String(),
+					ID:           "bucketkey2etag2" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
@@ -81,7 +90,7 @@ func TestStatesDelete(t *testing.T) {
 		},
 		"delete last": {
 			states: func() *states {
-				states := newStates()
+				states := newStates(inputCtx)
 				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
 				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
 				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
@@ -90,14 +99,14 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey3",
 			expected: []state{
 				{
-					Id:           "bucketkey1etag1" + lastModified.String(),
+					ID:           "bucketkey1etag1" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
 					LastModified: lastModified,
 				},
 				{
-					Id:           "bucketkey2etag2" + lastModified.String(),
+					ID:           "bucketkey2etag2" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key2",
 					Etag:         "etag2",
@@ -107,7 +116,7 @@ func TestStatesDelete(t *testing.T) {
 		},
 		"delete any": {
 			states: func() *states {
-				states := newStates()
+				states := newStates(inputCtx)
 				states.Update(newState("bucket", "key1", "etag1", lastModified), "")
 				states.Update(newState("bucket", "key2", "etag2", lastModified), "")
 				states.Update(newState("bucket", "key3", "etag3", lastModified), "")
@@ -116,14 +125,14 @@ func TestStatesDelete(t *testing.T) {
 			deleteID: "bucketkey2",
 			expected: []state{
 				{
-					Id:           "bucketkey1etag1" + lastModified.String(),
+					ID:           "bucketkey1etag1" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key1",
 					Etag:         "etag1",
 					LastModified: lastModified,
 				},
 				{
-					Id:           "bucketkey3etag3" + lastModified.String(),
+					ID:           "bucketkey3etag3" + lastModified.String(),
 					Bucket:       "bucket",
 					Key:          "key3",
 					Etag:         "etag3",

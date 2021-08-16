@@ -10,14 +10,11 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/go-concert/unison"
-
-	"github.com/elastic/beats/v7/filebeat/beater"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -25,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/go-concert/unison"
 )
 
 const inputName = "aws-s3"
@@ -40,8 +38,7 @@ func Plugin(store beater.StateStore) v2.Plugin {
 }
 
 type s3InputManager struct {
-	s3Input *s3Input
-	store   beater.StateStore
+	store beater.StateStore
 }
 
 func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
@@ -88,17 +85,15 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 	persistentStore, err := in.store.Access()
 	if err != nil {
-		return fmt.Errorf("Can not access persistent store: %w", err)
+		return fmt.Errorf("can not access persistent store: %w", err)
 	}
 
-	defer func() {
-		persistentStore.Close()
-	}()
+	defer persistentStore.Close()
 
-	states := newStates()
+	states := newStates(inputContext)
 	err = states.readStatesFrom(persistentStore)
 	if err != nil {
-		return fmt.Errorf("Can not start persistent store: %w", err)
+		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 
 	// Wrap input Context's cancellation Done channel a context.Context. This
@@ -143,7 +138,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}
 
-	if in.config.S3Bucket != "" {
+	if in.config.Bucket != "" {
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, client, persistentStore, states)
 		if err != nil {
@@ -208,9 +203,9 @@ func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistent
 		client: s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
 	}
 
-	log := ctx.Logger.With("s3_bucket", in.config.S3Bucket)
-	log.Infof("s3_bucket_number_of_workers is set to %v.", in.config.S3BucketNumberOfWorkers)
-	log.Infof("s3_bucket_poll_interval is set to %v.", in.config.S3BucketPollInterval)
+	log := ctx.Logger.With("s3_bucket", in.config.Bucket)
+	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
+	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
 
@@ -228,9 +223,9 @@ func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistent
 		s3EventHandlerFactory,
 		states,
 		persistentStore,
-		in.config.S3Bucket,
-		in.config.S3BucketNumberOfWorkers,
-		in.config.S3BucketPollInterval)
+		in.config.Bucket,
+		in.config.NumberOfWorkers,
+		in.config.BucketListInterval)
 
 	return s3Poller, nil
 }

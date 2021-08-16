@@ -46,17 +46,17 @@ be stopped and the SQS message will be returned back to the queue.
 
 When using the direct polling list of S3 objects in an S3 buckets,
 a number of workers that will process the S3 objects listed must be set
-through the `s3_bucket_number_of_workers` config.
+through the `number_of_workers` config.
 Listing of the S3 bucket will be polled according the time interval defined by
-`s3_bucket_poll_interval` config. Default value is 120secs.
+`bucket_list_interval` config. Default value is 120secs.
 
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
 - type: aws-s3
   s3_bucket: arn:aws:s3:::test-s3-bucket
-  s3_bucket_number_of_workers: 5
-  s3_bucket_poll_interval: 300s
+  number_of_workers: 5
+  bucket_list_interval: 300s
   credential_profile_name: elastic-beats
   expand_event_list_from_field: Records
 ----
@@ -273,13 +273,13 @@ value is `20s`.
 ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` is not set).
 
 [float]
-==== `s3_bucket_poll_interval`
+==== `bucket_list_interval`
 
 Time interval for polling listing of the S3 bucket: default to `120s`.
 
 
 [float]
-==== `s3_bucket_number_of_workers`
+==== `number_of_workers`
 
 Number of workers that will process the S3 objects listed. (Required when `s3_bucket` is set).
 
@@ -349,7 +349,7 @@ they can list the same S3 bucket at the same time. Since the state of the ingest
 and multiple {beatname_uc} cannot share the same `path.data` this will produce repeated
 ingestion of the S3 object.
 Therefore, when using the polling list of S3 bucket objects method, scaling should be
-vertical, with a single bigger {beatname_uc} instance and higher `s3_bucket_number_of_workers`
+vertical, with a single bigger {beatname_uc} instance and higher `number_of_workers`
 config value.
 
 
@@ -370,6 +370,9 @@ observe the activity of the input.
 | `sqs_messages_deleted_total`              | Number of SQS messages deleted.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
+| `s3_objects_listed_total`                 | Number of S3 objects returned by list operations.
+| `s3_objects_processed_total`              | Number of S3 objects that matched file_selectors rules.
+| `s3_objects_acked_total`                  | Number of S3 objects processed that were fully ACKed.
 | `s3_bytes_processed_total`                | Number of S3 bytes processed.
 | `s3_events_created_total`                 | Number of events created from processing S3 data.
 | `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).

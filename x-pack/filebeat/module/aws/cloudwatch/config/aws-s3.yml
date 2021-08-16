@@ -2,16 +2,16 @@ type: aws-s3
 {{ if .queue_url }}
 queue_url: {{ .queue_url }}
 {{ end }}
-{{ if .s3_bucket }}
-s3_bucket: {{ .s3_bucket }}
+{{ if .bucket }}
+bucket: {{ .bucket }}
 {{ end }}
 
-{{ if .s3_bucket_number_of_workers }}
-s3_bucket_number_of_workers: {{ .s3_bucket_number_of_workers }}
+{{ if .number_of_workers }}
+number_of_workers: {{ .number_of_workers }}
 {{ end }}
 
-{{ if .s3_bucket_poll_interval }}
-s3_bucket_poll_interval: {{ .s3_bucket_poll_interval }}
+{{ if .bucket_list_interval }}
+bucket_list_interval: {{ .bucket_list_interval }}
 {{ end }}
 
 {{ if .credential_profile_name }}

@@ -133,7 +133,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(), store, bucket, numberOfWorkers, pollInterval)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})
@@ -263,7 +263,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(), store, bucket, numberOfWorkers, pollInterval)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})

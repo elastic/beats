@@ -143,9 +143,7 @@ processingLoop:
 }
 
 func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
-	defer func() {
-		close(s3ObjectPayloadChan)
-	}()
+	defer close(s3ObjectPayloadChan)
 
 	bucketMetadata := strings.Split(p.bucket, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
@@ -176,7 +174,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			// Unescape s3 key name. For example, convert "%3D" back to "=".
 			filename, err := url.QueryUnescape(*object.Key)
 			if err != nil {
-				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "key", *object.Key)
+				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "s3_object", *object.Key)
 				continue
 			}
 
@@ -264,7 +262,7 @@ func (p *s3Poller) Purge() {
 			}
 
 			var latestStoredTime time.Time
-			keys[state.Id] = struct{}{}
+			keys[state.ID] = struct{}{}
 			latestStoredTime, ok := latestStoredTimeByBucket[state.Bucket]
 			if !ok {
 				var commitWriteState commitWriteState
@@ -273,10 +271,9 @@ func (p *s3Poller) Purge() {
 					// we have no entry in the map and we have no entry in the store
 					// set zero time
 					latestStoredTime = time.Time{}
+				} else {
+					latestStoredTime = commitWriteState.Time
 				}
-
-				latestStoredTime = commitWriteState.Time
-
 			}
 
 			if state.LastModified.After(latestStoredTime) {
@@ -289,7 +286,9 @@ func (p *s3Poller) Purge() {
 			p.states.Delete(key)
 		}
 
-		p.states.writeStates(p.store)
+		if err := p.states.writeStates(p.store); err != nil {
+			p.log.Errorw("Failed to write states to the registry", "error", err)
+		}
 
 		for bucket, latestStoredTime := range latestStoredTimeByBucket {
 			if err := p.store.Set(awsS3WriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {

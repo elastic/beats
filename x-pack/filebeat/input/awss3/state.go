@@ -11,11 +11,14 @@ import (
 
 // state is used to communicate the publishing state of a s3 object
 type state struct {
-	Id           string    `json:"id" struct:"id"`
+	// ID is used to identify the state in the store, and it is composed by
+	// Bucket + Key + Etag + LastModified.String(): changing this value or how it is
+	// composed will break backward compatibilities with entries already in the store.
+	ID           string    `json:"id" struct:"id"`
 	Bucket       string    `json:"bucket" struct:"bucket"`
 	Key          string    `json:"key" struct:"key"`
 	Etag         string    `json:"etag" struct:"etag"`
-	LastModified time.Time `json:"last_modified" struct:"last_modifed"`
+	LastModified time.Time `json:"last_modified" struct:"last_modified"`
 
 	// A state has Stored = true when all events are ACKed.
 	Stored bool `json:"stored" struct:"stored"`
@@ -34,7 +37,7 @@ func newState(bucket, key, etag string, lastModified time.Time) state {
 		Error:        false,
 	}
 
-	s.Id = s.Bucket + s.Key + s.Etag + s.LastModified.String()
+	s.ID = s.Bucket + s.Key + s.Etag + s.LastModified.String()
 
 	return s
 }
@@ -44,7 +47,7 @@ func (s *state) MarkAsStored() {
 	s.Stored = true
 }
 
-// MarkAsStored set the error flag to true
+// MarkAsError set the error flag to true
 func (s *state) MarkAsError() {
 	s.Error = true
 }
@@ -63,8 +66,8 @@ func (s *state) IsEmpty() bool {
 // String returns string representation of the struct
 func (s *state) String() string {
 	return fmt.Sprintf(
-		"{Id: %v, Bucket: %v, Key: %v, Etag: %v, LastModified: %v}",
-		s.Id,
+		"{ID: %v, Bucket: %v, Key: %v, Etag: %v, LastModified: %v}",
+		s.ID,
 		s.Bucket,
 		s.Key,
 		s.Etag,

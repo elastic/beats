@@ -8,9 +8,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
 const (
@@ -30,6 +32,8 @@ type listingInfo struct {
 type states struct {
 	sync.RWMutex
 
+	log *logp.Logger
+
 	// states store
 	states []state
 
@@ -42,8 +46,9 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates() *states {
+func newStates(ctx v2.Context) *states {
 	return &states{
+		log:               ctx.Logger.Named("states"),
 		states:            nil,
 		idx:               map[string]int{},
 		listingInfo:       new(sync.Map),
@@ -59,7 +64,7 @@ func (s *states) MustSkip(state state, store *statestore.Store) bool {
 
 	previousState := s.FindPrevious(state)
 
-	// status is forget. if there is no previous state and
+	// status is forgotten. if there is no previous state and
 	// the state.LastModified is before the last cleanStore
 	// write commit we can remove
 	var commitWriteState commitWriteState
@@ -90,7 +95,7 @@ func (s *states) Delete(id string) {
 
 		s.idx = map[string]int{}
 		for i, state := range s.states {
-			s.idx[state.Id] = i
+			s.idx[state.ID] = i
 		}
 	}
 }
@@ -139,7 +144,7 @@ func (s *states) Update(newState state, listingID string) {
 		// No existing state found, add new one
 		s.idx[id] = len(s.states)
 		s.states = append(s.states, newState)
-		logp.Debug("input", "New state added for %s", newState.Id)
+		s.log.Debug("input", "New state added for %s", newState.ID)
 	}
 
 	if listingID == "" || (!newState.Stored && !newState.Error) {
@@ -256,7 +261,7 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 			return true, nil
 		}
 
-		// try to decode. Ingore faulty/incompatible values.
+		// try to decode. Ignore faulty/incompatible values.
 		var st state
 		if err := dec.Decode(&st); err != nil {
 			// XXX: Do we want to log here? In case we start to store other
@@ -265,7 +270,7 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 			return true, nil
 		}
 
-		st.Id = key[len(awsS3ObjectStatePrefix):]
+		st.ID = key[len(awsS3ObjectStatePrefix):]
 		states = append(states, st)
 		return true, nil
 	})
@@ -295,9 +300,9 @@ func fixStates(states []state) []state {
 	for i := range states {
 		state := &states[i]
 
-		old, exists := idx[state.Id]
+		old, exists := idx[state.ID]
 		if !exists {
-			idx[state.Id] = state
+			idx[state.ID] = state
 		} else {
 			mergeStates(old, state) // overwrite the entry in 'old'
 		}
@@ -328,7 +333,7 @@ func mergeStates(st, other *state) {
 
 func (s *states) writeStates(store *statestore.Store) error {
 	for _, state := range s.GetStates() {
-		key := awsS3ObjectStatePrefix + state.Id
+		key := awsS3ObjectStatePrefix + state.ID
 		if err := store.Set(key, state); err != nil {
 			return err
 		}

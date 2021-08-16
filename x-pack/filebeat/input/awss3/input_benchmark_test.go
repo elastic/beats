@@ -14,8 +14,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -24,6 +22,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
@@ -33,7 +32,7 @@ import (
 )
 
 const cloudtrailTestFile = "testdata/aws-cloudtrail.json.gz"
-const totListingObjects = 10000
+const totalListingObjects = 10000
 
 type constantSQS struct {
 	msgs []sqs.Message
@@ -98,7 +97,7 @@ func newS3PagerConstant() *s3PagerConstant {
 		currentIndex: 0,
 	}
 
-	for i := 0; i < totListingObjects; i++ {
+	for i := 0; i < totalListingObjects; i++ {
 		ret.objects = append(ret.objects, s3.Object{
 			Key:          aws.String(fmt.Sprintf("key-%d.json.gz", i)),
 			ETag:         aws.String(fmt.Sprintf("etag-%d", i)),
@@ -278,13 +277,13 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		}
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, conf.FileSelectors)
-		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(), store, "bucket", numberOfWorkers, time.Second)
+		s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", numberOfWorkers, time.Second)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.s3ObjectsAckedTotal.Get() < totListingObjects {
+			for metrics.s3ObjectsAckedTotal.Get() < totalListingObjects {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
