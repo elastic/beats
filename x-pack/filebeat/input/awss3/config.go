@@ -50,11 +50,11 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if c.QueueURL == "" && c.Bucket == "" {
-		return fmt.Errorf("queue_url or s3_bucket must provided")
+		return fmt.Errorf("queue_url or bucket must provided")
 	}
 
 	if c.QueueURL != "" && c.Bucket != "" {
-		return fmt.Errorf("queue_url <%v> and s3_bucket <%v> "+
+		return fmt.Errorf("queue_url <%v> and bucket <%v> "+
 			"cannot be set at the same time", c.QueueURL, c.Bucket)
 	}
 
