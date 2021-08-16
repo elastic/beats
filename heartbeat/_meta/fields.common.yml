@@ -172,6 +172,9 @@
               type: text
             - name: id
               type: keyword
+            - name: tags
+              description: Tags used for grouping journeys
+              type: object
         - name: error
           type: group
           fields:

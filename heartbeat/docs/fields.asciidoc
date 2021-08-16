@@ -10525,6 +10525,15 @@ type: keyword
 
 --
 
+*`synthetics.journey.tags`*::
++
+--
+Tags used for grouping journeys
+
+type: object
+
+--
+
 
 *`synthetics.error.name`*::
 +
