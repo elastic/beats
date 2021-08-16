@@ -62,7 +62,13 @@ func PackageSystemTests() error {
 		os.Mkdir(parent, 0750)
 	}
 
-	return devtools.Tar(systemTestsDir, targetFile)
+	err = devtools.Tar(systemTestsDir, targetFile)
+	if err != nil {
+		fmt.Printf(">> %s", err)
+		return err
+	}
+
+	return nil
 }
 
 // fileExists returns true if the specified file exists.

@@ -373,8 +373,7 @@ func Tar(src string, targetFile string) error {
 		// generate tar header
 		header, err := tar.FileInfoHeader(fi, file)
 		if err != nil {
-			fmt.Printf(">> error getting file info header: %s\n", err)
-			return err
+			return fmt.Errorf("error getting file info header: %w", err)
 		}
 
 		// must provide real name
@@ -383,21 +382,18 @@ func Tar(src string, targetFile string) error {
 
 		// write header
 		if err := tw.WriteHeader(header); err != nil {
-			fmt.Printf(">> error writing header: %s\n", err)
-			return err
+			return fmt.Errorf("error writing header: %w", err)
 		}
 
 		// if not a dir, write file content
 		if !fi.IsDir() {
 			data, err := os.Open(file)
 			if err != nil {
-				fmt.Printf(">> error opening file: %s\n", err)
-				return err
+				return fmt.Errorf("error opening file: %w", err)
 			}
 			defer data.Close()
 			if _, err := io.Copy(tw, data); err != nil {
-				fmt.Printf(">> error compressing file: %s\n", err)
-				return err
+				return fmt.Errorf("error compressing file: %w", err)
 			}
 		}
 		return nil
@@ -405,13 +401,11 @@ func Tar(src string, targetFile string) error {
 
 	// produce tar
 	if err := tw.Close(); err != nil {
-		fmt.Printf(">> error closing tar file: %s\n", err)
-		return err
+		return fmt.Errorf("error closing tar file: %w", err)
 	}
 	// produce gzip
 	if err := zr.Close(); err != nil {
-		fmt.Printf(">> error closing gzip file: %s\n", err)
-		return err
+		return fmt.Errorf("error closing gzip file: %w", err)
 	}
 
 	// write the .tar.gzip
