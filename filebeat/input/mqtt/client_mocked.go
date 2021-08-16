@@ -101,6 +101,12 @@ func (m *mockedToken) WaitTimeout(time.Duration) bool {
 	return m.timeout
 }
 
+func (m *mockedToken) Done() <-chan struct{} {
+	ch := make(chan struct{})
+	close(ch)
+	return ch
+}
+
 func (m *mockedToken) Error() error {
 	return nil
 }

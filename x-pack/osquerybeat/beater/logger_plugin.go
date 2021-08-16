@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/kolide/osquery-go/plugin/logger"
+	"github.com/osquery/osquery-go/plugin/logger"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

@@ -32,10 +32,11 @@ type Monitor struct {
 }
 
 // NewMonitor creates a beats monitor.
-func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig) *Monitor {
+func NewMonitor(downloadConfig *artifact.Config, monitoringCfg *monitoringConfig.MonitoringConfig, logMetrics bool) *Monitor {
 	if monitoringCfg == nil {
 		monitoringCfg = monitoringConfig.DefaultConfig()
 	}
+	monitoringCfg.LogMetrics = logMetrics
 
 	return &Monitor{
 		operatingSystem: downloadConfig.OS(),
@@ -55,6 +56,11 @@ func (b *Monitor) Reload(rawConfig *config.Config) error {
 		b.config = monitoringConfig.DefaultConfig()
 	} else {
 		b.config = cfg.Settings.MonitoringConfig
+		logMetrics := true
+		if cfg.Settings.LoggingConfig != nil {
+			logMetrics = cfg.Settings.LoggingConfig.Metrics.Enabled
+		}
+		b.config.LogMetrics = logMetrics
 	}
 
 	return nil
@@ -135,6 +141,12 @@ func (b *Monitor) EnrichArgs(spec program.Spec, pipelineID string, args []string
 			"-E", "logging.files.permission=0640",
 			"-E", "logging.files.interval=1h",
 		)
+
+		if !b.config.LogMetrics {
+			appendix = append(appendix,
+				"-E", "logging.metrics.enabled=false",
+			)
+		}
 	}
 
 	return append(args, appendix...)

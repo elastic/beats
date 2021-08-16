@@ -1,0 +1,22 @@
+name: Issue Triage
+on:
+  issues:
+    types: [labeled,unlabeled]
+  pull_request:
+    types: [labeled,unlabeled]
+jobs:
+  assign_to_project:
+    runs-on: ubuntu-latest
+    name: Assign labelled issues to projects
+    steps:
+      - name: Assign to repo and user projects
+        uses: richkuz/github-actions/project-assigner@v2.1.1
+        id: project_assigner
+        with:
+          issue-mappings: |
+            [
+              {"label": "needs_team", "projectNumber": "556", "columnName": "Inbox", "projectScope": "org"},
+              {"label": "Team:Agent", "projectNumber": "478", "columnName": "Inbox", "projectScope": "org"}
+            ]
+
+          ghToken: ${{ secrets.PROJECT_ASSIGNER_TOKEN }}
