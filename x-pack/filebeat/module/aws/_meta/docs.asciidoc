@@ -168,7 +168,7 @@ Use to vertically scale the input.
 
 *`var.bucket_list_interval`*::
 
-Wait interval between completion of a list request to the S3 bucket and beginning of the nest one. Default to be 120 seconds.
+Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
 
 *`var.endpoint`*::
 
