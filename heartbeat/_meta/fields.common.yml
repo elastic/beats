@@ -174,7 +174,7 @@
               type: keyword
             - name: tags
               description: Tags used for grouping journeys
-              type: object
+              type: keyword
         - name: error
           type: group
           fields:

@@ -10530,7 +10530,7 @@ type: keyword
 --
 Tags used for grouping journeys
 
-type: object
+type: keyword
 
 --
 
