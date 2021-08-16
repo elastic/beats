@@ -42,12 +42,9 @@ func TestFetch(t *testing.T) {
 		events[0].BeatEvent("linux", "pressure").Fields.StringToPrint())
 
 	resources := []string{"cpu", "memory", "io"}
+
 	for i, _ := range events {
 		resource := resources[i]
-		fmt.Println("######")
-		fmt.Println(resources[i])
-		fmt.Println(events[i].BeatEvent("linux", "pressure").Fields["linux"].(common.MapStr)["pressure"])
-		fmt.Println("######")
 
 		testEvent := common.MapStr{
 			resource: common.MapStr{
@@ -79,7 +76,6 @@ func TestFetch(t *testing.T) {
 
 		rawEvent := events[i].BeatEvent("linux", "pressure").Fields["linux"].(common.MapStr)["pressure"]
 		assert.Equal(t, testEvent, rawEvent)
-
 	}
 }
 
