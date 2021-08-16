@@ -53,6 +53,10 @@ func RemoveIndexPattern(data []byte) ([]byte, error) {
 }
 
 func removeLineIfIndexPattern(line []byte) ([]byte, error) {
+	if len(bytes.TrimSpace(line)) == 0 {
+		return line, nil
+	}
+
 	var r common.MapStr
 	// Full struct need to not loose any data
 	err := json.Unmarshal(line, &r)

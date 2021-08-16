@@ -191,7 +191,7 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 }
 
 func replaceInNDJSON(logger *logp.Logger, index string, line []byte) []byte {
-	if len(line) == 0 {
+	if len(bytes.TrimSpace(line)) == 0 {
 		return line
 	}
 

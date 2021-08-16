@@ -56,6 +56,10 @@ func DecodeExported(exported []byte) []byte {
 }
 
 func decodeLine(line []byte) []byte {
+	if len(bytes.TrimSpace(line)) == 0 {
+		return line
+	}
+
 	o := common.MapStr{}
 	err := json.Unmarshal(line, &o)
 	if err != nil {
