@@ -47151,6 +47151,8 @@ Pressure over 10 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.cpu.pressure.some.60.pct`*::
@@ -47159,6 +47161,8 @@ type: float
 Pressure over 60 seconds
 
 type: float
+
+format: percent
 
 --
 
@@ -47169,6 +47173,8 @@ Pressure over 300 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.cpu.pressure.some.total`*::
@@ -47177,6 +47183,8 @@ type: float
 total Some pressure time
 
 type: long
+
+format: percent
 
 --
 
@@ -47193,6 +47201,8 @@ Pressure over 10 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.cpu.pressure.full.60.pct`*::
@@ -47202,6 +47212,8 @@ Pressure over 60 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.cpu.pressure.full.300.pct`*::
@@ -47210,6 +47222,8 @@ type: float
 Pressure over 300 seconds
 
 type: float
+
+format: percent
 
 --
 
@@ -48061,6 +48075,8 @@ Pressure over 10 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.io.pressure.full.60.pct`*::
@@ -48070,6 +48086,8 @@ Pressure over 60 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.io.pressure.full.300.pct`*::
@@ -48078,6 +48096,8 @@ type: float
 Pressure over 300 seconds
 
 type: float
+
+format: percent
 
 --
 
@@ -48103,6 +48123,8 @@ Pressure over 10 seconds
 
 type: float
 
+format: percent
+
 --
 
 *`system.process.cgroup.io.pressure.some.60.pct`*::
@@ -48111,6 +48133,8 @@ type: float
 Pressure over 60 seconds
 
 type: float
+
+format: percent
 
 --
 
