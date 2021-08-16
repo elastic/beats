@@ -1,0 +1,77 @@
+- name: health
+  type: group
+  release: beta
+  description: >
+    Enterprise Search health
+  fields:
+    - name: jvm
+      type: group
+      description: >
+        JVM health
+      fields:
+        - name: memory_usage
+          type: group
+          description: >
+            Memory usage
+          fields:
+            - name: heap_init.bytes
+              type: long
+              description: >
+                Heap init used by the JVM in bytes.
+            - name: heap_used.bytes
+              type: long
+              description: >
+                Heap used by the JVM in bytes.
+            - name: heap_committed.bytes
+              type: long
+              description: >
+                Committed heap to the JVM in bytes.
+            - name: heap_max.bytes
+              type: long
+              description: >
+                Max heap used by the JVM in bytes
+            - name: non_heap_init.bytes
+              type: long
+              description: >
+                Non-Heap initial memory used by the JVM in bytes.
+            - name: non_heap_committed.bytes
+              type: long
+              description: >
+                Non-Heap committed memory used by the JVM in bytes.
+            - name: object_pending_finalization_count
+              type: long
+              description: >
+                Displays the approximate number of objects for which finalization is pending.
+        - name: threads
+          type: group
+          description: >
+            Threads information
+          fields:
+            - name: thread_count
+              type: long
+              description: >
+                The number of live threads.
+            - name: peak_thread_count
+              type: long
+              description: >
+                Peak live thread count since the JVM started or the peak was reset. 
+            - name: total_started_thread_count
+              type: long
+              description: >
+                Total number of threads created and/or started since the JVM started. 
+            - name: daemon_thread_count
+              type: long
+              description: >
+                Current number of live daemon threads.
+            - name: non_heap_init.bytes
+              type: long
+              description: >
+                Non-Heap initial memory used by the JVM in bytes.
+            - name: non_heap_committed.bytes
+              type: long
+              description: >
+                Non-Heap committed memory used by the JVM in bytes.
+            - name: object_pending_finalization_count
+              type: long
+              description: >
+                Displays the approximate number of objects for which finalization is pending.

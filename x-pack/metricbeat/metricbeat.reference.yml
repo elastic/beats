@@ -513,6 +513,15 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
+#--------------------------- Enterprisesearch Module ---------------------------
+- module: enterprisesearch
+  metricsets: ["health"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  username: ${ENTERPRISESEARCH_USERNAME}
+  password: ${ENTERPRISESEARCH_PASSWORD}
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -2437,7 +2446,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
@@ -3017,4 +3026,3 @@ logging.files:
 
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: false
-

@@ -1,0 +1,7 @@
+- module: enterprisesearch
+  metricsets: ["health"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  username: ${ENTERPRISESEARCH_USERNAME}
+  password: ${ENTERPRISESEARCH_PASSWORD}

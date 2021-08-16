@@ -1,0 +1,35 @@
+{
+    "@timestamp":"2016-05-23T08:05:34.853Z",
+    "beat":{
+        "hostname":"beathost",
+        "name":"beathost"
+    },
+    "metricset":{
+        "host":"localhost",
+        "module":"enterprisesearch",
+        "name":"health",
+        "rtt":44269
+    },
+    "enterprisesearch":{
+        "health": {
+            "jvm": {
+                "memory_usage": {
+                    "heap_init": 268435456,
+                    "heap_used": 1551901480,
+                    "heap_committed": 1784152064,
+                    "heap_max": 3817865216,
+                    "object_pending_finalization_count": 0,
+                    "non_heap_init": 2555904,
+                    "non_heap_committed": 266469376
+                }
+            },
+            "threads": {
+                "thread_count": 24,
+                "peak_thread_count": 27,
+                "total_started_thread_count": 119,
+                "daemon_thread_count": 23
+            }
+        }
+    },
+    "type":"metricsets"
+}

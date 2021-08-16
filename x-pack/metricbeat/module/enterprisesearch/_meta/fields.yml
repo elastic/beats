@@ -1,0 +1,11 @@
+- key: enterprisesearch
+  title: "enterprisesearch"
+  release: beta
+  settings: ["ssl", "http"]
+  description: >
+    Enterprise Search module
+  fields:
+    - name: enterprisesearch
+      type: group
+      description: >
+      fields:
