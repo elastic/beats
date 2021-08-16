@@ -43,6 +43,12 @@ func (i *Installer) Install(ctx context.Context, spec program.Spec, version, ins
 	if err != nil {
 		return err
 	}
+
+	// always remove the entire tempDir
+	defer func() {
+		os.RemoveAll(tempDir)
+	}()
+
 	tempInstallDir := filepath.Join(tempDir, filepath.Base(installDir))
 
 	// cleanup install directory before Install
