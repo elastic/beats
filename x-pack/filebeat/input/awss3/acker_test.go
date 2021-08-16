@@ -52,3 +52,18 @@ func TestEventACKHandler(t *testing.T) {
 	assert.EqualValues(t, 0, acker.pendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
+
+func TestEventACKHandlerWait(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	// Create acker. Add one pending ACK.
+	acker := newEventACKTracker(ctx)
+	acker.Add()
+	acker.ACK()
+	acker.Wait()
+	acker.Add()
+
+	assert.EqualValues(t, 1, acker.pendingACKs)
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+}
