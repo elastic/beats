@@ -108,7 +108,11 @@ function makeObjFromNameValuePairArray(options) {
     return function(evt) {
         var src = evt.Get(options.from);
         var dict = {};
-        if (src == null || !(src instanceof Array)) return;
+        if (src == null) return;
+        if (!(src instanceof Array)) {
+            evt.Put(options.to, {"_raw": src} );
+            return;
+        }
         for (var i=0; i < src.length; i++) {
             var name, value;
             if (src[i] == null

@@ -63,6 +63,28 @@ function Audit(keep_original_message) {
         fail_on_error: false,
     });
 
+    var setOrchestratorMetadata = function(evt) {
+          if (evt.Get("json.resource.type") === "k8s_cluster") {
+            evt.Put("orchestrator.type", "kubernetes");
+            var convert_processor = new processor.Convert({
+                fields: [
+                    {
+                        from: "json.resource.labels.cluster_name",
+                        to: "orchestrator.cluster.name",
+                        type: "string"
+                    },
+                    {
+                        from: "json.protoPayload.resourceName",
+                        to: "orchestrator.resource.type_temp",
+                        type: "string"
+                    }
+                ],
+                ignore_missing: true,
+                fail_on_error: false,
+            }).Run(evt);
+        }
+    };
+
     // The log includes a protoPayload field.
     // https://cloud.google.com/logging/docs/reference/v2/rest/v2/LogEntry
     var convertLogEntry = new processor.Convert({
@@ -290,6 +312,7 @@ function Audit(keep_original_message) {
         .Add(dropPubSubFields)
         .Add(saveMetadata)
         .Add(setCloudMetadata)
+        .Add(setOrchestratorMetadata)
         .Add(convertLogEntry)
         .Add(convertProtoPayload)
         .Add(copyFields)

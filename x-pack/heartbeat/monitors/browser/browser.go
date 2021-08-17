@@ -25,14 +25,14 @@ func init() {
 
 var showExperimentalOnce = sync.Once{}
 
-var NotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
+var ErrNotSyntheticsCapableError = fmt.Errorf("synthetic monitors cannot be created outside the official elastic docker image")
 
 func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 	// We don't want users running synthetics in environments that don't have the required GUI libraries etc, so we check
 	// this flag. When we're ready to support the many possible configurations of systems outside the docker environment
 	// we can remove this check.
 	if os.Getenv("ELASTIC_SYNTHETICS_CAPABLE") != "true" {
-		return plugin.Plugin{}, NotSyntheticsCapableError
+		return plugin.Plugin{}, ErrNotSyntheticsCapableError
 	}
 
 	showExperimentalOnce.Do(func() {
@@ -47,26 +47,26 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
 	}
 
-	ss, err := NewSuite(cfg)
+	s, err := NewSuite(cfg)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}
 
 	extraArgs := []string{}
-	if ss.suiteCfg.Sandbox {
+	if s.suiteCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
 
 	var j jobs.Job
-	if src, ok := ss.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, ss.Params(), extraArgs...)
+	if src, ok := s.InlineSource(); ok {
+		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), extraArgs...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := ss.Fetch()
+			err := s.Fetch()
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), ss.Workdir(), ss.Params(), extraArgs...)
+			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), extraArgs...)
 			if err != nil {
 				return nil, err
 			}
@@ -76,7 +76,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 
 	return plugin.Plugin{
 		Jobs:      []jobs.Job{j},
-		DoClose:   ss.Close,
+		DoClose:   s.Close,
 		Endpoints: 1,
 	}, nil
 }

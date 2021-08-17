@@ -57,7 +57,7 @@ the keys of the selected principal. Otherwise, authentication will fail.
 [float]
 ==== `config_path`
 
-You need to set the path to the `krb5.conf`, so +{beatname_lc} can find the Kerberos KDC to
+You need to set the path to the `krb5.conf`, so {beatname_uc} can find the Kerberos KDC to
 retrieve a ticket.
 
 [float]
@@ -86,3 +86,8 @@ This option can only be configured for Kafka. It is the name of the Kafka servic
 ==== `realm`
 
 Name of the realm where the output resides.
+
+[float]
+==== `enable_krb5_fast`
+
+Enable Kerberos FAST authentication. This may conflict with some Active Directory installations. The default is `false`.

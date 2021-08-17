@@ -23,6 +23,7 @@ type Monitor interface {
 	Cleanup(spec program.Spec, pipelineID string) error
 	Reload(cfg *config.Config) error
 	IsMonitoringEnabled() bool
+	MonitoringNamespace() string
 	WatchLogs() bool
 	WatchMetrics() bool
 	Close()
@@ -30,5 +31,9 @@ type Monitor interface {
 
 // NewMonitor creates a monitor based on a process configuration.
 func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
-	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig), nil
+	logMetrics := true
+	if cfg.LoggingConfig != nil {
+		logMetrics = cfg.LoggingConfig.Metrics.Enabled
+	}
+	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig, logMetrics), nil
 }

@@ -82,7 +82,7 @@ func NewpersistentvolumeclaimMetricSet(base mb.BaseMetricSet) (mb.MetricSet, err
 // module rooted fields at the event that gets reported
 func (m *persistentvolumeclaimMetricSet) Fetch(reporter mb.ReporterV2) error {
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,40 @@
+Amazon Kinesis Data Streams sends data points to CloudWatch for
+monitoring purpose, such as to track shard usage, monitor incoming bytes and
+outgoing bytes. These metrics are automatically collected and pushed to CloudWatch
+every minute. There are two different levels of monitoring metrics:
+
+* *Basic(stream-level)*: Stream-level data is sent automatically every minute at no charge.
+* *Enhanced(shard-level)*: Shard-level data is sent every minute for an additional
+cost. To get this level of data, you must specifically enable it for the stream
+using the https://docs.aws.amazon.com/kinesis/latest/APIReference/API_EnableEnhancedMonitoring.html[EnableEnhancedMonitoring] operation.
+
+[float]
+=== AWS Permissions
+Some specific AWS permissions are required for IAM user to collect AWS EBS metrics.
+----
+ec2:DescribeRegions
+cloudwatch:GetMetricData
+cloudwatch:ListMetrics
+tag:getResources
+sts:GetCallerIdentity
+iam:ListAccountAliases
+----
+
+[float]
+=== Dashboard
+
+The kinesis metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-kinesis-overview.png[]
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: aws
+  period: 1m
+  metricsets:
+    - kinesis
+  # This module uses the aws cloudwatch metricset, all
+  # the options for this metricset are also available here.
+----

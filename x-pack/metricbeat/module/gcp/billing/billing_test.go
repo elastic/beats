@@ -5,6 +5,8 @@
 package billing
 
 import (
+	"io/ioutil"
+	"log"
 	"strconv"
 	"testing"
 
@@ -15,4 +17,18 @@ func TestGetCurrentMonth(t *testing.T) {
 	currentMonth := getCurrentMonth()
 	_, err := strconv.ParseInt(currentMonth, 0, 64)
 	assert.NoError(t, err)
+}
+
+func TestGenerateQuery(t *testing.T) {
+	log.SetOutput(ioutil.Discard)
+
+	query := generateQuery("my-table", "jan", "cost")
+	log.Println(query)
+
+	// verify that table name quoting is in effect
+	assert.Contains(t, query, "`my-table`")
+	// verify the group by is preserved
+	assert.Contains(t, query, "GROUP BY 1, 2, 3, 4, 5")
+	// verify the order by is preserved
+	assert.Contains(t, query, "ORDER BY 1 ASC, 2 ASC, 3 ASC, 4 ASC, 5 ASC")
 }

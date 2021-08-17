@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 
 	"github.com/gofrs/uuid"
@@ -101,28 +102,6 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
-	switch se.Type {
-	case "journey/end":
-		je.journeyComplete = true
-		return je.createSummary(event)
-	case "step/end":
-		je.stepCount++
-	case "step/screenshot":
-		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
-	case "journey/network_info":
-		add_data_stream_index.SetEventDataset(event, "browser_network")
-	}
-
-	eventext.MergeEventFields(event, se.ToMap())
-
-	if je.urlFields == nil {
-		if urlFields, err := event.GetValue("url"); err == nil {
-			if ufMap, ok := urlFields.(common.MapStr); ok {
-				je.urlFields = ufMap
-			}
-		}
-	}
-
 	var jobErr error
 	if se.Error != nil {
 		jobErr = stepError(se.Error)
@@ -132,6 +111,37 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 		}
 	}
 
+	switch se.Type {
+	case "journey/end":
+		je.journeyComplete = true
+		return je.createSummary(event)
+	case "step/end":
+		je.stepCount++
+	case "step/screenshot":
+		fallthrough
+	case "step/screenshot_ref":
+		fallthrough
+	case "screenshot/block":
+		add_data_stream_index.SetEventDataset(event, "browser.screenshot")
+	case "journey/network_info":
+		add_data_stream_index.SetEventDataset(event, "browser.network")
+	}
+
+	if se.Id != "" {
+		event.SetID(se.Id)
+		// This is only relevant for screenshots, which have a specific ID
+		// In that case we always want to issue an update op
+		event.Meta.Put(events.FieldMetaOpType, events.OpTypeCreate)
+	}
+	eventext.MergeEventFields(event, se.ToMap())
+
+	if je.urlFields == nil {
+		if urlFields, err := event.GetValue("url"); err == nil {
+			if ufMap, ok := urlFields.(common.MapStr); ok {
+				je.urlFields = ufMap
+			}
+		}
+	}
 	return jobErr
 }
 

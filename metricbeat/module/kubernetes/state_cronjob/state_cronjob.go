@@ -87,7 +87,7 @@ func NewCronJobMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 //
 // Copied from other kube state metrics.
 func (m *CronJobMetricSet) Fetch(reporter mb.ReporterV2) error {
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		return errors.Wrap(err, "error getting family metrics")
 	}

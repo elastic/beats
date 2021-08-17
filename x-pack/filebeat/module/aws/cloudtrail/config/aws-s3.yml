@@ -1,5 +1,18 @@
 type: aws-s3
+{{ if .queue_url }}
 queue_url: {{ .queue_url }}
+{{ end }}
+{{ if .bucket }}
+bucket: {{ .bucket }}
+{{ end }}
+
+{{ if .number_of_workers }}
+number_of_workers: {{ .number_of_workers }}
+{{ end }}
+
+{{ if .bucket_list_interval }}
+bucket_list_interval: {{ .bucket_list_interval }}
+{{ end }}
 file_selectors:
 {{ if .process_cloudtrail_logs }}
   - regex: '/CloudTrail/'
@@ -59,6 +72,10 @@ fips_enabled: {{ .fips_enabled }}
 max_number_of_messages: {{ .max_number_of_messages }}
 {{ end }}
 
+{{ if .proxy_url }}
+proxy_url: {{ .proxy_url }}
+{{ end }}
+
 tags: {{.tags | tojson}}
 publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 
@@ -66,4 +83,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.9.0
+        ecs.version: 1.11.0

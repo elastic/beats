@@ -1,6 +1,6 @@
 [
 	{
-		"RootFields": {},
+		"RootFields": null,
 		"ModuleFields": null,
 		"MetricSetFields": {
 			"cpu": {

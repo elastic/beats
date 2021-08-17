@@ -7,8 +7,8 @@
         "azure.platformlogs.ccpNamespace": "5e4bf4baee195b00017cdbfa",
         "azure.platformlogs.event_category": "Administrative",
         "azure.platformlogs.operation_name": "Microsoft.ContainerService/managedClusters/diagnosticLogs/Read",
+        "azure.platformlogs.properties.log.kind": "Event",
         "azure.platformlogs.properties.pod": "kube-apiserver-666bd4b459-hjgdc",
-        "azure.platformlogs.properties.stream": "stdout",
         "azure.resource.group": "OBS-INFRASTRUCTURE",
         "azure.resource.id": "/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE",
         "azure.resource.name": "OBSKUBE",
@@ -19,11 +19,10 @@
         "event.dataset": "azure.platformlogs",
         "event.kind": "event",
         "event.module": "azure",
-        "event.original": "{\"Cloud\":\"AzureCloud\",\"Environment\":\"prod\",\"category\":\"kube-audit\",\"ccpNamespace\":\"5e4bf4baee195b00017cdbfa\",\"operationName\":\"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read\",\"properties\":{\"log\":\"{\\\"kind\\\":\\\"Event\\\",\\\"apiVersion\\\":\\\"audit.k8s.io/v1\\\",\\\"level\\\":\\\"Metadata\\\",\\\"auditID\\\":\\\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\\\"}\",\"pod\":\"kube-apiserver-666bd4b459-hjgdc\",\"stream\":\"stdout\"},\"resourceId\":\"/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE\",\"time\":\"2020-11-09T10:57:31.0000000Z\"}",
+        "event.original": "{\"Cloud\":\"AzureCloud\",\"Environment\":\"prod\",\"category\":\"kube-audit\",\"ccpNamespace\":\"5e4bf4baee195b00017cdbfa\",\"operationName\":\"Microsoft.ContainerService/managedClusters/diagnosticLogs/Read\",\"properties\":{\"log\":\"{\\\"kind\\\":\\\"Event\\\"}\",\"pod\":\"kube-apiserver-666bd4b459-hjgdc\"},\"resourceId\":\"/SUBSCRIPTIONS/70BD6E77-4B1E-4835-8896-DB77B8EEF364/RESOURCEGROUPS/OBS-INFRASTRUCTURE/PROVIDERS/MICROSOFT.CONTAINERSERVICE/MANAGEDCLUSTERS/OBSKUBE\",\"time\":\"2020-11-09T10:57:31.0000000Z\"}",
         "fileset.name": "platformlogs",
         "input.type": "log",
         "log.offset": 0,
-        "message": "{\"kind\":\"Event\",\"apiVersion\":\"audit.k8s.io/v1\",\"level\":\"Metadata\",\"auditID\":\"22af12c3-a1fe-4f2c-99a9-3cdde671dbfe\"}",
         "service.type": "azure",
         "tags": [
             "forwarded"

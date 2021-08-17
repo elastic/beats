@@ -29,6 +29,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 )
@@ -46,7 +47,7 @@ func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
-	fileOutput := flag.String("output", "output.json", "Output file")
+	fileOutput := flag.String("output", "output.ndjson", "Output file")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
 	flag.BoolVar(&quiet, "quiet", false, "be quiet")
@@ -64,14 +65,18 @@ func main() {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
+
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = kibanaTimeout
+
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
-		Protocol: u.Scheme,
-		Host:     u.Host,
-		Username: user,
-		Password: pass,
-		Path:     u.Path,
-		SpaceID:  *spaceID,
-		Timeout:  kibanaTimeout,
+		Protocol:  u.Scheme,
+		Host:      u.Host,
+		Username:  user,
+		Password:  pass,
+		Path:      u.Path,
+		SpaceID:   *spaceID,
+		Transport: transport,
 	})
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
@@ -124,13 +129,12 @@ func exportSingleDashboard(client *kibana.Client, dashboard, output string) erro
 	if err != nil {
 		return fmt.Errorf("failed to export the dashboard: %+v", err)
 	}
-	result = dashboards.DecodeExported(result)
 
 	if err = os.MkdirAll(filepath.Dir(output), 0755); err != nil {
 		return errors.Wrap(err, "failed to create directory for dashboard")
 	}
 
-	err = ioutil.WriteFile(output, []byte(result.StringToPrint()), dashboards.OutputPermission)
+	err = ioutil.WriteFile(output, result, dashboards.OutputPermission)
 	if err != nil {
 		return fmt.Errorf("failed to save the dashboard: %+v", err)
 	}

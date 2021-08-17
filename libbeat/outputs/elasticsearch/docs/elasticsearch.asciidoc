@@ -170,6 +170,13 @@ output.elasticsearch.headers:
 It is possible to specify multiple header values for the same header
 name by separating them with a comma.
 
+
+===== `proxy_disable`
+
+If set to `true` all proxy settings, including `HTTP_PROXY` and `HTTPS_PROXY`
+variables are ignored.
+
+
 ===== `proxy_url`
 
 The URL of the proxy to use when connecting to the Elasticsearch servers. The
@@ -178,6 +185,11 @@ scheme is assumed. If a value is not specified through the configuration file
 then proxy environment variables are used. See the
 https://golang.org/pkg/net/http/#ProxyFromEnvironment[Go documentation]
 for more information about the environment variables.
+
+
+===== `proxy_headers`
+
+Additional headers to send to proxies during CONNECT requests.
 
 [[index-option-es]]
 ===== `index`
@@ -670,3 +682,38 @@ or <<configuration-ssl,SSL configuration reference>> for more information.
 Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
+
+===== `non_indexable_policy`
+
+Specifies the behavior when the elasticsearch cluster explicitly rejects documents, for example on mapping conflicts.
+
+====== `drop`
+The default behaviour, when an event is explicitly rejected by elasticsearch it is dropped.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  non_indexable_policy.drop: ~
+------------------------------------------------------------------------------
+
+====== `dead_letter_index`
+
+beta[]
+
+On an explicit rejection, this policy will retry the event in the next batch. However, the target index will change
+to index specified. In addition, the structure of the event will be change to the following fields:
+
+message:: Contains the escaped json of the original event.
+error.type:: Contains the status code
+error.message:: Contains status returned by elasticsearch, describing the reason
+
+`index`:: The index to send rejected events to.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  non_indexable_policy.dead_letter_index:
+    index: "my-dead-letter-index"
+------------------------------------------------------------------------------

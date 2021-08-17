@@ -10,6 +10,7 @@ processors:
     field: zeek.rfb.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.rfb.ts
 - append:

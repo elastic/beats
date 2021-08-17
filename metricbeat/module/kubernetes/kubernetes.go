@@ -25,6 +25,7 @@ import (
 	"github.com/pkg/errors"
 	dto "github.com/prometheus/client_model/go"
 
+	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -38,7 +39,8 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetKubeletStats(http *helper.HTTP) ([]byte, error)
 }
 
 type familiesCache struct {
@@ -53,10 +55,26 @@ type kubeStateMetricsCache struct {
 }
 
 func (c *kubeStateMetricsCache) getCacheMapEntry(hash uint64) *familiesCache {
-	c.lock.Lock()
-	defer c.lock.Unlock()
 	if _, ok := c.cacheMap[hash]; !ok {
 		c.cacheMap[hash] = &familiesCache{}
+	}
+	return c.cacheMap[hash]
+}
+
+type statsCache struct {
+	sharedStats        []byte
+	lastFetchErr       error
+	lastFetchTimestamp time.Time
+}
+
+type kubeletStatsCache struct {
+	cacheMap map[uint64]*statsCache
+	lock     sync.Mutex
+}
+
+func (c *kubeletStatsCache) getCacheMapEntry(hash uint64) *statsCache {
+	if _, ok := c.cacheMap[hash]; !ok {
+		c.cacheMap[hash] = &statsCache{}
 	}
 	return c.cacheMap[hash]
 }
@@ -65,43 +83,67 @@ type module struct {
 	mb.BaseModule
 
 	kubeStateMetricsCache *kubeStateMetricsCache
-	familiesCache         *familiesCache
+	kubeletStatsCache     *kubeletStatsCache
+	cacheHash             uint64
 }
 
 func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeStateMetricsCache := &kubeStateMetricsCache{
 		cacheMap: make(map[uint64]*familiesCache),
 	}
+	kubeletStatsCache := &kubeletStatsCache{
+		cacheMap: make(map[uint64]*statsCache),
+	}
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
 			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
 		}
-		// NOTE: These entries will be never removed, this can be a leak if
-		// metricbeat is used to monitor clusters dynamically created.
-		// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
-		familiesCache := kubeStateMetricsCache.getCacheMapEntry(hash)
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
-			familiesCache:         familiesCache,
+			kubeletStatsCache:     kubeletStatsCache,
+			cacheHash:             hash,
 		}
 		return &m, nil
 	}
 }
 
-func (m *module) GetSharedFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
+func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
 	m.kubeStateMetricsCache.lock.Lock()
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
 	now := time.Now()
+	// NOTE: These entries will be never removed, this can be a leak if
+	// metricbeat is used to monitor clusters dynamically created.
+	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	familiesCache := m.kubeStateMetricsCache.getCacheMapEntry(m.cacheHash)
 
-	if m.familiesCache.lastFetchTimestamp.IsZero() || now.Sub(m.familiesCache.lastFetchTimestamp) > m.Config().Period {
-		m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr = prometheus.GetFamilies()
-		m.familiesCache.lastFetchTimestamp = now
+	if familiesCache.lastFetchTimestamp.IsZero() || now.Sub(familiesCache.lastFetchTimestamp) > m.Config().Period {
+		familiesCache.sharedFamilies, familiesCache.lastFetchErr = prometheus.GetFamilies()
+		familiesCache.lastFetchTimestamp = now
 	}
 
-	return m.familiesCache.sharedFamilies, m.familiesCache.lastFetchErr
+	return familiesCache.sharedFamilies, familiesCache.lastFetchErr
+}
+
+func (m *module) GetKubeletStats(http *helper.HTTP) ([]byte, error) {
+	m.kubeletStatsCache.lock.Lock()
+	defer m.kubeletStatsCache.lock.Unlock()
+
+	now := time.Now()
+
+	// NOTE: These entries will be never removed, this can be a leak if
+	// metricbeat is used to monitor clusters dynamically created.
+	// (https://github.com/elastic/beats/pull/25640#discussion_r633395213)
+	statsCache := m.kubeletStatsCache.getCacheMapEntry(m.cacheHash)
+
+	if statsCache.lastFetchTimestamp.IsZero() || now.Sub(statsCache.lastFetchTimestamp) > m.Config().Period {
+		statsCache.sharedStats, statsCache.lastFetchErr = http.FetchContent()
+		statsCache.lastFetchTimestamp = now
+	}
+
+	return statsCache.sharedStats, statsCache.lastFetchErr
 }
 
 func generateCacheHash(host []string) (uint64, error) {

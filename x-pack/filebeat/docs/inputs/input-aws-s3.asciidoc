@@ -11,10 +11,21 @@
 <titleabbrev>AWS S3</titleabbrev>
 ++++
 
-Use the `aws-s3` input to retrieve logs from S3 objects that are pointed by
-messages from specific SQS queues. This input can, for example, be used to
-receive S3 server access logs to monitor detailed records for the requests that
+Use the `aws-s3` input to retrieve logs from S3 objects that are pointed to by
+S3 notification events read from an SQS queue or directly polling list of S3 objects in an S3 bucket.
+The use of SQS notification is preferred: polling list of S3 objects is expensive
+in terms of performance and costs and should be preferably used only when no SQS
+notification can be attached to the S3 buckets. This input can, for example, be
+used to receive S3 access logs to monitor detailed records for the requests that
 are made to a bucket.
+
+SQS notification method is enabled setting `queue_url` configuration value.
+S3 bucket list polling method is enabled setting `s3_bucket` configuration value.
+Both value cannot be set at the same time, at least one of the two value must be set.
+
+When using the SQS notification method this input depends on S3 notifications delivered
+to an SQS queue for `s3:ObjectCreated:*` events. You must create an SQS queue and configure S3
+to publish events to the queue.
 
 When processing a S3 object which pointed by a SQS message, if half of the set
 visibility timeout passed and the processing is still ongoing, then the
@@ -32,6 +43,24 @@ be stopped and the SQS message will be returned back to the queue.
   expand_event_list_from_field: Records
 ----
 
+
+When using the direct polling list of S3 objects in an S3 buckets,
+a number of workers that will process the S3 objects listed must be set
+through the `number_of_workers` config.
+Listing of the S3 bucket will be polled according the time interval defined by
+`bucket_list_interval` config. Default value is 120secs.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: aws-s3
+  s3_bucket: arn:aws:s3:::test-s3-bucket
+  number_of_workers: 5
+  bucket_list_interval: 300s
+  credential_profile_name: elastic-beats
+  expand_event_list_from_field: Records
+----
+
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
@@ -39,8 +68,9 @@ The `aws-s3` input supports the following configuration options plus the
 ==== `api_timeout`
 
 The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
-call will be interrupted. The default AWS API call timeout for a message is 120
-seconds. The maximum is half of the visibility timeout value.
+call will be interrupted. The default AWS API timeout is `120s`.
+
+The API timeout must be longer than the `sqs.wait_time` value.
 
 [id="input-{type}-buffer_size"]
 [float]
@@ -112,9 +142,10 @@ setting.  If `file_selectors` is given, then any global
 `expand_event_list_from_field` value is ignored in favor of the ones
 specified in the `file_selectors`.  Regex syntax is the same as the Go
 language.  Files that don't match one of the regexes won't be
-processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-multiline>>,
-<<input-aws-s3-max_bytes>>, <<input-aws-s3-buffer_size>>, and
-<<input-aws-s3-encoding>> may also be set for each file selector.
+processed.  <<input-aws-s3-content_type>>, <<input-aws-s3-parsers>>,
+<<input-aws-s3-include_s3_metadata>>,<<input-aws-s3-max_bytes>>,
+<<input-aws-s3-buffer_size>>, and <<input-aws-s3-encoding>> may also
+be set for each file selector.
 
 ["source", "yml"]
 ----
@@ -133,6 +164,22 @@ Enabling this option changes the service name from `s3` to `s3-fips` for
 connecting to the correct service endpoint. For example:
 `s3-fips.us-gov-east-1.amazonaws.com`.
 
+[id="input-{type}-include_s3_metadata"]
+[float]
+==== `include_s3_metadata`
+
+This input can include S3 object metadata in the generated events for use in
+follow-on processing. You must specify the list of keys to include. By default
+none are included. If the key exists in the S3 response then it will be included
+in the event as `aws.s3.metadata.<key>` where the key name as been normalized
+to all lowercase.
+
+----
+include_s3_metadata:
+  - last-modified
+  - x-amz-version-id
+----
+
 [id="input-{type}-max_bytes"]
 [float]
 ==== `max_bytes`
@@ -145,33 +192,98 @@ The default is `10 MiB`.
 [float]
 ==== `max_number_of_messages`
 
-The maximum number of messages to return. Amazon SQS never returns more messages
-than this value (however, fewer messages might be returned). Valid values: 1 to
-10. Default: 5.
+The maximum number of SQS messages that can be inflight at any time. Defaults
+to 5.
 
-[id="input-{type}-multiline"]
+[id="input-{type}-parsers"]
 [float]
-==== `multiline`
+==== `parsers`
+
+beta[]
+
+This option expects a list of parsers that non-JSON logs go through.
+
+Available parsers:
+
+* `multiline`
+
+In this example, {beatname_uc} is reading multiline messages that
+consist of XML that start with the `<Event>` tag.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: {type}
+  ...
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   after
+----
+
+See the available parser settings in detail below.
+
+[float]
+===== `multiline`
 
 beta[]
 
 Options that control how {beatname_uc} deals with log messages that span
-multiple lines. This only applies to non-JSON logs.  See <<multiline-examples>>
-for more information about configuring multiline options.
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
 
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. Required.
+URL of the AWS SQS queue that messages will be received from. (Required when `s3_bucket` is not set).
 
 [float]
 ==== `visibility_timeout`
 
-The duration that the received messages are hidden from subsequent retrieve
-requests after being retrieved by a ReceiveMessage request. This value needs to
-be a lot bigger than {beatname_uc} collection frequency so if it took too long
-to read the S3 log, this SQS message will not be reprocessed. The default
-visibility timeout for a message is 300 seconds. The maximum is 12 hours.
+The duration that the received SQS messages are hidden from subsequent retrieve
+requests after being retrieved by a `ReceiveMessage` request. The default
+visibility timeout is `300s`. The maximum is `12h`. {beatname_uc} will
+automatically reset the visibility timeout of a message after 1/2 of the
+duration passes to prevent a message that is still being processed from
+returning to the queue.
+
+[float]
+==== `sqs.max_receive_count`
+
+The maximum number of times a SQS message should be received (retried) before
+deleting it. This feature prevents poison-pill messages (messages that can be
+received but can't be processed) from consuming resources. The number of times
+a message has been received is tracked using the `ApproximateReceiveCount` SQS
+attribute. The default value is 5.
+
+If you have configured a dead letter queue then you can set this value to
+`-1` to disable deletion on failure.
+
+[float]
+==== `sqs.wait_time`
+
+The maximum duration that an SQS `ReceiveMessage` call should wait for a message
+to arrive in the queue before returning. The default value is `20s`. The maximum
+value is `20s`.
+
+[float]
+==== `s3_bucket`
+
+ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` is not set).
+
+[float]
+==== `bucket_list_interval`
+
+Time interval for polling listing of the S3 bucket: default to `120s`.
+
+
+[float]
+==== `number_of_workers`
+
+Number of workers that will process the S3 objects listed. (Required when `s3_bucket` is set).
+
+
 
 [float]
 ==== `aws credentials`
@@ -182,13 +294,22 @@ see <<aws-credentials-config,AWS credentials options>> for more details.
 [float]
 === AWS Permissions
 
-Specific AWS permissions are required for IAM user to access SQS and S3:
+Specific AWS permissions are required for IAM user to access SQS and S3
+when using the SQS notifications method:
 
 ----
 s3:GetObject
 sqs:ReceiveMessage
 sqs:ChangeMessageVisibility
 sqs:DeleteMessage
+----
+
+Reduced specific AWS permissions are required for IAM user to access S3
+when using the polling list of S3 bucket objects:
+
+----
+s3:GetObject
+s3:ListBucket
 ----
 
 [float]
@@ -202,7 +323,7 @@ for more details.
 [float]
 === Parallel Processing
 
-Multiple Filebeat instances can read from the same SQS queues at the same time.
+When using the SQS notifications method, multiple {beatname_uc} instances can read from the same SQS queues at the same time.
 To horizontally scale processing when there are large amounts of log data
 flowing into an S3 bucket, you can run multiple {beatname_uc} instances that
 read from the same SQS queues at the same time. No additional configuration is
@@ -213,14 +334,24 @@ when multiple {beatname_uc} instances are running in parallel. To prevent
 {beatname_uc} from receiving and processing the message more than once, set the
 visibility timeout.
 
-The visibility timeout begins when SQS returns a message to Filebeat. During
-this time, Filebeat processes and deletes the message. However, if Filebeat
+The visibility timeout begins when SQS returns a message to {beatname_uc}. During
+this time, {beatname_uc} processes and deletes the message. However, if {beatname_uc}
 fails before deleting the message and your system doesn't call the DeleteMessage
 action for that message before the visibility timeout expires, the message
 becomes visible to other {beatname_uc} instances, and the message is received
 again. By default, the visibility timeout is set to 5 minutes for aws-s3 input
 in {beatname_uc}. 5 minutes is sufficient time for {beatname_uc} to read SQS
 messages and process related s3 log files.
+
+When using the polling list of S3 bucket objects method be aware that if running multiple {beatname_uc} instances,
+they can list the same S3 bucket at the same time. Since the state of the ingested S3 objects is persisted
+(upon processing every page of the listing operation) in the `path.data` configuration
+and multiple {beatname_uc} cannot share the same `path.data` this will produce repeated
+ingestion of the S3 object.
+Therefore, when using the polling list of S3 bucket objects method, scaling should be
+vertical, with a single bigger {beatname_uc} instance and higher `number_of_workers`
+config value.
+
 
 [float]
 === Metrics
@@ -239,6 +370,9 @@ observe the activity of the input.
 | `sqs_messages_deleted_total`              | Number of SQS messages deleted.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
+| `s3_objects_listed_total`                 | Number of S3 objects returned by list operations.
+| `s3_objects_processed_total`              | Number of S3 objects that matched file_selectors rules.
+| `s3_objects_acked_total`                  | Number of S3 objects processed that were fully ACKed.
 | `s3_bytes_processed_total`                | Number of S3 bytes processed.
 | `s3_events_created_total`                 | Number of events created from processing S3 data.
 | `s3_objects_inflight_gauge`               | Number of S3 objects inflight (gauge).

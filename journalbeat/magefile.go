@@ -137,6 +137,8 @@ func selectImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
+	case strings.HasPrefix(platform, "linux/armv7"):
+		tagSuffix = "armhf"
 	case strings.HasPrefix(platform, "linux/arm"):
 		tagSuffix = "arm"
 		if runtime.GOARCH == "arm64" {
