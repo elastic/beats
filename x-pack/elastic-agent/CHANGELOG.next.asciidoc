@@ -81,7 +81,6 @@
 - Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
 - Fix issue with atomic extract running in K8s {pull}27396[27396]
 - Fix issue with install directory in state path in K8s {pull}27396[27396]
-- Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
 
 ==== New features
 
