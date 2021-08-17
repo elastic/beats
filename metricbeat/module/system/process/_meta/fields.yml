@@ -274,15 +274,19 @@
                   fields:
                     - name: 10.pct
                       type: float
+                      format: percent
                       description: Pressure over 10 seconds
                     - name: 60.pct
                       type: float
+                      format: percent
                       description: Pressure over 60 seconds
                     - name: 300.pct
                       type: float
+                      format: percent
                       description: Pressure over 300 seconds
                     - name: total
                       type: long
+                      format: percent
                       description: total Some pressure time
                 - name: full
                   type: group
@@ -290,12 +294,15 @@
                   fields:
                     - name: 10.pct
                       type: float
+                      format: percent
                       description: Pressure over 10 seconds
                     - name: 60.pct
                       type: float
+                      format: percent
                       description: Pressure over 60 seconds
                     - name: 300.pct
                       type: float
+                      format: percent
                       description: Pressure over 300 seconds
                     - name: total
                       type: long
@@ -715,12 +722,15 @@
                   fields:
                     - name: 10.pct
                       type: float
+                      format: percent
                       description: Pressure over 10 seconds
                     - name: 60.pct
                       type: float
+                      format: percent
                       description: Pressure over 60 seconds
                     - name: 300.pct
                       type: float
+                      format: percent
                       description: Pressure over 300 seconds
                     - name: total
                       type: long
@@ -731,9 +741,11 @@
                   fields:
                     - name: 10.pct
                       type: float
+                      format: percent
                       description: Pressure over 10 seconds
                     - name: 60.pct
                       type: float
+                      format: percent
                       description: Pressure over 60 seconds
                     - name: 300.pct
                       type: float
