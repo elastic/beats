@@ -19,6 +19,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3manager"
@@ -32,6 +34,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 )
 
 const (
@@ -69,7 +73,35 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func makeTestConfig(queueURL string) *common.Config {
+func makeTestConfigS3(s3bucket string) *common.Config {
+	return common.MustNewConfigFrom(fmt.Sprintf(`---
+bucket: aws:s3:::%s
+number_of_workers: 1
+file_selectors:
+-
+  regex: 'events-array.json$'
+  expand_event_list_from_field: Events
+  content_type: application/json
+  include_s3_metadata:
+    - last-modified
+    - x-amz-version-id
+    - x-amz-storage-class
+    - Content-Length
+    - Content-Type
+-
+  regex: '\.(?:nd)?json(\.gz)?$'
+  content_type: application/json
+-
+  regex: 'multiline.txt$'
+  parsers:
+    - multiline:
+        pattern: "^<Event"
+        negate:  true
+        match:   after
+`, s3bucket))
+}
+
+func makeTestConfigSQS(queueURL string) *common.Config {
 	return common.MustNewConfigFrom(fmt.Sprintf(`---
 queue_url: %s
 max_number_of_messages: 1
@@ -98,8 +130,30 @@ file_selectors:
 `, queueURL))
 }
 
+type testInputStore struct {
+	registry *statestore.Registry
+}
+
+func openTestStatestore() beater.StateStore {
+	return &testInputStore{
+		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
+	}
+}
+
+func (s *testInputStore) Close() {
+	s.registry.Close()
+}
+
+func (s *testInputStore) Access() (*statestore.Store, error) {
+	return s.registry.Get("filebeat")
+}
+
+func (s *testInputStore) CleanupInterval() time.Duration {
+	return 24 * time.Hour
+}
+
 func createInput(t *testing.T, cfg *common.Config) *s3Input {
-	inputV2, err := Plugin().Manager.Create(cfg)
+	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +170,7 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
-func TestInputRun(t *testing.T) {
+func TestInputRunSQS(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to setup S3 and SQS and must be executed manually.
@@ -124,6 +178,9 @@ func TestInputRun(t *testing.T) {
 
 	// Ensure SQS is empty before testing.
 	drainSQS(t, tfConfig)
+
+	// Ensure metrics are removed before testing.
+	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
 
 	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
 		"testdata/events-array.json",
@@ -136,7 +193,7 @@ func TestInputRun(t *testing.T) {
 		"testdata/log.txt", // Skipped (no match).
 	)
 
-	s3Input := createInput(t, makeTestConfig(tfConfig.QueueURL))
+	s3Input := createInput(t, makeTestConfigSQS(tfConfig.QueueURL))
 
 	inputCtx, cancel := newV2Context()
 	t.Cleanup(cancel)
@@ -179,6 +236,66 @@ func TestInputRun(t *testing.T) {
 	assertMetric(t, snap, "s3_events_created_total", 12)
 }
 
+func TestInputRunS3(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to setup S3 and must be executed manually.
+	tfConfig := getTerraformOutputs(t)
+
+	// Ensure metrics are removed before testing.
+	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
+
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
+	s3Input := createInput(t, makeTestConfigS3(tfConfig.BucketName))
+
+	inputCtx, cancel := newV2Context()
+	t.Cleanup(cancel)
+	time.AfterFunc(15*time.Second, func() {
+		cancel()
+	})
+
+	client := pubtest.NewChanClient(0)
+	defer close(client.Channel)
+	go func() {
+		for event := range client.Channel {
+			// Fake the ACK handling that's not implemented in pubtest.
+			event.Private.(*eventACKTracker).ACK()
+		}
+	}()
+
+	var errGroup errgroup.Group
+	errGroup.Go(func() error {
+		pipeline := pubtest.PublisherWithClient(client)
+		return s3Input.Run(inputCtx, pipeline)
+	})
+
+	if err := errGroup.Wait(); err != nil {
+		t.Fatal(err)
+	}
+
+	snap := common.MapStr(monitoring.CollectStructSnapshot(
+		monitoring.GetNamespace("dataset").GetRegistry(),
+		monitoring.Full,
+		false))
+	t.Log(snap.StringToPrint())
+
+	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
+	assertMetric(t, snap, "s3_objects_requested_total", 7)
+	assertMetric(t, snap, "s3_objects_listed_total", 8)
+	assertMetric(t, snap, "s3_objects_processed_total", 7)
+	assertMetric(t, snap, "s3_objects_acked_total", 6)
+	assertMetric(t, snap, "s3_events_created_total", 12)
+}
 func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
 	n, _ := snapshot.GetValue(inputID + "." + name)
 	assert.EqualValues(t, value, n, name)
