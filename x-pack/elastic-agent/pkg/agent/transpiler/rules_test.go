@@ -781,6 +781,60 @@ outputs:
 				},
 			},
 		},
+		"inject queue settings": {
+			givenYAML: `
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+    bulk_max_size: 46
+    worker: 5
+`,
+			expectedYAML: `
+queue:
+  mem:
+    events: 690
+    flush:
+      min_events: 46
+
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+    bulk_max_size: 46
+    worker: 5
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectQueue(),
+				},
+			},
+		},
+		"inject queue settings falls back on default values": {
+			givenYAML: `
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+`,
+			expectedYAML: `
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectQueue(),
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {

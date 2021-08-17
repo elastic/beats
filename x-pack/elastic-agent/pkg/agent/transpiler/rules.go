@@ -1525,6 +1525,11 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 
 type InjectQueueRule struct{}
 
+// InjectQueue creates a InjectQueueRule
+func InjectQueue() *InjectQueueRule {
+	return &InjectQueueRule{}
+}
+
 func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
