@@ -62,6 +62,10 @@ func (s *Suite) Params() map[string]interface{} {
 	return s.suiteCfg.Params
 }
 
+func (s *Suite) FilterJourneys() synthexec.FilterJourneyConfig {
+	return s.suiteCfg.FilterJourneys
+}
+
 func (s *Suite) Close() error {
 	if s.suiteCfg.Source.ActiveMemo != nil {
 		s.suiteCfg.Source.ActiveMemo.Close()
@@ -95,7 +99,7 @@ func (s *Suite) jobs() []jobs.Job {
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.extraArgs()...)
+			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.extraArgs()...)
 			if err != nil {
 				return nil, err
 			}

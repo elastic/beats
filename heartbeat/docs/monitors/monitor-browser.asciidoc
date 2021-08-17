@@ -169,7 +169,34 @@ though you will no longer get errors if there is anything wrong with the certifi
 [[monitor-browser-sandbox]]
 ==== `sandbox`
 
-Set this option to `true` to enable the normally disabled chromium sandbox. Defaults to false.
+Set this option to `true` to enable the normally disabled chromium sandbox.
+Defaults to false.
+
+[float]
+[[monitor-browser-filter-journeys]]
+==== `filter_journeys`
+
+Set this option to filter journeys based on journey tags and names.
+
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+- type: browser
+  id: local-journeys
+  name: Local journeys
+  schedule: '@every 1m'
+  filter_journeys:
+    tags: ["browse", "checkout"]
+    match: "login*"
+  source:
+    local:
+      path: "/path/to/synthetics/journeys"
+-------------------------------------------------------------------------------
+
+*`tags`*:: run only journeys with the given tag(s), or globs
+*`match`*:: run only journeys with a name or tags that matches the configured glob
 
 
 [float]
