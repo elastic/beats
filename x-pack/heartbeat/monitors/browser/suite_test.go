@@ -143,6 +143,11 @@ func TestExtraArgs(t *testing.T) {
 			[]string{"--sandbox"},
 		},
 		{
+			"ignore_https_errors",
+			&Config{IgnoreHTTPSErrors: true},
+			[]string{"--ignore-https-errors"},
+		},
+		{
 			"screenshots",
 			&Config{Screenshots: "off"},
 			[]string{"--screenshots", "off"},
