@@ -796,6 +796,7 @@ queue:
     events: 690
     flush:
       min_events: 46
+      timeout: 1s
 
 output:
   elasticsearch:
@@ -823,6 +824,7 @@ queue:
     events: 350
     flush:
       min_events: 50
+      timeout: 1s
 
 output:
   elasticsearch:

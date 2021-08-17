@@ -1590,9 +1590,10 @@ func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
 							name:  "min_events",
 							value: &IntVal{value: min_events},
 						},
-						// flush.timeout defaults to 1s, which is what we want for now,
-						// but if we wanted to customize that as well this is where it
-						// would go.
+						&Key{
+							name:  "timeout",
+							value: &StrVal{value: "1s"},
+						},
 					},
 				},
 			},
