@@ -52,7 +52,7 @@ func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
 			if err := run(streams, nil); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},

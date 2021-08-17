@@ -20,6 +20,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 - Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
+- Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dashboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
 
 *Auditbeat*
 
@@ -47,6 +48,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 - Release Filebeat Stack Monitoring modules as GA {pull}26226[26226]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 
 *Heartbeat*
 
@@ -246,8 +248,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - Allow metric prefix override per service in gcp module. {pull}26960[26960]
 - Change `server_status_path` default setting to `nginx_status` for the `nginx` module. {pull}26642[26642]
+- Fix cloudwatch metricset collecting duplicate data points. {pull}27327[27327]
 - Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
 - Fix flaky test TestAddCounterInvalidArgWhenQueryClosed. {issue}27312[27312] {pull}27313[27313]
+- Add percent formatters to system/process {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module {pull}27363[27363]
 
 *Packetbeat*
 
