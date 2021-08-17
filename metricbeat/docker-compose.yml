@@ -49,11 +49,11 @@ services:
 
   # Used by base tests
   metricbeat:
-    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.14.0}-1
+    image: docker.elastic.co/integrations-ci/beats-metricbeat:${BEAT_VERSION:-7.12.0}-1
     build:
       context: ./module/beat/_meta
       args:
-        BEAT_VERSION: ${BEAT_VERSION:-7.14.0}
+        BEAT_VERSION: ${BEAT_VERSION:-7.12.0}
     command: '-e'
     ports:
       - 5066
