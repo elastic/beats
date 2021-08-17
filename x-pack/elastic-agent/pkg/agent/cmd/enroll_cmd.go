@@ -546,6 +546,12 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 		"--path.home", paths.Top(), "--path.config", paths.Config(),
 		"--path.logs", paths.Logs(),
 	}
+	if paths.Downloads() != "" {
+		args = append(args, "--path.downloads", paths.Downloads())
+	}
+	if paths.Install() != "" {
+		args = append(args, "--path.install", paths.Install())
+	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
 	}
