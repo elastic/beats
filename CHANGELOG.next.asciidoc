@@ -303,6 +303,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `logging.metrics.namespaces` config option to control what metric groups are reported in logs. {pull}25727[25727]
 - Add sha256 digests to RPM packages. {issue}23670[23670]
 - Add new 'offline' docker image for Elastic Agent. {pull}27052[27052]
+- Add cgroups V2 support {pull}27242[27242]
+- update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 
 *Auditbeat*
 
@@ -448,6 +450,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
+- Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
+- update ecs.version to ECS 1.11.0. {pull}27107[27107]
 
 *Heartbeat*
 
