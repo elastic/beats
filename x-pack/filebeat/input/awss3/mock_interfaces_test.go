@@ -500,3 +500,15 @@ func (mr *MockS3ObjectHandlerMockRecorder) ProcessS3Object() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessS3Object", reflect.TypeOf((*MockS3ObjectHandler)(nil).ProcessS3Object))
 }
+
+// Wait mocks base method.
+func (m *MockS3ObjectHandler) Wait() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Wait")
+}
+
+// Wait indicates an expected call of Wait.
+func (mr *MockS3ObjectHandlerMockRecorder) Wait() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Wait", reflect.TypeOf((*MockS3ObjectHandler)(nil).Wait))
+}
