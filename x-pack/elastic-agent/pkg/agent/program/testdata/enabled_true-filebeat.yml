@@ -1,3 +1,9 @@
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+
 filebeat:
   inputs:
   - type: log

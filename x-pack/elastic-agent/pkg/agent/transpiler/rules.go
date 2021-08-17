@@ -93,6 +93,8 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "insert_defaults"
 		case *InjectHeadersRule:
 			name = "inject_headers"
+		case *InjectQueueRule:
+			name = "inject_queue"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -180,6 +182,8 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &InsertDefaultsRule{}
 		case "inject_headers":
 			r = &InjectHeadersRule{}
+		case "inject_queue":
+			r = &InjectQueueRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -1517,6 +1521,102 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 		Selectors: selectors,
 		Path:      path,
 	}
+}
+
+type InjectQueueRule struct{}
+
+func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject queue parameters into configuration")
+		}
+	}()
+
+	outputNode, found := Lookup(ast, "output")
+	if !found {
+		return nil
+	}
+
+	outputDict, ok := outputNode.Value().(*Dict)
+	if !ok || len(outputDict.value) == 0 {
+		faeNode := &Key{
+			name:  "hello",
+			value: &StrVal{value: "fae was here"},
+		}
+		if err := Insert(ast, faeNode, "output"); err != nil {
+			return err
+		}
+		return nil
+	}
+	outputChild := outputDict.value[0]
+
+	// Initialize the bulk_max_size and worker parameters to the global defaults,
+	// then override them if there's an explicit setting.
+	bulkMaxSize := 50
+	worker := 1
+
+	if bulkMaxSizeNode, ok := outputChild.Find("bulk_max_size"); ok {
+		if bulkMaxSizeInt, ok := bulkMaxSizeNode.Value().(*IntVal); ok {
+			bulkMaxSize = bulkMaxSizeInt.value
+		}
+	}
+
+	if workerNode, ok := outputChild.Find("worker"); ok {
+		if workerInt, ok := workerNode.Value().(*IntVal); ok {
+			worker = workerInt.value
+		}
+	}
+
+	// Insert memory queue settings based on the output params.
+	queueNode := queueDictFromOutputSettings(bulkMaxSize, worker)
+	if err := Insert(ast, queueNode, "queue.mem"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
+	events, min_events := queueParamsFromOutputSettings(bulkMaxSize, worker)
+	dict := &Dict{
+		value: []Node{
+			&Key{
+				name:  "events",
+				value: &IntVal{value: events},
+			},
+			&Key{
+				name: "flush",
+				value: &Dict{
+					value: []Node{
+						&Key{
+							name:  "min_events",
+							value: &IntVal{value: min_events},
+						},
+						// flush.timeout defaults to 1s, which is what we want for now,
+						// but if we wanted to customize that as well this is where it
+						// would go.
+					},
+				},
+			},
+		},
+	}
+	return dict
+}
+
+// Given output settings, returns inferred values for queue.mem.events
+// and queue.mem.flush.min_events.
+// See https://github.com/elastic/beats/issues/26638.
+func queueParamsFromOutputSettings(bulkMaxSize, worker int) (int, int) {
+	// Create space in the queue for each worker to have a full batch in flight
+	// and another one pending, plus a correction factor so users with the
+	// default worker count of 1 aren't surprised by an unreasonably small queue.
+	// These formulas could and perhaps should be customized further based on
+	// the specific beats being called, but their default behavior is already to
+	// significantly reduce the queue size, so let's get some experience using
+	// these baselines before optimizing further.
+	events := bulkMaxSize * (2*worker + 5)
+	minEvents := bulkMaxSize
+	return events, minEvents
 }
 
 // InjectHeadersRule injects headers into output.
