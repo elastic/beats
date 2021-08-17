@@ -78,6 +78,7 @@
 - Remove symlink.prev from previously failed upgrade {pull}26785[26785]
 - Fix apm-server supported outputs not being in sync with supported output types. {pull}26885[26885]
 - Set permissions during installation {pull}26665[26665]
+- Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
 
 ==== New features
 
