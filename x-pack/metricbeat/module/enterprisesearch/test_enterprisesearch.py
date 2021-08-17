@@ -5,7 +5,7 @@ from xpack_metricbeat import XPackTest, metricbeat
 
 
 class Test(XPackTest):
-    COMPOSE_SERVICES = ['entsearch']
+    COMPOSE_SERVICES = ['enterprise_search']
     COMPOSE_TIMEOUT = 600
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
@@ -29,5 +29,5 @@ class Test(XPackTest):
         self.assertIn("enterprisesearch", evt)
         self.assertIn("health", evt["enterprisesearch"])
 
-        entsearch_health = evt["enterprisesearch"]["health"]
-        self.assertIn("jvm", entsearch_health)
+        enterprisesearch_health = evt["enterprisesearch"]["health"]
+        self.assertIn("jvm", enterprisesearch_health)
