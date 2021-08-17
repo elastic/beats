@@ -3,6 +3,7 @@ queue:
     events: 575
     flush:
       min_events: 23
+      timeout: 1s
 
 filebeat:
   inputs:
