@@ -165,11 +165,9 @@ func TestLoggingECSFields(t *testing.T) {
 	logger.Debug("debug")
 	logs := ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
-		if assert.Len(t, logs[0].Context, 2) {
+		if assert.Len(t, logs[0].Context, 1) {
 			assert.Equal(t, "service.name", logs[0].Context[0].Key)
 			assert.Equal(t, "beat1", logs[0].Context[0].String)
-			assert.Equal(t, "event.dataset", logs[0].Context[1].Key)
-			assert.Equal(t, "beat1.log", logs[0].Context[1].String)
 		}
 	}
 }
