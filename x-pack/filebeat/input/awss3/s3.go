@@ -5,445 +5,348 @@
 package awss3
 
 import (
-	"bufio"
-	"bytes"
-	"compress/gzip"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"reflect"
+	"net/url"
 	"strings"
+	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
+	"go.uber.org/multierr"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/reader"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile"
-	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/go-concert/timed"
 )
 
-const (
-	contentTypeJSON   = "application/json"
-	contentTypeNDJSON = "application/x-ndjson"
-)
-
-type s3ObjectProcessorFactory struct {
-	log           *logp.Logger
-	metrics       *inputMetrics
-	s3            s3Getter
-	publisher     beat.Client
-	fileSelectors []fileSelectorConfig
+type commitWriteState struct {
+	time.Time
 }
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3Getter, publisher beat.Client, sel []fileSelectorConfig) *s3ObjectProcessorFactory {
+type s3ObjectInfo struct {
+	name         string
+	key          string
+	etag         string
+	lastModified time.Time
+	listingID    string
+}
+
+type s3ObjectPayload struct {
+	s3ObjectHandler s3ObjectHandler
+	s3ObjectInfo    s3ObjectInfo
+	s3ObjectEvent   s3EventV2
+}
+type s3Poller struct {
+	numberOfWorkers      int
+	bucket               string
+	bucketPollInterval   time.Duration
+	workerSem            *sem
+	s3                   s3API
+	log                  *logp.Logger
+	metrics              *inputMetrics
+	s3ObjectHandler      s3ObjectHandlerFactory
+	states               *states
+	store                *statestore.Store
+	workersListingMap    *sync.Map
+	workersProcessingMap *sync.Map
+}
+
+func newS3Poller(log *logp.Logger,
+	metrics *inputMetrics,
+	s3 s3API,
+	s3ObjectHandler s3ObjectHandlerFactory,
+	states *states,
+	store *statestore.Store,
+	bucket string,
+	numberOfWorkers int,
+	bucketPollInterval time.Duration) *s3Poller {
 	if metrics == nil {
 		metrics = newInputMetrics(monitoring.NewRegistry(), "")
 	}
-	if len(sel) == 0 {
-		sel = []fileSelectorConfig{
-			{ReaderConfig: defaultConfig().ReaderConfig},
-		}
-	}
-	return &s3ObjectProcessorFactory{
-		log:           log,
-		metrics:       metrics,
-		s3:            s3,
-		publisher:     publisher,
-		fileSelectors: sel,
-	}
-}
-
-func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
-	for _, sel := range f.fileSelectors {
-		if sel.Regex == nil || sel.Regex.MatchString(key) {
-			return &sel.ReaderConfig
-		}
-	}
-	return nil
-}
-
-// Create returns a new s3ObjectProcessor. It returns nil when no file selectors
-// match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *eventACKTracker, obj s3EventV2) s3ObjectHandler {
-	log = log.With(
-		"s3_bucket", obj.S3.Bucket.Name,
-		"s3_object", obj.S3.Object.Key)
-
-	readerConfig := f.findReaderConfig(obj.S3.Object.Key)
-	if readerConfig == nil {
-		log.Debug("Skipping S3 object processing. No file_selectors are a match.")
-		return nil
-	}
-
-	return &s3ObjectProcessor{
-		s3ObjectProcessorFactory: f,
-		log:                      log,
-		ctx:                      ctx,
-		acker:                    ack,
-		readerConfig:             readerConfig,
-		s3Obj:                    obj,
-		s3ObjHash:                s3ObjectHash(obj),
+	return &s3Poller{
+		numberOfWorkers:      numberOfWorkers,
+		bucket:               bucket,
+		bucketPollInterval:   bucketPollInterval,
+		workerSem:            newSem(numberOfWorkers),
+		s3:                   s3,
+		log:                  log,
+		metrics:              metrics,
+		s3ObjectHandler:      s3ObjectHandler,
+		states:               states,
+		store:                store,
+		workersListingMap:    new(sync.Map),
+		workersProcessingMap: new(sync.Map),
 	}
 }
 
-type s3ObjectProcessor struct {
-	*s3ObjectProcessorFactory
-
-	log          *logp.Logger
-	ctx          context.Context
-	acker        *eventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig    // Config about how to process the object.
-	s3Obj        s3EventV2        // S3 object information.
-	s3ObjHash    string
-
-	s3Metadata map[string]interface{} // S3 object metadata.
-}
-
-func (p *s3ObjectProcessor) ProcessS3Object() error {
-	if p == nil {
-		return nil
-	}
-
-	// Metrics and Logging
-	{
-		p.log.Debug("Begin S3 object processing.")
-		p.metrics.s3ObjectsRequestedTotal.Inc()
-		p.metrics.s3ObjectsInflight.Inc()
-		start := time.Now()
-		defer func() {
-			elapsed := time.Since(start)
-			p.metrics.s3ObjectsInflight.Dec()
-			p.metrics.s3ObjectProcessingTime.Update(elapsed.Nanoseconds())
-			p.log.Debugw("End S3 object processing.", "elapsed_time_ns", elapsed)
-		}()
-	}
-
-	// Request object (download).
-	contentType, meta, body, err := p.download()
-	if err != nil {
-		return errors.Wrap(err, "failed to get s3 object")
-	}
-	defer body.Close()
-	p.s3Metadata = meta
-
-	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
-	if err != nil {
-		return errors.Wrap(err, "failed checking for gzip content")
-	}
-
-	// Overwrite with user configured Content-Type.
-	if p.readerConfig.ContentType != "" {
-		contentType = p.readerConfig.ContentType
-	}
-
-	// Process object content stream.
-	switch {
-	case contentType == contentTypeJSON || contentType == contentTypeNDJSON:
-		err = p.readJSON(reader)
-	default:
-		err = p.readFile(reader)
-	}
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// download requests the S3 object from AWS and returns the object's
-// Content-Type and reader to get the object's contents. The caller must
-// close the returned reader.
-func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
-	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
-	if err != nil {
-		return "", nil, nil, err
-	}
-	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
-	return *resp.ContentType, meta, resp.Body, nil
-}
-
-func (p *s3ObjectProcessor) addGzipDecoderIfNeeded(body io.Reader) (io.Reader, error) {
-	bufReader := bufio.NewReader(body)
-
-	gzipped, err := isStreamGzipped(bufReader)
-	if err != nil {
-		return nil, err
-	}
-	if !gzipped {
-		return bufReader, nil
-	}
-
-	return gzip.NewReader(bufReader)
-}
-
-func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
-	dec := json.NewDecoder(r)
-	dec.UseNumber()
-
-	for dec.More() && p.ctx.Err() == nil {
-		offset := dec.InputOffset()
-
-		var item json.RawMessage
-		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode json: %w", err)
+func (p *s3Poller) handlePurgingLock(info s3ObjectInfo, isStored bool) {
+	id := info.name + info.key
+	previousState := p.states.FindPreviousByID(id)
+	if !previousState.IsEmpty() {
+		if isStored {
+			previousState.MarkAsStored()
+		} else {
+			previousState.MarkAsError()
 		}
 
-		if p.readerConfig.ExpandEventListFromField != "" {
-			if err := p.splitEventList(p.readerConfig.ExpandEventListFromField, item, offset, p.s3ObjHash); err != nil {
-				return err
-			}
+		p.states.Update(previousState, info.listingID)
+	}
+
+	// Manage locks for purging.
+	if p.states.IsListingFullyStored(info.listingID) {
+		// locked on processing we unlock when all the object were ACKed
+		lock, _ := p.workersListingMap.Load(info.listingID)
+		lock.(*sync.Mutex).Unlock()
+	}
+}
+
+func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
+	var errs []error
+
+	for s3ObjectPayload := range s3ObjectPayloadChan {
+		// Process S3 object (download, parse, create events).
+		err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
+
+		// Wait for all events to be ACKed before proceeding.
+		s3ObjectPayload.s3ObjectHandler.Wait()
+
+		info := s3ObjectPayload.s3ObjectInfo
+
+		if err != nil {
+			event := s3ObjectPayload.s3ObjectEvent
+			errs = append(errs, errors.Wrapf(err,
+				"failed processing S3 event for object key %q in bucket %q",
+				event.S3.Object.Key, event.S3.Bucket.Name))
+
+			p.handlePurgingLock(info, false)
 			continue
 		}
 
-		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
-		p.publish(p.acker, &evt)
+		p.handlePurgingLock(info, true)
+
+		// Metrics
+		p.metrics.s3ObjectsAckedTotal.Inc()
 	}
 
-	return nil
+	return multierr.Combine(errs...)
 }
 
-func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
-	var jsonObject map[string]json.RawMessage
-	if err := json.Unmarshal(raw, &jsonObject); err != nil {
-		return err
-	}
+func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
+	defer close(s3ObjectPayloadChan)
 
-	raw, found := jsonObject[key]
-	if !found {
-		return fmt.Errorf("expand_event_list_from_field key <%v> is not in event", key)
-	}
+	bucketMetadata := strings.Split(p.bucket, ":")
+	bucketName := bucketMetadata[len(bucketMetadata)-1]
 
-	dec := json.NewDecoder(bytes.NewReader(raw))
-	dec.UseNumber()
-
-	tok, err := dec.Token()
-	if err != nil {
-		return err
-	}
-	delim, ok := tok.(json.Delim)
-	if !ok || delim != '[' {
-		return fmt.Errorf("expand_event_list_from_field <%v> is not an array", key)
-	}
-
-	for dec.More() {
-		arrayOffset := dec.InputOffset()
-
-		var item json.RawMessage
-		if err := dec.Decode(&item); err != nil {
-			return fmt.Errorf("failed to decode array item at offset %d: %w", offset+arrayOffset, err)
+	paginator := p.s3.ListObjectsPaginator(bucketName)
+	for paginator.Next(ctx) {
+		listingID, err := uuid.NewV4()
+		if err != nil {
+			p.log.Warnw("Error generating UUID for listing page.", "error", err)
+			continue
 		}
 
-		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset+arrayOffset, p.s3Obj, objHash, p.s3Metadata)
-		p.publish(p.acker, &evt)
+		// lock for the listing page and state in workersListingMap
+		// this map is shared with the storedOp and will be unlocked there
+		lock := new(sync.Mutex)
+		lock.Lock()
+		p.workersListingMap.Store(listingID.String(), lock)
+
+		page := paginator.CurrentPage()
+
+		totProcessableObjects := 0
+		totListedObjects := len(page.Contents)
+		s3ObjectPayloadChanByPage := make(chan *s3ObjectPayload, totListedObjects)
+
+		// Metrics
+		p.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
+		for _, object := range page.Contents {
+			// Unescape s3 key name. For example, convert "%3D" back to "=".
+			filename, err := url.QueryUnescape(*object.Key)
+			if err != nil {
+				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "s3_object", *object.Key)
+				continue
+			}
+
+			state := newState(bucketName, filename, *object.ETag, *object.LastModified)
+			if p.states.MustSkip(state, p.store) {
+				p.log.Debugw("skipping state.", "state", state)
+				continue
+			}
+
+			p.states.Update(state, "")
+
+			event := s3EventV2{}
+			event.S3.Bucket.Name = bucketName
+			event.S3.Object.Key = filename
+
+			acker := newEventACKTracker(ctx)
+
+			s3Processor := p.s3ObjectHandler.Create(ctx, p.log, acker, event)
+			if s3Processor == nil {
+				continue
+			}
+
+			totProcessableObjects++
+
+			s3ObjectPayloadChanByPage <- &s3ObjectPayload{
+				s3ObjectHandler: s3Processor,
+				s3ObjectInfo: s3ObjectInfo{
+					name:         bucketName,
+					key:          filename,
+					etag:         *object.ETag,
+					lastModified: *object.LastModified,
+					listingID:    listingID.String(),
+				},
+				s3ObjectEvent: event,
+			}
+		}
+
+		if totProcessableObjects == 0 {
+			// nothing to be ACKed, unlock here
+			p.states.DeleteListing(listingID.String())
+			lock.Unlock()
+		} else {
+			listingInfo := &listingInfo{totObjects: totProcessableObjects}
+			p.states.AddListing(listingID.String(), listingInfo)
+
+			// Metrics
+			p.metrics.s3ObjectsProcessedTotal.Add(uint64(totProcessableObjects))
+		}
+
+		close(s3ObjectPayloadChanByPage)
+		for s3ObjectPayload := range s3ObjectPayloadChanByPage {
+			s3ObjectPayloadChan <- s3ObjectPayload
+		}
 	}
 
-	return nil
+	if err := paginator.Err(); err != nil {
+		p.log.Warnw("Error when paginating listing.", "error", err)
+	}
+
+	return
 }
 
-func (p *s3ObjectProcessor) readFile(r io.Reader) error {
-	encodingFactory, ok := encoding.FindEncoding(p.readerConfig.Encoding)
-	if !ok || encodingFactory == nil {
-		return fmt.Errorf("failed to find '%v' encoding", p.readerConfig.Encoding)
+func (p *s3Poller) Purge() {
+	listingIDs := p.states.GetListingIDs()
+	for _, listingID := range listingIDs {
+		// we lock here in order to process the purge only after
+		// full listing page is ACKed by all the workers
+		lock, loaded := p.workersListingMap.Load(listingID)
+		if !loaded {
+			// purge calls can overlap, GetListingIDs can return
+			// an outdated snapshot with listing already purged
+			p.states.DeleteListing(listingID)
+			continue
+		}
+
+		lock.(*sync.Mutex).Lock()
+
+		keys := map[string]struct{}{}
+		latestStoredTimeByBucket := make(map[string]time.Time, 0)
+
+		for _, state := range p.states.GetStatesByListingID(listingID) {
+			// it is not stored, keep
+			if !state.Stored {
+				continue
+			}
+
+			var latestStoredTime time.Time
+			keys[state.ID] = struct{}{}
+			latestStoredTime, ok := latestStoredTimeByBucket[state.Bucket]
+			if !ok {
+				var commitWriteState commitWriteState
+				err := p.store.Get(awsS3WriteCommitPrefix+state.Bucket, &commitWriteState)
+				if err == nil {
+					// we have no entry in the map and we have no entry in the store
+					// set zero time
+					latestStoredTime = time.Time{}
+				} else {
+					latestStoredTime = commitWriteState.Time
+				}
+			}
+
+			if state.LastModified.After(latestStoredTime) {
+				latestStoredTimeByBucket[state.Bucket] = state.LastModified
+			}
+
+		}
+
+		for key := range keys {
+			p.states.Delete(key)
+		}
+
+		if err := p.states.writeStates(p.store); err != nil {
+			p.log.Errorw("Failed to write states to the registry", "error", err)
+		}
+
+		for bucket, latestStoredTime := range latestStoredTimeByBucket {
+			if err := p.store.Set(awsS3WriteCommitPrefix+bucket, commitWriteState{latestStoredTime}); err != nil {
+				p.log.Errorw("Failed to write commit time to the registry", "error", err)
+			}
+		}
+
+		// purge is done, we can unlock and clean
+		lock.(*sync.Mutex).Unlock()
+		p.workersListingMap.Delete(listingID)
+		p.states.DeleteListing(listingID)
 	}
 
-	enc, err := encodingFactory(r)
-	if err != nil {
-		return fmt.Errorf("failed to initialize encoding: %w", err)
-	}
+	return
+}
 
-	var reader reader.Reader
-	reader, err = readfile.NewEncodeReader(ioutil.NopCloser(r), readfile.Config{
-		Codec:      enc,
-		BufferSize: int(p.readerConfig.BufferSize),
-		Terminator: p.readerConfig.LineTerminator,
-		MaxBytes:   int(p.readerConfig.MaxBytes) * 4,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to create encode reader: %w", err)
-	}
-
-	reader = readfile.NewStripNewline(reader, p.readerConfig.LineTerminator)
-	reader = p.readerConfig.Parsers.Create(reader)
-	reader = readfile.NewLimitReader(reader, int(p.readerConfig.MaxBytes))
-
-	var offset int64
-	for {
-		message, err := reader.Next()
-		if err == io.EOF {
-			// No more lines
+func (p *s3Poller) Poll(ctx context.Context) error {
+	// This loop tries to keep the workers busy as much as possible while
+	// honoring the number in config opposed to a simpler loop that does one
+	//  listing, sequentially processes every object and then does another listing
+	workerWg := new(sync.WaitGroup)
+	for ctx.Err() == nil {
+		// Determine how many S3 workers are available.
+		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
+		if err != nil {
 			break
 		}
-		if err != nil {
-			return fmt.Errorf("error reading message: %w", err)
+
+		if workers == 0 {
+			continue
 		}
 
-		event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
-		event.Fields.DeepUpdate(message.Fields)
-		offset += int64(message.Bytes)
-		p.publish(p.acker, &event)
+		s3ObjectPayloadChan := make(chan *s3ObjectPayload)
+
+		workerWg.Add(1)
+		go func() {
+			defer func() {
+				workerWg.Done()
+			}()
+
+			p.GetS3Objects(ctx, s3ObjectPayloadChan)
+			p.Purge()
+		}()
+
+		workerWg.Add(workers)
+		for i := 0; i < workers; i++ {
+			go func() {
+				defer func() {
+					workerWg.Done()
+					p.workerSem.Release(1)
+				}()
+				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
+					p.log.Warnw("Failed processing S3 listing.", "error", err)
+				}
+			}()
+		}
+
+		timed.Wait(ctx, p.bucketPollInterval)
+
 	}
 
-	return nil
-}
+	// Wait for all workers to finish.
+	workerWg.Wait()
 
-func (p *s3ObjectProcessor) publish(ack *eventACKTracker, event *beat.Event) {
-	ack.Add(1)
-	event.Private = ack
-	p.metrics.s3EventsCreatedTotal.Inc()
-	p.publisher.Publish(*event)
-}
-
-func createEvent(message string, offset int64, obj s3EventV2, objectHash string, meta map[string]interface{}) beat.Event {
-	event := beat.Event{
-		Timestamp: time.Now().UTC(),
-		Fields: common.MapStr{
-			"message": message,
-			"log": common.MapStr{
-				"offset": offset,
-				"file": common.MapStr{
-					"path": constructObjectURL(obj),
-				},
-			},
-			"aws": common.MapStr{
-				"s3": common.MapStr{
-					"bucket": common.MapStr{
-						"name": obj.S3.Bucket.Name,
-						"arn":  obj.S3.Bucket.ARN},
-					"object": common.MapStr{
-						"key": obj.S3.Object.Key,
-					},
-				},
-			},
-			"cloud": common.MapStr{
-				"provider": "aws",
-				"region":   obj.AWSRegion,
-			},
-		},
-	}
-	event.SetID(objectID(objectHash, offset))
-
-	if len(meta) > 0 {
-		event.Fields.Put("aws.s3.metadata", meta)
-	}
-
-	return event
-}
-
-func objectID(objectHash string, offset int64) string {
-	return fmt.Sprintf("%s-%012d", objectHash, offset)
-}
-
-func constructObjectURL(obj s3EventV2) string {
-	return "https://" + obj.S3.Bucket.Name + ".s3." + obj.AWSRegion + ".amazonaws.com/" + obj.S3.Object.Key
-}
-
-// s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
-func s3ObjectHash(obj s3EventV2) string {
-	h := sha256.New()
-	h.Write([]byte(obj.S3.Bucket.ARN))
-	h.Write([]byte(obj.S3.Object.Key))
-	prefix := hex.EncodeToString(h.Sum(nil))
-	return prefix[:10]
-}
-
-// isStreamGzipped determines whether the given stream of bytes (encapsulated in a buffered reader)
-// represents gzipped content or not. A buffered reader is used so the function can peek into the byte
-// stream without consuming it. This makes it convenient for code executed after this function call
-// to consume the stream if it wants.
-func isStreamGzipped(r *bufio.Reader) (bool, error) {
-	// Why 512? See https://godoc.org/net/http#DetectContentType
-	buf, err := r.Peek(512)
-	if err != nil && err != io.EOF {
-		return false, err
-	}
-
-	switch http.DetectContentType(buf) {
-	case "application/x-gzip", "application/zip":
-		return true, nil
-	default:
-		return false, nil
-	}
-}
-
-// s3Metadata returns a map containing the selected S3 object metadata keys.
-func s3Metadata(resp *s3.GetObjectResponse, keys ...string) common.MapStr {
-	if len(keys) == 0 {
+	if errors.Is(ctx.Err(), context.Canceled) {
+		// A canceled context is a normal shutdown.
 		return nil
 	}
-
-	// When you upload objects using the REST API, the optional user-defined
-	// metadata names must begin with "x-amz-meta-" to distinguish them from
-	// other HTTP headers.
-	const userMetaPrefix = "x-amz-meta-"
-
-	allMeta := map[string]interface{}{}
-
-	// Get headers using AWS SDK struct tags.
-	fields := reflect.TypeOf(resp.GetObjectOutput).Elem()
-	values := reflect.ValueOf(resp.GetObjectOutput).Elem()
-	for i := 0; i < fields.NumField(); i++ {
-		f := fields.Field(i)
-
-		if loc, _ := f.Tag.Lookup("location"); loc != "header" {
-			continue
-		}
-
-		name, found := f.Tag.Lookup("locationName")
-		if !found {
-			continue
-		}
-		name = strings.ToLower(name)
-
-		if name == userMetaPrefix {
-			continue
-		}
-
-		v := values.Field(i)
-		switch v.Kind() {
-		case reflect.Ptr:
-			if v.IsNil() {
-				continue
-			}
-			v = v.Elem()
-		default:
-			if v.IsZero() {
-				continue
-			}
-		}
-
-		allMeta[name] = v.Interface()
-	}
-
-	// Add in the user defined headers.
-	for k, v := range resp.Metadata {
-		k = strings.ToLower(k)
-		allMeta[userMetaPrefix+k] = v
-	}
-
-	// Select the matching headers from the config.
-	metadata := common.MapStr{}
-	for _, key := range keys {
-		key = strings.ToLower(key)
-
-		v, found := allMeta[key]
-		if !found {
-			continue
-		}
-
-		metadata[key] = v
-	}
-
-	return metadata
+	return ctx.Err()
 }
