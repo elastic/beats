@@ -157,6 +157,15 @@ Example configuration:
 -------------------------------------------------------------------------------
 
 [float]
+[[monitor-browser-ignore-https-errors]]]]
+==== `ignore_https_errors`
+
+Set this option to `true` to disable TLS/SSL validation in the synthetics browser. This is useful for testing
+sites that use self-signed certs. This option can also be used to test certs from non-standard CAs, 
+though you will no longer get errors if there is anything wrong with the certificate.
+
+
+[float]
 [[monitor-browser-sandbox]]
 ==== `sandbox`
 

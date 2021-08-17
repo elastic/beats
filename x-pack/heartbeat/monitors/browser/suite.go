@@ -72,6 +72,9 @@ func (s *Suite) Close() error {
 
 func (s *Suite) extraArgs() []string {
 	extraArgs := s.suiteCfg.SyntheticsArgs
+	if s.suiteCfg.IgnoreHTTPSErrors {
+		extraArgs = append(extraArgs, "--ignore-https-errors")
+	}
 	if s.suiteCfg.Sandbox {
 		extraArgs = append(extraArgs, "--sandbox")
 	}
