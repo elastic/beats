@@ -1,5 +1,18 @@
 type: aws-s3
+{{ if .queue_url }}
 queue_url: {{ .queue_url }}
+{{ end }}
+{{ if .bucket }}
+bucket: {{ .bucket }}
+{{ end }}
+
+{{ if .number_of_workers }}
+number_of_workers: {{ .number_of_workers }}
+{{ end }}
+
+{{ if .bucket_list_interval }}
+bucket_list_interval: {{ .bucket_list_interval }}
+{{ end }}
 file_selectors:
 {{ if .process_cloudtrail_logs }}
   - regex: '/CloudTrail/'
