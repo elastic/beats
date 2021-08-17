@@ -1523,6 +1523,8 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 	}
 }
 
+// InjectQueueRule injects inferred queue parameters into program
+// configurations.
 type InjectQueueRule struct{}
 
 // InjectQueue creates a InjectQueueRule
@@ -1530,6 +1532,8 @@ func InjectQueue() *InjectQueueRule {
 	return &InjectQueueRule{}
 }
 
+// Apply adds queue parameters to a program configuration based on the
+// output settings "worker" and "bulk_max_size".
 func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 	defer func() {
 		if err != nil {
@@ -1575,7 +1579,7 @@ func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 }
 
 func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
-	events, min_events := queueParamsFromOutputSettings(bulkMaxSize, worker)
+	events, minEvents := queueParamsFromOutputSettings(bulkMaxSize, worker)
 	dict := &Dict{
 		value: []Node{
 			&Key{
@@ -1588,7 +1592,7 @@ func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
 					value: []Node{
 						&Key{
 							name:  "min_events",
-							value: &IntVal{value: min_events},
+							value: &IntVal{value: minEvents},
 						},
 						&Key{
 							name:  "timeout",
