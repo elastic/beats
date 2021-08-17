@@ -1544,13 +1544,6 @@ func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 
 	outputDict, ok := outputNode.Value().(*Dict)
 	if !ok || len(outputDict.value) == 0 {
-		faeNode := &Key{
-			name:  "hello",
-			value: &StrVal{value: "fae was here"},
-		}
-		if err := Insert(ast, faeNode, "output"); err != nil {
-			return err
-		}
 		return nil
 	}
 	outputChild := outputDict.value[0]
