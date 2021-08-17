@@ -1,35 +1,37 @@
 {
-    "@timestamp":"2016-05-23T08:05:34.853Z",
-    "beat":{
-        "hostname":"beathost",
-        "name":"beathost"
-    },
-    "metricset":{
-        "host":"localhost",
-        "module":"enterprisesearch",
-        "name":"health",
-        "rtt":44269
-    },
-    "enterprisesearch":{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "enterprisesearch": {
         "health": {
             "jvm": {
                 "memory_usage": {
-                    "heap_init": 268435456,
-                    "heap_used": 1551901480,
-                    "heap_committed": 1784152064,
-                    "heap_max": 3817865216,
-                    "object_pending_finalization_count": 0,
-                    "non_heap_init": 2555904,
-                    "non_heap_committed": 266469376
+                    "heap_committed.bytes": 1908932608,
+                    "heap_init.bytes": 2147483648,
+                    "heap_max.bytes": 1908932608,
+                    "heap_used.bytes": 454791640,
+                    "non_heap_committed.bytes": 281149440,
+                    "non_heap_init.bytes": 2555904,
+                    "object_pending_finalization_count": 0
+                },
+                "threads": {
+                    "daemon_thread_count": 24,
+                    "peak_thread_count": 34,
+                    "thread_count": 34,
+                    "total_started_thread_count": 37
                 }
-            },
-            "threads": {
-                "thread_count": 24,
-                "peak_thread_count": 27,
-                "total_started_thread_count": 119,
-                "daemon_thread_count": 23
             }
         }
     },
-    "type":"metricsets"
+    "event": {
+        "dataset": "enterprisesearch.health",
+        "duration": 115000,
+        "module": "enterprisesearch"
+    },
+    "metricset": {
+        "name": "health",
+        "period": 10000
+    },
+    "service": {
+        "address": "localhost:3002",
+        "type": "enterprisesearch"
+    }
 }
