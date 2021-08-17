@@ -89,6 +89,11 @@ type s3ObjectHandler interface {
 	// the publisher before returning (use eventACKTracker's Wait() method to
 	// determine this).
 	ProcessS3Object() error
+
+	// Wait waits for every event published by ProcessS3Object() to be ACKed
+	// by the publisher before returning. Internally it uses the
+	// s3ObjectHandler eventACKTracker's Wait() method
+	Wait()
 }
 
 // ------

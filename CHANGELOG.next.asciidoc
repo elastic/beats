@@ -81,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -406,6 +407,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
 - Fix flaky test TestAddCounterInvalidArgWhenQueryClosed. {issue}27312[27312] {pull}27313[27313]
 - Add percent formatters to system/process {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module {pull}27363[27363]
 
 *Packetbeat*
 
@@ -506,6 +508,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add sha256 digests to RPM packages. {issue}23670[23670]
 - Add new 'offline' docker image for Elastic Agent. {pull}27052[27052]
 - Add cgroups V2 support {pull}27242[27242]
+- update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 
 *Auditbeat*
 
@@ -755,6 +758,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
+- update ecs.version to ECS 1.11.0. {pull}27107[27107]
 
 *Heartbeat*
 
