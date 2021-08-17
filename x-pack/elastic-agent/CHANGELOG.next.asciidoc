@@ -77,7 +77,8 @@
 - Remove symlink.prev from previously failed upgrade {pull}26785[26785]
 - Fix apm-server supported outputs not being in sync with supported output types. {pull}26885[26885]
 - Set permissions during installation {pull}26665[26665]
-- Fix issue with atomic extract running in K8s {pull}27375[27375]
+- Fix issue with atomic extract running in K8s {pull}27396[27396]
+- Fix issue with install directory in state path in K8s {pull}27396[27396]
 
 ==== New features
 
