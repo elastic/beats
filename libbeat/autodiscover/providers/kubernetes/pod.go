@@ -332,7 +332,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 			portsMap.DeepUpdate(ports)
 		}
 	}
-	if len(eventList) != 0 {
+	if len(eventList) != 0  && anyContainerRunning == false { // If there are no containers in pod, do not append
 		event := p.podEvent(flag, pod, portsMap, anyContainerRunning, annotations, namespaceAnnotations)
 		// Ensure that the pod level event is published first to avoid
 		// pod metadata overriding a valid container metadata.
