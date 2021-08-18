@@ -224,6 +224,7 @@ func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistent
 		states,
 		persistentStore,
 		in.config.Bucket,
+		in.awsConfig.Region,
 		in.config.NumberOfWorkers,
 		in.config.BucketListInterval)
 
