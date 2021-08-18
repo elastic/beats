@@ -297,6 +297,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
 - Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
+- Fixes a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
 
 *Heartbeat*
 
