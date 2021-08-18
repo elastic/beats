@@ -5,8 +5,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -66,8 +66,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -115,8 +115,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -164,8 +164,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -213,8 +213,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -262,8 +262,8 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
-    # AWS S3 bucket
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
