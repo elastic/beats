@@ -22,7 +22,14 @@ type config struct {
 	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
 	FIPSEnabled         bool                 `config:"fips_enabled"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
+<<<<<<< HEAD
 	QueueURL            string               `config:"queue_url" validate:"required"`
+=======
+	QueueURL            string               `config:"queue_url"`
+	BucketARN           string               `config:"bucket_arn"`
+	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	NumberOfWorkers     int                  `config:"number_of_workers"`
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
@@ -40,7 +47,28 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
+<<<<<<< HEAD
 	if c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12 {
+=======
+	if c.QueueURL == "" && c.BucketARN == "" {
+		return fmt.Errorf("queue_url or bucket_arn must provided")
+	}
+
+	if c.QueueURL != "" && c.BucketARN != "" {
+		return fmt.Errorf("queue_url <%v> and bucket_arn <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN)
+	}
+
+	if c.BucketARN != "" && c.BucketListInterval <= 0 {
+		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
+	}
+
+	if c.BucketARN != "" && c.NumberOfWorkers <= 0 {
+		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
+	}
+
+	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 		return fmt.Errorf("visibility_timeout <%v> must be greater than 0 and "+
 			"less than or equal to 12h", c.VisibilityTimeout)
 	}

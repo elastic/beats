@@ -39,6 +39,12 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -52,6 +58,12 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -65,6 +77,12 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -78,6 +96,12 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -91,6 +115,12 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -104,6 +134,12 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+<<<<<<< HEAD
+=======
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id

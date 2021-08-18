@@ -86,7 +86,62 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		ACKHandler: newACKHandler(),
 	})
 	if err != nil {
+<<<<<<< HEAD
 		return nil, err
+=======
+		return fmt.Errorf("failed to create pipeline client: %w", err)
+	}
+	defer client.Close()
+
+	if in.config.QueueURL != "" {
+		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+		if err != nil {
+			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+		}
+
+		in.awsConfig.Region = regionName
+
+		// Create SQS receiver and S3 notification processor.
+		receiver, err := in.createSQSReceiver(inputContext, client)
+		if err != nil {
+			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+		}
+		defer receiver.metrics.Close()
+
+		if err := receiver.Receive(ctx); err != nil {
+			return err
+		}
+	}
+
+	if in.config.BucketARN != "" {
+		// Create S3 receiver and S3 notification processor.
+		poller, err := in.createS3Lister(inputContext, client, persistentStore, states)
+		if err != nil {
+			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+		}
+		defer poller.metrics.Close()
+
+		if err := poller.Poll(ctx); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsReader, error) {
+	s3ServiceName := "s3"
+	if in.config.FIPSEnabled {
+		s3ServiceName = "s3-fips"
+	}
+
+	sqsAPI := &awsSQSAPI{
+		client:            sqs.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, "sqs", in.awsConfig.Region, in.awsConfig)),
+		queueURL:          in.config.QueueURL,
+		apiTimeout:        in.config.APITimeout,
+		visibilityTimeout: in.config.VisibilityTimeout,
+		longPollWaitTime:  in.config.SQSWaitTime,
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 	}
 
 	regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
@@ -113,6 +168,7 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		s3Servicename = "s3-fips"
 	}
 
+<<<<<<< HEAD
 	log.Debug("s3 service name = ", s3Servicename)
 	log.Debug("s3 input config max_number_of_messages = ", in.config.MaxNumberOfMessages)
 	log.Debug("s3 input config endpoint = ", in.config.AWSConfig.Endpoint)
@@ -127,6 +183,34 @@ func (in *s3Input) createCollector(ctx v2.Context, pipeline beat.Pipeline) (*s3C
 		s3:                s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3Servicename, regionName, awsConfig)),
 		metrics:           newInputMetrics(metricRegistry, ctx.ID),
 	}, nil
+=======
+	log := ctx.Logger.With("bucket_arn", in.config.BucketARN)
+	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
+	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
+	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
+	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
+
+	metricRegistry := monitoring.GetNamespace("dataset").GetRegistry()
+	metrics := newInputMetrics(metricRegistry, ctx.ID)
+
+	fileSelectors := in.config.FileSelectors
+	if len(in.config.FileSelectors) == 0 {
+		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
+	}
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, client, fileSelectors)
+	s3Poller := newS3Poller(log.Named("s3_poller"),
+		metrics,
+		s3API,
+		s3EventHandlerFactory,
+		states,
+		persistentStore,
+		in.config.BucketARN,
+		in.awsConfig.Region,
+		in.config.NumberOfWorkers,
+		in.config.BucketListInterval)
+
+	return s3Poller, nil
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 }
 
 func newACKHandler() beat.ACKer {

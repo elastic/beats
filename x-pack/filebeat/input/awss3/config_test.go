@@ -27,7 +27,12 @@ func TestConfig(t *testing.T) {
 		err := c.Unpack(cfg)
 		assert.Nil(t, err)
 		return config{
+<<<<<<< HEAD
 			QueueURL:            queueURL,
+=======
+			QueueURL:            quequeURL,
+			BucketARN:           s3Bucket,
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 			APITimeout:          120 * time.Second,
 			VisibilityTimeout:   300 * time.Second,
 			FIPSEnabled:         false,
@@ -56,6 +61,24 @@ func TestConfig(t *testing.T) {
 			makeConfig,
 		},
 		{
+<<<<<<< HEAD
+=======
+			"input with defaults for s3Bucket",
+			"",
+			s3Bucket,
+			common.MapStr{
+				"bucket_arn":        s3Bucket,
+				"number_of_workers": 5,
+			},
+			"",
+			func(queueURL, s3Bucket string) config {
+				c := makeConfig("", s3Bucket)
+				c.NumberOfWorkers = 5
+				return c
+			},
+		},
+		{
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 			"input with file_selectors",
 			common.MapStr{
 				"queue_url": queueURL,
@@ -79,12 +102,34 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
+<<<<<<< HEAD
 			"error on api_timeout == 0",
 			common.MapStr{
 				"queue_url":   queueURL,
 				"api_timeout": "0",
 			},
 			"api_timeout <0s> must be greater than 0 and less than 1/2 of the visibility_timeout (2m30s)",
+=======
+			"error on no queueURL and s3Bucket",
+			"",
+			"",
+			common.MapStr{
+				"queue_url":  "",
+				"bucket_arn": "",
+			},
+			"queue_url or bucket_arn must provided",
+			nil,
+		},
+		{
+			"error on both queueURL and s3Bucket",
+			queueURL,
+			s3Bucket,
+			common.MapStr{
+				"queue_url":  queueURL,
+				"bucket_arn": s3Bucket,
+			},
+			"queue_url <https://example.com> and bucket_arn <arn:aws:s3:::aBucket> cannot be set at the same time",
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 			nil,
 		},
 		{
@@ -115,10 +160,30 @@ func TestConfig(t *testing.T) {
 			nil,
 		},
 		{
+<<<<<<< HEAD
 			"error on max_number_of_messages == 0",
 			common.MapStr{
 				"queue_url":              queueURL,
 				"max_number_of_messages": "0",
+=======
+			"error on bucket_list_interval == 0",
+			"",
+			s3Bucket,
+			common.MapStr{
+				"bucket_arn":           s3Bucket,
+				"bucket_list_interval": "0",
+			},
+			"bucket_list_interval <0s> must be greater than 0",
+			nil,
+		},
+		{
+			"error on number_of_workers == 0",
+			"",
+			s3Bucket,
+			common.MapStr{
+				"bucket_arn":        s3Bucket,
+				"number_of_workers": "0",
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 			},
 			"max_number_of_messages <0> must be greater than 0 and less than or equal to 10",
 			nil,
@@ -160,6 +225,21 @@ func TestConfig(t *testing.T) {
 			"content_type must be `application/json` when expand_event_list_from_field is used",
 			nil,
 		},
+<<<<<<< HEAD
+=======
+		{
+			"error on expand_event_list_from_field and content_type != application/json ",
+			"",
+			s3Bucket,
+			common.MapStr{
+				"bucket_arn":                   s3Bucket,
+				"expand_event_list_from_field": "Records",
+				"content_type":                 "text/plain",
+			},
+			"content_type must be `application/json` when expand_event_list_from_field is used",
+			nil,
+		},
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 	}
 
 	for _, tc := range testCases {

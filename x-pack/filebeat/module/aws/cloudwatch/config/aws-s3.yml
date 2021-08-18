@@ -1,5 +1,20 @@
 type: aws-s3
 queue_url: {{ .queue_url }}
+<<<<<<< HEAD
+=======
+{{ end }}
+{{ if .bucket_arn }}
+bucket_arn: {{ .bucket_arn }}
+{{ end }}
+
+{{ if .number_of_workers }}
+number_of_workers: {{ .number_of_workers }}
+{{ end }}
+
+{{ if .bucket_list_interval }}
+bucket_list_interval: {{ .bucket_list_interval }}
+{{ end }}
+>>>>>>> b4ecc29bb (Add vars in modules.d/aws.yml.disabled (#27454))
 
 {{ if .credential_profile_name }}
 credential_profile_name: {{ .credential_profile_name }}
