@@ -42,7 +42,7 @@ func TestFetch(t *testing.T) {
 
 	resources := []string{"cpu", "memory", "io"}
 
-	for i, _ := range events {
+	for i := range events {
 		resource := resources[i]
 
 		testEvent := common.MapStr{
