@@ -12,8 +12,6 @@ This file is generated! See scripts/docs_collector.py
 
 == AWS module
 
-beta[]
-
 This is a module for aws logs. It uses filebeat s3 input to get log files from
 AWS S3 buckets with SQS notification or directly polling list of S3 objects in an S3 bucket.
 The use of SQS notification is preferred: polling list of S3 objects is expensive
@@ -49,7 +47,7 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -66,7 +64,7 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -83,7 +81,7 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -100,7 +98,7 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -117,7 +115,7 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -134,7 +132,7 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials

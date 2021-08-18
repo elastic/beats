@@ -75,7 +75,7 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 
 func makeTestConfigS3(s3bucket string) *common.Config {
 	return common.MustNewConfigFrom(fmt.Sprintf(`---
-bucket: aws:s3:::%s
+bucket_arn: aws:s3:::%s
 number_of_workers: 1
 file_selectors:
 -
