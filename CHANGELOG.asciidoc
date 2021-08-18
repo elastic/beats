@@ -278,7 +278,7 @@ https://github.com/elastic/beats/compare/v7.12.1...v7.13.0[View commits]
 *Affecting all Beats*
 
 - Fix events being dropped if they contain a floating point value of NaN or Inf. {pull}25051[25051]
-- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
+- Fix templates being overwritten if there was an error when check for the template existence. {pull}24332[24332]
 - Add `expand_keys` to the list of permitted config fields for `decode_json_fields` {pull}24862[24862]
 - Fix discovery of short-living and failing pods in Kubernetes autodiscover {issue}22718[22718] {pull}24742[24742]
 - Fix panic when overwriting metadata {pull}24741[24741]
@@ -386,7 +386,7 @@ https://github.com/elastic/beats/compare/v7.12.0...v7.12.1[View commits]
 
 *Affecting all Beats*
 
-- Fix templates being overwritten if there was an error when check for the template existance. {pull}24332[24332]
+- Fix templates being overwritten if there was an error when check for the template existence. {pull}24332[24332]
 - Fix Kubernetes autodiscovery provider to correctly handle pod states and avoid missing event data {pull}17223[17223]
 - Fix inode removal tracking code when files are replaced by files with the same name {pull}25002[25002]
 - Fix `mage GenerateCustomBeat` instructions for a new beat {pull}17679[17679]
@@ -631,7 +631,7 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 *Affecting all Beats*
 
-- Allow embedding of CAs, Certificate of private keys for anything that support TLS in ouputs and inputs. {pull}21179[21179]
+- Allow embedding of CAs, Certificate of private keys for anything that support TLS in outputs and inputs. {pull}21179[21179]
 - Update to ECS 1.7.0. {pull}22571[22571]
 - Add support for SCRAM-SHA-512 and SCRAM-SHA-256 in Kafka output. {pull}12867[12867]
 
@@ -707,7 +707,7 @@ https://github.com/elastic/beats/compare/v7.10.2...v7.11.0[View commits]
 
 - Change Session ID type from int to string {pull}22359[22359]
 - Fix filesystem types on Windows in filesystem metricset. {pull}22531[22531]
-- Fix failiures caused by custom beat names with more than 15 characters {pull}22550[22550]
+- Fix failures caused by custom beat names with more than 15 characters {pull}22550[22550]
 - Update NATS dashboards to leverage connection and route metricsets {pull}22646[22646]
 - Fix rate metrics in Kafka broker metricset by using last minute rate instead of mean rate. {pull}22733[22733]
 - Update config in `windows.yml` file. {issue}23027[23027]{pull}23327[23327]
@@ -864,7 +864,7 @@ https://github.com/elastic/beats/compare/v7.10.1\...v7.10.2[View commits]
 
 *Metricbeat*
 
-- Change `vsphere.datastore.capacity.used.pct` value to betweeen 0 and 1. {pull}23148[23148]
+- Change `vsphere.datastore.capacity.used.pct` value to between 0 and 1. {pull}23148[23148]
 
 [[release-notes-7.10.1]]
 === Beats version 7.10.1
@@ -987,7 +987,7 @@ https://github.com/elastic/beats/compare/v7.9.3\...v7.10.0[View commits]
 - Fix mapping of `fortinet.firewall.mem` as `integer`. {pull}19335[19335]
 - Fix auditd module syscall table for ppc64 and ppc64le. {pull}20052[20052]
 - Fix Filebeat OOMs on very long lines {issue}19500[19500], {pull}19552[19552]
-- Ignore missing in Zeek module when dropping unecessary fields. {pull}19984[19984]
+- Ignore missing in Zeek module when dropping unnecessary fields. {pull}19984[19984]
 - Fix `event.outcome` logic for azure/siginlogs fileset {pull}20254[20254]
 - Improve validation checks for Azure configuration {issue}20369[20369] {pull}20389[20389]
 - Fix `event.kind` for system/syslog pipeline {issue}20365[20365] {pull}20390[20390]
@@ -2062,7 +2062,7 @@ https://github.com/elastic/beats/compare/v7.5.1\...v7.6.0[View commits]
 - Add expand_event_list_from_field support in s3 input for reading json format AWS logs. {issue}15357[15357] {pull}15370[15370]
 - Add azure-eventhub input which will use the azure eventhub go sdk. {issue}14092[14092] {pull}14882[14882]
 - Expose more metrics of harvesters (e.g. `read_offset`, `start_time`). {pull}13395[13395]
-- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Include log.source.address for unparsable syslog messages. {issue}13268[13268] {pull}15453[15453]
 - Release aws elb fileset as GA. {pull}15426[15426] {issue}15380[15380]
 - Integrate the azure-eventhub with filebeat azure module (replace the kafka input). {pull}15480[15480]
 - Release aws s3access fileset to GA. {pull}15431[15431] {issue}15430[15430]
@@ -2133,7 +2133,7 @@ https://github.com/elastic/beats/compare/v7.5.1\...v7.5.2[View commits]
 
 *Filebeat*
 
-- Include log.source.address for unparseable syslog messages. {issue}13268[13268] {pull}15453[15453]
+- Include log.source.address for unparsable syslog messages. {issue}13268[13268] {pull}15453[15453]
 
 [[release-notes-7.5.1]]
 === Beats version 7.5.1
@@ -2378,7 +2378,7 @@ https://github.com/elastic/beats/compare/v7.3.1\...v7.4.0[View commits]
 *Affecting all Beats*
 
 - Update to Golang 1.12.7. {pull}12931[12931]
-- Remove `in_cluster` configuration parameter for Kuberentes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
+- Remove `in_cluster` configuration parameter for Kubernetes, now in-cluster configuration is used only if no other kubeconfig is specified {pull}13051[13051]
 
 *Auditbeat*
 
@@ -2464,7 +2464,7 @@ https://github.com/elastic/beats/compare/v7.3.1\...v7.4.0[View commits]
 *Affecting all Beats*
 
 - Add support for reading the `network.iana_number` field by default to the community_id processor. {pull}12701[12701]
-- Add a check so alias creation explicitely fails if there is an index with the same name. {pull}13070[13070]
+- Add a check so alias creation explicitly fails if there is an index with the same name. {pull}13070[13070]
 - Update kubernetes watcher to use official client-go libraries. {pull}13051[13051]
 - Add support for unix epoch time values in the `timestamp` processor. {pull}13319[13319]
 - add_host_metadata is now GA. {pull}13148[13148]
@@ -2594,7 +2594,7 @@ https://github.com/elastic/beats/compare/v7.2.0\...v7.3.0[View commits]
 
 *Filebeat*
 
-- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overriden with processors. {pull}12410[12410]
+- `convert_timezone` option is removed and locale is always added to the event so timezone is used when parsing the timestamp, this behaviour can be overridden with processors. {pull}12410[12410]
 
 ==== Bugfixes
 
@@ -4045,7 +4045,7 @@ https://github.com/elastic/beats/compare/v6.6.2\...v6.7.0[View commits]
 - Port settings have been deprecated in redis/logstash output and will be removed in 7.0. {pull}9915[9915]
 - Update the code of Central Management to align with the new returned format. {pull}10019[10019]
 - Allow Central Management to send events back to kibana. {issue}9382[9382]
-- Fix panic if fields settting is used to configure `hosts.x` fields. {issue}10824[10824] {pull}10935[10935]
+- Fix panic if fields setting is used to configure `hosts.x` fields. {issue}10824[10824] {pull}10935[10935]
 - Introduce query.default_field as part of the template. {pull}11205[11205]
 - Beats Xpack now checks for Basic license on connect. {pull}11296[11296]
 
@@ -4080,7 +4080,7 @@ https://github.com/elastic/beats/compare/v6.6.2\...v6.7.0[View commits]
 
 - Package: Disable librpm signal handlers. {pull}10694[10694]
 - Login: Handle different bad login UTMP types. {pull}10865[10865]
-- Fix hostname references in System module dashbords. {pull}11064[11064]
+- Fix hostname references in System module dashboards. {pull}11064[11064]
 - User dataset: Numerous fixes to error handling. {pull}10942[10942]
 
 *Filebeat*
@@ -4501,7 +4501,7 @@ https://github.com/elastic/beats/compare/v6.4.0\...v6.5.0[View commits]
 - Fixed `add_host_metadata` not initializing correctly on Windows. {issue}7715[7715]
 - Fixed missing file unlock in spool file on Windows, so file can be reopened and locked. {pull}7859[7859]
 - Fix spool file opening/creation failing due to file locking on Windows. {pull}7859[7859]
-- Fix size of maximum mmaped read area in spool file on Windows. {pull}7859[7859]
+- Fix size of maximum mapped read area in spool file on Windows. {pull}7859[7859]
 - Fix potential data loss on OS X in spool file by using fcntl with F_FULLFSYNC. {pull}7859[7859]
 - Improve fsync on linux, by assuming the kernel resets error flags of failed writes. {pull}7859[7859]
 - Remove unix-like permission checks on Windows, so files can be opened. {issue}7849[7849]
@@ -4640,7 +4640,7 @@ https://github.com/elastic/beats/compare/v6.4.0\...v6.5.0[View commits]
 
 *Heartbeat*
 
-- watch.poll_file is now deprecated and superceded by automatic config file reloading.
+- watch.poll_file is now deprecated and superseded by automatic config file reloading.
 
 *Metricbeat*
 
@@ -5061,7 +5061,7 @@ https://github.com/elastic/beats/compare/v6.2.3\...v6.3.0[View commits]
 - Add Logstash module support for main log and the slow log, support the plain text or structured JSON format {pull}5481[5481]
 - Add stream filtering when using `docker` prospector. {pull}6057[6057]
 - Add support for CRI logs format. {issue}5630[5630]
-- Add json.ignore_decoding_error config to not log json decoding erors. {issue}6547[6547]
+- Add json.ignore_decoding_error config to not log json decoding errors. {issue}6547[6547]
 - Make registry file permission configurable. {pull}6455[6455]
 - Add MongoDB module. {pull}6283[6238]
 - Add Ingest pipeline loading to setup. {pull}6814[6814]
@@ -6044,7 +6044,7 @@ https://github.com/elastic/beats/compare/v5.6.8\...v5.6.9[View commits]
 
 *Affecting all Beats*
 
-- Fix a type issue when specifying certicate authority when using the `import_dashboards` command. {pull}6678[6678]
+- Fix a type issue when specifying certificate authority when using the `import_dashboards` command. {pull}6678[6678]
 
 *Packetbeat*
 

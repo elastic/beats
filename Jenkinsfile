@@ -352,7 +352,7 @@ def packagingLinux(Map args = [:]) {
                 // confirming it is fixed, you will break the packaging
                 // pipeline!
                 //'linux/armv7',
-                // The platforms above are disabled temporarly as crossbuild images are
+                // The platforms above are disabled temporarily as crossbuild images are
                 // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
                 //'linux/ppc64le',
                 //'linux/mips64',
