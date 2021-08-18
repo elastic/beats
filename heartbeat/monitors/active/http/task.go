@@ -42,10 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
-
-var userAgent = useragent.UserAgent("Heartbeat")
 
 func newHTTPMonitorHostJob(
 	addr string,
@@ -205,9 +202,6 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 		}
 
 		request.Header.Add(k, v)
-	}
-	if ua := request.Header.Get("User-Agent"); ua == "" {
-		request.Header.Set("User-Agent", userAgent)
 	}
 
 	if enc != nil {
