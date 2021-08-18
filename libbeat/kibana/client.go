@@ -24,6 +24,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+<<<<<<< HEAD
+=======
+	"mime"
+	"mime/multipart"
+>>>>>>> 47c0c726b (Do not overwrite content type if it is multipart in Kibana loader (#27424))
 	"net/http"
 	"net/url"
 	"path"
@@ -197,7 +202,16 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	addHeaders(req.Header, conn.Headers)
 	addHeaders(req.Header, headers)
+<<<<<<< HEAD
 	req.Header.Set("Content-Type", "application/json")
+=======
+
+	contentType := req.Header.Get("Content-Type")
+	contentType, _, _ = mime.ParseMediaType(contentType)
+	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
+		req.Header.Set("Content-Type", "application/json")
+	}
+>>>>>>> 47c0c726b (Do not overwrite content type if it is multipart in Kibana loader (#27424))
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 

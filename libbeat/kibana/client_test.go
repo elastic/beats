@@ -119,3 +119,30 @@ headers:
 	assert.Equal(t, []string{"1"}, requests[1].Header.Values("kbn-xsrf"))
 
 }
+
+func TestNewKibanaClientWithMultipartData(t *testing.T) {
+	var requests []*http.Request
+	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests = append(requests, r)
+		if r.URL.Path == "/api/status" {
+			w.Write([]byte(`{"version":{"number":"1.2.3-beta","build_snapshot":true}}`))
+		}
+	}))
+	defer kibanaTs.Close()
+
+	client, err := NewKibanaClient(common.MustNewConfigFrom(fmt.Sprintf(`
+protocol: http
+host: %s
+headers:
+  content-type: multipart/form-data; boundary=46bea21be603a2c2ea6f51571a5e1baf5ea3be8ebd7101199320607b36ff
+  accept: text/plain
+  kbn-xsrf: 0
+`, kibanaTs.Listener.Addr().String())))
+	require.NoError(t, err)
+	require.NotNil(t, client)
+
+	client.Request(http.MethodPost, "/foo", url.Values{}, http.Header{"key": []string{"another_value"}}, nil)
+
+	assert.Equal(t, []string{"multipart/form-data; boundary=46bea21be603a2c2ea6f51571a5e1baf5ea3be8ebd7101199320607b36ff"}, requests[1].Header.Values("Content-Type"))
+
+}
