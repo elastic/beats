@@ -1,5 +1,5 @@
 dashboards:
 - id: 158be870-87f4-11e7-ad9c-db80de0bf8d3
-  file: Filebeat-Postgresql-overview.json
+  file: Filebeat-Postgresql-overview.ndjson
 - id: e4c5f230-87f3-11e7-ad9c-db80de0bf8d3
-  file: Filebeat-Postgresql-slowlogs.json
+  file: Filebeat-Postgresql-slowlogs.ndjson

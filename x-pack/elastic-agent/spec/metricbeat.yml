@@ -96,6 +96,7 @@ rules:
     - output
     - keystore
 - inject_headers: {}
+- inject_queue: {}
 
 when: length(${metricbeat.modules}) > 0 and hasKey(${output}, 'elasticsearch',
   'redis', 'kafka', 'logstash')

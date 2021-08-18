@@ -21,6 +21,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 - Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
+- Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dasbhboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
 
 *Auditbeat*
 
@@ -80,6 +81,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -196,6 +198,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Improve `perfmon` metricset performance. {pull}26886[26886]
 - Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
 - Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
+- Fix build constraint that caused issues with doc builds. {pull}27381[27381]
 
 *Auditbeat*
 
@@ -293,6 +296,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
 - Fix gcp/vpcflow module error where input type was defaulting to file. {pull}24719[24719]
 - Fix s3 input when there is a blank line in the log file. {pull}25357[25357]
+- Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
 
 *Heartbeat*
 
@@ -399,8 +403,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - Allow metric prefix override per service in gcp module. {pull}26960[26960]
 - Change `server_status_path` default setting to `nginx_status` for the `nginx` module. {pull}26642[26642]
+- Fix cloudwatch metricset collecting duplicate data points. {pull}27327[27327]
 - Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
 - Fix flaky test TestAddCounterInvalidArgWhenQueryClosed. {issue}27312[27312] {pull}27313[27313]
+- Add percent formatters to system/process {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module {pull}27363[27363]
 
 *Packetbeat*
 
@@ -497,8 +504,11 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow node/namespace metadata to be disabled on kubernetes metagen and ensure add_kubernetes_metadata honors host {pull}23012[23012]
 - Add proxy support for AWS functions. {pull}26832[26832]
 - Added policies to the elasticsearch output for non indexible events {pull}26952[26952]
+- Add `logging.metrics.namespaces` config option to control what metric groups are reported in logs. {pull}25727[25727]
 - Add sha256 digests to RPM packages. {issue}23670[23670]
 - Add new 'offline' docker image for Elastic Agent. {pull}27052[27052]
+- Add cgroups V2 support {pull}27242[27242]
+- update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 
 *Auditbeat*
 
@@ -748,6 +758,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
+- Move AWS module and filesets to GA. {pull}27428[27428]
+- update ecs.version to ECS 1.11.0. {pull}27107[27107]
 
 *Heartbeat*
 

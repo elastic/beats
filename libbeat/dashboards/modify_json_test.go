@@ -27,88 +27,69 @@ import (
 
 func TestReplaceStringInDashboard(t *testing.T) {
 	tests := []struct {
-		content  common.MapStr
+		content  []byte
 		old      string
 		new      string
-		expected common.MapStr
+		expected []byte
 	}{
 		{
-			content:  common.MapStr{"test": "CHANGEME"},
+			content:  []byte(`{"test": "CHANGEME"}`),
 			old:      "CHANGEME",
 			new:      "hostname",
-			expected: common.MapStr{"test": "hostname"},
+			expected: []byte(`{"test": "hostname"}`),
 		},
 		{
-			content:  common.MapStr{"test": "hello"},
+			content:  []byte(`{"test": "hello"}`),
 			old:      "CHANGEME",
 			new:      "hostname",
-			expected: common.MapStr{"test": "hello"},
+			expected: []byte(`{"test": "hello"}`),
 		},
 		{
-			content:  common.MapStr{"test": map[string]interface{}{"key": "\"CHANGEME\""}},
+			content:  []byte(`{"test": {"key": "\"CHANGEME\""}}`),
 			old:      "CHANGEME",
 			new:      "hostname.local",
-			expected: common.MapStr{"test": map[string]interface{}{"key": "\"hostname.local\""}},
+			expected: []byte(`{"test": {"key": "\"hostname.local\""}}`),
 		},
 		{
-			content: common.MapStr{
-				"kibanaSavedObjectMeta": map[string]interface{}{
-					"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"beat.name:\\\"CHANGEME_HOSTNAME\\\"\",\"language\":\"kuery\"}}"}},
+			content: []byte(`{"kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"beat.name:\\\"CHANGEME_HOSTNAME\\\"\",\"language\":\"kuery\"}}}}`),
 
-			old: "CHANGEME_HOSTNAME",
-			new: "hostname.local",
-			expected: common.MapStr{
-				"kibanaSavedObjectMeta": map[string]interface{}{
-					"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"beat.name:\\\"hostname.local\\\"\",\"language\":\"kuery\"}}"}},
+			old:      "CHANGEME_HOSTNAME",
+			new:      "hostname.local",
+			expected: []byte(`{"kibanaSavedObjectMeta": {"searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"version\":true,\"query\":{\"query\":\"beat.name:\\\"hostname.local\\\"\",\"language\":\"kuery\"}}}}`),
 		},
 	}
 
 	for _, test := range tests {
-		result, err := ReplaceStringInDashboard(test.old, test.new, test.content)
-		assert.NoError(t, err)
-		assert.Equal(t, test.expected, result)
+		result := ReplaceStringInDashboard(test.old, test.new, test.content)
+		assert.Equal(t, string(test.expected), string(result))
 	}
 }
 
 func TestReplaceIndexInDashboardObject(t *testing.T) {
 	tests := []struct {
-		dashboard common.MapStr
+		dashboard []byte
 		pattern   string
-		expected  common.MapStr
+		expected  []byte
 	}{
 		{
-			common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"attributes": map[string]interface{}{
-					"kibanaSavedObjectMeta": map[string]interface{}{
-						"searchSourceJSON": "{\"index\":\"metricbeat-*\"}",
-					},
-				}}}},
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"metricbeat-*\"}"}}}
+`),
 			"otherindex-*",
-			common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"attributes": map[string]interface{}{
-					"kibanaSavedObjectMeta": map[string]interface{}{
-						"searchSourceJSON": "{\"index\":\"otherindex-*\"}",
-					},
-				}}}},
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}
+`),
 		},
 		{
-			common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"attributes": map[string]interface{}{
-					"kibanaSavedObjectMeta": map[string]interface{}{},
-					"visState":              "{\"params\":{\"index_pattern\":\"metricbeat-*\"}}",
-				}}}},
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}
+`),
 			"otherindex-*",
-			common.MapStr{"objects": []interface{}{map[string]interface{}{
-				"attributes": map[string]interface{}{
-					"kibanaSavedObjectMeta": map[string]interface{}{},
-					"visState":              "{\"params\":{\"index_pattern\":\"otherindex-*\"}}",
-				}}}},
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}
+`),
 		},
 	}
 
 	for _, test := range tests {
 		result := ReplaceIndexInDashboardObject(test.pattern, test.dashboard)
-		assert.Equal(t, test.expected, result)
+		assert.Equal(t, string(test.expected), string(result))
 	}
 }
 

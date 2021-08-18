@@ -29,7 +29,7 @@ would like the Agent to operate.
 `,
 		Run: func(c *cobra.Command, args []string) {
 			if err := installCmd(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},

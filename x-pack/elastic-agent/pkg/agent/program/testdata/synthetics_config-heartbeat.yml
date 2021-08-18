@@ -1,3 +1,10 @@
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+      timeout: 1s
+
 inputs:
 - type: synthetics/http
   id: unique-http-id
