@@ -16,7 +16,7 @@
 <titleabbrev>{kib} endpoint</titleabbrev>
 ++++
 
-Starting with {beatname_uc} 6.0.0, the {kib} dashboards are loaded into {kib}
+{kib} dashboards are loaded into {kib}
 via the {kib} API. This requires a {kib} endpoint configuration. For details on
 authenticating to the {kib} API, see {kibana-ref}/api.html#api-authentication[Authentication].
 
