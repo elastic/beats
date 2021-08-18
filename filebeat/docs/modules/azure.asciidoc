@@ -83,7 +83,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 `eventhub` ::
   _string_
 Is the fully managed, real-time data ingestion service.
-Default value `insights-operational-logs`.
+Default value `insights-operational-logs` for activitylogs, `insights-logs-auditlogs` for auditlogs and `insights-logs-signinlogs` for signinlogs. It is recommended to use separate eventhub for each log type as the field mappings of each log type are different.
 
 `consumer_group` ::
 _string_
