@@ -770,6 +770,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
+- Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {pull}27423[27423]
 
 *Heartbeat*
 
