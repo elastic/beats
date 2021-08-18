@@ -5,6 +5,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Process CloudTrail logs
     # default is true, set to false to skip Cloudtrail logs
     # var.process_cloudtrail_logs: false
@@ -57,6 +66,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -96,6 +114,15 @@
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
 
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
@@ -137,6 +164,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -177,6 +213,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -216,6 +261,15 @@
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
 
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac

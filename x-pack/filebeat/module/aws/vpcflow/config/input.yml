@@ -4,8 +4,8 @@ type: aws-s3
 {{ if .queue_url }}
 queue_url: {{ .queue_url }}
 {{ end }}
-{{ if .bucket }}
-bucket: {{ .bucket }}
+{{ if .bucket_arn }}
+bucket_arn: {{ .bucket_arn }}
 {{ end }}
 
 {{ if .number_of_workers }}

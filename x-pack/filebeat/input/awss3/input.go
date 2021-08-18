@@ -138,7 +138,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}
 
-	if in.config.Bucket != "" {
+	if in.config.BucketARN != "" {
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, client, persistentStore, states)
 		if err != nil {
@@ -203,7 +203,7 @@ func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistent
 		client: s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
 	}
 
-	log := ctx.Logger.With("s3_bucket", in.config.Bucket)
+	log := ctx.Logger.With("bucket_arn", in.config.BucketARN)
 	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
 	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
@@ -223,7 +223,8 @@ func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistent
 		s3EventHandlerFactory,
 		states,
 		persistentStore,
-		in.config.Bucket,
+		in.config.BucketARN,
+		in.awsConfig.Region,
 		in.config.NumberOfWorkers,
 		in.config.BucketListInterval)
 

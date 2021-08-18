@@ -52,7 +52,7 @@ func (a *eventACKTracker) ACK() {
 
 // Wait waits for the number of pending ACKs to be zero.
 // Wait must be called sequentially only after every expected
-// Add call are made. Failing to do so could reset the pendingACKs
+// `Add` calls are made. Failing to do so could reset the pendingACKs
 // property to 0 and would results in Wait returning after additional
 // calls to `Add` are made without a corresponding `ACK` call.
 func (a *eventACKTracker) Wait() {

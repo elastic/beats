@@ -76,8 +76,8 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 // match the S3 object key.
 func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, ack *eventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
-		"s3_bucket", obj.S3.Bucket.Name,
-		"s3_object", obj.S3.Object.Key)
+		"bucket_arn", obj.S3.Bucket.Name,
+		"object_key", obj.S3.Object.Key)
 
 	readerConfig := f.findReaderConfig(obj.S3.Object.Key)
 	if readerConfig == nil {
