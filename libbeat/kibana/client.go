@@ -214,7 +214,8 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 	addHeaders(req.Header, headers)
 
 	contentType := req.Header.Get("Content-Type")
-	if !strings.HasPrefix(contentType, "multipart/form-data") && contentType != "application/ndjson" {
+	contentType, _, _ = mime.ParseMediaType(contentType)
+	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
 		req.Header.Set("Content-Type", "application/json")
 	}
 	req.Header.Set("Accept", "application/json")
