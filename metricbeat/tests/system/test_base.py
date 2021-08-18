@@ -121,7 +121,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
     def is_saved_object_api_available(self):
         kibana_semver = semver.VersionInfo.parse(self.get_version())
-        return semver.compare(kibana_semver, "7.14.0") >= 0
+        return semver.VersionInfo.parse("7.14.0")<= kibana_semver
 
     def get_version(self):
         url = self.get_kibana_url() + "/api/status"
