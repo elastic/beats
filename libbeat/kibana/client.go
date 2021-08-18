@@ -39,7 +39,9 @@ import (
 )
 
 var (
-	MinimumRequiredVersionSavedObjects = common.MustNewVersion("7.15.0")
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	MinimumRequiredVersionSavedObjects = common.MustNewVersion("7.14.0")
 )
 
 type Connection struct {
