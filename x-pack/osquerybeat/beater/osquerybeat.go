@@ -124,7 +124,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
+	inputConfigCh := config.WatchInputs(ctx, bt.log)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
@@ -164,7 +164,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 			g.Go(func() error {
 				err := bt.runOsquery(ctx, b, osq, inputCh)
 				if err != nil {
-					bt.log.Errorf("Failed to run osqueryd: %v", err)
+					if errors.Is(err, context.Canceled) {
+						bt.log.Errorf("Osquery exited: %v", err)
+					} else {
+						bt.log.Errorf("Failed to run osquery: %v", err)
+					}
 				}
 				return err
 			})
@@ -234,7 +238,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	g.Go(func() error {
 		err := osq.Run(ctx)
 		if err != nil {
-			bt.log.Errorf("Failed to run osqueryd: %v", err)
+			if errors.Is(err, context.Canceled) {
+				bt.log.Errorf("Osqueryd exited: %v", err)
+			} else {
+				bt.log.Errorf("Failed to run osqueryd: %v", err)
+			}
 		} else {
 			// When osqueryd is killed for example there is no error returned
 			// but we can't continue running. Exiting.
@@ -330,13 +338,13 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 }
 
 func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
-	sql, ok := configPlugin.ResolveName(res.Name)
+	qi, ok := configPlugin.LookupQueryInfo(res.Name)
 	if !ok {
 		bt.log.Errorf("failed to resolve query name: %s", res.Name)
 		return
 	}
 
-	hits, err := cli.ResolveResult(ctx, sql, res.Hits)
+	hits, err := cli.ResolveResult(ctx, qi.QueryConfig.Query, res.Hits)
 	if err != nil {
 		bt.log.Errorf("failed to resolve query types: %s", res.Name)
 		return
@@ -344,11 +352,10 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 
 	// Map to ECS
 	var ecsFields []common.MapStr
-	mapping, ok := configPlugin.LookupECSMapping(res.Name)
-	if ok && len(mapping) > 0 {
+	if ok && len(qi.ECSMapping) > 0 {
 		ecsFields = make([]common.MapStr, len(hits))
 		for i, hit := range hits {
-			ecsFields[i] = common.MapStr(mapping.Map(hit))
+			ecsFields[i] = common.MapStr(qi.ECSMapping.Map(hit))
 		}
 	} else {
 		// ECS mapping is optional, continue
@@ -356,7 +363,7 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 	}
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, ecsFields, nil)
+	bt.publishEvents(config.Datastream(qi.Namespace), res.Name, responseID, hits, ecsFields, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {

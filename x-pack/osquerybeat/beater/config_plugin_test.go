@@ -354,11 +354,11 @@ func TestSet(t *testing.T) {
 			for _, input := range tc.inputs {
 				for _, stream := range input.Streams {
 					name := strings.Join([]string{"pack", input.Name, stream.ID}, "_")
-					sql, ok := cfgp.ResolveName(name)
+					qi, ok := cfgp.LookupQueryInfo(name)
 					if !ok {
 						t.Fatalf("failed to resolve name %v", name)
 					}
-					diff = cmp.Diff(sql, stream.Query)
+					diff = cmp.Diff(qi.QueryConfig.Query, stream.Query)
 					if diff != "" {
 						t.Error(diff)
 					}
@@ -366,17 +366,12 @@ func TestSet(t *testing.T) {
 						continue
 					}
 
-					// test that the query ecs mapping lookup succeeds
-					ecsm, ok := cfgp.LookupECSMapping(name)
-					if !ok {
-						t.Fatalf("failed to lookup ecs mapping for %v", name)
-					}
-					diff = cmp.Diff(tc.ecsm, ecsm)
+					diff = cmp.Diff(tc.ecsm, qi.ECSMapping)
 				}
 			}
 
 			// test that unknown query can't be resolved
-			_, ok = cfgp.ResolveName("unknown query name")
+			_, ok = cfgp.LookupQueryInfo("unknown query name")
 			if ok {
 				t.Fatalf("unexpectedly resolved unknown query")
 			}

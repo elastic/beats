@@ -74,7 +74,7 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 	if err != nil {
 		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.executeQuery(ctx, config.DefaultStreamIndex, ad.ID, ad.Query, "", req)
+	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ad.ID, ad.Query, "", req)
 }
 
 func (a *actionHandler) executeQuery(ctx context.Context, index, id, query, responseID string, req map[string]interface{}) error {

@@ -31,6 +31,14 @@ var (
 	ErrECSMappingIsTooDeep = errors.New("ECS mapping is too deep")
 )
 
+type QueryInfo struct {
+	QueryConfig query
+	ECSMapping  ecs.Mapping
+	Namespace   string
+}
+
+type queryInfoMap map[string]QueryInfo
+
 type ConfigPlugin struct {
 	log *logp.Logger
 
@@ -38,11 +46,15 @@ type ConfigPlugin struct {
 
 	queriesCount int
 
-	// A map that allows to look up the original query by name for the column types resolution
-	queryMap map[string]query
+	// A map that allows to look up the queryInfo by query name
+	queryInfoMap queryInfoMap
 
-	// A map for the query ECS mapping lookups
-	ecsMap map[string]ecs.Mapping
+	// This map holds the new queries info before the configuration requested from the plugin.
+	// This replaces the queryInfoMap upon receiving GenerateConfig call from osqueryd.
+	// Until we receive this call from osqueryd we should use the previously set mapping,
+	// otherwise we potentially could receive the query result for the old queries before osqueryd requested the new configuration
+	// and we would not be able to resolve types or ECS mapping or the namespace.
+	newQueryInfoMap queryInfoMap
 
 	// Packs
 	packs map[string]pack
@@ -53,7 +65,8 @@ type ConfigPlugin struct {
 
 func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
 	p := &ConfigPlugin{
-		log: log.With("ctx", "config"),
+		log:          log.With("ctx", "config"),
+		queryInfoMap: make(queryInfoMap),
 	}
 
 	return p
@@ -70,19 +83,11 @@ func (p *ConfigPlugin) Count() int {
 	return p.queriesCount
 }
 
-func (p *ConfigPlugin) ResolveName(name string) (sql string, ok bool) {
+func (p *ConfigPlugin) LookupQueryInfo(name string) (qi QueryInfo, ok bool) {
 	p.mx.RLock()
 	defer p.mx.RUnlock()
-	sc, ok := p.queryMap[name]
-
-	return sc.Query, ok
-}
-
-func (p *ConfigPlugin) LookupECSMapping(name string) (m ecs.Mapping, ok bool) {
-	p.mx.RLock()
-	defer p.mx.RUnlock()
-	m, ok = p.ecsMap[name]
-	return m, ok
+	qi, ok = p.queryInfoMap[name]
+	return qi, ok
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -94,6 +99,12 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 	c, err := p.render()
 	if err != nil {
 		return nil, err
+	}
+
+	// replace the query info map
+	if p.newQueryInfoMap != nil {
+		p.queryInfoMap = p.newQueryInfoMap
+		p.newQueryInfoMap = nil
 	}
 
 	return map[string]string{
@@ -147,10 +158,13 @@ func (p *ConfigPlugin) render() (string, error) {
 }
 
 func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
+	var err error
+
 	p.configString = ""
 	queriesCount := 0
-	p.queryMap = make(map[string]query)
-	p.ecsMap = make(map[string]ecs.Mapping)
+	newQueryInfoMap := make(map[string]QueryInfo)
+	// queryMap := make(map[string]query)
+	// ecsMap := make(map[string]ecs.Mapping)
 	p.packs = make(map[string]pack)
 	for _, input := range inputs {
 		pack := pack{
@@ -168,19 +182,24 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 				Version:  stream.Version,
 				Snapshot: true, // enforce snapshot for all queries
 			}
-			p.queryMap[id] = query
+			var ecsm ecs.Mapping
 			if len(stream.ECSMapping) > 0 {
-				ecsm, err := flattenECSMapping(stream.ECSMapping)
+				ecsm, err = flattenECSMapping(stream.ECSMapping)
 				if err != nil {
 					return err
 				}
-				p.ecsMap[id] = ecsm
+			}
+			newQueryInfoMap[id] = QueryInfo{
+				QueryConfig: query,
+				ECSMapping:  ecsm,
+				Namespace:   input.Datastream.Namespace,
 			}
 			pack.Queries[stream.ID] = query
 			queriesCount++
 		}
 		p.packs[input.Name] = pack
 	}
+	p.newQueryInfoMap = newQueryInfoMap
 	p.queriesCount = queriesCount
 	return nil
 }
