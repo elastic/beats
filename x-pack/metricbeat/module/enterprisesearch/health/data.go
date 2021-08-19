@@ -35,6 +35,13 @@ var (
 				"daemon_thread_count":        c.Int("daemon_thread_count"),
 			}),
 		}),
+		"crawler": c.Dict("crawler", s.Schema{
+			"workers": c.Dict("workers", s.Schema{
+				"pool_size": c.Int("pool_size"),
+				"active":    c.Int("active"),
+				"available": c.Int("available"),
+			}),
+		}),
 	}
 )
 

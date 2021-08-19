@@ -54,11 +54,11 @@
             - name: peak_thread_count
               type: long
               description: >
-                Peak live thread count since the JVM started or the peak was reset. 
+                Peak live thread count since the JVM started or the peak was reset.
             - name: total_started_thread_count
               type: long
               description: >
-                Total number of threads created and/or started since the JVM started. 
+                Total number of threads created and/or started since the JVM started.
             - name: daemon_thread_count
               type: long
               description: >
@@ -75,3 +75,25 @@
               type: long
               description: >
                 Displays the approximate number of objects for which finalization is pending.
+    - name: crawler
+      type: group
+      description: >
+        Crawler health
+      fields:
+        - name: workers
+          type: group
+          description: >
+            Crawler workers
+          fields:
+            - name: pool_size
+              type: long
+              description: >
+                Workers pool size.
+            - name: active
+              type: long
+              description: >
+                Number of active workers.
+            - name: available
+              type: long
+              description: >
+                Number of available workers.

@@ -1,20 +1,27 @@
-
 {
-  "jvm": {
-      "memory_usage": {
-          "heap_init": 268435456,
-          "heap_used": 1551901480,
-          "heap_committed": 1784152064,
-          "heap_max": 3817865216,
-          "object_pending_finalization_count": 0,
-          "non_heap_init": 2555904,
-          "non_heap_committed": 266469376
-      },
-      "threads": {
-          "thread_count": 24,
-          "peak_thread_count": 27,
-          "total_started_thread_count": 119,
-          "daemon_thread_count": 23
-      }
-  }
+    "jvm": {
+        "memory_usage": {
+            "heap_init": 268435456,
+            "heap_used": 1551901480,
+            "heap_committed": 1784152064,
+            "heap_max": 3817865216,
+            "object_pending_finalization_count": 0,
+            "non_heap_init": 2555904,
+            "non_heap_committed": 266469376
+        },
+        "threads": {
+            "thread_count": 24,
+            "peak_thread_count": 27,
+            "total_started_thread_count": 119,
+            "daemon_thread_count": 23
+        }
+    },
+    "crawler": {
+        "running": true,
+        "workers": {
+            "pool_size": 32,
+            "active": 0,
+            "available": 32
+        }
+    }
 }

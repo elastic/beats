@@ -2,21 +2,28 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "enterprisesearch": {
         "health": {
+            "crawler": {
+                "workers": {
+                    "active": 0,
+                    "available": 16,
+                    "pool_size": 16
+                }
+            },
             "jvm": {
                 "memory_usage": {
-                    "heap_committed.bytes": 1908932608,
+                    "heap_committed.bytes": 1846018048,
                     "heap_init.bytes": 2147483648,
                     "heap_max.bytes": 1908932608,
-                    "heap_used.bytes": 454791640,
-                    "non_heap_committed.bytes": 281149440,
+                    "heap_used.bytes": 645763552,
+                    "non_heap_committed.bytes": 277594112,
                     "non_heap_init.bytes": 2555904,
                     "object_pending_finalization_count": 0
                 },
                 "threads": {
-                    "daemon_thread_count": 24,
-                    "peak_thread_count": 34,
-                    "thread_count": 34,
-                    "total_started_thread_count": 37
+                    "daemon_thread_count": 23,
+                    "peak_thread_count": 33,
+                    "thread_count": 33,
+                    "total_started_thread_count": 34
                 }
             }
         }
