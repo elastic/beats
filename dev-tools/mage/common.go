@@ -363,7 +363,7 @@ func Tar(src string, targetFile string) error {
 	}
 	defer f.Close()
 
-	// tar > gzip > buf
+	// tar > gzip > file
 	zr := gzip.NewWriter(f)
 	tw := tar.NewWriter(zr)
 
