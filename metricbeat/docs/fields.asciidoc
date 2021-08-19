@@ -43515,14 +43515,7 @@ type: object
 Linux pressure stall information metrics for cpu, memory, and io
 
 
-
-[float]
-=== pressure
-
-Linux pressure stall information
-
-
-*`linux.pressure.pressure.cpu.some.10.pct`*::
+*`linux.pressure.cpu.some.10.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on CPU over a ten second window.
@@ -43534,7 +43527,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.cpu.some.60.pct`*::
+*`linux.pressure.cpu.some.60.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on CPU over a sixty second window.
@@ -43546,7 +43539,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.cpu.some.300.pct`*::
+*`linux.pressure.cpu.some.300.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on CPU over a three hundred second window.
@@ -43558,17 +43551,17 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.cpu.some.total.time.us`*::
+*`linux.pressure.cpu.some.total.time.us`*::
 +
 --
-The total absolute stall time (in us) in which at least some tasks were stalled on CPU.
+The total absolute stall time (in microseconds) in which at least some tasks were stalled on CPU.
 
 
 type: long
 
 --
 
-*`linux.pressure.pressure.memory.some.10.pct`*::
+*`linux.pressure.memory.some.10.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on Memory over a ten second window.
@@ -43580,10 +43573,10 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.some.60.pct`*::
+*`linux.pressure.memory.some.60.pct`*::
 +
 --
-The average share of time in which at least some tasks were stalled on Memory over a 60.pct second window.
+The average share of time in which at least some tasks were stalled on Memory over a sixty second window.
 
 
 type: float
@@ -43592,7 +43585,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.some.300.pct`*::
+*`linux.pressure.memory.some.300.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on Memory over a three hundred second window.
@@ -43604,17 +43597,17 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.some.total.time.us`*::
+*`linux.pressure.memory.some.total.time.us`*::
 +
 --
-The total absolute stall time (in us) in which at least some tasks were stalled on memory.
+The total absolute stall time (in microseconds) in which at least some tasks were stalled on memory.
 
 
 type: long
 
 --
 
-*`linux.pressure.pressure.memory.full.10.pct`*::
+*`linux.pressure.memory.full.10.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a ten second window.
@@ -43626,7 +43619,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.full.60.pct`*::
+*`linux.pressure.memory.full.60.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a sixty second window.
@@ -43638,7 +43631,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.full.300.pct`*::
+*`linux.pressure.memory.full.300.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a three hundred second window.
@@ -43650,17 +43643,17 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.memory.full.total.time.us`*::
+*`linux.pressure.memory.full.total.time.us`*::
 +
 --
-The total absolute stall time (in us) in which in which all non-idle tasks were stalled on memory.
+The total absolute stall time (in microseconds) in which in which all non-idle tasks were stalled on memory.
 
 
 type: long
 
 --
 
-*`linux.pressure.pressure.io.some.10.pct`*::
+*`linux.pressure.io.some.10.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on io over a ten second window.
@@ -43672,10 +43665,10 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.some.60.pct`*::
+*`linux.pressure.io.some.60.pct`*::
 +
 --
-The average share of time in which at least some tasks were stalled on io over a 60.pct second window.
+The average share of time in which at least some tasks were stalled on io over a sixty second window.
 
 
 type: float
@@ -43684,7 +43677,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.some.300.pct`*::
+*`linux.pressure.io.some.300.pct`*::
 +
 --
 The average share of time in which at least some tasks were stalled on io over a three hundred second window.
@@ -43696,17 +43689,17 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.some.total.time.us`*::
+*`linux.pressure.io.some.total.time.us`*::
 +
 --
-The total absolute stall time (in us) in which at least some tasks were stalled on io.
+The total absolute stall time (in microseconds) in which at least some tasks were stalled on io.
 
 
 type: long
 
 --
 
-*`linux.pressure.pressure.io.full.10.pct`*::
+*`linux.pressure.io.full.10.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a ten second window.
@@ -43718,7 +43711,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.full.60.pct`*::
+*`linux.pressure.io.full.60.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a sixty second window.
@@ -43730,7 +43723,7 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.full.300.pct`*::
+*`linux.pressure.io.full.300.pct`*::
 +
 --
 The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a three hundred second window.
@@ -43742,10 +43735,10 @@ format: percent
 
 --
 
-*`linux.pressure.pressure.io.full.total.time.us`*::
+*`linux.pressure.io.full.total.time.us`*::
 +
 --
-The total absolute stall time (in us) in which in which all non-idle tasks were stalled on io.
+The total absolute stall time (in microseconds) in which in which all non-idle tasks were stalled on io.
 
 
 type: long
