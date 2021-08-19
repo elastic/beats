@@ -245,8 +245,11 @@ func TestSet(t *testing.T) {
 }`
 	oneInputConfig := []config.InputConfig{
 		{
-			Name:     "osquery-manager-1",
-			Type:     "osquery",
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
 			Platform: "posix",
 			Version:  "4.7.0",
 			Discovery: []string{
@@ -327,6 +330,15 @@ func TestSet(t *testing.T) {
 				t.Fatal(diff)
 			}
 
+			// Should not resolve the query until the config was generated
+			if tc.name == "one input" {
+				_, ok := cfgp.LookupQueryInfo("users")
+				diff := cmp.Diff(false, ok)
+				if diff != "" {
+					t.Fatal(diff)
+				}
+			}
+
 			// test generate config
 			mcfg, err := cfgp.GenerateConfig(context.Background())
 			if err != nil {
@@ -362,11 +374,20 @@ func TestSet(t *testing.T) {
 					if diff != "" {
 						t.Error(diff)
 					}
+
+					diff = cmp.Diff(input.Datastream.Namespace, qi.Namespace)
+					if diff != "" {
+						t.Error(diff)
+					}
+
 					if len(stream.ECSMapping) == 0 {
 						continue
 					}
 
 					diff = cmp.Diff(tc.ecsm, qi.ECSMapping)
+					if diff != "" {
+						t.Error(diff)
+					}
 				}
 			}
 
