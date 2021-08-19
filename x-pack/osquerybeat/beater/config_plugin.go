@@ -34,7 +34,6 @@ var (
 type QueryInfo struct {
 	QueryConfig query
 	ECSMapping  ecs.Mapping
-	Namespace   string
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -55,6 +54,12 @@ type ConfigPlugin struct {
 	// otherwise we potentially could receive the query result for the old queries before osqueryd requested the new configuration
 	// and we would not be able to resolve types or ECS mapping or the namespace.
 	newQueryInfoMap queryInfoMap
+
+	// Datastream namesapces map that allows to lookup the namespace per query.
+	// The datastream namespaces map is handled separatelly from query info
+	// because if we delay updating it until the osqueryd config refresh (up to 1 minute, the way we do with queryinfo)
+	// we could be sending data into the datastream with namespace that we don't have permissions meanwhile
+	namespaces map[string]string
 
 	// Packs
 	packs map[string]pack
@@ -88,6 +93,13 @@ func (p *ConfigPlugin) LookupQueryInfo(name string) (qi QueryInfo, ok bool) {
 	defer p.mx.RUnlock()
 	qi, ok = p.queryInfoMap[name]
 	return qi, ok
+}
+
+func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	ns, ok = p.namespaces[name]
+	return ns, ok
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -163,8 +175,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 	p.configString = ""
 	queriesCount := 0
 	newQueryInfoMap := make(map[string]QueryInfo)
-	// queryMap := make(map[string]query)
-	// ecsMap := make(map[string]ecs.Mapping)
+	namespaces := make(map[string]string)
 	p.packs = make(map[string]pack)
 	for _, input := range inputs {
 		pack := pack{
@@ -192,14 +203,15 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 			newQueryInfoMap[id] = QueryInfo{
 				QueryConfig: query,
 				ECSMapping:  ecsm,
-				Namespace:   input.Datastream.Namespace,
 			}
+			namespaces[id] = input.Datastream.Namespace
 			pack.Queries[stream.ID] = query
 			queriesCount++
 		}
 		p.packs[input.Name] = pack
 	}
 	p.newQueryInfoMap = newQueryInfoMap
+	p.namespaces = namespaces
 	p.queriesCount = queriesCount
 	return nil
 }

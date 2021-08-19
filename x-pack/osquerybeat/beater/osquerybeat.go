@@ -338,15 +338,23 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 }
 
 func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
+	ns, ok := configPlugin.LookupNamespace(res.Name)
+	if !ok {
+		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
+		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
+		// and the API key would not have permissions for that namespaces datastream to create the index
+		return
+	}
+
 	qi, ok := configPlugin.LookupQueryInfo(res.Name)
 	if !ok {
-		bt.log.Errorf("failed to resolve query name: %s", res.Name)
+		bt.log.Errorf("failed to lookup query info: %s", res.Name)
 		return
 	}
 
 	hits, err := cli.ResolveResult(ctx, qi.QueryConfig.Query, res.Hits)
 	if err != nil {
-		bt.log.Errorf("failed to resolve query types: %s", res.Name)
+		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
 		return
 	}
 
@@ -363,7 +371,7 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 	}
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.Datastream(qi.Namespace), res.Name, responseID, hits, ecsFields, nil)
+	bt.publishEvents(config.Datastream(ns), res.Name, responseID, hits, ecsFields, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {

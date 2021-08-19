@@ -333,9 +333,24 @@ func TestSet(t *testing.T) {
 			// Should not resolve the query until the config was generated
 			if tc.name == "one input" {
 				_, ok := cfgp.LookupQueryInfo("users")
-				diff := cmp.Diff(false, ok)
+				diff = cmp.Diff(false, ok)
 				if diff != "" {
 					t.Fatal(diff)
+				}
+
+				// Check the namespaces set before configuration is generated
+				for _, input := range tc.inputs {
+					_, ok := cfgp.LookupNamespace("users")
+					diff = cmp.Diff(false, ok)
+					if diff != "" {
+						t.Fatal(diff)
+					}
+
+					diff = cmp.Diff(oneInputConfig[0].Datastream.Namespace, input.Datastream.Namespace)
+					if diff != "" {
+						t.Fatal(diff)
+					}
+
 				}
 			}
 
@@ -366,6 +381,12 @@ func TestSet(t *testing.T) {
 			for _, input := range tc.inputs {
 				for _, stream := range input.Streams {
 					name := strings.Join([]string{"pack", input.Name, stream.ID}, "_")
+
+					ns, ok := cfgp.LookupNamespace(name)
+					if !ok {
+						t.Fatalf("failed to resolve namespace for %v", name)
+					}
+
 					qi, ok := cfgp.LookupQueryInfo(name)
 					if !ok {
 						t.Fatalf("failed to resolve name %v", name)
@@ -375,7 +396,7 @@ func TestSet(t *testing.T) {
 						t.Error(diff)
 					}
 
-					diff = cmp.Diff(input.Datastream.Namespace, qi.Namespace)
+					diff = cmp.Diff(input.Datastream.Namespace, ns)
 					if diff != "" {
 						t.Error(diff)
 					}
