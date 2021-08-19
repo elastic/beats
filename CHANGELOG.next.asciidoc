@@ -509,6 +509,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add new 'offline' docker image for Elastic Agent. {pull}27052[27052]
 - Add cgroups V2 support {pull}27242[27242]
 - update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
+- The disk queue is now GA. {pull}27515[27515]
 
 *Auditbeat*
 
