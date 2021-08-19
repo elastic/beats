@@ -356,10 +356,15 @@ func unzip(sourceFile, destinationDir string) error {
 // Tar compress a directory using tar + gzip algorithms
 func Tar(src string, targetFile string) error {
 	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
-	var buf bytes.Buffer
+
+	f, err := os.Create(targetFile)
+	if err != nil {
+		return fmt.Errorf("error creating tar file: %w", err)
+	}
+	defer f.Close()
 
 	// tar > gzip > buf
-	zr := gzip.NewWriter(&buf)
+	zr := gzip.NewWriter(f)
 	tw := tar.NewWriter(zr)
 
 	// walk through every file in the folder
@@ -408,8 +413,7 @@ func Tar(src string, targetFile string) error {
 		return fmt.Errorf("error closing gzip file: %w", err)
 	}
 
-	// write the .tar.gzip
-	return ioutil.WriteFile(targetFile, buf.Bytes(), os.FileMode(0600))
+	return nil
 }
 
 func untar(sourceFile, destinationDir string) error {
