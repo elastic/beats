@@ -127,12 +127,6 @@ The azure module comes with several predefined dashboards for general cloud over
 image::./images/filebeat-azure-overview.png[]
 
 
-
-
-
-
-
-
 [float]
 === Fields
 
