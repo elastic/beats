@@ -387,7 +387,8 @@ func WithAPMHTTPInstrumentation() TransportOption {
 	return withAPMHTTPRountTripper
 }
 
-func withHeaderRoundTripper(rt http.RoundTripper, headers map[string]string) http.RoundTripper {
+// HeaderRoundTripper will return a RoundTripper that sets header KVs if the key is not present.
+func HeaderRoundTripper(rt http.RoundTripper, headers map[string]string) http.RoundTripper {
 	return &headerRoundTripper{headers, rt}
 }
 
@@ -395,7 +396,7 @@ func withHeaderRoundTripper(rt http.RoundTripper, headers map[string]string) htt
 // This RoundTripper will add headers to each request if the key is not present.
 func WithHeaderRoundTripper(headers map[string]string) TransportOption {
 	return WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
-		return withHeaderRoundTripper(rt, headers)
+		return HeaderRoundTripper(rt, headers)
 	})
 }
 

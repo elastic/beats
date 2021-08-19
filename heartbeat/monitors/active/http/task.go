@@ -41,6 +41,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
@@ -138,27 +139,28 @@ func createPingFactory(
 		// prevents following redirects in this case, we know that
 		// config.MaxRedirects must be zero to even be here
 		checkRedirect := makeCheckRedirect(0, nil)
+		transport := &SimpleTransport{
+			Dialer: dialer,
+			OnStartWrite: func() {
+				cbMutex.Lock()
+				writeStart = time.Now()
+				cbMutex.Unlock()
+			},
+			OnEndWrite: func() {
+				cbMutex.Lock()
+				writeEnd = time.Now()
+				cbMutex.Unlock()
+			},
+			OnStartRead: func() {
+				cbMutex.Lock()
+				readStart = time.Now()
+				cbMutex.Unlock()
+			},
+		}
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
-			Transport: &SimpleTransport{
-				Dialer: dialer,
-				OnStartWrite: func() {
-					cbMutex.Lock()
-					writeStart = time.Now()
-					cbMutex.Unlock()
-				},
-				OnEndWrite: func() {
-					cbMutex.Lock()
-					writeEnd = time.Now()
-					cbMutex.Unlock()
-				},
-				OnStartRead: func() {
-					cbMutex.Lock()
-					readStart = time.Now()
-					cbMutex.Unlock()
-				},
-			},
+			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
 		}
 
 		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
