@@ -26,6 +26,7 @@ metricbeat.modules:
     # - ksm
     # - conntrack
     # - iostat
+    # - pressure
   enabled: true
   #hostfs: /hostfs
 
@@ -46,6 +47,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-linux-pageinfo,pageinfo>>
 
+* <<metricbeat-metricset-linux-pressure,pressure>>
+
 include::linux/conntrack.asciidoc[]
 
 include::linux/iostat.asciidoc[]
@@ -55,4 +58,6 @@ include::linux/ksm.asciidoc[]
 include::linux/memory.asciidoc[]
 
 include::linux/pageinfo.asciidoc[]
+
+include::linux/pressure.asciidoc[]
 
