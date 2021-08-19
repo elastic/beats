@@ -3,7 +3,7 @@
 
 ifndef::no_ilm[]
 TIP: If you're sending events to a cluster that supports index lifecycle
-management, you need to change the index name in the ILM policy to new one.
+management, you need to change the index name in the ILM policy.
 See <<ilm>> to learn how to change it.
 endif::no_ilm[]
 
