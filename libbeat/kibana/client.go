@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -211,6 +212,7 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 	addHeaders(req.Header, headers)
 
 	contentType := req.Header.Get("Content-Type")
+	contentType, _, _ = mime.ParseMediaType(contentType)
 	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
 		req.Header.Set("Content-Type", "application/json")
 	}
