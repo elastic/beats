@@ -33,7 +33,10 @@ metricbeat.modules:
     # - conntrack
     # - iostat
     # - pressure
+<<<<<<< HEAD
     # - rapl
+=======
+>>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
   enabled: true
   #hostfs: /hostfs
   #rapl.use_msr_safe: false
@@ -57,8 +60,11 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-linux-pressure,pressure>>
 
+<<<<<<< HEAD
 * <<metricbeat-metricset-linux-rapl,rapl>>
 
+=======
+>>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 include::linux/conntrack.asciidoc[]
 
 include::linux/iostat.asciidoc[]
@@ -71,5 +77,8 @@ include::linux/pageinfo.asciidoc[]
 
 include::linux/pressure.asciidoc[]
 
+<<<<<<< HEAD
 include::linux/rapl.asciidoc[]
 
+=======
+>>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))

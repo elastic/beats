@@ -101,7 +101,10 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/memory"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pageinfo"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/pressure"
+<<<<<<< HEAD
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux/rapl"
+=======
+>>>>>>> e49f2579c ([Metricbeat] Add Linux pressure metricset (#27355))
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/logstash/node_stats"
