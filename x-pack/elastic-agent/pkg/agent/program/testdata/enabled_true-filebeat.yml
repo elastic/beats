@@ -39,5 +39,7 @@ output:
     hosts:
       - 127.0.0.1:9200
       - 127.0.0.1:9300
+    headers:
+      h1: test-header
     username: elastic
     password: changeme
