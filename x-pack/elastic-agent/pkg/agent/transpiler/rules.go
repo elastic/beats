@@ -1535,12 +1535,12 @@ func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 		return nil
 	}
 
-	outputsNode, found := Lookup(ast, "outputs")
+	outputNode, found := Lookup(ast, "output")
 	if !found {
 		return nil
 	}
 
-	elasticsearchNode, found := outputsNode.Find("elasticsearch")
+	elasticsearchNode, found := outputNode.Find("elasticsearch")
 	if found {
 		headersNode, found := elasticsearchNode.Find("headers")
 		if found {

@@ -81,6 +81,8 @@ metricbeat:
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    headers:
+      h1: test-header
     username: elastic
     password: changeme
     api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
