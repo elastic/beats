@@ -15,19 +15,11 @@ services:
 
   # Used by base tests
   elasticsearch:
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.13.4}-1
-    build:
-      context: ./module/elasticsearch/_meta
-      args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.13.4}
-=======
     image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.14.0}-1
     build:
       context: ./module/elasticsearch/_meta
       args:
         ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.14.0}
->>>>>>> 2eb4601695 ([Metricbeat] CI: update stack to 7.14 (#27416))
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
@@ -45,19 +37,11 @@ services:
 
   # Used by base tests
   kibana:
-<<<<<<< HEAD
-    image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.13.4}-1
-    build:
-      context: ./module/kibana/_meta
-      args:
-        KIBANA_VERSION: ${KIBANA_VERSION:-7.13.4}
-=======
     image: docker.elastic.co/integrations-ci/beats-kibana:${KIBANA_VERSION:-7.14.0}-1
     build:
       context: ./module/kibana/_meta
       args:
         KIBANA_VERSION: ${KIBANA_VERSION:-7.14.0}
->>>>>>> 2eb4601695 ([Metricbeat] CI: update stack to 7.14 (#27416))
     depends_on:
       - elasticsearch
     ports:
