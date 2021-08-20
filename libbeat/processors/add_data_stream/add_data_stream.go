@@ -37,10 +37,10 @@ func SetEventDataset(event *beat.Event, ds string) {
 	}
 }
 
-// AddDataStreamIndex is a Processor to set an event's "raw_index" metadata field
-// based on the given type, dataset, and namespace fields.
-// If the event's metadata contains an
-type AddDataStreamIndex struct {
+// AddDataStream is a Processor to set an event's "raw_index" metadata field
+// based on the given type, dataset, and namespace fields, as well as its
+// `data_stream` field dynamically.
+type AddDataStream struct {
 	DataStream DataStream
 	// cached, compiled version of the index name derived from the data stream
 	idxNameCache string
@@ -50,14 +50,14 @@ type AddDataStreamIndex struct {
 }
 
 // New returns a new AddDataStreamIndex processor.
-func New(ds DataStream) *AddDataStreamIndex {
+func New(ds DataStream) *AddDataStream {
 	if ds.Namespace == "" {
 		ds.Namespace = "default"
 	}
 	if ds.Dataset == "" {
 		ds.Dataset = "generic"
 	}
-	return &AddDataStreamIndex{
+	return &AddDataStream{
 		DataStream:          ds,
 		idxNameCache:        ds.indexName(),
 		idxNamePartialCache: ds.idxNamePartialCache(),
@@ -65,7 +65,7 @@ func New(ds DataStream) *AddDataStreamIndex {
 }
 
 // Run runs the processor.
-func (p *AddDataStreamIndex) Run(event *beat.Event) (*beat.Event, error) {
+func (p *AddDataStream) Run(event *beat.Event) (*beat.Event, error) {
 	eventDataStream := p.DataStream
 	if event.Meta == nil {
 		event.Meta = common.MapStr{
@@ -80,12 +80,15 @@ func (p *AddDataStreamIndex) Run(event *beat.Event) (*beat.Event, error) {
 			eventDataStream.Dataset = customDataset.(string)
 		}
 	}
+	if event.Fields == nil {
+		event.Fields = common.MapStr{}
+	}
 	event.PutValue("data_stream", eventDataStream)
 
 	return event, nil
 }
 
-func (p *AddDataStreamIndex) String() string {
+func (p *AddDataStream) String() string {
 	return fmt.Sprintf("add_data_stream_index=%v", p.DataStream.indexName())
 }
 
