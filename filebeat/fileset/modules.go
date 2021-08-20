@@ -396,9 +396,19 @@ func (reg *ModuleRegistry) ModuleNames() []string {
 	return modules
 }
 
-// ModuleFilesets return the list of available filesets for the given module
+// ModuleAvailableFilesets return the list of available filesets for the given module
 // it returns an empty list if the module doesn't exist
-func (reg *ModuleRegistry) ModuleFilesets(module string) ([]string, error) {
+func (reg *ModuleRegistry) ModuleAvailableFilesets(module string) ([]string, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 	return getModuleFilesets(modulesPath, module)
+}
+
+// ModuleConfiguredFilesets return the list of configured filesets for the given module
+// it returns an empty list if the module doesn't exist
+func (reg *ModuleRegistry) ModuleConfiguredFilesets(module string) (list []string, err error) {
+	filesets, _ := reg.registry[module]
+	for name := range filesets {
+		list = append(list, name)
+	}
+	return
 }
