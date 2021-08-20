@@ -641,3 +641,703 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		})
 	}
 }
+
+func TestRemoveNetworkDirectionProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.13.0",
+			esVersion: common.MustNewVersion("7.12.34"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"network_direction": map[string]interface{}{
+							"internal_networks": []string{
+								"loopback",
+								"private",
+							},
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.13.0",
+			esVersion: common.MustNewVersion("7.13.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"network_direction": map[string]interface{}{
+							"internal_networks": []string{
+								"loopback",
+								"private",
+							},
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"network_direction": map[string]interface{}{
+							"internal_networks": []string{
+								"loopback",
+								"private",
+							},
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.13.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"network_direction": map[string]interface{}{
+							"internal_networks": []string{
+								"loopback",
+								"private",
+							},
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"network_direction": map[string]interface{}{
+							"internal_networks": []string{
+								"loopback",
+								"private",
+							},
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
+func TestReplaceConvertIPWithGrok(t *testing.T) {
+	logp.TestingSetup()
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES >= 7.13.0: keep processor",
+			esVersion: common.MustNewVersion("7.13.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"field":        "foo",
+							"target_field": "bar",
+							"type":         "ip",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"field":        "foo",
+							"target_field": "bar",
+							"type":         "ip",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES < 7.13.0: replace with grok",
+			esVersion: common.MustNewVersion("7.12.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"field":        "foo",
+							"target_field": "bar",
+							"type":         "ip",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"grok": map[string]interface{}{
+							"field": "foo",
+							"patterns": []string{
+								"^%{IP:bar}$",
+							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "implicit target",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"field": "foo",
+							"type":  "ip",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"grok": map[string]interface{}{
+							"field": "foo",
+							"patterns": []string{
+								"^%{IP:foo}$",
+							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "missing field",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"type": "ip",
+						},
+					},
+				},
+			},
+			isErrExpected: true,
+		},
+		{
+			name:      "keep settings in grok",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"convert": map[string]interface{}{
+							"field":          "foo",
+							"target_field":   "bar",
+							"type":           "ip",
+							"ignore_missing": true,
+							"description":    "foo bar",
+							"if":             "condition",
+							"ignore_failure": false,
+							"tag":            "myTag",
+							"on_failure": []interface{}{
+								map[string]interface{}{
+									"foo": map[string]interface{}{
+										"baz": false,
+									},
+								},
+								map[string]interface{}{
+									"bar": map[string]interface{}{
+										"baz": true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"grok": map[string]interface{}{
+							"field": "foo",
+							"patterns": []string{
+								"^%{IP:bar}$",
+							},
+							"ignore_missing": true,
+							"description":    "foo bar",
+							"if":             "condition",
+							"ignore_failure": false,
+							"tag":            "myTag",
+							"on_failure": []interface{}{
+								map[string]interface{}{
+									"foo": map[string]interface{}{
+										"baz": false,
+									},
+								},
+								map[string]interface{}{
+									"bar": map[string]interface{}{
+										"baz": true,
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
+func TestRemoveRegisteredDomainProcessor(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.13.0",
+			esVersion: common.MustNewVersion("7.12.34"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.13.0",
+			esVersion: common.MustNewVersion("7.13.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.13.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"registered_domain": map[string]interface{}{
+							"field": "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "test.field",
+							"value": "testvalue",
+						},
+					},
+				}},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
+func TestReplaceAlternativeFlowProcessors(t *testing.T) {
+	logp.TestingSetup()
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "Replace in on_failure section",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}(nil),
+				"on_failure": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+						},
+					},
+					map[string]interface{}{
+						"community_id": map[string]interface{}{},
+					},
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "error.message",
+							"value": "something's wrong",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}(nil),
+				"on_failure": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+						},
+					},
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "error.message",
+							"value": "something's wrong",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "Replace in processor's on_failure",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"foo": map[string]interface{}{
+							"bar": "baz",
+							"on_failure": []interface{}{
+								map[string]interface{}{
+									"append": map[string]interface{}{
+										"field":            "related.hosts",
+										"value":            "{{host.hostname}}",
+										"allow_duplicates": false,
+									},
+								},
+								map[string]interface{}{
+									"community_id": map[string]interface{}{},
+								},
+								map[string]interface{}{
+									"append": map[string]interface{}{
+										"field": "error.message",
+										"value": "something's wrong",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"foo": map[string]interface{}{
+							"bar": "baz",
+							"on_failure": []interface{}{
+								map[string]interface{}{
+									"append": map[string]interface{}{
+										"field": "related.hosts",
+										"value": "{{host.hostname}}",
+										"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+									},
+								},
+								map[string]interface{}{
+									"append": map[string]interface{}{
+										"field": "error.message",
+										"value": "something's wrong",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "Remove empty on_failure key",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"foo": map[string]interface{}{
+							"bar": "baz",
+							"on_failure": []interface{}{
+								map[string]interface{}{
+									"community_id": map[string]interface{}{},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"foo": map[string]interface{}{
+							"bar": "baz",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "process foreach processor",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field":            "related.hosts",
+							"value":            "{{host.hostname}}",
+							"allow_duplicates": false,
+							"if":               "ctx?.host?.hostname != null",
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"append": map[string]interface{}{
+							"field": "related.hosts",
+							"value": "{{host.hostname}}",
+							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "Remove leftover foreach processor",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"foreach": map[string]interface{}{
+							"field": "foo",
+							"processor": map[string]interface{}{
+								"community_id": map[string]interface{}{},
+							},
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}(nil),
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "nested",
+			esVersion: common.MustNewVersion("7.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}(nil),
+				"on_failure": []interface{}{
+					map[string]interface{}{
+						"foreach": map[string]interface{}{
+							"field": "foo",
+							"processor": map[string]interface{}{
+								"append": map[string]interface{}{
+									"field":            "related.hosts",
+									"value":            "{{host.hostname}}",
+									"allow_duplicates": false,
+									"if":               "ctx?.host?.hostname != null",
+									"on_failure": []interface{}{
+										map[string]interface{}{
+											"community_id": map[string]interface{}{},
+										},
+										map[string]interface{}{
+											"append": map[string]interface{}{
+												"field": "error.message",
+												"value": "panic",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: map[string]interface{}{
+				"processors": []interface{}(nil),
+				"on_failure": []interface{}{
+					map[string]interface{}{
+						"foreach": map[string]interface{}{
+							"field": "foo",
+							"processor": map[string]interface{}{
+								"append": map[string]interface{}{
+									"field": "related.hosts",
+									"value": "{{host.hostname}}",
+									"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
+									"on_failure": []interface{}{
+										map[string]interface{}{
+											"append": map[string]interface{}{
+												"field": "error.message",
+												"value": "panic",
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}

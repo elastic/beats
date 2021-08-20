@@ -8,16 +8,18 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strings"
-
 	"reflect"
 	"sort"
+	"strings"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
+	corecomp "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -41,7 +43,6 @@ type controller struct {
 // New creates a new controller.
 func New(log *logger.Logger, c *config.Config) (Controller, error) {
 	l := log.Named("composable")
-	l.Info("EXPERIMENTAL - Inputs with variables are currently experimental and should not be used in production")
 
 	var providersCfg Config
 	if c != nil {
@@ -98,6 +99,8 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 	notify := make(chan bool, 5000)
 	localCtx, cancel := context.WithCancel(ctx)
 
+	fetchContextProviders := common.MapStr{}
+
 	// run all the enabled context providers
 	for name, state := range c.contextProviders {
 		state.Context = localCtx
@@ -106,6 +109,9 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		if err != nil {
 			cancel()
 			return errors.New(err, fmt.Sprintf("failed to run provider '%s'", name), errors.TypeConfig, errors.M("provider", name))
+		}
+		if p, ok := state.provider.(corecomp.FetchContextProvider); ok {
+			fetchContextProviders.Put(name, p)
 		}
 	}
 
@@ -124,6 +130,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 		for {
 			// performs debounce of notifies; accumulates them into 100 millisecond chunks
 			changed := false
+			t := time.NewTimer(100 * time.Millisecond)
 			for {
 				exitloop := false
 				select {
@@ -132,14 +139,15 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					return
 				case <-notify:
 					changed = true
-				case <-time.After(100 * time.Millisecond):
+				case <-t.C:
 					exitloop = true
-					break
 				}
 				if exitloop {
 					break
 				}
 			}
+
+			t.Stop()
 			if !changed {
 				continue
 			}
@@ -151,7 +159,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 				mapping[name] = state.Current()
 			}
 			// this is ensured not to error, by how the mappings states are verified
-			vars[0], _ = transpiler.NewVars(mapping)
+			vars[0], _ = transpiler.NewVars(mapping, fetchContextProviders)
 
 			// add to the vars list for each dynamic providers mappings
 			for name, state := range c.dynamicProviders {
@@ -159,7 +167,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 					local, _ := cloneMap(mapping) // will not fail; already been successfully cloned once
 					local[name] = mappings.mapping
 					// this is ensured not to error, by how the mappings states are verified
-					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors)
+					v, _ := transpiler.NewVarsWithProcessors(local, name, mappings.processors, fetchContextProviders)
 					vars = append(vars, v)
 				}
 			}
@@ -175,7 +183,7 @@ func (c *controller) Run(ctx context.Context, cb VarsCallback) error {
 type contextProviderState struct {
 	context.Context
 
-	provider ContextProvider
+	provider corecomp.ContextProvider
 	lock     sync.RWMutex
 	mapping  map[string]interface{}
 	signal   chan bool
@@ -189,7 +197,7 @@ func (c *contextProviderState) Set(mapping map[string]interface{}) error {
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}
@@ -244,7 +252,7 @@ func (c *dynamicProviderState) AddOrUpdate(id string, priority int, mapping map[
 		return err
 	}
 	// ensure creating vars will not error
-	_, err = transpiler.NewVars(mapping)
+	_, err = transpiler.NewVars(mapping, nil)
 	if err != nil {
 		return err
 	}

@@ -6,26 +6,22 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"net/http"
+	"io/ioutil"
 	"os"
 	"os/signal"
 	"path/filepath"
-	"runtime"
-	"strings"
 	"syscall"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
-
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/api"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance/metrics"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
@@ -38,6 +34,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
+	monitoringServer "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/server"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -45,25 +44,27 @@ const (
 	agentName = "elastic-agent"
 )
 
-func newRunCommandWithArgs(flags *globalFlags, _ []string, streams *cli.IOStreams) *cobra.Command {
+type cfgOverrider func(cfg *configuration.Configuration)
+
+func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	return &cobra.Command{
 		Use:   "run",
 		Short: "Start the elastic-agent.",
 		Run: func(_ *cobra.Command, _ []string) {
-			if err := run(flags, streams); err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+			if err := run(streams, nil); err != nil {
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
 	}
 }
 
-func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark service as stopped.
+func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark service as stopped.
 	// After this is run, the service is considered by the OS to be stopped.
 	// This must be the first deferred cleanup task (last to execute).
 	defer service.NotifyTermination()
 
-	locker := application.NewAppLocker(paths.Data(), agentLockFileName)
+	locker := filelock.NewAppLocker(paths.Data(), paths.AgentLockFileName)
 	if err := locker.TryLock(); err != nil {
 		return err
 	}
@@ -74,34 +75,36 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 
 	// register as a service
 	stop := make(chan bool)
-	_, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
 	var stopBeat = func() {
 		close(stop)
 	}
 	service.HandleSignals(stopBeat, cancel)
 
-	pathConfigFile := flags.Config()
-	rawConfig, err := config.LoadFile(pathConfigFile)
+	cfg, err := loadConfig(override)
 	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
+		return err
 	}
 
-	if err := getOverwrites(rawConfig); err != nil {
-		return errors.New(err, "could not read overwrites")
-	}
-
-	cfg, err := configuration.NewFromConfig(rawConfig)
+	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig, true)
 	if err != nil {
-		return errors.New(err,
-			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
-			errors.TypeFilesystem,
-			errors.M(errors.MetaKeyPath, pathConfigFile))
+		return err
 	}
 
-	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg))
+	cfg, err = tryDelayEnroll(ctx, logger, cfg, override)
+	if err != nil {
+		err = errors.New(err, "failed to perform delayed enrollment")
+		logger.Error(err)
+		return err
+	}
+	pathConfigFile := paths.AgentConfigFile()
+
+	// agent ID needs to stay empty in bootstrap mode
+	createAgentID := true
+	if cfg.Fleet != nil && cfg.Fleet.Server != nil && cfg.Fleet.Server.Bootstrap {
+		createAgentID = false
+	}
+	agentInfo, err := info.NewAgentInfoWithLog(defaultLogLevel(cfg), createAgentID)
 	if err != nil {
 		return errors.New(err,
 			"could not load agent info",
@@ -109,19 +112,14 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 			errors.M(errors.MetaKeyPath, pathConfigFile))
 	}
 
-	logger, err := logger.NewFromConfig("", cfg.Settings.LoggingConfig)
-	if err != nil {
-		return err
-	}
-
 	// initiate agent watcher
 	if err := upgrade.InvokeWatcher(logger); err != nil {
 		// we should not fail because watcher is not working
-		logger.Error("failed to invoke rollback watcher", err)
+		logger.Error(errors.New(err, "failed to invoke rollback watcher"))
 	}
 
 	if allowEmptyPgp, _ := release.PGP(); allowEmptyPgp {
-		logger.Warn("Artifact has been build with security disabled. Elastic Agent will not verify signatures of used artifacts.")
+		logger.Info("Artifact has been built with security disabled. Elastic Agent will not verify signatures of the artifacts.")
 	}
 
 	execPath, err := reexecPath()
@@ -145,7 +143,7 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 		return err
 	}
 
-	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS())
+	serverStopFn, err := setupMetrics(agentInfo, logger, cfg.Settings.DownloadConfig.OS(), cfg.Settings.MonitoringConfig, app)
 	if err != nil {
 		return err
 	}
@@ -192,6 +190,35 @@ func run(flags *globalFlags, streams *cli.IOStreams) error { // Windows: Mark se
 	return err
 }
 
+func loadConfig(override cfgOverrider) (*configuration.Configuration, error) {
+	pathConfigFile := paths.ConfigFile()
+	rawConfig, err := config.LoadFile(pathConfigFile)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not read configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	if err := getOverwrites(rawConfig); err != nil {
+		return nil, errors.New(err, "could not read overwrites")
+	}
+
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return nil, errors.New(err,
+			fmt.Sprintf("could not parse configuration file %s", pathConfigFile),
+			errors.TypeFilesystem,
+			errors.M(errors.MetaKeyPath, pathConfigFile))
+	}
+
+	if override != nil {
+		override(cfg)
+	}
+
+	return cfg, nil
+}
+
 func reexecPath() (string, error) {
 	// set executable path to symlink instead of binary
 	// in case of updated symlinks we should spin up new agent
@@ -206,9 +233,18 @@ func reexecPath() (string, error) {
 }
 
 func getOverwrites(rawConfig *config.Config) error {
-	path := info.AgentConfigFile()
+	cfg, err := configuration.NewFromConfig(rawConfig)
+	if err != nil {
+		return err
+	}
 
+	if !cfg.Fleet.Enabled {
+		// overrides should apply only for fleet mode
+		return nil
+	}
+	path := paths.AgentConfigFile()
 	store := storage.NewDiskStore(path)
+
 	reader, err := store.Load()
 	if err != nil && errors.Is(err, os.ErrNotExist) {
 		// no fleet file ignore
@@ -239,12 +275,12 @@ func getOverwrites(rawConfig *config.Config) error {
 }
 
 func defaultLogLevel(cfg *configuration.Configuration) string {
-	if application.IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		// for standalone always take the one from config and don't override
 		return ""
 	}
 
-	defaultLogLevel := logger.DefaultLoggingConfig().Level.String()
+	defaultLogLevel := logger.DefaultLogLevel.String()
 	if configuredLevel := cfg.Settings.LoggingConfig.Level.String(); configuredLevel != "" && configuredLevel != defaultLogLevel {
 		// predefined log level
 		return configuredLevel
@@ -253,7 +289,7 @@ func defaultLogLevel(cfg *configuration.Configuration) string {
 	return defaultLogLevel
 }
 
-func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string) (func() error, error) {
+func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSystem string, cfg *monitoringCfg.MonitoringConfig, app application.Application) (func() error, error) {
 	// use libbeat to setup metrics
 	if err := metrics.SetupMetrics(agentName); err != nil {
 		return nil, err
@@ -262,18 +298,10 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	// start server for stats
 	endpointConfig := api.Config{
 		Enabled: true,
-		Host:    beats.AgentMonitoringEndpoint(operatingSystem),
+		Host:    beats.AgentMonitoringEndpoint(operatingSystem, cfg.HTTP),
 	}
 
-	// create agent config path
-	createAgentMonitoringDrop(endpointConfig.Host)
-
-	cfg, err := common.NewConfigFrom(endpointConfig)
-	if err != nil {
-		return nil, err
-	}
-
-	s, err := exposeMetricsEndpoint(logger, cfg, monitoring.GetNamespace)
+	s, err := monitoringServer.New(logger, endpointConfig, monitoring.GetNamespace, app.Routes, isProcessStatsEnabled(cfg.HTTP))
 	if err != nil {
 		return nil, errors.New(err, "could not start the HTTP server for the API")
 	}
@@ -283,55 +311,55 @@ func setupMetrics(agentInfo *info.AgentInfo, logger *logger.Logger, operatingSys
 	return s.Stop, nil
 }
 
-func createAgentMonitoringDrop(drop string) error {
-	if drop == "" || runtime.GOOS == "windows" {
-		return nil
-	}
-
-	path := strings.TrimPrefix(drop, "unix://")
-	if strings.HasSuffix(path, ".sock") {
-		path = filepath.Dir(path)
-	}
-
-	_, err := os.Stat(path)
-	if err != nil {
-		if !os.IsNotExist(err) {
-			return err
-		}
-
-		// create
-		if err := os.MkdirAll(path, 0775); err != nil {
-			return err
-		}
-	}
-
-	return os.Chown(path, os.Geteuid(), os.Getegid())
+func isProcessStatsEnabled(cfg *monitoringCfg.MonitoringHTTPConfig) bool {
+	return cfg != nil && cfg.Enabled
 }
 
-func exposeMetricsEndpoint(log *logger.Logger, config *common.Config, ns func(string) *monitoring.Namespace) (*api.Server, error) {
-	mux := http.NewServeMux()
-
-	makeAPIHandler := func(ns *monitoring.Namespace) func(http.ResponseWriter, *http.Request) {
-		return func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-
-			data := monitoring.CollectStructSnapshot(
-				ns.GetRegistry(),
-				monitoring.Full,
-				false,
-			)
-
-			bytes, err := json.Marshal(data)
-			var content string
-			if err != nil {
-				content = fmt.Sprintf("Not valid json: %v", err)
-			} else {
-				content = string(bytes)
-			}
-			fmt.Fprintf(w, content)
-		}
+func tryDelayEnroll(ctx context.Context, logger *logger.Logger, cfg *configuration.Configuration, override cfgOverrider) (*configuration.Configuration, error) {
+	enrollPath := paths.AgentEnrollFile()
+	if _, err := os.Stat(enrollPath); err != nil {
+		// no enrollment file exists or failed to stat it; nothing to do
+		return cfg, nil
 	}
-
-	mux.HandleFunc("/stats", makeAPIHandler(ns("stats")))
-	return api.New(log, mux, config)
+	contents, err := ioutil.ReadFile(enrollPath)
+	if err != nil {
+		return nil, errors.New(
+			err,
+			"failed to read delay enrollment file",
+			errors.TypeFilesystem,
+			errors.M("path", enrollPath))
+	}
+	var options enrollCmdOption
+	err = yaml.Unmarshal(contents, &options)
+	if err != nil {
+		return nil, errors.New(
+			err,
+			"failed to parse delay enrollment file",
+			errors.TypeConfig,
+			errors.M("path", enrollPath))
+	}
+	options.DelayEnroll = false
+	options.FleetServer.SpawnAgent = false
+	c, err := newEnrollCmd(
+		logger,
+		&options,
+		paths.ConfigFile(),
+	)
+	if err != nil {
+		return nil, err
+	}
+	err = c.Execute(ctx, cli.NewIOStreams())
+	if err != nil {
+		return nil, err
+	}
+	err = os.Remove(enrollPath)
+	if err != nil {
+		logger.Warn(errors.New(
+			err,
+			"failed to remove delayed enrollment file",
+			errors.TypeFilesystem,
+			errors.M("path", enrollPath)))
+	}
+	logger.Info("Successfully performed delayed enrollment of this Elastic Agent.")
+	return loadConfig(override)
 }

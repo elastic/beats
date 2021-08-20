@@ -26,16 +26,23 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/paths"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
+func setHostfs(pathString string) {
+	path := paths.Path{
+		Hostfs: pathString,
+	}
+	paths.InitPaths(&path)
+}
+
 func TestDataNameFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
+	oldFS := paths.Paths.Hostfs
+	setHostfs("_meta/testdata")
+
 	defer func() {
-		system.HostFS = oldFS
+		setHostfs(oldFS)
 	}()
 
 	conf := map[string]interface{}{
@@ -51,11 +58,11 @@ func TestDataNameFilter(t *testing.T) {
 }
 
 func TestDataEmptyFilter(t *testing.T) {
-	oldFS := system.HostFS
-	newFS := "_meta/testdata"
-	system.HostFS = &newFS
+	oldFS := paths.Paths.Hostfs
+	setHostfs("_meta/testdata")
+
 	defer func() {
-		system.HostFS = oldFS
+		setHostfs(oldFS)
 	}()
 
 	conf := map[string]interface{}{
@@ -67,6 +74,7 @@ func TestDataEmptyFilter(t *testing.T) {
 	data, errs := mbtest.ReportingFetchV2Error(f)
 	assert.Empty(t, errs)
 	assert.Equal(t, 10, len(data))
+
 }
 
 func TestFetch(t *testing.T) {

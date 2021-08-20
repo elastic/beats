@@ -6,7 +6,7 @@
       "category": [
         "configuration"
       ],
-      "code": 4739,
+      "code": "4739",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -48,7 +48,7 @@
         "SubjectUserName": "WIN-BVM4LI1L1Q6$",
         "SubjectUserSid": "S-1-5-18"
       },
-      "event_id": 4739,
+      "event_id": "4739",
       "keywords": [
         "Audit Success"
       ],

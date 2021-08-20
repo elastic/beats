@@ -16,6 +16,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
@@ -27,11 +28,6 @@ const (
 var (
 	beatSpec = program.Spec{Name: "Filebeat", Cmd: "filebeat", Artifact: "beat/filebeat"}
 )
-
-type testCase struct {
-	system string
-	arch   string
-}
 
 func TestFetchVerify(t *testing.T) {
 	timeout := 15 * time.Second
@@ -52,9 +48,11 @@ func TestFetchVerify(t *testing.T) {
 		TargetDirectory: targetPath,
 		DropPath:        dropPath,
 		InstallPath:     installPath,
-		Timeout:         timeout,
 		OperatingSystem: "darwin",
 		Architecture:    "32",
+		HTTPTransportSettings: httpcommon.HTTPTransportSettings{
+			Timeout: timeout,
+		},
 	}
 
 	err := prepareFetchVerifyTests(dropPath, targetPath, targetFilePath, hashTargetFilePath)
@@ -139,9 +137,11 @@ func TestVerify(t *testing.T) {
 	config := &artifact.Config{
 		TargetDirectory: targetDir,
 		DropPath:        filepath.Join(targetDir, "drop"),
-		Timeout:         timeout,
 		OperatingSystem: "linux",
 		Architecture:    "32",
+		HTTPTransportSettings: httpcommon.HTTPTransportSettings{
+			Timeout: timeout,
+		},
 	}
 
 	if err := prepareTestCase(beatSpec, version, config); err != nil {

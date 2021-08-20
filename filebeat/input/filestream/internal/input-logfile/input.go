@@ -32,10 +32,12 @@ import (
 type managedInput struct {
 	userID           string
 	manager          *InputManager
+	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
 	prospector       Prospector
 	harvester        Harvester
 	cleanTimeout     time.Duration
+	harvesterLimit   uint64
 }
 
 // Name is required to implement the v2.Input interface
@@ -62,11 +64,15 @@ func (inp *managedInput) Run(
 
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroup(),
+		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
-		tg:           unison.TaskGroup{},
+		ackCH:        inp.ackCH,
+		identifier:   inp.sourceIdentifier,
+		tg: unison.TaskGroup{
+			OnQuit: unison.ContinueOnErrors, // harvester should keep running if a single harvester errored
+		},
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
@@ -78,7 +84,7 @@ func (inp *managedInput) Run(
 	return nil
 }
 
-func newInputACKHandler(log *logp.Logger) beat.ACKer {
+func newInputACKHandler(ch *updateChan, log *logp.Logger) beat.ACKer {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int
@@ -99,6 +105,8 @@ func newInputACKHandler(log *logp.Logger) beat.ACKer {
 		if n == 0 {
 			return
 		}
-		private[last].(*updateOp).Execute(n)
+
+		op := private[last].(*updateOp)
+		ch.Send(scheduledUpdate{op: op, n: n})
 	})
 }

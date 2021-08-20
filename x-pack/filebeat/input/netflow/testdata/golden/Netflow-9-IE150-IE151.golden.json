@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.2",
-          "locality": "private",
+          "locality": "internal",
           "port": 137
         },
         "event": {
@@ -23,7 +23,7 @@
         },
         "flow": {
           "id": "X6k2SQeAX5c",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.2",
@@ -70,7 +70,7 @@
         "source": {
           "bytes": 78,
           "ip": "192.168.0.3",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 137
         }
@@ -84,7 +84,7 @@
       "Fields": {
         "destination": {
           "ip": "192.168.0.5",
-          "locality": "private",
+          "locality": "internal",
           "port": 6343
         },
         "event": {
@@ -100,7 +100,7 @@
         },
         "flow": {
           "id": "XEzNKvE_H1k",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "192.168.0.5",
@@ -147,7 +147,7 @@
         "source": {
           "bytes": 232,
           "ip": "192.168.0.4",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 58130
         }

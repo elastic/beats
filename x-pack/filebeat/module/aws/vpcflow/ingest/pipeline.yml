@@ -119,7 +119,7 @@ processors:
       ignore_empty_value: true
 
   - set:
-      if: "ctx.aws.vpcflow.instance_id != '-'"
+      if: "ctx.aws?.vpcflow?.instance_id != null && ctx.aws.vpcflow.instance_id != '-'"
       field: cloud.instance.id
       value: "{{aws.vpcflow.instance_id}}"
       ignore_empty_value: true
@@ -131,11 +131,9 @@ processors:
   - script:
       lang: painless
       ignore_failure: true
+      if: "ctx.aws?.vpcflow?.tcp_flags != null"
       source: |
-        if (ctx?.aws?.vpcflow?.tcp_flags == null)
-          return;
-
-        if (ctx?.aws?.vpcflow?.tcp_flags_array == null) {
+        if (ctx.aws.vpcflow.tcp_flags_array == null) {
           ArrayList al = new ArrayList();
           ctx.aws.vpcflow.put("tcp_flags_array", al);
         }

@@ -20,6 +20,7 @@ This input supports:
 * Pagination
 * Retries
 * Rate limiting
+* Proxying
 * Request transformations
 * Response transformations
 
@@ -53,10 +54,10 @@ filebeat.inputs:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
@@ -96,7 +97,7 @@ The `httpjson` input keeps a runtime state between requests. This state can be a
 The state has the following elements:
 
 - `last_response.url.value`: The full URL with params and fragments from the last request with a successful response.
-- `last_request.url.params`: A map containing the params from the URL in `last_response.url.value`.
+- `last_response.url.params`: A map containing the params from the URL in `last_response.url.value`.
 - `last_response.header`: A map containing the headers from the last successful response.
 - `last_response.body`: A map containing the parsed JSON body from the last successful response. This is the response as it comes from the remote server.
 - `last_response.page`: A number indicating the page number of the last response.
@@ -120,7 +121,7 @@ The access limitations are described in the corresponding configuration sections
 [float]
 ==== `append`
 
-Appends a value to a list. If the field does not exist, the first entry will be a scalar value, and subsequent additions will convert the value to a list.
+Appends a value to an array. If the field does not exist, the first entry will create a new array. If the field exists, the value is appended to the existing field and converted to a list.
 
 ["source","yaml",subs="attributes"]
 ----
@@ -133,6 +134,8 @@ Appends a value to a list. If the field does not exist, the first entry will be 
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `value_type` defines the type of the resulting value. Possible values are: `string`, `json`, and `int`. Default is `string`.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [float]
 ==== `delete`
@@ -163,6 +166,8 @@ Sets a value.
 - `target` defines the destination field where the value is stored.
 - `value` defines the value that will be stored and it is a <<value-templates,value template>>.
 - `default` defines the fallback value whenever `value` is empty or the template parsing fails. Default templates do not have access to any state, only to functions.
+- `value_type` defines how the resulting value will be treated. Possible values are: `string`, `json`, and `int`. Default is `string`.
+- `fail_on_template_error` if set to `true` an error will be returned and the request will be aborted when the template evaluation fails. Default is `false`.
 
 [[value-templates]]
 ==== Value templates
@@ -194,10 +199,13 @@ Some built-in helper functions are provided to work with the input state inside 
 - `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
 - `formatDate`: formats a `time.Time`. By default the format layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. It will default to UTC timezone when formatting, but you can specify a different timezone. If the timezone is incorrect, it will default to UTC. Example: `[[ formatDate (now) "UnixDate" ]]`, `[[ formatDate (now) "UnixDate" "America/New_York" ]]`.
 - `getRFC5988Link`: extracts a specific relation from a list of https://tools.ietf.org/html/rfc5988[RFC5988] links. It is useful when parsing header values for pagination. Example: `[[ getRFC5988Link "next" .last_response.header.Link ]]`.
-- `toInt`: converts a string to an integer. Returns 0 if the conversion fails.
+- `toInt`: converts a value of any type to an integer when possible. Returns 0 if the conversion fails.
 - `add`: adds a list of integers and returns their sum.
+- `mul`: multiplies two integers.
+- `div`: does the integer division of two integer values.
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 
-In addition to the provided functions, any of the native functions for `time.Time` and `http.Header` types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
+In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
 ==== Configuration options
 
@@ -349,7 +357,7 @@ HTTP method to use when making requests. `GET` or `POST` are the options. Defaul
 [float]
 ==== `request.encode_as`
 
-ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application\x-www-form-urlencoded`. `application/x-www-form-encoded` will url encode the `url.params` and set them as the body. It is not set by default.
+ContentType used for encoding the request body. If set it will force the encoding in the specified format regardless of the `Content-Type` header value, otherwise it will honor it if possible or fallback to `application/json`. By default the requests are sent with `Content-Type: application/json`. Supported values: `application/json` and `application/x-www-form-urlencoded`. `application/x-www-form-urlencoded` will url encode the `url.params` and set them as the body. It is not set by default.
 
 [float]
 ==== `request.body`
@@ -382,6 +390,22 @@ Duration before declaring that the HTTP client connection has timed out. Valid t
 This specifies SSL/TLS configuration. If the ssl section is missing, the host's
 CAs are used for HTTPS connections. See <<configuration-ssl>> for more
 information.
+
+[float]
+==== `request.proxy_url`
+
+This specifies proxy configuration in the form of `http[s]://<user>:<password>@<server name/ip>:<port>`
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+# Fetch your public IP every minute.
+- type: httpjson
+  config_version: 2
+  interval: 1m
+  request.url: https://api.ipify.org/?format=json
+  request.proxy_url: http://proxy.example:8080
+----
 
 [float]
 ==== `request.retry.max_attempts`
@@ -482,16 +506,16 @@ filebeat.inputs:
     - delete:
         target: body.very_confidential
   response.split:
-    target: .body.hits.hits
+    target: body.hits.hits
   response.pagination:
     - set:
         target: url.value
         value: http://localhost:9200/_search/scroll
     - set:
-        target: .url.params.scroll_id
-        value: '[[.last_request.body._scroll_id]]'
+        target: url.params.scroll_id
+        value: '[[.last_response.body._scroll_id]]'
     - set:
-        target: .body.scroll
+        target: body.scroll
         value: 5m
 ----
 
@@ -864,6 +888,12 @@ This will output:
 ==== `cursor`
 
 Cursor is a list of key value objects where arbitrary values are defined. The values are interpreted as  <<value-templates,value templates>> and a default template can be set. Cursor state is kept between input restarts and updated once all the events for a request are published.
+
+Each cursor entry is formed by:
+
+- A `value` template, which will define the value to store when evaluated.
+- A `default` template, which will define the value to store when the value template fails or is empty.
+- An `ignore_empty_value` flag. When set to `true`, will not store empty values, preserving the previous one, if any. Default: `true`.
 
 Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`].
 

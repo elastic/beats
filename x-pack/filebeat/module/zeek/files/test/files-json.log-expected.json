@@ -23,8 +23,8 @@
             "a8985d3a65e5e5c4b2d7d66d40c6dd2fb19c5436"
         ],
         "related.ip": [
-            "35.199.178.4",
-            "10.178.98.102"
+            "10.178.98.102",
+            "35.199.178.4"
         ],
         "server.ip": "35.199.178.4",
         "service.type": "zeek",
@@ -32,9 +32,9 @@
             "zeek.files"
         ],
         "zeek.files.analyzers": [
-            "X509",
             "MD5",
-            "SHA1"
+            "SHA1",
+            "X509"
         ],
         "zeek.files.depth": 0,
         "zeek.files.duration": 0,
@@ -76,12 +76,12 @@
         "input.type": "log",
         "log.offset": 452,
         "related.hash": [
-            "b9742f12eb97eff531d94f7800c6706c",
-            "b88d13fe319d342e7a808ce3a0a1158111fc3c2a"
+            "b88d13fe319d342e7a808ce3a0a1158111fc3c2a",
+            "b9742f12eb97eff531d94f7800c6706c"
         ],
         "related.ip": [
-            "17.134.127.250",
-            "10.178.98.102"
+            "10.178.98.102",
+            "17.134.127.250"
         ],
         "server.ip": "17.134.127.250",
         "service.type": "zeek",
@@ -89,9 +89,9 @@
             "zeek.files"
         ],
         "zeek.files.analyzers": [
-            "X509",
             "MD5",
-            "SHA1"
+            "SHA1",
+            "X509"
         ],
         "zeek.files.depth": 0,
         "zeek.files.duration": 0,

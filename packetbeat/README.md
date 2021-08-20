@@ -13,7 +13,7 @@ For each transaction, the shipper inserts a JSON document into Elasticsearch,
 where it is stored and indexed. You can then use Kibana to view key metrics and
 do ad-hoc queries against the data.
 
-To learn more about Packetbeat, check out <https://www.elastic.co/products/beats/packetbeat>.
+To learn more about Packetbeat, check out <https://www.elastic.co/beats/packetbeat>.
 
 ## Getting started
 

@@ -17,12 +17,14 @@ platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     metricbeat-test:
         make: "make -C generator/_templates/metricbeat test test-package"
+        stage: mandatory
     beat-test:
         make: "make -C generator/_templates/beat test test-package"
+        stage: mandatory
     macos-metricbeat:
         make: "make -C generator/_templates/metricbeat test"
         platforms:             ## override default label in this specific stage.
-          - "macosx"
+          - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"
@@ -32,10 +34,11 @@ stages:
                 - "macosTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+        stage: extended
     macos-beat:
         make: "make -C generator/_templates/beat test"
         platforms:             ## override default label in this specific stage.
-            - "macosx"
+            - "macosx&&x86_64"
         when:                  ## Override the top-level when.
             comments:
                 - "/test generator for macos"
@@ -45,3 +48,4 @@ stages:
                 - "macosTest"
             branches: true     ## for all the branches
             tags: true         ## for all the tags
+        stage: extended

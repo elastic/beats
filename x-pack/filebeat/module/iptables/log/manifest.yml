@@ -12,8 +12,6 @@ var:
     default: 9001
   - name: input
     default: syslog
-  - name: community_id
-    default: true
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

@@ -19,11 +19,11 @@ package kubernetes
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
 	k8s "k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -39,11 +39,15 @@ type pod struct {
 	config           *Config
 	metagen          metadata.MetaGen
 	logger           *logp.Logger
-	publish          func([]bus.Event)
+	publishFunc      func([]bus.Event)
 	watcher          kubernetes.Watcher
 	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
-	namespaceStore   cache.Store
+
+	// Mutex used by configuration updates not triggered by the main watcher,
+	// to avoid race conditions between cross updates and deletions.
+	// Other updaters must use a write lock.
+	crossUpdate sync.RWMutex
 }
 
 // NewPodEventer creates an eventer that can discover and process pod objects
@@ -59,7 +63,16 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
+		nd := &kubernetes.DiscoverKubernetesNodeParams{
+			ConfigHost:  config.Node,
+			Client:      client,
+			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
+		}
+		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, nd)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't discover kubernetes node due to error %w", err)
+		}
 	} else {
 		config.Node = ""
 	}
@@ -102,7 +115,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	p := &pod{
 		config:           config,
 		uuid:             uuid,
-		publish:          publish,
+		publishFunc:      publish,
 		metagen:          metaGen,
 		logger:           logger,
 		watcher:          watcher,
@@ -111,62 +124,48 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	}
 
 	watcher.AddEventHandler(p)
+
+	if namespaceWatcher != nil && (config.Hints.Enabled() || metaConf.Namespace.Enabled()) {
+		updater := newNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
+		namespaceWatcher.AddEventHandler(updater)
+	}
+
 	return p, nil
 }
 
-// OnAdd ensures processing of pod objects that are newly added
+// OnAdd ensures processing of pod objects that are newly added.
 func (p *pod) OnAdd(obj interface{}) {
+	p.crossUpdate.RLock()
+	defer p.crossUpdate.RUnlock()
+
 	p.logger.Debugf("Watcher Pod add: %+v", obj)
 	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
-// OnUpdate emits events for a given pod depending on the state of the pod,
-// if it is terminating, a stop event is scheduled, if not, a stop and a start
-// events are sent sequentially to recreate the resources assotiated to the pod.
+// OnUpdate handles events for pods that have been updated.
 func (p *pod) OnUpdate(obj interface{}) {
-	pod := obj.(*kubernetes.Pod)
+	p.crossUpdate.RLock()
+	defer p.crossUpdate.RUnlock()
 
-	p.logger.Debugf("Watcher Pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
-	switch pod.Status.Phase {
-	case kubernetes.PodSucceeded, kubernetes.PodFailed:
-		// If Pod is in a phase where all containers in the have terminated emit a stop event
-		p.logger.Debugf("Watcher Pod update (terminated): %+v", obj)
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-		return
-	case kubernetes.PodPending:
-		p.logger.Debugf("Watcher Pod update (pending): don't know what to do with this Pod yet, skipping for now: %+v", obj)
-		return
-	}
+	p.unlockedUpdate(obj)
+}
 
-	// here handle the case when a Pod is in `Terminating` phase.
-	// In this case the pod is neither `PodSucceeded` nor `PodFailed` and
-	// hence requires special handling.
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		p.logger.Debugf("Watcher Pod update (terminating): %+v", obj)
-		// Pod is terminating, don't reload its configuration and ignore the event
-		// if some pod is still running, we will receive more events when containers
-		// terminate.
-		for _, container := range pod.Status.ContainerStatuses {
-			if container.State.Running != nil {
-				return
-			}
-		}
-		time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(pod, "stop") })
-		return
-	}
-
+func (p *pod) unlockedUpdate(obj interface{}) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
-	p.emit(pod, "stop")
-	p.emit(pod, "start")
+	p.emit(obj.(*kubernetes.Pod), "stop")
+	p.emit(obj.(*kubernetes.Pod), "start")
 }
 
-// OnDelete stops pod objects that are deleted
+// OnDelete stops pod objects that are deleted.
 func (p *pod) OnDelete(obj interface{}) {
+	p.crossUpdate.RLock()
+	defer p.crossUpdate.RUnlock()
+
 	p.logger.Debugf("Watcher Pod delete: %+v", obj)
-	time.AfterFunc(p.config.CleanupTimeout, func() { p.emit(obj.(*kubernetes.Pod), "stop") })
+	p.emit(obj.(*kubernetes.Pod), "stop")
 }
 
-// GenerateHints creates hints needed for hints builder
+// GenerateHints creates hints needed for hints builder.
 func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
@@ -188,9 +187,9 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
 		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
-			nsAnn, _ := rawNsAnn.(common.MapStr)
-			if len(nsAnn) != 0 {
-				annotations.DeepUpdateNoOverwrite(nsAnn)
+			namespaceAnnotations, _ := rawNsAnn.(common.MapStr)
+			if len(namespaceAnnotations) != 0 {
+				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
 			}
 		}
 	}
@@ -257,197 +256,344 @@ func (p *pod) Stop() {
 	}
 }
 
-func (p *pod) emit(pod *kubernetes.Pod, flag string) {
-	containers, statuses := getContainersInPod(pod)
-	p.emitEvents(pod, flag, containers, statuses)
+type containerInPod struct {
+	id      string
+	runtime string
+	spec    kubernetes.Container
+	status  kubernetes.PodContainerStatus
 }
 
 // getContainersInPod returns all the containers defined in a pod and their statuses.
 // It includes init and ephemeral containers.
-func getContainersInPod(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
-	var containers []kubernetes.Container
-	var statuses []kubernetes.PodContainerStatus
-
-	// Emit events for all containers
-	containers = append(containers, pod.Spec.Containers...)
-	statuses = append(statuses, pod.Status.ContainerStatuses...)
-
-	// Emit events for all initContainers
-	containers = append(containers, pod.Spec.InitContainers...)
-	statuses = append(statuses, pod.Status.InitContainerStatuses...)
-
-	// Emit events for all ephemeralContainers
-	// Ephemeral containers are alpha feature in k8s and this code may require some changes, if their
-	// api change in the future.
-	for _, c := range pod.Spec.EphemeralContainers {
-		containers = append(containers, kubernetes.Container(c.EphemeralContainerCommon))
+func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
+	var containers []*containerInPod
+	for _, c := range pod.Spec.Containers {
+		containers = append(containers, &containerInPod{spec: c})
 	}
-	statuses = append(statuses, pod.Status.EphemeralContainerStatuses...)
+	for _, c := range pod.Spec.InitContainers {
+		containers = append(containers, &containerInPod{spec: c})
+	}
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := kubernetes.Container(c.EphemeralContainerCommon)
+		containers = append(containers, &containerInPod{spec: c})
+	}
 
-	return containers, statuses
+	statuses := make(map[string]*kubernetes.PodContainerStatus)
+	mapStatuses := func(s []kubernetes.PodContainerStatus) {
+		for i := range s {
+			statuses[s[i].Name] = &s[i]
+		}
+	}
+	mapStatuses(pod.Status.ContainerStatuses)
+	mapStatuses(pod.Status.InitContainerStatuses)
+	mapStatuses(pod.Status.EphemeralContainerStatuses)
+	for _, c := range containers {
+		if s, ok := statuses[c.spec.Name]; ok {
+			c.id, c.runtime = kubernetes.ContainerIDWithRuntime(*s)
+			c.status = *s
+		}
+	}
+
+	return containers
 }
 
-func (p *pod) emitEvents(pod *kubernetes.Pod, flag string, containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
-	host := pod.Status.PodIP
+// emit emits the events for the given pod according to its state and
+// the given flag.
+// It emits a pod event if the pod has at least a running container,
+// and a container event for each one of the ports defined in each
+// container.
+// If a container doesn't have any defined port, it emits a single
+// container event with "port" set to 0.
+// "start" events are only generated for containers that have an id.
+// "stop" events are always generated to ensure that configurations are
+// deleted.
+// If the pod is terminated, "stop" events are delayed during the grace
+// period defined in `CleanupTimeout`.
+// Network information is only included in events for running containers
+// and for pods with at least one running container.
+func (p *pod) emit(pod *kubernetes.Pod, flag string) {
+	annotations := podAnnotations(pod)
+	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
 
-	// If the container doesn't exist in the runtime or its network
-	// is not configured, it won't have an IP. Skip it as we cannot
-	// generate configs without host, and an update will arrive when
-	// the container is ready.
-	// If stopping, emit the event in any case to ensure cleanup.
-	if host == "" && flag != "stop" {
-		return
-	}
-
-	// Collect all runtimes from status information.
-	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
-	for _, c := range containerstatuses {
-		// If the container is not being stopped then add the container only if it is in running state.
-		// This makes sure that we dont keep tailing init container logs after they have stopped.
-		// Emit the event in case that the pod is being stopped.
-		if flag == "stop" || c.State.Running != nil {
-			cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-			containerIDs[c.Name] = cid
-			runtimes[c.Name] = runtime
-		}
-	}
-
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	var (
-		annotations = common.MapStr{}
-		nsAnn       = common.MapStr{}
-		podPorts    = common.MapStr{}
-		eventList   = make([][]bus.Event, 0)
-	)
-	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
-	}
-
-	if p.namespaceWatcher != nil {
-		if rawNs, ok, err := p.namespaceWatcher.Store().GetByKey(pod.Namespace); ok && err == nil {
-			if namespace, ok := rawNs.(*kubernetes.Namespace); ok {
-				for k, v := range namespace.GetAnnotations() {
-					safemapstr.Put(nsAnn, k, v)
-				}
-			}
-		}
-	}
-
-	// Emit container and port information
+	eventList := make([][]bus.Event, 0)
+	portsMap := common.MapStr{}
+	containers := getContainersInPod(pod)
+	anyContainerRunning := false
 	for _, c := range containers {
-		// If it doesn't have an ID, container doesn't exist in
-		// the runtime, emit only an event if we are stopping, so
-		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.Name]
-		if cid == "" && flag != "stop" {
-			continue
+		if c.status.State.Running != nil {
+			anyContainerRunning = true
 		}
 
-		// This must be an id that doesn't depend on the state of the container
-		// so it works also on `stop` if containers have been already deleted.
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
-
-		meta := p.metagen.Generate(
-			pod,
-			metadata.WithFields("container.name", c.Name),
-			metadata.WithFields("container.image", c.Image),
-		)
-
-		cmeta := common.MapStr{
-			"id": cid,
-			"image": common.MapStr{
-				"name": c.Image,
-			},
-			"runtime": runtimes[c.Name],
-		}
-
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["annotations"] = annotations
-		kubemeta["container"] = common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
-		}
-		if len(nsAnn) != 0 {
-			kubemeta["namespace_annotations"] = nsAnn
-		}
-
-		var events []bus.Event
-		// Without this check there would be overlapping configurations with and without ports.
-		if len(c.Ports) == 0 {
-			// Set a zero port on the event to signify that the event is from a container
-			event := bus.Event{
-				"provider":   p.uuid,
-				"id":         eventID,
-				flag:         true,
-				"host":       host,
-				"port":       0,
-				"kubernetes": kubemeta,
-				"meta": common.MapStr{
-					"kubernetes": meta,
-					"container":  cmeta,
-				},
-			}
-			events = append(events, event)
-		}
-
-		for _, port := range c.Ports {
-			podPorts[port.Name] = port.ContainerPort
-			event := bus.Event{
-				"provider":   p.uuid,
-				"id":         eventID,
-				flag:         true,
-				"host":       host,
-				"port":       port.ContainerPort,
-				"kubernetes": kubemeta,
-				"meta": common.MapStr{
-					"kubernetes": meta,
-					"container":  cmeta,
-				},
-			}
-			events = append(events, event)
-		}
+		events, ports := p.containerPodEvents(flag, pod, c, annotations, namespaceAnnotations)
 		if len(events) != 0 {
 			eventList = append(eventList, events)
 		}
+		if len(ports) > 0 {
+			portsMap.DeepUpdate(ports)
+		}
+	}
+	if len(eventList) != 0 {
+		event := p.podEvent(flag, pod, portsMap, anyContainerRunning, annotations, namespaceAnnotations)
+		// Ensure that the pod level event is published first to avoid
+		// pod metadata overriding a valid container metadata.
+		eventList = append([][]bus.Event{{event}}, eventList...)
 	}
 
-	// Publish a pod level event so that hints that have no exposed ports can get processed.
-	// Log hints would just ignore this event as there is no ${data.container.id}
-	// Publish the pod level hint only if at least one container level hint was generated. This ensures that there is
-	// no unnecessary pod level events emitted prematurely.
-	// We publish the pod level hint first so that it doesn't override a valid container level event.
-	if len(eventList) != 0 {
-		meta := p.metagen.Generate(pod)
+	delay := (flag == "stop" && podTerminated(pod, containers))
+	p.publishAll(eventList, delay)
+}
 
-		// Information that can be used in discovering a workload
-		kubemeta := meta.Clone()
-		kubemeta["annotations"] = annotations
-		if len(nsAnn) != 0 {
-			kubemeta["namespace_annotations"] = nsAnn
-		}
+// containerPodEvents creates the events for a container in a pod
+// One event is created for each configured port. If there is no
+// configured port, a single event is created, with the port set to 0.
+// Host and port information is only included if the container is
+// running.
+// If the container ID is unknown, only "stop" events are generated.
+// It also returns a map with the named ports.
+func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerInPod, annotations, namespaceAnnotations common.MapStr) ([]bus.Event, common.MapStr) {
+	if c.id == "" && flag != "stop" {
+		return nil, nil
+	}
 
-		// Don't set a port on the event
+	// This must be an id that doesn't depend on the state of the container
+	// so it works also on `stop` if containers have been already deleted.
+	eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
+
+	meta := p.metagen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
+
+	cmeta := common.MapStr{
+		"id":      c.id,
+		"runtime": c.runtime,
+		"image": common.MapStr{
+			"name": c.spec.Image,
+		},
+	}
+
+	// Information that can be used in discovering a workload
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
+	kubemeta["annotations"] = annotations
+	kubemeta["container"] = common.MapStr{
+		"id":      c.id,
+		"name":    c.spec.Name,
+		"image":   c.spec.Image,
+		"runtime": c.runtime,
+	}
+	if len(namespaceAnnotations) != 0 {
+		kubemeta["namespace_annotations"] = namespaceAnnotations
+	}
+
+	ports := c.spec.Ports
+	if len(ports) == 0 {
+		// Ensure that at least one event is generated for this container.
+		// Set port to zero to signify that the event is from a container
+		// and not from a pod.
+		ports = []kubernetes.ContainerPort{{ContainerPort: 0}}
+	}
+
+	var events []bus.Event
+	portsMap := common.MapStr{}
+
+	meta.Put("container", cmeta)
+
+	for _, port := range ports {
 		event := bus.Event{
 			"provider":   p.uuid,
-			"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
+			"id":         eventID,
 			flag:         true,
-			"host":       host,
-			"ports":      podPorts,
 			"kubernetes": kubemeta,
-			"meta": common.MapStr{
-				"kubernetes": meta,
-			},
+			// Actual metadata that will enrich the event.
+			"meta": meta,
 		}
-		p.publish([]bus.Event{event})
+		// Include network information only if the container is running,
+		// so templates that need network don't generate a config.
+		if c.status.State.Running != nil {
+			if port.Name != "" && port.ContainerPort != 0 {
+				portsMap[port.Name] = port.ContainerPort
+			}
+			event["host"] = pod.Status.PodIP
+			event["port"] = port.ContainerPort
+		}
+
+		events = append(events, event)
 	}
 
-	// Ensure that the pod level event is published first to avoid pod metadata overriding a valid container metadata
+	return events, portsMap
+}
+
+// podEvent creates an event for a pod.
+// It only includes network information if `includeNetwork` is true.
+func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, includeNetwork bool, annotations, namespaceAnnotations common.MapStr) bus.Event {
+	meta := p.metagen.Generate(pod)
+
+	// Information that can be used in discovering a workload
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
+	kubemeta["annotations"] = annotations
+	if len(namespaceAnnotations) != 0 {
+		kubemeta["namespace_annotations"] = namespaceAnnotations
+	}
+
+	// Don't set a port on the event
+	event := bus.Event{
+		"provider":   p.uuid,
+		"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
+		flag:         true,
+		"kubernetes": kubemeta,
+		"meta":       meta,
+	}
+
+	// Include network information only if the pod has an IP and there is any
+	// running container that could handle requests.
+	if pod.Status.PodIP != "" && includeNetwork {
+		event["host"] = pod.Status.PodIP
+		if len(ports) > 0 {
+			event["ports"] = ports
+		}
+	}
+
+	return event
+}
+
+// podAnnotations returns the annotations in a pod
+func podAnnotations(pod *kubernetes.Pod) common.MapStr {
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// podNamespaceAnnotations returns the annotations of the namespace of the pod
+func podNamespaceAnnotations(pod *kubernetes.Pod, watcher kubernetes.Watcher) common.MapStr {
+	if watcher == nil {
+		return nil
+	}
+
+	rawNs, ok, err := watcher.Store().GetByKey(pod.Namespace)
+	if !ok || err != nil {
+		return nil
+	}
+
+	namespace, ok := rawNs.(*kubernetes.Namespace)
+	if !ok {
+		return nil
+	}
+
+	annotations := common.MapStr{}
+	for k, v := range namespace.GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
+}
+
+// podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
+func podTerminating(pod *kubernetes.Pod) bool {
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		return true
+	}
+
+	switch pod.Status.Phase {
+	case kubernetes.PodRunning, kubernetes.PodPending:
+	default:
+		return true
+	}
+
+	return false
+}
+
+// podTerminated returns true if a pod is terminated, this method considers a
+// pod as terminated if none of its containers are running (or going to be running).
+func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
+	// Pod is not marked for termination, so it is not terminated.
+	if !podTerminating(pod) {
+		return false
+	}
+
+	// If any container is running, the pod is not terminated yet.
+	for _, container := range containers {
+		if container.status.State.Running != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+// publishAll publishes all events in the event list in the same order. If delay is true
+// publishAll schedules the publication of the events after the configured `CleanupPeriod`
+// and returns inmediatelly.
+// Order of published events matters, so this function will always publish a given eventList
+// in the same goroutine.
+func (p *pod) publishAll(eventList [][]bus.Event, delay bool) {
+	if delay && p.config.CleanupTimeout > 0 {
+		p.logger.Debug("Publish will wait for the cleanup timeout")
+		time.AfterFunc(p.config.CleanupTimeout, func() {
+			p.publishAll(eventList, false)
+		})
+		return
+	}
+
 	for _, events := range eventList {
-		p.publish(events)
+		p.publishFunc(events)
 	}
 }
+
+// podUpdaterHandlerFunc is a function that handles pod updater notifications.
+type podUpdaterHandlerFunc func(interface{})
+
+// podUpdaterStore is the interface that an object needs to implement to be
+// used as a pod updater store.
+type podUpdaterStore interface {
+	List() []interface{}
+}
+
+// namespacePodUpdater notifies updates on pods when their namespaces are updated.
+type namespacePodUpdater struct {
+	handler podUpdaterHandlerFunc
+	store   podUpdaterStore
+	locker  sync.Locker
+}
+
+// newNamespacePodUpdater creates a namespacePodUpdater
+func newNamespacePodUpdater(handler podUpdaterHandlerFunc, store podUpdaterStore, locker sync.Locker) *namespacePodUpdater {
+	return &namespacePodUpdater{
+		handler: handler,
+		store:   store,
+		locker:  locker,
+	}
+}
+
+// OnUpdate handles update events on namespaces.
+func (n *namespacePodUpdater) OnUpdate(obj interface{}) {
+	ns, ok := obj.(*kubernetes.Namespace)
+	if !ok {
+		return
+	}
+
+	// n.store.List() returns a snapshot at this point. If a delete is received
+	// from the main watcher, this loop may generate an update event after the
+	// delete is processed, leaving configurations that would never be deleted.
+	// Also this loop can miss updates, what could leave outdated configurations.
+	// Avoid these issues by locking the processing of events from the main watcher.
+	if n.locker != nil {
+		n.locker.Lock()
+		defer n.locker.Unlock()
+	}
+	for _, pod := range n.store.List() {
+		pod, ok := pod.(*kubernetes.Pod)
+		if ok && pod.Namespace == ns.Name {
+			n.handler(pod)
+		}
+	}
+}
+
+// OnAdd handles add events on namespaces. Nothing to do, if pods are added to this
+// namespace they will generate their own add events.
+func (*namespacePodUpdater) OnAdd(interface{}) {}
+
+// OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
+// namespace they will generate their own delete events.
+func (*namespacePodUpdater) OnDelete(interface{}) {}

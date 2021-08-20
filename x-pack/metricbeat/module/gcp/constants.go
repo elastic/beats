@@ -16,11 +16,11 @@ const (
 
 // Metricsets / GCP services names
 const (
-	ServiceCompute       = "compute"
-	ServicePubsub        = "pubsub"
-	ServiceLoadBalancing = "loadbalancing"
-	ServiceFirestore     = "firestore"
-	ServiceStorage       = "storage"
+	ServiceCloudFunctions = "cloudfunctions"
+	ServiceCompute        = "compute"
+	ServiceLoadBalancing  = "loadbalancing"
+	ServicePubsub         = "pubsub"
+	ServiceStorage        = "storage"
 )
 
 //Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event

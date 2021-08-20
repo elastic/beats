@@ -62,7 +62,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             ]
         )
         self.run_config_tst(exit_code=1)
-        assert self.log_contains("Failed to create new event log. "
+        assert self.log_contains("failed to create new event log: "
                                  "file API is not available")
 
     def run_config_tst(self, pcap=None, exit_code=0):

@@ -6,7 +6,7 @@
       "category": [
         "process"
       ],
-      "code": 4106,
+      "code": "4106",
       "kind": "event",
       "module": "powershell",
       "provider": "Microsoft-Windows-PowerShell",
@@ -34,7 +34,7 @@
       "api": "wineventlog",
       "channel": "Microsoft-Windows-PowerShell/Operational",
       "computer_name": "vagrant",
-      "event_id": 4106,
+      "event_id": "4106",
       "opcode": "On create calls",
       "process": {
         "pid": 4776,

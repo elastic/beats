@@ -61,7 +61,7 @@ func TestMetricSet(t *testing.T) {
 
 	expectedFields := common.MapStr{
 		"cloudfoundry.app.id":                       "1234",
-		"cloudfoundry.container.cpu.pct":            float64(12.34),
+		"cloudfoundry.container.cpu.pct":            float64(0.1234),
 		"cloudfoundry.container.disk.bytes":         uint64(0),
 		"cloudfoundry.container.disk.quota.bytes":   uint64(0),
 		"cloudfoundry.container.instance_index":     int32(0),
@@ -116,7 +116,7 @@ func TestMetricValuesAreNumbers(t *testing.T) {
 		case "1234":
 			v, err := e.RootFields.GetValue(cpuPctKey)
 			if assert.NoError(t, err, "checking cpu pct") {
-				assert.Equal(t, 12.34, v.(float64))
+				assert.Equal(t, 0.1234, v.(float64))
 			}
 		default:
 			t.Errorf("unexpected app: %s", app)

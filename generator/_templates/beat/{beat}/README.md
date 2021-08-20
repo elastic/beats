@@ -16,7 +16,7 @@ To get running with {Beat} and also install the
 dependencies, run the following command:
 
 ```
-make setup
+make update
 ```
 
 It will create a clean git history for each major step. Note that you can always rewrite the history if you wish before pushing your changes.

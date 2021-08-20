@@ -619,6 +619,17 @@ example: Montreal
 
 --
 
+*`client.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`client.geo.continent_name`*::
 +
 --
@@ -676,6 +687,18 @@ example: boston-dc
 
 --
 
+*`client.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`client.geo.region_iso_code`*::
 +
 --
@@ -698,6 +721,17 @@ example: Quebec
 
 --
 
+*`client.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`client.ip`*::
 +
 --
@@ -711,8 +745,11 @@ type: ip
 +
 --
 MAC address of the client.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -943,7 +980,7 @@ example: elastic-dev
 *`cloud.availability_zone`*::
 +
 --
-Availability zone in which this host is running.
+Availability zone in which this host, resource, or service is located.
 
 type: keyword
 
@@ -1020,11 +1057,23 @@ example: aws
 *`cloud.region`*::
 +
 --
-Region in which this host is running.
+Region in which this host, resource, or service is located.
 
 type: keyword
 
 example: us-east-1
+
+--
+
+*`cloud.service.name`*::
++
+--
+The cloud service name is intended to distinguish services running on different platforms within a provider, eg AWS EC2 vs Lambda, GCP GCE vs App Engine, Azure VM vs App Server.
+Examples: app engine, app service, cloud run, fargate, lambda.
+
+type: keyword
+
+example: lambda
 
 --
 
@@ -1042,6 +1091,18 @@ Boolean to capture if a signature is present.
 type: boolean
 
 example: true
+
+--
+
+*`code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
 
 --
 
@@ -1065,6 +1126,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -1156,6 +1229,56 @@ example: docker
 --
 
 [float]
+=== data_stream
+
+The data_stream fields take part in defining the new data stream naming scheme.
+In the new data stream naming scheme the value of the data stream fields combine to the name of the actual data stream in the following manner: `{data_stream.type}-{data_stream.dataset}-{data_stream.namespace}`. This means the fields can only contain characters that are valid as part of names of data streams. More details about this can be found in this https://www.elastic.co/blog/an-introduction-to-the-elastic-data-stream-naming-scheme[blog post].
+An Elasticsearch data stream consists of one or more backing indices, and a data stream name forms part of the backing indices names. Due to this convention, data streams must also follow index naming restrictions. For example, data stream names cannot include `\`, `/`, `*`, `?`, `"`, `<`, `>`, `|`, ` ` (space character), `,`, or `#`. Please see the Elasticsearch reference for additional https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params[restrictions].
+
+
+*`data_stream.dataset`*::
++
+--
+The field can contain anything that makes sense to signify the source of the data.
+Examples include `nginx.access`, `prometheus`, `endpoint` etc. For data streams that otherwise fit, but that do not have dataset set we use the value "generic" for the dataset value. `event.dataset` should have the same value as `data_stream.dataset`.
+Beyond the Elasticsearch data stream naming criteria noted above, the `dataset` value has additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: nginx.access
+
+--
+
+*`data_stream.namespace`*::
++
+--
+A user defined namespace. Namespaces are useful to allow grouping of data.
+Many users already organize their indices this way, and the data stream naming scheme now provides this best practice as a default. Many users will populate this field with `default`. If no value is used, it falls back to `default`.
+Beyond the Elasticsearch index naming criteria noted above, `namespace` value has the additional restrictions:
+  * Must not contain `-`
+  * No longer than 100 characters
+
+type: constant_keyword
+
+example: production
+
+--
+
+*`data_stream.type`*::
++
+--
+An overarching type for the data stream.
+Currently allowed values are "logs" and "metrics". We expect to also add "traces" and "synthetics" in the near future.
+
+type: constant_keyword
+
+example: logs
+
+--
+
+[float]
 === destination
 
 Destination fields capture details about the receiver of a network exchange/packet. These fields are populated from a network event, packet, or other event containing details of a network transaction.
@@ -1234,6 +1357,17 @@ example: Montreal
 
 --
 
+*`destination.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`destination.geo.continent_name`*::
 +
 --
@@ -1291,6 +1425,18 @@ example: boston-dc
 
 --
 
+*`destination.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`destination.geo.region_iso_code`*::
 +
 --
@@ -1313,6 +1459,17 @@ example: Quebec
 
 --
 
+*`destination.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`destination.ip`*::
 +
 --
@@ -1326,8 +1483,11 @@ type: ip
 +
 --
 MAC address of the destination.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -1547,6 +1707,18 @@ example: true
 
 --
 
+*`dll.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`dll.code_signature.status`*::
 +
 --
@@ -1567,6 +1739,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`dll.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -1625,6 +1809,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`dll.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -1968,6 +2161,293 @@ required: True
 --
 
 [float]
+=== elf
+
+These fields contain Linux Executable Linkable Format (ELF) metadata.
+
+
+*`elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
+
+--
+
+[float]
 === error
 
 These fields can represent errors of any kind.
@@ -2046,6 +2526,24 @@ This describes the information in the event. It is more specific than `event.cat
 type: keyword
 
 example: user-password-change
+
+--
+
+*`event.agent_id_status`*::
++
+--
+Agents are normally responsible for populating the `agent.id` field value. If the system receiving events is capable of validating the value based on authentication information for the client then this field can be used to reflect the outcome of that validation.
+For example if the agent's connection is authenticated with mTLS and the client cert contains the ID of the agent to which the cert was issued then the `agent.id` value in events can be checked against the certificate. If the values match then `event.agent_id_status: verified` is added to the event, otherwise one of the other allowed values should be used.
+If no validation is performed then the field should be omitted.
+The allowed values are:
+`verified` - The `agent.id` field value matches expected value obtained from auth metadata.
+`mismatch` - The `agent.id` field value does not match the expected value obtained from auth metadata.
+`missing` - There was no `agent.id` field in the event to validate.
+`auth_metadata_missing` - There was no auth metadata or it was missing information about the agent ID.
+
+type: keyword
+
+example: verified
 
 --
 
@@ -2185,8 +2683,8 @@ example: apache
 *`event.original`*::
 +
 --
-Raw text message of entire event. Used to demonstrate log integrity.
-This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, consider using the wildcard data type.
+Raw text message of entire event. Used to demonstrate log integrity or where the full log message (before splitting it up in multiple parts) may be required, e.g. for reindex.
+This field is not indexed and doc_values are disabled. It cannot be searched, but it can be retrieved from `_source`. If users wish to override this and index this field, please see `Field data types` in the `Elasticsearch Reference`.
 
 type: keyword
 
@@ -2375,6 +2873,18 @@ example: true
 
 --
 
+*`file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`file.code_signature.status`*::
 +
 --
@@ -2395,6 +2905,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -2476,6 +2998,287 @@ example: C
 
 --
 
+*`file.elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`file.elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`file.elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`file.elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`file.elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`file.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`file.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`file.elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`file.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`file.elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`file.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`file.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`file.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`file.elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`file.elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`file.elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`file.elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`file.elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`file.elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`file.elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`file.elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`file.elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`file.elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`file.elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`file.elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`file.elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`file.elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`file.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`file.elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
+
+--
+
 *`file.extension`*::
 +
 --
@@ -2541,6 +3344,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -3036,6 +3848,17 @@ example: Montreal
 
 --
 
+*`geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`geo.continent_name`*::
 +
 --
@@ -3093,6 +3916,18 @@ example: boston-dc
 
 --
 
+*`geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`geo.region_iso_code`*::
 +
 --
@@ -3112,6 +3947,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -3152,8 +3998,9 @@ type: keyword
 [float]
 === hash
 
-The hash fields represent different hash algorithms and their values.
+The hash fields represent different bitwise hash algorithms and their values.
 Field names for common hashes (e.g. MD5, SHA1) are predefined. Add fields for other hashes by lowercasing the hash algorithm name and using underscore separators as appropriate (snake case, e.g. sha3_512).
+Note that this fieldset is used for common hashes that may be computed over a range of generic bytes. Entity-specific hashes such as ja3 or imphash are placed in the fieldsets to which they relate (tls and pe, respectively).
 
 
 *`hash.md5`*::
@@ -3192,6 +4039,15 @@ type: keyword
 
 --
 
+*`hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 [float]
 === host
 
@@ -3207,6 +4063,35 @@ Operating system architecture.
 type: keyword
 
 example: x86_64
+
+--
+
+*`host.cpu.usage`*::
++
+--
+Percent CPU used which is normalized by the number of CPU cores and it ranges from 0 to 1.
+Scaling factor: 1000.
+For example: For a two core host, this value should be the average of the two cores, between 0 and 1.
+
+type: scaled_float
+
+--
+
+*`host.disk.read.bytes`*::
++
+--
+The total number of bytes (gauge) read successfully (aggregated from all disks) since the last metric collection.
+
+type: long
+
+--
+
+*`host.disk.write.bytes`*::
++
+--
+The total number of bytes (gauge) written successfully (aggregated from all disks) since the last metric collection.
+
+type: long
 
 --
 
@@ -3230,6 +4115,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`host.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -3290,6 +4186,18 @@ example: boston-dc
 
 --
 
+*`host.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`host.geo.region_iso_code`*::
 +
 --
@@ -3309,6 +4217,17 @@ Region name.
 type: keyword
 
 example: Quebec
+
+--
+
+*`host.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
 
 --
 
@@ -3345,9 +4264,12 @@ type: ip
 *`host.mac`*::
 +
 --
-Host mac addresses.
+Host MAC addresses.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -3358,6 +4280,42 @@ Name of the host.
 It can contain what `hostname` returns on Unix systems, the fully qualified domain name, or a name specified by the user. The sender decides which value to use.
 
 type: keyword
+
+--
+
+*`host.network.egress.bytes`*::
++
+--
+The number of bytes (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.egress.packets`*::
++
+--
+The number of packets (gauge) sent out on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.bytes`*::
++
+--
+The number of bytes received (gauge) on all network interfaces by the host since the last metric collection.
+
+type: long
+
+--
+
+*`host.network.ingress.packets`*::
++
+--
+The number of packets (gauge) received on all network interfaces by the host since the last metric collection.
+
+type: long
 
 --
 
@@ -3638,6 +4596,18 @@ format: bytes
 
 --
 
+*`http.request.id`*::
++
+--
+A unique identifier for each HTTP request to correlate logs between clients and servers in transactions.
+The id may be contained in a non-standard HTTP header, such as `X-Request-ID` or `X-Correlation-ID`.
+
+type: keyword
+
+example: 123e4567-e89b-12d3-a456-426614174000
+
+--
+
 *`http.request.method`*::
 +
 --
@@ -3875,6 +4845,7 @@ example: init
 *`log.original`*::
 +
 --
+Deprecated for removal in next major version release. This field is superseded by  `event.original`.
 This is the original log message and contains the full log message before splitting it up in multiple parts.
 In contrast to the `message` field which can contain an extracted part of the log message, this field contains the original, full log message. It can have already some modifications applied like encoding or new lines removed to clean up the log message.
 This field is not indexed and doc_values are disabled so it can't be queried but the value can be retrieved from `_source`.
@@ -4171,7 +5142,7 @@ This could be a custom hardware appliance or a server that has been configured t
 *`observer.egress`*::
 +
 --
-Observer.egress holds information like interface number and name, vlan, and zone information to  classify egress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.egress holds information like interface number and name, vlan, and zone information to classify egress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -4235,7 +5206,7 @@ example: outside
 *`observer.egress.zone`*::
 +
 --
-Network zone of outbound traffic as reported by the observer to categorize the destination area of egress  traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
+Network zone of outbound traffic as reported by the observer to categorize the destination area of egress traffic, e.g. Internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -4251,6 +5222,17 @@ City name.
 type: keyword
 
 example: Montreal
+
+--
+
+*`observer.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
 
 --
 
@@ -4311,6 +5293,18 @@ example: boston-dc
 
 --
 
+*`observer.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`observer.geo.region_iso_code`*::
 +
 --
@@ -4333,6 +5327,17 @@ example: Quebec
 
 --
 
+*`observer.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`observer.hostname`*::
 +
 --
@@ -4345,7 +5350,7 @@ type: keyword
 *`observer.ingress`*::
 +
 --
-Observer.ingress holds information like interface number and name, vlan, and zone information to  classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should  only use observer.ingress to categorize traffic.
+Observer.ingress holds information like interface number and name, vlan, and zone information to classify ingress traffic.  Single armed monitoring such as a network sensor on a span port should only use observer.ingress to categorize traffic.
 
 type: object
 
@@ -4409,7 +5414,7 @@ example: outside
 *`observer.ingress.zone`*::
 +
 --
-Network zone of incoming traffic as reported by the observer to categorize the source area of ingress  traffic. e.g. internal, External, DMZ, HR, Legal, etc.
+Network zone of incoming traffic as reported by the observer to categorize the source area of ingress traffic. e.g. internal, External, DMZ, HR, Legal, etc.
 
 type: keyword
 
@@ -4429,9 +5434,12 @@ type: ip
 *`observer.mac`*::
 +
 --
-MAC addresses of the observer
+MAC addresses of the observer.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: ["00-00-5E-00-53-23", "00-00-5E-00-53-24"]
 
 --
 
@@ -4590,6 +5598,105 @@ example: Symantec
 Observer version.
 
 type: keyword
+
+--
+
+[float]
+=== orchestrator
+
+Fields that describe the resources which container orchestrators manage or act upon.
+
+
+*`orchestrator.api_version`*::
++
+--
+API version being used to carry out the action
+
+type: keyword
+
+example: v1beta1
+
+--
+
+*`orchestrator.cluster.name`*::
++
+--
+Name of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.url`*::
++
+--
+URL of the API used to manage the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.cluster.version`*::
++
+--
+The version of the cluster.
+
+type: keyword
+
+--
+
+*`orchestrator.namespace`*::
++
+--
+Namespace in which the action is taking place.
+
+type: keyword
+
+example: kube-system
+
+--
+
+*`orchestrator.organization`*::
++
+--
+Organization affected by the event (for multi-tenant orchestrator setups).
+
+type: keyword
+
+example: elastic
+
+--
+
+*`orchestrator.resource.name`*::
++
+--
+Name of the resource being acted upon.
+
+type: keyword
+
+example: test-pod-cdcws
+
+--
+
+*`orchestrator.resource.type`*::
++
+--
+Type of resource being acted upon.
+
+type: keyword
+
+example: service
+
+--
+
+*`orchestrator.type`*::
++
+--
+Orchestrator cluster type (e.g. kubernetes, nomad or cloudfoundry).
+
+type: keyword
+
+example: kubernetes
 
 --
 
@@ -5002,6 +6109,18 @@ example: true
 
 --
 
+*`process.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.code_signature.status`*::
 +
 --
@@ -5022,6 +6141,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -5065,6 +6196,287 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`process.elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`process.elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`process.elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`process.elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`process.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`process.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`process.elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`process.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`process.elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`process.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`process.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`process.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`process.elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`process.elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`process.elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`process.elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`process.elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`process.elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`process.elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`process.elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`process.elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`process.elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`process.elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`process.elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`process.elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`process.elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`process.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`process.elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
 
 --
 
@@ -5147,6 +6559,15 @@ type: keyword
 
 --
 
+*`process.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
 *`process.name`*::
 +
 --
@@ -5201,6 +6622,18 @@ example: true
 
 --
 
+*`process.parent.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
 *`process.parent.code_signature.status`*::
 +
 --
@@ -5221,6 +6654,18 @@ Subject name of the code signer
 type: keyword
 
 example: Microsoft Corporation
+
+--
+
+*`process.parent.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
 
 --
 
@@ -5264,6 +6709,287 @@ example: /usr/bin/ssh -l user 10.0.0.16
 +
 --
 type: text
+
+--
+
+*`process.parent.elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`process.parent.elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`process.parent.elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`process.parent.elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`process.parent.elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`process.parent.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`process.parent.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`process.parent.elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`process.parent.elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`process.parent.elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`process.parent.elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`process.parent.elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`process.parent.elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`process.parent.elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`process.parent.elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`process.parent.elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`process.parent.elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`process.parent.elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`process.parent.elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`process.parent.elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`process.parent.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`process.parent.elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
 
 --
 
@@ -5341,6 +7067,15 @@ type: keyword
 +
 --
 SHA512 hash.
+
+type: keyword
+
+--
+
+*`process.parent.hash.ssdeep`*::
++
+--
+SSDEEP hash.
 
 type: keyword
 
@@ -5880,7 +7615,7 @@ type: ip
 *`related.user`*::
 +
 --
-All the user names seen on your event.
+All the user names or other user identifiers seen on the event.
 
 type: keyword
 
@@ -6084,6 +7819,17 @@ example: Montreal
 
 --
 
+*`server.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`server.geo.continent_name`*::
 +
 --
@@ -6141,6 +7887,18 @@ example: boston-dc
 
 --
 
+*`server.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`server.geo.region_iso_code`*::
 +
 --
@@ -6163,6 +7921,17 @@ example: Quebec
 
 --
 
+*`server.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`server.ip`*::
 +
 --
@@ -6176,8 +7945,11 @@ type: ip
 +
 --
 MAC address of the server.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -6546,6 +8318,17 @@ example: Montreal
 
 --
 
+*`source.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
 *`source.geo.continent_name`*::
 +
 --
@@ -6603,6 +8386,18 @@ example: boston-dc
 
 --
 
+*`source.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
 *`source.geo.region_iso_code`*::
 +
 --
@@ -6625,6 +8420,17 @@ example: Quebec
 
 --
 
+*`source.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
 *`source.ip`*::
 +
 --
@@ -6638,8 +8444,11 @@ type: ip
 +
 --
 MAC address of the source.
+The notation format from RFC 7042 is suggested: Each octet (that is, 8-bit byte) is represented by two [uppercase] hexadecimal digits giving the value of the octet as an unsigned integer. Successive octets are separated by a hyphen.
 
 type: keyword
+
+example: 00-00-5E-00-53-23
 
 --
 
@@ -6844,6 +8653,1655 @@ Fields to classify events and alerts according to a threat taxonomy such as the 
 These fields are for users to classify alerts from all of their sources (e.g. IDS, NGFW, etc.) within a common taxonomy. The threat.tactic.* are meant to capture the high level category of the threat (e.g. "impact"). The threat.technique.* fields are meant to capture which kind of approach is used by this detected threat, to accomplish the goal (e.g. "endpoint denial of service").
 
 
+*`threat.enrichments`*::
++
+--
+A list of associated indicators objects enriching the event, and the context of that association/enrichment.
+
+type: nested
+
+--
+
+*`threat.enrichments.indicator`*::
++
+--
+Object containing associated indicators enriching the event.
+
+type: object
+
+--
+
+*`threat.enrichments.indicator.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`threat.enrichments.indicator.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`threat.enrichments.indicator.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.enrichments.indicator.confidence`*::
++
+--
+Identifies the confidence rating assigned by the provider using STIX confidence scales. Expected values:
+  * Not Specified, None, Low, Medium, High
+  * 0-10
+  * Admirality Scale (1-6)
+  * DNI Scale (5-95)
+  * WEP Scale (Impossible - Certain)
+
+type: keyword
+
+example: High
+
+--
+
+*`threat.enrichments.indicator.description`*::
++
+--
+Describes the type of action conducted by the threat.
+
+type: keyword
+
+example: IP x.x.x.x was observed delivering the Angler EK.
+
+--
+
+*`threat.enrichments.indicator.email.address`*::
++
+--
+Identifies a threat indicator as an email address (irrespective of direction).
+
+type: keyword
+
+example: phish@example.com
+
+--
+
+*`threat.enrichments.indicator.file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`threat.enrichments.indicator.file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.enrichments.indicator.file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
+*`threat.enrichments.indicator.file.ctime`*::
++
+--
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
+
+type: date
+
+--
+
+*`threat.enrichments.indicator.file.device`*::
++
+--
+Device that is the source of the file.
+
+type: keyword
+
+example: sda
+
+--
+
+*`threat.enrichments.indicator.file.directory`*::
++
+--
+Directory where the file is located. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`threat.enrichments.indicator.file.drive_letter`*::
++
+--
+Drive letter where the file is located. This field is only relevant on Windows.
+The value should be uppercase, and not include the colon.
+
+type: keyword
+
+example: C
+
+--
+
+*`threat.enrichments.indicator.file.elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`threat.enrichments.indicator.file.elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`threat.enrichments.indicator.file.elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`threat.enrichments.indicator.file.elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`threat.enrichments.indicator.file.elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`threat.enrichments.indicator.file.elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`threat.enrichments.indicator.file.elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`threat.enrichments.indicator.file.elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.extension`*::
++
+--
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+
+type: keyword
+
+example: png
+
+--
+
+*`threat.enrichments.indicator.file.gid`*::
++
+--
+Primary group ID (GID) of the file.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`threat.enrichments.indicator.file.group`*::
++
+--
+Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`threat.enrichments.indicator.file.inode`*::
++
+--
+Inode representing the file in the filesystem.
+
+type: keyword
+
+example: 256383
+
+--
+
+*`threat.enrichments.indicator.file.mime_type`*::
++
+--
+MIME type should identify the format of the file or stream of bytes using https://www.iana.org/assignments/media-types/media-types.xhtml[IANA official types], where possible. When more than one type is applicable, the most specific type should be used.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.mode`*::
++
+--
+Mode of the file in octal representation.
+
+type: keyword
+
+example: 0640
+
+--
+
+*`threat.enrichments.indicator.file.mtime`*::
++
+--
+Last time the file content was modified.
+
+type: date
+
+--
+
+*`threat.enrichments.indicator.file.name`*::
++
+--
+Name of the file including the extension, without the directory.
+
+type: keyword
+
+example: example.png
+
+--
+
+*`threat.enrichments.indicator.file.owner`*::
++
+--
+File owner's username.
+
+type: keyword
+
+example: alice
+
+--
+
+*`threat.enrichments.indicator.file.path`*::
++
+--
+Full path to the file, including the file name. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice/example.png
+
+--
+
+*`threat.enrichments.indicator.file.path.text`*::
++
+--
+type: text
+
+--
+
+*`threat.enrichments.indicator.file.size`*::
++
+--
+File size in bytes.
+Only relevant when `file.type` is "file".
+
+type: long
+
+example: 16384
+
+--
+
+*`threat.enrichments.indicator.file.target_path`*::
++
+--
+Target path for symlinks.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.target_path.text`*::
++
+--
+type: text
+
+--
+
+*`threat.enrichments.indicator.file.type`*::
++
+--
+File type (file, dir, or symlink).
+
+type: keyword
+
+example: file
+
+--
+
+*`threat.enrichments.indicator.file.uid`*::
++
+--
+The user ID (UID) or security identifier (SID) of the file owner.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`threat.enrichments.indicator.first_seen`*::
++
+--
+The date and time when intelligence source first reported sighting this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.enrichments.indicator.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`threat.enrichments.indicator.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
+*`threat.enrichments.indicator.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`threat.enrichments.indicator.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`threat.enrichments.indicator.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`threat.enrichments.indicator.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`threat.enrichments.indicator.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`threat.enrichments.indicator.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
+*`threat.enrichments.indicator.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`threat.enrichments.indicator.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`threat.enrichments.indicator.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
+*`threat.enrichments.indicator.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.ip`*::
++
+--
+Identifies a threat indicator as an IP address (irrespective of direction).
+
+type: ip
+
+example: 1.2.3.4
+
+--
+
+*`threat.enrichments.indicator.last_seen`*::
++
+--
+The date and time when intelligence source last reported sighting this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.enrichments.indicator.marking.tlp`*::
++
+--
+Traffic Light Protocol sharing markings. Recommended values are:
+  * WHITE
+  * GREEN
+  * AMBER
+  * RED
+
+type: keyword
+
+example: White
+
+--
+
+*`threat.enrichments.indicator.modified_at`*::
++
+--
+The date and time when intelligence source last modified information for this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.enrichments.indicator.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.enrichments.indicator.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.enrichments.indicator.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.enrichments.indicator.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.enrichments.indicator.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.enrichments.indicator.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.enrichments.indicator.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+*`threat.enrichments.indicator.port`*::
++
+--
+Identifies a threat indicator as a port number (irrespective of direction).
+
+type: long
+
+example: 443
+
+--
+
+*`threat.enrichments.indicator.provider`*::
++
+--
+The name of the indicator's provider.
+
+type: keyword
+
+example: lrz_urlhaus
+
+--
+
+*`threat.enrichments.indicator.reference`*::
++
+--
+Reference URL linking to additional information about this indicator.
+
+type: keyword
+
+example: https://system.example.com/indicator/0001234
+
+--
+
+*`threat.enrichments.indicator.registry.data.bytes`*::
++
+--
+Original bytes written with base64 encoding.
+For Windows registry operations, such as SetValueEx and RegQueryValueEx, this corresponds to the data pointed by `lp_data`. This is optional but provides better recoverability and should be populated for REG_BINARY encoded values.
+
+type: keyword
+
+example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
+
+--
+
+*`threat.enrichments.indicator.registry.data.strings`*::
++
+--
+Content when writing string types.
+Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`threat.enrichments.indicator.registry.data.type`*::
++
+--
+Standard registry type for encoding contents
+
+type: keyword
+
+example: REG_SZ
+
+--
+
+*`threat.enrichments.indicator.registry.hive`*::
++
+--
+Abbreviated name for the hive.
+
+type: keyword
+
+example: HKLM
+
+--
+
+*`threat.enrichments.indicator.registry.key`*::
++
+--
+Hive-relative path of keys.
+
+type: keyword
+
+example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
+
+--
+
+*`threat.enrichments.indicator.registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`threat.enrichments.indicator.registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
+*`threat.enrichments.indicator.scanner_stats`*::
++
+--
+Count of AV/EDR vendors that successfully detected malicious file or URL.
+
+type: long
+
+example: 4
+
+--
+
+*`threat.enrichments.indicator.sightings`*::
++
+--
+Number of times this indicator was observed conducting threat activity.
+
+type: long
+
+example: 20
+
+--
+
+*`threat.enrichments.indicator.type`*::
++
+--
+Type of indicator as represented by Cyber Observable in STIX 2.0. Recommended values:
+  * autonomous-system
+  * artifact
+  * directory
+  * domain-name
+  * email-addr
+  * file
+  * ipv4-addr
+  * ipv6-addr
+  * mac-addr
+  * mutex
+  * port
+  * process
+  * software
+  * url
+  * user-account
+  * windows-registry-key
+  * x509-certificate
+
+type: keyword
+
+example: ipv4-addr
+
+--
+
+*`threat.enrichments.indicator.url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`threat.enrichments.indicator.url.extension`*::
++
+--
+The field contains the file extension from the original request url, excluding the leading dot.
+The file extension is only set if it exists, as not every url has a file extension.
+The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+
+type: keyword
+
+example: png
+
+--
+
+*`threat.enrichments.indicator.url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top
+
+--
+
+*`threat.enrichments.indicator.url.full.text`*::
++
+--
+type: text
+
+--
+
+*`threat.enrichments.indicator.url.original`*::
++
+--
+Unmodified original url as seen in the event source.
+Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
+This field is meant to represent the URL as it was observed, complete or not.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+--
+
+*`threat.enrichments.indicator.url.original.text`*::
++
+--
+type: text
+
+--
+
+*`threat.enrichments.indicator.url.password`*::
++
+--
+Password of the request.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.url.path`*::
++
+--
+Path of the request, such as "/search".
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.url.port`*::
++
+--
+Port of the request, such as 443.
+
+type: long
+
+example: 443
+
+format: string
+
+--
+
+*`threat.enrichments.indicator.url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain.
+For example, the registered domain for "foo.example.com" is "example.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: example.com
+
+--
+
+*`threat.enrichments.indicator.url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+type: keyword
+
+example: https
+
+--
+
+*`threat.enrichments.indicator.url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
+*`threat.enrichments.indicator.url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`threat.enrichments.indicator.url.username`*::
++
+--
+Username of the request.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.enrichments.indicator.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.enrichments.indicator.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.enrichments.indicator.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.enrichments.indicator.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.enrichments.indicator.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.enrichments.indicator.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.enrichments.indicator.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.enrichments.indicator.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.enrichments.indicator.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.enrichments.indicator.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.enrichments.indicator.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.enrichments.indicator.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.enrichments.indicator.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.enrichments.indicator.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`threat.enrichments.matched.atomic`*::
++
+--
+Identifies the atomic indicator value that matched a local environment endpoint or network event.
+
+type: keyword
+
+example: bad-domain.com
+
+--
+
+*`threat.enrichments.matched.field`*::
++
+--
+Identifies the field of the atomic indicator that matched a local environment endpoint or network event.
+
+type: keyword
+
+example: file.hash.sha256
+
+--
+
+*`threat.enrichments.matched.id`*::
++
+--
+Identifies the _id of the indicator document enriching the event.
+
+type: keyword
+
+example: ff93aee5-86a1-4a61-b0e6-0cdc313d01b5
+
+--
+
+*`threat.enrichments.matched.index`*::
++
+--
+Identifies the _index of the indicator document enriching the event.
+
+type: keyword
+
+example: filebeat-8.0.0-2021.05.23-000011
+
+--
+
+*`threat.enrichments.matched.type`*::
++
+--
+Identifies the type of match that caused the event to be enriched with the given indicator
+
+type: keyword
+
+example: indicator_match_rule
+
+--
+
 *`threat.framework`*::
 +
 --
@@ -6852,6 +10310,1698 @@ Name of the threat framework used to further categorize and classify the tactic 
 type: keyword
 
 example: MITRE ATT&CK
+
+--
+
+*`threat.group.alias`*::
++
+--
+The alias(es) of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group alias(es).
+
+type: keyword
+
+example: [ "Magecart Group 6" ]
+
+--
+
+*`threat.group.id`*::
++
+--
+The id of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group id.
+
+type: keyword
+
+example: G0037
+
+--
+
+*`threat.group.name`*::
++
+--
+The name of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group name.
+
+type: keyword
+
+example: FIN6
+
+--
+
+*`threat.group.reference`*::
++
+--
+The reference URL of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group reference URL.
+
+type: keyword
+
+example: https://attack.mitre.org/groups/G0037/
+
+--
+
+*`threat.indicator.as.number`*::
++
+--
+Unique number allocated to the autonomous system. The autonomous system number (ASN) uniquely identifies each network on the Internet.
+
+type: long
+
+example: 15169
+
+--
+
+*`threat.indicator.as.organization.name`*::
++
+--
+Organization name.
+
+type: keyword
+
+example: Google LLC
+
+--
+
+*`threat.indicator.as.organization.name.text`*::
++
+--
+type: text
+
+--
+
+*`threat.indicator.confidence`*::
++
+--
+Identifies the confidence rating assigned by the provider using STIX confidence scales.
+Recommended values:
+  * Not Specified, None, Low, Medium, High
+  * 0-10
+  * Admirality Scale (1-6)
+  * DNI Scale (5-95)
+  * WEP Scale (Impossible - Certain)
+
+type: keyword
+
+example: High
+
+--
+
+*`threat.indicator.description`*::
++
+--
+Describes the type of action conducted by the threat.
+
+type: keyword
+
+example: IP x.x.x.x was observed delivering the Angler EK.
+
+--
+
+*`threat.indicator.email.address`*::
++
+--
+Identifies a threat indicator as an email address (irrespective of direction).
+
+type: keyword
+
+example: phish@example.com
+
+--
+
+*`threat.indicator.file.accessed`*::
++
+--
+Last time the file was accessed.
+Note that not all filesystems keep track of access time.
+
+type: date
+
+--
+
+*`threat.indicator.file.attributes`*::
++
+--
+Array of file attributes.
+Attributes names will vary by platform. Here's a non-exhaustive list of values that are expected in this field: archive, compressed, directory, encrypted, execute, hidden, read, readonly, system, write.
+
+type: keyword
+
+example: ["readonly", "system"]
+
+--
+
+*`threat.indicator.file.code_signature.exists`*::
++
+--
+Boolean to capture if a signature is present.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.indicator.file.code_signature.signing_id`*::
++
+--
+The identifier used to sign the process.
+This is used to identify the application manufactured by a software vendor. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: com.apple.xpc.proxy
+
+--
+
+*`threat.indicator.file.code_signature.status`*::
++
+--
+Additional information about the certificate status.
+This is useful for logging cryptographic errors with the certificate validity or trust status. Leave unpopulated if the validity or trust of the certificate was unchecked.
+
+type: keyword
+
+example: ERROR_UNTRUSTED_ROOT
+
+--
+
+*`threat.indicator.file.code_signature.subject_name`*::
++
+--
+Subject name of the code signer
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.indicator.file.code_signature.team_id`*::
++
+--
+The team identifier used to sign the process.
+This is used to identify the team or vendor of a software product. The field is relevant to Apple *OS only.
+
+type: keyword
+
+example: EQHXZ8M8AV
+
+--
+
+*`threat.indicator.file.code_signature.trusted`*::
++
+--
+Stores the trust status of the certificate chain.
+Validating the trust of the certificate chain may be complicated, and this field should only be populated by tools that actively check the status.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.indicator.file.code_signature.valid`*::
++
+--
+Boolean to capture if the digital signature is verified against the binary content.
+Leave unpopulated if a certificate was unchecked.
+
+type: boolean
+
+example: true
+
+--
+
+*`threat.indicator.file.created`*::
++
+--
+File creation time.
+Note that not all filesystems store the creation time.
+
+type: date
+
+--
+
+*`threat.indicator.file.ctime`*::
++
+--
+Last time the file attributes or metadata changed.
+Note that changes to the file content will update `mtime`. This implies `ctime` will be adjusted at the same time, since `mtime` is an attribute of the file.
+
+type: date
+
+--
+
+*`threat.indicator.file.device`*::
++
+--
+Device that is the source of the file.
+
+type: keyword
+
+example: sda
+
+--
+
+*`threat.indicator.file.directory`*::
++
+--
+Directory where the file is located. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice
+
+--
+
+*`threat.indicator.file.drive_letter`*::
++
+--
+Drive letter where the file is located. This field is only relevant on Windows.
+The value should be uppercase, and not include the colon.
+
+type: keyword
+
+example: C
+
+--
+
+*`threat.indicator.file.elf.architecture`*::
++
+--
+Machine architecture of the ELF file.
+
+type: keyword
+
+example: x86-64
+
+--
+
+*`threat.indicator.file.elf.byte_order`*::
++
+--
+Byte sequence of ELF file.
+
+type: keyword
+
+example: Little Endian
+
+--
+
+*`threat.indicator.file.elf.cpu_type`*::
++
+--
+CPU type of the ELF file.
+
+type: keyword
+
+example: Intel
+
+--
+
+*`threat.indicator.file.elf.creation_date`*::
++
+--
+Extracted when possible from the file's metadata. Indicates when it was built or compiled. It can also be faked by malware creators.
+
+type: date
+
+--
+
+*`threat.indicator.file.elf.exports`*::
++
+--
+List of exported element names and types.
+
+type: flattened
+
+--
+
+*`threat.indicator.file.elf.header.abi_version`*::
++
+--
+Version of the ELF Application Binary Interface (ABI).
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.class`*::
++
+--
+Header class of the ELF file.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.data`*::
++
+--
+Data table of the ELF header.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.entrypoint`*::
++
+--
+Header entrypoint of the ELF file.
+
+type: long
+
+format: string
+
+--
+
+*`threat.indicator.file.elf.header.object_version`*::
++
+--
+"0x1" for original ELF files.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.os_abi`*::
++
+--
+Application Binary Interface (ABI) of the Linux OS.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.type`*::
++
+--
+Header type of the ELF file.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.header.version`*::
++
+--
+Version of the ELF header.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.imports`*::
++
+--
+List of imported element names and types.
+
+type: flattened
+
+--
+
+*`threat.indicator.file.elf.sections`*::
++
+--
+An array containing an object for each section of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.sections.*`.
+
+type: nested
+
+--
+
+*`threat.indicator.file.elf.sections.chi2`*::
++
+--
+Chi-square probability distribution of the section.
+
+type: long
+
+format: number
+
+--
+
+*`threat.indicator.file.elf.sections.entropy`*::
++
+--
+Shannon entropy calculation from the section.
+
+type: long
+
+format: number
+
+--
+
+*`threat.indicator.file.elf.sections.flags`*::
++
+--
+ELF Section List flags.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.sections.name`*::
++
+--
+ELF Section List name.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.sections.physical_offset`*::
++
+--
+ELF Section List offset.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.sections.physical_size`*::
++
+--
+ELF Section List physical size.
+
+type: long
+
+format: bytes
+
+--
+
+*`threat.indicator.file.elf.sections.type`*::
++
+--
+ELF Section List type.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.sections.virtual_address`*::
++
+--
+ELF Section List virtual address.
+
+type: long
+
+format: string
+
+--
+
+*`threat.indicator.file.elf.sections.virtual_size`*::
++
+--
+ELF Section List virtual size.
+
+type: long
+
+format: string
+
+--
+
+*`threat.indicator.file.elf.segments`*::
++
+--
+An array containing an object for each segment of the ELF file.
+The keys that should be present in these objects are defined by sub-fields underneath `elf.segments.*`.
+
+type: nested
+
+--
+
+*`threat.indicator.file.elf.segments.sections`*::
++
+--
+ELF object segment sections.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.segments.type`*::
++
+--
+ELF object segment type.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.shared_libraries`*::
++
+--
+List of shared libraries used by this ELF object.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.elf.telfhash`*::
++
+--
+telfhash symbol hash for ELF file.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.extension`*::
++
+--
+File extension, excluding the leading dot.
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+
+type: keyword
+
+example: png
+
+--
+
+*`threat.indicator.file.gid`*::
++
+--
+Primary group ID (GID) of the file.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`threat.indicator.file.group`*::
++
+--
+Primary group name of the file.
+
+type: keyword
+
+example: alice
+
+--
+
+*`threat.indicator.file.inode`*::
++
+--
+Inode representing the file in the filesystem.
+
+type: keyword
+
+example: 256383
+
+--
+
+*`threat.indicator.file.mime_type`*::
++
+--
+MIME type should identify the format of the file or stream of bytes using https://www.iana.org/assignments/media-types/media-types.xhtml[IANA official types], where possible. When more than one type is applicable, the most specific type should be used.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.mode`*::
++
+--
+Mode of the file in octal representation.
+
+type: keyword
+
+example: 0640
+
+--
+
+*`threat.indicator.file.mtime`*::
++
+--
+Last time the file content was modified.
+
+type: date
+
+--
+
+*`threat.indicator.file.name`*::
++
+--
+Name of the file including the extension, without the directory.
+
+type: keyword
+
+example: example.png
+
+--
+
+*`threat.indicator.file.owner`*::
++
+--
+File owner's username.
+
+type: keyword
+
+example: alice
+
+--
+
+*`threat.indicator.file.path`*::
++
+--
+Full path to the file, including the file name. It should include the drive letter, when appropriate.
+
+type: keyword
+
+example: /home/alice/example.png
+
+--
+
+*`threat.indicator.file.path.text`*::
++
+--
+type: text
+
+--
+
+*`threat.indicator.file.size`*::
++
+--
+File size in bytes.
+Only relevant when `file.type` is "file".
+
+type: long
+
+example: 16384
+
+--
+
+*`threat.indicator.file.target_path`*::
++
+--
+Target path for symlinks.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.target_path.text`*::
++
+--
+type: text
+
+--
+
+*`threat.indicator.file.type`*::
++
+--
+File type (file, dir, or symlink).
+
+type: keyword
+
+example: file
+
+--
+
+*`threat.indicator.file.uid`*::
++
+--
+The user ID (UID) or security identifier (SID) of the file owner.
+
+type: keyword
+
+example: 1001
+
+--
+
+*`threat.indicator.first_seen`*::
++
+--
+The date and time when intelligence source first reported sighting this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.indicator.geo.city_name`*::
++
+--
+City name.
+
+type: keyword
+
+example: Montreal
+
+--
+
+*`threat.indicator.geo.continent_code`*::
++
+--
+Two-letter code representing continent's name.
+
+type: keyword
+
+example: NA
+
+--
+
+*`threat.indicator.geo.continent_name`*::
++
+--
+Name of the continent.
+
+type: keyword
+
+example: North America
+
+--
+
+*`threat.indicator.geo.country_iso_code`*::
++
+--
+Country ISO code.
+
+type: keyword
+
+example: CA
+
+--
+
+*`threat.indicator.geo.country_name`*::
++
+--
+Country name.
+
+type: keyword
+
+example: Canada
+
+--
+
+*`threat.indicator.geo.location`*::
++
+--
+Longitude and latitude.
+
+type: geo_point
+
+example: { "lon": -73.614830, "lat": 45.505918 }
+
+--
+
+*`threat.indicator.geo.name`*::
++
+--
+User-defined description of a location, at the level of granularity they care about.
+Could be the name of their data centers, the floor number, if this describes a local physical entity, city names.
+Not typically used in automated geolocation.
+
+type: keyword
+
+example: boston-dc
+
+--
+
+*`threat.indicator.geo.postal_code`*::
++
+--
+Postal code associated with the location.
+Values appropriate for this field may also be known as a postcode or ZIP code and will vary widely from country to country.
+
+type: keyword
+
+example: 94040
+
+--
+
+*`threat.indicator.geo.region_iso_code`*::
++
+--
+Region ISO code.
+
+type: keyword
+
+example: CA-QC
+
+--
+
+*`threat.indicator.geo.region_name`*::
++
+--
+Region name.
+
+type: keyword
+
+example: Quebec
+
+--
+
+*`threat.indicator.geo.timezone`*::
++
+--
+The time zone of the location, such as IANA time zone name.
+
+type: keyword
+
+example: America/Argentina/Buenos_Aires
+
+--
+
+*`threat.indicator.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.ip`*::
++
+--
+Identifies a threat indicator as an IP address (irrespective of direction).
+
+type: ip
+
+example: 1.2.3.4
+
+--
+
+*`threat.indicator.last_seen`*::
++
+--
+The date and time when intelligence source last reported sighting this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.indicator.marking.tlp`*::
++
+--
+Traffic Light Protocol sharing markings.
+Recommended values are:
+  * WHITE
+  * GREEN
+  * AMBER
+  * RED
+
+type: keyword
+
+example: WHITE
+
+--
+
+*`threat.indicator.modified_at`*::
++
+--
+The date and time when intelligence source last modified information for this indicator.
+
+type: date
+
+example: 2020-11-05T17:25:47.000Z
+
+--
+
+*`threat.indicator.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.indicator.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.indicator.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.indicator.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.indicator.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.indicator.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.indicator.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
+
+--
+
+*`threat.indicator.port`*::
++
+--
+Identifies a threat indicator as a port number (irrespective of direction).
+
+type: long
+
+example: 443
+
+--
+
+*`threat.indicator.provider`*::
++
+--
+The name of the indicator's provider.
+
+type: keyword
+
+example: lrz_urlhaus
+
+--
+
+*`threat.indicator.reference`*::
++
+--
+Reference URL linking to additional information about this indicator.
+
+type: keyword
+
+example: https://system.example.com/indicator/0001234
+
+--
+
+*`threat.indicator.registry.data.bytes`*::
++
+--
+Original bytes written with base64 encoding.
+For Windows registry operations, such as SetValueEx and RegQueryValueEx, this corresponds to the data pointed by `lp_data`. This is optional but provides better recoverability and should be populated for REG_BINARY encoded values.
+
+type: keyword
+
+example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
+
+--
+
+*`threat.indicator.registry.data.strings`*::
++
+--
+Content when writing string types.
+Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
+
+type: keyword
+
+example: ["C:\rta\red_ttp\bin\myapp.exe"]
+
+--
+
+*`threat.indicator.registry.data.type`*::
++
+--
+Standard registry type for encoding contents
+
+type: keyword
+
+example: REG_SZ
+
+--
+
+*`threat.indicator.registry.hive`*::
++
+--
+Abbreviated name for the hive.
+
+type: keyword
+
+example: HKLM
+
+--
+
+*`threat.indicator.registry.key`*::
++
+--
+Hive-relative path of keys.
+
+type: keyword
+
+example: SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe
+
+--
+
+*`threat.indicator.registry.path`*::
++
+--
+Full path, including hive, key and value
+
+type: keyword
+
+example: HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\winword.exe\Debugger
+
+--
+
+*`threat.indicator.registry.value`*::
++
+--
+Name of the value written.
+
+type: keyword
+
+example: Debugger
+
+--
+
+*`threat.indicator.scanner_stats`*::
++
+--
+Count of AV/EDR vendors that successfully detected malicious file or URL.
+
+type: long
+
+example: 4
+
+--
+
+*`threat.indicator.sightings`*::
++
+--
+Number of times this indicator was observed conducting threat activity.
+
+type: long
+
+example: 20
+
+--
+
+*`threat.indicator.type`*::
++
+--
+Type of indicator as represented by Cyber Observable in STIX 2.0.
+Recommended values:
+  * autonomous-system
+  * artifact
+  * directory
+  * domain-name
+  * email-addr
+  * file
+  * ipv4-addr
+  * ipv6-addr
+  * mac-addr
+  * mutex
+  * port
+  * process
+  * software
+  * url
+  * user-account
+  * windows-registry-key
+  * x509-certificate
+
+type: keyword
+
+example: ipv4-addr
+
+--
+
+*`threat.indicator.url.domain`*::
++
+--
+Domain of the url, such as "www.elastic.co".
+In some cases a URL may refer to an IP and/or port directly, without a domain name. In this case, the IP address would go to the `domain` field.
+If the URL contains a literal IPv6 address enclosed by `[` and `]` (IETF RFC 2732), the `[` and `]` characters should also be captured in the `domain` field.
+
+type: keyword
+
+example: www.elastic.co
+
+--
+
+*`threat.indicator.url.extension`*::
++
+--
+The field contains the file extension from the original request url, excluding the leading dot.
+The file extension is only set if it exists, as not every url has a file extension.
+The leading period must not be included. For example, the value must be "png", not ".png".
+Note that when the file name has multiple extensions (example.tar.gz), only the last one should be captured ("gz", not "tar.gz").
+
+type: keyword
+
+example: png
+
+--
+
+*`threat.indicator.url.fragment`*::
++
+--
+Portion of the url after the `#`, such as "top".
+The `#` is not part of the fragment.
+
+type: keyword
+
+--
+
+*`threat.indicator.url.full`*::
++
+--
+If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top
+
+--
+
+*`threat.indicator.url.full.text`*::
++
+--
+type: text
+
+--
+
+*`threat.indicator.url.original`*::
++
+--
+Unmodified original url as seen in the event source.
+Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
+This field is meant to represent the URL as it was observed, complete or not.
+
+type: keyword
+
+example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
+
+--
+
+*`threat.indicator.url.original.text`*::
++
+--
+type: text
+
+--
+
+*`threat.indicator.url.password`*::
++
+--
+Password of the request.
+
+type: keyword
+
+--
+
+*`threat.indicator.url.path`*::
++
+--
+Path of the request, such as "/search".
+
+type: keyword
+
+--
+
+*`threat.indicator.url.port`*::
++
+--
+Port of the request, such as 443.
+
+type: long
+
+example: 443
+
+format: string
+
+--
+
+*`threat.indicator.url.query`*::
++
+--
+The query field describes the query string of the request, such as "q=elasticsearch".
+The `?` is excluded from the query string. If a URL contains no `?`, there is no query field. If there is a `?` but no query, the query field exists with an empty string. The `exists` query can be used to differentiate between the two cases.
+
+type: keyword
+
+--
+
+*`threat.indicator.url.registered_domain`*::
++
+--
+The highest registered url domain, stripped of the subdomain.
+For example, the registered domain for "foo.example.com" is "example.com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last two labels will not work well for TLDs such as "co.uk".
+
+type: keyword
+
+example: example.com
+
+--
+
+*`threat.indicator.url.scheme`*::
++
+--
+Scheme of the request, such as "https".
+Note: The `:` is not part of the scheme.
+
+type: keyword
+
+example: https
+
+--
+
+*`threat.indicator.url.subdomain`*::
++
+--
+The subdomain portion of a fully qualified domain name includes all of the names except the host name under the registered_domain.  In a partially qualified domain, or if the the qualification level of the full name cannot be determined, subdomain contains all of the names below the registered domain.
+For example the subdomain portion of "www.east.mydomain.co.uk" is "east". If the domain has multiple levels of subdomain, such as "sub2.sub1.example.com", the subdomain field should contain "sub2.sub1", with no trailing period.
+
+type: keyword
+
+example: east
+
+--
+
+*`threat.indicator.url.top_level_domain`*::
++
+--
+The effective top level domain (eTLD), also known as the domain suffix, is the last part of the domain name. For example, the top level domain for example.com is "com".
+This value can be determined precisely with a list like the public suffix list (http://publicsuffix.org). Trying to approximate this by simply taking the last label will not work well for effective TLDs such as "co.uk".
+
+type: keyword
+
+example: co.uk
+
+--
+
+*`threat.indicator.url.username`*::
++
+--
+Username of the request.
+
+type: keyword
+
+--
+
+*`threat.indicator.x509.alternative_names`*::
++
+--
+List of subject alternative names (SAN). Name types vary by certificate authority and certificate type but commonly contain IP addresses, DNS names (and wildcards), and email addresses.
+
+type: keyword
+
+example: *.elastic.co
+
+--
+
+*`threat.indicator.x509.issuer.common_name`*::
++
+--
+List of common name (CN) of issuing certificate authority.
+
+type: keyword
+
+example: Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.x509.issuer.country`*::
++
+--
+List of country (C) codes
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.x509.issuer.distinguished_name`*::
++
+--
+Distinguished name (DN) of issuing certificate authority.
+
+type: keyword
+
+example: C=US, O=Example Inc, OU=www.example.com, CN=Example SHA2 High Assurance Server CA
+
+--
+
+*`threat.indicator.x509.issuer.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: Mountain View
+
+--
+
+*`threat.indicator.x509.issuer.organization`*::
++
+--
+List of organizations (O) of issuing certificate authority.
+
+type: keyword
+
+example: Example Inc
+
+--
+
+*`threat.indicator.x509.issuer.organizational_unit`*::
++
+--
+List of organizational units (OU) of issuing certificate authority.
+
+type: keyword
+
+example: www.example.com
+
+--
+
+*`threat.indicator.x509.issuer.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.x509.not_after`*::
++
+--
+Time at which the certificate is no longer considered valid.
+
+type: date
+
+example: 2020-07-16 03:15:39+00:00
+
+--
+
+*`threat.indicator.x509.not_before`*::
++
+--
+Time at which the certificate is first considered valid.
+
+type: date
+
+example: 2019-08-16 01:40:25+00:00
+
+--
+
+*`threat.indicator.x509.public_key_algorithm`*::
++
+--
+Algorithm used to generate the public key.
+
+type: keyword
+
+example: RSA
+
+--
+
+*`threat.indicator.x509.public_key_curve`*::
++
+--
+The curve used by the elliptic curve public key algorithm. This is algorithm specific.
+
+type: keyword
+
+example: nistp521
+
+--
+
+*`threat.indicator.x509.public_key_exponent`*::
++
+--
+Exponent used to derive the public key. This is algorithm specific.
+
+type: long
+
+example: 65537
+
+Field is not indexed.
+
+--
+
+*`threat.indicator.x509.public_key_size`*::
++
+--
+The size of the public key space in bits.
+
+type: long
+
+example: 2048
+
+--
+
+*`threat.indicator.x509.serial_number`*::
++
+--
+Unique serial number issued by the certificate authority. For consistency, if this value is alphanumeric, it should be formatted without colons and uppercase characters.
+
+type: keyword
+
+example: 55FBB9C7DEBF09809D12CCAA
+
+--
+
+*`threat.indicator.x509.signature_algorithm`*::
++
+--
+Identifier for certificate signature algorithm. We recommend using names found in Go Lang Crypto library. See https://github.com/golang/go/blob/go1.14/src/crypto/x509/x509.go#L337-L353.
+
+type: keyword
+
+example: SHA256-RSA
+
+--
+
+*`threat.indicator.x509.subject.common_name`*::
++
+--
+List of common names (CN) of subject.
+
+type: keyword
+
+example: shared.global.example.net
+
+--
+
+*`threat.indicator.x509.subject.country`*::
++
+--
+List of country (C) code
+
+type: keyword
+
+example: US
+
+--
+
+*`threat.indicator.x509.subject.distinguished_name`*::
++
+--
+Distinguished name (DN) of the certificate subject entity.
+
+type: keyword
+
+example: C=US, ST=California, L=San Francisco, O=Example, Inc., CN=shared.global.example.net
+
+--
+
+*`threat.indicator.x509.subject.locality`*::
++
+--
+List of locality names (L)
+
+type: keyword
+
+example: San Francisco
+
+--
+
+*`threat.indicator.x509.subject.organization`*::
++
+--
+List of organizations (O) of subject.
+
+type: keyword
+
+example: Example, Inc.
+
+--
+
+*`threat.indicator.x509.subject.organizational_unit`*::
++
+--
+List of organizational units (OU) of subject.
+
+type: keyword
+
+--
+
+*`threat.indicator.x509.subject.state_or_province`*::
++
+--
+List of state or province names (ST, S, or P)
+
+type: keyword
+
+example: California
+
+--
+
+*`threat.indicator.x509.version_number`*::
++
+--
+Version of x509 format.
+
+type: keyword
+
+example: 3
+
+--
+
+*`threat.software.id`*::
++
+--
+The id of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software id.
+
+type: keyword
+
+example: S0552
+
+--
+
+*`threat.software.name`*::
++
+--
+The name of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software name.
+
+type: keyword
+
+example: AdFind
+
+--
+
+*`threat.software.platforms`*::
++
+--
+The platforms of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software platforms.
+Recommended Values:
+  * AWS
+  * Azure
+  * Azure AD
+  * GCP
+  * Linux
+  * macOS
+  * Network
+  * Office 365
+  * SaaS
+  * Windows
+
+type: keyword
+
+example: [ "Windows" ]
+
+--
+
+*`threat.software.reference`*::
++
+--
+The reference URL of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software reference URL.
+
+type: keyword
+
+example: https://attack.mitre.org/software/S0552/
+
+--
+
+*`threat.software.type`*::
++
+--
+The type of software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software type.
+Recommended values
+  * Malware
+  * Tool
+
+type: keyword
+
+example: Tool
 
 --
 
@@ -9459,6 +14609,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.ip`*::
++
+--
+Kubernetes Pod IP
+
+
+type: ip
+
+--
+
 *`kubernetes.namespace`*::
 +
 --
@@ -9509,10 +14669,10 @@ type: object
 
 --
 
-*`kubernetes.service.selectors.*`*::
+*`kubernetes.selectors.*`*::
 +
 --
-Kubernetes Service selectors map
+Kubernetes selectors map
 
 
 type: object
@@ -9552,7 +14712,7 @@ type: keyword
 *`kubernetes.container.name`*::
 +
 --
-Kubernetes container name
+Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
@@ -9565,7 +14725,9 @@ type: keyword
 Kubernetes container image
 
 
-type: keyword
+type: alias
+
+alias to: container.image.name
 
 --
 
@@ -9583,6 +14745,39 @@ Process metadata fields
 type: alias
 
 alias to: process.executable
+
+--
+
+[float]
+=== owner
+
+Process owner information.
+
+
+*`process.owner.id`*::
++
+--
+Unique identifier of the user.
+
+type: keyword
+
+--
+
+*`process.owner.name`*::
++
+--
+Short name or login of the user.
+
+type: keyword
+
+example: albert
+
+--
+
+*`process.owner.name.text`*::
++
+--
+type: text
 
 --
 
@@ -9783,6 +14978,28 @@ type: integer
 
 --
 
+*`synthetics.step.status`*::
++
+--
+type: keyword
+
+--
+
+[float]
+=== duration
+
+Duration required to complete the step.
+
+
+*`synthetics.step.duration.us`*::
++
+--
+Duration in microseconds
+
+type: integer
+
+--
+
 
 *`synthetics.journey.name`*::
 +
@@ -9794,6 +15011,15 @@ type: text
 *`synthetics.journey.id`*::
 +
 --
+type: keyword
+
+--
+
+*`synthetics.journey.tags`*::
++
+--
+Tags used for grouping journeys
+
 type: keyword
 
 --
@@ -9817,6 +15043,169 @@ type: text
 +
 --
 type: text
+
+--
+
+
+*`synthetics.screenshot_ref.width`*::
++
+--
+Width of the full screenshot in pixels.
+
+type: integer
+
+--
+
+*`synthetics.screenshot_ref.height`*::
++
+--
+Height of the full screenshot in pixels
+
+type: integer
+
+--
+
+[float]
+=== blocks
+
+Attributes representing individual screenshot blocks. Only hash is indexed since it's the only one we'd query on.
+
+
+*`synthetics.screenshot_ref.blocks.hash`*::
++
+--
+Hash that uniquely identifies this image by content. Corresponds to block document id.
+
+type: keyword
+
+--
+
+
+[float]
+=== experience
+
+Absolute values of all user experience metrics in the browser relative to the navigation start event in microseconds
+
+
+
+[float]
+=== fcp
+
+duration of First contentful paint metric
+
+
+*`synthetics.browser.experience.fcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== lcp
+
+duration of Largest contentful paint metric
+
+
+*`synthetics.browser.experience.lcp.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== dcl
+
+duration of Document content loaded end event
+
+
+*`synthetics.browser.experience.dcl.us`*::
++
+--
+type: integer
+
+--
+
+[float]
+=== load
+
+duration of Load end event
+
+
+*`synthetics.browser.experience.load.duration`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.experience.cls`*::
++
+--
+culumative layout shift score across all frames
+
+type: integer
+
+--
+
+[float]
+=== relative_trace
+
+trace event with timing information that are realtive to journey timings in microseconds
+
+
+
+*`synthetics.browser.relative_trace.name`*::
++
+--
+name of the trace event
+
+type: keyword
+
+--
+
+*`synthetics.browser.relative_trace.type`*::
++
+--
+could be one of mark or measure event types
+
+type: text
+
+--
+
+[float]
+=== start
+
+monotonically increasing trace start time in microseconds
+
+
+*`synthetics.browser.relative_trace.start.us`*::
++
+--
+type: long
+
+--
+
+[float]
+=== duration
+
+duration of the trace event in microseconds.
+
+
+*`synthetics.browser.relative_trace.duration.us`*::
++
+--
+type: integer
+
+--
+
+*`synthetics.browser.relative_trace.score`*::
++
+--
+weighted score of the layout shift event
+
+type: integer
 
 --
 

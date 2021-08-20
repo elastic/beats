@@ -11,7 +11,7 @@
         Fields from the threatintel Filebeat module.
       fields:
         - name: indicator.first_seen
-          type: keyword
+          type: date
           description: >
             The date and time when intelligence source first reported sighting this indicator.
         - name: indicator.last_seen
@@ -162,31 +162,36 @@
         - name: indicator.geo
           type: group
           fields:
-          - name: geo.city_name
+          - name: city_name
             type: keyword
             ignore_above: 1024
             description: City name.
             example: Montreal
-          - name: geo.country_iso_code
+          - name: continent_name
+            type: keyword
+            ignore_above: 1024
+            description: Name of the continent.
+            example: North America
+          - name: country_iso_code
             type: keyword
             ignore_above: 1024
             description: Country ISO code.
             example: CA
-          - name: geo.country_name
+          - name: country_name
             type: keyword
             ignore_above: 1024
             description: Country name.
             example: Canada
-          - name: geo.location
+          - name: location
             type: geo_point
             description: Longitude and latitude.
             example: '{ "lon": -73.614830, "lat": 45.505918 }'
-          - name: geo.region_iso_code
+          - name: region_iso_code
             type: keyword
             ignore_above: 1024
             description: Region ISO code.
             example: CA-QC
-          - name: geo.region_name
+          - name: region_name
             type: keyword
             ignore_above: 1024
             description: Region name.
@@ -225,6 +230,10 @@
               type: keyword
               description: >
                 The file's sha256 hash, if available.
+            - name: sha384
+              type: keyword
+              description: >
+                The file's sha384 hash, if available.
             - name: sha512
               type: keyword
               description: >
@@ -233,15 +242,23 @@
             type: keyword
             ignore_above: 1024
             description: >
-              The file type
+              The file type.
           - name: size
             type: long
             description: >
-              The file's total size
+              The file's total size.
           - name: name
             type: keyword
             description: >
-              The file's name
+              The file's name.
+          - name: extension
+            type: keyword
+            description: >
+              The file's extension.
+          - name: mime_type
+            type: keyword
+            description: >
+              The file's MIME type.
         - name: indicator.url
           type: group
           fields:
@@ -363,3 +380,7 @@
               authority and certificate type but commonly contain IP addresses, DNS names
               (and wildcards), and email addresses.
             example: '*.elastic.co'
+        - name: indicator.signature
+          type: keyword
+          description: >
+            Malware family of sample (if available).

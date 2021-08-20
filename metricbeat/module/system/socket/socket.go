@@ -24,7 +24,6 @@ import (
 	"net"
 	"os"
 	"os/user"
-	"path/filepath"
 	"strconv"
 	"syscall"
 
@@ -32,10 +31,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 	"github.com/elastic/gosigar/sys/linux"
 )
 
@@ -50,6 +49,10 @@ func init() {
 	)
 }
 
+// MetricSet holds any configuration or state information. It must implement
+// the mb.MetricSet interface. And this is best achieved by embedding
+// mb.BaseMetricSet because it implements all of the required mb.MetricSet
+// interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
 	netlink       *sock.NetlinkSession
@@ -62,18 +65,15 @@ type MetricSet struct {
 	users         UserCache
 }
 
+// New creates a new instance of the MetricSet. New is responsible for unpacking
+// any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	c := defaultConfig
 	if err := base.Module().UnpackConfig(&c); err != nil {
 		return nil, err
 	}
 
-	systemModule, ok := base.Module().(*system.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
-
-	ptable, err := sock.NewProcTable(filepath.Join(systemModule.HostFS, "/proc"))
+	ptable, err := sock.NewProcTable(paths.Resolve(paths.Hostfs, "/proc"))
 	if err != nil {
 		return nil, err
 	}

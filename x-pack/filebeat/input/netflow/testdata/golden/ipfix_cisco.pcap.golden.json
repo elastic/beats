@@ -23,7 +23,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -110,7 +110,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -197,7 +197,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACCA==",
@@ -284,7 +284,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -371,7 +371,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -458,7 +458,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -545,7 +545,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -632,7 +632,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -719,7 +719,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -806,7 +806,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAMQ==",
@@ -893,7 +893,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -980,7 +980,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -1067,7 +1067,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACCA==",
@@ -1154,7 +1154,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1241,7 +1241,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1328,7 +1328,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQAAAQ==",
@@ -1415,7 +1415,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1502,7 +1502,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -1589,7 +1589,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -1676,7 +1676,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACZg==",
@@ -1763,7 +1763,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",
@@ -1850,7 +1850,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAFmQ==",
@@ -1937,7 +1937,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAAUA==",
@@ -2024,7 +2024,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2111,7 +2111,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "AwAFmQ==",
@@ -2198,7 +2198,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2285,7 +2285,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2372,7 +2372,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQABxQ==",
@@ -2459,7 +2459,7 @@
         },
         "flow": {
           "id": "Vhs9T5k296w",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "application_id": "DQACYw==",

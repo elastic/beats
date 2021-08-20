@@ -4,11 +4,19 @@
     S3 fields from s3 input.
   release: ga
   fields:
-    - name: bucket_name
+    - name: bucket.name
       type: keyword
       description: >
         Name of the S3 bucket that this log retrieved from.
-    - name: object_key
+    - name: bucket.arn
+      type: keyword
+      description: >
+        ARN of the S3 bucket that this log retrieved from.
+    - name: object.key
       type: keyword
       description: >
         Name of the S3 object that this log retrieved from.
+    - name: metadata
+      type: flattened
+      description:
+        AWS S3 object metadata values.

@@ -19,11 +19,9 @@ package eslegclient
 
 import (
 	"fmt"
-	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
 type config struct {
@@ -33,45 +31,33 @@ type config struct {
 	Params   map[string]string `config:"parameters"`
 	Headers  map[string]string `config:"headers"`
 
-	TLS      *tlscommon.Config `config:"ssl"`
-	Kerberos *kerberos.Config  `config:"kerberos"`
-
-	ProxyURL     string `config:"proxy_url"`
-	ProxyDisable bool   `config:"proxy_disable"`
+	Kerberos *kerberos.Config `config:"kerberos"`
 
 	Username string `config:"username"`
 	Password string `config:"password"`
 	APIKey   string `config:"api_key"`
 
-	CompressionLevel int           `config:"compression_level" validate:"min=0, max=9"`
-	EscapeHTML       bool          `config:"escape_html"`
-	Timeout          time.Duration `config:"timeout"`
+	CompressionLevel int  `config:"compression_level" validate:"min=0, max=9"`
+	EscapeHTML       bool `config:"escape_html"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 func defaultConfig() config {
 	return config{
 		Protocol:         "",
 		Path:             "",
-		ProxyURL:         "",
-		ProxyDisable:     false,
 		Params:           nil,
 		Username:         "",
 		Password:         "",
 		APIKey:           "",
-		Timeout:          90 * time.Second,
 		CompressionLevel: 0,
 		EscapeHTML:       false,
-		TLS:              nil,
+		Transport:        httpcommon.DefaultHTTPTransportSettings(),
 	}
 }
 
 func (c *config) Validate() error {
-	if c.ProxyURL != "" && !c.ProxyDisable {
-		if _, err := common.ParseURL(c.ProxyURL); err != nil {
-			return err
-		}
-	}
-
 	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
 		return fmt.Errorf("cannot set both api_key and username/password")
 	}

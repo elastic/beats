@@ -1,0 +1,193 @@
+[
+    {
+        "@timestamp": "2021-03-04T17:27:14.000Z",
+        "cyberarkpas.audit.action": "Logon",
+        "cyberarkpas.audit.desc": "Logon",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-04T17:27:14Z",
+        "cyberarkpas.audit.issuer": "PVWAGWUser",
+        "cyberarkpas.audit.message": "Logon",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 04 09:27:14",
+        "event.action": "authentication_success",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.code": "7",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "success",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAGWUser"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "PVWAGWUser"
+    },
+    {
+        "@timestamp": "2021-03-04T17:27:21.000Z",
+        "cyberarkpas.audit.action": "Logon",
+        "cyberarkpas.audit.desc": "Logon",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-04T17:27:21Z",
+        "cyberarkpas.audit.issuer": "PasswordManager",
+        "cyberarkpas.audit.message": "Logon",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 04 09:27:21",
+        "event.action": "authentication_success",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.code": "7",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "success",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 534,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "related.user": [
+            "PasswordManager"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "PasswordManager"
+    },
+    {
+        "@timestamp": "2021-03-04T17:27:21.000Z",
+        "cyberarkpas.audit.action": "Retrieve File",
+        "cyberarkpas.audit.desc": "Retrieve File",
+        "cyberarkpas.audit.file": "Root\\Policies\\Policy-GenericWebApp.ini",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-04T17:27:21Z",
+        "cyberarkpas.audit.issuer": "PasswordManager",
+        "cyberarkpas.audit.message": "Retrieve File",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.safe": "PasswordManagerShared",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 04 09:27:21",
+        "event.action": "retrieve file",
+        "event.code": "51",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\Policies\\Policy-GenericWebApp.ini",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 1073,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2021-03-04T17:27:33.000Z",
+        "cyberarkpas.audit.action": "Logon",
+        "cyberarkpas.audit.desc": "Logon",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-04T17:27:33Z",
+        "cyberarkpas.audit.issuer": "PVWAAppUser",
+        "cyberarkpas.audit.message": "Logon",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "cyberarkpas.audit.timestamp": "Mar 04 09:27:33",
+        "event.action": "authentication_success",
+        "event.category": [
+            "authentication",
+            "session"
+        ],
+        "event.code": "7",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "success",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "start"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 1698,
+        "log.syslog.priority": "5",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "related.user": [
+            "PVWAAppUser"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "PVWAAppUser"
+    }
+]

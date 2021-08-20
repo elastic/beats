@@ -169,8 +169,8 @@
         "network.transport": "tcp",
         "network.type": "ipv6",
         "related.ip": [
-            "2001:DB8::3",
-            "2001:DB8:1000::1"
+            "2001:DB8:1000::1",
+            "2001:DB8::3"
         ],
         "service.type": "cisco",
         "source.address": "2001:DB8::3",
@@ -364,8 +364,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -862,8 +862,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1057,8 +1057,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1205,8 +1205,8 @@
         "network.transport": "udp",
         "network.type": "ipv4",
         "related.ip": [
-            "8.8.8.8",
-            "198.51.100.195"
+            "198.51.100.195",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
@@ -1281,8 +1281,8 @@
         "network.transport": "icmp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "198.51.100.1"
+            "198.51.100.1",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1334,8 +1334,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",
@@ -1576,8 +1576,8 @@
         "network.transport": "tcp",
         "network.type": "ipv4",
         "related.ip": [
-            "198.51.100.12",
-            "172.217.10.46"
+            "172.217.10.46",
+            "198.51.100.12"
         ],
         "service.type": "cisco",
         "source.address": "198.51.100.12",

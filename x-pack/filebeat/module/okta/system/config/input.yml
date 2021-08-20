@@ -12,6 +12,11 @@ request.ssl: {{ .ssl | tojson }}
 request.timeout: {{ .http_client_timeout }}
 {{ end }}
 
+
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
 request.method: GET
 request.url: {{ .url }}
 request.rate_limit:
@@ -31,6 +36,7 @@ response.pagination:
   - set:
       target: url.value
       value: '[[ getRFC5988Link "next" .last_response.header.Link ]]'
+      fail_on_template_error: true
 
 cursor:
   published:
@@ -63,4 +69,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.8.0
+        ecs.version: 1.11.0

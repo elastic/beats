@@ -14,8 +14,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPAbcdefyZslakjflP",
         "zoom.zoomroom.alert_kind": 1,
@@ -42,8 +42,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "EPAbcdefyZslakjflP",
         "zoom.zoomroom.alert_kind": 1,
@@ -74,8 +74,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "vhdnmf673q2543rfhgsca",
         "zoom.zoomroom.calendar_id": "mytestemailaddress123444@zoom.us",
@@ -106,8 +106,8 @@
         "observer.vendor": "Zoom",
         "service.type": "zoom",
         "tags": [
-            "zoom-webhook",
-            "forwarded"
+            "forwarded",
+            "zoom-webhook"
         ],
         "zoom.account_id": "vhdnmf673q2543rfhgsca",
         "zoom.zoomroom.calendar_id": "mytestemailaddress123444@zoom.us",

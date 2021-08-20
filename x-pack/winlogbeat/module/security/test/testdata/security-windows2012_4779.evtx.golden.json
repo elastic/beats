@@ -7,7 +7,7 @@
         "authentication",
         "session"
       ],
-      "code": 4779,
+      "code": "4779",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -46,7 +46,7 @@
         "LogonID": "0x60d1ccb",
         "SessionName": "RDP-Tcp#116"
       },
-      "event_id": 4779,
+      "event_id": "4779",
       "keywords": [
         "Audit Success"
       ],

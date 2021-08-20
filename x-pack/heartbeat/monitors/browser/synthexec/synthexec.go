@@ -26,16 +26,21 @@ import (
 
 const debugSelector = "synthexec"
 
+type FilterJourneyConfig struct {
+	Tags  []string `config:"tags"`
+	Match string   `config:"match"`
+}
+
 // SuiteJob will run a single journey by name from the given suite.
-func SuiteJob(ctx context.Context, suitePath string, params common.MapStr) (jobs.Job, error) {
+func SuiteJob(ctx context.Context, suitePath string, params common.MapStr, filterJourneys FilterJourneyConfig, extraArgs ...string) (jobs.Job, error) {
 	// Run the command in the given suitePath, use '.' as the first arg since the command runs
 	// in the correct dir
-	newCmd, err := suiteCommandFactory(suitePath, ".", "--screenshots")
+	cmdFactory, err := suiteCommandFactory(suitePath, extraArgs...)
 	if err != nil {
 		return nil, err
 	}
 
-	return startCmdJob(ctx, newCmd, nil, params), nil
+	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys), nil
 }
 
 func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, error) {
@@ -46,7 +51,11 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 
 	newCmd := func() *exec.Cmd {
 		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
-		cmd := exec.Command(bin, args...)
+		// Always put the suite path first to prevent conflation with variadic args!
+		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
+		// Note, we don't use the -- approach because it's cleaner to always know we can add new options
+		// to the end.
+		cmd := exec.Command(bin, append([]string{suitePath}, args...)...)
 		cmd.Dir = npmRoot
 		return cmd
 	}
@@ -55,20 +64,20 @@ func suiteCommandFactory(suitePath string, args ...string) (func() *exec.Cmd, er
 }
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
-func InlineJourneyJob(ctx context.Context, script string, params common.MapStr) jobs.Job {
+func InlineJourneyJob(ctx context.Context, script string, params common.MapStr, extraArgs ...string) jobs.Job {
 	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", "--inline", "--screenshots")
+		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)
 	}
 
-	return startCmdJob(ctx, newCmd, &script, params)
+	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{})
 }
 
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params common.MapStr, filterJourneys FilterJourneyConfig) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
-		mpx, err := runCmd(ctx, newCmd(), stdinStr, params)
+		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
 		if err != nil {
 			return nil, err
 		}
@@ -100,6 +109,7 @@ func runCmd(
 	cmd *exec.Cmd,
 	stdinStr *string,
 	params common.MapStr,
+	filterJourneys FilterJourneyConfig,
 ) (mpx *ExecMultiplexer, err error) {
 	mpx = NewExecMultiplexer()
 	// Setup a pipe for JSON structured output
@@ -110,20 +120,27 @@ func runCmd(
 
 	// Common args
 	cmd.Env = append(os.Environ(), "NODE_ENV=production")
+	cmd.Args = append(cmd.Args, "--rich-events")
+
+	if len(params) > 0 {
+		paramsBytes, _ := json.Marshal(params)
+		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
+	}
+
+	if len(filterJourneys.Tags) > 0 {
+		cmd.Args = append(cmd.Args, "--tags", strings.Join(filterJourneys.Tags, " "))
+	}
+
+	if filterJourneys.Match != "" {
+		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
+	}
+
 	// We need to pass both files in here otherwise we get a broken pipe, even
 	// though node only touches the writer
 	cmd.ExtraFiles = []*os.File{jsonWriter, jsonReader}
-	cmd.Args = append(cmd.Args,
-		// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
-		// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
-		"--json",
-		"--network",
-		"--outfd", "3",
-	)
-	if len(params) > 0 {
-		paramsBytes, _ := json.Marshal(params)
-		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
-	}
+	// Out fd is always 3 since it's the only FD passed into cmd.ExtraFiles
+	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
+	cmd.Args = append(cmd.Args, "--outfd", "3")
 
 	logp.Info("Running command: %s in directory: '%s'", cmd.String(), cmd.Dir)
 
@@ -168,9 +185,6 @@ func runCmd(
 	// Close mpx after the process is done and all events have been sent / consumed
 	go func() {
 		err := cmd.Wait()
-		if err != nil {
-			logp.Err("Error waiting for command %s: %s", cmd.String(), err)
-		}
 		jsonWriter.Close()
 		jsonReader.Close()
 		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd.String())
@@ -244,6 +258,7 @@ func jsonToSynthEvent(bytes []byte, text string) (res *SynthEvent, err error) {
 
 	res = &SynthEvent{}
 	err = json.Unmarshal(bytes, res)
+
 	if err != nil {
 		return nil, err
 	}

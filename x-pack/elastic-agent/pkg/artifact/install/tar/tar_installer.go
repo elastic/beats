@@ -33,7 +33,7 @@ func NewInstaller(config *artifact.Config) (*Installer, error) {
 
 // Install performs installation of program in a specific version.
 // It expects package to be already downloaded.
-func (i *Installer) Install(_ context.Context, spec program.Spec, version, installDir string) error {
+func (i *Installer) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
 	artifactPath, err := artifact.GetArtifactPath(spec, version, i.config.OS(), i.config.Arch(), i.config.TargetDirectory)
 	if err != nil {
 		return err
@@ -53,10 +53,10 @@ func (i *Installer) Install(_ context.Context, spec program.Spec, version, insta
 
 	// unpack must occur in directory that holds the installation directory
 	// or the extraction will be double nested
-	return unpack(f, filepath.Dir(installDir))
+	return unpack(ctx, f, filepath.Dir(installDir))
 }
 
-func unpack(r io.Reader, dir string) error {
+func unpack(ctx context.Context, r io.Reader, dir string) error {
 	zr, err := gzip.NewReader(r)
 	if err != nil {
 		return errors.New("requires gzip-compressed body", err, errors.TypeFilesystem)
@@ -66,6 +66,11 @@ func unpack(r io.Reader, dir string) error {
 	var rootDir string
 
 	for {
+		// exit and propagate cancellation err as soon as we know about it
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+
 		f, err := tr.Next()
 		if err == io.EOF {
 			break

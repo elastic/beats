@@ -16,6 +16,7 @@ import (
 )
 
 type SynthEvent struct {
+	Id                   string        `json:"_id"`
 	Type                 string        `json:"type"`
 	PackageVersion       string        `json:"package_version"`
 	Step                 *Step         `json:"step"`
@@ -27,18 +28,35 @@ type SynthEvent struct {
 	Error                *SynthError   `json:"error"`
 	URL                  string        `json:"url"`
 	Status               string        `json:"status"`
+	RootFields           common.MapStr `json:"root_fields"`
 	index                int
 }
 
 func (se SynthEvent) ToMap() (m common.MapStr) {
 	// We don't add @timestamp to the map string since that's specially handled in beat.Event
-	m = common.MapStr{
+	// Use the root fields as a base, and layer additional, stricter, fields on top
+	if se.RootFields != nil {
+		m = se.RootFields
+		// We handle url specially since it can be passed as a string,
+		// but expanded to match ECS
+		if urlStr, ok := m["url"].(string); ok {
+			if se.URL == "" {
+				se.URL = urlStr
+			}
+		}
+	} else {
+		m = common.MapStr{}
+	}
+
+	m.DeepUpdate(common.MapStr{
 		"synthetics": common.MapStr{
 			"type":            se.Type,
 			"package_version": se.PackageVersion,
-			"payload":         se.Payload,
 			"index":           se.index,
 		},
+	})
+	if len(se.Payload) > 0 {
+		m.Put("synthetics.payload", se.Payload)
 	}
 	if se.Blob != "" {
 		m.Put("synthetics.blob", se.Blob)
@@ -61,7 +79,7 @@ func (se SynthEvent) ToMap() (m common.MapStr) {
 		if e != nil {
 			logp.Warn("Could not parse synthetics URL '%s': %s", se.URL, e.Error())
 		} else {
-			m["url"] = wrappers.URLFields(u)
+			m.Put("url", wrappers.URLFields(u))
 		}
 	}
 
@@ -94,26 +112,56 @@ func (se *SynthError) toMap() common.MapStr {
 	}
 }
 
+type DurationUs struct {
+	Micros int64 `json:"us"`
+}
+
+func (tu *DurationUs) durationMicros() int64 {
+	return tu.Micros
+}
+
+func (tu *DurationUs) ToMap() common.MapStr {
+	if tu == nil {
+		return nil
+	}
+	return common.MapStr{
+		"us": tu.durationMicros(),
+	}
+}
+
 type Step struct {
-	Name  string `json:"name"`
-	Index int    `json:"index"`
+	Name     string     `json:"name"`
+	Index    int        `json:"index"`
+	Status   string     `json:"status"`
+	Duration DurationUs `json:"duration"`
 }
 
 func (s *Step) ToMap() common.MapStr {
 	return common.MapStr{
-		"name":  s.Name,
-		"index": s.Index,
+		"name":     s.Name,
+		"index":    s.Index,
+		"status":   s.Status,
+		"duration": s.Duration.ToMap(),
 	}
 }
 
 type Journey struct {
-	Name string `json:"name"`
-	Id   string `json:"id"`
+	Name string   `json:"name"`
+	Id   string   `json:"id"`
+	Tags []string `json:"tags"`
 }
 
 func (j Journey) ToMap() common.MapStr {
+	if len(j.Tags) > 0 {
+		return common.MapStr{
+			"name": j.Name,
+			"id":   j.Id,
+			"tags": j.Tags,
+		}
+	}
 	return common.MapStr{
 		"name": j.Name,
 		"id":   j.Id,
 	}
+
 }

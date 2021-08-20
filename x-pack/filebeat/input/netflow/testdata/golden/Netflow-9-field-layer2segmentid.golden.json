@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "80.82.237.40",
-          "locality": "public",
+          "locality": "external",
           "port": 445
         },
         "event": {
@@ -26,7 +26,7 @@
         },
         "flow": {
           "id": "tS3zN7t_rFg",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "80.82.237.40",
@@ -75,7 +75,7 @@
         "source": {
           "bytes": 52,
           "ip": "192.168.200.136",
-          "locality": "private",
+          "locality": "internal",
           "packets": 1,
           "port": 61926
         }

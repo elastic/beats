@@ -22,7 +22,7 @@ func registerResponseTransforms() {
 }
 
 type response struct {
-	page   int
+	page   int64
 	url    url.URL
 	header http.Header
 	body   interface{}
@@ -118,14 +118,20 @@ func (rp *responseProcessor) startProcessing(stdCtx context.Context, trCtx *tran
 				}
 
 				if err := rp.split.run(trCtx, tr, ch); err != nil {
-					if err == errEmptyField {
+					switch err {
+					case errEmptyField:
 						// nothing else to send for this page
 						rp.log.Debug("split operation finished")
 						continue
+					case errEmptyRootField:
+						// root field not found, most likely the response is empty
+						rp.log.Debug(err)
+						return
+					default:
+						rp.log.Debug("split operation failed")
+						ch <- maybeMsg{err: err}
+						return
 					}
-					rp.log.Debug("split operation failed")
-					ch <- maybeMsg{err: err}
-					return
 				}
 			}
 		}
@@ -169,10 +175,10 @@ func (resp *response) templateValues() common.MapStr {
 		return common.MapStr{}
 	}
 	return common.MapStr{
-		"header":    resp.header.Clone(),
-		"page":      resp.page,
-		"url.value": resp.url.String(),
-		"params":    resp.url.Query(),
-		"body":      resp.body,
+		"header":     resp.header.Clone(),
+		"page":       resp.page,
+		"url.value":  resp.url.String(),
+		"url.params": resp.url.Query(),
+		"body":       resp.body,
 	}
 }

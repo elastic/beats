@@ -32,10 +32,6 @@ file to listen for firewall logs sent from the Pensando DSC(s) on port 5514 (def
 
 include::../include/config-option-intro.asciidoc[]
 
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
-
 [float]
 ==== `dfw` log fileset settings
 

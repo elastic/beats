@@ -19,18 +19,22 @@ var errNewURLValueNotSet = errors.New("the new url.value was not set")
 const setName = "set"
 
 type setConfig struct {
-	Target  string    `config:"target"`
-	Value   *valueTpl `config:"value"`
-	Default *valueTpl `config:"default"`
+	Target              string    `config:"target"`
+	Value               *valueTpl `config:"value"`
+	Default             *valueTpl `config:"default"`
+	FailOnTemplateError bool      `config:"fail_on_template_error"`
+	ValueType           string    `config:"value_type"`
 }
 
 type set struct {
-	log          *logp.Logger
-	targetInfo   targetInfo
-	value        *valueTpl
-	defaultValue *valueTpl
+	log                 *logp.Logger
+	targetInfo          targetInfo
+	value               *valueTpl
+	defaultValue        *valueTpl
+	failOnTemplateError bool
+	valueType           valueType
 
-	runFunc func(ctx *transformContext, transformable transformable, key, val string) error
+	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
 }
 
 func (set) transformName() string { return setName }
@@ -104,63 +108,78 @@ func newSet(cfg *common.Config, log *logp.Logger) (set, error) {
 		return set{}, err
 	}
 
+	vt, err := newValueType(c.ValueType)
+	if err != nil {
+		return set{}, err
+	}
+
 	return set{
-		log:          log,
-		targetInfo:   ti,
-		value:        c.Value,
-		defaultValue: c.Default,
+		log:                 log,
+		targetInfo:          ti,
+		value:               c.Value,
+		defaultValue:        c.Default,
+		failOnTemplateError: c.FailOnTemplateError,
+		valueType:           vt,
 	}, nil
 }
 
 func (set *set) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value := set.value.Execute(ctx, tr, set.defaultValue, set.log)
-	if err := set.runFunc(ctx, tr, set.targetInfo.Name, value); err != nil {
+	value, err := set.value.Execute(ctx, tr, set.defaultValue, set.log)
+	if err != nil && set.failOnTemplateError {
+		return transformable{}, err
+	}
+	if value == "" {
+		return tr, nil
+	}
+	converted, err := set.valueType.convertToType(value)
+	if err != nil {
+		return transformable{}, fmt.Errorf("can't convert template value to %s: %w", set.valueType, err)
+	}
+	if err := set.runFunc(ctx, tr, set.targetInfo.Name, converted); err != nil {
 		return transformable{}, err
 	}
 	return tr, nil
 }
 
-func setToCommonMap(m common.MapStr, key, val string) error {
-	if val == "" {
-		return nil
-	}
+func setToCommonMap(m common.MapStr, key string, val interface{}) error {
 	if _, err := m.Put(key, val); err != nil {
 		return err
 	}
 	return nil
 }
 
-func setBody(ctx *transformContext, transformable transformable, key, value string) error {
+func setBody(ctx *transformContext, transformable transformable, key string, value interface{}) error {
 	return setToCommonMap(transformable.body(), key, value)
 }
 
-func setHeader(ctx *transformContext, transformable transformable, key, value string) error {
-	if value == "" {
-		return nil
+func setHeader(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+	v, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("headers can only contain string values, but got: %T", value)
 	}
-	transformable.header().Add(key, value)
+	transformable.header().Add(key, v)
 	return nil
 }
 
-func setURLParams(ctx *transformContext, transformable transformable, key, value string) error {
-	if value == "" {
-		return nil
+func setURLParams(ctx *transformContext, transformable transformable, key string, value interface{}) error {
+	v, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("URL params can only contain string values, but got: %T", value)
 	}
 	url := transformable.url()
 	q := url.Query()
-	q.Set(key, value)
+	q.Set(key, v)
 	url.RawQuery = q.Encode()
 	transformable.setURL(url)
 	return nil
 }
 
-func setURLValue(ctx *transformContext, transformable transformable, _, value string) error {
-	// if the template processing did not find any value
-	// we fail without parsing
-	if value == "<no value>" || value == "" {
-		return errNewURLValueNotSet
+func setURLValue(ctx *transformContext, transformable transformable, _ string, value interface{}) error {
+	v, ok := value.(string)
+	if !ok {
+		return fmt.Errorf("URL value can only contain string values, but got: %T", value)
 	}
-	url, err := url.Parse(value)
+	url, err := url.Parse(v)
 	if err != nil {
 		return errNewURLValueNotSet
 	}

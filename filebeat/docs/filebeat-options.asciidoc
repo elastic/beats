@@ -68,6 +68,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-docker>>
+* <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
@@ -86,6 +87,8 @@ You can configure {beatname_uc} to use the following inputs:
 include::multiline.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-aws-cloudwatch.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
@@ -114,8 +117,6 @@ include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
-
-include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
 

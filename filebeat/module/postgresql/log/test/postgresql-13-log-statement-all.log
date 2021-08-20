@@ -1,0 +1,235 @@
+2021-03-17 15:18:00.201 UTC [149] postgres@postgres LOG:  statement: CREATE DATABASE accounts;
+2021-03-17 15:18:00.631 UTC [149] postgres@postgres LOG:  duration: 430.394 ms
+2021-03-17 15:18:02.732 UTC [151] postgres@accounts LOG:  statement: drop table if exists pgbench_accounts, pgbench_branches, pgbench_history, pgbench_tellers
+2021-03-17 15:18:02.732 UTC [151] postgres@accounts LOG:  duration: 0.559 ms
+2021-03-17 15:18:02.732 UTC [151] postgres@accounts LOG:  statement: create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))
+2021-03-17 15:18:02.737 UTC [151] postgres@accounts LOG:  duration: 4.812 ms
+2021-03-17 15:18:02.738 UTC [151] postgres@accounts LOG:  statement: create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)
+2021-03-17 15:18:02.740 UTC [151] postgres@accounts LOG:  duration: 1.900 ms
+2021-03-17 15:18:02.740 UTC [151] postgres@accounts LOG:  statement: create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)
+2021-03-17 15:18:02.741 UTC [151] postgres@accounts LOG:  duration: 1.444 ms
+2021-03-17 15:18:02.741 UTC [151] postgres@accounts LOG:  statement: create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)
+2021-03-17 15:18:02.743 UTC [151] postgres@accounts LOG:  duration: 1.336 ms
+2021-03-17 15:18:02.743 UTC [151] postgres@accounts LOG:  statement: begin
+2021-03-17 15:18:02.743 UTC [151] postgres@accounts LOG:  duration: 0.068 ms
+2021-03-17 15:18:02.743 UTC [151] postgres@accounts LOG:  statement: truncate table pgbench_accounts, pgbench_branches, pgbench_history, pgbench_tellers
+2021-03-17 15:18:02.744 UTC [151] postgres@accounts LOG:  duration: 0.656 ms
+2021-03-17 15:18:02.744 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_branches(bid,bbalance) values(1,0)
+2021-03-17 15:18:02.744 UTC [151] postgres@accounts LOG:  duration: 0.538 ms
+2021-03-17 15:18:02.744 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)
+2021-03-17 15:18:02.745 UTC [151] postgres@accounts LOG:  duration: 0.304 ms
+2021-03-17 15:18:02.745 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  duration: 1.510 ms
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  duration: 0.094 ms
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  duration: 0.056 ms
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)
+2021-03-17 15:18:02.746 UTC [151] postgres@accounts LOG:  duration: 0.052 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (6,1,0)
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  duration: 0.051 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (7,1,0)
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  duration: 0.051 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (8,1,0)
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  duration: 0.050 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (9,1,0)
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  duration: 0.052 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (10,1,0)
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  duration: 0.052 ms
+2021-03-17 15:18:02.747 UTC [151] postgres@accounts LOG:  statement: copy pgbench_accounts from stdin
+2021-03-17 15:18:02.987 UTC [151] postgres@accounts LOG:  duration: 239.763 ms
+2021-03-17 15:18:02.987 UTC [151] postgres@accounts LOG:  statement: commit
+2021-03-17 15:18:03.054 UTC [151] postgres@accounts LOG:  duration: 67.302 ms
+2021-03-17 15:18:03.057 UTC [151] postgres@accounts LOG:  statement: vacuum analyze pgbench_branches
+2021-03-17 15:18:03.073 UTC [151] postgres@accounts LOG:  duration: 15.246 ms
+2021-03-17 15:18:03.073 UTC [151] postgres@accounts LOG:  statement: vacuum analyze pgbench_tellers
+2021-03-17 15:18:03.076 UTC [151] postgres@accounts LOG:  duration: 3.531 ms
+2021-03-17 15:18:03.077 UTC [151] postgres@accounts LOG:  statement: vacuum analyze pgbench_accounts
+2021-03-17 15:18:03.157 UTC [151] postgres@accounts LOG:  duration: 80.735 ms
+2021-03-17 15:18:03.158 UTC [151] postgres@accounts LOG:  statement: vacuum analyze pgbench_history
+2021-03-17 15:18:03.159 UTC [151] postgres@accounts LOG:  duration: 0.893 ms
+2021-03-17 15:18:03.159 UTC [151] postgres@accounts LOG:  statement: alter table pgbench_branches add primary key (bid)
+2021-03-17 15:18:03.165 UTC [151] postgres@accounts LOG:  duration: 5.266 ms
+2021-03-17 15:18:03.165 UTC [151] postgres@accounts LOG:  statement: alter table pgbench_tellers add primary key (tid)
+2021-03-17 15:18:03.168 UTC [151] postgres@accounts LOG:  duration: 2.807 ms
+2021-03-17 15:18:03.168 UTC [151] postgres@accounts LOG:  statement: alter table pgbench_accounts add primary key (aid)
+2021-03-17 15:18:03.249 UTC [151] postgres@accounts LOG:  duration: 81.593 ms
+2021-03-17 15:18:04.110 UTC [154] postgres@accounts LOG:  statement: drop table if exists pgbench_accounts, pgbench_branches, pgbench_history, pgbench_tellers
+2021-03-17 15:18:04.130 UTC [154] postgres@accounts LOG:  duration: 20.521 ms
+2021-03-17 15:18:04.132 UTC [154] postgres@accounts LOG:  statement: create table pgbench_history(tid int,bid int,aid    int,delta int,mtime timestamp,filler char(22))
+2021-03-17 15:18:04.143 UTC [154] postgres@accounts LOG:  duration: 11.098 ms
+2021-03-17 15:18:04.143 UTC [154] postgres@accounts LOG:  statement: create table pgbench_tellers(tid int not null,bid int,tbalance int,filler char(84)) with (fillfactor=100)
+2021-03-17 15:18:04.152 UTC [154] postgres@accounts LOG:  duration: 8.950 ms
+2021-03-17 15:18:04.152 UTC [154] postgres@accounts LOG:  statement: create table pgbench_accounts(aid    int not null,bid int,abalance int,filler char(84)) with (fillfactor=100)
+2021-03-17 15:18:04.156 UTC [154] postgres@accounts LOG:  duration: 4.302 ms
+2021-03-17 15:18:04.156 UTC [154] postgres@accounts LOG:  statement: create table pgbench_branches(bid int not null,bbalance int,filler char(88)) with (fillfactor=100)
+2021-03-17 15:18:04.163 UTC [154] postgres@accounts LOG:  duration: 6.999 ms
+2021-03-17 15:18:04.164 UTC [154] postgres@accounts LOG:  statement: begin
+2021-03-17 15:18:04.164 UTC [154] postgres@accounts LOG:  duration: 0.075 ms
+2021-03-17 15:18:04.164 UTC [154] postgres@accounts LOG:  statement: truncate table pgbench_accounts, pgbench_branches, pgbench_history, pgbench_tellers
+2021-03-17 15:18:04.164 UTC [154] postgres@accounts LOG:  duration: 0.676 ms
+2021-03-17 15:18:04.164 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_branches(bid,bbalance) values(1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.247 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (1,1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.164 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (2,1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.080 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (3,1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.077 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (4,1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.075 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (5,1,0)
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  duration: 0.074 ms
+2021-03-17 15:18:04.165 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (6,1,0)
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  duration: 0.071 ms
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (7,1,0)
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  duration: 0.071 ms
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (8,1,0)
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  duration: 0.069 ms
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (9,1,0)
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  duration: 0.071 ms
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  statement: insert into pgbench_tellers(tid,bid,tbalance) values (10,1,0)
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  duration: 0.072 ms
+2021-03-17 15:18:04.166 UTC [154] postgres@accounts LOG:  statement: copy pgbench_accounts from stdin
+2021-03-17 15:18:04.355 UTC [154] postgres@accounts LOG:  duration: 188.620 ms
+2021-03-17 15:18:04.355 UTC [154] postgres@accounts LOG:  statement: commit
+2021-03-17 15:18:04.366 UTC [154] postgres@accounts LOG:  duration: 11.135 ms
+2021-03-17 15:18:04.366 UTC [154] postgres@accounts LOG:  statement: vacuum analyze pgbench_branches
+2021-03-17 15:18:04.383 UTC [154] postgres@accounts LOG:  duration: 16.594 ms
+2021-03-17 15:18:04.383 UTC [154] postgres@accounts LOG:  statement: vacuum analyze pgbench_tellers
+2021-03-17 15:18:04.386 UTC [154] postgres@accounts LOG:  duration: 3.410 ms
+2021-03-17 15:18:04.386 UTC [154] postgres@accounts LOG:  statement: vacuum analyze pgbench_accounts
+2021-03-17 15:18:04.466 UTC [154] postgres@accounts LOG:  duration: 79.842 ms
+2021-03-17 15:18:04.466 UTC [154] postgres@accounts LOG:  statement: vacuum analyze pgbench_history
+2021-03-17 15:18:04.467 UTC [154] postgres@accounts LOG:  duration: 0.907 ms
+2021-03-17 15:18:04.468 UTC [154] postgres@accounts LOG:  statement: alter table pgbench_branches add primary key (bid)
+2021-03-17 15:18:04.471 UTC [154] postgres@accounts LOG:  duration: 3.192 ms
+2021-03-17 15:18:04.471 UTC [154] postgres@accounts LOG:  statement: alter table pgbench_tellers add primary key (tid)
+2021-03-17 15:18:04.473 UTC [154] postgres@accounts LOG:  duration: 2.332 ms
+2021-03-17 15:18:04.473 UTC [154] postgres@accounts LOG:  statement: alter table pgbench_accounts add primary key (aid)
+2021-03-17 15:18:04.545 UTC [154] postgres@accounts LOG:  duration: 71.641 ms
+2021-03-17 15:18:05.633 UTC [170] postgres@postgres LOG:  statement: SELECT d.datname as "Name",
+	       pg_catalog.pg_get_userbyid(d.datdba) as "Owner",
+	       pg_catalog.pg_encoding_to_char(d.encoding) as "Encoding",
+	       d.datcollate as "Collate",
+	       d.datctype as "Ctype",
+	       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges"
+	FROM pg_catalog.pg_database d
+	ORDER BY 1;
+2021-03-17 15:18:05.634 UTC [170] postgres@postgres LOG:  duration: 1.095 ms
+2021-03-17 15:18:15.868 UTC [185] postgres@postgres LOG:  statement: SELECT d.datname as "Name",
+	       pg_catalog.pg_get_userbyid(d.datdba) as "Owner",
+	       pg_catalog.pg_encoding_to_char(d.encoding) as "Encoding",
+	       d.datcollate as "Collate",
+	       d.datctype as "Ctype",
+	       pg_catalog.array_to_string(d.datacl, E'\n') AS "Access privileges"
+	FROM pg_catalog.pg_database d
+	ORDER BY 1;
+2021-03-17 15:18:15.869 UTC [185] postgres@postgres LOG:  duration: 1.125 ms
+2021-03-17 15:18:18.861 UTC [187] postgres@accounts LOG:  statement: select count(*) from pgbench_branches
+2021-03-17 15:18:18.863 UTC [187] postgres@accounts LOG:  duration: 1.694 ms
+2021-03-17 15:18:18.863 UTC [187] postgres@accounts LOG:  statement: select o.n, p.partstrat, pg_catalog.count(i.inhparent) from pg_catalog.pg_class as c join pg_catalog.pg_namespace as n on (n.oid = c.relnamespace) cross join lateral (select pg_catalog.array_position(pg_catalog.current_schemas(true), n.nspname)) as o(n) left join pg_catalog.pg_partitioned_table as p on (p.partrelid = c.oid) left join pg_catalog.pg_inherits as i on (c.oid = i.inhparent) where c.relname = 'pgbench_accounts' and o.n is not null group by 1, 2 order by 1 asc limit 1
+2021-03-17 15:18:18.867 UTC [187] postgres@accounts LOG:  duration: 4.281 ms
+2021-03-17 15:18:18.868 UTC [187] postgres@accounts LOG:  statement: vacuum pgbench_branches
+2021-03-17 15:18:18.882 UTC [187] postgres@accounts LOG:  duration: 13.791 ms
+2021-03-17 15:18:18.883 UTC [187] postgres@accounts LOG:  statement: vacuum pgbench_tellers
+2021-03-17 15:18:18.884 UTC [187] postgres@accounts LOG:  duration: 1.842 ms
+2021-03-17 15:18:18.886 UTC [187] postgres@accounts LOG:  statement: truncate pgbench_history
+2021-03-17 15:18:18.897 UTC [187] postgres@accounts LOG:  duration: 11.270 ms
+2021-03-17 15:18:19.012 UTC [188] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:19.012 UTC [188] postgres@accounts LOG:  duration: 5.739 ms
+2021-03-17 15:18:19.012 UTC [188] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + 1113 WHERE aid = 92718;
+2021-03-17 15:18:19.016 UTC [188] postgres@accounts LOG:  duration: 3.784 ms
+2021-03-17 15:18:19.021 UTC [188] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 92718;
+2021-03-17 15:18:19.021 UTC [188] postgres@accounts LOG:  duration: 0.372 ms
+2021-03-17 15:18:19.021 UTC [188] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + 1113 WHERE tid = 2;
+2021-03-17 15:18:19.022 UTC [188] postgres@accounts LOG:  duration: 0.902 ms
+2021-03-17 15:18:19.022 UTC [188] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + 1113 WHERE bid = 1;
+2021-03-17 15:18:19.023 UTC [188] postgres@accounts LOG:  duration: 0.407 ms
+2021-03-17 15:18:19.023 UTC [188] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (2, 1, 92718, 1113, CURRENT_TIMESTAMP);
+2021-03-17 15:18:19.023 UTC [188] postgres@accounts LOG:  duration: 0.384 ms
+2021-03-17 15:18:19.023 UTC [188] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:19.025 UTC [188] postgres@accounts LOG:  duration: 1.814 ms
+2021-03-17 15:18:19.600 UTC [189] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:19.600 UTC [189] postgres@accounts LOG:  duration: 0.267 ms
+2021-03-17 15:18:19.600 UTC [189] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + 4043 WHERE aid = 81209;
+2021-03-17 15:18:19.602 UTC [189] postgres@accounts LOG:  duration: 2.114 ms
+2021-03-17 15:18:19.602 UTC [189] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 81209;
+2021-03-17 15:18:19.603 UTC [189] postgres@accounts LOG:  duration: 0.261 ms
+2021-03-17 15:18:19.603 UTC [189] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + 4043 WHERE tid = 7;
+2021-03-17 15:18:19.603 UTC [189] postgres@accounts LOG:  duration: 0.728 ms
+2021-03-17 15:18:19.604 UTC [189] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + 4043 WHERE bid = 1;
+2021-03-17 15:18:19.604 UTC [189] postgres@accounts LOG:  duration: 0.699 ms
+2021-03-17 15:18:19.605 UTC [189] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (7, 1, 81209, 4043, CURRENT_TIMESTAMP);
+2021-03-17 15:18:19.605 UTC [189] postgres@accounts LOG:  duration: 0.518 ms
+2021-03-17 15:18:19.605 UTC [189] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:19.610 UTC [189] postgres@accounts LOG:  duration: 4.495 ms
+2021-03-17 15:18:20.137 UTC [190] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:20.137 UTC [190] postgres@accounts LOG:  duration: 0.141 ms
+2021-03-17 15:18:20.137 UTC [190] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + 1240 WHERE aid = 12035;
+2021-03-17 15:18:20.138 UTC [190] postgres@accounts LOG:  duration: 0.953 ms
+2021-03-17 15:18:20.138 UTC [190] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 12035;
+2021-03-17 15:18:20.138 UTC [190] postgres@accounts LOG:  duration: 0.120 ms
+2021-03-17 15:18:20.138 UTC [190] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + 1240 WHERE tid = 10;
+2021-03-17 15:18:20.138 UTC [190] postgres@accounts LOG:  duration: 0.256 ms
+2021-03-17 15:18:20.139 UTC [190] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + 1240 WHERE bid = 1;
+2021-03-17 15:18:20.139 UTC [190] postgres@accounts LOG:  duration: 0.214 ms
+2021-03-17 15:18:20.139 UTC [190] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (10, 1, 12035, 1240, CURRENT_TIMESTAMP);
+2021-03-17 15:18:20.139 UTC [190] postgres@accounts LOG:  duration: 0.191 ms
+2021-03-17 15:18:20.139 UTC [190] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:20.140 UTC [190] postgres@accounts LOG:  duration: 0.874 ms
+2021-03-17 15:18:21.461 UTC [191] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:21.461 UTC [191] postgres@accounts LOG:  duration: 0.282 ms
+2021-03-17 15:18:21.461 UTC [191] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + -3890 WHERE aid = 82888;
+2021-03-17 15:18:21.464 UTC [191] postgres@accounts LOG:  duration: 2.364 ms
+2021-03-17 15:18:21.464 UTC [191] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 82888;
+2021-03-17 15:18:21.464 UTC [191] postgres@accounts LOG:  duration: 0.339 ms
+2021-03-17 15:18:21.464 UTC [191] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + -3890 WHERE tid = 2;
+2021-03-17 15:18:21.465 UTC [191] postgres@accounts LOG:  duration: 0.716 ms
+2021-03-17 15:18:21.465 UTC [191] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + -3890 WHERE bid = 1;
+2021-03-17 15:18:21.466 UTC [191] postgres@accounts LOG:  duration: 0.644 ms
+2021-03-17 15:18:21.466 UTC [191] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (2, 1, 82888, -3890, CURRENT_TIMESTAMP);
+2021-03-17 15:18:21.466 UTC [191] postgres@accounts LOG:  duration: 0.537 ms
+2021-03-17 15:18:21.467 UTC [191] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:21.469 UTC [191] postgres@accounts LOG:  duration: 2.604 ms
+2021-03-17 15:18:21.551 UTC [192] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:21.551 UTC [192] postgres@accounts LOG:  duration: 0.676 ms
+2021-03-17 15:18:21.552 UTC [192] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + 2966 WHERE aid = 21833;
+2021-03-17 15:18:21.554 UTC [192] postgres@accounts LOG:  duration: 2.755 ms
+2021-03-17 15:18:21.555 UTC [192] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 21833;
+2021-03-17 15:18:21.555 UTC [192] postgres@accounts LOG:  duration: 0.329 ms
+2021-03-17 15:18:21.555 UTC [192] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + 2966 WHERE tid = 9;
+2021-03-17 15:18:21.556 UTC [192] postgres@accounts LOG:  duration: 0.630 ms
+2021-03-17 15:18:21.556 UTC [192] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + 2966 WHERE bid = 1;
+2021-03-17 15:18:21.557 UTC [192] postgres@accounts LOG:  duration: 0.690 ms
+2021-03-17 15:18:21.557 UTC [192] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (9, 1, 21833, 2966, CURRENT_TIMESTAMP);
+2021-03-17 15:18:21.557 UTC [192] postgres@accounts LOG:  duration: 0.542 ms
+2021-03-17 15:18:21.558 UTC [192] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:21.559 UTC [192] postgres@accounts LOG:  duration: 1.938 ms
+2021-03-17 15:18:22.825 UTC [193] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:22.825 UTC [193] postgres@accounts LOG:  duration: 0.280 ms
+2021-03-17 15:18:22.826 UTC [193] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + -442 WHERE aid = 93281;
+2021-03-17 15:18:22.828 UTC [193] postgres@accounts LOG:  duration: 2.183 ms
+2021-03-17 15:18:22.828 UTC [193] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 93281;
+2021-03-17 15:18:22.828 UTC [193] postgres@accounts LOG:  duration: 0.302 ms
+2021-03-17 15:18:22.828 UTC [193] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + -442 WHERE tid = 4;
+2021-03-17 15:18:22.829 UTC [193] postgres@accounts LOG:  duration: 0.703 ms
+2021-03-17 15:18:22.829 UTC [193] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + -442 WHERE bid = 1;
+2021-03-17 15:18:22.830 UTC [193] postgres@accounts LOG:  duration: 0.759 ms
+2021-03-17 15:18:22.830 UTC [193] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (4, 1, 93281, -442, CURRENT_TIMESTAMP);
+2021-03-17 15:18:22.831 UTC [193] postgres@accounts LOG:  duration: 0.773 ms
+2021-03-17 15:18:22.831 UTC [193] postgres@accounts LOG:  statement: END;
+2021-03-17 15:18:22.833 UTC [193] postgres@accounts LOG:  duration: 2.048 ms
+2021-03-17 15:18:22.881 UTC [194] postgres@accounts LOG:  statement: BEGIN;
+2021-03-17 15:18:22.881 UTC [194] postgres@accounts LOG:  duration: 0.316 ms
+2021-03-17 15:18:22.881 UTC [194] postgres@accounts LOG:  statement: UPDATE pgbench_accounts SET abalance = abalance + -1591 WHERE aid = 2814;
+2021-03-17 15:18:22.884 UTC [194] postgres@accounts LOG:  duration: 2.911 ms
+2021-03-17 15:18:22.884 UTC [194] postgres@accounts LOG:  statement: SELECT abalance FROM pgbench_accounts WHERE aid = 2814;
+2021-03-17 15:18:22.885 UTC [194] postgres@accounts LOG:  duration: 0.695 ms
+2021-03-17 15:18:22.885 UTC [194] postgres@accounts LOG:  statement: UPDATE pgbench_tellers SET tbalance = tbalance + -1591 WHERE tid = 10;
+2021-03-17 15:18:22.886 UTC [194] postgres@accounts LOG:  duration: 0.902 ms
+2021-03-17 15:18:22.886 UTC [194] postgres@accounts LOG:  statement: UPDATE pgbench_branches SET bbalance = bbalance + -1591 WHERE bid = 1;
+2021-03-17 15:18:22.887 UTC [194] postgres@accounts LOG:  duration: 0.863 ms
+2021-03-17 15:18:22.887 UTC [194] postgres@accounts LOG:  statement: INSERT INTO pgbench_history (tid, bid, aid, delta, mtime) VALUES (10, 1, 2814, -1591, CURRENT_TIMESTAMP);
+2021-03-17 15:18:22.888 UTC [194] postgres@accounts LOG:  duration: 0.584 ms
+2021-03-17 15:18:22.890 UTC [194] postgres@accounts LOG:  statement: END;

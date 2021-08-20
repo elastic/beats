@@ -34,6 +34,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegtest"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -66,13 +67,25 @@ func newTestSetup(t *testing.T, cfg TemplateConfig) *testSetup {
 	}
 	s := testSetup{t: t, client: client, loader: NewESLoader(client), config: cfg}
 	client.Request("DELETE", templateLoaderPath[cfg.Type]+cfg.Name, "", nil, nil)
-	require.False(t, s.loader.templateExists(cfg.Name, cfg.Type))
+	s.requireTemplateDoesNotExist("")
 	return &s
 }
+
+func (ts *testSetup) mustLoadTemplate(body map[string]interface{}) {
+	err := ts.loader.loadTemplate(ts.config.Name, ts.config.Type, body)
+	require.NoError(ts.t, err)
+	ts.requireTemplateExists("")
+}
+
 func (ts *testSetup) loadFromFile(fileElems []string) error {
 	ts.config.Fields = path(ts.t, fileElems)
 	beatInfo := beat.Info{Version: version.GetDefaultVersion()}
 	return ts.loader.Load(ts.config, beatInfo, nil, false)
+}
+
+func (ts *testSetup) mustLoadFromFile(fileElems []string) {
+	require.NoError(ts.t, ts.loadFromFile(fileElems))
+	ts.requireTemplateExists("")
 }
 
 func (ts *testSetup) load(fields []byte) error {
@@ -82,7 +95,25 @@ func (ts *testSetup) load(fields []byte) error {
 
 func (ts *testSetup) mustLoad(fields []byte) {
 	require.NoError(ts.t, ts.load(fields))
-	require.True(ts.t, ts.loader.templateExists(ts.config.Name, ts.config.Type))
+	ts.requireTemplateExists("")
+}
+
+func (ts *testSetup) requireTemplateExists(name string) {
+	if name == "" {
+		name = ts.config.Name
+	}
+	exists, err := ts.loader.templateExists(name, ts.config.Type)
+	require.NoError(ts.t, err, "failed to query template status")
+	require.True(ts.t, exists, "template must exist")
+}
+
+func (ts *testSetup) requireTemplateDoesNotExist(name string) {
+	if name == "" {
+		name = ts.config.Name
+	}
+	exists, err := ts.loader.templateExists(name, ts.config.Type)
+	require.NoError(ts.t, err, "failed to query template status")
+	require.False(ts.t, exists, "template must not exist")
 }
 
 func TestESLoader_Load(t *testing.T) {
@@ -91,7 +122,7 @@ func TestESLoader_Load(t *testing.T) {
 			setup := newTestSetup(t, TemplateConfig{Enabled: false})
 
 			setup.load(nil)
-			assert.False(t, setup.loader.templateExists(setup.config.Name, setup.config.Type))
+			setup.requireTemplateDoesNotExist("")
 		})
 
 		t.Run("invalid version", func(t *testing.T) {
@@ -99,9 +130,8 @@ func TestESLoader_Load(t *testing.T) {
 
 			beatInfo := beat.Info{Version: "invalid"}
 			err := setup.loader.Load(setup.config, beatInfo, nil, false)
-			if assert.Error(t, err) {
-				assert.Contains(t, err.Error(), "version is not semver")
-			}
+			require.Error(t, err)
+			require.Contains(t, err.Error(), "version is not semver")
 		})
 	})
 
@@ -140,7 +170,7 @@ func TestESLoader_Load(t *testing.T) {
 			Name    string `config:"name"`
 		}{Enabled: true, Path: path(t, []string{"testdata", "fields.json"}), Name: nameJSON}
 		setup.load(nil)
-		assert.True(t, setup.loader.templateExists(nameJSON, setup.config.Type))
+		setup.requireTemplateExists(nameJSON)
 	})
 
 	t.Run("load template successful", func(t *testing.T) {
@@ -211,8 +241,7 @@ func TestESLoader_Load(t *testing.T) {
 
 func TestTemplate_LoadFile(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
-	assert.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
-	assert.True(t, setup.loader.templateExists(setup.config.Name, setup.config.Type))
+	setup.mustLoadFromFile([]string{"..", "fields.yml"})
 }
 
 func TestLoadInvalidTemplate(t *testing.T) {
@@ -222,7 +251,7 @@ func TestLoadInvalidTemplate(t *testing.T) {
 	template := map[string]interface{}{"json": "invalid"}
 	err := setup.loader.loadTemplate(setup.config.Name, setup.config.Type, template)
 	assert.Error(t, err)
-	assert.False(t, setup.loader.templateExists(setup.config.Name, setup.config.Type))
+	setup.requireTemplateDoesNotExist("")
 }
 
 // Tests loading the templates for each beat
@@ -233,8 +262,7 @@ func TestLoadBeatsTemplate_fromFile(t *testing.T) {
 
 	for _, beat := range beats {
 		setup := newTestSetup(t, TemplateConfig{Name: beat, Enabled: true})
-		assert.NoError(t, setup.loadFromFile([]string{"..", "..", beat, "fields.yml"}))
-		assert.True(t, setup.loader.templateExists(setup.config.Name, setup.config.Type))
+		setup.mustLoadFromFile([]string{"..", "..", beat, "fields.yml"})
 	}
 }
 
@@ -244,7 +272,7 @@ func TestTemplateSettings(t *testing.T) {
 		Source: common.MapStr{"enabled": false},
 	}
 	setup := newTestSetup(t, TemplateConfig{Settings: settings, Enabled: true})
-	require.NoError(t, setup.loadFromFile([]string{"..", "fields.yml"}))
+	setup.mustLoadFromFile([]string{"..", "fields.yml"})
 
 	// Check that it contains the mapping
 	templateJSON := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
@@ -297,8 +325,8 @@ var dataTests = []struct {
 // Tests if data can be loaded into elasticsearch with right types
 func TestTemplateWithData(t *testing.T) {
 	setup := newTestSetup(t, TemplateConfig{Enabled: true})
-	require.NoError(t, setup.loadFromFile([]string{"testdata", "fields.yml"}))
-	require.True(t, setup.loader.templateExists(setup.config.Name, setup.config.Type))
+	setup.mustLoadFromFile([]string{"testdata", "fields.yml"})
+
 	esClient := setup.client.(*eslegclient.Connection)
 	for _, test := range dataTests {
 		_, _, err := esClient.Index(setup.config.Name, "_doc", "", nil, test.data)
@@ -377,8 +405,8 @@ func path(t *testing.T, fileElems []string) string {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:     eslegtest.GetURL(),
-		Timeout: 0,
+		URL:       eslegtest.GetURL(),
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	})
 	if err != nil {
 		t.Fatal(err)

@@ -23,10 +23,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
@@ -204,4 +210,52 @@ func TestClientWaitClose(t *testing.T) {
 			t.Fatal("expected Close to stop waiting after event acknowledgement")
 		}
 	})
+}
+
+func TestMonitoring(t *testing.T) {
+	const (
+		maxEvents  = 123
+		batchSize  = 456
+		numClients = 42
+	)
+	var config Config
+	err := common.MustNewConfigFrom(map[string]interface{}{
+		"queue.mem.events":           maxEvents,
+		"queue.mem.flush.min_events": 1,
+	}).Unpack(&config)
+	require.NoError(t, err)
+
+	metrics := monitoring.NewRegistry()
+	telemetry := monitoring.NewRegistry()
+	pipeline, err := Load(
+		beat.Info{},
+		Monitors{
+			Metrics:   metrics,
+			Telemetry: telemetry,
+		},
+		config,
+		processing.Supporter(nil),
+		func(outputs.Observer) (string, outputs.Group, error) {
+			clients := make([]outputs.Client, numClients)
+			for i := range clients {
+				clients[i] = newMockClient(func(publisher.Batch) error {
+					return nil
+				})
+			}
+			return "output_name", outputs.Group{
+				BatchSize: batchSize,
+				Clients:   clients,
+			}, nil
+		},
+	)
+	require.NoError(t, err)
+	defer pipeline.Close()
+
+	metricsSnapshot := monitoring.CollectFlatSnapshot(metrics, monitoring.Full, true)
+	assert.Equal(t, int64(maxEvents), metricsSnapshot.Ints["pipeline.queue.max_events"])
+
+	telemetrySnapshot := monitoring.CollectFlatSnapshot(telemetry, monitoring.Full, true)
+	assert.Equal(t, "output_name", telemetrySnapshot.Strings["output.name"])
+	assert.Equal(t, int64(batchSize), telemetrySnapshot.Ints["output.batch_size"])
+	assert.Equal(t, int64(numClients), telemetrySnapshot.Ints["output.clients"])
 }

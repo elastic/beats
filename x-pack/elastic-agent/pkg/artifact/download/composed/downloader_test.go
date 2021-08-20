@@ -38,19 +38,19 @@ func (d *SuccDownloader) Called() bool { return d.called }
 
 func TestComposed(t *testing.T) {
 	testCases := []testCase{
-		testCase{
+		{
 			downloaders:    []CheckableDownloader{&FailingDownloader{}, &SuccDownloader{}},
 			checkFunc:      func(d []CheckableDownloader) bool { return d[0].Called() && d[1].Called() },
 			expectedResult: true,
-		}, testCase{
+		}, {
 			downloaders:    []CheckableDownloader{&SuccDownloader{}, &SuccDownloader{}},
 			checkFunc:      func(d []CheckableDownloader) bool { return d[0].Called() && !d[1].Called() },
 			expectedResult: true,
-		}, testCase{
+		}, {
 			downloaders:    []CheckableDownloader{&SuccDownloader{}, &FailingDownloader{}},
 			checkFunc:      func(d []CheckableDownloader) bool { return d[0].Called() && !d[1].Called() },
 			expectedResult: true,
-		}, testCase{
+		}, {
 			downloaders:    []CheckableDownloader{&FailingDownloader{}, &FailingDownloader{}},
 			checkFunc:      func(d []CheckableDownloader) bool { return d[0].Called() && d[1].Called() },
 			expectedResult: false,
@@ -59,7 +59,7 @@ func TestComposed(t *testing.T) {
 
 	for _, tc := range testCases {
 		d := NewDownloader(tc.downloaders[0], tc.downloaders[1])
-		r, _ := d.Download(nil, program.Spec{Name: "a", Cmd: "a", Artifact: "a/a"}, "b")
+		r, _ := d.Download(context.TODO(), program.Spec{Name: "a", Cmd: "a", Artifact: "a/a"}, "b")
 
 		assert.Equal(t, tc.expectedResult, r == "succ")
 

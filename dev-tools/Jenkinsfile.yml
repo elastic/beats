@@ -13,4 +13,5 @@ when:
 platform: "immutable && ubuntu-18" ## default label for all the stages
 stages:
     lint:
-       make: "make -C dev-tools check"
+        make: "make -C dev-tools check"
+        stage: lint

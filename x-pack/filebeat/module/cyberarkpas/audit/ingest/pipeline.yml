@@ -1,0 +1,1199 @@
+---
+description: Pipeline for CyberArk PAS
+
+processors:
+  #
+  # Set ECS event.ingested
+  #
+  - set:
+        field: event.ingested
+        value: '{{{_ingest.timestamp}}}'
+
+  #
+  # Set event.original from message, unless reindexing.
+  #
+  - rename:
+      field: message
+      target_field: event.original
+      if: 'ctx.event?.original == null'
+
+  #
+  # Parse syslog headers (if any) and extract JSON payload.
+  #
+  - grok:
+      field: event.original
+      patterns:
+        # RFC5424 from Cyberark.
+        # UseLegacySyslogFormat=No
+        # <5>1 2021-03-04T17:28:23Z VAULT {"format":"elastic","version":"1.0",...}
+        - "^<%{NONNEGINT:log.syslog.priority}>%{NONNEGINT} %{TIMESTAMP_ISO8601:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+
+        # Legacy format.
+        # UseLegacySyslogFormat=Yes
+        # Mar 08 02:57:42 VAULT {"format":"elastic","version":"1.0",...}
+        - "^%{SYSLOGTIMESTAMP:_tmp.syslog_ts} %{SYSLOGHOST:_tmp.hostname} %{JSON_PAYLOAD:_tmp.payload}"
+
+        # Catch-all mode, just JSON payload.
+        - "%{JSON_PAYLOAD:_tmp.payload}"
+      pattern_definitions:
+        JSON_PAYLOAD: '{"format":"elastic","version":"1.0",.*}'
+      on_failure:
+        - fail:
+            message: "unexpected event format: {{{_ingest.on_failure_message}}}"
+
+  - json:
+      field: _tmp.payload
+      target_field: _tmp.json
+      on_failure:
+        - fail:
+            message: "malformed JSON event: {{{_ingest.on_failure_message}}}"
+
+  - rename:
+      field: _tmp.json.syslog.audit_record
+      target_field: cyberarkpas.audit
+      on_failure:
+        - fail:
+            message: "unexpected event structure: {{{_ingest.on_failure_message}}}"
+
+
+  #
+  # Remove all empty fields
+  #
+  - script:
+      lang: painless
+      description: 'Removes empty audit fields'
+      source: >-
+        ctx.cyberarkpas.audit.entrySet().removeIf(entry -> entry.getValue() == "");
+
+  - rename:
+      field: _tmp.json.raw
+      target_field: cyberarkpas.audit.raw
+      ignore_missing: true
+
+  # The following processors populate @timestamp from the different sources that can exist in an event.
+  # In the following order of precedence:
+  # - IsoTimestamp field (expected ISO8601). Present when new syslog format is used (rfc5424: yes).
+  # - Timestamp (expected MMM dd HH:mm:ss). Also present only when new syslog format is used.
+  # - Syslog header timestamp. Either ISO8601 or legacy MMM dd HH:mm:ss, depending on the syslog format in use.
+  # - Original @timestamp from Filebeat.
+  - date:
+      if: 'ctx.cyberarkpas.audit.IsoTimestamp != null'
+      field: cyberarkpas.audit.IsoTimestamp
+      target_field: _tmp.timestamp
+      formats:
+        - ISO8601
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse ISO timestamp field: {{{cyberarkpas.audit.IsoTimestamp}}}: {{{_ingest.on_failure_message}}}"
+
+  - date:
+      if: 'ctx._tmp.timestamp == null && ctx.cyberarkpas.audit.Timestamp != null'
+      field: cyberarkpas.audit.Timestamp
+      target_field: _tmp.timestamp
+      formats:
+        # This is the default format.
+        - 'MMM dd HH:mm:ss'
+        # Drop a few other formats in case the above fails.
+        - ISO8601
+        - 'MMM  d HH:mm:ss'
+        - "EEE MMM dd HH:mm:ss"
+        - "EEE MMM  d HH:mm:ss"
+        - "MMM  d HH:mm:ss z"
+        - "MMM dd HH:mm:ss z"
+        - "EEE MMM  d HH:mm:ss z"
+        - "EEE MMM dd HH:mm:ss z"
+        - "MMM  d yyyy HH:mm:ss"
+        - "MMM dd yyyy HH:mm:ss"
+        - "EEE MMM  d yyyy HH:mm:ss"
+        - "EEE MMM dd yyyy HH:mm:ss"
+        - "MMM  d yyyy HH:mm:ss z"
+        - "MMM dd yyyy HH:mm:ss z"
+        - "EEE MMM  d yyyy HH:mm:ss z"
+        - "EEE MMM dd yyyy HH:mm:ss z"
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse timestamp field: {{{cyberarkpas.audit.Timestamp}}}: {{{_ingest.on_failure_message}}}"
+
+  - date:
+      if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null && ctx.event?.timezone == null'
+      field: _tmp.syslog_ts
+      target_field: _tmp.timestamp
+      formats:
+        # This is the default format.
+        - 'MMM dd HH:mm:ss'
+        # Drop a few other formats in case the above fails.
+        - ISO8601
+        - 'MMM  d HH:mm:ss'
+        - "EEE MMM dd HH:mm:ss"
+        - "EEE MMM  d HH:mm:ss"
+        - "MMM  d HH:mm:ss z"
+        - "MMM dd HH:mm:ss z"
+        - "EEE MMM  d HH:mm:ss z"
+        - "EEE MMM dd HH:mm:ss z"
+        - "MMM  d yyyy HH:mm:ss"
+        - "MMM dd yyyy HH:mm:ss"
+        - "EEE MMM  d yyyy HH:mm:ss"
+        - "EEE MMM dd yyyy HH:mm:ss"
+        - "MMM  d yyyy HH:mm:ss z"
+        - "MMM dd yyyy HH:mm:ss z"
+        - "EEE MMM  d yyyy HH:mm:ss z"
+        - "EEE MMM dd yyyy HH:mm:ss z"
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse legacy syslog timestamp: {{{_tmp.syslog_ts}}}: {{{_ingest.on_failure_message}}}"
+
+  - date:
+      if: 'ctx._tmp.timestamp == null && ctx._tmp.syslog_ts != null && ctx.event?.timezone != null'
+      field: _tmp.syslog_ts
+      target_field: _tmp.timestamp
+      timezone: '{{{event.timezone}}}'
+      formats:
+        # This is the default format.
+        - 'MMM dd HH:mm:ss'
+        # Drop a few other formats in case the above fails.
+        - ISO8601
+        - 'MMM  d HH:mm:ss'
+        - "EEE MMM dd HH:mm:ss"
+        - "EEE MMM  d HH:mm:ss"
+        - "MMM  d HH:mm:ss z"
+        - "MMM dd HH:mm:ss z"
+        - "EEE MMM  d HH:mm:ss z"
+        - "EEE MMM dd HH:mm:ss z"
+        - "MMM  d yyyy HH:mm:ss"
+        - "MMM dd yyyy HH:mm:ss"
+        - "EEE MMM  d yyyy HH:mm:ss"
+        - "EEE MMM dd yyyy HH:mm:ss"
+        - "MMM  d yyyy HH:mm:ss z"
+        - "MMM dd yyyy HH:mm:ss z"
+        - "EEE MMM  d yyyy HH:mm:ss z"
+        - "EEE MMM dd yyyy HH:mm:ss z"
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to parse legacy syslog timestamp: {{{_tmp.syslog_ts}}}: {{{_ingest.on_failure_message}}}"
+
+  - set:
+      field: '@timestamp'
+      value: '{{{_tmp.timestamp}}}'
+      ignore_empty_value: true
+      override: true
+
+  # This script converts the nested object under cyberarkpas.audit.CAProperties.CAProperty
+  # into an object under cyberarkpas.audit.CAProperties:
+  #
+  # input:
+  # "cyberarkpas.audit.CAProperties.CAProperty": [
+  #            {
+  #                "Name": "PolicyID",
+  #                "Value": "LINUX-SSH"
+  #            },
+  #            {
+  #                "Name": "UserName",
+  #                "Value": "test12"
+  #            }
+  # output:
+  # "cyberarkpas.audit.CAProperties":
+  #            {
+  #                "PolicyID": "LINUX-SSH",
+  #                "UserName": "test12"
+  #            }
+  - foreach:
+      field: cyberarkpas.audit.CAProperties.CAProperty
+      ignore_missing: true
+      processor:
+        set:
+          field: 'cyberarkpas.audit.CAProperties.{{{_ingest._value.Name}}}'
+          value: '{{{_ingest._value.Value}}}'
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to process CAProperties array: {{{_ingest.on_failure_message}}}"
+  - remove:
+      field: cyberarkpas.audit.CAProperties.CAProperty
+      ignore_missing: true
+
+  # Parse key-value pairs at ExtraDetails:
+  # input:
+  #   "cyberarkpas.audit.ExtraDetails": "Command=ls \"/var/tmp\";ConnectionComponentId=PSMP-SSH;DstHost=[...]",
+  #
+  # output:
+  #   "cyberarkpas.audit.ExtraDetails":
+  #     {
+  #       "Command": "ls \"/var/tmp\"",
+  #       "ConnectionComponentId": "PSMP-SSH",
+  #       "DstHost": [...]
+  #
+  # The original string can contain escaped separators, \= and \;
+  - kv:
+      field: cyberarkpas.audit.ExtraDetails
+      field_split: '(?<!\\);' # unescaped ;
+      value_split: '(?<!\\)=' # uneescaped =
+      target_field: _tmp.kv
+      ignore_missing: true
+      on_failure:
+        - append:
+            field: error.message
+            value: "failed to process ExtraDetails expression '{{{cyberarkpas.audit.ExtraDetails}}}': {{{_ingest.on_failure_message}}}"
+  - remove:
+      field: cyberarkpas.audit.ExtraDetails
+      ignore_missing: true
+
+  - rename:
+      field: _tmp.kv
+      target_field: cyberarkpas.audit.ExtraDetails
+      ignore_missing: true
+
+  #
+  # Convert field names from CamelCase to snake_case.
+  #
+  - script:
+      lang: painless
+      description: "Converts audit field's names from CamelCase to snake_case"
+      source: >
+        String to_snake_case(String s) {
+          /* faster code path for strings that won't need an underscore */
+          if (s.chars().skip(1).noneMatch(Character::isUpperCase)) {
+            return s.toLowerCase();
+          }
+          int run = 0;
+          boolean first = true;
+          StringBuilder result = new StringBuilder();
+          for (char c : s.toCharArray()) {
+            char o = Character.toLowerCase(c);
+            if (c != o) {
+              if (run == 0 && !first) {
+                result.append('_');
+              }
+              run ++;
+            } else {
+              if (run > 1) {
+                char prev = result.charAt(result.length()-1);
+                result.setCharAt(result.length()-1, (char)'_');
+                result.append(prev);
+              }
+              run = 0;
+              first = false;
+            }
+            result.append(o);
+          }
+          return result.toString();
+        }
+        def keys_to_snake_case_recursive(Map object) {
+          return object.entrySet().stream().collect(
+            Collectors.toMap(
+              e -> to_snake_case(e.getKey()),
+              e -> e.getValue() instanceof Map? keys_to_snake_case_recursive(e.getValue()) : e.getValue()
+            )
+          );
+        }
+        ctx.cyberarkpas.audit = keys_to_snake_case_recursive(ctx.cyberarkpas.audit);
+
+  #
+  # Convert rfc5424 field to boolean.
+  #
+  - script:
+      description: 'Converts the rfc5424 audit field to a boolean'
+      lang: painless
+      source: >
+        def value = ctx.cyberarkpas.audit.rfc5424;
+        ctx.cyberarkpas.audit["rfc5424"] = value == 'yes';
+
+  ########################################################
+  # ECS enrichment
+  #
+  # All processors from this point use the snake_case form
+  # to access Cyberark fields.
+  ########################################################
+
+  - set:
+      field: event.kind
+      value: event
+
+  - lowercase:
+      field: cyberarkpas.audit.action
+      target_field: event.action
+      ignore_missing: true
+
+  # Severity to number
+  #
+  # Possible values:
+  # Info -> 0
+  # Error -> 7
+  # Critical -> 10
+  - set:
+      field: event.severity
+      value: 2
+      if: 'ctx.cyberarkpas.audit.severity == "Info"'
+  - set:
+      field: event.severity
+      value: 7
+      if: 'ctx.cyberarkpas.audit.severity == "Error"'
+  - set:
+      field: event.severity
+      value: 10
+      if: 'ctx.cyberarkpas.audit.severity == "Critical"'
+  - set:
+      field: event.type
+      value: error
+      if: 'ctx.event?.severity > 6'
+
+  - rename:
+      field: cyberarkpas.audit.message_id
+      target_field: event.code
+      ignore_missing: true
+
+  - set:
+      field: source.address
+      value: '{{{cyberarkpas.audit.station}}}'
+      ignore_empty_value: true
+
+  - set:
+      field: destination.address
+      value: '{{{cyberarkpas.audit.gateway_station}}}'
+      ignore_empty_value: true
+
+  - set:
+      field: file.path
+      value: '{{{cyberarkpas.audit.file}}}'
+      if: 'ctx.cyberarkpas.audit?.file != null'
+
+  #
+  # Observer fields
+  #
+  - rename:
+      field: cyberarkpas.audit.vendor
+      target_field: observer.vendor
+      ignore_missing: true
+  - rename:
+      field: cyberarkpas.audit.product
+      target_field: observer.product
+      ignore_missing: true
+  - rename:
+      field: cyberarkpas.audit.version
+      target_field: observer.version
+      ignore_missing: true
+  - rename:
+      field: cyberarkpas.audit.hostname
+      target_field: observer.hostname
+      ignore_missing: true
+  # Use hostname from syslog if audit record's Hostname field is missing.
+  - rename:
+      field: _tmp.hostname
+      target_field: observer.hostname
+      ignore_missing: true
+      if: 'ctx.observer?.hostname == null'
+  #
+  # Enrichment based on message_id
+  #
+  # This script is overly complicated (read_field) because at this time
+  # there is no processor that allows to set one field from a source
+  # field using indirection (it is possible with rename, but that
+  # removes the original field).
+  #
+  # Once something like this is possible:
+  # set:
+  #   target_field: '{{{_ingest.value.to}}}'
+  #   copy_from: '{{{_ingest.value.from}}}'
+  #
+  # ... this script can be updated to just create two output lists, one
+  # for value-to pairs, another for value-from pairs.
+  #
+  - script:
+      lang: painless
+      description: 'ECS enrichment based on message_id'
+      params:
+        # 4 - User Authentication
+        #
+        # Always a failure.
+        "4":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["authentication"]
+          - set: event.type
+            value: ["error"]
+          - set: event.action
+            value:  "authentication_failure"
+          - set: event.outcome
+            value: "failure"
+
+        # 7 - Logon
+        #
+        # User logged on to the PVWA.
+        "7":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: [ "authentication", "session"]
+          - set: event.type
+            value: [ "start"]
+          - set: event.action
+            value:  "authentication_success"
+          - set: event.outcome
+            value: "success"
+
+        # 8 - Logoff
+        #
+        # User logged of from the PVWA.
+        "8": # Logoff
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: [ "authentication", "session"]
+          - set: event.type
+            value: ["end"]
+          - set: event.outcome
+            value: "success"
+
+        # 19 - Full gateway connection.
+        "19":
+          - set: source.user.name
+            from: cyberarkpas.audit.source_user
+          - set: user.name
+            from: cyberarkpas.audit.source_user
+          - set: destination.user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["network"]
+          - set: event.type
+            value: ["start"]
+          - set: event.outcome
+            value: "success"
+
+        # 22 - CPM Verify Password
+        #
+        # Password on a target host is verified.
+        "22":
+          # Address of device that hosts the account.
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "info"]
+
+        # 23 - Action on closed safe
+        #
+        # Nothing remarkable.
+        #
+        # "23":
+
+        # 24 - CPM Change Password
+        "24":
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
+
+        # 31 - CPM Reconcile Password
+        #
+        "31":
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
+
+        # 32 - Add Owner
+        #
+        # Change owner of a Safe.
+        # source_user performs the action, docs suggest otherwise.
+        "32":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.category
+            value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+          - set: event.type
+            value: ["admin", "change"]
+          - set: event.outcome
+            value: "success"
+
+        # 33 - Update Owner
+        #
+        # Same as above
+        "33":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.category
+            value: ["iam"] # How to best model Vault/Safes? An IAM system? A Database?
+          - set: event.type
+            value: ["admin", "change"]
+          - set: event.outcome
+            value: "success"
+
+        # 38 - CPM Verify Password Failed
+        #
+        # Like 22 but failed.
+        "38":
+          # Address of device that hosts the account.
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            value: "failure"
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["error"]
+
+        # 50 - Store File
+        #
+        # I don't think it makes much sense to enrich Vault file events as "file" category.
+        # This will involve probably constructing a file.path prefixed by the safe name.
+        # Then these file events may be treated as file events in SIEM, which can have
+        # unwanted consequences.
+        # "50":
+
+        # 57 - CPM Change Password Failed
+        "57":
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            value: "failure"
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change", "error"]
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+
+        # 60 - CPM Reconcile Password Failed
+        "60":
+          - set: destination.address # This could be host.* or user.target.* (doesn't exists).
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            value: "failure"
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change", "error"]
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+
+        # 130 - CPM Disable Password
+        "130":
+          - set: event.outcome
+            value: "failure"
+          - set: user.target.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.reason
+            from: cyberarkpas.audit.ca_properties.cpm_error_details
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+
+        # 174 - Change User (untested)
+        "174":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 175 - Change Your User (untested)
+        "175":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "change"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 176 - Delete User (untested)
+        "176":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "deletion"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 177 - Delete Your User (untested)
+        "177":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "deletion"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 173 - Add User (alternative to 180, untested)
+        "173":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "creation"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 180 - Add User
+        "180":
+          - set: user.target.name
+            from: cyberarkpas.audit.source_user
+          - set: event.type
+            value: ["user", "creation"]
+          - set: event.category
+            value: ["iam"]
+          - set: event.outcome
+            value: "success"
+
+        # 295 - Retrieve Password succeeded
+        "295":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            value: "success"
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+
+        # 300 - PSM Connect
+        "300":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["start"]
+          - set: event.outcome
+            value: "success"
+
+        # 302 - PSM Disconnect
+        "302":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: _tmp.duration_hms
+            from: cyberarkpas.audit.extra_details.session_duration
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["end"]
+          - set: event.outcome
+            value: "success"
+
+        # 308 - Use Password
+        "308":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+
+        # 309 - Undefined user logon
+        #
+        "309":
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["authentication"]
+          - set: event.type
+            value: ["error"]
+          - set: event.action
+            value:  "authentication_failure"
+          - set: event.outcome
+            value: "failure"
+
+        # 361 - Keystroke logging
+        "361":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["info"]
+
+        # 412 - Keystroke logging (same as 361?)
+        "412":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["session"]
+          - set: event.type
+            value: ["info"]
+
+        # 359 - SQL Command
+        "359":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: event.category
+            value: ["database"]
+          - set: event.type
+            value: ["access"]
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+
+        # 411 - Window Title
+        "411":
+          - set: destination.address
+            from: cyberarkpas.audit.extra_details.dst_host
+          - set: destination.user.name
+            from: cyberarkpas.audit.extra_details.user
+          - set: source.address
+            from: cyberarkpas.audit.extra_details.src_host
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: network.application
+            from: cyberarkpas.audit.extra_details.protocol
+          - set: process.pid
+            from: cyberarkpas.audit.extra_details.process_id
+          - set: process.name
+            from: cyberarkpas.audit.extra_details.process_name
+          - set: event.category
+            value: ["process"]
+          - set: event.type
+            value: ["access", "info"]
+
+        # 414 - CPM Verify SSH Key
+        #
+        # SSH-key on a target host is verified.
+        "414":
+          # Address of device that hosts the account.
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: event.outcome
+            from: cyberarkpas.audit.ca_properties.cpm_status
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "info"]
+
+        # 428 - Retrieve SSH Key
+        "428":
+          - set: destination.address
+            from: cyberarkpas.audit.ca_properties.address
+          - set: destination.user.name
+            from: cyberarkpas.audit.ca_properties.user_name
+          - set: source.user.name
+            from: cyberarkpas.audit.issuer
+          - set: user.name
+            from: cyberarkpas.audit.issuer
+          - set: event.category
+            value: ["iam"]
+          - set: event.type
+            value: ["admin", "access"]
+          - set: event.outcome
+            value: "success"
+          - set: event.reason
+            from: cyberarkpas.audit.reason
+      on_failure:
+        - append:
+            field: error.message
+            value: 'Failed to enrich based on ID #{{{ event.code }}}: {{{_ingest.on_failure_message}}}'
+
+      source: >
+        def clone(def ref) {
+          if (ref == null) return ref;
+          if (ref instanceof Map) {
+            ref = ref.entrySet().stream().collect(
+                    Collectors.toMap(
+                      e -> e.getKey(),
+                      e -> clone(e.getValue())
+                    )
+                  );
+          } else if (ref instanceof List) {
+            ref = ref.stream().map(e -> clone(e)).collect(
+                    Collectors.toList()
+                  );
+          }
+          return ref;
+        }
+        def read_field(def map, String name) {
+          if (map == null || !(map instanceof Map)) return null;
+          int pos = name.indexOf(".");
+          return pos == -1? map[name]
+                          : read_field(map[name.substring(0, pos)], name.substring(pos+1));
+        }
+        boolean set_field(Map map, String name, def value) {
+          int pos = name.indexOf(".");
+          if (pos == -1) {
+            map[name] = clone(value);
+            return true;
+          }
+          String key  = name.substring(0, pos),
+                 path = name.substring(pos+1);
+          if (!map.containsKey(key)) {
+            map[key] = new HashMap();
+          }
+          map = map[key];
+          return map instanceof Map? set_field(map, path, value)
+                                   : false;
+        }
+        String msgID = ctx.event?.code;
+        def actions = params.get(msgID);
+        if (actions == null) return;
+        for (def item : actions) {
+          def val = item.value;
+          if (val == null && (val = read_field(ctx, item.from)) == null || val == "") continue;
+          if (!set_field(ctx, item.set, val)) {
+            throw new Exception("Failed to set field " + item.set);
+          }
+        }
+
+  #
+  # Force event.outcome: unknown in case it gets a value other than one of the allowed.
+  #
+  - set:
+      field: event.outcome
+      value: 'unknown'
+      if: 'ctx.event?.outcome != null && !["success", "failure"].contains(ctx.event.outcome)'
+
+
+  #
+  # Set event.duration from the session duration ("hh:mm:ss") present in some messages.
+  #
+  - script:
+      lang: painless
+      description: 'Set event.duration from the session duration ("hh:mm:ss")'
+      if: "ctx._tmp?.duration_hms != null"
+      source: >
+        long parse_hms(String s) {
+            long cur = 0, total = 0;
+            for (char c: s.toCharArray()) {
+                if (c >= (char)'0' && c <= (char)'9') {
+                    cur = (cur*10) + (long)c - (char)'0';
+                } else if (c == (char)':') {
+                    total = (total + cur) * 60;
+                    cur = 0;
+                } else {
+                    return 0;
+                }
+            }
+            return total + cur;
+        }
+        long nanos = parse_hms(ctx._tmp.duration_hms) * 1000000000L;
+        ctx.event['duration'] = nanos;
+
+  #
+  # Populate ip/domain fields from address.
+  #
+  - convert:
+      field: source.address
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+        - set:
+            field: source.domain
+            value: '{{{source.address}}}'
+  - convert:
+      field: destination.address
+      target_field: destination.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+        - set:
+            field: destination.domain
+            value: '{{{destination.address}}}'
+
+  #
+  # Populate related.ip
+  #
+  - append:
+      field: related.ip
+      value: '{{{source.ip}}}'
+      if: 'ctx.source?.ip != null'
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{{destination.ip}}}'
+      if: 'ctx.destination?.ip != null'
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{{cyberarkpas.audit.station}}}'
+      if: 'ctx.cyberarkpas.audit.station != null'
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: '{{{cyberarkpas.audit.gateway_station}}}'
+      if: 'ctx.cyberarkpas.audit.gateway_station != null'
+      allow_duplicates: false
+
+  #
+  # Populate related.user
+  #
+  - append:
+      field: related.user
+      value: '{{{user.name}}}'
+      if: 'ctx.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{{source.user.name}}}'
+      if: 'ctx.source?.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{{destination.user.name}}}'
+      if: 'ctx.destination?.user?.name != null'
+      allow_duplicates: false
+  - append:
+      field: related.user
+      value: '{{{user.target.name}}}'
+      if: 'ctx.user?.target?.name != null'
+      allow_duplicates: false
+
+  #
+  # sometimes application is capitalized.
+  #
+  - lowercase:
+      field: network.application
+      ignore_missing: true
+
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+
+  - geoip:
+      field: destination.ip
+      target_field: destination.geo
+      ignore_missing: true
+
+  #
+  # Set host.name
+  # This sets host.name from observer.hostname when the original event from Filebeat didn't
+  # have a host.name. This is the case of forwarded events (the tag "forwarded" is present).
+  #
+  - set:
+      field: host.name
+      value: '{{{observer.hostname}}}'
+      ignore_empty_value: true
+      if: 'ctx.host?.name == null'
+
+  - network_direction:
+      ignore_missing: true
+      internal_networks:
+        - loopback
+        - private
+        - unspecified
+
+  #
+  # Save only interesting fields under extra_fields and ca_properties
+  # to prevent mapping explosion. Keep the rest under .other (type flattened).
+  #
+  - script:
+      lang: painless
+      description: Map interesting fields from ca_properties and extra_details.
+      params:
+        ca_properties:
+          - address
+          - cpm_disabled
+          - cpm_error_details
+          - cpm_status
+          - creation_method
+          - customer
+          - database
+          - device_type
+          - dual_account_status
+          - group_name
+          - in_process
+          - index
+          - last_fail_date
+          - last_success_change
+          - last_success_reconciliation
+          - last_success_verification
+          - last_task
+          - logon_domain
+          - policy_id
+          - port
+          - privcloud
+          - reset_immediately
+          - retries_count
+          - sequence_id
+          - tags
+          - user_dn
+          - user_name
+          - virtual_username
+        extra_details:
+          - ad_process_id
+          - ad_process_name
+          - application_type
+          - command
+          - connection_component_id
+          - dst_host
+          - logon_account
+          - managed_account
+          - process_id
+          - process_name
+          - protocol
+          - psmid
+          - session_duration
+          - session_id
+          - src_host
+          - username
+      source: >
+        Map audit = ctx.cyberarkpas.audit;
+        params.entrySet().stream().filter(e -> audit.containsKey(e.getKey())).forEach(lst -> {
+          Map base = audit[lst.getKey()],
+              selected = new HashMap();
+          lst.getValue().stream().filter(fld -> base.containsKey(fld)).forEach(fld -> {
+            selected[fld] = base.remove(fld);
+          });
+          selected['other'] = base;
+          audit[lst.getKey()] = selected;
+        });
+
+  #
+  # Cleanup
+  #
+  - remove:
+      field: _tmp
+      ignore_missing: true
+
+  - remove:
+      field: event.original
+      ignore_missing: true
+      if: 'ctx.tags == null || !ctx.tags.contains("preserve_original_event")'
+
+on_failure:
+  - append:
+        field: error.message
+        value: '{{{_ingest.on_failure_message}}}'
+
+  - remove:
+      field: _tmp
+      ignore_missing: true
+
+  - set:
+      field: event.kind
+      value: pipeline_error

@@ -85,6 +85,8 @@ type ApplicationState struct {
 	actionsConn    bool
 	actionsDone    chan bool
 	actionsLock    sync.RWMutex
+
+	inputTypes map[string]struct{}
 }
 
 // Handler is the used by the server to inform of status changes.
@@ -185,6 +187,24 @@ func (s *Server) Get(app interface{}) (*ApplicationState, bool) {
 	s.apps.Range(func(_ interface{}, val interface{}) bool {
 		as := val.(*ApplicationState)
 		if as.app == app {
+			foundState = as
+			return false
+		}
+		return true
+	})
+	return foundState, foundState != nil
+}
+
+// FindByInputType application by input type
+func (s *Server) FindByInputType(inputType string) (*ApplicationState, bool) {
+	var foundState *ApplicationState
+	s.apps.Range(func(_ interface{}, val interface{}) bool {
+		as := val.(*ApplicationState)
+		if as.inputTypes == nil {
+			return true
+		}
+
+		if _, ok := as.inputTypes[inputType]; ok {
 			foundState = as
 			return false
 		}
@@ -685,6 +705,16 @@ func (as *ApplicationState) SetStatus(status proto.StateObserved_Status, msg str
 	return nil
 }
 
+// SetInputTypes sets the allowed action input types for this application
+func (as *ApplicationState) SetInputTypes(inputTypes []string) {
+	as.checkinLock.Lock()
+	as.inputTypes = make(map[string]struct{})
+	for _, inputType := range inputTypes {
+		as.inputTypes[inputType] = struct{}{}
+	}
+	as.checkinLock.Unlock()
+}
+
 // updateStatus updates the current observed status from the application, sends the expected state back to the
 // application if the server expects it to be different then its observed state, and alerts the handler on the
 // server when the application status has changed.
@@ -831,10 +861,12 @@ func (as *ApplicationState) destroyCheckinStream() {
 func (s *Server) watchdog() {
 	defer s.watchdogWG.Done()
 	for {
+		t := time.NewTimer(s.watchdogCheckInterval)
 		select {
 		case <-s.watchdogDone:
+			t.Stop()
 			return
-		case <-time.After(s.watchdogCheckInterval):
+		case <-t.C:
 		}
 
 		now := time.Now().UTC()

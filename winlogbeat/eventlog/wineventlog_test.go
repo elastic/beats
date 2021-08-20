@@ -36,6 +36,23 @@ import (
 	"github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
+const (
+	// Names that are registered by the test for logging events.
+	providerName = "WinlogbeatTestGo"
+	sourceName   = "Integration Test"
+
+	// Event message files used when logging events.
+
+	// EventCreate.exe has valid event IDs in the range of 1-1000 where each
+	// event message requires a single parameter.
+	eventCreateMsgFile = "%SystemRoot%\\System32\\EventCreate.exe"
+	// services.exe is used by the Service Control Manager as its event message
+	// file; these tests use it to log messages with more than one parameter.
+	servicesMsgFile = "%SystemRoot%\\System32\\services.exe"
+	// netevent.dll has messages that require no message parameters.
+	netEventMsgFile = "%SystemRoot%\\System32\\netevent.dll"
+)
+
 func TestWindowsEventLogAPI(t *testing.T) {
 	testWindowsEventLog(t, winEventLogAPIName)
 }
@@ -200,8 +217,6 @@ func openLog(t testing.TB, api string, state *checkpoint.EventLogState, config m
 		log, err = newWinEventLog(cfg)
 	case winEventLogExpAPIName:
 		log, err = newWinEventLogExp(cfg)
-	case eventLoggingAPIName:
-		log, err = newEventLogging(cfg)
 	default:
 		t.Fatalf("Unknown API name: '%s'", api)
 	}

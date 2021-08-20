@@ -6,46 +6,9 @@ package application
 
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/kibana"
 )
 
 type localConfig struct {
 	Fleet    *configuration.FleetAgentConfig `config:"fleet"`
 	Settings *configuration.SettingsConfig   `config:"agent" yaml:"agent"`
-}
-
-func createFleetConfigFromEnroll(accessAPIKey string, kbn *kibana.Config) (*configuration.FleetAgentConfig, error) {
-	cfg := configuration.DefaultFleetAgentConfig()
-	cfg.Enabled = true
-	cfg.AccessAPIKey = accessAPIKey
-	cfg.Kibana = kbn
-
-	if err := cfg.Valid(); err != nil {
-		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
-	}
-	return cfg, nil
-}
-
-func createFleetServerBootstrapConfig(connStr string, policyID string) (*configuration.FleetAgentConfig, error) {
-	es, err := configuration.ElasticsearchFromConnStr(connStr)
-	if err != nil {
-		return nil, err
-	}
-	cfg := configuration.DefaultFleetAgentConfig()
-	cfg.Enabled = true
-	cfg.Server = &configuration.FleetServerConfig{
-		Bootstrap: true,
-		Output: configuration.FleetServerOutputConfig{
-			Elasticsearch: es,
-		},
-	}
-	if policyID != "" {
-		cfg.Server.Policy = &configuration.FleetServerPolicyConfig{ID: policyID}
-	}
-
-	if err := cfg.Valid(); err != nil {
-		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
-	}
-	return cfg, nil
 }

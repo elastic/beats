@@ -26,6 +26,7 @@ func EventsMapping(results Usage) []mb.Event {
 					"resource": common.MapStr{
 						"type":  usageDetail.ConsumedService,
 						"group": getResourceGroupFromId(*usageDetail.InstanceID),
+						"name":  usageDetail.InstanceName,
 					},
 					"subscription_id": usageDetail.SubscriptionGUID,
 				},

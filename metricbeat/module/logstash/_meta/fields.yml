@@ -4,8 +4,103 @@
     Logstash module
   release: ga
   settings: ["ssl", "http"]
+  short_config: false
   fields:
+    - name: logstash_stats
+      type: group
+      fields:
+        - name: timestamp
+          type: alias
+          path: "@timestamp"
+        - name: jvm
+          type: group
+          fields:
+            - name: mem
+              type: group
+              fields:
+                - name: heap_used_in_bytes
+                  type: alias
+                  path: logstash.node.stats.jvm.mem.heap_used_in_bytes
+                - name: heap_max_in_bytes
+                  type: alias
+                  path: logstash.node.stats.jvm.mem.heap_max_in_bytes
+            - name: uptime_in_millis
+              type: alias
+              path: logstash.node.stats.jvm.uptime_in_millis
+        - name: events
+          type: group
+          fields:
+            - name: in
+              type: alias
+              path: logstash.node.stats.events.in
+            - name: out
+              type: alias
+              path: logstash.node.stats.events.out
+            - name: duration_in_millis
+              type: alias
+              path: logstash.node.stats.events.duration_in_millis
+        - name: logstash
+          type: group
+          fields:
+            - name: uuid
+              type: alias
+              path: logstash.node.stats.logstash.uuid
+            - name: version
+              type: alias
+              path: logstash.node.stats.logstash.version
+        - name: pipelines
+          type: nested
+        - name: os
+          type: group
+          fields:
+            - name: cpu
+              type: group
+              fields:
+                - name: stat
+                  type: group
+                  fields:
+                    - name: number_of_elapsed_periods
+                      type: alias
+                      path: logstash.node.stats.os.cgroup.cpu.stat.number_of_elapsed_periods
+                    - name: time_throttled_nanos
+                      type: alias
+                      path: logstash.node.stats.os.cgroup.cpu.stat.time_throttled_nanos
+                    - name: number_of_times_throttled
+                      type: alias
+                      path: logstash.node.stats.os.cgroup.cpu.stat.number_of_times_throttled
+                - name: load_average
+                  type: group
+                  fields:
+                    - name: 15m
+                      type: alias
+                      path: logstash.node.stats.os.cpu.load_average.15m
+                    - name: 1m
+                      type: alias
+                      path: logstash.node.stats.os.cpu.load_average.1m
+                    - name: 5m
+                      type: alias
+                      path: logstash.node.stats.os.cpu.load_average.5m
+            - name: cgroup
+              type: group
+              fields:
+                - name: cpuacct.usage_nanos
+                  type: alias
+                  path: logstash.node.stats.os.cgroup.cpuacct.usage_nanos
+        - name: process.cpu.percent
+          type: alias
+          path: logstash.node.stats.process.cpu.percent
+        - name: queue.events_count
+          type: alias
+          path: logstash.node.stats.queue.events_count
+    - name: logstash_state
+      type: group
+      fields:
+        - name: pipeline.id
+          type: alias
+          path: logstash.node.state.pipeline.id
+        - name: pipeline.hash
+          type: alias
+          path: logstash.node.state.pipeline.hash
     - name: logstash
       type: group
-      description: >
       fields:

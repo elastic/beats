@@ -10,15 +10,15 @@ import (
 	"crypto/sha256"
 	"fmt"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 )
 
 // Address returns the address to connect to Elastic Agent daemon.
 func Address() string {
 	// when installed the control address is fixed
-	if install.RunningInstalled() {
-		return install.SocketPath
+	if info.RunningInstalled() {
+		return paths.SocketPath
 	}
 
 	// not install, adjust the path based on data path

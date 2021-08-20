@@ -80,7 +80,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2-my.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
+        "url.path": "/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers Financial Data.docx",
+        "url.scheme": "https",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.email": "ASR@TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -176,7 +180,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2-my.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
+        "url.path": "/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers Financial Data Copy.docx",
+        "url.scheme": "https",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.email": "ASR@TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -268,7 +276,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2-my.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data%20Copy.docx",
+        "url.path": "/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers Financial Data Copy.docx",
+        "url.scheme": "https",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.email": "ASR@TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -364,7 +376,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2-my.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers%20Financial%20Data.docx",
+        "url.path": "/personal/asr_testsiem2_onmicrosoft_com/Documents/Customers Financial Data.docx",
+        "url.scheme": "https",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.email": "ASR@TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -460,7 +476,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2-my.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2-my.sharepoint.com/personal/asr_testsiem2_onmicrosoft_com/Documents/INTERNAL%20CREDIT%20CARD%20NUMBERS.docx",
+        "url.path": "/personal/asr_testsiem2_onmicrosoft_com/Documents/INTERNAL CREDIT CARD NUMBERS.docx",
+        "url.scheme": "https",
         "user.domain": "TESTSIEM2.ONMICROSOFT.COM",
         "user.email": "ASR@TESTSIEM2.ONMICROSOFT.COM",
         "user.id": "ASR@TESTSIEM2.ONMICROSOFT.COM",
@@ -556,7 +576,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
+        "url.path": "/sites/Internalcommunications/Shared Documents/Document.docx",
+        "url.scheme": "https",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",
@@ -652,7 +676,11 @@
         "tags": [
             "forwarded"
         ],
+        "url.domain": "testsiem2.sharepoint.com",
+        "url.extension": "docx",
         "url.original": "https://testsiem2.sharepoint.com/sites/Internalcommunications/Shared%20Documents/Document.docx",
+        "url.path": "/sites/Internalcommunications/Shared Documents/Document.docx",
+        "url.scheme": "https",
         "user.domain": "testsiem2.onmicrosoft.com",
         "user.email": "alice@testsiem2.onmicrosoft.com",
         "user.id": "alice@testsiem2.onmicrosoft.com",

@@ -5,10 +5,7 @@
 package synthexec
 
 import (
-	"encoding/json"
-
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ExecMultiplexer struct {
@@ -36,13 +33,9 @@ func (e ExecMultiplexer) writeSynthEvent(se *SynthEvent) {
 		e.currentJourney.Store(false)
 	}
 
-	out, err := json.Marshal(se)
-
 	se.index = e.eventCounter.Inc()
 	if hasCurrentJourney {
 		e.synthEvents <- se
-	} else {
-		logp.Warn("received output from synthetics outside of journey scope: %s %s", out, err)
 	}
 }
 

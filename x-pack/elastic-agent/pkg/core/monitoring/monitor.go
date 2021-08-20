@@ -7,10 +7,8 @@ package monitoring
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
-	monitoringConfig "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 )
 
 // Monitor is a monitoring interface providing information about the way
@@ -25,18 +23,17 @@ type Monitor interface {
 	Cleanup(spec program.Spec, pipelineID string) error
 	Reload(cfg *config.Config) error
 	IsMonitoringEnabled() bool
+	MonitoringNamespace() string
 	WatchLogs() bool
 	WatchMetrics() bool
 	Close()
 }
 
-// TODO: changeme
-type wrappedConfig struct {
-	DownloadConfig   *artifact.Config                   `yaml:"agent.download" config:"agent.download"`
-	MonitoringConfig *monitoringConfig.MonitoringConfig `config:"agent.monitoring" yaml:"agent.monitoring"`
-}
-
 // NewMonitor creates a monitor based on a process configuration.
 func NewMonitor(cfg *configuration.SettingsConfig) (Monitor, error) {
-	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig), nil
+	logMetrics := true
+	if cfg.LoggingConfig != nil {
+		logMetrics = cfg.LoggingConfig.Metrics.Enabled
+	}
+	return beats.NewMonitor(cfg.DownloadConfig, cfg.MonitoringConfig, logMetrics), nil
 }

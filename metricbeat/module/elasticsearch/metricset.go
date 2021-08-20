@@ -18,6 +18,7 @@
 package elasticsearch
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/pkg/errors"
@@ -65,13 +66,18 @@ func (h *Scope) Unpack(str string) error {
 	return nil
 }
 
+type MetricSetAPI interface {
+	Module() mb.Module
+	GetMasterNodeID() (string, error)
+	IsMLockAllEnabled(string) (bool, error)
+}
+
 // MetricSet can be used to build other metric sets that query RabbitMQ
 // management plugin
 type MetricSet struct {
 	mb.BaseMetricSet
 	servicePath string
 	*helper.HTTP
-	XPack bool
 	Scope Scope
 }
 
@@ -84,10 +90,8 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 	}
 
 	config := struct {
-		XPack bool  `config:"xpack.enabled"`
 		Scope Scope `config:"scope"`
 	}{
-		XPack: false,
 		Scope: ScopeNode,
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
@@ -98,7 +102,6 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		base,
 		servicePath,
 		http,
-		config.XPack,
 		config.Scope,
 	}
 
@@ -122,7 +125,7 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 	// If we're talking to a set of ES nodes directly, only collect stats from the master node so
 	// we don't collect the same stats from every node and end up duplicating them.
 	if m.Scope == ScopeNode {
-		isMaster, err := IsMaster(m.HTTP, m.GetServiceURI())
+		isMaster, err := isMaster(m.HTTP, m.GetServiceURI())
 		if err != nil {
 			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
 		}
@@ -135,4 +138,53 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 	}
 
 	return false, nil
+}
+
+// GetMasterNodeID returns the ID of the Elasticsearch cluster's master node
+func (m *MetricSet) GetMasterNodeID() (string, error) {
+	http := m.HTTP
+	resetURI := m.GetServiceURI()
+
+	content, err := fetchPath(http, resetURI, "_nodes/_master", "filter_path=nodes.*.name")
+	if err != nil {
+		return "", err
+	}
+
+	var response struct {
+		Nodes map[string]interface{} `json:"nodes"`
+	}
+
+	if err := json.Unmarshal(content, &response); err != nil {
+		return "", err
+	}
+
+	for nodeID := range response.Nodes {
+		return nodeID, nil
+	}
+
+	return "", errors.New("could not determine master node ID")
+}
+
+// IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
+func (m *MetricSet) IsMLockAllEnabled(nodeID string) (bool, error) {
+	http := m.HTTP
+	resetURI := m.GetServiceURI()
+
+	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
+	if err != nil {
+		return false, err
+	}
+
+	var response map[string]map[string]map[string]map[string]bool
+	err = json.Unmarshal(content, &response)
+	if err != nil {
+		return false, err
+	}
+
+	for _, nodeInfo := range response["nodes"] {
+		mlockall := nodeInfo["process"]["mlockall"]
+		return mlockall, nil
+	}
+
+	return false, fmt.Errorf("could not determine if mlockall is enabled on node ID = %v", nodeID)
 }

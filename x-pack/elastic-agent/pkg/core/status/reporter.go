@@ -5,6 +5,7 @@
 package status
 
 import (
+	"reflect"
 	"sync"
 
 	"github.com/google/uuid"
@@ -38,6 +39,7 @@ type AgentApplicationStatus struct {
 	Name    string
 	Status  state.Status
 	Message string
+	Payload map[string]interface{}
 }
 
 // AgentStatus returns the overall status of the Elastic Agent.
@@ -167,6 +169,7 @@ func (r *controller) Status() AgentStatus {
 			Name:    rep.name,
 			Status:  rep.status,
 			Message: rep.message,
+			Payload: rep.payload,
 		})
 		rep.mx.Unlock()
 	}
@@ -240,7 +243,7 @@ func (r *controller) StatusString() string {
 
 // Reporter reports status of component
 type Reporter interface {
-	Update(state.Status, string)
+	Update(state.Status, string, map[string]interface{})
 	Unregister()
 }
 
@@ -251,21 +254,23 @@ type reporter struct {
 	isRegistered     bool
 	status           state.Status
 	message          string
+	payload          map[string]interface{}
 	unregisterFunc   func()
 	notifyChangeFunc func()
 }
 
 // Update updates the status of a component.
-func (r *reporter) Update(s state.Status, message string) {
+func (r *reporter) Update(s state.Status, message string, payload map[string]interface{}) {
 	r.mx.Lock()
 	defer r.mx.Unlock()
 
 	if !r.isRegistered {
 		return
 	}
-	r.message = message
-	if r.status != s {
+	if r.status != s || r.message != message || !reflect.DeepEqual(r.payload, payload) {
 		r.status = s
+		r.message = message
+		r.payload = payload
 		r.notifyChangeFunc()
 	}
 }

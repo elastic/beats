@@ -1,0 +1,11 @@
+- key: awsfargate
+  title: AWS Fargate
+  release: beta
+  description: >
+    Module for collecting container logs from Amazon ECS Fargate.
+  fields:
+    - name: awsfargate
+      type: group
+      description: >
+        Fields from Amazon ECS Fargate logs.
+      fields:

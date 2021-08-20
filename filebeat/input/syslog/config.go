@@ -30,19 +30,36 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
+	Format                    syslogFormat           `config:"format"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
 }
+
+type syslogFormat int
+
+const (
+	syslogFormatRFC3164 = iota
+	syslogFormatRFC5424
+	syslogFormatAuto
+)
+
+var (
+	syslogFormats = map[string]syslogFormat{
+		"rfc3164": syslogFormatRFC3164,
+		"rfc5424": syslogFormatRFC5424,
+		"auto":    syslogFormatAuto,
+	}
+)
 
 var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "syslog",
 	},
+	Format: syslogFormatRFC3164,
 }
 
 type syslogTCP struct {
@@ -101,8 +118,6 @@ func factory(
 
 		return tcp.New(&config.Config, factory)
 	case unix.Name:
-		cfgwarn.Beta("Syslog Unix socket support is beta.")
-
 		config := defaultUnix()
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err
@@ -121,4 +136,13 @@ func factory(
 	default:
 		return nil, fmt.Errorf("you must choose between TCP or UDP")
 	}
+}
+
+func (f *syslogFormat) Unpack(value string) error {
+	format, ok := syslogFormats[value]
+	if !ok {
+		return fmt.Errorf("invalid format '%s'", value)
+	}
+	*f = format
+	return nil
 }

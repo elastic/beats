@@ -78,10 +78,10 @@
         "observer.vendor": "Check Point",
         "observer.version": "Check Point",
         "related.ip": [
-            "52.173.84.157",
             "0.0.0.0",
             "192.168.101.100",
-            "192.168.103.254"
+            "192.168.103.254",
+            "52.173.84.157"
         ],
         "rule.category": "Business / Economy",
         "rule.uuid": "9e5e6e74-aa9a-4693-b9fe-53712dd27bea",

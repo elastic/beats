@@ -61,8 +61,8 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "ServicePrincipal_9d47c163-bf1f-45c5-9b7e-b7b5e88cf451",
-                "Type": 2
+                "ID": "Microsoft Azure AD Identity Protection",
+                "Type": 1
             },
             {
                 "ID": "9d47c163-bf1f-45c5-9b7e-b7b5e88cf451",
@@ -73,8 +73,8 @@
                 "Type": 2
             },
             {
-                "ID": "Microsoft Azure AD Identity Protection",
-                "Type": 1
+                "ID": "ServicePrincipal_9d47c163-bf1f-45c5-9b7e-b7b5e88cf451",
+                "Type": 2
             },
             {
                 "ID": "a3dfc3c6-2c7d-4f42-aeec-b2877f9bce97",
@@ -110,8 +110,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "user",
-            "creation"
+            "creation",
+            "user"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -120,24 +120,24 @@
         "log.offset": 3360,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -174,10 +174,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_43399311-1c28-4cce-a8bc-7e6e791473f2",
-                "Type": 2
-            },
-            {
                 "ID": "43399311-1c28-4cce-a8bc-7e6e791473f2",
                 "Type": 2
             },
@@ -186,12 +182,16 @@
                 "Type": 2
             },
             {
-                "ID": "eve@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_43399311-1c28-4cce-a8bc-7e6e791473f2",
+                "Type": 2
             },
             {
                 "ID": "1003200113AE1D62",
                 "Type": 3
+            },
+            {
+                "ID": "eve@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -202,8 +202,8 @@
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "related.user": [
-            "root",
-            "eve"
+            "eve",
+            "root"
         ],
         "service.type": "o365",
         "tags": [
@@ -230,8 +230,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -240,24 +240,24 @@
         "log.offset": 26184,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -280,10 +280,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
@@ -292,12 +288,16 @@
                 "Type": 2
             },
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
             },
             {
                 "ID": "1003200112EB07E6",
                 "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -343,23 +343,11 @@
         "network.type": "ipv4",
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
                 "ID": "Microsoft Office 365 Portal",
                 "Type": 1
             },
             {
                 "ID": "00000006-0000-0ff1-ce00-000000000000",
-                "Type": 2
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
@@ -369,6 +357,18 @@
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -397,10 +397,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -409,12 +405,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -465,24 +465,24 @@
         "log.offset": 29455,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -501,10 +501,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -513,12 +509,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -557,24 +557,24 @@
         "log.offset": 30817,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -593,10 +593,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -605,12 +601,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -652,23 +652,11 @@
         "network.type": "ipv4",
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
                 "ID": "Microsoft Office 365 Portal",
                 "Type": 1
             },
             {
                 "ID": "00000006-0000-0ff1-ce00-000000000000",
-                "Type": 2
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
@@ -678,6 +666,18 @@
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -706,10 +706,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -718,12 +714,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -769,8 +769,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "user",
-            "change"
+            "change",
+            "user"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -780,23 +780,11 @@
         "network.type": "ipv4",
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
                 "ID": "Microsoft Office 365 Portal",
                 "Type": 1
             },
             {
                 "ID": "00000006-0000-0ff1-ce00-000000000000",
-                "Type": 2
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
@@ -806,6 +794,18 @@
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -834,10 +834,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -846,12 +842,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -863,8 +863,8 @@
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "related.ip": "52.109.68.40",
         "related.user": [
-            "root",
-            "newuser"
+            "newuser",
+            "root"
         ],
         "service.type": "o365",
         "source.as.number": 8075,
@@ -912,23 +912,11 @@
         "network.type": "ipv4",
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
                 "ID": "Microsoft Office 365 Portal",
                 "Type": 1
             },
             {
                 "ID": "00000006-0000-0ff1-ce00-000000000000",
-                "Type": 2
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
@@ -938,6 +926,18 @@
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -964,10 +964,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -976,12 +972,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1025,8 +1025,8 @@
         "event.outcome": "success",
         "event.provider": "AzureActiveDirectory",
         "event.type": [
-            "user",
-            "deletion"
+            "deletion",
+            "user"
         ],
         "fileset.name": "audit",
         "host.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1035,24 +1035,24 @@
         "log.offset": 42153,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1073,10 +1073,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -1085,12 +1081,16 @@
                 "Type": 2
             },
             {
-                "ID": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "6d4ca534c337474d8c766c715b31bc52newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1101,8 +1101,8 @@
         "o365.audit.Workload": "AzureActiveDirectory",
         "organization.id": "48622b8f-44d3-420c-b4a2-510c8165767e",
         "related.user": [
-            "root",
-            "6d4ca534c337474d8c766c715b31bc52newuser"
+            "6d4ca534c337474d8c766c715b31bc52newuser",
+            "root"
         ],
         "service.type": "o365",
         "tags": [
@@ -1136,24 +1136,24 @@
         "log.offset": 43608,
         "o365.audit.Actor": [
             {
-                "ID": "root@testsiem4.onmicrosoft.com",
-                "Type": 5
-            },
-            {
-                "ID": "1003200112EB07E6",
-                "Type": 3
-            },
-            {
-                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
-                "Type": 2
-            },
-            {
                 "ID": "21119711-1517-43d4-8138-b537dafad016",
                 "Type": 2
             },
             {
                 "ID": "User",
                 "Type": 2
+            },
+            {
+                "ID": "User_21119711-1517-43d4-8138-b537dafad016",
+                "Type": 2
+            },
+            {
+                "ID": "1003200112EB07E6",
+                "Type": 3
+            },
+            {
+                "ID": "root@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.ActorContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",
@@ -1172,10 +1172,6 @@
         "o365.audit.SupportTicketId": "",
         "o365.audit.Target": [
             {
-                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
-                "Type": 2
-            },
-            {
                 "ID": "6d4ca534-c337-474d-8c76-6c715b31bc52",
                 "Type": 2
             },
@@ -1184,12 +1180,16 @@
                 "Type": 2
             },
             {
-                "ID": "newuser@testsiem4.onmicrosoft.com",
-                "Type": 5
+                "ID": "User_6d4ca534-c337-474d-8c76-6c715b31bc52",
+                "Type": 2
             },
             {
                 "ID": "10032001131B9761",
                 "Type": 3
+            },
+            {
+                "ID": "newuser@testsiem4.onmicrosoft.com",
+                "Type": 5
             }
         ],
         "o365.audit.TargetContextId": "48622b8f-44d3-420c-b4a2-510c8165767e",

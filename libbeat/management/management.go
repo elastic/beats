@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 )
 
 // Status describes the current status of the beat.
@@ -82,6 +83,14 @@ type Manager interface {
 
 	// CheckRawConfig check settings are correct before launching the beat.
 	CheckRawConfig(cfg *common.Config) error
+
+	// RegisterAction registers action handler with the client
+	RegisterAction(action client.Action)
+	// UnregisterAction unregisters action handler with the client
+	UnregisterAction(action client.Action)
+
+	// SetPayload sets the client payload
+	SetPayload(map[string]interface{})
 }
 
 // PluginFunc for creating FactoryFunc if it matches a config
@@ -155,3 +164,9 @@ func (n *nilManager) UpdateStatus(status Status, msg string) {
 		n.logger.Infof("Status change to %s: %s", status, msg)
 	}
 }
+
+func (n *nilManager) RegisterAction(action client.Action) {}
+
+func (n *nilManager) UnregisterAction(action client.Action) {}
+
+func (n *nilManager) SetPayload(map[string]interface{}) {}

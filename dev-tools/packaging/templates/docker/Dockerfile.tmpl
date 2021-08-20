@@ -10,25 +10,27 @@ COPY beat {{ $beatHome }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \
-    find {{ $beatHome }} -type d -exec chmod 0750 {} \; && \
-    find {{ $beatHome }} -type f -exec chmod 0640 {} \; && \
-    chmod 0750 {{ $beatBinary }} && \
+    find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
+    find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
+    chmod 0755 {{ $beatBinary }} && \
 {{- if .linux_capabilities }}
     setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
 {{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
-    chmod 0770 {{ $beatHome}}/{{ $modulesd }} && \
+    chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-    chmod 0770 {{ $beatHome }}/data {{ $beatHome }}/logs
+    chmod 0775 {{ $beatHome }}/data {{ $beatHome }}/logs
 
 FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
-RUN microdnf -y --setopt=tsflags=nodocs update && \
+RUN microdnf -y update && \
     microdnf install shadow-utils && \
     microdnf clean all
 {{- else }}
-RUN yum -y --setopt=tsflags=nodocs update \
+# FIXME: Package bind-license failed to update in arm
+RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
+    yum -y update $YUM_FLAGS \
   {{- if (eq .BeatName "heartbeat") }}
     && yum -y install epel-release \
     && yum -y install atk cups gtk gdk xrandr pango libXcomposite libXcursor libXdamage \
@@ -45,7 +47,7 @@ ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
     {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.synthetics \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
@@ -126,7 +128,7 @@ USER {{ .user }}
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=12.18.4
+ENV NODE_VERSION=14.17.5
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

@@ -32,56 +32,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
-// WriteEvent fetches a single event writes the output to a ./_meta/data.json
-// file.
-func WriteEvent(f mb.EventFetcher, t testing.TB) error {
-	if !*flags.DataFlag {
-		t.Skip("skip data generation tests")
-	}
-
-	event, err := f.Fetch()
-	if err != nil {
-		return err
-	}
-
-	fullEvent := CreateFullEvent(f, event)
-	WriteEventToDataJSON(t, fullEvent, ".")
-	return nil
-}
-
-// WriteEvents fetches events and writes the first event to a ./_meta/data.json
-// file.
-func WriteEvents(f mb.EventsFetcher, t testing.TB) error {
-	return WriteEventsCond(f, t, nil)
-
-}
-
-// WriteEventsCond fetches events and writes the first event that matches the condition
-// to a ./_meta/data.json file.
-func WriteEventsCond(f mb.EventsFetcher, t testing.TB, cond func(e common.MapStr) bool) error {
-	if !*flags.DataFlag {
-		t.Skip("skip data generation tests")
-	}
-
-	events, err := f.Fetch()
-	if err != nil {
-		return err
-	}
-
-	if len(events) == 0 {
-		return fmt.Errorf("no events were generated")
-	}
-
-	event, err := SelectEvent(events, cond)
-	if err != nil {
-		return err
-	}
-
-	fullEvent := CreateFullEvent(f, event)
-	WriteEventToDataJSON(t, fullEvent, "")
-	return nil
-}
-
 // WriteEventsReporterV2 fetches events and writes the first event to a ./_meta/data.json
 // file.
 func WriteEventsReporterV2(f mb.ReportingMetricSetV2, t testing.TB, path string) error {

@@ -29,7 +29,7 @@ POST /_security/api_key
   "name": "{beat_default_index_prefix}_host001", <1>
   "role_descriptors": {
     "{beat_default_index_prefix}_writer": { <2>
-      "cluster": ["monitor", "read_ilm"],
+      "cluster": ["monitor", "read_ilm", "read_pipeline"],
       "index": [
         {
           "names": ["{beat_default_index_prefix}-*"],

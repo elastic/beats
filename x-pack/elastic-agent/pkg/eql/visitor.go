@@ -218,10 +218,7 @@ func (v *expVisitor) VisitExpArithmeticLT(ctx *parser.ExpArithmeticLTContext) in
 }
 
 func (v *expVisitor) VisitBoolean(ctx *parser.BooleanContext) interface{} {
-	if ctx.TRUE() != nil {
-		return true
-	}
-	return false
+	return ctx.TRUE() != nil
 }
 
 func (v *expVisitor) VisitArguments(ctx *parser.ArgumentsContext) interface{} {

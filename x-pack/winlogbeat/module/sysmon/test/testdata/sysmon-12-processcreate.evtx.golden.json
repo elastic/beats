@@ -5,7 +5,7 @@
       "category": [
         "process"
       ],
-      "code": 1,
+      "code": "1",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -72,10 +72,9 @@
         "LogonGuid": "{9f32b55f-6fdd-5f98-e7c9-020000000000}",
         "LogonId": "0x2c9e7",
         "Product": "Microsoft® Windows® Operating System",
-        "RuleName": "-",
         "TerminalSessionId": "1"
       },
-      "event_id": 1,
+      "event_id": "1",
       "process": {
         "pid": 7144,
         "thread": {

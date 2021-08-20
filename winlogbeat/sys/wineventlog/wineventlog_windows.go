@@ -25,6 +25,7 @@ import (
 	"io"
 	"reflect"
 	"runtime"
+	"sort"
 	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -419,6 +420,42 @@ func FormatEventString(
 	return common.UTF16ToUTF8Bytes(buffer[:bufferUsed], out)
 }
 
+// Publishers returns a sort list of event publishers on the local computer.
+func Publishers() ([]string, error) {
+	publisherEnumerator, err := _EvtOpenPublisherEnum(NilHandle, 0)
+	if err != nil {
+		return nil, fmt.Errorf("failed in EvtOpenPublisherEnum: %w", err)
+	}
+	defer Close(publisherEnumerator)
+
+	var (
+		publishers []string
+		bufferUsed uint32
+		buffer     = make([]uint16, 1024)
+	)
+
+loop:
+	for {
+		if err = _EvtNextPublisherId(publisherEnumerator, uint32(len(buffer)), &buffer[0], &bufferUsed); err != nil {
+			switch err {
+			case ERROR_NO_MORE_ITEMS:
+				break loop
+			case ERROR_INSUFFICIENT_BUFFER:
+				buffer = make([]uint16, bufferUsed)
+				continue loop
+			default:
+				return nil, fmt.Errorf("failed in EvtNextPublisherId: %w", err)
+			}
+		}
+
+		provider := windows.UTF16ToString(buffer)
+		publishers = append(publishers, provider)
+	}
+
+	sort.Strings(publishers)
+	return publishers, nil
+}
+
 // offset reads a pointer value from the reader then calculates an offset from
 // the start of the buffer to the pointer location. If the pointer value is
 // NULL or is outside of the bounds of the buffer then an error is returned.
@@ -471,7 +508,7 @@ func readString(buffer []byte, reader io.Reader) (string, error) {
 		}
 		return "", err
 	}
-	str, _, err := sys.UTF16BytesToString(buffer[offset:])
+	str, err := sys.UTF16BytesToString(buffer[offset:])
 	return str, err
 }
 

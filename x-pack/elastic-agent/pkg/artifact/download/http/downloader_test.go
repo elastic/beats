@@ -21,8 +21,7 @@ func TestDownloadBodyError(t *testing.T) {
 	// part way through the download, while copying the response body.
 
 	type connKey struct{}
-	var srv *httptest.Server
-	srv = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.(http.Flusher).Flush()
 		conn := r.Context().Value(connKey{}).(net.Conn)

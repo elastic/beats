@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 )
 
 func TestSetupIndexProcessor(t *testing.T) {
@@ -37,38 +38,43 @@ func TestSetupIndexProcessor(t *testing.T) {
 	tests := map[string]struct {
 		settings      publishSettings
 		expectedIndex string
+		monitorType   string
 		wantProc      bool
 		wantErr       bool
 	}{
 		"no settings should yield no processor": {
 			publishSettings{},
 			"",
+			"browser",
 			false,
 			false,
 		},
 		"exact index should be used exactly": {
 			publishSettings{Index: *fmtstr.MustCompileEvent("test")},
 			"test",
+			"browser",
 			true,
 			false,
 		},
 		"data stream should be type-namespace-dataset": {
 			publishSettings{
-				DataStream: &datastream{
-					Type:      "myType",
-					Dataset:   "myDataset",
+				DataStream: &add_data_stream_index.DataStream{
 					Namespace: "myNamespace",
+					Dataset:   "myDataset",
+					Type:      "myType",
 				},
 			},
 			"myType-myDataset-myNamespace",
+			"myType",
 			true,
 			false,
 		},
 		"data stream should use defaults": {
 			publishSettings{
-				DataStream: &datastream{},
+				DataStream: &add_data_stream_index.DataStream{},
 			},
-			"synthetics-generic-default",
+			"synthetics-browser-default",
+			"browser",
 			true,
 			false,
 		},
@@ -77,7 +83,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			e := beat.Event{Meta: common.MapStr{}, Fields: common.MapStr{}}
-			proc, err := setupIndexProcessor(binfo, tt.settings)
+			proc, err := setupIndexProcessor(binfo, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)
 				return
@@ -89,6 +95,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 				return
 			}
 
+			require.NotNil(t, proc)
 			_, err = proc.Run(&e)
 			require.Equal(t, tt.expectedIndex, e.Meta[events.FieldMetaRawIndex])
 		})

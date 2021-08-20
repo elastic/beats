@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.163.21",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -26,7 +26,7 @@
         },
         "flow": {
           "id": "6gDDasxO-4o",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -83,7 +83,7 @@
         "source": {
           "bytes": 1027087,
           "ip": "10.22.166.30",
-          "locality": "private",
+          "locality": "internal",
           "packets": 697,
           "port": 0
         }
@@ -97,7 +97,7 @@
       "Fields": {
         "destination": {
           "ip": "10.21.3.172",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -116,7 +116,7 @@
         },
         "flow": {
           "id": "RJbWY0zxttI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -173,7 +173,7 @@
         "source": {
           "bytes": 6200,
           "ip": "10.22.166.12",
-          "locality": "private",
+          "locality": "internal",
           "packets": 6,
           "port": 0
         }
@@ -187,7 +187,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.178.37",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -206,7 +206,7 @@
         },
         "flow": {
           "id": "MfdYhUDA3Y4",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -263,7 +263,7 @@
         "source": {
           "bytes": 11896,
           "ip": "10.22.166.33",
-          "locality": "private",
+          "locality": "internal",
           "packets": 21,
           "port": 0
         }
@@ -277,7 +277,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.100.253",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -296,7 +296,7 @@
         },
         "flow": {
           "id": "_QFogYw9xiY",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -353,7 +353,7 @@
         "source": {
           "bytes": 1041,
           "ip": "10.22.166.35",
-          "locality": "private",
+          "locality": "internal",
           "packets": 3,
           "port": 0
         }
@@ -367,7 +367,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.136.36",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -386,7 +386,7 @@
         },
         "flow": {
           "id": "-O7eEnuq5LI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -443,7 +443,7 @@
         "source": {
           "bytes": 1740,
           "ip": "10.22.166.36",
-          "locality": "private",
+          "locality": "internal",
           "packets": 20,
           "port": 0
         }
@@ -457,7 +457,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.147.28",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -476,7 +476,7 @@
         },
         "flow": {
           "id": "pcgnaJ3iCvI",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -533,7 +533,7 @@
         "source": {
           "bytes": 2998,
           "ip": "10.22.166.36",
-          "locality": "private",
+          "locality": "internal",
           "packets": 16,
           "port": 0
         }
@@ -547,7 +547,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.141.16",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -566,7 +566,7 @@
         },
         "flow": {
           "id": "_gbuwRW4AVE",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -623,7 +623,7 @@
         "source": {
           "bytes": 55773,
           "ip": "10.22.166.28",
-          "locality": "private",
+          "locality": "internal",
           "packets": 37,
           "port": 0
         }
@@ -637,7 +637,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.162.17",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -656,7 +656,7 @@
         },
         "flow": {
           "id": "VOe0rUor-cg",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -713,7 +713,7 @@
         "source": {
           "bytes": 3239438,
           "ip": "10.22.166.35",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2135,
           "port": 0
         }
@@ -727,7 +727,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.171.36",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -746,7 +746,7 @@
         },
         "flow": {
           "id": "nkp7tr2MVcs",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -803,7 +803,7 @@
         "source": {
           "bytes": 5701,
           "ip": "10.22.166.15",
-          "locality": "private",
+          "locality": "internal",
           "packets": 20,
           "port": 0
         }
@@ -817,7 +817,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.208.12",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -836,7 +836,7 @@
         },
         "flow": {
           "id": "WxCFEmsTIh0",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -893,7 +893,7 @@
         "source": {
           "bytes": 4255012,
           "ip": "10.22.166.2",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2804,
           "port": 0
         }
@@ -907,7 +907,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.196.21",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -926,7 +926,7 @@
         },
         "flow": {
           "id": "rAIv2psXy74",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -983,7 +983,7 @@
         "source": {
           "bytes": 37557,
           "ip": "10.22.166.28",
-          "locality": "private",
+          "locality": "internal",
           "packets": 25,
           "port": 0
         }
@@ -997,7 +997,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.202.15",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -1016,7 +1016,7 @@
         },
         "flow": {
           "id": "lR18K-eSVNM",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -1073,7 +1073,7 @@
         "source": {
           "bytes": 23676,
           "ip": "10.22.166.25",
-          "locality": "private",
+          "locality": "internal",
           "packets": 68,
           "port": 0
         }
@@ -1087,7 +1087,7 @@
       "Fields": {
         "destination": {
           "ip": "10.20.166.26",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -1106,7 +1106,7 @@
         },
         "flow": {
           "id": "1XCFo-Jv19g",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -1163,7 +1163,7 @@
         "source": {
           "bytes": 22821,
           "ip": "10.22.166.25",
-          "locality": "private",
+          "locality": "internal",
           "packets": 30,
           "port": 0
         }
@@ -1177,7 +1177,7 @@
       "Fields": {
         "destination": {
           "ip": "10.21.3.117",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -1196,7 +1196,7 @@
         },
         "flow": {
           "id": "DkV-9Meb8W8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -1253,7 +1253,7 @@
         "source": {
           "bytes": 526,
           "ip": "10.22.166.12",
-          "locality": "private",
+          "locality": "internal",
           "packets": 2,
           "port": 0
         }
@@ -1267,7 +1267,7 @@
       "Fields": {
         "destination": {
           "ip": "10.22.145.26",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -1286,7 +1286,7 @@
         },
         "flow": {
           "id": "v1m_MeAqdL4",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -1343,7 +1343,7 @@
         "source": {
           "bytes": 33129,
           "ip": "10.22.166.17",
-          "locality": "private",
+          "locality": "internal",
           "packets": 220,
           "port": 0
         }
@@ -1357,7 +1357,7 @@
       "Fields": {
         "destination": {
           "ip": "10.21.75.38",
-          "locality": "private",
+          "locality": "internal",
           "port": 0
         },
         "event": {
@@ -1376,7 +1376,7 @@
         },
         "flow": {
           "id": "ru0mPvG-tKw",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -1433,7 +1433,7 @@
         "source": {
           "bytes": 5092,
           "ip": "10.22.166.36",
-          "locality": "private",
+          "locality": "internal",
           "packets": 9,
           "port": 0
         }

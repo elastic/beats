@@ -20,8 +20,8 @@
         "event.module": "crowdstrike",
         "event.outcome": "unknown",
         "event.type": [
-            "start",
-            "session"
+            "session",
+            "start"
         ],
         "fileset.name": "falcon",
         "host.name": "hostnameofmachine",
@@ -92,24 +92,24 @@
     {
         "crowdstrike.event.AuditKeyValues": [
             {
-                "Key": "APIClientID",
-                "ValueString": "1234567890abcdefghijklmnopqr"
+                "Key": "offset",
+                "ValueString": "-1"
             },
             {
                 "Key": "partition",
                 "ValueString": "0"
             },
             {
-                "Key": "offset",
-                "ValueString": "-1"
-            },
-            {
-                "Key": "appId",
-                "ValueString": "siem-connector-v2.0.0"
+                "Key": "APIClientID",
+                "ValueString": "1234567890abcdefghijklmnopqr"
             },
             {
                 "Key": "eventType",
                 "ValueString": "[UserActivityAuditEvent HashSpreadingEvent RemoteResponseSessionStartEvent RemoteResponseSessionEndEvent DetectionSummaryEvent AuthActivityAuditEvent]"
+            },
+            {
+                "Key": "appId",
+                "ValueString": "siem-connector-v2.0.0"
             }
         ],
         "crowdstrike.event.OperationName": "streamStarted",
@@ -574,20 +574,20 @@
     {
         "crowdstrike.event.AuditKeyValues": [
             {
-                "Key": "detection_id",
-                "ValueString": "ldt:5a6fd0b7347440cd74cb84855a8aee18:17180539745"
-            },
-            {
-                "Key": "new_state",
-                "ValueString": "in_progress"
-            },
-            {
                 "Key": "assigned_to",
                 "ValueString": "First Last"
             },
             {
                 "Key": "assigned_to_uid",
                 "ValueString": "first.last@company.com"
+            },
+            {
+                "Key": "new_state",
+                "ValueString": "in_progress"
+            },
+            {
+                "Key": "detection_id",
+                "ValueString": "ldt:5a6fd0b7347440cd74cb84855a8aee18:17180539745"
             }
         ],
         "crowdstrike.event.OperationName": "detection_update",

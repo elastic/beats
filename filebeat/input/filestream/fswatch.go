@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -50,6 +51,7 @@ type watcherFactory func(paths []string, cfg *common.Config) (loginp.FSWatcher, 
 type fileScanner struct {
 	paths         []string
 	excludedFiles []match.Matcher
+	includedFiles []match.Matcher
 	symlinks      bool
 
 	log *logp.Logger
@@ -58,6 +60,9 @@ type fileScanner struct {
 type fileWatcherConfig struct {
 	// Interval is the time between two scans.
 	Interval time.Duration `config:"check_interval"`
+	// ResendOnModTime  if a file has been changed according to modtime but the size is the same
+	// it is still considered truncation.
+	ResendOnModTime bool `config:"resend_on_touch"`
 	// Scanner is the configuration of the scanner.
 	Scanner fileScannerConfig `config:",inline"`
 }
@@ -65,11 +70,12 @@ type fileWatcherConfig struct {
 // fileWatcher gets the list of files from a FSWatcher and creates events by
 // comparing the files between its last two runs.
 type fileWatcher struct {
-	interval time.Duration
-	prev     map[string]os.FileInfo
-	scanner  loginp.FSScanner
-	log      *logp.Logger
-	events   chan loginp.FSEvent
+	interval        time.Duration
+	resendOnModTime bool
+	prev            map[string]os.FileInfo
+	scanner         loginp.FSScanner
+	log             *logp.Logger
+	events          chan loginp.FSEvent
 }
 
 func newFileWatcher(paths []string, ns *common.ConfigNamespace) (loginp.FSWatcher, error) {
@@ -97,34 +103,34 @@ func newScannerWatcher(paths []string, c *common.Config) (loginp.FSWatcher, erro
 		return nil, err
 	}
 	return &fileWatcher{
-		log:      logp.NewLogger(watcherDebugKey),
-		interval: config.Interval,
-		prev:     make(map[string]os.FileInfo, 0),
-		scanner:  scanner,
-		events:   make(chan loginp.FSEvent),
+		log:             logp.NewLogger(watcherDebugKey),
+		interval:        config.Interval,
+		resendOnModTime: config.ResendOnModTime,
+		prev:            make(map[string]os.FileInfo, 0),
+		scanner:         scanner,
+		events:          make(chan loginp.FSEvent),
 	}, nil
 }
 
 func defaultFileWatcherConfig() fileWatcherConfig {
 	return fileWatcherConfig{
-		Interval: 10 * time.Second,
-		Scanner:  defaultFileScannerConfig(),
+		Interval:        10 * time.Second,
+		ResendOnModTime: false,
+		Scanner:         defaultFileScannerConfig(),
 	}
 }
 
 func (w *fileWatcher) Run(ctx unison.Canceler) {
 	defer close(w.events)
 
-	ticker := time.NewTicker(w.interval)
-	defer ticker.Stop()
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case <-ticker.C:
-			w.watch(ctx)
-		}
-	}
+	// run initial scan before starting regular
+	w.watch(ctx)
+
+	timed.Periodic(ctx, w.interval, func() error {
+		w.watch(ctx)
+
+		return nil
+	})
 }
 
 func (w *fileWatcher) watch(ctx unison.Canceler) {
@@ -143,10 +149,18 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 		}
 
 		if prevInfo.ModTime() != info.ModTime() {
-			select {
-			case <-ctx.Done():
-				return
-			case w.events <- writeEvent(path, info):
+			if prevInfo.Size() > info.Size() || w.resendOnModTime && prevInfo.Size() == info.Size() {
+				select {
+				case <-ctx.Done():
+					return
+				case w.events <- truncateEvent(path, info):
+				}
+			} else {
+				select {
+				case <-ctx.Done():
+					return
+				case w.events <- writeEvent(path, info):
+				}
 			}
 		}
 
@@ -199,6 +213,10 @@ func writeEvent(path string, fi os.FileInfo) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpWrite, OldPath: path, NewPath: path, Info: fi}
 }
 
+func truncateEvent(path string, fi os.FileInfo) loginp.FSEvent {
+	return loginp.FSEvent{Op: loginp.OpTruncate, OldPath: path, NewPath: path, Info: fi}
+}
+
 func renamedEvent(oldPath, path string, fi os.FileInfo) loginp.FSEvent {
 	return loginp.FSEvent{Op: loginp.OpRename, OldPath: oldPath, NewPath: path, Info: fi}
 }
@@ -217,6 +235,7 @@ func (w *fileWatcher) GetFiles() map[string]os.FileInfo {
 
 type fileScannerConfig struct {
 	ExcludedFiles []match.Matcher `config:"exclude_files"`
+	IncludedFiles []match.Matcher `config:"include_files"`
 	Symlinks      bool            `config:"symlinks"`
 	RecursiveGlob bool            `config:"recursive_glob"`
 }
@@ -232,6 +251,7 @@ func newFileScanner(paths []string, cfg fileScannerConfig) (loginp.FSScanner, er
 	fs := fileScanner{
 		paths:         paths,
 		excludedFiles: cfg.ExcludedFiles,
+		includedFiles: cfg.IncludedFiles,
 		symlinks:      cfg.Symlinks,
 		log:           logp.NewLogger(scannerName),
 	}
@@ -320,7 +340,7 @@ func (s *fileScanner) GetFiles() map[string]os.FileInfo {
 }
 
 func (s *fileScanner) shouldSkipFile(file string) bool {
-	if s.isFileExcluded(file) {
+	if s.isFileExcluded(file) || !s.isFileIncluded(file) {
 		s.log.Debugf("Exclude file: %s", file)
 		return true
 	}
@@ -339,6 +359,18 @@ func (s *fileScanner) shouldSkipFile(file string) bool {
 	isSymlink := fileInfo.Mode()&os.ModeSymlink > 0
 	if isSymlink && !s.symlinks {
 		s.log.Debugf("File %s skipped as it is a symlink", file)
+		return true
+	}
+
+	originalFile, err := filepath.EvalSymlinks(file)
+	if err != nil {
+		s.log.Debugf("finding path to original file has failed %s: %+v", file, err)
+		return true
+	}
+	// Check if original file is included to make sure we are not reading from
+	// unwanted files.
+	if s.isFileExcluded(originalFile) || !s.isFileIncluded(originalFile) {
+		s.log.Debugf("Exclude original file: %s", file)
 		return true
 	}
 
@@ -365,6 +397,13 @@ func (s *fileScanner) isOriginalAndSymlinkConfigured(file string, paths map[stri
 
 func (s *fileScanner) isFileExcluded(file string) bool {
 	return len(s.excludedFiles) > 0 && s.matchAny(s.excludedFiles, file)
+}
+
+func (s *fileScanner) isFileIncluded(file string) bool {
+	if len(s.includedFiles) == 0 {
+		return true
+	}
+	return s.matchAny(s.includedFiles, file)
 }
 
 // matchAny checks if the text matches any of the regular expressions

@@ -1,0 +1,21 @@
+module_version: 1.0
+
+var:
+  - name: paths
+    default:
+      - /var/log/bro/current/ntp.log
+    os.linux:
+      - /var/log/bro/current/ntp.log
+    os.darwin:
+      - /usr/local/var/logs/current/ntp.log
+  - name: tags
+    default: [zeek.ntp]
+  - name: internal_networks
+    default: [ private ]
+
+ingest_pipeline: ingest/pipeline.yml
+input: config/ntp.yml
+
+requires.processors:
+- name: geoip
+  plugin: ingest-geoip

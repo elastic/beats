@@ -11,6 +11,11 @@ This file is generated! See scripts/docs_collector.py
 The +{modulename}+ module parses access and error logs created by the
 Internet Information Services (IIS) HTTP server.
 
+[IMPORTANT]
+=====
+The +{modulename}+ module currently supports only the default W3C log format.
+=====
+
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]

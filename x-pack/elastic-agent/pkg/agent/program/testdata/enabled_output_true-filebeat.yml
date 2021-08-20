@@ -1,3 +1,10 @@
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+      timeout: 1s
+
 filebeat:
   inputs:
   - type: log
@@ -22,11 +29,17 @@ filebeat:
             id: agent-id
             version: 8.0.0
             snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
 output:
   elasticsearch:
     enabled: true
     hosts:
       - 127.0.0.1:9200
       - 127.0.0.1:9300
+    headers:
+      h1: test-header
     username: elastic
     password: changeme

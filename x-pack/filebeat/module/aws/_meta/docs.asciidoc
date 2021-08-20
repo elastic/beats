@@ -7,12 +7,15 @@
 
 == AWS module
 
-beta[]
-
 This is a module for aws logs. It uses filebeat s3 input to get log files from
-AWS S3 buckets with SQS notification. This module supports reading s3 server
-access logs with `s3access` fileset, ELB access logs with `elb` fileset, VPC
-flow logs with `vpcflow` fileset, and CloudTrail logs with `cloudtrail` fileset.
+AWS S3 buckets with SQS notification or directly polling list of S3 objects in an S3 bucket.
+The use of SQS notification is preferred: polling list of S3 objects is expensive
+in terms of performance and costs, and cannot scale horizontally without ingestion duplication,
+and should be preferably used only when no SQS notification can be attached to the S3 buckets.
+
+This module supports reading S3 server access logs with `s3access` fileset,
+ELB access logs with `elb` fileset, VPC flow logs with `vpcflow` fileset,
+and CloudTrail logs with `cloudtrail` fileset.
 
 Access logs contain detailed information about the requests made to these
 services. VPC flow logs captures information about the IP traffic going to and
@@ -39,6 +42,9 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -48,10 +54,14 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -61,10 +71,14 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -74,10 +88,14 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -87,10 +105,14 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -100,10 +122,14 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_interval: 300s
+    #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
     #var.credential_profile_name: fb-aws
     #var.access_key_id: access_key_id
@@ -113,11 +139,12 @@ Example config:
     #var.api_timeout: 120s
     #var.endpoint: amazonaws.com
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+    #var.proxy_url: http://proxy:8080
 ----
 
 *`var.queue_url`*::
 
-(Required) AWS SQS queue url.
+AWS SQS queue url (Required when `var.bucket` is not set).
 
 *`var.visibility_timeout`*::
 
@@ -127,6 +154,19 @@ Default to be 300 seconds.
 *`var.api_timeout`*::
 
 Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+
+*`var.bucket`*::
+
+AWS S3 bucket ARN (Required when `var.queue_url` is not set).
+
+*`var.number_of_workers`*::
+
+Number of workers that will process the S3 objects listed (Required when `var.bucket` is set).
+Use to vertically scale the input.
+
+*`var.bucket_list_interval`*::
+
+Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
 
 *`var.endpoint`*::
 

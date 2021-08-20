@@ -29,7 +29,7 @@ Example configuration:
 
 <1> `hosts` are required.
 
-<2> `paths` are required.
+<2> `topics` are required.
 
 All other settings are optional.
 

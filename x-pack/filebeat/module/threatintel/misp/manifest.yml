@@ -14,6 +14,7 @@ var:
     default: "https://localhost/events/restSearch"
   - name: tags
     default: [threatintel-misp, forwarded]
+  - name: proxy_url
 
 ingest_pipeline:
   - ingest/pipeline.yml

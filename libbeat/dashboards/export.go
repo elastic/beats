@@ -50,12 +50,12 @@ type YMLElement struct {
 }
 
 // Export wraps GetDashboard call to provide a more descriptive API
-func Export(client *kibana.Client, id string) (common.MapStr, error) {
+func Export(client *kibana.Client, id string) ([]byte, error) {
 	return client.GetDashboard(id)
 }
 
 // ExportAllFromYml exports all dashboards found in the YML file
-func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, ListYML, error) {
+func ExportAllFromYml(client *kibana.Client, ymlPath string) ([][]byte, ListYML, error) {
 	b, err := ioutil.ReadFile(ymlPath)
 	if err != nil {
 		return nil, ListYML{}, errors.Wrap(err, "error opening the list of dashboards")
@@ -75,8 +75,8 @@ func ExportAllFromYml(client *kibana.Client, ymlPath string) ([]common.MapStr, L
 }
 
 // ExportAll exports all dashboards from an opened and parsed dashboards YML.
-func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
-	var results []common.MapStr
+func ExportAll(client *kibana.Client, list ListYML) ([][]byte, error) {
+	var results [][]byte
 	for _, e := range list.Dashboards {
 		result, err := Export(client, e.ID)
 		if err != nil {
@@ -88,7 +88,7 @@ func ExportAll(client *kibana.Client, list ListYML) ([]common.MapStr, error) {
 }
 
 // SaveToFile creates the required directories if needed and saves dashboard.
-func SaveToFile(dashboard common.MapStr, filename, root string, version common.Version) error {
+func SaveToFile(dashboard []byte, filename, root string, version common.Version) error {
 	dashboardsPath := path.Join("_meta", "kibana", strconv.Itoa(version.Major), "dashboard")
 	err := os.MkdirAll(path.Join(root, dashboardsPath), 0750)
 	if err != nil {
@@ -97,5 +97,5 @@ func SaveToFile(dashboard common.MapStr, filename, root string, version common.V
 
 	out := filepath.Join(root, dashboardsPath, filename)
 
-	return ioutil.WriteFile(out, []byte(dashboard.StringToPrint()), OutputPermission)
+	return ioutil.WriteFile(out, dashboard, OutputPermission)
 }

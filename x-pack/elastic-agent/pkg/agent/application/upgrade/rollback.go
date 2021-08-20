@@ -73,6 +73,9 @@ func Cleanup(currentHash string, removeMarker bool) error {
 		return err
 	}
 
+	// remove symlink to avoid upgrade failures, ignore error
+	_ = os.Remove(prevSymlinkPath())
+
 	dirPrefix := fmt.Sprintf("%s-", agentName)
 	currentDir := fmt.Sprintf("%s-%s", agentName, currentHash)
 	for _, dir := range subdirs {
@@ -101,7 +104,8 @@ func InvokeWatcher(log *logger.Logger) error {
 		return nil
 	}
 
-	cmd := invokeCmd()
+	versionedHome := paths.VersionedHome(paths.Top())
+	cmd := invokeCmd(versionedHome)
 	defer func() {
 		if cmd.Process != nil {
 			log.Debugf("releasing watcher %v", cmd.Process.Pid)

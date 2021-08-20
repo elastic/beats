@@ -9,16 +9,22 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/modifiers"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/router"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline/stream"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/operation"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
@@ -33,7 +39,7 @@ type FleetServerBootstrap struct {
 	log         *logger.Logger
 	Config      configuration.FleetAgentConfig
 	agentInfo   *info.AgentInfo
-	router      *router
+	router      pipeline.Router
 	source      source
 	srv         *server.Server
 }
@@ -52,7 +58,7 @@ func newFleetServerBootstrap(
 	}
 
 	if log == nil {
-		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig)
+		log, err = logger.NewFromConfig("", cfg.Settings.LoggingConfig, false)
 		if err != nil {
 			return nil, err
 		}
@@ -80,12 +86,17 @@ func newFleetServerBootstrap(
 
 	reporter := reporting.NewReporter(bootstrapApp.bgContext, log, bootstrapApp.agentInfo, logR)
 
+	if cfg.Settings.MonitoringConfig != nil {
+		cfg.Settings.MonitoringConfig.Enabled = false
+	} else {
+		cfg.Settings.MonitoringConfig = &monitoringCfg.MonitoringConfig{Enabled: false}
+	}
 	monitor, err := monitoring.NewMonitor(cfg.Settings)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize monitoring")
 	}
 
-	router, err := newRouter(log, streamFactory(bootstrapApp.bgContext, agentInfo, cfg.Settings, bootstrapApp.srv, reporter, monitor, statusCtrl))
+	router, err := router.New(log, stream.Factory(bootstrapApp.bgContext, agentInfo, cfg.Settings, bootstrapApp.srv, reporter, monitor, statusCtrl))
 	if err != nil {
 		return nil, errors.New(err, "fail to initialize pipeline router")
 	}
@@ -96,8 +107,8 @@ func newFleetServerBootstrap(
 		log,
 		agentInfo,
 		router,
-		&configModifiers{
-			Filters: []filterFunc{filters.StreamChecker, injectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+		&pipeline.ConfigModifiers{
+			Filters: []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 	)
 	if err != nil {
@@ -107,6 +118,11 @@ func newFleetServerBootstrap(
 	discover := discoverer(pathConfigFile, cfg.Settings.Path)
 	bootstrapApp.source = newOnce(log, discover, emit)
 	return bootstrapApp, nil
+}
+
+// Routes returns a list of routes handled by server.
+func (b *FleetServerBootstrap) Routes() *sorted.Set {
+	return b.router.Routes()
 }
 
 // Start starts a managed elastic-agent.
@@ -138,7 +154,7 @@ func (b *FleetServerBootstrap) AgentInfo() *info.AgentInfo {
 	return b.agentInfo
 }
 
-func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers) (emitterFunc, error) {
+func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers) (pipeline.EmitterFunc, error) {
 	ch := make(chan *config.Config)
 
 	go func() {
@@ -163,8 +179,8 @@ func bootstrapEmitter(ctx context.Context, log *logger.Logger, agentInfo transpi
 	}, nil
 }
 
-func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDispatcher, modifiers *configModifiers, c *config.Config) error {
-	if err := InjectAgentConfig(c); err != nil {
+func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router pipeline.Router, modifiers *pipeline.ConfigModifiers, c *config.Config) error {
+	if err := info.InjectAgentConfig(c); err != nil {
 		return err
 	}
 
@@ -202,8 +218,8 @@ func emit(log *logger.Logger, agentInfo transpiler.AgentInfo, router programsDis
 		return errors.New("bootstrap configuration is incorrect causing fleet-server to not be started")
 	}
 
-	return router.Dispatch(ast.HashStr(), map[routingKey][]program.Program{
-		defautlRK: {
+	return router.Route(ast.HashStr(), map[pipeline.RoutingKey][]program.Program{
+		pipeline.DefaultRK: {
 			{
 				Spec:   spec,
 				Config: ast,

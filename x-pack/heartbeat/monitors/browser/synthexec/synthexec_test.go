@@ -55,7 +55,7 @@ func TestJsonToSynthEvent(t *testing.T) {
 		},
 		{
 			name: "a valid line",
-			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
+			line: `{"@timestamp":7165676811882692608,"type":"step/end","journey":{"name":"inline","id":"inline"},"step":{"name":"Go to home page","index":0,"status":"succeeded"},"payload":{"source":"async ({page, params}) => {await page.goto('http://www.elastic.co')}","duration_ms":3472,"url":"https://www.elastic.co/","status":"succeeded"},"url":"https://www.elastic.co/","package_version":"0.0.1"}`,
 			synthEvent: &SynthEvent{
 				TimestampEpochMicros: 7165676811882692608,
 				Type:                 "step/end",
@@ -64,8 +64,9 @@ func TestJsonToSynthEvent(t *testing.T) {
 					Id:   "inline",
 				},
 				Step: &Step{
-					Name:  "Go to home page",
-					Index: 0,
+					Name:   "Go to home page",
+					Index:  0,
+					Status: "succeeded",
 				},
 				Payload: map[string]interface{}{
 					"source":      "async ({page, params}) => {await page.goto('http://www.elastic.co')}",
@@ -101,7 +102,7 @@ func TestRunCmd(t *testing.T) {
 
 	stdinStr := "MY_STDIN"
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil)
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent
@@ -153,6 +154,59 @@ Loop:
 	for _, typ := range expectedEventTypes {
 		t.Run(fmt.Sprintf("Should have at least one event of type %s", typ), func(t *testing.T) {
 			require.GreaterOrEqual(t, len(eventsWithType(typ)), 1)
+		})
+	}
+}
+
+func TestSuiteCommandFactory(t *testing.T) {
+	_, filename, _, _ := runtime.Caller(0)
+	origPath := path.Join(filepath.Dir(filename), "../source/fixtures/todos")
+	suitePath, err := filepath.Abs(origPath)
+	require.NoError(t, err)
+	binPath := path.Join(suitePath, "node_modules/.bin/elastic-synthetics")
+
+	tests := []struct {
+		name      string
+		suitePath string
+		extraArgs []string
+		want      []string
+		wantErr   bool
+	}{
+		{
+			"no args",
+			suitePath,
+			nil,
+			[]string{binPath, suitePath},
+			false,
+		},
+		{
+			"with args",
+			suitePath,
+			[]string{"--capability", "foo", "bar", "--rich-events"},
+			[]string{binPath, suitePath, "--capability", "foo", "bar", "--rich-events"},
+			false,
+		},
+		{
+			"no npm root",
+			"/not/a/path/for/sure",
+			nil,
+			nil,
+			true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			factory, err := suiteCommandFactory(tt.suitePath, tt.extraArgs...)
+
+			if tt.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+
+			cmd := factory()
+			got := cmd.Args
+			require.Equal(t, tt.want, got)
 		})
 	}
 }

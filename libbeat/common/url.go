@@ -46,7 +46,10 @@ func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPor
 
 	scheme := addr.Scheme
 	host := addr.Host
-	port := strconv.Itoa(defaultPort)
+	port := ""
+	if defaultPort > 0 {
+		port = strconv.Itoa(defaultPort)
+	}
 
 	if host == "" {
 		host = "localhost"
@@ -71,7 +74,10 @@ func MakeURL(defaultScheme string, defaultPath string, rawURL string, defaultPor
 
 	// reconstruct url
 	addr.Scheme = scheme
-	addr.Host = host + ":" + port
+	addr.Host = host
+	if port != "" {
+		addr.Host += ":" + port
+	}
 
 	return addr.String(), nil
 }

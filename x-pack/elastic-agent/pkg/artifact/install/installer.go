@@ -12,6 +12,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/atomic"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/awaitable"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/dir"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/hooks"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/install/tar"
@@ -39,12 +40,20 @@ type InstallerChecker interface {
 	Check(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
+// AwaitableInstallerChecker is an interface that installs, checks but also is awaitable to check when actions are done.
+type AwaitableInstallerChecker interface {
+	InstallerChecker
+
+	// Waits for its work to be done.
+	Wait()
+}
+
 // NewInstaller returns a correct installer associated with a
 // package type:
 // - rpm -> rpm installer
 // - deb -> deb installer
 // - binary -> zip installer on windows, tar installer on linux and mac
-func NewInstaller(config *artifact.Config) (InstallerChecker, error) {
+func NewInstaller(config *artifact.Config) (AwaitableInstallerChecker, error) {
 	if config == nil {
 		return nil, ErrConfigNotProvided
 	}
@@ -66,5 +75,10 @@ func NewInstaller(config *artifact.Config) (InstallerChecker, error) {
 		return nil, err
 	}
 
-	return hooks.NewInstallerChecker(atomicInstaller, dir.NewChecker())
+	hooksInstaller, err := hooks.NewInstallerChecker(atomicInstaller, dir.NewChecker())
+	if err != nil {
+		return nil, err
+	}
+
+	return awaitable.NewInstaller(hooksInstaller, hooksInstaller)
 }

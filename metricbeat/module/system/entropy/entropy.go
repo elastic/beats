@@ -29,8 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -55,12 +55,7 @@ type MetricSet struct {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The system entropy metricset is beta.")
 
-	systemModule, ok := base.Module().(*system.Module)
-	if !ok {
-		return nil, errors.New("unexpected module type")
-	}
-
-	totalPath := path.Join(systemModule.HostFS, "/proc/sys/kernel/random")
+	totalPath := paths.Resolve(paths.Hostfs, "/proc/sys/kernel/random")
 
 	return &MetricSet{
 		BaseMetricSet: base,

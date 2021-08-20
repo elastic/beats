@@ -7,7 +7,7 @@
       "Fields": {
         "destination": {
           "ip": "10.36.236.100",
-          "locality": "private",
+          "locality": "internal",
           "port": 54594
         },
         "event": {
@@ -23,7 +23,7 @@
         },
         "flow": {
           "id": "6mUV1nPVG80",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "10.36.236.100",
@@ -68,7 +68,7 @@
         "source": {
           "bytes": 1855,
           "ip": "10.127.32.11",
-          "locality": "private",
+          "locality": "internal",
           "packets": 5,
           "port": 53
         }
@@ -82,7 +82,7 @@
       "Fields": {
         "destination": {
           "ip": "10.36.237.22",
-          "locality": "private",
+          "locality": "internal",
           "port": 52058
         },
         "event": {
@@ -98,7 +98,7 @@
         },
         "flow": {
           "id": "3BTOVt9gp8I",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "10.36.237.22",
@@ -143,7 +143,7 @@
         "source": {
           "bytes": 217,
           "ip": "10.36.228.103",
-          "locality": "private",
+          "locality": "internal",
           "packets": 3,
           "port": 8000
         }
@@ -157,7 +157,7 @@
       "Fields": {
         "destination": {
           "ip": "10.127.32.11",
-          "locality": "private",
+          "locality": "internal",
           "port": 53
         },
         "event": {
@@ -173,7 +173,7 @@
         },
         "flow": {
           "id": "6mUV1nPVG80",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "10.127.32.11",
@@ -218,7 +218,7 @@
         "source": {
           "bytes": 547,
           "ip": "10.36.236.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 7,
           "port": 54594
         }
@@ -232,7 +232,7 @@
       "Fields": {
         "destination": {
           "ip": "10.36.236.100",
-          "locality": "private",
+          "locality": "internal",
           "port": 49180
         },
         "event": {
@@ -248,7 +248,7 @@
         },
         "flow": {
           "id": "HVg4SttTufc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "10.36.236.100",
@@ -293,7 +293,7 @@
         "source": {
           "bytes": 7158,
           "ip": "52.206.251.4",
-          "locality": "public",
+          "locality": "external",
           "packets": 10,
           "port": 443
         }
@@ -307,7 +307,7 @@
       "Fields": {
         "destination": {
           "ip": "52.206.251.4",
-          "locality": "public",
+          "locality": "external",
           "port": 443
         },
         "event": {
@@ -323,7 +323,7 @@
         },
         "flow": {
           "id": "HVg4SttTufc",
-          "locality": "public"
+          "locality": "external"
         },
         "netflow": {
           "destination_ipv4_address": "52.206.251.4",
@@ -368,7 +368,7 @@
         "source": {
           "bytes": 1538,
           "ip": "10.36.236.100",
-          "locality": "private",
+          "locality": "internal",
           "packets": 11,
           "port": 49180
         }
@@ -382,7 +382,7 @@
       "Fields": {
         "destination": {
           "ip": "10.36.228.103",
-          "locality": "private",
+          "locality": "internal",
           "port": 8000
         },
         "event": {
@@ -398,7 +398,7 @@
         },
         "flow": {
           "id": "3BTOVt9gp8I",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "destination_ipv4_address": "10.36.228.103",
@@ -443,7 +443,7 @@
         "source": {
           "bytes": 217,
           "ip": "10.36.237.22",
-          "locality": "private",
+          "locality": "internal",
           "packets": 3,
           "port": 52058
         }

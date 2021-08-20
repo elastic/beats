@@ -20,9 +20,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -74,14 +74,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -96,8 +97,8 @@
         "source.nat.port": 37679,
         "source.port": 52984,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -124,9 +125,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -146,8 +147,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28219,1,52983,443,28249,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7727,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:svoGHRUXQeOT1QlGYhMbEalRiPU=",
-            "1:j6so5fl9DGKhDhaNmjI+6ipOFyc="
+            "1:j6so5fl9DGKhDhaNmjI+6ipOFyc=",
+            "1:svoGHRUXQeOT1QlGYhMbEalRiPU="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -178,14 +179,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -200,8 +202,8 @@
         "source.nat.port": 28249,
         "source.port": 52983,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -228,9 +230,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -250,8 +252,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,27723,1,52986,443,63898,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7728,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:cl1ZW9fCG1bKgQuAww26hYqxyq0=",
-            "1:c4Xs8aAPhIYB760P+BLmrzOvjv4="
+            "1:c4Xs8aAPhIYB760P+BLmrzOvjv4=",
+            "1:cl1ZW9fCG1bKgQuAww26hYqxyq0="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -282,14 +284,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -304,8 +307,8 @@
         "source.nat.port": 63898,
         "source.port": 52986,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -332,9 +335,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -386,14 +389,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -408,8 +412,8 @@
         "source.nat.port": 7515,
         "source.port": 52985,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -436,9 +440,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -458,8 +462,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28151,1,52987,443,3225,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7730,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:ZuULYSnnlQSsdqWsfJBHQTPqbJo=",
-            "1:FTVZK5v5Nqts17X+FJm/bQk1rwM="
+            "1:FTVZK5v5Nqts17X+FJm/bQk1rwM=",
+            "1:ZuULYSnnlQSsdqWsfJBHQTPqbJo="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -490,14 +494,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -512,8 +517,8 @@
         "source.nat.port": 3225,
         "source.port": 52987,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -540,9 +545,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -562,8 +567,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28076,1,52988,443,60449,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7731,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:ovf/7i/MclKhY1UKalpHzmmlthk=",
-            "1:iHTY/vpQo2TsRYJW2n+lqb0w5f4="
+            "1:iHTY/vpQo2TsRYJW2n+lqb0w5f4=",
+            "1:ovf/7i/MclKhY1UKalpHzmmlthk="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -594,14 +599,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -616,8 +622,8 @@
         "source.nat.port": 60449,
         "source.port": 52988,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -644,9 +650,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -698,14 +704,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -720,8 +727,8 @@
         "source.nat.port": 60559,
         "source.port": 52990,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -748,9 +755,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -802,14 +809,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -824,8 +832,8 @@
         "source.nat.port": 47414,
         "source.port": 52989,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -852,9 +860,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -874,8 +882,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28192,1,52992,443,37673,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7734,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:UDkY52oWrSsYAqwPSTAKyKhwzvQ=",
-            "1:BilmVEwf9nQIXodvin3X6lZuVAc="
+            "1:BilmVEwf9nQIXodvin3X6lZuVAc=",
+            "1:UDkY52oWrSsYAqwPSTAKyKhwzvQ="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -906,14 +914,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -928,8 +937,8 @@
         "source.nat.port": 37673,
         "source.port": 52992,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -956,9 +965,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -978,8 +987,8 @@
         "log.original": "Nov 30 16:44:36 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,27011,1,52991,443,8232,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7735,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:pWCQCkwDKmw2APwAJ2GcT6QNXQg=",
-            "1:CmZ6KkZzaxpkJHXJn0lNskvvZLA="
+            "1:CmZ6KkZzaxpkJHXJn0lNskvvZLA=",
+            "1:pWCQCkwDKmw2APwAJ2GcT6QNXQg="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -1010,14 +1019,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1032,8 +1042,8 @@
         "source.nat.port": 8232,
         "source.port": 52991,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1060,9 +1070,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1114,14 +1124,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1136,8 +1147,8 @@
         "source.nat.port": 32982,
         "source.port": 52994,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1164,9 +1175,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1218,14 +1229,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1240,8 +1252,8 @@
         "source.nat.port": 10473,
         "source.port": 52993,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1268,9 +1280,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1290,8 +1302,8 @@
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28272,1,52995,443,20446,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7738,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:r3rve3ghPTa/BACcRlan0FEgZFw=",
-            "1:XNlHvX7cDGGCkvSS/aFHGg/RnAk="
+            "1:XNlHvX7cDGGCkvSS/aFHGg/RnAk=",
+            "1:r3rve3ghPTa/BACcRlan0FEgZFw="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -1322,14 +1334,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1344,8 +1357,8 @@
         "source.nat.port": 20446,
         "source.port": 52995,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1372,9 +1385,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1426,14 +1439,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1448,8 +1462,8 @@
         "source.nat.port": 34699,
         "source.port": 52996,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1476,9 +1490,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1498,8 +1512,8 @@
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:36,012801096514,THREAT,url,2049,2018/11/30 16:44:36,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:36,28278,1,52997,443,22820,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7740,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:ttgSlbqHs+GKueSexHsquCbfjCk=",
-            "1:lJHLfl+/x95GohXozN52zokIxvA="
+            "1:lJHLfl+/x95GohXozN52zokIxvA=",
+            "1:ttgSlbqHs+GKueSexHsquCbfjCk="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -1530,14 +1544,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1552,8 +1567,8 @@
         "source.nat.port": 22820,
         "source.port": 52997,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1580,9 +1595,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1602,8 +1617,8 @@
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28185,1,52998,443,41060,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7741,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:h4Yhxi4lfeFiizTNiugYzEk9CM4=",
-            "1:OVE3ctnTt5X1L6qNDr4QILL0dFg="
+            "1:OVE3ctnTt5X1L6qNDr4QILL0dFg=",
+            "1:h4Yhxi4lfeFiizTNiugYzEk9CM4="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -1634,14 +1649,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1656,8 +1672,8 @@
         "source.nat.port": 41060,
         "source.port": 52998,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1684,9 +1700,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1738,14 +1754,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1760,8 +1777,8 @@
         "source.nat.port": 9058,
         "source.port": 52999,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1788,9 +1805,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1842,14 +1859,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1864,8 +1882,8 @@
         "source.nat.port": 54846,
         "source.port": 53001,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1892,9 +1910,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -1914,8 +1932,8 @@
         "log.original": "Nov 30 16:44:37 PA-220 1,2018/11/30 16:44:37,012801096514,THREAT,url,2049,2018/11/30 16:44:37,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:37,28121,1,53002,443,52731,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7744,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:X4Zvg9D/bP0EYECRSLna3za4r68=",
-            "1:9noBCzeHKSZpuQWETkS7W5mOTT0="
+            "1:9noBCzeHKSZpuQWETkS7W5mOTT0=",
+            "1:X4Zvg9D/bP0EYECRSLna3za4r68="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -1946,14 +1964,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -1968,8 +1987,8 @@
         "source.nat.port": 52731,
         "source.port": 53002,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -1996,9 +2015,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2018,8 +2037,8 @@
         "log.original": "Nov 30 16:44:38 PA-220 1,2018/11/30 16:44:38,012801096514,THREAT,url,2049,2018/11/30 16:44:38,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:38,28228,1,53003,443,15165,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7745,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:greC2ffRfw5diAvjZvd+je5rhrk=",
-            "1:NQ3UU1pIt7hTJ2TYkbe6yjIVIsw="
+            "1:NQ3UU1pIt7hTJ2TYkbe6yjIVIsw=",
+            "1:greC2ffRfw5diAvjZvd+je5rhrk="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -2050,14 +2069,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2072,8 +2092,8 @@
         "source.nat.port": 15165,
         "source.port": 53003,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2100,9 +2120,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2154,14 +2174,15 @@
         "panw.panos.threat.resource": "b.scorecardresearch.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "b.scorecardresearch.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.137.131",
-            "192.168.1.63"
+            "23.72.137.131"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.137.131",
@@ -2176,8 +2197,8 @@
         "source.nat.port": 53918,
         "source.port": 53004,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "b.scorecardresearch.com",
         "url.original": "b.scorecardresearch.com/",
@@ -2204,9 +2225,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2258,14 +2279,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2280,8 +2302,8 @@
         "source.nat.port": 40792,
         "source.port": 53000,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2308,9 +2330,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2330,8 +2352,8 @@
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28117,1,53006,443,54044,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7748,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:oWKucHrzLhzCpDmWJPLBELyMrzw=",
-            "1:WmnET8BZufXJpdVk04PIVGj+Kgk="
+            "1:WmnET8BZufXJpdVk04PIVGj+Kgk=",
+            "1:oWKucHrzLhzCpDmWJPLBELyMrzw="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -2362,14 +2384,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2384,8 +2407,8 @@
         "source.nat.port": 54044,
         "source.port": 53006,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2412,9 +2435,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2466,14 +2489,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2488,8 +2512,8 @@
         "source.nat.port": 19544,
         "source.port": 53007,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2516,9 +2540,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2570,14 +2594,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2592,8 +2617,8 @@
         "source.nat.port": 13462,
         "source.port": 53008,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2620,9 +2645,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2674,14 +2699,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2696,8 +2722,8 @@
         "source.nat.port": 44892,
         "source.port": 53010,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2724,9 +2750,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2746,8 +2772,8 @@
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28266,1,53011,443,16487,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7753,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:l33FK2i+ASkvlnDYQYRCH4evHcI=",
-            "1:00oN9bToRGtVdpy+GQ742sbkpfI="
+            "1:00oN9bToRGtVdpy+GQ742sbkpfI=",
+            "1:l33FK2i+ASkvlnDYQYRCH4evHcI="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -2778,14 +2804,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2800,8 +2827,8 @@
         "source.nat.port": 16487,
         "source.port": 53011,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2828,9 +2855,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2850,8 +2877,8 @@
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28294,1,53012,443,23952,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7754,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:cSD3ZfDTv0BFEStL/v2rRm0wow0=",
-            "1:AmJtkqyAyzgRUMxNGxjT3hhwb8c="
+            "1:AmJtkqyAyzgRUMxNGxjT3hhwb8c=",
+            "1:cSD3ZfDTv0BFEStL/v2rRm0wow0="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -2882,14 +2909,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -2904,8 +2932,8 @@
         "source.nat.port": 23952,
         "source.port": 53012,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -2932,9 +2960,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -2954,8 +2982,8 @@
         "log.original": "Nov 30 16:44:46 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28248,1,53013,443,2810,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7755,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:l8cnTJWO0qdKrXtvCBWHbQUpvgE=",
-            "1:CzGrIa22/gNrIvkcJMIh6eWNjFI="
+            "1:CzGrIa22/gNrIvkcJMIh6eWNjFI=",
+            "1:l8cnTJWO0qdKrXtvCBWHbQUpvgE="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -2986,14 +3014,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3008,8 +3037,8 @@
         "source.nat.port": 2810,
         "source.port": 53013,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3036,9 +3065,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3090,14 +3119,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3112,8 +3142,8 @@
         "source.nat.port": 13272,
         "source.port": 53014,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3140,9 +3170,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3194,14 +3224,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3216,8 +3247,8 @@
         "source.nat.port": 8663,
         "source.port": 53022,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3244,9 +3275,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3298,14 +3329,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3320,8 +3352,8 @@
         "source.nat.port": 55738,
         "source.port": 53023,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3348,9 +3380,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3370,8 +3402,8 @@
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28116,1,53024,443,10650,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7764,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:spPQtp0F92JeXKXtvGndU6vymNo=",
-            "1:sWvGFBOOisURcvYe5nB5HUSa6B8="
+            "1:sWvGFBOOisURcvYe5nB5HUSa6B8=",
+            "1:spPQtp0F92JeXKXtvGndU6vymNo="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -3402,14 +3434,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3424,8 +3457,8 @@
         "source.nat.port": 10650,
         "source.port": 53024,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3452,9 +3485,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3474,8 +3507,8 @@
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28214,1,53025,443,44087,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7765,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:xBwOt7zrEs9oyuV1oEHKLKXdg1Q=",
-            "1:LHZawFx+zgZPTd01rJqX/31kNmE="
+            "1:LHZawFx+zgZPTd01rJqX/31kNmE=",
+            "1:xBwOt7zrEs9oyuV1oEHKLKXdg1Q="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -3506,14 +3539,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3528,8 +3562,8 @@
         "source.nat.port": 44087,
         "source.port": 53025,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3556,9 +3590,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3578,8 +3612,8 @@
         "log.original": "Nov 30 16:44:47 PA-220 1,2018/11/30 16:44:46,012801096514,THREAT,url,2049,2018/11/30 16:44:46,192.168.15.224,152.195.55.192,192.168.1.63,152.195.55.192,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:46,28080,1,53026,443,15915,443,0x403000,tcp,block-url,\"consent.cmp.oath.com/\",(9999),business-and-economy,informational,client-to-server,7766,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:z5jHjldbSP1U0TqDWR9Uox2k3Js=",
-            "1:XcghkvaiKIQS/KgINx7Mb5Vvn3M="
+            "1:XcghkvaiKIQS/KgINx7Mb5Vvn3M=",
+            "1:z5jHjldbSP1U0TqDWR9Uox2k3Js="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -3610,14 +3644,15 @@
         "panw.panos.threat.resource": "consent.cmp.oath.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "consent.cmp.oath.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "152.195.55.192",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "152.195.55.192",
@@ -3632,8 +3667,8 @@
         "source.nat.port": 15915,
         "source.port": 53026,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "consent.cmp.oath.com",
         "url.original": "consent.cmp.oath.com/",
@@ -3660,9 +3695,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3682,8 +3717,8 @@
         "log.original": "Nov 30 16:44:53 PA-220 1,2018/11/30 16:44:53,012801096514,THREAT,url,2049,2018/11/30 16:44:53,192.168.15.224,151.101.2.2,192.168.1.63,151.101.2.2,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:53,28318,1,53041,443,41165,443,0x403000,tcp,block-url,\"cdn.taboola.com/\",(9999),business-and-economy,informational,client-to-server,7768,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:tQxUFWF1PJh9XS+U53oZgNQELoA=",
-            "1:XdO4yHx+1HZM4GcutRTyur9ixdM="
+            "1:XdO4yHx+1HZM4GcutRTyur9ixdM=",
+            "1:tQxUFWF1PJh9XS+U53oZgNQELoA="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -3714,14 +3749,15 @@
         "panw.panos.threat.resource": "cdn.taboola.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "cdn.taboola.com"
         ],
         "related.ip": [
-            "192.168.15.224",
             "151.101.2.2",
-            "192.168.1.63"
+            "192.168.1.63",
+            "192.168.15.224"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "151.101.2.2",
@@ -3736,8 +3772,8 @@
         "source.nat.port": 41165,
         "source.port": 53041,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "cdn.taboola.com",
         "url.original": "cdn.taboola.com/",
@@ -3767,9 +3803,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3821,14 +3857,15 @@
         "panw.panos.threat.resource": "rules.quantcount.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "rules.quantcount.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.192.7.152",
-            "192.168.1.63"
+            "54.192.7.152"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.192.7.152",
@@ -3843,8 +3880,8 @@
         "source.nat.port": 54133,
         "source.port": 53040,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "rules.quantcount.com",
         "url.original": "rules.quantcount.com/",
@@ -3874,9 +3911,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -3928,14 +3965,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -3950,8 +3988,8 @@
         "source.nat.port": 8485,
         "source.port": 53093,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -3981,9 +4019,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4035,14 +4073,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4057,8 +4096,8 @@
         "source.nat.port": 12496,
         "source.port": 53094,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4088,9 +4127,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4142,14 +4181,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4164,8 +4204,8 @@
         "source.nat.port": 17029,
         "source.port": 53095,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4195,9 +4235,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4249,14 +4289,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4271,8 +4312,8 @@
         "source.nat.port": 23696,
         "source.port": 53096,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4302,9 +4343,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4324,8 +4365,8 @@
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:44:59,012801096514,THREAT,url,2049,2018/11/30 16:44:59,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:44:59,28433,1,53097,443,34769,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7774,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:Z8gFtZEJJ5xho2+kyaSyoXp1O/I=",
-            "1:33ah/rOB1xL3Yy0FUH0sEGuRvx8="
+            "1:33ah/rOB1xL3Yy0FUH0sEGuRvx8=",
+            "1:Z8gFtZEJJ5xho2+kyaSyoXp1O/I="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -4356,14 +4397,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4378,8 +4420,8 @@
         "source.nat.port": 34769,
         "source.port": 53097,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4409,9 +4451,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4463,14 +4505,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4485,8 +4528,8 @@
         "source.nat.port": 22486,
         "source.port": 53099,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4516,9 +4559,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4570,14 +4613,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4592,8 +4636,8 @@
         "source.nat.port": 12894,
         "source.port": 53100,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4623,9 +4667,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4645,8 +4689,8 @@
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28349,1,53101,443,62348,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7777,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:T7UcACShDtZytIaufQKjiQ8jkhM=",
-            "1:/GTSxrH684FoBXpyEBepCy2M81Q="
+            "1:/GTSxrH684FoBXpyEBepCy2M81Q=",
+            "1:T7UcACShDtZytIaufQKjiQ8jkhM="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -4677,14 +4721,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4699,8 +4744,8 @@
         "source.nat.port": 62348,
         "source.port": 53101,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4730,9 +4775,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4784,14 +4829,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4806,8 +4852,8 @@
         "source.nat.port": 6224,
         "source.port": 53104,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4837,9 +4883,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4891,14 +4937,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -4913,8 +4960,8 @@
         "source.nat.port": 44120,
         "source.port": 53107,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -4944,9 +4991,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -4966,8 +5013,8 @@
         "log.original": "Nov 30 16:45:00 PA-220 1,2018/11/30 16:45:00,012801096514,THREAT,url,2049,2018/11/30 16:45:00,192.168.15.224,52.4.120.175,192.168.1.63,52.4.120.175,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:00,28347,1,53108,443,44228,443,0x403000,tcp,block-url,\"srv-2018-11-30-22.config.parsely.com/\",(9999),business-and-economy,informational,client-to-server,7780,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:abQPCp6V8x2Fumiz5x/+vZnuNfM=",
-            "1:G3GfJYWnCjo8Ato/aBgr49UKGTI="
+            "1:G3GfJYWnCjo8Ato/aBgr49UKGTI=",
+            "1:abQPCp6V8x2Fumiz5x/+vZnuNfM="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -4998,14 +5045,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -5020,8 +5068,8 @@
         "source.nat.port": 44228,
         "source.port": 53108,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -5051,9 +5099,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5105,14 +5153,15 @@
         "panw.panos.threat.resource": "srv-2018-11-30-22.config.parsely.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "srv-2018-11-30-22.config.parsely.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "52.4.120.175",
-            "192.168.1.63"
+            "52.4.120.175"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "52.4.120.175",
@@ -5127,8 +5176,8 @@
         "source.nat.port": 31322,
         "source.port": 53109,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "srv-2018-11-30-22.config.parsely.com",
         "url.original": "srv-2018-11-30-22.config.parsely.com/",
@@ -5158,9 +5207,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5180,8 +5229,8 @@
         "log.original": "Nov 30 16:45:14 PA-220 1,2018/11/30 16:45:13,012801096514,THREAT,url,2049,2018/11/30 16:45:13,192.168.15.224,216.58.194.98,192.168.1.63,216.58.194.98,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:13,28439,1,53118,443,1672,443,0x403000,tcp,block-url,\"www.googleadservices.com/\",(9999),business-and-economy,informational,client-to-server,7782,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:iBwlaPm6awPJaLJMdMMVOH9f5RU=",
-            "1:WQC21tSR1QNUhWYgrcbgaLyTkos="
+            "1:WQC21tSR1QNUhWYgrcbgaLyTkos=",
+            "1:iBwlaPm6awPJaLJMdMMVOH9f5RU="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -5212,14 +5261,15 @@
         "panw.panos.threat.resource": "www.googleadservices.com/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "www.googleadservices.com"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "216.58.194.98",
-            "192.168.1.63"
+            "216.58.194.98"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "216.58.194.98",
@@ -5234,8 +5284,8 @@
         "source.nat.port": 1672,
         "source.port": 53118,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "www.googleadservices.com",
         "url.original": "www.googleadservices.com/",
@@ -5262,9 +5312,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5316,14 +5366,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5338,8 +5389,8 @@
         "source.nat.port": 20801,
         "source.port": 53126,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5366,9 +5417,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5420,14 +5471,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5442,8 +5494,8 @@
         "source.nat.port": 24533,
         "source.port": 53127,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5470,9 +5522,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5524,14 +5576,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5546,8 +5599,8 @@
         "source.nat.port": 30150,
         "source.port": 53128,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5574,9 +5627,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5628,14 +5681,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5650,8 +5704,8 @@
         "source.nat.port": 36305,
         "source.port": 53129,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5678,9 +5732,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5700,8 +5754,8 @@
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28458,1,53130,443,42682,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7787,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:Ob0VEjF8YeGq1hR7SbX0pZ+5/EI=",
-            "1:93oplAL+YibXq75Qng9iomHp97k="
+            "1:93oplAL+YibXq75Qng9iomHp97k=",
+            "1:Ob0VEjF8YeGq1hR7SbX0pZ+5/EI="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -5732,14 +5786,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5754,8 +5809,8 @@
         "source.nat.port": 42682,
         "source.port": 53130,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5782,9 +5837,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5836,14 +5891,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5858,8 +5914,8 @@
         "source.nat.port": 22530,
         "source.port": 53131,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5886,9 +5942,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -5908,8 +5964,8 @@
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28520,1,53132,443,43713,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7789,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:U5qBRasQ13RQONeFOyA2+9QbWK8=",
-            "1:KtlZO5BbsoCg/ymqE05xAvw/iIA="
+            "1:KtlZO5BbsoCg/ymqE05xAvw/iIA=",
+            "1:U5qBRasQ13RQONeFOyA2+9QbWK8="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -5940,14 +5996,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -5962,8 +6019,8 @@
         "source.nat.port": 43713,
         "source.port": 53132,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -5990,9 +6047,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6012,8 +6069,8 @@
         "log.original": "Nov 30 16:45:16 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28335,1,53133,443,60608,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7790,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:S99EiT3uXg1VHeNM5TVPoeW1Zrk=",
-            "1:4MqfykfAOpIQmtvXcxzLNXqgyTs="
+            "1:4MqfykfAOpIQmtvXcxzLNXqgyTs=",
+            "1:S99EiT3uXg1VHeNM5TVPoeW1Zrk="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -6044,14 +6101,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -6066,8 +6124,8 @@
         "source.nat.port": 60608,
         "source.port": 53133,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -6094,9 +6152,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6148,14 +6206,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -6170,8 +6229,8 @@
         "source.nat.port": 9302,
         "source.port": 53134,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -6198,9 +6257,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6220,8 +6279,8 @@
         "log.original": "Nov 30 16:45:17 PA-220 1,2018/11/30 16:45:16,012801096514,THREAT,url,2049,2018/11/30 16:45:16,192.168.15.224,23.72.145.245,192.168.1.63,23.72.145.245,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:16,28488,1,53135,443,11634,443,0x403000,tcp,block-url,\"service.maxymiser.net/\",(9999),business-and-economy,informational,client-to-server,7792,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:Z6zBvBoA+0NQryjJ96nYaFcOuXw=",
-            "1:BQw3RXiNvT4NW4kw0J5Ol6rFN5A="
+            "1:BQw3RXiNvT4NW4kw0J5Ol6rFN5A=",
+            "1:Z6zBvBoA+0NQryjJ96nYaFcOuXw="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -6252,14 +6311,15 @@
         "panw.panos.threat.resource": "service.maxymiser.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "service.maxymiser.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "23.72.145.245",
-            "192.168.1.63"
+            "23.72.145.245"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "23.72.145.245",
@@ -6274,8 +6334,8 @@
         "source.nat.port": 11634,
         "source.port": 53135,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "service.maxymiser.net",
         "url.original": "service.maxymiser.net/",
@@ -6305,9 +6365,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6327,8 +6387,8 @@
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28469,1,53152,443,30818,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7793,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:Qo8vSWzvn9QN5ADlmHxjJft+bxA=",
-            "1:1XJhGS1EujYy5wSCA64wjjK7hwA="
+            "1:1XJhGS1EujYy5wSCA64wjjK7hwA=",
+            "1:Qo8vSWzvn9QN5ADlmHxjJft+bxA="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -6359,14 +6419,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6381,8 +6442,8 @@
         "source.nat.port": 30818,
         "source.port": 53152,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6412,9 +6473,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6466,14 +6527,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6488,8 +6550,8 @@
         "source.nat.port": 64260,
         "source.port": 53155,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6519,9 +6581,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6573,14 +6635,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6595,8 +6658,8 @@
         "source.nat.port": 7071,
         "source.port": 53158,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6626,9 +6689,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6680,14 +6743,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6702,8 +6766,8 @@
         "source.nat.port": 4512,
         "source.port": 53160,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6733,9 +6797,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6755,8 +6819,8 @@
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:26,012801096514,THREAT,url,2049,2018/11/30 16:45:26,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:26,28580,1,53161,443,3422,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7797,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:zcJ3HhZj3urz6vGwVhseviLv7kY=",
-            "1:KhCfFcRk3sovsTfN9pRRfgjsP84="
+            "1:KhCfFcRk3sovsTfN9pRRfgjsP84=",
+            "1:zcJ3HhZj3urz6vGwVhseviLv7kY="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -6787,14 +6851,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6809,8 +6874,8 @@
         "source.nat.port": 3422,
         "source.port": 53161,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6840,9 +6905,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6894,14 +6959,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -6916,8 +6982,8 @@
         "source.nat.port": 4651,
         "source.port": 53162,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -6947,9 +7013,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -6969,8 +7035,8 @@
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28484,1,53163,443,19068,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7799,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:oQCUvcNDUq8NlFsOiIljRD/md2E=",
-            "1:lFuLGvzKiGz77tAPKRWLQ7eIBNw="
+            "1:lFuLGvzKiGz77tAPKRWLQ7eIBNw=",
+            "1:oQCUvcNDUq8NlFsOiIljRD/md2E="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7001,14 +7067,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7023,8 +7090,8 @@
         "source.nat.port": 19068,
         "source.port": 53163,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7054,9 +7121,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7108,14 +7175,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7130,8 +7198,8 @@
         "source.nat.port": 5831,
         "source.port": 53164,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7161,9 +7229,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7183,8 +7251,8 @@
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28564,1,53165,443,7084,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7801,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:fsi7g4zFbrFG09Mvo8P/WofCEKc=",
-            "1:SDf7YJ4JLx2oja8SY0iCD/f9ZYk="
+            "1:SDf7YJ4JLx2oja8SY0iCD/f9ZYk=",
+            "1:fsi7g4zFbrFG09Mvo8P/WofCEKc="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7215,14 +7283,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7237,8 +7306,8 @@
         "source.nat.port": 7084,
         "source.port": 53165,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7268,9 +7337,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7290,8 +7359,8 @@
         "log.original": "Nov 30 16:45:27 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28542,1,53166,443,18633,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7802,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:wICcAfDG87s8YdjIhDgBqv6mTws=",
-            "1:/wf94ECkqPez+fxVgk+3KErtaBQ="
+            "1:/wf94ECkqPez+fxVgk+3KErtaBQ=",
+            "1:wICcAfDG87s8YdjIhDgBqv6mTws="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7322,14 +7391,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7344,8 +7414,8 @@
         "source.nat.port": 18633,
         "source.port": 53166,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7375,9 +7445,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7429,14 +7499,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7451,8 +7522,8 @@
         "source.nat.port": 25557,
         "source.port": 53167,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7482,9 +7553,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7504,8 +7575,8 @@
         "log.original": "Nov 30 16:45:28 PA-220 1,2018/11/30 16:45:27,012801096514,THREAT,url,2049,2018/11/30 16:45:27,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:27,28455,1,53150,443,20661,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7804,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:pvzPjqjqA6kLTjxiRDVSDxuidwg=",
-            "1:O1zDnt5d52xTreiMgL/sHMRHiXA="
+            "1:O1zDnt5d52xTreiMgL/sHMRHiXA=",
+            "1:pvzPjqjqA6kLTjxiRDVSDxuidwg="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7536,14 +7607,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7558,8 +7630,8 @@
         "source.nat.port": 20661,
         "source.port": 53150,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7589,9 +7661,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7611,8 +7683,8 @@
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28585,1,53185,443,65438,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7805,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:hu8p8gkxiimZqTLhIkgVfSePEqk=",
-            "1:CwNRTMQumfdoC3msd4z5PIYkKLU="
+            "1:CwNRTMQumfdoC3msd4z5PIYkKLU=",
+            "1:hu8p8gkxiimZqTLhIkgVfSePEqk="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7643,14 +7715,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7665,8 +7738,8 @@
         "source.nat.port": 65438,
         "source.port": 53185,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7696,9 +7769,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7718,8 +7791,8 @@
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28462,1,53187,443,53101,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7806,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:z12wzV1bKYppHPfC9LypWH+RtE4=",
-            "1:0YBp8myYbHSoKWG2HvxutMfose0="
+            "1:0YBp8myYbHSoKWG2HvxutMfose0=",
+            "1:z12wzV1bKYppHPfC9LypWH+RtE4="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7750,14 +7823,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7772,8 +7846,8 @@
         "source.nat.port": 53101,
         "source.port": 53187,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7803,9 +7877,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7825,8 +7899,8 @@
         "log.original": "Nov 30 16:45:29 PA-220 1,2018/11/30 16:45:28,012801096514,THREAT,url,2049,2018/11/30 16:45:28,192.168.15.224,54.209.101.70,192.168.1.63,54.209.101.70,new_outbound_from_trust,,,ssl,vsys1,trust,untrust,ethernet1/2,ethernet1/1,send_to_mac,2018/11/30 16:45:28,28839,1,53188,443,35463,443,0x403000,tcp,block-url,\"segment-data.zqtk.net/\",(9999),business-and-economy,informational,client-to-server,7807,0x2000000000000000,192.168.0.0-192.168.255.255,United States,0,,0,,,0,,,,,,,,0,0,0,0,0,,PA-220,,,,,0,,0,,N/A,unknown,AppThreat-0-0,0x0,0,4294967295,",
         "network.application": "ssl",
         "network.community_id": [
-            "1:eJYKKiIqzYxe5ja/6/hDB3CgzSI=",
-            "1:CQrsQ2CJN8/aVtRj6kkSqGiLA4w="
+            "1:CQrsQ2CJN8/aVtRj6kkSqGiLA4w=",
+            "1:eJYKKiIqzYxe5ja/6/hDB3CgzSI="
         ],
         "network.direction": "inbound",
         "network.transport": "tcp",
@@ -7857,14 +7931,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7879,8 +7954,8 @@
         "source.nat.port": 35463,
         "source.port": 53188,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",
@@ -7910,9 +7985,9 @@
         "destination.port": 443,
         "event.action": "url_filtering",
         "event.category": [
-            "security_threat",
             "intrusion_detection",
-            "network"
+            "network",
+            "security_threat"
         ],
         "event.dataset": "panw.panos",
         "event.kind": "alert",
@@ -7964,14 +8039,15 @@
         "panw.panos.threat.resource": "segment-data.zqtk.net/",
         "panw.panos.type": "THREAT",
         "panw.panos.url.category": "business-and-economy",
+        "panw.panos.virtual_sys": "vsys1",
         "related.hosts": [
             "PA-220",
             "segment-data.zqtk.net"
         ],
         "related.ip": [
+            "192.168.1.63",
             "192.168.15.224",
-            "54.209.101.70",
-            "192.168.1.63"
+            "54.209.101.70"
         ],
         "rule.name": "new_outbound_from_trust",
         "server.ip": "54.209.101.70",
@@ -7986,8 +8062,8 @@
         "source.nat.port": 45769,
         "source.port": 53178,
         "tags": [
-            "pan-os",
-            "forwarded"
+            "forwarded",
+            "pan-os"
         ],
         "url.domain": "segment-data.zqtk.net",
         "url.original": "segment-data.zqtk.net/",

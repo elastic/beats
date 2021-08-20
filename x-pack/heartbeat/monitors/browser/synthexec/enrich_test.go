@@ -13,9 +13,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -29,6 +30,11 @@ func TestJourneyEnricher(t *testing.T) {
 		Message: "my-errmsg",
 		Name:    "my-errname",
 		Stack:   "my\nerr\nstack",
+	}
+	otherErr := &SynthError{
+		Message: "last-errmsg",
+		Name:    "last-errname",
+		Stack:   "last\nerr\nstack",
 	}
 	journeyStart := &SynthEvent{
 		Type:                 "journey/start",
@@ -44,12 +50,12 @@ func TestJourneyEnricher(t *testing.T) {
 		Journey:              journey,
 		Payload:              common.MapStr{},
 	}
-	makeStepEvent := func(typ string, ts float64, name string, index int, urlstr string, err *SynthError) *SynthEvent {
+	makeStepEvent := func(typ string, ts float64, name string, index int, status string, urlstr string, err *SynthError) *SynthEvent {
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: 1000 + ts,
 			PackageVersion:       "1.0.0",
-			Step:                 &Step{Name: name, Index: index},
+			Step:                 &Step{Name: name, Index: index, Status: status},
 			Error:                err,
 			Payload:              common.MapStr{},
 			URL:                  urlstr,
@@ -61,12 +67,12 @@ func TestJourneyEnricher(t *testing.T) {
 
 	synthEvents := []*SynthEvent{
 		journeyStart,
-		makeStepEvent("step/start", 10, "Step1", 1, "", nil),
-		makeStepEvent("step/end", 20, "Step1", 1, url1, nil),
-		makeStepEvent("step/start", 21, "Step2", 1, "", nil),
-		makeStepEvent("step/end", 30, "Step2", 1, url2, syntherr),
-		makeStepEvent("step/start", 31, "Step3", 1, "", nil),
-		makeStepEvent("step/end", 40, "Step3", 1, url3, nil),
+		makeStepEvent("step/start", 10, "Step1", 1, "succeeded", "", nil),
+		makeStepEvent("step/end", 20, "Step1", 1, "", url1, nil),
+		makeStepEvent("step/start", 21, "Step2", 1, "", "", nil),
+		makeStepEvent("step/end", 30, "Step2", 1, "failed", url2, syntherr),
+		makeStepEvent("step/start", 31, "Step3", 1, "", "", nil),
+		makeStepEvent("step/end", 40, "Step3", 1, "", url3, otherErr),
 		journeyEnd,
 	}
 
@@ -103,6 +109,89 @@ func TestJourneyEnricher(t *testing.T) {
 					testslike.Test(t, v, e.Fields)
 				})
 			}
+		})
+	}
+}
+
+func TestEnrichSynthEvent(t *testing.T) {
+	tests := []struct {
+		name    string
+		je      *journeyEnricher
+		se      *SynthEvent
+		wantErr bool
+		check   func(t *testing.T, e *beat.Event, je *journeyEnricher)
+	}{
+		{
+			"journey/end",
+			&journeyEnricher{},
+			&SynthEvent{Type: "journey/end"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				v := lookslike.MustCompile(map[string]interface{}{
+					"summary": map[string]int{
+						"up":   1,
+						"down": 0,
+					},
+				})
+				testslike.Test(t, v, e.Fields)
+			},
+		},
+		{
+			"step/end",
+			&journeyEnricher{},
+			&SynthEvent{Type: "step/end"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, 1, je.stepCount)
+			},
+		},
+		{
+			"step/screenshot",
+			&journeyEnricher{},
+			&SynthEvent{Type: "step/screenshot"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+			},
+		},
+		{
+			"step/screenshot_ref",
+			&journeyEnricher{},
+			&SynthEvent{Type: "step/screenshot_ref"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+			},
+		},
+		{
+			"step/screenshot_block",
+			&journeyEnricher{},
+			&SynthEvent{Type: "screenshot/block", Id: "my_id"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "my_id", e.Meta["_id"])
+				require.Equal(t, events.OpTypeCreate, e.Meta[events.FieldMetaOpType])
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+			},
+		},
+		{
+			"journey/network_info",
+			&journeyEnricher{},
+			&SynthEvent{Type: "journey/network_info"},
+			false,
+			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
+				require.Equal(t, "browser.network", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			e := &beat.Event{}
+			if err := tt.je.enrichSynthEvent(e, tt.se); (err != nil) != tt.wantErr {
+				t.Errorf("journeyEnricher.enrichSynthEvent() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			tt.check(t, e, tt.je)
 		})
 	}
 }

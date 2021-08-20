@@ -178,8 +178,7 @@ class Test(BaseTest):
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-            lambda: self.log_contains(
-                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            lambda: self.log_contains("Closing file"),
             max_timeout=10)
 
         # wait a bit longer (on 1.0.1 this would cause the harvester
@@ -305,8 +304,7 @@ class Test(BaseTest):
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-            lambda: self.log_contains(
-                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            lambda: self.log_contains("Closing file"),
             max_timeout=10)
 
         # write second line
@@ -359,8 +357,7 @@ class Test(BaseTest):
 
         # wait for file to be closed due to close_inactive
         self.wait_until(
-            lambda: self.log_contains(
-                "Closing file: {}\n".format(os.path.abspath(testfile))),
+            lambda: self.log_contains("Closing file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -407,7 +404,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.log_contains(
                 # Still checking for old file name as filename does not change in harvester
-                "Closing file: "),
+                "Closing file"),
             max_timeout=10)
 
         filebeat.check_kill_and_wait()
@@ -467,7 +464,7 @@ class Test(BaseTest):
         self.wait_until(
             lambda: self.log_contains_count(
                 # Checking if two files were closed
-                "Closing file: ") == 2,
+                "Closing file") == 2,
             max_timeout=10)
 
         filebeat.check_kill_and_wait()

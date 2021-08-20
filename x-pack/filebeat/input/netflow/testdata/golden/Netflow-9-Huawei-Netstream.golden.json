@@ -8,7 +8,7 @@
         "destination": {
           "bytes": 0,
           "ip": "10.111.112.204",
-          "locality": "private",
+          "locality": "internal",
           "port": 2598
         },
         "event": {
@@ -27,7 +27,7 @@
         },
         "flow": {
           "id": "d-FUjj8eKi8",
-          "locality": "private"
+          "locality": "internal"
         },
         "netflow": {
           "bgp_destination_as_number": 0,
@@ -84,7 +84,7 @@
         "source": {
           "bytes": 200,
           "ip": "10.108.219.53",
-          "locality": "private",
+          "locality": "internal",
           "packets": 4,
           "port": 45587
         }

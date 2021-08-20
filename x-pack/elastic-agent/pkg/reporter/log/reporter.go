@@ -47,28 +47,10 @@ func (r *Reporter) Close() error { return nil }
 func defaultFormatFunc(e reporter.Event) string {
 	return fmt.Sprintf(defaultLogFormat,
 		e.Time().Format(timeFormat),
+		e.Message(),
 		e.Type(),
 		e.SubType(),
-		e.Message(),
 	)
-}
-
-type reportableEvent struct {
-	Type    string
-	SubType string
-	Time    string
-	Message string
-	Payload map[string]interface{} `json:"payload,omitempty"`
-}
-
-func makeEventReportable(event reporter.Event) reportableEvent {
-	return reportableEvent{
-		Type:    event.Type(),
-		SubType: event.SubType(),
-		Time:    event.Time().Format(timeFormat),
-		Message: event.Message(),
-		Payload: event.Payload(),
-	}
 }
 
 // Check it is reporter.Backend

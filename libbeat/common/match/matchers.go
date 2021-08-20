@@ -252,13 +252,14 @@ func (m *matchAny) MatchString(_ string) bool { return true }
 func (m *matchAny) String() string            { return "<any>" }
 
 func bytesToString(b []byte) string {
-	bh := (*reflect.SliceHeader)(unsafe.Pointer(&b))
-	sh := reflect.StringHeader{Data: bh.Data, Len: bh.Len}
-	return *(*string)(unsafe.Pointer(&sh))
+	return *(*string)(unsafe.Pointer(&b))
 }
 
-func stringToBytes(s string) []byte {
-	sh := (*reflect.StringHeader)(unsafe.Pointer(&s))
-	bh := reflect.SliceHeader{Data: sh.Data, Len: sh.Len, Cap: sh.Len}
-	return *(*[]byte)(unsafe.Pointer(&bh))
+func stringToBytes(s string) (b []byte) {
+	pb := (*reflect.SliceHeader)(unsafe.Pointer(&b))
+	ps := (*reflect.StringHeader)(unsafe.Pointer(&s))
+	pb.Data = ps.Data
+	pb.Len = ps.Len
+	pb.Cap = ps.Len
+	return
 }

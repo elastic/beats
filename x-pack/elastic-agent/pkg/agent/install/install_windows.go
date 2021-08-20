@@ -11,13 +11,14 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
 // postInstall performs post installation for Windows systems.
 func postInstall() error {
 	// delete the top-level elastic-agent.exe
-	binary := filepath.Join(InstallPath, BinaryName)
+	binary := filepath.Join(paths.InstallPath, paths.BinaryName)
 	err := os.Remove(binary)
 	if err != nil {
 		// do not handle does not exist, it should have existed
@@ -25,7 +26,7 @@ func postInstall() error {
 	}
 
 	// create top-level symlink to nested binary
-	realBinary := filepath.Join(InstallPath, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()), BinaryName)
+	realBinary := filepath.Join(paths.InstallPath, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()), paths.BinaryName)
 	err = os.Symlink(realBinary, binary)
 	if err != nil {
 		return err

@@ -10,6 +10,7 @@ processors:
     field: zeek.mysql.ts
     formats:
     - UNIX
+    - ISO8601
 - remove:
     field: zeek.mysql.ts
 - append:

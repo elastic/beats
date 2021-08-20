@@ -1,0 +1,299 @@
+[
+    {
+        "@timestamp": "2021-03-08T18:31:52.000Z",
+        "cyberarkpas.audit.action": "Undefined User Logon",
+        "cyberarkpas.audit.desc": "Undefined User Logon",
+        "cyberarkpas.audit.gateway_station": "10.0.1.20",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-08T18:31:52Z",
+        "cyberarkpas.audit.issuer": "adriansr",
+        "cyberarkpas.audit.message": "Undefined User Logon",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 08 10:31:52",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "309",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "log.syslog.priority": "7",
+        "network.direction": "internal",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20",
+            "127.0.0.1"
+        ],
+        "related.user": [
+            "adriansr"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "adriansr"
+    },
+    {
+        "@timestamp": "2021-03-08T18:32:03.000Z",
+        "cyberarkpas.audit.action": "Undefined User Logon",
+        "cyberarkpas.audit.desc": "Undefined User Logon",
+        "cyberarkpas.audit.gateway_station": "10.0.1.20",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-08T18:32:03Z",
+        "cyberarkpas.audit.issuer": "adriansra",
+        "cyberarkpas.audit.message": "Undefined User Logon",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 08 10:32:03",
+        "destination.address": "10.0.1.20",
+        "destination.ip": "10.0.1.20",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "309",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 589,
+        "log.syslog.priority": "7",
+        "network.direction": "internal",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20",
+            "127.0.0.1"
+        ],
+        "related.user": [
+            "adriansra"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "adriansra"
+    },
+    {
+        "@timestamp": "2021-03-11T16:43:26.000Z",
+        "cyberarkpas.audit.action": "Undefined User Logon",
+        "cyberarkpas.audit.desc": "Undefined User Logon",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T16:43:26Z",
+        "cyberarkpas.audit.issuer": "PSMAdmin",
+        "cyberarkpas.audit.message": "Undefined User Logon",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 08:43:26</Timestamp>\n    <IsoTimestamp>2021-03-11T16:43:26Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>309</MessageID>\n    <Desc>Undefined User Logon</Desc>\n    <Severity>Error</Severity>\n    <Issuer>PSMAdmin</Issuer>\n    <Action>Undefined User Logon</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.32.170.205</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Undefined User Logon</Message>\n    <GatewayStation></GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.timestamp": "Mar 11 08:43:26",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "309",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 1179,
+        "log.syslog.priority": "7",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "81.32.170.205"
+        ],
+        "related.user": [
+            "PSMAdmin"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "81.32.170.205",
+        "source.geo.city_name": "Barcelona",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
+        "source.geo.region_iso_code": "ES-B",
+        "source.geo.region_name": "Barcelona",
+        "source.ip": "81.32.170.205",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "PSMAdmin"
+    },
+    {
+        "@timestamp": "2021-03-11T17:46:28.000Z",
+        "cyberarkpas.audit.action": "Undefined User Logon",
+        "cyberarkpas.audit.desc": "Undefined User Logon",
+        "cyberarkpas.audit.gateway_station": "81.32.170.205",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-11T17:46:28Z",
+        "cyberarkpas.audit.issuer": "adrian",
+        "cyberarkpas.audit.message": "Undefined User Logon",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 11 09:46:28</Timestamp>\n    <IsoTimestamp>2021-03-11T17:46:28Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>309</MessageID>\n    <Desc>Undefined User Logon</Desc>\n    <Severity>Error</Severity>\n    <Issuer>adrian</Issuer>\n    <Action>Undefined User Logon</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>127.0.0.1</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Undefined User Logon</Message>\n    <GatewayStation>81.32.170.205</GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "127.0.0.1",
+        "cyberarkpas.audit.timestamp": "Mar 11 09:46:28",
+        "destination.address": "81.32.170.205",
+        "destination.geo.city_name": "Barcelona",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "ES",
+        "destination.geo.country_name": "Spain",
+        "destination.geo.location.lat": 41.3891,
+        "destination.geo.location.lon": 2.1611,
+        "destination.geo.region_iso_code": "ES-B",
+        "destination.geo.region_name": "Barcelona",
+        "destination.ip": "81.32.170.205",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "309",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 2627,
+        "log.syslog.priority": "7",
+        "network.direction": "outbound",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "127.0.0.1",
+            "81.32.170.205"
+        ],
+        "related.user": [
+            "adrian"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "adrian"
+    },
+    {
+        "@timestamp": "2021-03-14T13:28:00.000Z",
+        "cyberarkpas.audit.action": "Undefined User Logon",
+        "cyberarkpas.audit.desc": "Undefined User Logon",
+        "cyberarkpas.audit.gateway_station": "34.71.250.247",
+        "cyberarkpas.audit.iso_timestamp": "2021-03-14T13:28:00Z",
+        "cyberarkpas.audit.issuer": "testark",
+        "cyberarkpas.audit.message": "Undefined User Logon",
+        "cyberarkpas.audit.raw": "<syslog>\n\n  <audit_record>\n    <Rfc5424>yes</Rfc5424>\n    <Timestamp>Mar 14 06:28:00</Timestamp>\n    <IsoTimestamp>2021-03-14T13:28:00Z</IsoTimestamp>\n    <Hostname>VAULT</Hostname>\n    <Vendor>Cyber-Ark</Vendor>\n    <Product>Vault</Product>\n    <Version>11.7.0000</Version>\n    <MessageID>309</MessageID>\n    <Desc>Undefined User Logon</Desc>\n    <Severity>Error</Severity>\n    <Issuer>testark</Issuer>\n    <Action>Undefined User Logon</Action>\n    <SourceUser></SourceUser>\n    <TargetUser></TargetUser>\n    <Safe></Safe>\n    <File></File>\n    <Station>81.32.170.205</Station>\n    <Location></Location>\n    <Category></Category>\n    <RequestId></RequestId>\n    <Reason></Reason>\n    <ExtraDetails></ExtraDetails>\n    <Message>Undefined User Logon</Message>\n    <GatewayStation>34.71.250.247</GatewayStation>\n  </audit_record>\n\n</syslog>",
+        "cyberarkpas.audit.rfc5424": true,
+        "cyberarkpas.audit.severity": "Error",
+        "cyberarkpas.audit.station": "81.32.170.205",
+        "cyberarkpas.audit.timestamp": "Mar 14 06:28:00",
+        "destination.address": "34.71.250.247",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "34.71.250.247",
+        "event.action": "authentication_failure",
+        "event.category": [
+            "authentication"
+        ],
+        "event.code": "309",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.outcome": "failure",
+        "event.severity": 7,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 4089,
+        "log.syslog.priority": "7",
+        "network.direction": "external",
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "34.71.250.247",
+            "81.32.170.205"
+        ],
+        "related.user": [
+            "testark"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "81.32.170.205",
+        "source.geo.city_name": "Barcelona",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
+        "source.geo.location.lat": 41.3891,
+        "source.geo.location.lon": 2.1611,
+        "source.geo.region_iso_code": "ES-B",
+        "source.geo.region_name": "Barcelona",
+        "source.ip": "81.32.170.205",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ],
+        "user.name": "testark"
+    }
+]

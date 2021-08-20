@@ -66,7 +66,7 @@ func (c *outputCapability) Apply(cfgMap map[string]interface{}) (map[string]inte
 		if ok {
 			renderedOutputs, err := c.renderOutputs(outputs)
 			if err != nil {
-				c.log.Errorf("marking outputs failed for capability '%s': %v", c.name(), err)
+				c.log.Errorf("marking outputs as failed for the capability '%s': %v", c.name(), err)
 				return cfgMap, err
 			}
 
@@ -89,13 +89,13 @@ func (c *outputCapability) name() string {
 		return c.Name
 	}
 
-	t := "A"
+	t := "allow"
 	if c.Type == denyKey {
-		t = "D"
+		t = "deny"
 	}
 
 	// e.g OA(*) or OD(logstash)
-	c.Name = fmt.Sprintf("O%s(%s)", t, c.Output)
+	c.Name = fmt.Sprintf("Output %s(%s)", t, c.Output)
 	return c.Name
 }
 
@@ -133,7 +133,7 @@ func (c *outputCapability) renderOutputs(outputs map[string]interface{}) (map[st
 		if !isSupported {
 			msg := fmt.Sprintf("output '%s' is left out due to capability restriction '%s'", outputName, c.name())
 			c.log.Errorf(msg)
-			c.reporter.Update(state.Degraded, msg)
+			c.reporter.Update(state.Degraded, msg, nil)
 		}
 	}
 
@@ -182,11 +182,21 @@ func (c *multiOutputsCapability) cleanupOutput(cfgMap map[string]interface{}) (m
 		return cfgMap, nil
 	}
 
-	outputsMap, ok := outputsIface.(map[string]interface{})
-	if !ok {
+	switch outputsMap := outputsIface.(type) {
+	case map[string]interface{}:
+		handleOutputMapStr(outputsMap)
+		cfgMap[outputKey] = outputsMap
+	case map[interface{}]interface{}:
+		handleOutputMapIface(outputsMap)
+		cfgMap[outputKey] = outputsMap
+	default:
 		return nil, fmt.Errorf("outputs must be a map")
 	}
 
+	return cfgMap, nil
+}
+
+func handleOutputMapStr(outputsMap map[string]interface{}) {
 	for outputName, outputIface := range outputsMap {
 		acceptValue := true
 
@@ -208,7 +218,28 @@ func (c *multiOutputsCapability) cleanupOutput(cfgMap map[string]interface{}) (m
 
 		delete(outputMap, conditionKey)
 	}
+}
 
-	cfgMap[outputKey] = outputsMap
-	return cfgMap, nil
+func handleOutputMapIface(outputsMap map[interface{}]interface{}) {
+	for outputName, outputIface := range outputsMap {
+		acceptValue := true
+
+		outputMap, ok := outputIface.(map[interface{}]interface{})
+		if ok {
+			conditionIface, found := outputMap[conditionKey]
+			if found {
+				conditionVal, ok := conditionIface.(bool)
+				if ok {
+					acceptValue = conditionVal
+				}
+			}
+		}
+
+		if !acceptValue {
+			delete(outputsMap, outputName)
+			continue
+		}
+
+		delete(outputMap, conditionKey)
+	}
 }

@@ -22,12 +22,10 @@ func (a *Application) externalProcess(proc *os.Process) {
 	}
 
 	for {
-		select {
-		case <-time.After(1 * time.Second):
-			if proc.Signal(syscall.Signal(0)) != nil {
-				// failed to contact process, return
-				return
-			}
+		<-time.After(1 * time.Second)
+		if proc.Signal(syscall.Signal(0)) != nil {
+			// failed to contact process, return
+			return
 		}
 	}
 }

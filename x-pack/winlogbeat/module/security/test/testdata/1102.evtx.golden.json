@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 1102,
+      "code": "1102",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -34,7 +34,7 @@
       "api": "wineventlog",
       "channel": "Security",
       "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
-      "event_id": 1102,
+      "event_id": "1102",
       "keywords": [
         "Audit Success"
       ],

@@ -58,6 +58,9 @@ func init() {
 
 	devtools.BeatDescription = "Agent manages other beats based on configuration provided."
 	devtools.BeatLicense = "Elastic License"
+
+	devtools.Platforms = devtools.Platforms.Filter("!linux/386")
+	devtools.Platforms = devtools.Platforms.Filter("!windows/386")
 }
 
 // Default set to build everything by default.
@@ -192,16 +195,19 @@ func (Build) Clean() {
 // TestBinaries build the required binaries for the test suite.
 func (Build) TestBinaries() error {
 	p := filepath.Join("pkg", "agent", "operation", "tests", "scripts")
-
+	p2 := filepath.Join("pkg", "agent", "transpiler", "tests")
 	configurableName := "configurable"
 	serviceableName := "serviceable"
+	execName := "exec"
 	if runtime.GOOS == "windows" {
 		configurableName += ".exe"
 		serviceableName += ".exe"
+		execName += ".exe"
 	}
 	return combineErr(
 		RunGo("build", "-o", filepath.Join(p, "configurable-1.0-darwin-x86_64", configurableName), filepath.Join(p, "configurable-1.0-darwin-x86_64", "main.go")),
 		RunGo("build", "-o", filepath.Join(p, "serviceable-1.0-darwin-x86_64", serviceableName), filepath.Join(p, "serviceable-1.0-darwin-x86_64", "main.go")),
+		RunGo("build", "-o", filepath.Join(p2, "exec-1.0-darwin-x86_64", execName), filepath.Join(p2, "exec-1.0-darwin-x86_64", "main.go")),
 	)
 }
 
@@ -300,10 +306,8 @@ func Package() {
 		packages string
 	}{
 		{"darwin/amd64", "darwin-x86_64.tar.gz"},
-		{"linux/386", "linux-x86.tar.gz"},
 		{"linux/amd64", "linux-x86_64.tar.gz"},
 		{"linux/arm64", "linux-arm64.tar.gz"},
-		{"windows/386", "windows-x86.zip"},
 		{"windows/amd64", "windows-x86_64.zip"},
 	}
 
@@ -323,6 +327,9 @@ func Package() {
 
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
+		if _, ok := os.LookupEnv(snapshotEnv); ok {
+			version += "-SNAPSHOT"
+		}
 		packageName := fmt.Sprintf("%s-%s-%s", beat, version, pkg)
 		path := filepath.Join(basePath, "build", "distributions", packageName)
 
@@ -572,6 +579,16 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
+		if runtime.GOARCH == "arm64" {
+			const platformsVar = "PLATFORMS"
+			oldPlatforms := os.Getenv(platformsVar)
+			os.Setenv(platformsVar, runtime.GOOS+"/"+runtime.GOARCH)
+			if oldPlatforms != "" {
+				defer os.Setenv(platformsVar, oldPlatforms)
+			} else {
+				defer os.Unsetenv(oldPlatforms)
+			}
+		}
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)

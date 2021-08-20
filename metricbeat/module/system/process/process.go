@@ -27,11 +27,12 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 var debugf = logp.MakeDebug("system.process")
@@ -64,14 +65,27 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("unexpected module type")
 	}
 
+	enableCgroups := false
+	if runtime.GOOS == "linux" {
+		if config.Cgroups == nil || *config.Cgroups {
+			enableCgroups = true
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", paths.Paths.Hostfs)
+		}
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{
-			Procs:        config.Procs,
-			EnvWhitelist: config.EnvWhitelist,
-			CpuTicks:     config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
-			CacheCmdLine: config.CacheCmdLine,
-			IncludeTop:   config.IncludeTop,
+			Procs:         config.Procs,
+			EnvWhitelist:  config.EnvWhitelist,
+			CPUTicks:      config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
+			CacheCmdLine:  config.CacheCmdLine,
+			IncludeTop:    config.IncludeTop,
+			EnableCgroups: enableCgroups,
+			CgroupOpts: cgroup.ReaderOptions{
+				RootfsMountpoint:  paths.Paths.Hostfs,
+				IgnoreRootCgroups: true,
+			},
 		},
 		perCPU:  config.IncludePerCPU,
 		IsAgent: systemModule.IsAgent,
@@ -80,21 +94,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	if runtime.GOOS == "linux" {
-		if config.Cgroups == nil || *config.Cgroups {
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
-			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
-			if err != nil {
-				if err == cgroup.ErrCgroupsMissing {
-					logp.Warn("cgroup data collection will be disabled: %v", err)
-				} else {
-					return nil, errors.Wrap(err, "error initializing cgroup reader")
-				}
-			}
-		}
-	}
-
 	return m, nil
 }
 
@@ -104,25 +103,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	procs, err := m.stats.Get()
 	if err != nil {
 		return errors.Wrap(err, "process stats")
-	}
-
-	if m.cgroup != nil {
-		for _, proc := range procs {
-			pid, ok := proc["pid"].(int)
-			if !ok {
-				debugf("error converting pid to int for proc %+v", proc)
-				continue
-			}
-			stats, err := m.cgroup.GetStatsForProcess(pid)
-			if err != nil {
-				debugf("error getting cgroups stats for pid=%d, %v", pid, err)
-				continue
-			}
-
-			if statsMap := cgroupStatsToMap(stats, m.perCPU); statsMap != nil {
-				proc["cgroup"] = statsMap
-			}
-		}
 	}
 
 	for _, proc := range procs {
@@ -136,6 +116,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			"user": common.MapStr{
 				"name": getAndRemove(proc, "username"),
 			},
+		}
+
+		if m.stats.EnableCgroups && !m.perCPU {
+			proc.Delete("cgroup.cpuacct.percpu")
 		}
 
 		// Duplicate system.process.cmdline with ECS name process.command_line

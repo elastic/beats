@@ -22,6 +22,7 @@ import (
 	"time"
 
 	appsv1 "k8s.io/api/apps/v1"
+	batchv1 "k8s.io/api/batch/v1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -71,6 +72,9 @@ type StatefulSet = appsv1.StatefulSet
 
 // Service data
 type Service = v1.Service
+
+// Job data
+type Job = batchv1.Job
 
 const (
 	// PodPending phase

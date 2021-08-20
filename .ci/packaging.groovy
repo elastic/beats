@@ -115,6 +115,7 @@ pipeline {
                    'x-pack/heartbeat',
                   // 'x-pack/journalbeat',
                   'x-pack/metricbeat',
+                  'x-pack/osquerybeat',
                   'x-pack/packetbeat',
                   'x-pack/winlogbeat'
                 )
@@ -137,7 +138,11 @@ pipeline {
                     'linux/amd64',
                     'linux/386',
                     'linux/arm64',
-                    'linux/armv7',
+                    // armv7 packaging isn't working, and we don't currently
+                    // need it for release. Do not re-enable it without
+                    // confirming it is fixed, you will break the packaging
+                    // pipeline!
+                    //'linux/armv7',
                     // The platforms above are disabled temporarly as crossbuild images are
                     // not available. See: https://github.com/elastic/golang-crossbuild/issues/71
                     //'linux/ppc64le',
@@ -152,7 +157,9 @@ pipeline {
                   withGithubNotify(context: "Packaging Linux ${BEATS_FOLDER}") {
                     deleteDir()
                     release()
-                    pushCIDockerImages()
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'amd64')
+                    }
                   }
                   prepareE2ETestForPackage("${BEATS_FOLDER}")
                 }
@@ -234,7 +241,9 @@ pipeline {
                   withGithubNotify(context: "Packaging linux/arm64 ${BEATS_FOLDER}") {
                     deleteWorkspace()
                     release()
-                    pushCIDockerImages()
+                    dir("${BASE_DIR}"){
+                      pushCIDockerImages(arch: 'arm64')
+                    }
                   }
                 }
                 post {
@@ -247,7 +256,6 @@ pipeline {
             }
           }
         }
-        /*
         stage('Run E2E Tests for Packages'){
           agent { label 'ubuntu-18 && immutable' }
           options { skipDefaultCheckout() }
@@ -255,7 +263,6 @@ pipeline {
             runE2ETests()
           }
         }
-        */
       }
       post {
         success {
@@ -272,27 +279,39 @@ pipeline {
   }
 }
 
-def pushCIDockerImages(){
+/**
+* @param arch what architecture
+*/
+def pushCIDockerImages(Map args = [:]) {
+  def arch = args.get('arch', 'amd64')
   catchError(buildResult: 'UNSTABLE', message: 'Unable to push Docker images', stageResult: 'FAILURE') {
     if (env?.BEATS_FOLDER?.endsWith('auditbeat')) {
-      tagAndPush('auditbeat')
+      tagAndPush(beatName: 'auditbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('filebeat')) {
-      tagAndPush('filebeat')
+      tagAndPush(beatName: 'filebeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('heartbeat')) {
-      tagAndPush('heartbeat')
+      tagAndPush(beatName: 'heartbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "journalbeat"){
-      tagAndPush('journalbeat')
+      tagAndPush(beatName: 'journalbeat', arch: arch)
     } else if (env?.BEATS_FOLDER?.endsWith('metricbeat')) {
-      tagAndPush('metricbeat')
+      tagAndPush(beatName: 'metricbeat', arch: arch)
+    } else if (env?.BEATS_FOLDER?.endsWith('osquerybeat')) {
+      tagAndPush(beatName: 'osquerybeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "packetbeat"){
-      tagAndPush('packetbeat')
+      tagAndPush(beatName: 'packetbeat', arch: arch)
     } else if ("${env.BEATS_FOLDER}" == "x-pack/elastic-agent") {
-      tagAndPush('elastic-agent')
+      tagAndPush(beatName: 'elastic-agent', arch: arch)
     }
   }
 }
 
-def tagAndPush(beatName){
+/**
+* @param beatName name of the Beat
+* @param arch what architecture
+*/
+def tagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def arch = args.get('arch', 'amd64')
   def libbetaVer = env.BEAT_VERSION
   def aliasVersion = ""
   if("${env.SNAPSHOT}" == "true"){
@@ -309,14 +328,22 @@ def tagAndPush(beatName){
 
   dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
 
+  // supported tags
+  def tags = [tagName, "${env.GIT_BASE_COMMIT}"]
+  if (!isPR() && aliasVersion != "") {
+    tags << aliasVersion
+  }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
   variants.each { variant ->
-    doTagAndPush(beatName, variant, libbetaVer, tagName)
-    doTagAndPush(beatName, variant, libbetaVer, "${env.GIT_BASE_COMMIT}")
-
-    if (!isPR() && aliasVersion != "") {
-      doTagAndPush(beatName, variant, libbetaVer, aliasVersion)
+    tags.each { tag ->
+      // TODO:
+      // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
+      // they support the versioning with the architecture
+      if ("${arch}" == "amd64") {
+        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}")
+      }
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
     }
   }
 }
@@ -327,18 +354,19 @@ def tagAndPush(beatName){
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
-def doTagAndPush(beatName, variant, sourceTag, targetTag) {
+def doTagAndPush(Map args = [:]) {
+  def beatName = args.beatName
+  def variant = args.variant
+  def sourceTag = args.sourceTag
+  def targetTag = args.targetTag
   def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
-
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
     iterations++
-    def status = sh(label: "Change tag and push ${targetName}", script: """
-      docker tag ${sourceName} ${targetName}
-      docker push ${targetName}
-    """, returnStatus: true)
-
+    def status = sh(label: "Change tag and push ${targetName}",
+                    script: ".ci/scripts/docker-tag-push.sh ${sourceName} ${targetName}",
+                    returnStatus: true)
     if ( status > 0 && iterations < 3) {
       error("tag and push failed for ${beatName}, retry")
     } else if ( status > 0 ) {
@@ -401,22 +429,19 @@ def triggerE2ETests(String suite) {
 
   def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
+  def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
 
   def parameters = [
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'BEAT_VERSION', value: beatVersion),
     booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
     string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
   ]
-  if (isPR()) {
-    def version = "pr-${env.CHANGE_ID}"
-    parameters.push(string(name: 'ELASTIC_AGENT_VERSION', value: "${version}"))
-    parameters.push(string(name: 'METRICBEAT_VERSION', value: "${version}"))
-  }
 
   build(job: "${e2eTestsPipeline}",
     parameters: parameters,

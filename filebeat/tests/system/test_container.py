@@ -66,3 +66,42 @@ class Test(BaseTest):
         output = self.read_output()
         assert len(output) == 1
         assert output[0]["stream"] == "stdout"
+
+    def test_container_input_registry_for_unparsable_lines(self):
+        """
+        Test container input properly updates registry offset in case
+        of unparsable lines
+        """
+        input_raw = """
+- type: container
+  paths:
+    - {}/logs/*.log
+"""
+        self.render_config_template(
+            input_raw=input_raw.format(os.path.abspath(self.working_dir)),
+            inputs=False,
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        self.copy_files(["logs/docker_corrupted.log"],
+                        target_dir="logs")
+
+        filebeat = self.start_beat()
+
+        self.wait_until(lambda: self.output_has(lines=20))
+
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+        assert len(output) == 20
+        assert output[19]["message"] == "Moving binaries to host..."
+        for o in output:
+            assert o["stream"] == "stdout"
+
+        # Check that file exist
+        data = self.get_registry()
+        logs = self.log_access()
+        assert logs.contains("Parse line error") == True
+        # bytes of healthy file are 2244 so for the corrupted one should
+        # be 2244-1=2243 since we removed one character
+        assert data[0]["offset"] == 2243

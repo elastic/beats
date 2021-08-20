@@ -1,0 +1,40 @@
+[
+    {
+        "@timestamp": "2021-03-08T03:41:01.000-02:00",
+        "cyberarkpas.audit.action": "Retrieve File",
+        "cyberarkpas.audit.desc": "Retrieve File",
+        "cyberarkpas.audit.file": "Root\\Policies\\Policy-BusinessWebsite.ini",
+        "cyberarkpas.audit.issuer": "PasswordManager",
+        "cyberarkpas.audit.message": "Retrieve File",
+        "cyberarkpas.audit.rfc5424": false,
+        "cyberarkpas.audit.safe": "PasswordManagerShared",
+        "cyberarkpas.audit.severity": "Info",
+        "cyberarkpas.audit.station": "10.0.1.20",
+        "event.action": "retrieve file",
+        "event.code": "51",
+        "event.dataset": "cyberarkpas.audit",
+        "event.kind": "event",
+        "event.module": "cyberarkpas",
+        "event.severity": 2,
+        "event.timezone": "-02:00",
+        "file.path": "Root\\Policies\\Policy-BusinessWebsite.ini",
+        "fileset.name": "audit",
+        "host.name": "VAULT",
+        "input.type": "log",
+        "log.offset": 0,
+        "observer.hostname": "VAULT",
+        "observer.product": "Vault",
+        "observer.vendor": "Cyber-Ark",
+        "observer.version": "11.7.0000",
+        "related.ip": [
+            "10.0.1.20"
+        ],
+        "service.type": "cyberarkpas",
+        "source.address": "10.0.1.20",
+        "source.ip": "10.0.1.20",
+        "tags": [
+            "cyberarkpas.audit",
+            "forwarded"
+        ]
+    }
+]

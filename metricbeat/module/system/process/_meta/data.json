@@ -11,51 +11,320 @@
     },
     "process": {
         "args": [
-            "/sbin/init",
-            "splash"
+            "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat",
+            "-E",
+            "setup.ilm.enabled=false",
+            "-E",
+            "setup.template.enabled=false",
+            "-E",
+            "management.enabled=true",
+            "-E",
+            "logging.level=debug",
+            "-E",
+            "gc_percent=${METRICBEAT_GOGC:100}",
+            "-E",
+            "logging.level=info",
+            "-E",
+            "http.enabled=true",
+            "-E",
+            "http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor",
+            "-E",
+            "logging.json=true",
+            "-E",
+            "logging.ecs=true",
+            "-E",
+            "logging.files.path=/usr/share/elastic-agent/data/logs/default",
+            "-E",
+            "logging.files.name=metricbeat_monitor-json.log",
+            "-E",
+            "logging.files.keepfiles=7",
+            "-E",
+            "logging.files.permission=0640",
+            "-E",
+            "logging.files.interval=1h",
+            "-E",
+            "path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635"
         ],
-        "command_line": "/sbin/init splash",
+        "command_line": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat_monitor-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635",
         "cpu": {
-            "pct": 0,
-            "start_time": "2020-12-04T22:17:35.000Z"
+            "pct": 0.0001,
+            "start_time": "2021-08-05T20:26:34.000Z"
         },
+        "executable": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat",
         "memory": {
-            "pct": 0.0004
+            "pct": 0.0023
         },
-        "name": "systemd",
-        "pgid": 1,
-        "pid": 1,
-        "ppid": 0,
-        "state": "sleeping"
+        "name": "metricbeat",
+        "pgid": 201795,
+        "pid": 205480,
+        "ppid": 201795,
+        "state": "sleeping",
+        "working_directory": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64"
     },
     "service": {
         "type": "system"
     },
     "system": {
         "process": {
-            "cmdline": "/sbin/init splash",
+            "cgroup": {
+                "cgroups_version": 2,
+                "cpu": {
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "pressure": {
+                        "some": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 142702537
+                        }
+                    },
+                    "stats": {
+                        "periods": 0,
+                        "system": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 2867565257,
+                            "pct": 0
+                        },
+                        "throttled": {
+                            "periods": 0,
+                            "us": 0
+                        },
+                        "usage": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 8330696216,
+                            "pct": 0
+                        },
+                        "user": {
+                            "norm": {
+                                "pct": 0
+                            },
+                            "ns": 5463130958,
+                            "pct": 0
+                        }
+                    }
+                },
+                "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                "io": {
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "pressure": {
+                        "full": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 109199
+                        },
+                        "some": {
+                            "10": {
+                                "pct": 0
+                            },
+                            "300": {
+                                "pct": 0
+                            },
+                            "60": {
+                                "pct": 0
+                            },
+                            "total": 109886
+                        }
+                    },
+                    "stats": {
+                        "dm-0": {
+                            "discarded": {
+                                "bytes": 0,
+                                "ios": 0
+                            },
+                            "read": {
+                                "bytes": 85557248,
+                                "ios": 663
+                            },
+                            "write": {
+                                "bytes": 663152640,
+                                "ios": 46402
+                            }
+                        },
+                        "sda": {
+                            "discarded": {
+                                "bytes": 0,
+                                "ios": 0
+                            },
+                            "read": {
+                                "bytes": 85557248,
+                                "ios": 663
+                            },
+                            "write": {
+                                "bytes": 663152640,
+                                "ios": 48783
+                            }
+                        }
+                    }
+                },
+                "memory": {
+                    "id": "docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "mem": {
+                        "events": {
+                            "high": 0,
+                            "low": 0,
+                            "max": 0,
+                            "oom": 0,
+                            "oom_kill": 0
+                        },
+                        "low": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 603746304
+                        }
+                    },
+                    "memsw": {
+                        "events": {
+                            "fail": 0,
+                            "high": 0,
+                            "max": 0
+                        },
+                        "low": {
+                            "bytes": 0
+                        },
+                        "usage": {
+                            "bytes": 0
+                        }
+                    },
+                    "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope",
+                    "stats": {
+                        "active_anon": {
+                            "bytes": 0
+                        },
+                        "active_file": {
+                            "bytes": 85426176
+                        },
+                        "anon": {
+                            "bytes": 149688320
+                        },
+                        "anon_thp": {
+                            "bytes": 2097152
+                        },
+                        "file": {
+                            "bytes": 441593856
+                        },
+                        "file_dirty": {
+                            "bytes": 135168
+                        },
+                        "file_mapped": {
+                            "bytes": 189640704
+                        },
+                        "file_thp": {
+                            "bytes": 0
+                        },
+                        "file_writeback": {
+                            "bytes": 0
+                        },
+                        "htp_collapse_alloc": 0,
+                        "inactive_anon": {
+                            "bytes": 149798912
+                        },
+                        "inactive_file": {
+                            "bytes": 355221504
+                        },
+                        "kernel_stack": {
+                            "bytes": 2211840
+                        },
+                        "major_page_faults": 0,
+                        "page_activate": 33660,
+                        "page_deactivate": 0,
+                        "page_faults": 117884250,
+                        "page_lazy_free": 46101,
+                        "page_lazy_freed": 0,
+                        "page_refill": 0,
+                        "page_scan": 0,
+                        "page_steal": 0,
+                        "page_tables": {
+                            "bytes": 2433024
+                        },
+                        "per_cpu": {
+                            "bytes": 1152
+                        },
+                        "shmem": {
+                            "bytes": 0
+                        },
+                        "shmem_thp": {
+                            "bytes": 0
+                        },
+                        "slab": {
+                            "bytes": 8386280
+                        },
+                        "slab_reclaimable": {
+                            "bytes": 5750544
+                        },
+                        "slab_unreclaimable": {
+                            "bytes": 2635736
+                        },
+                        "sock": {
+                            "bytes": 126976
+                        },
+                        "swap_cached": {
+                            "bytes": 0
+                        },
+                        "thp_fault_alloc": 0,
+                        "unevictable": {
+                            "bytes": 0
+                        },
+                        "workingset_activate_anon": 0,
+                        "workingset_activate_file": 0,
+                        "workingset_node_reclaim": 0,
+                        "workingset_refault_anon": 0,
+                        "workingset_refault_file": 0,
+                        "workingset_restore_anon": 0,
+                        "workingset_restore_file": 0
+                    }
+                },
+                "path": "/system.slice/docker-348d85c5f322ecee9364d8c2f29102b0ee2f63ac54f8c30cac2a9e90db846d36.scope"
+            },
+            "cmdline": "/usr/share/elastic-agent/data/install/metricbeat-7.15.0-SNAPSHOT-linux-x86_64/metricbeat -E setup.ilm.enabled=false -E setup.template.enabled=false -E management.enabled=true -E logging.level=debug -E gc_percent=${METRICBEAT_GOGC:100} -E logging.level=info -E http.enabled=true -E http.host=unix:///usr/share/elastic-agent/data/tmp/default/metricbeat/metricbeat.sock_monitor -E logging.json=true -E logging.ecs=true -E logging.files.path=/usr/share/elastic-agent/data/logs/default -E logging.files.name=metricbeat_monitor-json.log -E logging.files.keepfiles=7 -E logging.files.permission=0640 -E logging.files.interval=1h -E path.data=/usr/share/elastic-agent/data/run/default/metricbeat--7.15.0-SNAPSHOT--36643631373035623733363936343635",
             "cpu": {
-                "start_time": "2020-12-04T22:17:35.000Z",
+                "start_time": "2021-08-05T20:26:34.000Z",
                 "total": {
                     "norm": {
-                        "pct": 0
+                        "pct": 0.0001
                     },
-                    "pct": 0,
-                    "value": 1290
+                    "pct": 0.002,
+                    "value": 792730
                 }
+            },
+            "fd": {
+                "limit": {
+                    "hard": 1048576,
+                    "soft": 1048576
+                },
+                "open": 15
             },
             "memory": {
                 "rss": {
-                    "bytes": 12173312,
-                    "pct": 0.0004
+                    "bytes": 154656768,
+                    "pct": 0.0023
                 },
-                "share": 8679424,
-                "size": 172113920
+                "share": 98959360,
+                "size": 2219364352
             },
             "state": "sleeping"
         }
     },
     "user": {
-        "name": "root"
+        "name": "alexk"
     }
 }

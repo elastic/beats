@@ -11,11 +11,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -25,6 +26,7 @@ type Application interface {
 	Start() error
 	Stop() error
 	AgentInfo() *info.AgentInfo
+	Routes() *sorted.Set
 }
 
 type reexecManager interface {
@@ -45,7 +47,7 @@ func New(log *logger.Logger, pathConfigFile string, reexec reexecManager, status
 		return nil, err
 	}
 
-	if err := InjectAgentConfig(rawConfig); err != nil {
+	if err := info.InjectAgentConfig(rawConfig); err != nil {
 		return nil, err
 	}
 
@@ -61,7 +63,6 @@ func createApplication(
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (Application, error) {
-	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
 
@@ -70,16 +71,19 @@ func createApplication(
 		return nil, err
 	}
 
-	if IsStandalone(cfg.Fleet) {
+	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file
 	var store storage.Store
 	store, cfg, err = mergeFleetConfig(rawConfig)
+	if err != nil {
+		return nil, err
+	}
 
-	if IsFleetServerBootstrap(cfg.Fleet) {
+	if configuration.IsFleetServerBootstrap(cfg.Fleet) {
 		log.Info("Agent is in Fleet Server bootstrap mode")
 		return newFleetServerBootstrap(ctx, log, pathConfigFile, rawConfig, statusCtrl, agentInfo)
 	}
@@ -88,18 +92,8 @@ func createApplication(
 	return newManaged(ctx, log, store, cfg, rawConfig, reexec, statusCtrl, agentInfo)
 }
 
-// IsStandalone decides based on missing of fleet.enabled: true or fleet.{access_token,kibana} will place Elastic Agent into standalone mode.
-func IsStandalone(cfg *configuration.FleetAgentConfig) bool {
-	return cfg == nil || !cfg.Enabled
-}
-
-// IsFleetServerBootstrap decides if Elastic Agent is started in bootstrap mode.
-func IsFleetServerBootstrap(cfg *configuration.FleetAgentConfig) bool {
-	return cfg != nil && cfg.Server != nil && cfg.Server.Bootstrap
-}
-
 func mergeFleetConfig(rawConfig *config.Config) (storage.Store, *configuration.Configuration, error) {
-	path := info.AgentConfigFile()
+	path := paths.AgentConfigFile()
 	store := storage.NewDiskStore(path)
 	reader, err := store.Load()
 	if err != nil {

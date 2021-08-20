@@ -20,6 +20,7 @@ AGENT_FIELDS = [
 ]
 
 
+@metricbeat.parameterized_with_supported_versions
 class ConsulAgentTest(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['consul']

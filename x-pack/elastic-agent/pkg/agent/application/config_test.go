@@ -5,11 +5,8 @@
 package application
 
 import (
-	"io/ioutil"
 	"testing"
 	"time"
-
-	"gopkg.in/yaml.v2"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -30,7 +27,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, false, m.Fleet.Enabled)
-		assert.Equal(t, true, IsStandalone(m.Fleet))
+		assert.Equal(t, true, configuration.IsStandalone(m.Fleet))
 
 	})
 
@@ -40,7 +37,7 @@ func testMgmtMode(t *testing.T) {
 		err := c.Unpack(&m)
 		require.NoError(t, err)
 		assert.Equal(t, true, m.Fleet.Enabled)
-		assert.Equal(t, false, IsStandalone(m.Fleet))
+		assert.Equal(t, false, configuration.IsStandalone(m.Fleet))
 	})
 }
 
@@ -76,10 +73,4 @@ func mustWithConfigMode(standalone bool) *config.Config {
 			},
 		},
 	)
-}
-
-func dumpToYAML(t *testing.T, out string, in interface{}) {
-	b, err := yaml.Marshal(in)
-	require.NoError(t, err)
-	ioutil.WriteFile(out, b, 0600)
 }

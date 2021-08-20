@@ -6,36 +6,24 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 	"os"
-	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-const (
-	defaultConfig     = "elastic-agent.yml"
-	hashLen           = 6
-	commitFile        = ".elastic-agent.active.commit"
-	agentLockFileName = "agent.lock"
-)
-
-type globalFlags struct {
-	PathConfigFile string
-}
-
-// Config returns path which identifies configuration file.
-func (f *globalFlags) Config() string {
-	if len(f.PathConfigFile) == 0 || f.PathConfigFile == defaultConfig {
-		return filepath.Join(paths.Config(), defaultConfig)
-	}
-	return f.PathConfigFile
+func troubleshootMessage() string {
+	v := strings.Split(release.Version(), ".")
+	version := strings.Join(v[:2], ".")
+	return fmt.Sprintf("For help, please see our troubleshooting guide at https://www.elastic.co/guide/en/fleet/%s/fleet-troubleshooting.html", version)
 }
 
 // NewCommand returns the default command for the agent.
@@ -49,13 +37,15 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 		Use: "elastic-agent [subcommand]",
 	}
 
-	flags := &globalFlags{}
-
 	// path flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home.unversioned"))
+	cmd.PersistentFlags().MarkHidden("path.home.unversioned") // hidden used internally by container subcommand
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
-	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "c", "c", defaultConfig, `Configuration file, relative to path.config`)
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.downloads"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.install"))
 
 	// logging flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
@@ -64,18 +54,20 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 
 	// sub-commands
-	run := newRunCommandWithArgs(flags, args, streams)
+	run := newRunCommandWithArgs(args, streams)
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(run)
-	cmd.AddCommand(newInstallCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newUninstallCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newUpgradeCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newWatchCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newInstallCommandWithArgs(args, streams))
+	cmd.AddCommand(newUninstallCommandWithArgs(args, streams))
+	cmd.AddCommand(newUpgradeCommandWithArgs(args, streams))
+	cmd.AddCommand(newEnrollCommandWithArgs(args, streams))
+	cmd.AddCommand(newInspectCommandWithArgs(args, streams))
+	cmd.AddCommand(newWatchCommandWithArgs(args, streams))
+	cmd.AddCommand(newContainerCommand(args, streams))
+	cmd.AddCommand(newStatusCommand(args, streams))
 
 	// windows special hidden sub-command (only added on windows)
-	reexec := newReExecWindowsCommand(flags, args, streams)
+	reexec := newReExecWindowsCommand(args, streams)
 	if reexec != nil {
 		cmd.AddCommand(reexec)
 	}

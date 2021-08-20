@@ -94,6 +94,8 @@ receiving a custom payload.
 *<<monitor-http-options,`http`>>*:: Connects via HTTP and optionally verifies that the host returns the
 expected response. Will use `Elastic-Heartbeat` as
 the user agent product.
+*<<monitor-browser-options,`browser`>>*:: Allows users to run the synthetic
+monitoring test suites via Synthetic Agent on the Chromium browser.
 
 The `tcp` and `http` monitor types both support SSL/TLS and some proxy
 settings.
@@ -105,3 +107,5 @@ include::monitors/monitor-icmp.asciidoc[]
 include::monitors/monitor-tcp.asciidoc[]
 
 include::monitors/monitor-http.asciidoc[]
+
+include::monitors/monitor-browser.asciidoc[]

@@ -6,7 +6,7 @@
       "category": [
         "iam"
       ],
-      "code": 4747,
+      "code": "4747",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -62,7 +62,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2903",
         "TargetUserName": "testdistlocal1"
       },
-      "event_id": 4747,
+      "event_id": "4747",
       "keywords": [
         "Audit Success"
       ],

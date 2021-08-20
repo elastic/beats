@@ -7,7 +7,6 @@ package metrics
 import (
 	"context"
 	"fmt"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -36,14 +35,14 @@ type timeSeriesWithAligner struct {
 	aligner    string
 }
 
-func (r *metricsRequester) Metric(ctx context.Context, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
+func (r *metricsRequester) Metric(ctx context.Context, serviceName, metricType string, timeInterval *monitoringpb.TimeInterval, aligner string) (out timeSeriesWithAligner) {
 	timeSeries := make([]*monitoringpb.TimeSeries, 0)
 
 	req := &monitoringpb.ListTimeSeriesRequest{
 		Name:     "projects/" + r.config.ProjectID,
 		Interval: timeInterval,
 		View:     monitoringpb.ListTimeSeriesRequest_FULL,
-		Filter:   r.getFilterForMetric(metricType),
+		Filter:   r.getFilterForMetric(serviceName, metricType),
 		Aggregation: &monitoringpb.Aggregation{
 			PerSeriesAligner: gcp.AlignersMapToGCP[aligner],
 			AlignmentPeriod:  r.config.period,
@@ -83,9 +82,9 @@ func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metri
 		go func(mt string) {
 			defer wg.Done()
 
-			r.logger.Debugf("For metricType %s, metricMeta = %s", mt, metricMeta)
+			r.logger.Debugf("For metricType %s, metricMeta = %d", mt, metricMeta)
 			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
-			ts := r.Metric(ctx, mt, interval, aligner)
+			ts := r.Metric(ctx, sdc.ServiceName, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
 			results = append(results, ts)
@@ -96,20 +95,16 @@ func (r *metricsRequester) Metrics(ctx context.Context, sdc metricsConfig, metri
 	return results, nil
 }
 
-var serviceRegexp = regexp.MustCompile(`^(?P<service>[a-z]+)\.googleapis.com.*`)
-
 // getFilterForMetric returns the filter associated with the corresponding filter. Some services like Pub/Sub fails
 // if they have a region specified.
-func (r *metricsRequester) getFilterForMetric(m string) (f string) {
+func (r *metricsRequester) getFilterForMetric(serviceName, m string) (f string) {
 	f = fmt.Sprintf(`metric.type="%s"`, m)
 	if r.config.Zone == "" && r.config.Region == "" {
 		return
 	}
 
-	service := serviceRegexp.ReplaceAllString(m, "${service}")
-
-	switch service {
-	case gcp.ServicePubsub, gcp.ServiceLoadBalancing:
+	switch serviceName {
+	case gcp.ServicePubsub, gcp.ServiceLoadBalancing, gcp.ServiceCloudFunctions:
 		return
 	case gcp.ServiceStorage:
 		if r.config.Region == "" {

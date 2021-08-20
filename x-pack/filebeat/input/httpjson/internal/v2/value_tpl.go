@@ -6,6 +6,13 @@ package v2
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
+	"hash"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -19,6 +26,11 @@ import (
 const (
 	leftDelim  = "[["
 	rightDelim = "]]"
+)
+
+var (
+	errEmptyTemplateResult = errors.New("the template result is empty")
+	errExecutingTemplate   = errors.New("the template execution failed")
 )
 
 type valueTpl struct {
@@ -39,6 +51,9 @@ func (t *valueTpl) Unpack(in string) error {
 			"getRFC5988Link":      getRFC5988Link,
 			"toInt":               toInt,
 			"add":                 add,
+			"mul":                 mul,
+			"div":                 div,
+			"hmac":                hmacString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -51,21 +66,21 @@ func (t *valueTpl) Unpack(in string) error {
 	return nil
 }
 
-func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string) {
-	fallback := func(err error) string {
-		if err != nil {
-			log.Debugf("template execution failed: %v", err)
-		}
+func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal *valueTpl, log *logp.Logger) (val string, err error) {
+	fallback := func(err error) (string, error) {
 		if defaultVal != nil {
 			log.Debugf("template execution: falling back to default value")
 			return defaultVal.Execute(emptyTransformContext(), transformable{}, nil, log)
 		}
-		return ""
+		return "", err
 	}
 
 	defer func() {
 		if r := recover(); r != nil {
-			val = fallback(r.(error))
+			val, err = fallback(errExecutingTemplate)
+		}
+		if err != nil {
+			log.Debugf("template execution failed: %v", err)
 		}
 		log.Debugf("template execution: evaluated template %q", val)
 	}()
@@ -83,9 +98,9 @@ func (t *valueTpl) Execute(trCtx *transformContext, tr transformable, defaultVal
 
 	val = buf.String()
 	if val == "" || strings.Contains(val, "<no value>") {
-		return fallback(nil)
+		return fallback(errEmptyTemplateResult)
 	}
-	return val
+	return val, nil
 }
 
 var (
@@ -195,15 +210,58 @@ func getRFC5988Link(rel string, links []string) string {
 	return ""
 }
 
-func toInt(s string) int {
-	i, _ := strconv.ParseInt(s, 10, 64)
-	return int(i)
+func toInt(v interface{}) int64 {
+	vv := reflect.ValueOf(v)
+	switch vv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return int64(vv.Int())
+	case reflect.Float32, reflect.Float64:
+		return int64(vv.Float())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return int64(vv.Uint())
+	case reflect.String:
+		f, _ := strconv.ParseFloat(vv.String(), 64)
+		return int64(f)
+	default:
+		return 0
+	}
 }
 
-func add(vs ...int) int {
-	var sum int
+func add(vs ...int64) int64 {
+	var sum int64
 	for _, v := range vs {
 		sum += v
 	}
 	return sum
+}
+
+func mul(a, b int64) int64 {
+	return a * b
+}
+
+func div(a, b int64) int64 {
+	return a / b
+}
+
+func hmacString(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	// Create a new HMAC by defining the hash type and the key (as byte array)
+	var mac hash.Hash
+	switch hmacType {
+	case "sha256":
+		mac = hmac.New(sha256.New, []byte(hmacKey))
+	case "sha1":
+		mac = hmac.New(sha1.New, []byte(hmacKey))
+	default:
+		// Upstream config validation prevents this from happening.
+		return ""
+	}
+	// Write Data to it
+	mac.Write([]byte(data))
+
+	// Get result and encode as hexadecimal string
+	return hex.EncodeToString(mac.Sum(nil))
 }

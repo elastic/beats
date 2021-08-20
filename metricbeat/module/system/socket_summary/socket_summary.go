@@ -155,7 +155,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	stats := calculateConnStats(conns)
-	newStats, err := applyEnhancements(stats, m)
+	newStats, err := applyEnhancements(stats)
 	if err != nil {
 		m.Logger().Debugf("error applying enhancements: %s", err)
 		newStats = stats

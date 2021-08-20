@@ -1,0 +1,50 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/Kinesis
+        resource_type: kinesis
+        statistic: ["Average"]
+        name:
+          - GetRecords.Bytes
+          - GetRecords.IteratorAgeMilliseconds
+          - GetRecords.Latency
+          - IncomingBytes
+          - IncomingRecords
+          - PutRecord.Bytes
+          - PutRecord.Latency
+          - PutRecord.Success
+          - PutRecords.Bytes
+          - PutRecords.Latency
+          - PutRecords.Success
+          - ReadProvisionedThroughputExceeded
+          - SubscribeToShard.RateExceeded
+          - SubscribeToShard.Success
+          - SubscribeToShardEvent.Bytes
+          - SubscribeToShardEvent.MillisBehindLatest
+          - SubscribeToShardEvent.Success
+          - WriteProvisionedThroughputExceeded
+          - OutgoingBytes
+          - IteratorAgeMilliseconds
+      - namespace: AWS/Kinesis
+        resource_type: kinesis
+        statistic: ["Sum"]
+        name:
+          - GetRecords.Records
+          - GetRecords.Success
+          - PutRecords.TotalRecords
+          - PutRecords.SuccessfulRecords
+          - PutRecords.FailedRecords
+          - PutRecords.ThrottledRecords
+          - SubscribeToShardEvent.Records
+          - OutgoingRecords
+
+
+
+
+
+
+
+

@@ -175,3 +175,15 @@
     type: keyword
     description: >
       The total count of burst rate hits since the object was created or cleared
+
+  - name: termination_user
+    default_field: false
+    type: keyword
+    description: >
+      AAA name of user requesting termination
+
+  - name: webvpn.group_name
+    type: keyword
+    default_field: false
+    description: >
+      The WebVPN group name the user belongs to

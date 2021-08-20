@@ -16,7 +16,6 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -49,7 +48,7 @@ func (p *pidProvider) Close() {}
 func (p *pidProvider) Name() string { return "Windows Service Manager" }
 
 func (p *pidProvider) PID(ctx context.Context) (int, error) {
-	svc, err := p.winManager.OpenService(install.ServiceName)
+	svc, err := p.winManager.OpenService(paths.ServiceName)
 	if err != nil {
 		return 0, errors.New("failed to read windows service", err)
 	}
@@ -62,8 +61,8 @@ func (p *pidProvider) PID(ctx context.Context) (int, error) {
 	return int(status.ProcessId), nil
 }
 
-func invokeCmd() *exec.Cmd {
-	homeExePath := filepath.Join(paths.Home(), agentName)
+func invokeCmd(topPath string) *exec.Cmd {
+	homeExePath := filepath.Join(topPath, agentName)
 
 	cmd := exec.Command(homeExePath, watcherSubcommand,
 		"--path.config", paths.Config(),

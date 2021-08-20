@@ -1,3 +1,10 @@
+queue:
+  mem:
+    events: 575
+    flush:
+      min_events: 23
+      timeout: 1s
+
 filebeat:
   inputs:
   - type: log
@@ -24,6 +31,10 @@ filebeat:
             id: agent-id
             version: 8.0.0
             snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
   - type: log
     paths:
       - /var/log/hello3.log
@@ -48,12 +59,20 @@ filebeat:
             id: agent-id
             version: 8.0.0
             snapshot: false
+      - add_fields:
+          target: "agent"
+          fields:
+            id: agent-id
 output:
   elasticsearch:
     hosts:
       - 127.0.0.1:9200
       - 127.0.0.1:9300
+    headers:
+      h1: test-header
     username: elastic
     password: changeme
+    bulk_max_size: 23
+    worker: 10
     api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA
     ca_sha256: 7HIpactkIAq2Y49orFOOQKurWxmmSFZhBCoQYcRhJ3Y=
