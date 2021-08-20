@@ -161,7 +161,7 @@ AWS S3 bucket ARN (Required when `var.queue_url` is not set).
 
 *`var.number_of_workers`*::
 
-Number of workers that will process the S3 objects listed (Required when `var.bucket` is set).
+Number of workers that will process the S3 objects listed (Required when `var.bucket_arn` is set).
 Use to vertically scale the input.
 
 *`var.bucket_list_interval`*::
