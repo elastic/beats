@@ -369,6 +369,10 @@ func Tar(src string, targetFile string) error {
 
 	// walk through every file in the folder
 	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+		if errFn != nil {
+			return fmt.Errorf("error traversing the file system: %w", errFn)
+		}
+
 		// if a symlink, skip file
 		if fi.Mode().Type() == os.ModeSymlink {
 			fmt.Printf(">> skipping symlink: %s\n", file)
