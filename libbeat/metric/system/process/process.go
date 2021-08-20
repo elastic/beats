@@ -538,7 +538,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s; err=", pid, process.Name, err)
+		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
 		return nil
 	}
 
