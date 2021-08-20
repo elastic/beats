@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_data_stream_index
+package add_data_stream
 
 import (
 	"fmt"
@@ -43,8 +43,10 @@ func SetEventDataset(event *beat.Event, ds string) {
 type AddDataStreamIndex struct {
 	DataStream DataStream
 	// cached, compiled version of the index name derived from the data stream
-	dsCached      string
-	customDsCache string
+	idxNameCache string
+	// cached, compiled version of the index name derived from the data stream, sans datastream
+	// which is dynamic
+	idxNamePartialCache string
 }
 
 // New returns a new AddDataStreamIndex processor.
@@ -56,26 +58,29 @@ func New(ds DataStream) *AddDataStreamIndex {
 		ds.Dataset = "generic"
 	}
 	return &AddDataStreamIndex{
-		DataStream:    ds,
-		dsCached:      ds.indexName(),
-		customDsCache: ds.datasetFmtString(),
+		DataStream:          ds,
+		idxNameCache:        ds.indexName(),
+		idxNamePartialCache: ds.idxNamePartialCache(),
 	}
 }
 
 // Run runs the processor.
 func (p *AddDataStreamIndex) Run(event *beat.Event) (*beat.Event, error) {
+	eventDataStream := p.DataStream
 	if event.Meta == nil {
 		event.Meta = common.MapStr{
-			events.FieldMetaRawIndex: p.dsCached,
+			events.FieldMetaRawIndex: p.idxNameCache,
 		}
 	} else {
-		customDs, hasCustom := event.Meta[FieldMetaCustomDataset]
+		customDataset, hasCustom := event.Meta[FieldMetaCustomDataset]
 		if !hasCustom {
-			event.Meta[events.FieldMetaRawIndex] = p.dsCached
+			event.Meta[events.FieldMetaRawIndex] = p.idxNameCache
 		} else {
-			event.Meta[events.FieldMetaRawIndex] = fmt.Sprintf(p.customDsCache, customDs)
+			event.Meta[events.FieldMetaRawIndex] = fmt.Sprintf(p.idxNamePartialCache, customDataset)
+			eventDataStream.Dataset = customDataset.(string)
 		}
 	}
+	event.PutValue("data_stream", eventDataStream)
 
 	return event, nil
 }
@@ -92,10 +97,12 @@ type DataStream struct {
 	Type      string `config:"type"`
 }
 
-func (ds DataStream) datasetFmtString() string {
+// genIdxFmtStringForDataset returns a format string that takes a single argument, the dataset
+// this is slightly more efficient than generating the entire string with all three vars every time
+func (ds DataStream) idxNamePartialCache() string {
 	return fmt.Sprintf("%s-%%s-%s", ds.Type, ds.Namespace)
 }
 
 func (ds DataStream) indexName() string {
-	return fmt.Sprintf(ds.datasetFmtString(), ds.Dataset)
+	return fmt.Sprintf(ds.idxNamePartialCache(), ds.Dataset)
 }

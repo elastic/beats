@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 )
@@ -51,10 +51,10 @@ type publishSettings struct {
 	KeepNull bool `config:"keep_null"`
 
 	// Output meta data settings
-	Pipeline   string                            `config:"pipeline"` // ES Ingest pipeline name
-	Index      fmtstr.EventFormatString          `config:"index"`    // ES output index pattern
-	DataStream *add_data_stream_index.DataStream `config:"data_stream"`
-	DataSet    string                            `config:"dataset"`
+	Pipeline   string                      `config:"pipeline"` // ES Ingest pipeline name
+	Index      fmtstr.EventFormatString    `config:"index"`    // ES output index pattern
+	DataStream *add_data_stream.DataStream `config:"data_stream"`
+	DataSet    string                      `config:"dataset"`
 }
 
 // NewFactory takes a scheduler and creates a RunnerFactory that can create cfgfile.Runner(Monitor) objects.
@@ -119,10 +119,6 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		fields := clientCfg.Processing.Fields.Clone()
 		fields.Put("event.dataset", dataset)
 
-		if settings.DataStream != nil {
-			fields.Put("data_stream", settings.DataStream)
-		}
-
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {
 			meta.Put("pipeline", settings.Pipeline)
@@ -164,7 +160,7 @@ func setupIndexProcessor(info beat.Info, settings publishSettings, dataset strin
 		if ds.Dataset == "" {
 			ds.Dataset = dataset
 		}
-		return add_data_stream_index.New(*ds), nil
+		return add_data_stream.New(*ds), nil
 	}
 
 	if !settings.Index.IsEmpty() {
