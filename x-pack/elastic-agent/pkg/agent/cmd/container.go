@@ -145,7 +145,7 @@ occurs on every start of the container set FLEET_FORCE to 1.
 }
 
 func logError(streams *cli.IOStreams, err error) {
-	fmt.Fprintf(streams.Err, "Error: %v\n", err)
+	fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
@@ -333,6 +333,12 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		"--path.home", paths.Top(), // --path.home actually maps to paths.Top()
 		"--path.config", paths.Config(),
 		"--path.logs", paths.Logs(),
+	}
+	if paths.Downloads() != "" {
+		args = append(args, "--path.downloads", paths.Downloads())
+	}
+	if paths.Install() != "" {
+		args = append(args, "--path.install", paths.Install())
 	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
@@ -704,16 +710,18 @@ func setPaths(statePath, configPath, logsPath string, writePaths bool) error {
 		}
 	}
 	// sync the downloads to the data directory
-	srcDownloads := filepath.Join(paths.Home(), "downloads")
 	destDownloads := filepath.Join(statePath, "data", "downloads")
-	if err := syncDir(srcDownloads, destDownloads); err != nil {
+	if err := syncDir(paths.Downloads(), destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
+	originalInstall := paths.Install()
 	originalTop := paths.Top()
 	paths.SetTop(topPath)
 	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
+	// install path stays on container default mount (otherwise a bind mounted directory could have noexec set)
+	paths.SetInstall(originalInstall)
 	// set LOGS_PATH is given
 	logsPath = envWithDefault(logsPath, "LOGS_PATH")
 	if logsPath != "" {

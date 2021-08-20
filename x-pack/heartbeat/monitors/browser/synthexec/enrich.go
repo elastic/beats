@@ -122,9 +122,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case "step/screenshot_ref":
 		fallthrough
 	case "screenshot/block":
-		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
+		add_data_stream_index.SetEventDataset(event, "browser.screenshot")
 	case "journey/network_info":
-		add_data_stream_index.SetEventDataset(event, "browser_network")
+		add_data_stream_index.SetEventDataset(event, "browser.network")
 	}
 
 	if se.Id != "" {

@@ -12,11 +12,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
-	"github.com/google/go-cmp/cmp"
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
@@ -244,8 +245,11 @@ func TestSet(t *testing.T) {
 }`
 	oneInputConfig := []config.InputConfig{
 		{
-			Name:     "osquery-manager-1",
-			Type:     "osquery",
+			Name: "osquery-manager-1",
+			Type: "osquery",
+			Datastream: config.DatastreamConfig{
+				Namespace: "custom",
+			},
 			Platform: "posix",
 			Version:  "4.7.0",
 			Discovery: []string{
@@ -326,6 +330,30 @@ func TestSet(t *testing.T) {
 				t.Fatal(diff)
 			}
 
+			// Should not resolve the query until the config was generated
+			if tc.name == "one input" {
+				_, ok := cfgp.LookupQueryInfo("users")
+				diff = cmp.Diff(false, ok)
+				if diff != "" {
+					t.Fatal(diff)
+				}
+
+				// Check the namespaces set before configuration is generated
+				for _, input := range tc.inputs {
+					_, ok := cfgp.LookupNamespace("users")
+					diff = cmp.Diff(false, ok)
+					if diff != "" {
+						t.Fatal(diff)
+					}
+
+					diff = cmp.Diff(oneInputConfig[0].Datastream.Namespace, input.Datastream.Namespace)
+					if diff != "" {
+						t.Fatal(diff)
+					}
+
+				}
+			}
+
 			// test generate config
 			mcfg, err := cfgp.GenerateConfig(context.Background())
 			if err != nil {
@@ -353,29 +381,39 @@ func TestSet(t *testing.T) {
 			for _, input := range tc.inputs {
 				for _, stream := range input.Streams {
 					name := strings.Join([]string{"pack", input.Name, stream.ID}, "_")
-					sql, ok := cfgp.ResolveName(name)
+
+					ns, ok := cfgp.LookupNamespace(name)
+					if !ok {
+						t.Fatalf("failed to resolve namespace for %v", name)
+					}
+
+					qi, ok := cfgp.LookupQueryInfo(name)
 					if !ok {
 						t.Fatalf("failed to resolve name %v", name)
 					}
-					diff = cmp.Diff(sql, stream.Query)
+					diff = cmp.Diff(qi.QueryConfig.Query, stream.Query)
 					if diff != "" {
 						t.Error(diff)
 					}
+
+					diff = cmp.Diff(input.Datastream.Namespace, ns)
+					if diff != "" {
+						t.Error(diff)
+					}
+
 					if len(stream.ECSMapping) == 0 {
 						continue
 					}
 
-					// test that the query ecs mapping lookup succeeds
-					ecsm, ok := cfgp.LookupECSMapping(name)
-					if !ok {
-						t.Fatalf("failed to lookup ecs mapping for %v", name)
+					diff = cmp.Diff(tc.ecsm, qi.ECSMapping)
+					if diff != "" {
+						t.Error(diff)
 					}
-					diff = cmp.Diff(tc.ecsm, ecsm)
 				}
 			}
 
 			// test that unknown query can't be resolved
-			_, ok = cfgp.ResolveName("unknown query name")
+			_, ok = cfgp.LookupQueryInfo("unknown query name")
 			if ok {
 				t.Fatalf("unexpectedly resolved unknown query")
 			}
