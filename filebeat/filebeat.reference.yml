@@ -1111,8 +1111,8 @@ filebeat.inputs:
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
