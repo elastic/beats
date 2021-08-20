@@ -119,7 +119,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	} else {
 		name = strings.Title(name)
 	}
-	userAgent = useragent.UserAgent(name)
+	userAgent := useragent.UserAgent(name)
 
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),

@@ -148,12 +148,12 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 
 	name, err := os.Executable()
 	if err != nil {
-		logp.Errorf("Unable to get running executable name: %v", err)
+		log.Errorf("Unable to get running executable name: %v", err)
 		name = "KibanaClient"
 	} else {
 		name = strings.Title(name)
 	}
-	userAgent = useragent.UserAgent(name)
+	userAgent := useragent.UserAgent(name)
 
 	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {
