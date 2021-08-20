@@ -4,3 +4,4 @@ metricsets:
   - pubsub
   - loadbalancing
   - storage
+  - gke
