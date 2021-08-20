@@ -18,8 +18,11 @@
 package dashboards
 
 import (
+	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -36,21 +39,42 @@ var (
 )
 
 // DecodeExported decodes an exported dashboard
-func DecodeExported(result common.MapStr) common.MapStr {
+func DecodeExported(exported []byte) []byte {
 	// remove unsupported chars
-	objects := result["objects"].([]interface{})
-	for _, obj := range objects {
-		o := obj.(common.MapStr)
-		for _, key := range responseToDecode {
-			// All fields are optional, so errors are not caught
-			err := decodeValue(o, key)
-			if err != nil {
-				logger := logp.NewLogger("dashboards")
-				logger.Debugf("Error while decoding dashboard objects: %+v", err)
+	var result []byte
+	r := bufio.NewReader(bytes.NewReader(exported))
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return append(result, decodeLine(line)...)
 			}
+			return exported
 		}
+		result = append(result, decodeLine(line)...)
 	}
-	result["objects"] = objects
+}
+
+func decodeLine(line []byte) []byte {
+	if len(bytes.TrimSpace(line)) == 0 {
+		return line
+	}
+
+	o := common.MapStr{}
+	err := json.Unmarshal(line, &o)
+	if err != nil {
+		return line
+	}
+	var result []byte
+	for _, key := range responseToDecode {
+		// All fields are optional, so errors are not caught
+		err := decodeValue(o, key)
+		if err != nil {
+			logger := logp.NewLogger("dashboards")
+			logger.Debugf("Error while decoding dashboard objects: %+v", err)
+		}
+		result = append(result, []byte(o.String())...)
+	}
 	return result
 }
 
