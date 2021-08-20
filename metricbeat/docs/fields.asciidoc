@@ -26884,6 +26884,387 @@ type: long
 --
 
 [float]
+=== gke
+
+`gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
+
+
+
+
+*`gcp.gke.container.cpu.core_usage_time.value`*::
++
+--
+Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.cpu.limit_cores.value`*::
++
+--
+CPU cores limit of the container. Sampled every 60 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.cpu.limit_utilization.value`*::
++
+--
+The fraction of the CPU limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.cpu.request_cores.value`*::
++
+--
+Number of CPU cores requested by the container. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.cpu.request_utilization.value`*::
++
+--
+The fraction of the requested CPU that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
+
+type: double
+
+--
+
+
+*`gcp.gke.container.ephemeral_storage.limit_bytes.value`*::
++
+--
+Local ephemeral storage limit in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.ephemeral_storage.request_bytes.value`*::
++
+--
+Local ephemeral storage request in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.ephemeral_storage.used_bytes.value`*::
++
+--
+Local ephemeral storage usage in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+*`gcp.gke.container.memory.limit_bytes.value`*::
++
+--
+Memory limit of the container in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.memory.limit_utilization.value`*::
++
+--
+The fraction of the memory limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.memory.page_fault_count.value`*::
++
+--
+Number of page faults, broken down by type, major and minor.
+
+type: long
+
+--
+
+*`gcp.gke.container.memory.request_bytes.value`*::
++
+--
+Memory request of the container in bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.memory.request_utilization.value`*::
++
+--
+The fraction of the requested memory that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.container.memory.used_bytes.value`*::
++
+--
+Memory usage in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.restart_count.value`*::
++
+--
+Number of times the container has restarted. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.container.uptime.value`*::
++
+--
+Time in seconds that the container has been running. Sampled every 60 seconds.
+
+type: double
+
+--
+
+
+
+*`gcp.gke.node.cpu.allocatable_cores.value`*::
++
+--
+Number of allocatable CPU cores on the node. Sampled every 60 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.node.cpu.allocatable_utilization.value`*::
++
+--
+The fraction of the allocatable CPU that is currently in use on the instance. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.node.cpu.core_usage_time.value`*::
++
+--
+Cumulative CPU usage on all cores used on the node in seconds. Sampled every 60 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.node.cpu.total_cores.value`*::
++
+--
+Total number of CPU cores on the node. Sampled every 60 seconds.
+
+type: double
+
+--
+
+
+*`gcp.gke.node.ephemeral_storage.allocatable_bytes.value`*::
++
+--
+Local ephemeral storage bytes allocatable on the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.ephemeral_storage.inodes_free.value`*::
++
+--
+Free number of inodes on local ephemeral storage. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.ephemeral_storage.inodes_total.value`*::
++
+--
+Total number of inodes on local ephemeral storage. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.ephemeral_storage.total_bytes.value`*::
++
+--
+Total ephemeral storage bytes on the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.ephemeral_storage.used_bytes.value`*::
++
+--
+Local ephemeral storage bytes used by the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+*`gcp.gke.node.memory.allocatable_bytes.value`*::
++
+--
+Cumulative memory bytes used by the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.memory.allocatable_utilization.value`*::
++
+--
+The fraction of the allocatable memory that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed allocatable memory bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: double
+
+--
+
+*`gcp.gke.node.memory.total_bytes.value`*::
++
+--
+Number of bytes of memory allocatable on the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.memory.used_bytes.value`*::
++
+--
+Cumulative memory bytes used by the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+*`gcp.gke.node.network.received_bytes_count.value`*::
++
+--
+Cumulative number of bytes received by the node over the network. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.network.sent_bytes_count.value`*::
++
+--
+Cumulative number of bytes transmitted by the node over the network. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.pid_limit.value`*::
++
+--
+The max PID of OS on the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.node.pid_used.value`*::
++
+--
+The number of running process in the OS on the node. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+
+*`gcp.gke.node_daemon.cpu.core_usage_time.value`*::
++
+--
+Cumulative CPU usage on all cores used by the node level system daemon in seconds. Sampled every 60 seconds.
+
+type: double
+
+--
+
+
+*`gcp.gke.node_daemon.memory.used_bytes.value`*::
++
+--
+Memory usage by the system daemon in bytes. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+
+*`gcp.gke.pod.network.received_bytes_count.value`*::
++
+--
+Cumulative number of bytes received by the pod over the network. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.pod.network.sent_bytes_count.value`*::
++
+--
+Cumulative number of bytes transmitted by the pod over the network. Sampled every 60 seconds.
+
+type: long
+
+--
+
+
+*`gcp.gke.pod.volume.total_bytes.value`*::
++
+--
+Total number of disk bytes available to the pod. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.pod.volume.used_bytes.value`*::
++
+--
+Number of disk bytes used by the pod. Sampled every 60 seconds.
+
+type: long
+
+--
+
+*`gcp.gke.pod.volume.utilization.value`*::
++
+--
+The fraction of the volume that is currently being used by the instance. This value cannot be greater than 1 as usage cannot exceed the total available volume space. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
+
+type: double
+
+--
+
+[float]
 === loadbalancing
 
 Google Cloud Load Balancing metrics
