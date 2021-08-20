@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -95,17 +96,6 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	indexProcessor, err := setupIndexProcessor(info, settings, stdFields.Type)
-	if err != nil {
-		return nil, err
-	}
-
-	userProcessors, err := processors.New(settings.Processors)
-	if err != nil {
-		return nil, err
-	}
-
-	// TODO: Remove this logic in the 8.0/master branch, preserve only in 7.x
 	dataset := settings.DataSet
 	if dataset == "" {
 		if settings.DataStream != nil && settings.DataStream.Dataset != "" {
@@ -113,6 +103,15 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		} else {
 			dataset = "uptime"
 		}
+	}
+	datastreamProcessor, err := setupDataStream(info, settings, stdFields.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	userProcessors, err := processors.New(settings.Processors)
+	if err != nil {
+		return nil, err
 	}
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
@@ -128,8 +127,8 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
 		procs := processors.NewList(nil)
-		if indexProcessor != nil {
-			procs.AddProcessor(indexProcessor)
+		if datastreamProcessor != nil {
+			procs.AddProcessor(datastreamProcessor)
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -149,8 +148,8 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	}, nil
 }
 
-func setupIndexProcessor(info beat.Info, settings publishSettings, dataset string) (processors.Processor, error) {
-	var indexProcessor processors.Processor
+func setupDataStream(info beat.Info, settings publishSettings, dataset string) (processors.Processor, error) {
+	var processor processors.Processor
 	if settings.DataStream != nil {
 		ds := settings.DataStream
 		if ds.Type == "" {
@@ -160,6 +159,10 @@ func setupIndexProcessor(info beat.Info, settings publishSettings, dataset strin
 			ds.Dataset = dataset
 		}
 		return add_data_stream.New(*ds), nil
+	} else {
+		// for monitors writing to traditional indices...
+		// TODO: Consider removing in 8.0.0
+		processor = actions.NewAddFields(common.MapStr{"event.dataset": "uptime"}, true, true)
 	}
 
 	if !settings.Index.IsEmpty() {
@@ -170,7 +173,7 @@ func setupIndexProcessor(info beat.Info, settings publishSettings, dataset strin
 		if err != nil {
 			return nil, err
 		}
-		indexProcessor = add_formatted_index.New(timestampFormat)
+		processor = add_formatted_index.New(timestampFormat)
 	}
-	return indexProcessor, nil
+	return processor, nil
 }
