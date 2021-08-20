@@ -51,7 +51,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 			if !ok {
 				return a, fmt.Errorf("invalid ECS mapping: %w", ErrActionRequest)
 			}
-			ecsm, err = convertActionDataECSMapping(m)
+			ecsm, err = parseECSMapping(m)
 			if err != nil {
 				return a, err
 			}
@@ -75,7 +75,7 @@ func FromMap(m map[string]interface{}) (a Action, err error) {
 	}, nil
 }
 
-func convertActionDataECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
+func parseECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
 	ecsm = make(ecs.Mapping)
 	for k, v := range m {
 		k = strings.TrimSpace(k)

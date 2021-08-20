@@ -9,11 +9,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
 
@@ -69,17 +67,6 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	var ecsFields []common.MapStr
-	// If non-empty result and the ECSMapping is present
-	if len(hits) > 0 && len(ac.ECSMapping) > 0 {
-		ecsFields = make([]common.MapStr, len(hits))
-		for i, hit := range hits {
-			ecsFields[i] = common.MapStr(ac.ECSMapping.Map(ecs.Doc(hit)))
-		}
-	}
-	if err != nil {
-		return err
-	}
-	a.bt.publishEvents(index, ac.ID, responseID, hits, ecsFields, req["data"])
+	a.bt.publishEvents(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
 	return nil
 }
