@@ -25,6 +25,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch"
@@ -34,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -110,6 +113,14 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
+	name, err := os.Executable()
+	if err != nil {
+		name = "ESLegClient"
+	} else {
+		name = strings.Title(name)
+	}
+	userAgent = useragent.UserAgent(name)
+
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),
 		httpcommon.WithIOStats(s.Observer),
@@ -119,6 +130,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 	if err != nil {
 		return nil, err

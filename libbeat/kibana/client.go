@@ -29,12 +29,15 @@ import (
 	"net/http"
 	"net/textproto"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -143,7 +146,16 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		headers.Set(k, v)
 	}
 
-	rt, err := config.Transport.Client()
+	name, err := os.Executable()
+	if err != nil {
+		logp.Errorf("Unable to get running executable name: %v", err)
+		name = "KibanaClient"
+	} else {
+		name = strings.Title(name)
+	}
+	userAgent = useragent.UserAgent(name)
+
+	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {
 		return nil, err
 	}
