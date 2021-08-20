@@ -93,7 +93,7 @@ func init() {
 		feature.MakeDetails(
 			"Disk queue",
 			"Buffer events on disk before sending to the output.",
-			feature.Beta))
+			feature.Stable))
 }
 
 // queueFactory matches the queue.Factory interface, and is used to add the
