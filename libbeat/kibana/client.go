@@ -20,6 +20,7 @@ package kibana
 import (
 	"bytes"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -48,6 +49,7 @@ type Connection struct {
 	URL      string
 	Username string
 	Password string
+	APIKey   string
 	Headers  http.Header
 
 	HTTP    *http.Client
@@ -109,6 +111,10 @@ func NewClientWithConfig(config *ClientConfig) (*Client, error) {
 
 // NewClientWithConfig creates and returns a kibana client using the given config
 func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client, error) {
+	if err := config.Validate(); err != nil {
+		return nil, err
+	}
+
 	p := config.Path
 	if config.SpaceID != "" {
 		p = path.Join(p, "s", config.SpaceID)
@@ -130,6 +136,10 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		username = u.User.Username()
 		password, _ = u.User.Password()
 		u.User = nil
+
+		if config.APIKey != "" && (username != "" || password != "") {
+			return nil, fmt.Errorf("cannot set api_key with username/password in Kibana URL")
+		}
 
 		// Re-write URL without credentials.
 		kibanaURL = u.String()
@@ -153,6 +163,7 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 			URL:      kibanaURL,
 			Username: username,
 			Password: password,
+			APIKey:   config.APIKey,
 			Headers:  headers,
 			HTTP:     rt,
 		},
@@ -211,6 +222,10 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	if conn.Username != "" || conn.Password != "" {
 		req.SetBasicAuth(conn.Username, conn.Password)
+	}
+	if conn.APIKey != "" {
+		v := fmt.Sprintf("ApiKey %s", base64.StdEncoding.EncodeToString([]byte(conn.APIKey)))
+		req.Header.Set("Authorization", v)
 	}
 
 	addHeaders(req.Header, conn.Headers)
