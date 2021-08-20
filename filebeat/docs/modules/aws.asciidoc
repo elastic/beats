@@ -149,7 +149,7 @@ Example config:
 
 *`var.queue_url`*::
 
-AWS SQS queue url (Required when `var.bucket` is not set).
+AWS SQS queue url (Required when `var.bucket_arn` is not set).
 
 *`var.visibility_timeout`*::
 
@@ -160,7 +160,7 @@ Default to be 300 seconds.
 
 Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
 
-*`var.bucket`*::
+*`var.bucket_arn`*::
 
 AWS S3 bucket ARN (Required when `var.queue_url` is not set).
 
