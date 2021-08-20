@@ -46,10 +46,34 @@ func TestNewModuleRegistry(t *testing.T) {
 	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		{Module: "nginx"},
-		{Module: "mysql"},
-		{Module: "system"},
-		{Module: "auditd"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"access":             {},
+				"error":              {},
+				"ingress_controller": {},
+			},
+		},
+		{
+			Module: "mysql",
+			Filesets: map[string]*FilesetConfig{
+				"slowlog": {},
+				"error":   {},
+			},
+		},
+		{
+			Module: "system",
+			Filesets: map[string]*FilesetConfig{
+				"syslog": {},
+				"auth":   {},
+			},
+		},
+		{
+			Module: "auditd",
+			Filesets: map[string]*FilesetConfig{
+				"log": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
@@ -371,6 +395,19 @@ func TestMcfgFromConfig(t *testing.T) {
 						},
 						Input: nil,
 					},
+				},
+			},
+		},
+		{
+			name: "empty fileset (nil)",
+			config: load(t, map[string]interface{}{
+				"module": "nginx",
+				"error":  nil,
+			}),
+			expected: ModuleConfig{
+				Module: "nginx",
+				Filesets: map[string]*FilesetConfig{
+					"error": {},
 				},
 			},
 		},
