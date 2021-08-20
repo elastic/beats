@@ -28,5 +28,7 @@ rules:
     - inputs
     - output
 
+- inject_queue: {}
+
 when: length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')
 constraints: ${runtime.arch} != '386'

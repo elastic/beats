@@ -18,9 +18,11 @@
 package dashboards
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"github.com/pkg/errors"
 
@@ -28,6 +30,11 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+var (
+	newline = []byte("\n")
+)
+
+// JSONObjectAttribute contains the attributes for a Kibana json object
 type JSONObjectAttribute struct {
 	Description           string                 `json:"description"`
 	KibanaSavedObjectMeta map[string]interface{} `json:"kibanaSavedObjectMeta"`
@@ -118,6 +125,10 @@ func ReplaceIndexInSavedObject(index string, kibanaSavedObject map[string]interf
 		}
 		kibanaSavedObject["searchSourceJSON"] = searchSourceJSON
 	}
+	if visStateJSON, ok := kibanaSavedObject["visState"].(string); ok {
+		visStateJSON = ReplaceIndexInVisState(index, visStateJSON)
+		kibanaSavedObject["visState"] = visStateJSON
+	}
 
 	return kibanaSavedObject
 }
@@ -154,51 +165,63 @@ func ReplaceIndexInVisState(index string, visStateJSON string) string {
 }
 
 // ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
-func ReplaceIndexInDashboardObject(index string, content common.MapStr) common.MapStr {
+func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	if index == "" {
 		return content
 	}
 
-	objects, ok := content["objects"].([]interface{})
-	if !ok {
-		return content
+	var result []byte
+	r := bufio.NewReader(bytes.NewReader(content))
+	for {
+		line, err := r.ReadBytes('\n')
+		if err != nil {
+			if err == io.EOF {
+				return append(result, replaceInNDJSON(index, line)...)
+			}
+			logp.Err("Error reading bytes from raw dashboard object: %+v", err)
+			return content
+		}
+		result = append(result, replaceInNDJSON(index, line)...)
 	}
-
-	for i, object := range objects {
-		objectMap, ok := object.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		attributes, ok := objectMap["attributes"].(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-			attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
-		}
-
-		if visState, ok := attributes["visState"].(string); ok {
-			attributes["visState"] = ReplaceIndexInVisState(index, visState)
-		}
-
-		objects[i] = objectMap
-	}
-	content["objects"] = objects
-
-	return content
 }
 
-func ReplaceStringInDashboard(old, new string, content common.MapStr) (common.MapStr, error) {
-	marshaled, err := json.Marshal(content)
-	if err != nil {
-		return nil, fmt.Errorf("fail to marshal dashboard object: %v", content)
+func replaceInNDJSON(index string, line []byte) []byte {
+	if len(bytes.TrimSpace(line)) == 0 {
+		return line
 	}
 
-	replaced := bytes.Replace(marshaled, []byte(old), []byte(new), -1)
+	objectMap := make(map[string]interface{}, 0)
+	err := json.Unmarshal(line, &objectMap)
+	if err != nil {
+		logp.Err("Failed to convert bytes to map[string]interface: %+v", err)
+		return line
+	}
 
-	var result common.MapStr
-	err = json.Unmarshal(replaced, &result)
-	return result, nil
+	attributes, ok := objectMap["attributes"].(map[string]interface{})
+	if !ok {
+		logp.Err("Object does not have attributes key")
+		return line
+	}
+
+	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+		attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
+	}
+
+	if visState, ok := attributes["visState"].(string); ok {
+		attributes["visState"] = ReplaceIndexInVisState(index, visState)
+	}
+
+	b, err := json.Marshal(objectMap)
+	if err != nil {
+		logp.Err("Error marshaling modified dashboard: %+v", err)
+		return line
+	}
+
+	return append(b, newline...)
+
+}
+
+// ReplaceStringInDashboard replaces a string field in a dashboard
+func ReplaceStringInDashboard(old, new string, content []byte) []byte {
+	return bytes.Replace(content, []byte(old), []byte(new), -1)
 }
