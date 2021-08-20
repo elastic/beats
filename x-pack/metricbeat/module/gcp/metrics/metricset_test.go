@@ -34,6 +34,11 @@ func Test_metricsConfig_AddPrefixTo(t *testing.T) {
 			fields: fakeMetricsConfig[2],
 			want:   "foobar/" + metric,
 		},
+		{
+			name:   "service metric prefix override (w/ dot)",
+			fields: metricsConfig{"billing", "foo.bar/", []string{}, ""},
+			want:   "foo.bar/" + metric,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
