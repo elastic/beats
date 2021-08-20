@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 )
 
 func TestSetupIndexProcessor(t *testing.T) {
@@ -58,7 +58,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 		},
 		"data stream should be type-namespace-dataset": {
 			publishSettings{
-				DataStream: &add_data_stream_index.DataStream{
+				DataStream: &add_data_stream.DataStream{
 					Namespace: "myNamespace",
 					Dataset:   "myDataset",
 					Type:      "myType",
@@ -71,7 +71,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 		},
 		"data stream should use defaults": {
 			publishSettings{
-				DataStream: &add_data_stream_index.DataStream{},
+				DataStream: &add_data_stream.DataStream{},
 			},
 			"synthetics-browser-default",
 			"browser",

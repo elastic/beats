@@ -117,7 +117,6 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 
 	return func(clientCfg beat.ClientConfig) (beat.ClientConfig, error) {
 		fields := clientCfg.Processing.Fields.Clone()
-		fields.Put("event.dataset", dataset)
 
 		meta := clientCfg.Processing.Meta.Clone()
 		if settings.Pipeline != "" {

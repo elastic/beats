@@ -83,6 +83,7 @@ func (p *AddDataStream) Run(event *beat.Event) (*beat.Event, error) {
 	if event.Fields == nil {
 		event.Fields = common.MapStr{}
 	}
+	event.PutValue("event.dataset", eventDataStream.Dataset)
 	event.PutValue("data_stream", eventDataStream)
 
 	return event, nil

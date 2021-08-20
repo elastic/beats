@@ -88,6 +88,7 @@ func TestAddDataStream(t *testing.T) {
 			}
 			require.Equal(t, tt.wantIndex, got.Meta[events.FieldMetaRawIndex])
 			require.Equal(t, tt.wantDataStream, got.Fields["data_stream"])
+			require.Equal(t, tt.wantDataStream.Dataset, got.Fields["event"].(common.MapStr)["dataset"])
 		})
 	}
 }
