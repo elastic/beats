@@ -248,6 +248,11 @@ func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *
 
 	// Create the roles for the lambda.
 	// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-role.html
+
+	roleName = "functionbeat-lambda-" + name + "-" + cloudformation.Ref("AWS::Region")
+	if (len(roleName) > 64) {
+		roleName = roleName[:len(roleName) - (len(roleName)-64)]
+	}
 	return &iam.Role{
 		AssumeRolePolicyDocument: map[string]interface{}{
 			"Statement": []interface{}{
@@ -264,7 +269,7 @@ func (d *defaultTemplateBuilder) roleTemplate(function installer, name string) *
 			},
 		},
 		Path:     "/",
-		RoleName: "functionbeat-lambda-" + name + "-" + cloudformation.Ref("AWS::Region"),
+		RoleName: roleName,
 		// Allow the lambda to write log to cloudwatch logs.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-policy.html
 		Policies: policies,
