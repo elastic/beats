@@ -1,3 +1,10 @@
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+      timeout: 1s
+
 filebeat:
   inputs:
   - type: log
@@ -32,5 +39,7 @@ output:
     hosts:
       - 127.0.0.1:9200
       - 127.0.0.1:9300
+    headers:
+      h1: test-header
     username: elastic
     password: changeme

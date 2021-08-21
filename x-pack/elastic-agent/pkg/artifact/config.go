@@ -5,7 +5,6 @@
 package artifact
 
 import (
-	"path/filepath"
 	"runtime"
 	"strings"
 	"time"
@@ -43,7 +42,6 @@ type Config struct {
 
 // DefaultConfig creates a config with pre-set default values.
 func DefaultConfig() *Config {
-	homePath := paths.Home()
 	transport := httpcommon.DefaultHTTPTransportSettings()
 
 	// binaries are a getting bit larger it might take >30s to download them
@@ -51,8 +49,8 @@ func DefaultConfig() *Config {
 
 	return &Config{
 		SourceURI:             "https://artifacts.elastic.co/downloads/",
-		TargetDirectory:       filepath.Join(homePath, "downloads"),
-		InstallPath:           filepath.Join(homePath, "install"),
+		TargetDirectory:       paths.Downloads(),
+		InstallPath:           paths.Install(),
 		HTTPTransportSettings: transport,
 	}
 }

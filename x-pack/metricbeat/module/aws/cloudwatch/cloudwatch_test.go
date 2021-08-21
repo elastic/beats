@@ -1233,6 +1233,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1265,6 +1266,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1282,6 +1284,7 @@ func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.Li
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1314,6 +1317,7 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1345,6 +1349,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1621,5 +1626,5 @@ func TestGetStartTimeEndTime(t *testing.T) {
 	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
 	m.logger = logp.NewLogger("test")
 	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
-	assert.Equal(t, 9*time.Minute+59*time.Second, endTime.Sub(startTime))
+	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }

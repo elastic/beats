@@ -149,7 +149,8 @@ agent.logging.to_stderr: true
 # If enabled, Elastic-Agent periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
-# all non-zero internal metrics are logged on shutdown. The default is true.
+# all non-zero internal metrics are logged on shutdown. This setting is also passed
+# to beats running under the agent. The default is true.
 #agent.logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.
