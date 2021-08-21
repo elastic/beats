@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/Shopify/sarama"
+
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"

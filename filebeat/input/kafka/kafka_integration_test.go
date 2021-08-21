@@ -22,15 +22,16 @@ package kafka
 import (
 	"context"
 	"fmt"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"math/rand"
 	"os"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
@@ -170,6 +171,133 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		checkMatchingHeaders(t, event, message.headers)
 	case <-timeout:
 		t.Fatal("timeout waiting for incoming events")
+	}
+
+	cancel()
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func TestInputWithJsonPayload(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test message to the topic for the input to read.
+	message := testMessage{
+		message: "{\"val\":\"val1\"}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":      getTestKafkaHost(),
+		"topics":     []string{testTopic},
+		"group_id":   "filebeat",
+		"wait_close": 0,
+		"parsers": []common.MapStr{
+			{
+				"ndjson": common.MapStr{
+					"target": "",
+				},
+			},
+		},
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	cancel, input := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	select {
+	case event := <-events:
+		text, err := event.Fields.GetValue("val")
+		if err != nil {
+			t.Fatal(err)
+		}
+		msgs := []string{"val1"}
+		assert.Contains(t, msgs, text)
+		checkMatchingHeaders(t, event, message.headers)
+	case <-timeout:
+		t.Fatal("timeout waiting for incoming events")
+	}
+
+	cancel()
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":                        getTestKafkaHost(),
+		"topics":                       []string{testTopic},
+		"group_id":                     "filebeat",
+		"wait_close":                   0,
+		"expand_event_list_from_field": "records",
+		"parsers": []common.MapStr{
+			{
+				"ndjson": common.MapStr{
+					"target": "",
+				},
+			},
+		},
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	cancel, input := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	for i := 0; i < 2; i++ {
+		select {
+		case event := <-events:
+			text, err := event.Fields.GetValue("val")
+			if err != nil {
+				t.Fatal(err)
+			}
+			msgs := []string{"val1", "val2"}
+			assert.Contains(t, msgs, text)
+			checkMatchingHeaders(t, event, message.headers)
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
+		}
 	}
 
 	cancel()

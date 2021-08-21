@@ -19,14 +19,18 @@ package kafka
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/reader"
 	"io"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+
 	"github.com/Shopify/sarama"
+	"github.com/pkg/errors"
+
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,8 +39,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
-	"github.com/pkg/errors"
 )
 
 const pluginName = "kafka"
@@ -90,7 +94,7 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 			acker.EventPrivateReporter(func(_ int, events []interface{}) {
 				for _, event := range events {
 					if meta, ok := event.(eventMeta); ok {
-						meta.handler.ack(meta.message)
+						meta.ackHandler()
 					}
 				}
 			}),
@@ -193,6 +197,12 @@ func (input *kafkaInput) runConsumerGroup(log *logp.Logger, client beat.Client, 
 	}
 }
 
+// The metadata attached to incoming events, so they can be ACKed once they've
+// been successfully sent.
+type eventMeta struct {
+	ackHandler func()
+}
+
 func arrayForKafkaHeaders(headers []*sarama.RecordHeader) []string {
 	array := []string{}
 	for _, header := range headers {
@@ -249,13 +259,6 @@ type groupHandler struct {
 	reader                   reader.Reader
 }
 
-// The metadata attached to incoming events so they can be ACKed once they've
-// been successfully sent.
-type eventMeta struct {
-	handler *groupHandler
-	message *sarama.ConsumerMessage
-}
-
 func (h *groupHandler) Setup(session sarama.ConsumerGroupSession) error {
 	h.Lock()
 	h.session = session
@@ -281,10 +284,7 @@ func (h *groupHandler) ack(message *sarama.ConsumerMessage) {
 }
 
 func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim sarama.ConsumerGroupClaim) error {
-	reader := messageReader{
-		claim:        claim,
-		groupHandler: h,
-	}
+	reader := h.createReader(claim)
 	parser := h.parsers.Create(reader)
 	for h.session.Context().Err() == nil {
 		message, err := parser.Next()
@@ -303,30 +303,101 @@ func (h *groupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, claim s
 	return nil
 }
 
-type messageReader struct {
-	claim        sarama.ConsumerGroupClaim
-	groupHandler *groupHandler
+func (h *groupHandler) createReader(claim sarama.ConsumerGroupClaim) reader.Reader {
+	if h.expandEventListFromField != "" {
+		return &listFromFieldReader{
+			claim:        claim,
+			groupHandler: h,
+			field:        h.expandEventListFromField,
+			log:          h.log,
+		}
+	}
+	return &recordReader{
+		claim:        claim,
+		groupHandler: h,
+		log:          h.log,
+	}
 }
 
-func (m messageReader) Close() error {
+type recordReader struct {
+	claim        sarama.ConsumerGroupClaim
+	groupHandler *groupHandler
+	log          *logp.Logger
+}
+
+func (m *recordReader) Close() error {
 	return nil
 }
 
-func (m messageReader) Next() (reader.Message, error) {
+func (m *recordReader) Next() (reader.Message, error) {
 	msg, ok := <-m.claim.Messages()
 	if !ok {
 		return reader.Message{}, io.EOF
 	}
 
+	timestamp, kafkaFields := composeEventMetadata(m.claim, m.groupHandler, msg)
+	ackHandler := func() {
+		m.groupHandler.ack(msg)
+	}
+	return composeMessage(timestamp, msg.Value, kafkaFields, ackHandler), nil
+}
+
+type listFromFieldReader struct {
+	claim        sarama.ConsumerGroupClaim
+	groupHandler *groupHandler
+	buffer       []reader.Message
+	field        string
+	log          *logp.Logger
+}
+
+func (l *listFromFieldReader) Close() error {
+	return nil
+}
+
+func (l *listFromFieldReader) Next() (reader.Message, error) {
+	if len(l.buffer) != 0 {
+		return l.returnFromBuffer()
+	}
+
+	msg, ok := <-l.claim.Messages()
+	if !ok {
+		return reader.Message{}, io.EOF
+	}
+
+	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
+	messages := parseMultipleMessages(msg.Value, l.field, l.log)
+
+	neededAcks := atomic.MakeInt(len(messages))
+	ackHandler := func() {
+		if neededAcks.Dec() == 0 {
+			l.groupHandler.ack(msg)
+		}
+	}
+	for _, message := range messages {
+		newBuffer := append(l.buffer, composeMessage(timestamp, []byte(message), kafkaFields, ackHandler))
+		l.buffer = newBuffer
+	}
+
+	return l.returnFromBuffer()
+}
+
+func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
+	next := l.buffer[0]
+	newBuffer := l.buffer[1:]
+	l.buffer = newBuffer
+	return next, nil
+}
+
+func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, common.MapStr) {
 	timestamp := time.Now()
 	kafkaFields := common.MapStr{
-		"topic":     m.claim.Topic(),
-		"partition": m.claim.Partition(),
+		"topic":     claim.Topic(),
+		"partition": claim.Partition(),
 		"offset":    msg.Offset,
 		"key":       string(msg.Key),
 	}
 
-	version, versionOk := m.groupHandler.version.Get()
+	version, versionOk := handler.version.Get()
 	if versionOk && version.IsAtLeast(sarama.V0_10_0_0) {
 		timestamp = msg.Timestamp
 		if !msg.BlockTimestamp.IsZero() {
@@ -336,17 +407,39 @@ func (m messageReader) Next() (reader.Message, error) {
 	if versionOk && version.IsAtLeast(sarama.V0_11_0_0) {
 		kafkaFields["headers"] = arrayForKafkaHeaders(msg.Headers)
 	}
+	return timestamp, kafkaFields
+}
 
+func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapStr, ackHandler func()) reader.Message {
 	return reader.Message{
 		Ts:      timestamp,
-		Content: msg.Value,
+		Content: content,
 		Fields: common.MapStr{
 			"kafka":   kafkaFields,
-			"message": string(msg.Value),
+			"message": string(content),
 		},
 		Meta: common.MapStr{
-			"handler": m.groupHandler,
-			"message": msg,
+			"ackHandler": ackHandler,
 		},
-	}, nil
+	}
+}
+
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+func parseMultipleMessages(bMessage []byte, field string, log *logp.Logger) []string {
+	var obj map[string][]interface{}
+	err := json.Unmarshal(bMessage, &obj)
+	if err != nil {
+		log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", field), "error", err)
+		return []string{}
+	}
+	var messages []string
+	for _, ms := range obj[field] {
+		js, err := json.Marshal(ms)
+		if err == nil {
+			messages = append(messages, string(js))
+		} else {
+			log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
+		}
+	}
+	return messages
 }
