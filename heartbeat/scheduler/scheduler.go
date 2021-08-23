@@ -207,8 +207,7 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		j := newSchedJob(jobCtx, s, jobType, entrypoint)
-		lastRanAt = j.run()
+		lastRanAt := newSchedJob(jobCtx, s, jobType, entrypoint).run()
 		s.stats.activeJobs.Dec()
 		s.runOnce(sched.Next(lastRanAt), taskFn)
 		debugf("Job '%v' returned at %v", id, time.Now())
