@@ -327,6 +327,8 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 			// irrelevant
 			go sj.runTask(cont)
 		}
+		// There is always at least 1 task (the current one), if that's all, then we know
+		// there are no other jobs active or pending, and we can release the jobLimitSem
 		if sj.jobLimitSem != nil && sj.activeTasks.Load() == 1 {
 			sj.jobLimitSem.Release(1)
 		}
