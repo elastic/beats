@@ -40,6 +40,7 @@ var (
 
 // DecodeExported decodes an exported dashboard
 func DecodeExported(exported []byte) []byte {
+	newLine := []byte{'\n'}
 	// remove unsupported chars
 	var result []byte
 	r := bufio.NewReader(bytes.NewReader(exported))
@@ -51,7 +52,7 @@ func DecodeExported(exported []byte) []byte {
 			}
 			return exported
 		}
-		result = append(result, decodeLine(line)...)
+		result = append(result, append(decodeLine(line), newLine...)...)
 	}
 }
 
@@ -65,7 +66,6 @@ func decodeLine(line []byte) []byte {
 	if err != nil {
 		return line
 	}
-	var result []byte
 	for _, key := range responseToDecode {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
@@ -73,9 +73,8 @@ func decodeLine(line []byte) []byte {
 			logger := logp.NewLogger("dashboards")
 			logger.Debugf("Error while decoding dashboard objects: %+v", err)
 		}
-		result = append(result, []byte(o.String())...)
 	}
-	return result
+	return []byte(o.String())
 }
 
 func decodeValue(data common.MapStr, key string) error {

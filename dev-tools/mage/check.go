@@ -231,17 +231,19 @@ func CheckDashboardsFormat() error {
 		}
 
 		r := bufio.NewReader(bytes.NewReader(d))
+		count := 0
 		for {
 			line, err := r.ReadBytes('\n')
+			count++
 			if err != nil {
 				if err == io.EOF {
-					if checkDashboardForErrors(file, line) {
+					if checkDashboardForErrors(file, line, count) {
 						hasErrors = true
 					}
 					break
 				}
 			}
-			if checkDashboardForErrors(file, line) {
+			if checkDashboardForErrors(file, line, count) {
 				hasErrors = true
 			}
 		}
@@ -253,7 +255,7 @@ func CheckDashboardsFormat() error {
 	return nil
 }
 
-func checkDashboardForErrors(file string, d []byte) bool {
+func checkDashboardForErrors(file string, d []byte, count int) bool {
 	if len(bytes.TrimRight(d, "\n")) == 0 {
 		return false
 	}
@@ -261,7 +263,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 	var dashboard Dashboard
 	err := json.Unmarshal(d, &dashboard)
 	if err != nil {
-		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s", file).Error())
+		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s line %d", file, count).Error())
 		return true
 	}
 
