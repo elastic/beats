@@ -1,0 +1,35 @@
+- id: 2d95e02d-0e6e-4654-b04e-7e38d273c5f3
+  name: oueauoeaouea
+  enabled: true
+  revision: 1
+  type: synthetics/browser
+  use_output: default
+  meta:
+    package:
+      name: synthetics
+      version: 0.3.0
+  data_stream:
+    namespace: default
+  streams:
+    - id: synthetics/browser-browser-2d95e02d-0e6e-4654-b04e-7e38d273c5f3
+      params:
+        url: "https://elastic.github.io/synthetics-demo/"
+      source:
+        zip_url: 
+          url: "https://github.com/elastic/synthetics-demo/archive/refs/heads/main.zip"
+          folder: "todos/synthetics-tests"
+      name: oueauoeaouea
+      type: browser
+      data_stream:
+        dataset: browser
+        type: synthetics
+      schedule: '@every 3m'
+      timeout: 16s
+      processors:
+        - add_observer_metadata:
+            geo:
+              name: Fleet managed
+        - add_fields:
+            target: ''
+            fields:
+              monitor.fleet_managed: true

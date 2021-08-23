@@ -270,16 +270,16 @@ func newSchedJob(ctx context.Context, s *Scheduler, jobType string, task TaskFun
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (j *schedJob) run() (startedAt time.Time) {
-	j.wg.Add(1)
-	j.activeTasks.Inc()
-	if j.jobLimitSem != nil {
-		j.jobLimitSem.Acquire(j.ctx, 1)
+func (sj *schedJob) run() (startedAt time.Time) {
+	sj.wg.Add(1)
+	sj.activeTasks.Inc()
+	if sj.jobLimitSem != nil {
+		sj.jobLimitSem.Acquire(sj.ctx, 1)
 	}
 
-	startedAt = j.runTask(j.entrypoint)
+	startedAt = sj.runTask(sj.entrypoint)
 
-	j.wg.Wait()
+	sj.wg.Wait()
 	return startedAt
 }
 
@@ -287,23 +287,23 @@ func (j *schedJob) run() (startedAt time.Time) {
 // Since task funcs can emit continuations recursively we need a function to execute
 // recursively.
 // The wait group passed into this function expects to already have its count incremented by one.
-func (j *schedJob) runTask(task TaskFunc) time.Time {
-	defer j.wg.Done()
-	defer j.activeTasks.Dec()
+func (sj *schedJob) runTask(task TaskFunc) time.Time {
+	defer sj.wg.Done()
+	defer sj.activeTasks.Dec()
 
 	// The accounting for waiting/active tasks is done using atomics.
 	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
-	j.scheduler.stats.waitingTasks.Inc()
+	sj.scheduler.stats.waitingTasks.Inc()
 
 	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
 	// this should block until resources are available.
 	// In the case where the semaphore has free resources immediately
 	// it will not block and will not check the cancelled status of the
 	// context, which is OK, because we check it later anyway.
-	limitErr := j.scheduler.limitSem.Acquire(j.ctx, 1)
-	j.scheduler.stats.waitingTasks.Dec()
+	limitErr := sj.scheduler.limitSem.Acquire(sj.ctx, 1)
+	sj.scheduler.stats.waitingTasks.Dec()
 	if limitErr == nil {
-		defer j.scheduler.limitSem.Release(1)
+		defer sj.scheduler.limitSem.Release(1)
 	}
 
 	// Record the time this task started now that we have a resource to execute with
@@ -311,24 +311,24 @@ func (j *schedJob) runTask(task TaskFunc) time.Time {
 
 	// Check if the scheduler has been shut down. If so, exit early
 	select {
-	case <-j.ctx.Done():
+	case <-sj.ctx.Done():
 		return startedAt
 	default:
-		j.scheduler.stats.activeTasks.Inc()
+		sj.scheduler.stats.activeTasks.Inc()
 
-		continuations := task(j.ctx)
-		j.scheduler.stats.activeTasks.Dec()
+		continuations := task(sj.ctx)
+		sj.scheduler.stats.activeTasks.Dec()
 
-		j.wg.Add(len(continuations))
-		j.activeTasks.Add(len(continuations))
+		sj.wg.Add(len(continuations))
+		sj.activeTasks.Add(len(continuations))
 		for _, cont := range continuations {
 			// Run continuations in parallel, note that these each will acquire their own slots
 			// We can discard the started at times for continuations as those are
 			// irrelevant
-			go j.runTask(cont)
+			go sj.runTask(cont)
 		}
-		if j.jobLimitSem != nil && len(continuations) == 0 {
-			j.jobLimitSem.Release(1)
+		if sj.jobLimitSem != nil && sj.activeTasks.Load() == 1 {
+			sj.jobLimitSem.Release(1)
 		}
 	}
 
