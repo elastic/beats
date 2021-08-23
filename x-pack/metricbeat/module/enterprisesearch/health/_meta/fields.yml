@@ -9,6 +9,10 @@
       description: >
         JVM health
       fields:
+        - name: cluster_uuid
+          type: keyword
+          description: >
+            Elasticsearch Cluster UUID used by Enterprise Search
         - name: memory_usage
           type: group
           description: >

@@ -42,6 +42,8 @@ var (
 				"available": c.Int("available"),
 			}),
 		}),
+		// TODO: Must not be optional once it is added to a released version of Enterprise Search health endpoint
+		"cluster_uuid": c.Str("cluster_uuid", s.Optional),
 	}
 )
 

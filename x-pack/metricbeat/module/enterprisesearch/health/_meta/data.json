@@ -40,5 +40,6 @@
     "service": {
         "address": "localhost:3002",
         "type": "enterprisesearch"
-    }
+    },
+    "cluster_uuid": "Bkz2QJZuSxuZrbQRJ8xhuA"
 }
