@@ -175,6 +175,10 @@ The `gke` metricset contains all GA metrics exported by https://cloud.google.com
 
 Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
 
+The `gke` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-gcp-gke-overview.png[]
+
 [float]
 === `loadbalancing`
 This metricset fetches metrics from https://cloud.google.com/load-balancing/[Load Balancing]
