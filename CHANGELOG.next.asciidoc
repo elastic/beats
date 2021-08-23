@@ -390,6 +390,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `kibana.log` pipeline when `event.duration` calculation becomes a Long. {issue}24556[24556] {pull}25675[25675]
 - Removed incorrect `http.request.referrer` field from `aws.elb` module. {issue}26435[26435] {pull}26441[26441]
 - Fix `threatintel.indicator.url.full` not being populated. {issue}26351[26351] {pull}26508[26508]
+- Update indentation for azure filebeat configuration. {pull}26604[26604]
 
 *Heartbeat*
 
