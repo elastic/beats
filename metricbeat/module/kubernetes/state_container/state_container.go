@@ -151,7 +151,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 					if requestFieldsMapStr, ok := request.(common.MapStr); ok {
 						if cores, ok := requestFieldsMapStr["cores"]; ok {
 							if requestCores, ok := cores.(float64); ok {
-								event["cpu.request.nanocores"] = requestCores * nanocores
+								event.Put("cpu.request.nanocores", requestCores*nanocores)
 							}
 						}
 					}
@@ -160,7 +160,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 					if limitFieldsMapStr, ok := limit.(common.MapStr); ok {
 						if cores, ok := limitFieldsMapStr["cores"]; ok {
 							if limitCores, ok := cores.(float64); ok {
-								event["cpu.limit.nanocores"] = limitCores * nanocores
+								event.Put("cpu.limit.nanocores", limitCores*nanocores)
 							}
 						}
 					}
