@@ -83,7 +83,7 @@ func TestSetupIndexProcessor(t *testing.T) {
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
 			e := beat.Event{Meta: common.MapStr{}, Fields: common.MapStr{}}
-			proc, err := setupIndexProcessor(binfo, tt.settings, tt.monitorType)
+			proc, err := setupDataStream(binfo, tt.settings, tt.monitorType)
 			if tt.wantErr == true {
 				require.Error(t, err)
 				return
