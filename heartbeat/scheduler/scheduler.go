@@ -299,7 +299,7 @@ func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *
 			// irrelevant
 			go s.runRecursiveTask(jobCtx, cont, wg, jobSem)
 		}
-		if jobSem != nil && len(continuations) == 0 {
+		if jobSem != nil && len(continuations) == 0 && s.stats.activeTasks.Get() == 0 {
 			jobSem.Release(1)
 		}
 	}
