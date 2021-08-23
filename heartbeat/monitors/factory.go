@@ -91,22 +91,17 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	stdFields, err := stdfields.ConfigToStdMonitorFields(cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	dataset := settings.DataSet
-	if dataset == "" {
-		if settings.DataStream != nil && settings.DataStream.Dataset != "" {
-			dataset = settings.DataStream.Dataset
-		} else {
-			dataset = "uptime"
+	var preprocessor processors.Processor
+	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
+		var err error
+		preprocessor, err = setupDataStream(info, settings, settings.DataStream.Dataset)
+		if err != nil {
+			return nil, err
 		}
-	}
-	datastreamProcessor, err := setupDataStream(info, settings, stdFields.Type)
-	if err != nil {
-		return nil, err
+	} else {
+		// for monitors writing to traditional indices...
+		// TODO: Consider removing in 8.0.0
+		preprocessor = actions.NewAddFields(common.MapStr{"event.dataset": "uptime"}, true, true)
 	}
 
 	userProcessors, err := processors.New(settings.Processors)
@@ -127,8 +122,8 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
 		procs := processors.NewList(nil)
-		if datastreamProcessor != nil {
-			procs.AddProcessor(datastreamProcessor)
+		if preprocessor != nil {
+			procs.AddProcessor(preprocessor)
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -160,9 +155,7 @@ func setupDataStream(info beat.Info, settings publishSettings, dataset string) (
 		}
 		return add_data_stream.New(*ds), nil
 	} else {
-		// for monitors writing to traditional indices...
-		// TODO: Consider removing in 8.0.0
-		processor = actions.NewAddFields(common.MapStr{"event.dataset": "uptime"}, true, true)
+
 	}
 
 	if !settings.Index.IsEmpty() {
