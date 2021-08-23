@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
@@ -358,20 +359,8 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 		return
 	}
 
-	// Map to ECS
-	var ecsFields []common.MapStr
-	if ok && len(qi.ECSMapping) > 0 {
-		ecsFields = make([]common.MapStr, len(hits))
-		for i, hit := range hits {
-			ecsFields[i] = common.MapStr(qi.ECSMapping.Map(hit))
-		}
-	} else {
-		// ECS mapping is optional, continue
-		bt.log.Debugf("ECS mapping is not found for query name: %s", res.Name)
-	}
-
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.Datastream(ns), res.Name, responseID, hits, ecsFields, nil)
+	bt.publishEvents(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -452,14 +441,16 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	}
 }
 
-func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, ecsFields []common.MapStr, reqData interface{}) {
+func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	for i, hit := range hits {
+
+	for _, hit := range hits {
 		var fields common.MapStr
 
-		if len(ecsFields) > i {
-			fields = ecsFields[i]
+		if len(ecsm) > 0 {
+			// Map ECS fields if the mapping is provided
+			fields = common.MapStr(ecsm.Map(hit))
 		} else {
 			fields = common.MapStr{}
 		}
