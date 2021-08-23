@@ -22,6 +22,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -216,7 +217,7 @@ func CheckDashboardsFormat() error {
 		if strings.HasPrefix(path, "vendor") {
 			return false
 		}
-		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
+		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".ndjson")
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to find dashboards")
@@ -228,19 +229,20 @@ func CheckDashboardsFormat() error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to read dashboard file %s", file)
 		}
-		var dashboard Dashboard
-		err = json.Unmarshal(d, &dashboard)
-		if err != nil {
-			return errors.Wrapf(err, "failed to parse dashboard from %s", file)
-		}
 
-		module := moduleNameFromDashboard(file)
-		errs := dashboard.CheckFormat(module)
-		if len(errs) > 0 {
-			hasErrors = true
-			fmt.Printf(">> Dashboard format - %s:\n", file)
-			for _, err := range errs {
-				fmt.Println("  ", err)
+		r := bufio.NewReader(bytes.NewReader(d))
+		for {
+			line, err := r.ReadBytes('\n')
+			if err != nil {
+				if err == io.EOF {
+					if checkDashboardForErrors(file, line) {
+						hasErrors = true
+					}
+					break
+				}
+			}
+			if checkDashboardForErrors(file, line) {
+				hasErrors = true
 			}
 		}
 	}
@@ -251,6 +253,29 @@ func CheckDashboardsFormat() error {
 	return nil
 }
 
+func checkDashboardForErrors(file string, d []byte) bool {
+	if len(bytes.TrimRight(d, "\n")) == 0 {
+		return false
+	}
+	var hasErrors bool
+	var dashboard Dashboard
+	err := json.Unmarshal(d, &dashboard)
+	if err != nil {
+		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s", file).Error())
+		return true
+	}
+
+	module := moduleNameFromDashboard(file)
+	err = dashboard.CheckFormat(module)
+	if err != nil {
+		hasErrors = true
+		fmt.Printf(">> Dashboard format - %s:\n", file)
+		fmt.Println("  ", err)
+	}
+
+	return hasErrors
+}
+
 func moduleNameFromDashboard(path string) string {
 	moduleDir := filepath.Clean(filepath.Join(filepath.Dir(path), "../../../.."))
 	return filepath.Base(moduleDir)
@@ -258,11 +283,7 @@ func moduleNameFromDashboard(path string) string {
 
 // Dashboard is a dashboard
 type Dashboard struct {
-	Version string            `json:"version"`
-	Objects []dashboardObject `json:"objects"`
-}
-
-type dashboardObject struct {
+	Version    string `json:"version"`
 	Type       string `json:"type"`
 	Attributes struct {
 		Description           string `json:"description"`
@@ -293,35 +314,26 @@ var (
 )
 
 // CheckFormat checks the format of a dashboard
-func (d *Dashboard) CheckFormat(module string) []error {
-	checkObject := func(o *dashboardObject) error {
-		switch o.Type {
-		case "dashboard":
-			if o.Attributes.Description == "" {
-				return errors.Errorf("empty description on dashboard '%s'", o.Attributes.Title)
-			}
-			if err := checkTitle(dashboardTitleRegexp, o.Attributes.Title, module); err != nil {
-				return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", strings.Title(BeatName), o.Attributes.Title)
-			}
-		case "visualization":
-			if err := checkTitle(visualizationTitleRegexp, o.Attributes.Title, module); err != nil {
-				return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), o.Attributes.Title)
-			}
+func (d *Dashboard) CheckFormat(module string) error {
+	switch d.Type {
+	case "dashboard":
+		if d.Attributes.Description == "" {
+			return errors.Errorf("empty description on dashboard '%s'", d.Attributes.Title)
 		}
+		if err := checkTitle(dashboardTitleRegexp, d.Attributes.Title, module); err != nil {
+			return errors.Wrapf(err, "expected title with format '[%s Module] Some title', found '%s'", strings.Title(BeatName), d.Attributes.Title)
+		}
+	case "visualization":
+		if err := checkTitle(visualizationTitleRegexp, d.Attributes.Title, module); err != nil {
+			return errors.Wrapf(err, "expected title with format 'Some title [%s Module]', found '%s'", strings.Title(BeatName), d.Attributes.Title)
+		}
+	}
 
-		expectedIndexPattern := strings.ToLower(BeatName) + "-*"
-		if err := checkDashboardIndexPattern(expectedIndexPattern, o); err != nil {
-			return errors.Wrapf(err, "expected index pattern reference '%s'", expectedIndexPattern)
-		}
-		return nil
+	expectedIndexPattern := strings.ToLower(BeatName) + "-*"
+	if err := checkDashboardIndexPattern(expectedIndexPattern, d); err != nil {
+		return errors.Wrapf(err, "expected index pattern reference '%s'", expectedIndexPattern)
 	}
-	var errs []error
-	for _, o := range d.Objects {
-		if err := checkObject(&o); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	return errs
+	return nil
 }
 
 func checkTitle(re *regexp.Regexp, title string, module string) error {
@@ -344,7 +356,7 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 	return nil
 }
 
-func checkDashboardIndexPattern(expectedIndex string, o *dashboardObject) error {
+func checkDashboardIndexPattern(expectedIndex string, o *Dashboard) error {
 	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
 		if index := objectMeta.SearchSourceJSON.Index; index != nil && *index != expectedIndex {
 			return errors.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)
