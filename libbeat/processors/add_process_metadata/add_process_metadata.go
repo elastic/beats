@@ -19,6 +19,7 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"time"
 
@@ -28,9 +29,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 const (
@@ -64,11 +65,11 @@ type addProcessMetadata struct {
 }
 
 type processMetadata struct {
-	name, title, exe string
-	args             []string
-	env              map[string]string
-	startTime        time.Time
-	pid, ppid        int
+	name, title, exe, username, userid string
+	args                               []string
+	env                                map[string]string
+	startTime                          time.Time
+	pid, ppid                          int
 	//
 	fields common.MapStr
 }
@@ -182,23 +183,40 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, ErrNoMatch
 }
 
+func pidToInt(value interface{}) (pid int, err error) {
+	switch v := value.(type) {
+	case string:
+		pid, err = strconv.Atoi(v)
+		if err != nil {
+			return 0, errors.Wrap(err, "error converting string to integer")
+		}
+	case int:
+		pid = v
+	case int8, int16, int32, int64:
+		pid64 := reflect.ValueOf(v).Int()
+		if pid = int(pid64); int64(pid) != pid64 {
+			return 0, errors.Errorf("integer out of range: %d", pid64)
+		}
+	case uint, uintptr, uint8, uint16, uint32, uint64:
+		pidu64 := reflect.ValueOf(v).Uint()
+		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 {
+			return 0, errors.Errorf("integer out of range: %d", pidu64)
+		}
+	default:
+		return 0, errors.Errorf("not an integer or string, but %T", v)
+	}
+	return pid, nil
+}
+
 func (p *addProcessMetadata) enrich(event common.MapStr, pidField string) (result common.MapStr, err error) {
 	pidIf, err := event.GetValue(pidField)
 	if err != nil {
 		return nil, err
 	}
 
-	var pid int
-	switch v := pidIf.(type) {
-	case string:
-		pid, err = strconv.Atoi(v)
-		if err != nil {
-			return nil, errors.Wrapf(err, "cannot convert string field '%s' to an integer", pidField)
-		}
-	case int:
-		pid = v
-	default:
-		return nil, errors.Errorf("cannot parse field '%s' (not an integer or string)", pidField)
+	pid, err := pidToInt(pidIf)
+	if err != nil {
+		return nil, errors.Wrapf(err, "cannot parse pid field '%s'", pidField)
 	}
 
 	var meta common.MapStr
@@ -283,16 +301,28 @@ func (p *addProcessMetadata) String() string {
 }
 
 func (p *processMetadata) toMap() common.MapStr {
+	process := common.MapStr{
+		"name":       p.name,
+		"title":      p.title,
+		"executable": p.exe,
+		"args":       p.args,
+		"env":        p.env,
+		"pid":        p.pid,
+		"ppid":       p.ppid,
+		"start_time": p.startTime,
+	}
+	if p.username != "" || p.userid != "" {
+		user := common.MapStr{}
+		if p.username != "" {
+			user["name"] = p.username
+		}
+		if p.userid != "" {
+			user["id"] = p.userid
+		}
+		process["owner"] = user
+	}
+
 	return common.MapStr{
-		"process": common.MapStr{
-			"name":       p.name,
-			"title":      p.title,
-			"executable": p.exe,
-			"args":       p.args,
-			"env":        p.env,
-			"pid":        p.pid,
-			"ppid":       p.ppid,
-			"start_time": p.startTime,
-		},
+		"process": process,
 	}
 }

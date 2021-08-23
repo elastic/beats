@@ -60,6 +60,7 @@ func (p gosigarProvider) GetProcessMetadata(pid int) (result *processMetadata, e
 		env:       procEnv.Vars,
 		pid:       pid,
 		ppid:      procState.Ppid,
+		username:  procState.Username,
 		startTime: time.Unix(int64(procTime.StartTime/1000), int64(procTime.StartTime%1000)*1000000),
 	}
 	r.fields = r.toMap()

@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	monitoringCfg "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	reporting "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/reporter"
@@ -85,6 +86,11 @@ func newFleetServerBootstrap(
 
 	reporter := reporting.NewReporter(bootstrapApp.bgContext, log, bootstrapApp.agentInfo, logR)
 
+	if cfg.Settings.MonitoringConfig != nil {
+		cfg.Settings.MonitoringConfig.Enabled = false
+	} else {
+		cfg.Settings.MonitoringConfig = &monitoringCfg.MonitoringConfig{Enabled: false}
+	}
 	monitor, err := monitoring.NewMonitor(cfg.Settings)
 	if err != nil {
 		return nil, errors.New(err, "failed to initialize monitoring")

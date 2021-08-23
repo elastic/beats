@@ -14,15 +14,21 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 type config struct {
 	APITimeout          time.Duration        `config:"api_timeout"`
 	VisibilityTimeout   time.Duration        `config:"visibility_timeout"`
+	SQSWaitTime         time.Duration        `config:"sqs.wait_time"`         // The max duration for which the SQS ReceiveMessage call waits for a message to arrive in the queue before returning.
+	SQSMaxReceiveCount  int                  `config:"sqs.max_receive_count"` // The max number of times a message should be received (retried) before deleting it.
 	FIPSEnabled         bool                 `config:"fips_enabled"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
-	QueueURL            string               `config:"queue_url" validate:"required"`
+	QueueURL            string               `config:"queue_url"`
+	BucketARN           string               `config:"bucket_arn"`
+	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
@@ -32,6 +38,9 @@ func defaultConfig() config {
 	c := config{
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
+		BucketListInterval:  120 * time.Second,
+		SQSWaitTime:         20 * time.Second,
+		SQSMaxReceiveCount:  5,
 		FIPSEnabled:         false,
 		MaxNumberOfMessages: 5,
 	}
@@ -40,20 +49,43 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12 {
+	if c.QueueURL == "" && c.BucketARN == "" {
+		return fmt.Errorf("queue_url or bucket_arn must provided")
+	}
+
+	if c.QueueURL != "" && c.BucketARN != "" {
+		return fmt.Errorf("queue_url <%v> and bucket_arn <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN)
+	}
+
+	if c.BucketARN != "" && c.BucketListInterval <= 0 {
+		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
+	}
+
+	if c.BucketARN != "" && c.NumberOfWorkers <= 0 {
+		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
+	}
+
+	if c.QueueURL != "" && (c.VisibilityTimeout <= 0 || c.VisibilityTimeout.Hours() > 12) {
 		return fmt.Errorf("visibility_timeout <%v> must be greater than 0 and "+
 			"less than or equal to 12h", c.VisibilityTimeout)
 	}
 
-	if c.APITimeout <= 0 || c.APITimeout > c.VisibilityTimeout/2 {
-		return fmt.Errorf("api_timeout <%v> must be greater than 0 and less "+
-			"than 1/2 of the visibility_timeout (%v)", c.APITimeout, c.VisibilityTimeout/2)
+	if c.QueueURL != "" && (c.SQSWaitTime <= 0 || c.SQSWaitTime.Seconds() > 20) {
+		return fmt.Errorf("wait_time <%v> must be greater than 0 and "+
+			"less than or equal to 20s", c.SQSWaitTime)
 	}
 
-	if c.MaxNumberOfMessages <= 0 || c.MaxNumberOfMessages > 10 {
-		return fmt.Errorf("max_number_of_messages <%v> must be greater than "+
-			"0 and less than or equal to 10", c.MaxNumberOfMessages)
+	if c.QueueURL != "" && c.MaxNumberOfMessages <= 0 {
+		return fmt.Errorf("max_number_of_messages <%v> must be greater than 0",
+			c.MaxNumberOfMessages)
 	}
+
+	if c.QueueURL != "" && c.APITimeout < c.SQSWaitTime {
+		return fmt.Errorf("api_timeout <%v> must be greater than the sqs.wait_time <%v",
+			c.APITimeout, c.SQSWaitTime)
+	}
+
 	return nil
 }
 
@@ -76,23 +108,29 @@ type readerConfig struct {
 	Parsers                  parser.Config           `config:",inline"`
 }
 
-func (f *readerConfig) Validate() error {
-	if f.BufferSize <= 0 {
-		return fmt.Errorf("buffer_size <%v> must be greater than 0", f.BufferSize)
+func (rc *readerConfig) Validate() error {
+	if rc.BufferSize <= 0 {
+		return fmt.Errorf("buffer_size <%v> must be greater than 0", rc.BufferSize)
 	}
 
-	if f.MaxBytes <= 0 {
-		return fmt.Errorf("max_bytes <%v> must be greater than 0", f.MaxBytes)
+	if rc.MaxBytes <= 0 {
+		return fmt.Errorf("max_bytes <%v> must be greater than 0", rc.MaxBytes)
 	}
-	if f.ExpandEventListFromField != "" && f.ContentType != "" && f.ContentType != "application/json" {
+
+	if rc.ExpandEventListFromField != "" && rc.ContentType != "" && rc.ContentType != "application/json" {
 		return fmt.Errorf("content_type must be `application/json` when expand_event_list_from_field is used")
+	}
+
+	_, found := encoding.FindEncoding(rc.Encoding)
+	if !found {
+		return fmt.Errorf("encoding type <%v> not found", rc.Encoding)
 	}
 
 	return nil
 }
 
-func (f *readerConfig) InitDefaults() {
-	f.BufferSize = 16 * humanize.KiByte
-	f.MaxBytes = 10 * humanize.MiByte
-	f.LineTerminator = readfile.AutoLineTerminator
+func (rc *readerConfig) InitDefaults() {
+	rc.BufferSize = 16 * humanize.KiByte
+	rc.MaxBytes = 10 * humanize.MiByte
+	rc.LineTerminator = readfile.AutoLineTerminator
 }

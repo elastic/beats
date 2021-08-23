@@ -15,13 +15,13 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/25130")
 	config := mtest.GetConfigForTest(t, "billing", "24h")
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)

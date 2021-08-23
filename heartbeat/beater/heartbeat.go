@@ -65,15 +65,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	if err != nil {
 		return nil, err
 	}
+	jobConfig := parsedConfig.Jobs
 
-	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location)
+	scheduler := scheduler.NewWithLocation(limit, hbregistry.SchedulerRegistry, location, jobConfig)
 
 	bt := &Heartbeat{
 		done:      make(chan struct{}),
 		config:    parsedConfig,
 		scheduler: scheduler,
 		// dynamicFactory is the factory used for dynamic configs, e.g. autodiscover / reload
-		dynamicFactory: monitors.NewFactory(b.Info, scheduler, false),
+		dynamicFactory: monitors.NewFactory(b.Info, scheduler),
 	}
 	return bt, nil
 }
@@ -125,7 +126,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunStaticMonitors runs the `heartbeat.monitors` portion of the yaml config if present.
 func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
-	factory := monitors.NewFactory(b.Info, bt.scheduler, true)
+	factory := monitors.NewFactory(b.Info, bt.scheduler)
 
 	var runners []cfgfile.Runner
 	for _, cfg := range bt.config.Monitors {

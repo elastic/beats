@@ -84,7 +84,7 @@ processors:
     if: ctx?.threatintel?.indicator?.type == 'url'
 - set:
     field: threatintel.indicator.url.full
-    copy_from: threatintel.indicator.url.original
+    value: '{{{threatintel.indicator.url.original}}}'
     ignore_empty_value: true
 - rename:
     field: _tmp.threatvalue
@@ -100,6 +100,20 @@ processors:
     field: threatintel.indicator.type
     value: unknown
     if: ctx?.threatintel?.indicator?.type == null
+- foreach:
+    field: threatintel.anomali.labels
+    ignore_missing: true
+    processor:
+      append:
+        field: tags
+        value: "{{_ingest._value}}"
+        allow_duplicates: false
+- grok:
+    field: threatintel.anomali.description
+    patterns:
+      - "^%{GREEDYDATA}Source: %{GREEDYDATA:threatintel.indicator.provider}"
+    ignore_missing: true
+    ignore_failure: true
 ######################
 # Cleanup processors #
 ######################
@@ -131,6 +145,7 @@ processors:
     field:
     - threatintel.anomali.created
     - message
+    - _tmp
     ignore_missing: true
 on_failure:
 - set:

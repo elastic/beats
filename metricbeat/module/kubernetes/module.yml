@@ -1,3 +1,3 @@
 dashboards:
     - id: AV4RGUqo5NkDleZmzKuZ
-      file: Metricbeat-kubernetes-overview.json
+      file: Metricbeat-kubernetes-overview.ndjson

@@ -82,6 +82,15 @@ data:
               - 'kube-state-metrics:8080'
             period: 10s
           - data_stream:
+              dataset: kubernetes.state_job
+              type: metrics
+            metricsets:
+              - state_job
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
               dataset: kubernetes.state_node
               type: metrics
             metricsets:
@@ -482,10 +491,10 @@ spec:
             runAsUser: 0
           resources:
             limits:
-              memory: 200Mi
+              memory: 500Mi
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 200Mi
           volumeMounts:
             - name: datastreams
               mountPath: /etc/agent.yml
@@ -592,6 +601,10 @@ rules:
       - statefulsets
       - deployments
       - replicasets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""

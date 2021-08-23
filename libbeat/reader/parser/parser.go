@@ -25,6 +25,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
@@ -43,11 +44,13 @@ type Parser interface {
 }
 
 type CommonConfig struct {
-	MaxBytes       int                     `config:"max_bytes"`
+	MaxBytes       cfgtype.ByteSize        `config:"max_bytes"`
 	LineTerminator readfile.LineTerminator `config:"line_terminator"`
 }
 
 type Config struct {
+	Suffix string
+
 	pCfg    CommonConfig
 	parsers []common.ConfigNamespace
 }
@@ -78,6 +81,7 @@ func (c *Config) Unpack(cc *common.Config) error {
 }
 
 func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+	var suffix string
 	for _, ns := range parsers {
 		name := ns.Name()
 		switch name {
@@ -102,12 +106,19 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 			if err != nil {
 				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
 			}
+			if config.Stream != readjson.All {
+				if suffix != "" {
+					return nil, fmt.Errorf("only one stream selection is allowed")
+				}
+				suffix = config.Stream.String()
+			}
 		default:
 			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
 		}
 	}
 
 	return &Config{
+		Suffix:  suffix,
 		pCfg:    pCfg,
 		parsers: parsers,
 	}, nil
@@ -126,7 +137,7 @@ func (c *Config) Create(in reader.Reader) Parser {
 			if err != nil {
 				return p
 			}
-			p, err = multiline.New(p, "\n", c.pCfg.MaxBytes, &config)
+			p, err = multiline.New(p, "\n", int(c.pCfg.MaxBytes), &config)
 			if err != nil {
 				return p
 			}
