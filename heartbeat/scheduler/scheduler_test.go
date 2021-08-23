@@ -177,7 +177,7 @@ func TestScheduler_Stop(t *testing.T) {
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
 
-func TestScheduler_runRecursiveTask(t *testing.T) {
+func TestSchedJobRun(t *testing.T) {
 	cancelledCtx, cancel := context.WithCancel(context.Background())
 	cancel()
 
@@ -226,7 +226,8 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, nil)
+			sj := newSchedJob(testCase.jobCtx, s, "atype", tf)
+			startedAt := sj.run()
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
 			// for an error value and released an unacquired resource in scheduler.go.
@@ -242,6 +243,29 @@ func TestScheduler_runRecursiveTask(t *testing.T) {
 	}
 }
 
+// testRecursiveForkingJob tests that a schedJob that splits into multiple parallel pieces executes without error
+func TestRecursiveForkingJob(t *testing.T) {
+	s := NewWithLocation(1000, monitoring.NewRegistry(), tarawaTime(), nil)
+	ran := batomic.NewInt(0)
+
+	var terminalTf TaskFunc = func(ctx context.Context) []TaskFunc {
+		ran.Inc()
+		return nil
+	}
+	var forkingTf TaskFunc = func(ctx context.Context) []TaskFunc {
+		ran.Inc()
+		return []TaskFunc{
+			terminalTf, terminalTf, terminalTf,
+		}
+	}
+
+	sj := newSchedJob(context.Background(), s, "atype", forkingTf)
+
+	sj.run()
+	require.Equal(t, 4, ran.Load())
+
+}
+
 func makeTasks(num int, callback func()) TaskFunc {
 	return func(ctx context.Context) []TaskFunc {
 		callback()
@@ -252,7 +276,7 @@ func makeTasks(num int, callback func()) TaskFunc {
 	}
 }
 
-func TestScheduler_runRecursiveJob(t *testing.T) {
+func TestSchedTaskLimits(t *testing.T) {
 	tests := []struct {
 		name    string
 		numJobs int
@@ -311,7 +335,8 @@ func TestScheduler_runRecursiveJob(t *testing.T) {
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {
-					s.runRecursiveJob(context.Background(), tff, jobType)
+					sj := newSchedJob(context.Background(), s, "atype", tff)
+					sj.run()
 					wg.Done()
 				}(tf)
 			}
