@@ -30,7 +30,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
-	batomic "github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 )
 
@@ -177,71 +176,6 @@ func TestScheduler_Stop(t *testing.T) {
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
 
-func TestScheduler_runRecursiveTask(t *testing.T) {
-	cancelledCtx, cancel := context.WithCancel(context.Background())
-	cancel()
-
-	testCases := []struct {
-		name          string
-		jobCtx        context.Context
-		overLimit     bool
-		shouldRunTask bool
-	}{
-		{
-			"context not cancelled",
-			context.Background(),
-			false,
-			true,
-		},
-		{
-			"context cancelled",
-			cancelledCtx,
-			false,
-			false,
-		},
-		{
-			"context cancelled over limit",
-			cancelledCtx,
-			true,
-			false,
-		},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.name, func(t *testing.T) {
-			limit := int64(100)
-			s := NewWithLocation(limit, monitoring.NewRegistry(), tarawaTime(), nil)
-
-			if testCase.overLimit {
-				s.limitSem.Acquire(context.Background(), limit)
-			}
-
-			wg := &sync.WaitGroup{}
-			wg.Add(1)
-			executed := batomic.MakeBool(false)
-
-			tf := func(ctx context.Context) []TaskFunc {
-				executed.Store(true)
-				return nil
-			}
-
-			beforeStart := time.Now()
-			startedAt := s.runRecursiveTask(testCase.jobCtx, tf, wg, nil)
-
-			// This will panic in the case where we don't check s.limitSem.Acquire
-			// for an error value and released an unacquired resource in scheduler.go.
-			// In that case this will release one more resource than allowed causing
-			// the panic.
-			if testCase.overLimit {
-				s.limitSem.Release(limit)
-			}
-
-			require.Equal(t, testCase.shouldRunTask, executed.Load())
-			require.True(t, startedAt.Equal(beforeStart) || startedAt.After(beforeStart))
-		})
-	}
-}
-
 func makeTasks(num int, callback func()) TaskFunc {
 	return func(ctx context.Context) []TaskFunc {
 		callback()
@@ -252,7 +186,7 @@ func makeTasks(num int, callback func()) TaskFunc {
 	}
 }
 
-func TestScheduler_runRecursiveJob(t *testing.T) {
+func TestSchedTaskLimits(t *testing.T) {
 	tests := []struct {
 		name    string
 		numJobs int
@@ -311,7 +245,8 @@ func TestScheduler_runRecursiveJob(t *testing.T) {
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {
-					s.runRecursiveJob(context.Background(), tff, jobType)
+					sj := newSchedJob(context.Background(), s, "myid", jobType, tff)
+					sj.run()
 					wg.Done()
 				}(tf)
 			}
