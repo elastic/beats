@@ -116,6 +116,10 @@ func (p *pod) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) common.
 		out.Put("pod.ip", po.Status.PodIP)
 	}
 
+	if po.Spec.Hostname != "" {
+		out.Put("pod.hostname", po.Spec.Hostname)
+	}
+
 	return out
 }
 

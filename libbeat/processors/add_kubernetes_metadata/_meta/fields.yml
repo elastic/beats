@@ -13,6 +13,11 @@
           description: >
             Kubernetes pod name
 
+        - name: pod.hostname
+          type: keyword
+          description: >
+            Kubernetes pod hostname
+
         - name: pod.uid
           type: keyword
           description: >

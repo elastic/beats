@@ -141,6 +141,51 @@ func TestPod_Generate(t *testing.T) {
 			},
 		},
 		{
+			name: "test simple object with hostname",
+			input: &v1.Pod{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      name,
+					UID:       types.UID(uid),
+					Namespace: namespace,
+					Labels: map[string]string{
+						"foo": "bar",
+					},
+					Annotations: map[string]string{
+						"app": "production",
+					},
+				},
+				TypeMeta: metav1.TypeMeta{
+					Kind:       "Pod",
+					APIVersion: "v1",
+				},
+				Spec: v1.PodSpec{
+					NodeName: "testnode",
+					Hostname: "foobar",
+				},
+				Status: v1.PodStatus{PodIP: "127.0.0.5"},
+			},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"pod": common.MapStr{
+						"name":     "obj",
+						"uid":      uid,
+						"ip":       "127.0.0.5",
+						"hostname": "foobar",
+					},
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"app": "production",
+					},
+					"namespace": "default",
+					"node": common.MapStr{
+						"name": "testnode",
+					},
+				},
+			},
+		},
+		{
 			name: "test object with owner reference to Deployment",
 			input: &v1.Pod{
 				ObjectMeta: metav1.ObjectMeta{

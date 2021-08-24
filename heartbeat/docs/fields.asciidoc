@@ -14599,6 +14599,16 @@ type: keyword
 
 --
 
+*`kubernetes.pod.hostname`*::
++
+--
+Kubernetes pod hostname
+
+
+type: keyword
+
+--
+
 *`kubernetes.pod.uid`*::
 +
 --
