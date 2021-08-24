@@ -455,7 +455,7 @@ def tagAndPush(Map args = [:]) {
     tags << aliasVersion
   }
   // supported image flavours
-  def variants = ["", "-oss", "-ubi8"]
+  def variants = ["", "-complete", "-oss", "-ubi8"]
   variants.each { variant ->
     tags.each { tag ->
       doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
