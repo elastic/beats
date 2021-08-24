@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -43,9 +42,7 @@ func (sj *schedJob) run() (startedAt time.Time) {
 	sj.wg.Add(1)
 	sj.activeTasks.Inc()
 	if sj.jobLimitSem != nil {
-		logp.Warn("TRY-BLOCKING-ACQUIRE ? %s", sj.id)
 		sj.jobLimitSem.Acquire(sj.ctx, 1)
-		logp.Warn("ACQUIRED + %s", sj.id)
 	}
 
 	startedAt = sj.runTask(sj.entrypoint)
@@ -102,7 +99,6 @@ func (sj *schedJob) runTask(task TaskFunc) time.Time {
 		// there are no other jobs active or pending, and we can release the jobLimitSem
 		if sj.jobLimitSem != nil && sj.activeTasks.Load() == 1 {
 			sj.jobLimitSem.Release(1)
-			logp.Warn("RELEASED + %s", sj.id)
 		}
 	}
 
