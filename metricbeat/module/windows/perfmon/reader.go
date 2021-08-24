@@ -116,7 +116,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	var err error
 	if re.config.IgnoreObjectIndex {
 		values, err = re.getArrayValues()
-	}else {
+	} else {
 		values, err = re.getValues()
 	}
 	if err != nil {

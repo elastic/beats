@@ -39,7 +39,7 @@ type Config struct {
 	Queries                 []Query       `config:"perfmon.queries"`
 	GroupAllCountersTo      string        `config:"perfmon.group_all_counter"`
 	// option used for iis/website metricset, if set to true, it will call GetFormattedCounterArrayValues instead of getting individual perfmon counter values. The GetFormattedCounterArrayValues will not retrieve the index value but this is not necessary for websites
-	IgnoreObjectIndex       bool          `config:"perfmon.ignore_object_index"`
+	IgnoreObjectIndex bool `config:"perfmon.ignore_object_index"`
 }
 
 // Counter for the perfmon counters (old implementation deprecated).

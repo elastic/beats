@@ -54,20 +54,20 @@ func errnoErr(e syscall.Errno) error {
 }
 
 var (
-	modpdh = windows.NewLazySystemDLL("pdh.dll")
+	modpdh                           = windows.NewLazySystemDLL("pdh.dll")
 	procPdhGetFormattedCounterArrayW = modpdh.NewProc("PdhGetFormattedCounterArrayW")
-	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
-	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
-	procPdhAddCounterW              = modpdh.NewProc("PdhAddCounterW")
-	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
-	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
-	procPdhCollectQueryDataEx       = modpdh.NewProc("PdhCollectQueryDataEx")
-	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
-	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
-	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
-	procPdhExpandCounterPathW       = modpdh.NewProc("PdhExpandCounterPathW")
-	procPdhGetCounterInfoW          = modpdh.NewProc("PdhGetCounterInfoW")
-	procPdhEnumObjectItemsW         = modpdh.NewProc("PdhEnumObjectItemsW")
+	procPdhOpenQueryW                = modpdh.NewProc("PdhOpenQueryW")
+	procPdhAddEnglishCounterW        = modpdh.NewProc("PdhAddEnglishCounterW")
+	procPdhAddCounterW               = modpdh.NewProc("PdhAddCounterW")
+	procPdhRemoveCounter             = modpdh.NewProc("PdhRemoveCounter")
+	procPdhCollectQueryData          = modpdh.NewProc("PdhCollectQueryData")
+	procPdhCollectQueryDataEx        = modpdh.NewProc("PdhCollectQueryDataEx")
+	procPdhGetFormattedCounterValue  = modpdh.NewProc("PdhGetFormattedCounterValue")
+	procPdhCloseQuery                = modpdh.NewProc("PdhCloseQuery")
+	procPdhExpandWildCardPathW       = modpdh.NewProc("PdhExpandWildCardPathW")
+	procPdhExpandCounterPathW        = modpdh.NewProc("PdhExpandCounterPathW")
+	procPdhGetCounterInfoW           = modpdh.NewProc("PdhGetCounterInfoW")
+	procPdhEnumObjectItemsW          = modpdh.NewProc("PdhEnumObjectItemsW")
 )
 
 func _PdhOpenQuery(dataSource *uint16, userData uintptr, query *PdhQueryHandle) (errcode error) {
