@@ -31,9 +31,14 @@ function unixProvision () {
 }
 
 function debProvision () {
-    set -eio pipefail
+    set -eo pipefail
     apt-get update
     apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev curl
+}
+
+function rhelProvision () {
+    yum update
+    yum install -y make gcc git python3 python3-pip python3-venv git rpm-devel
 }
 
 
@@ -44,7 +49,9 @@ case "${PROVISION_TYPE}" in
     "unix")
         unixProvision
     ;;
-\
+    "rhel")
+        rhelProvision
+    ;;
     "debian")
         debProvision
     ;;
