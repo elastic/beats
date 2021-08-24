@@ -1,0 +1,329 @@
+{
+    "attributes": {
+        "description": "This dashboard provides an overview of user activity, alerts and resource in Azure cloud.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "6b6e7452-979c-4f78-afc2-cc58fcf105ff",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "6b6e7452-979c-4f78-afc2-cc58fcf105ff",
+                "panelRefName": "panel_6b6e7452-979c-4f78-afc2-cc58fcf105ff",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "042f777a-5e41-41e8-9d6e-d842473a8aed",
+                    "w": 15,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "042f777a-5e41-41e8-9d6e-d842473a8aed",
+                "panelRefName": "panel_042f777a-5e41-41e8-9d6e-d842473a8aed",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1e73bca7-8569-41b5-830e-2f762602219a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "1e73bca7-8569-41b5-830e-2f762602219a",
+                "panelRefName": "panel_1e73bca7-8569-41b5-830e-2f762602219a",
+                "title": "Activity Level",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "d9465e9f-49f1-4173-b1a4-fea9ee3120ab",
+                    "w": 24,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "d9465e9f-49f1-4173-b1a4-fea9ee3120ab",
+                "panelRefName": "panel_d9465e9f-49f1-4173-b1a4-fea9ee3120ab",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "18ec1e20-202b-4a40-8d0d-22060ac3e23c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 8
+                },
+                "panelIndex": "18ec1e20-202b-4a40-8d0d-22060ac3e23c",
+                "panelRefName": "panel_18ec1e20-202b-4a40-8d0d-22060ac3e23c",
+                "title": "Access Requests",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "d2bdec0f-dde1-4925-bf7e-afbc430c0eca",
+                    "w": 24,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "d2bdec0f-dde1-4925-bf7e-afbc430c0eca",
+                "panelRefName": "panel_d2bdec0f-dde1-4925-bf7e-afbc430c0eca",
+                "title": "Top Active Users",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "3bcc964d-6862-4fdd-9d82-f7510cc02162",
+                    "w": 12,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "3bcc964d-6862-4fdd-9d82-f7510cc02162",
+                "panelRefName": "panel_3bcc964d-6862-4fdd-9d82-f7510cc02162",
+                "title": "Alerts Overview",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "74436614-9dfc-4c38-bc58-8cb76c348f37",
+                    "w": 12,
+                    "x": 36,
+                    "y": 15
+                },
+                "panelIndex": "74436614-9dfc-4c38-bc58-8cb76c348f37",
+                "panelRefName": "panel_74436614-9dfc-4c38-bc58-8cb76c348f37",
+                "title": "Service Health",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "a6f36dfe-b6d6-4dca-b63c-81f5b4f7c8f8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "a6f36dfe-b6d6-4dca-b63c-81f5b4f7c8f8",
+                "panelRefName": "panel_a6f36dfe-b6d6-4dca-b63c-81f5b4f7c8f8",
+                "title": "Top Resource Groups",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "644c6151-fd05-4b2e-b18e-30843697e932",
+                    "w": 12,
+                    "x": 24,
+                    "y": 22
+                },
+                "panelIndex": "644c6151-fd05-4b2e-b18e-30843697e932",
+                "panelRefName": "panel_644c6151-fd05-4b2e-b18e-30843697e932",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "3d5ccff8-6576-4a1c-b3ee-363ae665906e",
+                    "w": 12,
+                    "x": 36,
+                    "y": 22
+                },
+                "panelIndex": "3d5ccff8-6576-4a1c-b3ee-363ae665906e",
+                "panelRefName": "panel_3d5ccff8-6576-4a1c-b3ee-363ae665906e",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "legendOpen": false,
+                    "vis": {
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1a6dce1d-d039-4d18-87c7-1b700da676c2",
+                    "w": 12,
+                    "x": 24,
+                    "y": 28
+                },
+                "panelIndex": "1a6dce1d-d039-4d18-87c7-1b700da676c2",
+                "panelRefName": "panel_1a6dce1d-d039-4d18-87c7-1b700da676c2",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "legendOpen": false,
+                    "vis": {
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "8fddd3bb-c1e6-4533-b075-1ab7361b3af0",
+                    "w": 12,
+                    "x": 36,
+                    "y": 28
+                },
+                "panelIndex": "8fddd3bb-c1e6-4533-b075-1ab7361b3af0",
+                "panelRefName": "panel_8fddd3bb-c1e6-4533-b075-1ab7361b3af0",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Azure] Cloud Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "41e84340-ec20-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "fe24ac90-f05a-11e9-90ec-112a988266d5",
+            "name": "6b6e7452-979c-4f78-afc2-cc58fcf105ff:panel_6b6e7452-979c-4f78-afc2-cc58fcf105ff",
+            "type": "visualization"
+        },
+        {
+            "id": "097d74d0-f044-11e9-90ec-112a988266d5",
+            "name": "042f777a-5e41-41e8-9d6e-d842473a8aed:panel_042f777a-5e41-41e8-9d6e-d842473a8aed",
+            "type": "visualization"
+        },
+        {
+            "id": "da67d650-ec14-11e9-90ec-112a988266d5",
+            "name": "1e73bca7-8569-41b5-830e-2f762602219a:panel_1e73bca7-8569-41b5-830e-2f762602219a",
+            "type": "visualization"
+        },
+        {
+            "id": "e4c7f4b0-f045-11e9-90ec-112a988266d5",
+            "name": "d9465e9f-49f1-4173-b1a4-fea9ee3120ab:panel_d9465e9f-49f1-4173-b1a4-fea9ee3120ab",
+            "type": "visualization"
+        },
+        {
+            "id": "709995e0-ec16-11e9-90ec-112a988266d5",
+            "name": "18ec1e20-202b-4a40-8d0d-22060ac3e23c:panel_18ec1e20-202b-4a40-8d0d-22060ac3e23c",
+            "type": "visualization"
+        },
+        {
+            "id": "ffe22180-ec1c-11e9-90ec-112a988266d5",
+            "name": "d2bdec0f-dde1-4925-bf7e-afbc430c0eca:panel_d2bdec0f-dde1-4925-bf7e-afbc430c0eca",
+            "type": "visualization"
+        },
+        {
+            "id": "52c2a4e0-ec1f-11e9-90ec-112a988266d5",
+            "name": "3bcc964d-6862-4fdd-9d82-f7510cc02162:panel_3bcc964d-6862-4fdd-9d82-f7510cc02162",
+            "type": "visualization"
+        },
+        {
+            "id": "bc65e840-ec1e-11e9-90ec-112a988266d5",
+            "name": "74436614-9dfc-4c38-bc58-8cb76c348f37:panel_74436614-9dfc-4c38-bc58-8cb76c348f37",
+            "type": "visualization"
+        },
+        {
+            "id": "71b62ca0-ec1a-11e9-90ec-112a988266d5",
+            "name": "a6f36dfe-b6d6-4dca-b63c-81f5b4f7c8f8:panel_a6f36dfe-b6d6-4dca-b63c-81f5b4f7c8f8",
+            "type": "visualization"
+        },
+        {
+            "id": "f684a750-ec23-11e9-90ec-112a988266d5",
+            "name": "644c6151-fd05-4b2e-b18e-30843697e932:panel_644c6151-fd05-4b2e-b18e-30843697e932",
+            "type": "visualization"
+        },
+        {
+            "id": "e37cd3d0-ec23-11e9-90ec-112a988266d5",
+            "name": "3d5ccff8-6576-4a1c-b3ee-363ae665906e:panel_3d5ccff8-6576-4a1c-b3ee-363ae665906e",
+            "type": "visualization"
+        },
+        {
+            "id": "d91ce8d0-53e8-11ea-b1b7-7de801e1c297",
+            "name": "1a6dce1d-d039-4d18-87c7-1b700da676c2:panel_1a6dce1d-d039-4d18-87c7-1b700da676c2",
+            "type": "visualization"
+        },
+        {
+            "id": "6db84660-53e9-11ea-b1b7-7de801e1c297",
+            "name": "8fddd3bb-c1e6-4533-b075-1ab7361b3af0:panel_8fddd3bb-c1e6-4533-b075-1ab7361b3af0",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:02.545Z",
+    "version": "WzQzODUsMV0="
+}

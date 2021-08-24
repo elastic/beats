@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "Dashboard for analyzing the query durations of the Filebeat PostgreSQL module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "user.name",
+                        "postgresql.log.database",
+                        "event.duration",
+                        "postgresql.log.query"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "search",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "user.name",
+                        "postgresql.log.database",
+                        "event.duration",
+                        "postgresql.log.query"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "search",
+                "version": "7.10.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat PostgreSQL] Query Duration Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e4c5f230-87f3-11e7-ad9c-db80de0bf8d3-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "PostgreSQL Query Count and Duration-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "Slow PostgreSQL Queries-ecs",
+            "name": "2:panel_2",
+            "type": "search"
+        },
+        {
+            "id": "PostgreSQL Query Durations-ecs",
+            "name": "3:panel_3",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:51.290Z",
+    "version": "WzQzMTYsMV0="
+}

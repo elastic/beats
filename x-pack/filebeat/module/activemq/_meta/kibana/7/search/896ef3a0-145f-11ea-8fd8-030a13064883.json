@@ -1,0 +1,46 @@
+{
+    "attributes": {
+        "columns": [
+            "log.level",
+            "activemq.user",
+            "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset :\"activemq.audit\""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Audit Events [Filebeat ActiveMQ]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "896ef3a0-145f-11ea-8fd8-030a13064883",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:54.354Z",
+    "version": "WzQzMzYsMV0="
+}

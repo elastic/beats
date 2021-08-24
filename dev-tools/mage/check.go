@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -217,7 +216,7 @@ func CheckDashboardsFormat() error {
 		if strings.HasPrefix(path, "vendor") {
 			return false
 		}
-		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".ndjson")
+		return strings.Contains(filepath.ToSlash(path), dashboardSubDir) && strings.HasSuffix(path, ".json")
 	})
 	if err != nil {
 		return errors.Wrap(err, "failed to find dashboards")
@@ -230,22 +229,8 @@ func CheckDashboardsFormat() error {
 			return errors.Wrapf(err, "failed to read dashboard file %s", file)
 		}
 
-		r := bufio.NewReader(bytes.NewReader(d))
-		count := 0
-		for {
-			line, err := r.ReadBytes('\n')
-			count++
-			if err != nil {
-				if err == io.EOF {
-					if checkDashboardForErrors(file, line, count) {
-						hasErrors = true
-					}
-					break
-				}
-			}
-			if checkDashboardForErrors(file, line, count) {
-				hasErrors = true
-			}
+		if checkDashboardForErrors(file, d) {
+			hasErrors = true
 		}
 	}
 
@@ -255,7 +240,7 @@ func CheckDashboardsFormat() error {
 	return nil
 }
 
-func checkDashboardForErrors(file string, d []byte, count int) bool {
+func checkDashboardForErrors(file string, d []byte) bool {
 	if len(bytes.TrimRight(d, "\n")) == 0 {
 		return false
 	}
@@ -263,7 +248,7 @@ func checkDashboardForErrors(file string, d []byte, count int) bool {
 	var dashboard Dashboard
 	err := json.Unmarshal(d, &dashboard)
 	if err != nil {
-		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s line %d", file, count).Error())
+		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s", file).Error())
 		return true
 	}
 

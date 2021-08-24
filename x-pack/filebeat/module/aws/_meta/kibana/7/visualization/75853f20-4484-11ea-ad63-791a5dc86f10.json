@@ -1,0 +1,105 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "VPC Flow Top IP Addresses [Filebeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "29527130-3e86-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "cc6d5070-3e85-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "2b29c940-3e86-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "pivot_id": "user_agent.original",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "color_rules": [
+                            {
+                                "id": "42e14220-3e86-11ea-9067-cf383a4ea3b3"
+                            }
+                        ],
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"vpcflow\" "
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "IP address",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "40c52370-3e87-11ea-9067-cf383a4ea3b3",
+                                "type": "cumulative_sum"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "source.ip",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "VPC Flow Top IP Addresses [Filebeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "75853f20-4484-11ea-ad63-791a5dc86f10",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:00.470Z",
+    "version": "WzQzNzYsMV0="
+}
