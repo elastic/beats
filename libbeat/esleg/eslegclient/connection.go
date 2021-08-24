@@ -25,8 +25,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"time"
 
 	"go.elastic.co/apm/module/apmelasticsearch"
@@ -60,7 +58,8 @@ type Connection struct {
 
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
-	URL string
+	URL      string
+	Beatname string
 
 	Username string
 	Password string
@@ -113,13 +112,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
-	name, err := os.Executable()
-	if err != nil {
-		name = "ESLegClient"
-	} else {
-		name = strings.Title(name)
-	}
-	userAgent := useragent.UserAgent(name)
+	userAgent := useragent.UserAgent(s.Beatname)
 
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),
@@ -172,7 +165,7 @@ func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
-func NewClients(cfg *common.Config) ([]Connection, error) {
+func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -197,6 +190,7 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
+			Beatname:         beatname,
 			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
@@ -217,8 +211,8 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 	return clients, nil
 }
 
-func NewConnectedClient(cfg *common.Config) (*Connection, error) {
-	clients, err := NewClients(cfg)
+func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err
 	}

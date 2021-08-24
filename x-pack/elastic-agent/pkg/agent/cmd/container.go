@@ -474,7 +474,7 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 		IgnoreVersion: true,
 		Transport:     transport,
 		Headers:       headers,
-	}, 0)
+	}, 0, "Elastic-agent")
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {

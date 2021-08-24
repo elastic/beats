@@ -29,7 +29,6 @@ import (
 	"net/http"
 	"net/textproto"
 	"net/url"
-	"os"
 	"path"
 	"strings"
 
@@ -96,22 +95,22 @@ func extractError(result []byte) error {
 }
 
 // NewKibanaClient builds and returns a new Kibana client
-func NewKibanaClient(cfg *common.Config) (*Client, error) {
+func NewKibanaClient(cfg *common.Config, beatname string) (*Client, error) {
 	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	return NewClientWithConfig(&config)
+	return NewClientWithConfig(&config, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfig(config *ClientConfig) (*Client, error) {
-	return NewClientWithConfigDefault(config, 5601)
+func NewClientWithConfig(config *ClientConfig, beatname string) (*Client, error) {
+	return NewClientWithConfigDefault(config, 5601, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client, error) {
+func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, beatname string) (*Client, error) {
 	p := config.Path
 	if config.SpaceID != "" {
 		p = path.Join(p, "s", config.SpaceID)
@@ -146,15 +145,7 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		headers.Set(k, v)
 	}
 
-	name, err := os.Executable()
-	if err != nil {
-		log.Errorf("Unable to get running executable name: %v", err)
-		name = "KibanaClient"
-	} else {
-		name = strings.Title(name)
-	}
-	userAgent := useragent.UserAgent(name)
-
+	userAgent := useragent.UserAgent(beatname)
 	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {
 		return nil, err
