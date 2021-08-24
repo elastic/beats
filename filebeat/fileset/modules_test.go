@@ -45,13 +45,17 @@ func TestNewModuleRegistry(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
 
+	falseVar := false
+
 	configs := []*ModuleConfig{
 		{
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
-				"access":             {},
-				"error":              {},
-				"ingress_controller": {},
+				"access": {},
+				"error":  {},
+				"ingress_controller": {
+					Enabled: &falseVar,
+				},
 			},
 		},
 		{
@@ -82,7 +86,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error", "ingress_controller"},
+		"nginx":  {"access", "error"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
