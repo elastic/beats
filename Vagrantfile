@@ -31,119 +31,6 @@
 # Read the branch's Go version from the .go-version file.
 GO_VERSION = File.read(File.join(File.dirname(__FILE__), ".go-version")).strip
 
-# Provisioning for Windows PowerShell
-$winPsProvision = <<SCRIPT
-$gopath_beats = "C:\\Gopath\\src\\github.com\\elastic\\beats"
-if (-Not (Test-Path $gopath_beats)) {
-    echo 'Creating github.com\\elastic in the GOPATH'
-    New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
-    echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
-    cmd /c mklink /d $gopath_beats \\\\vboxsvr\\vagrant
-}
-
-if (-Not (Get-Command "gvm" -ErrorAction SilentlyContinue)) {
-    echo "Installing gvm to manage go version"
-    [Net.ServicePointManager]::SecurityProtocol = "tls12"
-    Invoke-WebRequest -URI https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-windows-amd64.exe -Outfile C:\\Windows\\System32\\gvm.exe
-    C:\\Windows\\System32\\gvm.exe --format=powershell #{GO_VERSION} | Invoke-Expression
-    go version
-
-    echo "Configure Go environment variables"
-    [System.Environment]::SetEnvironmentVariable("GOPATH", "C:\\Gopath", [System.EnvironmentVariableTarget]::Machine)
-    [System.Environment]::SetEnvironmentVariable("GOROOT", "C:\\Users\\vagrant\\.gvm\\versions\\go#{GO_VERSION}.windows.amd64", [System.EnvironmentVariableTarget]::Machine)
-    [System.Environment]::SetEnvironmentVariable("PATH", "%GOROOT%\\bin;$env:PATH;C:\\Gopath\\bin", [System.EnvironmentVariableTarget]::Machine)
-}
-
-$shell_link = "$Home\\Desktop\\Beats Shell.lnk"
-if (-Not (Test-Path $shell_link)) {
-    echo "Creating Beats Shell desktop shortcut"
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut($shell_link)
-    $Shortcut.TargetPath = "powershell.exe"
-    $Shortcut.Arguments = "-noexit -command '$gopath_beats'"
-    $Shortcut.WorkingDirectory = $gopath_beats
-    $Shortcut.Save()
-}
-
-Try {
-    echo "Disabling automatic updates"
-    $AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
-    $AUSettings.NotificationLevel = 1
-    $AUSettings.Save()
-} Catch {
-    echo "Failed to disable automatic updates."
-}
-
-if (-Not (Get-Command "choco" -ErrorAction SilentlyContinue)) {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-}
-
-choco feature disable -n=showDownloadProgress
-
-if (-Not (Get-Command "python" -ErrorAction SilentlyContinue)) {
-    echo "Installing python 3"
-    choco install python -y -r --version 3.8.2
-    refreshenv
-    $env:PATH = "$env:PATH;C:\\Python38;C:\\Python38\\Scripts"
-}
-
-echo "Updating pip"
-python -m pip install --upgrade pip 2>&1 | %{ "$_" }
-
-if (-Not (Get-Command "git" -ErrorAction SilentlyContinue)) {
-    echo "Installing git"
-    choco install git -y -r
-}
-
-if (-Not (Get-Command "gcc" -ErrorAction SilentlyContinue)) {
-    echo "Installing mingw (gcc)"
-    choco install mingw -y -r
-}
-
-echo "Setting PYTHON_ENV in VM to point to C:\\beats-python-env."
-[System.Environment]::SetEnvironmentVariable("PYTHON_ENV", "C:\\beats-python-env", [System.EnvironmentVariableTarget]::Machine)
-SCRIPT
-
-# Provisioning for Unix/Linux
-$unixProvision = <<SCRIPT
-echo 'Creating github.com/elastic in the GOPATH'
-mkdir -p ~/go/src/github.com/elastic
-echo 'Symlinking /vagrant to ~/go/src/github.com/elastic'
-cd ~/go/src/github.com/elastic
-if [ -d "/vagrant" ]  && [ ! -e "beats" ]; then ln -s /vagrant beats; fi
-SCRIPT
-
-$freebsdShellUpdate = <<SCRIPT
-pkg install -y -q bash
-chsh -s bash vagrant
-SCRIPT
-
-
-# Linux GVM
-def gvmProvision(arch="amd64", os="linux")
-  return <<SCRIPT
-mkdir -p ~/bin
-if [ ! -e "~/bin/gvm" ]; then
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-#{os}-#{arch}
-  chmod +x ~/bin/gvm
-  ~/bin/gvm #{GO_VERSION}
-  echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
-  echo 'export PATH=$HOME/bin:$GOPATH/bin:$PATH' >> ~/.bash_profile
-  echo 'eval "$(gvm #{GO_VERSION})"' >> ~/.bash_profile
-fi
-SCRIPT
-end
-
-# Provision packages for Linux Debian.
-def linuxDebianProvision()
-  return <<SCRIPT
-#!/usr/bin/env bash
-set -eio pipefail
-apt-get update
-apt-get install -y make gcc python3 python3-pip python3-venv git libsystemd-dev
-SCRIPT
-end
 
 Vagrant.configure("2") do |config|
   config.vm.provider :virtualbox do |vbox|
@@ -164,25 +51,25 @@ Vagrant.configure("2") do |config|
     c.vm.network :forwarded_port, guest: 3389, host: 33389, id: "rdp", auto_correct: true
     c.vm.network :forwarded_port, guest: 5985, host: 55985, id: "winrm", auto_correct: true
 
-    c.vm.provision "shell", inline: $winPsProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/winProvision.ps1", args: "-go_version #{GO_VERSION}"
   end
 
   config.vm.define "win2016" do |c|
     c.vm.box = "StefanScherer/windows_2016"
-    c.vm.provision "shell", inline: $winPsProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/winProvision.ps1", args: "-go_version #{GO_VERSION}"
   end
 
   config.vm.define "win2019" do |c|
     c.vm.box = "StefanScherer/windows_2019"
-    c.vm.provision "shell", inline: $winPsProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/winProvision.ps1", args: "-go_version #{GO_VERSION}"
   end
 
   config.vm.define "centos6" do |c|
     c.vm.box = "bento/centos-6.10"
     c.vm.network :forwarded_port, guest: 22, host: 2223, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc git rpm-devel epel-release"
     c.vm.provision "shell", inline: "yum install -y python34 python34-pip"
   end
@@ -191,8 +78,8 @@ Vagrant.configure("2") do |config|
     c.vm.box = "bento/centos-7"
     c.vm.network :forwarded_port, guest: 22, host: 2224, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -200,8 +87,8 @@ Vagrant.configure("2") do |config|
     c.vm.box = "bento/centos-8"
     c.vm.network :forwarded_port, guest: 22, host: 2225, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -209,8 +96,8 @@ Vagrant.configure("2") do |config|
     c.vm.box = "ubuntu/trusty64"
     c.vm.network :forwarded_port, guest: 22, host: 2226, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "apt-get update && apt-get install -y make gcc python3 python3-pip python3.4-venv git"
   end
 
@@ -218,62 +105,78 @@ Vagrant.configure("2") do |config|
     c.vm.box = "ubuntu/xenial64"
     c.vm.network :forwarded_port, guest: 22, host: 2227, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
+
+    config.vm.provision "docker", type: "shell", run: "never" do |s|
+      s.path = "dev-tools/vagrant_scripts/dockerProvision.sh"
+    end
   end
 
   config.vm.define "ubuntu1804" do |c|
     c.vm.box = "ubuntu/bionic64"
     c.vm.network :forwarded_port, guest: 22, host: 2228, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
+
+    config.vm.provision "docker", type: "shell", run: "never" do |s|
+      s.path = "dev-tools/vagrant_scripts/dockerProvision.sh"
+    end
   end
 
   config.vm.define "ubuntu2004", primary: true  do |c|
     c.vm.box = "ubuntu/focal64"
     c.vm.network :forwarded_port, guest: 22, host: 2229, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
+
+    config.vm.provision "docker", type: "shell", run: "never" do |s|
+      s.path = "dev-tools/vagrant_scripts/dockerProvision.sh"
+    end
   end
 
   config.vm.define "debian8" do |c|
-    c.vm.box = "debian/jessie64"
+    c.vm.box = "generic/debian8"
     c.vm.network :forwarded_port, guest: 22, host: 2231, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
   end
 
   config.vm.define "debian9" do |c|
     c.vm.box = "debian/stretch64"
     c.vm.network :forwarded_port, guest: 22, host: 2232, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+   
   end
 
   config.vm.define "debian10" do |c|
     c.vm.box = "debian/buster64"
     c.vm.network :forwarded_port, guest: 22, host: 2233, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
-    c.vm.provision "shell", inline: linuxDebianProvision
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "debian"
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+    config.vm.provision "docker", type: "shell", run: "never" do |s|
+      s.path = "dev-tools/vagrant_scripts/dockerProvision.sh"
+    end
   end
 
   config.vm.define "amazon1" do |c|
     c.vm.box = "mvbcoding/awslinux"
     c.vm.network :forwarded_port, guest: 22, host: 2234, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -281,8 +184,8 @@ Vagrant.configure("2") do |config|
     c.vm.box = "bento/amazonlinux-2"
     c.vm.network :forwarded_port, guest: 22, host: 2235, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "yum install -y make gcc python3 python3-pip git rpm-devel"
   end
 
@@ -304,9 +207,10 @@ Vagrant.configure("2") do |config|
     c.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
 
     c.vm.hostname = "beats-tester"
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: $freebsdShellUpdate, privileged: true
-    c.vm.provision "shell", inline: gvmProvision(arch="amd64", os="freebsd"), privileged: false
+    c.vm.provision "shell", inline: "pkg install -y -q bash"
+    c.vm.provision "shell", inline: "chsh -s bash vagrant"
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 freebsd #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
   end
 
@@ -321,7 +225,7 @@ Vagrant.configure("2") do |config|
       vbox.functional_vboxsf = false
     end
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
     c.vm.provision "shell", inline: "sudo pkg_add go", privileged: true
   end
 
@@ -329,8 +233,8 @@ Vagrant.configure("2") do |config|
     c.vm.box = "archlinux/archlinux"
     c.vm.network :forwarded_port, guest: 22, host: 2239, id: "ssh", auto_correct: true
 
-    c.vm.provision "shell", inline: $unixProvision, privileged: false
-    c.vm.provision "shell", inline: gvmProvision, privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+    c.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 freebsd #{GO_VERSION}", privileged: false
     c.vm.provision "shell", inline: "pacman -Sy && pacman -S --noconfirm make gcc python python-pip git"
   end
 end
