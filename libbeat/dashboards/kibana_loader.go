@@ -81,7 +81,7 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 			case <-ctx.Done():
 				return nil, err
 			case <-time.After(retryCfg.Interval):
-				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1)
+				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1, beatname)
 			}
 		}
 		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
