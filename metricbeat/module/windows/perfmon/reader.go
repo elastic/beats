@@ -111,8 +111,14 @@ func (re *Reader) Read() ([]mb.Event, error) {
 		}
 	}
 
-	// Get the values.
-	values, err := re.getValues()
+	// Get the counter values.
+	var values map[string][]pdh.CounterValue
+	var err error
+	if re.config.IgnoreObjectIndex {
+		values, err = re.getArrayValues()
+	}else {
+		values, err = re.getValues()
+	}
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
@@ -147,6 +153,37 @@ func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	switch waitFor {
 	case windows.WAIT_OBJECT_0:
 		val, err = re.query.GetFormattedCounterValues()
+		if err != nil {
+			return nil, err
+		}
+	case windows.WAIT_FAILED:
+		return nil, errors.New("WaitForSingleObject has failed")
+	default:
+		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
+	}
+	return val, err
+}
+
+func (re *Reader) getArrayValues() (map[string][]pdh.CounterValue, error) {
+	var val map[string][]pdh.CounterValue
+	rand.Seed(time.Now().UnixNano())
+	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
+	event, err := windows.CreateEvent(nil, 0, 0, title)
+	if err != nil {
+		return nil, err
+	}
+	defer windows.CloseHandle(event)
+	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
+	if err != nil {
+		return nil, err
+	}
+	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	if err != nil {
+		return nil, err
+	}
+	switch waitFor {
+	case windows.WAIT_OBJECT_0:
+		val, err = re.query.GetFormattedCounterArrayValues()
 		if err != nil {
 			return nil, err
 		}

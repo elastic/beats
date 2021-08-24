@@ -5,6 +5,7 @@ input:
   defaults:
     perfmon.group_measurements_by_instance: true
     perfmon.ignore_non_existent_counters: true
+    perfmon.ignore_object_index: true
     perfmon.queries:
     - object: "Web Service"
       instance: "*"
