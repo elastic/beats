@@ -35,7 +35,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/ibmmq"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/application_pool"
-	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/iis/website"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/citadel"
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/istio/galley"

@@ -21,8 +21,6 @@ import (
 
 const ecsProcessId = "process.pid"
 
-
-
 // Reader will contain the config options
 type Reader struct {
 	applicationPools []ApplicationPool
@@ -30,7 +28,7 @@ type Reader struct {
 	query            pdh.Query    // PDH Query
 	executed         bool         // Indicates if the query has been executed.
 	log              *logp.Logger //
-	config           Config   // Metricset configuration
+	config           Config       // Metricset configuration
 }
 
 // ApplicationPool struct contains the list of applications and their worker processes
