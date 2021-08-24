@@ -206,11 +206,10 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		logp.Warn("Run %s | %d limit", id, s.jobLimitSem[jobType])
+		debugf("Job '%s' started", id)
 		lastRanAt := newSchedJob(jobCtx, s, id, jobType, entrypoint).run()
 		s.stats.activeJobs.Dec()
 		s.runOnce(sched.Next(lastRanAt), taskFn)
-		logp.Warn("End %s", id)
 		debugf("Job '%v' returned at %v", id, time.Now())
 	}
 
