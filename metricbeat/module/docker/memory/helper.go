@@ -62,6 +62,23 @@ func (s *MemoryService) getMemoryStatsList(containers []docker.Stat, dedot bool)
 
 func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) MemoryData {
 	totalRSS := myRawStat.Stats.MemoryStats.Stats["total_rss"]
+
+	// Emulate newer docker releases and exclude cache values from memory usage
+	// See here for a little more context. usage - cache won't work, as it includes shared mappings that can't be dropped
+	// like regular cache.
+	// This formula is used by both cadvisor and containerd
+	// https://github.com/google/cadvisor/commit/307d1b1cb320fef66fab02db749f07a459245451
+	var fileUsage, memUsage uint64
+	// use this a shortcut to see if the underlying system is V1 or V2
+	totalInactive, isV1 := myRawStat.Stats.MemoryStats.Stats["total_inactive_file"]
+	if isV1 && totalInactive < myRawStat.Stats.MemoryStats.Usage {
+		fileUsage = totalInactive
+	}
+	if fileInactive, ok := myRawStat.Stats.MemoryStats.Stats["inactive_file"]; !isV1 && ok && fileInactive < myRawStat.Stats.MemoryStats.Usage {
+		fileUsage = fileInactive
+	}
+
+	memUsage = myRawStat.Stats.MemoryStats.Usage - fileUsage
 	return MemoryData{
 		Time:      common.Time(myRawStat.Stats.Read),
 		Container: docker.NewContainer(myRawStat.Container, dedot),
@@ -70,8 +87,8 @@ func (s *MemoryService) getMemoryStats(myRawStat docker.Stat, dedot bool) Memory
 		MaxUsage:  myRawStat.Stats.MemoryStats.MaxUsage,
 		TotalRss:  totalRSS,
 		TotalRssP: float64(totalRSS) / float64(myRawStat.Stats.MemoryStats.Limit),
-		Usage:     myRawStat.Stats.MemoryStats.Usage,
-		UsageP:    float64(myRawStat.Stats.MemoryStats.Usage) / float64(myRawStat.Stats.MemoryStats.Limit),
+		Usage:     memUsage,
+		UsageP:    float64(memUsage) / float64(myRawStat.Stats.MemoryStats.Limit),
 		Stats:     myRawStat.Stats.MemoryStats.Stats,
 		//Windows memory statistics
 		Commit:            myRawStat.Stats.MemoryStats.Commit,

@@ -1001,9 +1001,9 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets an 'offline' variant for synthetics and other large
+        # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
-        variants: ["offline"]
+        variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1027,9 +1027,9 @@ specs:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
-        # This image gets an 'offline' variant for synthetics and other large
+        # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
-        variants: ["offline"]
+        variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
