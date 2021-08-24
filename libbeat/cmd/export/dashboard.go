@@ -38,6 +38,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
 			decode, _ := cmd.Flags().GetBool("decode")
+			folder, _ := cmd.Flags().GetString("folder")
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
@@ -90,7 +91,16 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 				if decode {
 					result = dashboards.DecodeExported(result)
 				}
-				fmt.Println(string(result))
+
+				if folder != "" {
+					err = dashboards.SaveToFolder(result, folder, client.GetVersion())
+					if err != nil {
+						fatalf("Error saving assets to folder '%s' : %+v.\n", folder, err)
+					}
+
+				} else {
+					fmt.Println(string(result))
+				}
 			}
 		},
 	}
@@ -98,6 +108,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
 	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
 	genTemplateConfigCmd.Flags().Bool("decode", false, "Decode exported dashboard")
+	genTemplateConfigCmd.Flags().String("folder", "", "Target folder to save exported assets")
 
 	return genTemplateConfigCmd
 }
