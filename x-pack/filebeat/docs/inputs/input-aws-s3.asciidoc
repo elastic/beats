@@ -20,7 +20,7 @@ used to receive S3 access logs to monitor detailed records for the requests that
 are made to a bucket.
 
 SQS notification method is enabled setting `queue_url` configuration value.
-S3 bucket list polling method is enabled setting `s3_bucket` configuration value.
+S3 bucket list polling method is enabled setting `bucket_arn` configuration value.
 Both value cannot be set at the same time, at least one of the two value must be set.
 
 When using the SQS notification method this input depends on S3 notifications delivered
@@ -54,7 +54,7 @@ Listing of the S3 bucket will be polled according the time interval defined by
 ----
 {beatname_lc}.inputs:
 - type: aws-s3
-  s3_bucket: arn:aws:s3:::test-s3-bucket
+  bucket_arn: arn:aws:s3:::test-s3-bucket
   number_of_workers: 5
   bucket_list_interval: 300s
   credential_profile_name: elastic-beats
@@ -236,7 +236,7 @@ configuring multiline options.
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. (Required when `s3_bucket` is not set).
+URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` is not set).
 
 [float]
 ==== `visibility_timeout`
@@ -268,7 +268,7 @@ to arrive in the queue before returning. The default value is `20s`. The maximum
 value is `20s`.
 
 [float]
-==== `s3_bucket`
+==== `bucket_arn`
 
 ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` is not set).
 
@@ -281,7 +281,7 @@ Time interval for polling listing of the S3 bucket: default to `120s`.
 [float]
 ==== `number_of_workers`
 
-Number of workers that will process the S3 objects listed. (Required when `s3_bucket` is set).
+Number of workers that will process the S3 objects listed. (Required when `bucket_arn` is set).
 
 
 
@@ -345,7 +345,7 @@ messages and process related s3 log files.
 
 When using the polling list of S3 bucket objects method be aware that if running multiple {beatname_uc} instances,
 they can list the same S3 bucket at the same time. Since the state of the ingested S3 objects is persisted
-(upon processing every page of the listing operation) in the `path.data` configuration
+(upon processing a single list operation) in the `path.data` configuration
 and multiple {beatname_uc} cannot share the same `path.data` this will produce repeated
 ingestion of the S3 object.
 Therefore, when using the polling list of S3 bucket objects method, scaling should be

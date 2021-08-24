@@ -725,7 +725,7 @@ rest: of
 
 		"inject auth headers: no headers": {
 			givenYAML: `
-outputs:
+output:
   elasticsearch:
     hosts:
       - "127.0.0.1:9201"
@@ -734,7 +734,7 @@ outputs:
     port: 5
 `,
 			expectedYAML: `
-outputs:
+output:
   elasticsearch:
     headers:
       h1: test-header
@@ -753,7 +753,7 @@ outputs:
 
 		"inject auth headers: existing headers": {
 			givenYAML: `
-outputs:
+output:
   elasticsearch:
     headers:
       sample-header: existing
@@ -764,7 +764,7 @@ outputs:
     port: 5
 `,
 			expectedYAML: `
-outputs:
+output:
   elasticsearch:
     headers:
       sample-header: existing
