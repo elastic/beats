@@ -18,6 +18,8 @@
 package monitors
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -26,7 +28,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -91,17 +92,13 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	var preprocessor processors.Processor
-	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
-		var err error
-		preprocessor, err = setupDataStream(info, settings, settings.DataStream.Dataset)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		// for monitors writing to traditional indices...
-		// TODO: Consider removing in 8.0.0
-		preprocessor = actions.NewAddFields(common.MapStr{"event.dataset": "uptime"}, true, true)
+	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("could not parse cfg for datastream %w", err)
+	}
+	datastreamProcessor, err := setupDataStream(info, settings, sf.Type)
+	if err != nil {
+		return nil, err
 	}
 
 	userProcessors, err := processors.New(settings.Processors)
@@ -122,8 +119,8 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		// 2. add processors added by the input that wants to connect
 		// 3. add locally configured processors from the 'processors' settings
 		procs := processors.NewList(nil)
-		if preprocessor != nil {
-			procs.AddProcessor(preprocessor)
+		if datastreamProcessor != nil {
+			procs.AddProcessor(datastreamProcessor)
 		}
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
@@ -143,19 +140,20 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	}, nil
 }
 
-func setupDataStream(info beat.Info, settings publishSettings, dataset string) (processors.Processor, error) {
-	var processor processors.Processor
-	if settings.DataStream != nil {
-		ds := settings.DataStream
-		if ds.Type == "" {
-			ds.Type = "synthetics"
-		}
-		if ds.Dataset == "" {
-			ds.Dataset = dataset
-		}
-		return add_data_stream.New(*ds), nil
+func setupDataStream(info beat.Info, settings publishSettings, monitorType string) (processors.Processor, error) {
+	var dataset string
+	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
+		dataset = settings.DataStream.Dataset
 	} else {
+		dataset = monitorType
+	}
 
+	ds := settings.DataStream
+	if ds.Type == "" {
+		ds.Type = "synthetics"
+	}
+	if ds.Dataset == "" {
+		ds.Dataset = dataset
 	}
 
 	if !settings.Index.IsEmpty() {
