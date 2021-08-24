@@ -42,7 +42,7 @@ Example config:
   cloudtrail:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -59,7 +59,7 @@ Example config:
   cloudwatch:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -76,7 +76,7 @@ Example config:
   ec2:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -93,7 +93,7 @@ Example config:
   elb:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -110,7 +110,7 @@ Example config:
   s3access:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -127,7 +127,7 @@ Example config:
   vpcflow:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
-    #var.bucket: 'arn:aws:s3:::mybucket'
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -144,7 +144,7 @@ Example config:
 
 *`var.queue_url`*::
 
-AWS SQS queue url (Required when `var.bucket` is not set).
+AWS SQS queue url (Required when `var.bucket_arn` is not set).
 
 *`var.visibility_timeout`*::
 
@@ -155,13 +155,13 @@ Default to be 300 seconds.
 
 Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
 
-*`var.bucket`*::
+*`var.bucket_arn`*::
 
 AWS S3 bucket ARN (Required when `var.queue_url` is not set).
 
 *`var.number_of_workers`*::
 
-Number of workers that will process the S3 objects listed (Required when `var.bucket` is set).
+Number of workers that will process the S3 objects listed (Required when `var.bucket_arn` is set).
 Use to vertically scale the input.
 
 *`var.bucket_list_interval`*::
