@@ -7,8 +7,9 @@
 package application_pool
 
 import (
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
+	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -26,24 +27,72 @@ func init() {
 // mb.BaseMetricSet because it implements all of the required mb.MetricSet
 // interface methods except for Fetch.
 type MetricSet struct {
-	*iis.MetricSet
-	log *logp.Logger
+	mb.BaseMetricSet
+	log    *logp.Logger
+	reader *Reader
+}
+
+// Config for the iis website metricset.
+type Config struct {
+	Websites []string `config:"website.name"`
+	AppPools []string `config:"application_pool.name"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := iis.NewMetricSet(base)
+	cfgwarn.Beta("The iis application_pool metricset is beta.")
+	var config Config
+	if err := base.Module().UnpackConfig(&config); err != nil {
+		return nil, err
+	}
+	// instantiate reader object
+	reader, err := NewReader(config)
 	if err != nil {
 		return nil, err
 	}
-	reader, err := NewReader(ms.Config)
-	if err != nil {
-		return nil, err
+	ms := &MetricSet{
+		BaseMetricSet: base,
+		log:           logp.NewLogger("application pool"),
+		reader:        reader,
 	}
-	ms.Reader = reader
-	return &MetricSet{
-		MetricSet: ms,
-		log:       logp.NewLogger("application pool"),
-	}, nil
+
+	return ms, nil
+}
+
+// Fetch methods implements the data gathering and data conversion to the right
+// format. It publishes the event which is then forwarded to the output. In case
+// of an error set the Error field of mb.Event or simply call report.Error().
+func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// refresh performance counter list
+	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
+	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
+	// A flag is set if the second call has been executed else refresh will fail (reader.executed)
+	if m.reader.HasExecuted() {
+		err := m.reader.InitCounters()
+		if err != nil {
+			return errors.Wrap(err, "failed retrieving counters")
+		}
+	}
+	events, err := m.reader.Read()
+	if err != nil {
+		return errors.Wrap(err, "failed reading counters")
+	}
+
+	for _, event := range events {
+		isOpen := report.Event(event)
+		if !isOpen {
+			break
+		}
+	}
+	return nil
+}
+
+// Close will be called when metricbeat is stopped, should close the query.
+func (m *MetricSet) Close() error {
+	err := m.reader.Close()
+	if err != nil {
+		return errors.Wrap(err, "failed to close pdh query")
+	}
+	return nil
 }

@@ -9,8 +9,6 @@ package application_pool
 import (
 	"strings"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/go-sysinfo"
@@ -23,14 +21,16 @@ import (
 
 const ecsProcessId = "process.pid"
 
+
+
 // Reader will contain the config options
-type AppPoolReader struct {
+type Reader struct {
 	applicationPools []ApplicationPool
 	workerProcesses  map[string]string
 	query            pdh.Query    // PDH Query
 	executed         bool         // Indicates if the query has been executed.
 	log              *logp.Logger //
-	config           iis.Config   // Metricset configuration
+	config           Config   // Metricset configuration
 }
 
 // ApplicationPool struct contains the list of applications and their worker processes
@@ -65,12 +65,12 @@ var appPoolCounters = map[string]string{
 }
 
 // newReader creates a new instance of Reader.
-func NewReader(config iis.Config) (*AppPoolReader, error) {
+func NewReader(config Config) (*Reader, error) {
 	var query pdh.Query
 	if err := query.Open(); err != nil {
 		return nil, err
 	}
-	r := &AppPoolReader{
+	r := &Reader{
 		query:           query,
 		log:             logp.NewLogger("application_pool"),
 		config:          config,
@@ -85,7 +85,7 @@ func NewReader(config iis.Config) (*AppPoolReader, error) {
 }
 
 // InitCounters will check for any new instances and add them to the counter list
-func (r *AppPoolReader) InitCounters() error {
+func (r *Reader) InitCounters() error {
 	apps, err := getApplicationPools(r.config.AppPools)
 	if err != nil {
 		return errors.Wrap(err, "failed retrieving running worker processes")
@@ -131,7 +131,7 @@ func (r *AppPoolReader) InitCounters() error {
 }
 
 // read executes a query and returns those values in an event.
-func (r *AppPoolReader) Read() ([]mb.Event, error) {
+func (r *Reader) Read() ([]mb.Event, error) {
 	if len(r.applicationPools) == 0 {
 		r.executed = true
 		return nil, nil
@@ -159,7 +159,7 @@ func (r *AppPoolReader) Read() ([]mb.Event, error) {
 	return results, nil
 }
 
-func (r *AppPoolReader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.Event {
+func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.Event {
 	workers := getProcessIds(values)
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
@@ -201,12 +201,12 @@ func (r *AppPoolReader) mapEvents(values map[string][]pdh.CounterValue) map[stri
 }
 
 // HasExecuted will chck if collect has been executed.
-func (r *AppPoolReader) HasExecuted() bool {
+func (r *Reader) HasExecuted() bool {
 	return r.executed
 }
 
 // close will close the PDH query for now.
-func (r *AppPoolReader) Close() error {
+func (r *Reader) Close() error {
 	return r.query.Close()
 }
 

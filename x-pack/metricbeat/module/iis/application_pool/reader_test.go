@@ -9,8 +9,6 @@ package application_pool
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/iis"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
@@ -18,7 +16,7 @@ import (
 
 // TestNewReaderValid should successfully instantiate the reader.
 func TestNewReaderValid(t *testing.T) {
-	var config iis.Config
+	var config Config
 	reader, err := NewReader(config)
 	assert.NoError(t, err)
 	assert.NotNil(t, reader)
@@ -30,7 +28,7 @@ func TestNewReaderValid(t *testing.T) {
 
 // TestInitCounters should successfully instantiate the reader counters.
 func TestInitCounters(t *testing.T) {
-	var config iis.Config
+	var config Config
 	reader, err := NewReader(config)
 	assert.NotNil(t, reader)
 	assert.NoError(t, err)
