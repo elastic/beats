@@ -100,6 +100,20 @@ processors:
     field: threatintel.indicator.type
     value: unknown
     if: ctx?.threatintel?.indicator?.type == null
+- foreach:
+    field: threatintel.anomali.labels
+    ignore_missing: true
+    processor:
+      append:
+        field: tags
+        value: "{{_ingest._value}}"
+        allow_duplicates: false
+- grok:
+    field: threatintel.anomali.description
+    patterns:
+      - "^%{GREEDYDATA}Source: %{GREEDYDATA:threatintel.indicator.provider}"
+    ignore_missing: true
+    ignore_failure: true
 ######################
 # Cleanup processors #
 ######################
