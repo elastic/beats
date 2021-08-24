@@ -79,7 +79,7 @@ func TestSchedJobRun(t *testing.T) {
 			}
 
 			beforeStart := time.Now()
-			sj := newSchedJob(testCase.jobCtx, s, "atype", tf)
+			sj := newSchedJob(testCase.jobCtx, s, "myid", "atype", tf)
 			startedAt := sj.run()
 
 			// This will panic in the case where we don't check s.limitSem.Acquire
@@ -114,7 +114,7 @@ func TestRecursiveForkingJob(t *testing.T) {
 		}
 	}
 
-	sj := newSchedJob(context.Background(), s, "atype", forkingTf)
+	sj := newSchedJob(context.Background(), s, "myid", "atype", forkingTf)
 
 	sj.run()
 	require.Equal(t, 4, ran.Load())

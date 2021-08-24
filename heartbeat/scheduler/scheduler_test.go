@@ -245,7 +245,7 @@ func TestSchedTaskLimits(t *testing.T) {
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {
-					sj := newSchedJob(context.Background(), s, jobType, tff)
+					sj := newSchedJob(context.Background(), s, "myid", jobType, tff)
 					sj.run()
 					wg.Done()
 				}(tf)
