@@ -104,14 +104,13 @@ stages:
     cloud:
       cloud: "mage build test"
       withModule: true       ## run the ITs only if the changeset affects a specific module.
-      dirs:                  ## run the cloud tests for the given modules.
-        - "x-pack/filebeat/input/awss3/_meta/terraform" # needed by startCloudTestEnv in order to apply terraform
-        - "x-pack/filebeat/input/awss3" # the actual dir where tests reside
+      dirs:                  ## apply terraform for the given directory.
+        - "x-pack/filebeat/input/awss3/_meta/terraform"
       when:                  ## Override the top-level when.
         parameters:
           - "awsCloudTests"
         comments:
-          - "/test x-pack/filebeat/input for aws cloud"
+          - "/test x-pack/filebeat for aws cloud"
         labels:
           - "aws"
       stage: extended
