@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 
 	"github.com/gofrs/uuid"
 
@@ -122,9 +122,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case "step/screenshot_ref":
 		fallthrough
 	case "screenshot/block":
-		add_data_stream_index.SetEventDataset(event, "browser.screenshot")
+		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case "journey/network_info":
-		add_data_stream_index.SetEventDataset(event, "browser.network")
+		add_data_stream.SetEventDataset(event, "browser.network")
 	}
 
 	if se.Id != "" {

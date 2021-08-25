@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package add_data_stream_index
+package add_data_stream
 
 import (
 	"testing"
@@ -27,24 +27,26 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestAddDataStreamIndex(t *testing.T) {
+func TestAddDataStream(t *testing.T) {
 	simpleDs := DataStream{
 		"myns",
 		"myds",
 		"mytype",
 	}
 	tests := []struct {
-		name    string
-		ds      DataStream
-		event   *beat.Event
-		want    string
-		wantErr bool
+		name           string
+		ds             DataStream
+		event          *beat.Event
+		wantIndex      string
+		wantDataStream DataStream
+		wantErr        bool
 	}{
 		{
 			"simple",
 			simpleDs,
 			&beat.Event{},
 			"mytype-myds-myns",
+			simpleDs,
 			false,
 		},
 		{
@@ -52,6 +54,7 @@ func TestAddDataStreamIndex(t *testing.T) {
 			simpleDs,
 			&beat.Event{Meta: common.MapStr{}},
 			"mytype-myds-myns",
+			simpleDs,
 			false,
 		},
 		{
@@ -61,6 +64,7 @@ func TestAddDataStreamIndex(t *testing.T) {
 				FieldMetaCustomDataset: "custom-ds",
 			}},
 			"mytype-custom-ds-myns",
+			DataStream{"myns", "custom-ds", "mytype"},
 			false,
 		},
 		{
@@ -70,6 +74,7 @@ func TestAddDataStreamIndex(t *testing.T) {
 			},
 			&beat.Event{},
 			"mytype-generic-default",
+			DataStream{"default", "generic", "mytype"},
 			false,
 		},
 	}
@@ -81,7 +86,9 @@ func TestAddDataStreamIndex(t *testing.T) {
 				t.Errorf("Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			require.Equal(t, tt.want, got.Meta[events.FieldMetaRawIndex])
+			require.Equal(t, tt.wantIndex, got.Meta[events.FieldMetaRawIndex])
+			require.Equal(t, tt.wantDataStream, got.Fields["data_stream"])
+			require.Equal(t, tt.wantDataStream.Dataset, got.Fields["event"].(common.MapStr)["dataset"])
 		})
 	}
 }

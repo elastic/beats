@@ -206,6 +206,6 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         for output in self.read_output():
             self.assertEqual(
                 output["event.dataset"],
-                "uptime",
+                output["monitor.type"],
                 "Check for event.dataset in {} failed".format(output)
             )
