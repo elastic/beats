@@ -197,6 +197,3 @@ metrics, uptime, and application performance data.
 include::{libbeat-dir}/shared/obs-apps.asciidoc[]
 
 :modulename!:
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]
