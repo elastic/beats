@@ -142,32 +142,19 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	m.enricher.Enrich(events)
-	//m.Logger().Infof("Events are %+v", events)
 	// Calculate deprecated nanocores values
 	for _, event := range events {
-		if cpuFields, ok := event["cpu"]; ok {
-			if cpuFieldsMapStr, ok := cpuFields.(common.MapStr); ok {
-				if request, ok := cpuFieldsMapStr["request"]; ok {
-					if requestFieldsMapStr, ok := request.(common.MapStr); ok {
-						if cores, ok := requestFieldsMapStr["cores"]; ok {
-							if requestCores, ok := cores.(float64); ok {
-								event.Put("cpu.request.nanocores", requestCores*nanocores)
-							}
-						}
-					}
-				}
-				if limit, ok := cpuFieldsMapStr["limit"]; ok {
-					if limitFieldsMapStr, ok := limit.(common.MapStr); ok {
-						if cores, ok := limitFieldsMapStr["cores"]; ok {
-							if limitCores, ok := cores.(float64); ok {
-								event.Put("cpu.limit.nanocores", limitCores*nanocores)
-							}
-						}
-					}
-				}
+		if request, err := event.GetValue("cpu.request.cores"); err == nil {
+			if requestCores, ok := request.(float64); ok {
+				event.Put("cpu.request.nanocores", requestCores*nanocores)
 			}
 		}
 
+		if limit, err := event.GetValue("cpu.limit.cores"); err == nil {
+			if limitCores, ok := limit.(float64); ok {
+				event.Put("cpu.limit.nanocores", limitCores*nanocores)
+			}
+		}
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		containerFields := common.MapStr{}
