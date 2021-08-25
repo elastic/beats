@@ -455,7 +455,13 @@ def tagAndPush(Map args = [:]) {
     tags << aliasVersion
   }
   // supported image flavours
-  def variants = ["", "-complete", "-oss", "-ubi8"]
+  def variants = ["", "-oss", "-ubi8"]
+
+  // only add complete variant for the elastic-agent
+  if(beatName == 'elastic-agent'){
+      variants.add("-complete")
+  }
+
   variants.each { variant ->
     tags.each { tag ->
       doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
