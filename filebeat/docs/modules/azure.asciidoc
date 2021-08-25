@@ -83,7 +83,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 `eventhub` ::
   _string_
 Is the fully managed, real-time data ingestion service.
-Default value `insights-operational-logs`.
+Default value of `insights-operational-logs` for activitylogs, `insights-logs-auditlogs` for auditlogs, and `insights-logs-signinlogs` for signinlogs. It is recommended to use a separate eventhub for each log type as the field mappings of each log type are different.
 
 `consumer_group` ::
 _string_
@@ -125,12 +125,6 @@ include::../include/gs-link.asciidoc[]
 The azure module comes with several predefined dashboards for general cloud overview, user activity and alerts. For example:
 
 image::./images/filebeat-azure-overview.png[]
-
-
-
-
-
-
 
 
 [float]

@@ -104,11 +104,16 @@ func (m *stdManager) CheckEnabled() (bool, error) {
 
 func (m *stdManager) EnsureAlias() error {
 	log := m.log
+	if !m.checkExists {
+		log.Infof("Index alias is not checked as setup.ilm.check_exists is disabled")
+		return nil
+	}
+
 	overwrite := m.Overwrite()
 	name := m.alias.Name
 
 	var exists bool
-	if m.checkExists && !overwrite {
+	if !overwrite {
 		var err error
 		exists, err = m.client.HasAlias(name)
 		if err != nil {
@@ -143,11 +148,16 @@ func (m *stdManager) EnsureAlias() error {
 
 func (m *stdManager) EnsurePolicy(overwrite bool) (bool, error) {
 	log := m.log
+	if !m.checkExists {
+		log.Infof("ILM policy is not checked as setup.ilm.check_exists is disabled")
+		return false, nil
+	}
+
 	overwrite = overwrite || m.Overwrite()
 	name := m.policy.Name
 
 	var exists bool
-	if m.checkExists && !overwrite {
+	if !overwrite {
 		var err error
 		exists, err = m.client.HasILMPolicy(name)
 		if err != nil {
