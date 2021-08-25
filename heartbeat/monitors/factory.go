@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -96,7 +97,9 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	if err != nil {
 		return nil, fmt.Errorf("could not parse cfg for datastream %w", err)
 	}
-	datastreamProcessor, err := setupDataStream(info, settings, sf.Type)
+
+	// Early stage processors for setting data_stream, event.dataset, and index to write to
+	preProcs, err := preProcessors(info, settings, sf.Type)
 	if err != nil {
 		return nil, err
 	}
@@ -114,17 +117,12 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 			meta.Put("pipeline", settings.Pipeline)
 		}
 
-		// assemble the processors. Ordering is important.
-		// 1. add support for index configuration via processor
-		// 2. add processors added by the input that wants to connect
-		// 3. add locally configured processors from the 'processors' settings
 		procs := processors.NewList(nil)
-		if datastreamProcessor != nil {
-			procs.AddProcessor(datastreamProcessor)
-		}
+
 		if lst := clientCfg.Processing.Processor; lst != nil {
 			procs.AddProcessor(lst)
 		}
+		procs.AddProcessors(*preProcs)
 		if userProcessors != nil {
 			procs.AddProcessors(*userProcessors)
 		}
@@ -140,7 +138,10 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 	}, nil
 }
 
-func setupDataStream(info beat.Info, settings publishSettings, monitorType string) (processors.Processor, error) {
+// preProcessors sets up the required event.dataset, data_stream.*, and write index processors for future event publishes.
+func preProcessors(info beat.Info, settings publishSettings, monitorType string) (procs *processors.Processors, err error) {
+	procs = processors.NewList(nil)
+
 	var dataset string
 	if settings.DataStream != nil && settings.DataStream.Dataset != "" {
 		dataset = settings.DataStream.Dataset
@@ -148,23 +149,39 @@ func setupDataStream(info beat.Info, settings publishSettings, monitorType strin
 		dataset = monitorType
 	}
 
-	ds := settings.DataStream
-	if ds.Type == "" {
-		ds.Type = "synthetics"
-	}
-	if ds.Dataset == "" {
-		ds.Dataset = dataset
+	// Always set event.dataset
+	procs.AddProcessor(actions.NewAddFields(common.MapStr{"event": common.MapStr{"dataset": dataset}}, true, true))
+
+	if settings.DataStream != nil {
+		ds := *settings.DataStream
+		if ds.Type == "" {
+			ds.Type = "synthetics"
+		}
+		if ds.Dataset == "" {
+			ds.Dataset = dataset
+		}
+
+		procs.AddProcessor(add_data_stream.New(ds))
 	}
 
 	if !settings.Index.IsEmpty() {
-		staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
-
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&settings.Index, staticFields)
+		proc, err := indexProcessor(&settings.Index, info)
 		if err != nil {
 			return nil, err
 		}
-		processor = add_formatted_index.New(timestampFormat)
+		procs.AddProcessor(proc)
 	}
-	return processor, nil
+
+	return procs, nil
+}
+
+func indexProcessor(index *fmtstr.EventFormatString, info beat.Info) (beat.Processor, error) {
+	staticFields := fmtstr.FieldsForBeat(info.Beat, info.Version)
+
+	timestampFormat, err :=
+		fmtstr.NewTimestampFormatString(index, staticFields)
+	if err != nil {
+		return nil, err
+	}
+	return add_formatted_index.New(timestampFormat), nil
 }
