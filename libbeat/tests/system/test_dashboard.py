@@ -306,13 +306,12 @@ class Test(BaseTest):
         assert os.path.isdir(os.path.join(assets_root, "visualization")) is True
 
         with open(os.path.join(assets_root, "dashboard", "Metricbeat-system-overview.json")) as dashboard_file:
-                dashboard = json.load(dashboard_file)
-                for reference in dashboard["references"]:
-                    reference_path = os.path.join(assets_root, reference["type"], reference["id"]+".json")
-                    assert os.path.isfile(reference_path)
+            dashboard = json.load(dashboard_file)
+            for reference in dashboard["references"]:
+                reference_path = os.path.join(assets_root, reference["type"], reference["id"]+".json")
+                assert os.path.isfile(reference_path)
 
         shutil.rmtree(folder_name)
-
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
