@@ -14,6 +14,9 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ZipURLSource struct {
@@ -23,12 +26,31 @@ type ZipURLSource struct {
 	Password string `config:"password" json:"password"`
 	Retries  int    `config:"retries" default:"3" json:"retries"`
 	BaseSource
-	// Etag from last successful fetch
-	etag            string
 	TargetDirectory string `config:"target_directory" json:"target_directory"`
+
+	// Include the standard HTTP Transport settings, proxy, tls, timeout, etc
+	httpcommon.HTTPTransportSettings
+	httpClient *http.Client
+
+	// Etag from last successful fetch
+	etag string
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
+
+// NewZipURLSource constructs a zip URL source, automatically validating it as go ucfg would.
+func NewZipURLSource(z ZipURLSource) (*ZipURLSource, error) {
+	zus := &z
+	err := zus.Validate()
+	return zus, err
+}
+
+func (z *ZipURLSource) Validate() (err error) {
+	// Validate and instantiate the HTTP client
+	//z.httpClient, err = z.HTTPTransportSettings.Client()
+	z.httpClient, _ = httpcommon.DefaultHTTPTransportSettings().Client()
+	return err
+}
 
 func (z *ZipURLSource) Fetch() error {
 	changed, err := checkIfChanged(z)
@@ -188,7 +210,10 @@ func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
 	if z.Username != "" && z.Password != "" {
 		req.SetBasicAuth(z.Username, z.Password)
 	}
-	return http.DefaultClient.Do(req)
+	logp.Warn("EXEC REQ %#v", req)
+	logp.Warn("EXEC REQUE %#v", z.URL)
+	logp.Warn("EXEC REQUa %#v", z)
+	return z.httpClient.Do(req)
 }
 
 func download(z *ZipURLSource, tf *os.File) (etag string, err error) {

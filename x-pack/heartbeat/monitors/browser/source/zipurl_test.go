@@ -23,11 +23,28 @@ func TestZipUrlFetchNoAuth(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus := &ZipURLSource{
+	zus, err := NewZipURLSource(ZipURLSource{
 		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
 		Folder:  "/",
 		Retries: 3,
-	}
+	})
+	require.NoError(t, err)
+	fetchAndCheckDir(t, zus)
+}
+
+func TestClientInstantiation(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus, err := NewZipURLSource(ZipURLSource{
+		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:  "/",
+		Retries: 3,
+	})
+	require.NoError(t, err)
+
+	require.NotNil(t, zus.httpClient)
+
 	fetchAndCheckDir(t, zus)
 }
 
@@ -35,13 +52,14 @@ func TestZipUrlFetchWithAuth(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus := &ZipURLSource{
+	zus, err := NewZipURLSource(ZipURLSource{
 		URL:      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
 		Folder:   "/",
 		Retries:  3,
 		Username: "testuser",
 		Password: "testpass",
-	}
+	})
+	require.NoError(t, err)
 	fetchAndCheckDir(t, zus)
 }
 
@@ -49,12 +67,13 @@ func TestZipUrlTargetDirectory(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus := &ZipURLSource{
+	zus, err := NewZipURLSource(ZipURLSource{
 		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
 		Folder:          "/",
 		Retries:         3,
 		TargetDirectory: "/tmp/synthetics/blah",
-	}
+	})
+	require.NoError(t, err)
 	fetchAndCheckDir(t, zus)
 }
 
@@ -62,12 +81,13 @@ func TestZipUrlWithSameEtag(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus := ZipURLSource{
+	zus, err := NewZipURLSource(ZipURLSource{
 		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
 		Folder:  "/",
 		Retries: 3,
-	}
-	err := zus.Fetch()
+	})
+	require.NoError(t, err)
+	err = zus.Fetch()
 	defer zus.Close()
 	require.NoError(t, err)
 
@@ -83,12 +103,13 @@ func TestZipUrlWithBadUrl(t *testing.T) {
 	_, teardown := setupTests()
 	defer teardown()
 
-	zus := ZipURLSource{
+	zus, err := NewZipURLSource(ZipURLSource{
 		URL:     "http://notahost.notadomaintoehutoeuhn",
 		Folder:  "/",
 		Retries: 2,
-	}
-	err := zus.Fetch()
+	})
+	require.NoError(t, err)
+	err = zus.Fetch()
 	defer zus.Close()
 	require.Error(t, err)
 }
