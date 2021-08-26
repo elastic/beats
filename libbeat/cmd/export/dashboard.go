@@ -18,7 +18,6 @@
 package export
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -38,6 +37,10 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
 			folder, _ := cmd.Flags().GetString("folder")
+
+			if len(folder) == 0 {
+				fatalf("-folder must be specified")
+			}
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
@@ -87,15 +90,11 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 
 				result = dashboards.DecodeExported(result)
 
-				if folder != "" {
-					err = dashboards.SaveToFolder(result, folder, client.GetVersion())
-					if err != nil {
-						fatalf("Error saving assets to folder '%s' : %+v.\n", folder, err)
-					}
-
-				} else {
-					fmt.Println(string(result))
+				err = dashboards.SaveToFolder(result, folder, client.GetVersion())
+				if err != nil {
+					fatalf("Error saving assets to folder '%s' : %+v.\n", folder, err)
 				}
+
 			}
 		},
 	}
