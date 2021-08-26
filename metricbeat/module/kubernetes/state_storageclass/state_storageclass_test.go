@@ -36,6 +36,10 @@ func TestEventMapping(t *testing.T) {
 				MetricsFile:  "./_meta/test/ksm.unit.v1.8.0",
 				ExpectedFile: "./_meta/test/ksm.unit.v1.8.0.expected",
 			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v2.0.0",
+				ExpectedFile: "./_meta/test/ksm.v2.0.0.expected",
+			},
 		},
 	)
 }
