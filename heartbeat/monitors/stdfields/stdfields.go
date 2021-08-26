@@ -26,9 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
-var ErrPluginDisabled = errors.New("monitor not loaded, plugin is disabled")
-
 type ServiceFields struct {
 	Name string `config:"name"`
 }
@@ -58,10 +55,6 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 		if mpi.Service.Name == "" {
 			mpi.Service.Name = mpi.LegacyServiceName
 		}
-	}
-
-	if !mpi.Enabled {
-		return mpi, ErrPluginDisabled
 	}
 
 	return mpi, nil
