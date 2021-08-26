@@ -245,7 +245,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 		return false
 	}
 	var hasErrors bool
-	var dashboard Dashboard
+	var dashboard DashboardObject
 	err := json.Unmarshal(d, &dashboard)
 	if err != nil {
 		fmt.Println(errors.Wrapf(err, "failed to parse dashboard from %s", file).Error())
@@ -268,8 +268,8 @@ func moduleNameFromDashboard(path string) string {
 	return filepath.Base(moduleDir)
 }
 
-// Dashboard is a dashboard
-type Dashboard struct {
+// DashboardObject is a dashboard
+type DashboardObject struct {
 	Version    string `json:"version"`
 	Type       string `json:"type"`
 	Attributes struct {
@@ -301,7 +301,7 @@ var (
 )
 
 // CheckFormat checks the format of a dashboard
-func (d *Dashboard) CheckFormat(module string) error {
+func (d *DashboardObject) CheckFormat(module string) error {
 	switch d.Type {
 	case "dashboard":
 		if d.Attributes.Description == "" {
@@ -343,7 +343,7 @@ func checkTitle(re *regexp.Regexp, title string, module string) error {
 	return nil
 }
 
-func checkDashboardIndexPattern(expectedIndex string, o *Dashboard) error {
+func checkDashboardIndexPattern(expectedIndex string, o *DashboardObject) error {
 	if objectMeta := o.Attributes.KibanaSavedObjectMeta; objectMeta != nil {
 		if index := objectMeta.SearchSourceJSON.Index; index != nil && *index != expectedIndex {
 			return errors.Errorf("unexpected index pattern reference found in object meta: `%s` in visualization `%s`", *index, o.Attributes.Title)

@@ -136,7 +136,6 @@ func exportSingleDashboard(client *kibana.Client, dashboard, folder, output stri
 	}
 
 	if folder != "" {
-		fmt.Println("FOLDER", folder)
 		return writeAssetsToFolder(client, result, folder)
 	} else if output != "" {
 		return writeDashboardToFile(result, output)
