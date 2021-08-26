@@ -52,7 +52,8 @@ func DecodeExported(exported []byte) []byte {
 			}
 			return exported
 		}
-		result = append(result, append(decodeLine(line), newLine...)...)
+		result.WriteBytes(decodeLine(line))
+		result.WriteBytes(newline)
 	}
 }
 
