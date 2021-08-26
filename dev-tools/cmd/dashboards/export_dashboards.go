@@ -47,7 +47,7 @@ func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
-	fileOutput := flag.String("output", "output.ndjson", "Output NDJSON file")
+	fileOutput := flag.String("output", "output.ndjson", "Output NDJSON file, when exporting dashboards for Beats, please use -folder instead")
 	folderOutput := flag.String("folder", "", "Output folder to save all assets to more human friendly JSON format")
 	ymlFile := flag.String("yml", "", "Path to the module.yml file containing the dashboards")
 	flag.BoolVar(&indexPattern, "indexPattern", false, "include index-pattern in output")
