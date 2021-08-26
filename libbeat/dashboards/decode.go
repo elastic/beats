@@ -40,20 +40,29 @@ var (
 
 // DecodeExported decodes an exported dashboard
 func DecodeExported(exported []byte) []byte {
-	newLine := []byte{'\n'}
 	// remove unsupported chars
-	var result []byte
+	var result bytes.Buffer
 	r := bufio.NewReader(bytes.NewReader(exported))
 	for {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return append(result, decodeLine(line)...)
+				_, err = result.Write(decodeLine(line))
+				if err != nil {
+					return exported
+				}
+				return result.Bytes()
 			}
 			return exported
 		}
-		result.WriteBytes(decodeLine(line))
-		result.WriteBytes(newline)
+		_, err = result.Write(decodeLine(line))
+		if err != nil {
+			return exported
+		}
+		_, err = result.WriteRune('\n')
+		if err != nil {
+			return exported
+		}
 	}
 }
 

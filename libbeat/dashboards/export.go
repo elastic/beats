@@ -159,6 +159,10 @@ func saveAsset(line []byte, assetRoot string) error {
 	}
 
 	out := filepath.Join(assetFolder, assetID+".json")
-	return ioutil.WriteFile(out, []byte(a.StringToPrint()), OutputPermission)
+	assetIndented, err := json.MarshalIndent(a, "", "    ")
+	if err != nil {
+		return fmt.Errorf("failed to get indented bytes: %+v", err)
+	}
+	return ioutil.WriteFile(out, assetIndented, OutputPermission)
 
 }
