@@ -167,7 +167,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 }
 
 func correctExtension(file string) string {
-	return filepath.Base(file[:len(file)-len("json")]) + "json"
+	return filepath.Base(file[:len(file)-len("json")]) + "ndjson"
 }
 
 // Close closes the client
