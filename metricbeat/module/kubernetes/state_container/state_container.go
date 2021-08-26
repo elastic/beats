@@ -142,6 +142,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	m.enricher.Enrich(events)
+
 	// Calculate deprecated nanocores values
 	for _, event := range events {
 		if request, err := event.GetValue("cpu.request.cores"); err == nil {
@@ -155,6 +156,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				event.Put("cpu.limit.nanocores", limitCores*nanocores)
 			}
 		}
+
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		containerFields := common.MapStr{}
