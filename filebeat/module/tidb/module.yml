@@ -1,0 +1,11 @@
+dashboards:
+- id: Filebeat-tidb-tidb-Dashboard
+  file: Filebeat-tidb-tidb.json
+- id: Filebeat-tidb-slowlog-Dashboard
+  file: Filebeat-tidb-slowlog.json
+- id: Filebeat-tidb-pd-Dashboard
+  file: Filebeat-tidb-pd.json
+- id: Filebeat-tidb-tikv-Dashboard
+  file: Filebeat-tidb-tikv.json
+- id: Filebeat-tidb-tiflash-Dashboard
+  file: Filebeat-tidb-tiflash.json

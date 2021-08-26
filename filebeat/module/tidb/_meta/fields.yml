@@ -1,0 +1,9 @@
+- key: tidb
+  title: "TiDB"
+  description: >
+    TiDB Module
+  fields:
+    - name: tidb
+      type: group
+      description: >
+      fields:
