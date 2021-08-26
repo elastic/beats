@@ -54,13 +54,13 @@ func errnoErr(e syscall.Errno) error {
 }
 
 var (
-	modpdh = windows.NewLazySystemDLL("pdh.dll")
-
+	modpdh                          = windows.NewLazySystemDLL("pdh.dll")
 	procPdhOpenQueryW               = modpdh.NewProc("PdhOpenQueryW")
 	procPdhAddEnglishCounterW       = modpdh.NewProc("PdhAddEnglishCounterW")
 	procPdhAddCounterW              = modpdh.NewProc("PdhAddCounterW")
 	procPdhRemoveCounter            = modpdh.NewProc("PdhRemoveCounter")
 	procPdhCollectQueryData         = modpdh.NewProc("PdhCollectQueryData")
+	procPdhCollectQueryDataEx       = modpdh.NewProc("PdhCollectQueryDataEx")
 	procPdhGetFormattedCounterValue = modpdh.NewProc("PdhGetFormattedCounterValue")
 	procPdhCloseQuery               = modpdh.NewProc("PdhCloseQuery")
 	procPdhExpandWildCardPathW      = modpdh.NewProc("PdhExpandWildCardPathW")
@@ -121,6 +121,13 @@ func _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) {
 
 func _PdhCollectQueryData(query PdhQueryHandle) (errcode error) {
 	r0, _, _ := syscall.Syscall(procPdhCollectQueryData.Addr(), 1, uintptr(query), 0, 0)
+	if r0 != 0 {
+		errcode = syscall.Errno(r0)
+	}
+	return
+}
+func _PdhCollectQueryDataEx(query PdhQueryHandle, interval uint32, event windows.Handle) (errcode error) {
+	r0, _, _ := syscall.Syscall(procPdhCollectQueryDataEx.Addr(), 1, uintptr(query), uintptr(interval), uintptr(event))
 	if r0 != 0 {
 		errcode = syscall.Errno(r0)
 	}

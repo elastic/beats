@@ -61,11 +61,11 @@ type metadataCollector struct {
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
 func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (gcp.MetadataCollectorData, error) {
-	if s.computeMetadata == nil {
-		_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceZone(resp))
-		if err != nil {
-			return gcp.MetadataCollectorData{}, err
-		}
+	// NOTE: ignoring the return value because instanceMetadata changes s.computeMetadata in place.
+	// This is probably not thread safe.
+	_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceZone(resp))
+	if err != nil {
+		return gcp.MetadataCollectorData{}, err
 	}
 
 	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
@@ -107,6 +107,7 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
+	// FIXME: remove side effect on metadataCollector instance and use return value instead
 	i, err := s.instance(ctx, instanceID, zone)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error trying to get data from instance '%s' in zone '%s'", instanceID, zone)

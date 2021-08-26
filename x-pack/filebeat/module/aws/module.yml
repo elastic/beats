@@ -1,2 +1,2 @@
 - id: Filebeat-aws-cloudtrail-Dashboard
-  file: Filebeat-aws-cloudtrail.json
+  file: Filebeat-aws-cloudtrail.ndjson
