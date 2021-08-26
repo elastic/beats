@@ -76,8 +76,9 @@ Vagrant.configure("2") do |config|
       end
 
       if node[:platform] == "centos" or node[:platform] == "ubuntu" or node[:platform] == "debian"
-        nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
         nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
+        nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+        
       end
 
       if node[:platform] == "centos"
