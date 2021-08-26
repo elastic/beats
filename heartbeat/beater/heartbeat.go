@@ -18,15 +18,13 @@
 package beater
 
 import (
+	"errors"
 	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
-	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -132,11 +130,12 @@ func (bt *Heartbeat) RunStaticMonitors(b *beat.Beat) (stop func(), err error) {
 	for _, cfg := range bt.config.Monitors {
 		created, err := factory.Create(b.Publisher, cfg)
 		if err != nil {
-			if err == stdfields.ErrPluginDisabled {
+			if errors.Is(err, monitors.ErrMonitorDisabled) {
+				logp.Info("skipping disabled monitor: %s", err)
 				continue // don't stop loading monitors just because they're disabled
 			}
 
-			return nil, errors.Wrap(err, "could not create monitor")
+			return nil, fmt.Errorf("could not create monitor: %w", err)
 		}
 
 		created.Start()
@@ -163,7 +162,7 @@ func (bt *Heartbeat) RunCentralMgmtMonitors(b *beat.Beat) {
 func (bt *Heartbeat) RunReloadableMonitors(b *beat.Beat) (err error) {
 	// Check monitor configs
 	if err := bt.monitorReloader.Check(bt.dynamicFactory); err != nil {
-		logp.Error(errors.Wrap(err, "error loading reloadable monitors"))
+		logp.Error(fmt.Errorf("error loading reloadable monitors: %w", err))
 	}
 
 	// Execute the monitor
