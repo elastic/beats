@@ -449,6 +449,10 @@ shared:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
 
+  - &agent_docker_complete_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-complete'
+
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -1000,6 +1004,18 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
@@ -1024,6 +1040,18 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_arm_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_complete_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
