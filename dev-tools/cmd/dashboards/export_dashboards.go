@@ -87,6 +87,9 @@ func main() {
 		flag.Usage()
 		log.Fatalf("Please specify a dashboard ID (-dashboard) or a manifest file (-yml)")
 	}
+	if len(*folderOutput) == 0 {
+		log.Fatalf("Please specify a target folder using -folder flag")
+	}
 
 	if len(*ymlFile) > 0 {
 		err = exportDashboardsFromYML(client, *ymlFile)
