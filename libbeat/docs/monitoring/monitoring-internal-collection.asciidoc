@@ -85,7 +85,7 @@ monitoring:
 <1> This setting identifies the {es} cluster under which the
 monitoring data for this {beatname_uc} instance will appear in the
 Stack Monitoring UI. To get a cluster's `cluster_uuid`,
-call the `GET /` API against that cluster.
+call the `GET /` API against that production cluster.
 <2> This setting identifies the hosts and port numbers of {es} nodes
 that are part of the monitoring cluster.
 <3> Specify one of `api_key` or `username`/`password`.
