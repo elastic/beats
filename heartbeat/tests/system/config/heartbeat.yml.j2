@@ -8,6 +8,10 @@ heartbeat.monitors:
   timeout: {{monitor.timeout}}
   {% endif -%}
 
+  {%- if monitor.enabled is defined %}
+  enabled: {{monitor.enabled}}
+  {% endif -%}
+
   {%- if monitor.tags is defined %}
   tags:
     {% for tag in monitor.tags -%}
