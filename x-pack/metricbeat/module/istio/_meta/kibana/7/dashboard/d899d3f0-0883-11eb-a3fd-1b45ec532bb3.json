@@ -1,0 +1,347 @@
+{
+    "attributes": {
+        "description": "Overview of the Istiod Service status",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 3,
+                    "i": "3ab7d813-a0b5-48b8-9c10-5ac962a4177c",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3ab7d813-a0b5-48b8-9c10-5ac962a4177c",
+                "panelRefName": "panel_3ab7d813-a0b5-48b8-9c10-5ac962a4177c",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "06af11e6-e026-48db-a06b-b34b402b535b",
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "06af11e6-e026-48db-a06b-b34b402b535b",
+                "panelRefName": "panel_06af11e6-e026-48db-a06b-b34b402b535b",
+                "title": "Pilot xds Push Time",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c",
+                    "w": 11,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c",
+                "panelRefName": "panel_d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c",
+                "title": "Pilot xds Pushes",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "a8e47ef0-03db-419f-890f-0880d674682c",
+                    "w": 13,
+                    "x": 35,
+                    "y": 0
+                },
+                "panelIndex": "a8e47ef0-03db-419f-890f-0880d674682c",
+                "panelRefName": "panel_a8e47ef0-03db-419f-890f-0880d674682c",
+                "title": "Pilot Inbound Updates",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "0a63d980-8d93-4ce1-b5a1-ab77e589ceec",
+                    "w": 12,
+                    "x": 0,
+                    "y": 3
+                },
+                "panelIndex": "0a63d980-8d93-4ce1-b5a1-ab77e589ceec",
+                "panelRefName": "panel_0a63d980-8d93-4ce1-b5a1-ab77e589ceec",
+                "title": "Pilot Conflict Inbound Listener",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "cd1bbc4f-95de-4156-a3ef-c091cf6402c0",
+                    "w": 12,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "cd1bbc4f-95de-4156-a3ef-c091cf6402c0",
+                "panelRefName": "panel_cd1bbc4f-95de-4156-a3ef-c091cf6402c0",
+                "title": "Pilot Proxy Queue Time",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "724f0f9e-2186-4ddd-859c-edb2649b8c0f",
+                    "w": 12,
+                    "x": 12,
+                    "y": 9
+                },
+                "panelIndex": "724f0f9e-2186-4ddd-859c-edb2649b8c0f",
+                "panelRefName": "panel_724f0f9e-2186-4ddd-859c-edb2649b8c0f",
+                "title": "Galley Validation Failed",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "32eaa989-a4f9-4d31-97cb-684f31488aa8",
+                    "w": 8,
+                    "x": 24,
+                    "y": 9
+                },
+                "panelIndex": "32eaa989-a4f9-4d31-97cb-684f31488aa8",
+                "panelRefName": "panel_32eaa989-a4f9-4d31-97cb-684f31488aa8",
+                "title": "Pods witout IP",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "6a8463fe-b7cb-4cd8-bf01-f7ca6a185178",
+                    "w": 8,
+                    "x": 32,
+                    "y": 9
+                },
+                "panelIndex": "6a8463fe-b7cb-4cd8-bf01-f7ca6a185178",
+                "panelRefName": "panel_6a8463fe-b7cb-4cd8-bf01-f7ca6a185178",
+                "title": "Pilot Virtual Services",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad",
+                    "w": 8,
+                    "x": 40,
+                    "y": 9
+                },
+                "panelIndex": "51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad",
+                "panelRefName": "panel_51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad",
+                "title": "Pilot Services",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9fbfca4c-37b5-4a1a-924e-49fc9ef2294c",
+                    "w": 10,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "9fbfca4c-37b5-4a1a-924e-49fc9ef2294c",
+                "panelRefName": "panel_9fbfca4c-37b5-4a1a-924e-49fc9ef2294c",
+                "title": "Pilot eds instances",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "e708abfa-5a95-483c-9bb2-4470ee913f3c",
+                    "w": 12,
+                    "x": 10,
+                    "y": 18
+                },
+                "panelIndex": "e708abfa-5a95-483c-9bb2-4470ee913f3c",
+                "panelRefName": "panel_e708abfa-5a95-483c-9bb2-4470ee913f3c",
+                "title": "Citadel Cert Issuane",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "d6b2845f-9582-4863-853e-ab753f3d763e",
+                    "w": 11,
+                    "x": 22,
+                    "y": 18
+                },
+                "panelIndex": "d6b2845f-9582-4863-853e-ab753f3d763e",
+                "panelRefName": "panel_d6b2845f-9582-4863-853e-ab753f3d763e",
+                "title": "Pilot xds endpoints",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "3d0dec37-26c3-490b-a45f-48b6d1baa160",
+                    "w": 15,
+                    "x": 33,
+                    "y": 18
+                },
+                "panelIndex": "3d0dec37-26c3-490b-a45f-48b6d1baa160",
+                "panelRefName": "panel_3d0dec37-26c3-490b-a45f-48b6d1baa160",
+                "title": "Pilot xds expired",
+                "type": "visualization",
+                "version": "7.9.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Istio] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d899d3f0-0883-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "19a8b9c0-0c7f-11eb-a3fd-1b45ec532bb3",
+            "name": "3ab7d813-a0b5-48b8-9c10-5ac962a4177c:panel_3ab7d813-a0b5-48b8-9c10-5ac962a4177c",
+            "type": "visualization"
+        },
+        {
+            "id": "b5b3abb0-087c-11eb-a3fd-1b45ec532bb3",
+            "name": "06af11e6-e026-48db-a06b-b34b402b535b:panel_06af11e6-e026-48db-a06b-b34b402b535b",
+            "type": "visualization"
+        },
+        {
+            "id": "f858c200-087e-11eb-a3fd-1b45ec532bb3",
+            "name": "d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c:panel_d9a49bf0-f88b-4d4f-a1e2-74fbd482f77c",
+            "type": "visualization"
+        },
+        {
+            "id": "aa997510-087d-11eb-a3fd-1b45ec532bb3",
+            "name": "a8e47ef0-03db-419f-890f-0880d674682c:panel_a8e47ef0-03db-419f-890f-0880d674682c",
+            "type": "visualization"
+        },
+        {
+            "id": "d62a1e60-0881-11eb-a3fd-1b45ec532bb3",
+            "name": "0a63d980-8d93-4ce1-b5a1-ab77e589ceec:panel_0a63d980-8d93-4ce1-b5a1-ab77e589ceec",
+            "type": "visualization"
+        },
+        {
+            "id": "dd1392f0-07d8-11eb-a3fd-1b45ec532bb3",
+            "name": "cd1bbc4f-95de-4156-a3ef-c091cf6402c0:panel_cd1bbc4f-95de-4156-a3ef-c091cf6402c0",
+            "type": "visualization"
+        },
+        {
+            "id": "98b01f00-087f-11eb-a3fd-1b45ec532bb3",
+            "name": "724f0f9e-2186-4ddd-859c-edb2649b8c0f:panel_724f0f9e-2186-4ddd-859c-edb2649b8c0f",
+            "type": "visualization"
+        },
+        {
+            "id": "4275f710-0882-11eb-a3fd-1b45ec532bb3",
+            "name": "32eaa989-a4f9-4d31-97cb-684f31488aa8:panel_32eaa989-a4f9-4d31-97cb-684f31488aa8",
+            "type": "visualization"
+        },
+        {
+            "id": "96bfe060-0882-11eb-a3fd-1b45ec532bb3",
+            "name": "6a8463fe-b7cb-4cd8-bf01-f7ca6a185178:panel_6a8463fe-b7cb-4cd8-bf01-f7ca6a185178",
+            "type": "visualization"
+        },
+        {
+            "id": "6cfbe3f0-0882-11eb-a3fd-1b45ec532bb3",
+            "name": "51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad:panel_51ecc2f8-3c3f-4a80-b4b6-b52db10e68ad",
+            "type": "visualization"
+        },
+        {
+            "id": "12cdcce0-0882-11eb-a3fd-1b45ec532bb3",
+            "name": "9fbfca4c-37b5-4a1a-924e-49fc9ef2294c:panel_9fbfca4c-37b5-4a1a-924e-49fc9ef2294c",
+            "type": "visualization"
+        },
+        {
+            "id": "506c8490-087f-11eb-a3fd-1b45ec532bb3",
+            "name": "e708abfa-5a95-483c-9bb2-4470ee913f3c:panel_e708abfa-5a95-483c-9bb2-4470ee913f3c",
+            "type": "visualization"
+        },
+        {
+            "id": "e5f3e870-0882-11eb-a3fd-1b45ec532bb3",
+            "name": "d6b2845f-9582-4863-853e-ab753f3d763e:panel_d6b2845f-9582-4863-853e-ab753f3d763e",
+            "type": "visualization"
+        },
+        {
+            "id": "0ed17c80-0883-11eb-a3fd-1b45ec532bb3",
+            "name": "3d0dec37-26c3-490b-a45f-48b6d1baa160:panel_3d0dec37-26c3-490b-a45f-48b6d1baa160",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:32.143Z",
+    "version": "WzM5NjEsMV0="
+}

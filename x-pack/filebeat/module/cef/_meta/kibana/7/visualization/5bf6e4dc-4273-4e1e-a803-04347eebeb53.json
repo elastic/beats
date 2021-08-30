@@ -1,0 +1,106 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes by User Names [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "/Informational": "#7EB26D",
+                    "/Informational/Warning": "#EF843C",
+                    "/Success": "#64B0C8",
+                    "Anti-Virus": "#B7DBAB",
+                    "Host-based IDS/IPS": "#629E51",
+                    "Log Consolidator": "#E0F9D7",
+                    "Operating System": "#3F6833",
+                    "Recon": "#BF1B00",
+                    "Security Mangement": "#CFFAFF"
+                },
+                "legendOpen": true
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "exclude": "Network-based IDS/IPS",
+                        "field": "cef.extensions.categoryDeviceType",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "cef.extensions.categoryOutcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "field": "destination.user.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": false,
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Outcomes by User Names [Filebeat CEF]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5bf6e4dc-4273-4e1e-a803-04347eebeb53",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "5cede2d3-20fe-4140-add4-4c4f841b71a2",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:37.252Z",
+    "version": "WzQ3MjcsMV0="
+}

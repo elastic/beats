@@ -1,0 +1,338 @@
+{
+    "attributes": {
+        "description": "Suspicious network activity overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "lucene",
+                    "query": "*"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "Destination Addresses": "#E0752D",
+                            "Destination Ports": "#E24D42"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 32,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 16,
+                    "x": 0,
+                    "y": 40
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 16,
+                    "x": 16,
+                    "y": 40
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "/Attempt": "#0A50A1",
+                            "/Failure": "#BF1B00",
+                            "/Success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9",
+                    "w": 16,
+                    "x": 32,
+                    "y": 28
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "11",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "12",
+                    "w": 24,
+                    "x": 0,
+                    "y": 52
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "13",
+                    "w": 24,
+                    "x": 24,
+                    "y": 52
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "14",
+                    "w": 16,
+                    "x": 32,
+                    "y": 40
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "15",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "16",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 50": "rgb(255,255,204)",
+                            "100 - 200": "rgb(253,141,60)",
+                            "200 - 300": "rgb(227,27,28)",
+                            "300 - 400": "rgb(128,0,38)",
+                            "50 - 100": "rgb(254,217,118)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "display": "Off",
+            "pause": false,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] Network Suspicious Activity Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "db1e1aca-279e-4ecc-b84e-fe58644f7619",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "fa8b26c1-6973-4381-adb3-bcde0d03a520",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "82f3fae3-1189-4f04-8ea5-47fde1d2e7b1",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "f03d734b-b85c-4e99-9c0e-9c89716a81f3",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "9bef4db9-a8b2-4be8-b2b0-6ea02fab424d",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "fff249b2-18b6-4b48-bcf7-dd4595d111e7",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "d02dd523-ce91-40e9-9209-83797f80ed45",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "589fec8c-336e-4122-8fef-a450bddf84f6",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "86bd5f13-ca6b-43fa-b209-54e7460344bb",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "1204cf27-05e0-4905-bfa1-688aaaaaa840",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "677891a1-90c4-4273-b126-f0e54689bd76",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "01c3618c-9962-4fe9-b9c5-f73dfecc6eba",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "33747d52-ec4c-4d91-86d8-fbdf9b9c82db",
+            "name": "17:panel_17",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:40.331Z",
+    "version": "WzQ3NjQsMV0="
+}
