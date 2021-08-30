@@ -13,9 +13,9 @@ import (
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/kolide/osquery-go"
-	kconfig "github.com/kolide/osquery-go/plugin/config"
-	klogger "github.com/kolide/osquery-go/plugin/logger"
+	"github.com/osquery/osquery-go"
+	kconfig "github.com/osquery/osquery-go/plugin/config"
+	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -26,6 +26,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
@@ -124,7 +125,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
+	inputConfigCh := config.WatchInputs(ctx, bt.log)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
@@ -164,7 +165,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 			g.Go(func() error {
 				err := bt.runOsquery(ctx, b, osq, inputCh)
 				if err != nil {
-					bt.log.Errorf("Failed to run osqueryd: %v", err)
+					if errors.Is(err, context.Canceled) {
+						bt.log.Errorf("Osquery exited: %v", err)
+					} else {
+						bt.log.Errorf("Failed to run osquery: %v", err)
+					}
 				}
 				return err
 			})
@@ -234,7 +239,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	g.Go(func() error {
 		err := osq.Run(ctx)
 		if err != nil {
-			bt.log.Errorf("Failed to run osqueryd: %v", err)
+			if errors.Is(err, context.Canceled) {
+				bt.log.Errorf("Osqueryd exited: %v", err)
+			} else {
+				bt.log.Errorf("Failed to run osqueryd: %v", err)
+			}
 		} else {
 			// When osqueryd is killed for example there is no error returned
 			// but we can't continue running. Exiting.
@@ -330,33 +339,28 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 }
 
 func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
-	sql, ok := configPlugin.ResolveName(res.Name)
+	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
-		bt.log.Errorf("failed to resolve query name: %s", res.Name)
+		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
+		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
+		// and the API key would not have permissions for that namespaces datastream to create the index
 		return
 	}
 
-	hits, err := cli.ResolveResult(ctx, sql, res.Hits)
+	qi, ok := configPlugin.LookupQueryInfo(res.Name)
+	if !ok {
+		bt.log.Errorf("failed to lookup query info: %s", res.Name)
+		return
+	}
+
+	hits, err := cli.ResolveResult(ctx, qi.QueryConfig.Query, res.Hits)
 	if err != nil {
-		bt.log.Errorf("failed to resolve query types: %s", res.Name)
+		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
 		return
-	}
-
-	// Map to ECS
-	var ecsFields []common.MapStr
-	mapping, ok := configPlugin.LookupECSMapping(res.Name)
-	if ok && len(mapping) > 0 {
-		ecsFields = make([]common.MapStr, len(hits))
-		for i, hit := range hits {
-			ecsFields[i] = common.MapStr(mapping.Map(hit))
-		}
-	} else {
-		// ECS mapping is optional, continue
-		bt.log.Debugf("ECS mapping is not found for query name: %s", res.Name)
 	}
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, ecsFields, nil)
+	bt.publishEvents(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -437,14 +441,16 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	}
 }
 
-func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, ecsFields []common.MapStr, reqData interface{}) {
+func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	for i, hit := range hits {
+
+	for _, hit := range hits {
 		var fields common.MapStr
 
-		if len(ecsFields) > i {
-			fields = ecsFields[i]
+		if len(ecsm) > 0 {
+			// Map ECS fields if the mapping is provided
+			fields = common.MapStr(ecsm.Map(hit))
 		} else {
 			fields = common.MapStr{}
 		}

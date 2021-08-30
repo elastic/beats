@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
+	"path/filepath"
 	"time"
 
 	"github.com/joeshaw/multierror"
@@ -33,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var importAPI = "/api/kibana/dashboards/import"
+var importAPI = "/api/saved_objects/_import"
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
@@ -90,6 +91,12 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
+	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	}
+
+	loader.statusMsg("Importing index file from %s", file)
+
 	// read json file
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
@@ -107,15 +114,20 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 
 // ImportIndex imports the passed index pattern to Kibana
 func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
+	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	}
+
 	var errs multierror.Errors
 
 	params := url.Values{}
-	params.Set("force", "true") //overwrite the existing dashboards
+	params.Set("overwrite", "true")
 
 	if err := ReplaceIndexInIndexPattern(loader.config.Index, pattern); err != nil {
 		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
 	}
-	if err := loader.client.ImportJSON(importAPI, params, pattern); err != nil {
+
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
 		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
 	}
 	return errs.Err()
@@ -123,29 +135,39 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
+	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	}
+
+	loader.statusMsg("Importing dashboard from %s", file)
+
 	params := url.Values{}
-	params.Set("force", "true")            //overwrite the existing dashboards
-	params.Add("exclude", "index-pattern") //don't import the index pattern from the dashboards
+	params.Set("overwrite", "true")
 
 	// read json file
-	reader, err := ioutil.ReadFile(file)
+	content, err := ioutil.ReadFile(file)
 	if err != nil {
 		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
-	}
-	var content common.MapStr
-	err = json.Unmarshal(reader, &content)
-	if err != nil {
-		return fmt.Errorf("fail to unmarshal the dashboard content from file %s: %v", file, err)
 	}
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 
-	content, err = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+
+	var obj common.MapStr
+	err = json.Unmarshal(content, &obj)
 	if err != nil {
-		return fmt.Errorf("fail to replace the hostname in dashboard %s: %v", file, err)
+		return err
 	}
 
-	return loader.client.ImportJSON(importAPI, params, content)
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), obj.String()); err != nil {
+		return fmt.Errorf("error dashboard asset: %+v", err)
+	}
+	return nil
+}
+
+func correctExtension(file string) string {
+	return filepath.Base(file[:len(file)-len("json")]) + "ndjson"
 }
 
 // Close closes the client

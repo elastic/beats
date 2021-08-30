@@ -16,9 +16,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi"
 	"github.com/aws/aws-sdk-go-v2/service/resourcegroupstaggingapi/resourcegroupstaggingapiiface"
 	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
 )
 
 // GetStartTimeEndTime function uses durationString to create startTime and endTime for queries.
@@ -29,11 +26,14 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 		endTime = endTime.Add(latency * -1)
 	}
 
-	// Set startTime double the period plus one second earlier than the endTime in order to
-	// make sure GetMetricDataRequest gets the latest data point for each metric. The plus
-	// one second is to make sure the startTime of the next collect period is one second later
-	// than the endTime of last collection period. This is to avoid collecting duplicate data.
-	return endTime.Add(period*-2 + time.Second), endTime
+	// Set startTime to be one period earlier than the endTime. If metrics are
+	// not being collected, use latency config parameter to offset the startTime
+	// and endTime.
+	startTime := endTime.Add(period * -1)
+	// Defining duration
+	d := 60 * time.Second
+	// Calling Round() method
+	return startTime.Round(d), endTime.Round(d)
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -96,11 +96,6 @@ func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cl
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil
-}
-
-// EventMapping maps data in input to a predefined schema.
-func EventMapping(input map[string]interface{}, schema s.Schema) (common.MapStr, error) {
-	return schema.Apply(input, s.FailOnRequired)
 }
 
 // CheckTimestampInArray checks if input timestamp exists in timestampArray and if it exists, return the position.

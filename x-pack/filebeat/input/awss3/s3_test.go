@@ -5,257 +5,266 @@
 package awss3
 
 import (
-	"bytes"
 	"context"
-	"errors"
-	"io/ioutil"
-	"path/filepath"
-	"strings"
 	"testing"
+	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
+
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return newS3Event(filename), newS3GetObjectResponse(filename, data, contentType)
-}
-
-func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectResponse {
-	r := bytes.NewReader(data)
-	contentLen := int64(r.Len())
-	resp := &s3.GetObjectResponse{
-		GetObjectOutput: &s3.GetObjectOutput{
-			Body:          ioutil.NopCloser(r),
-			ContentLength: &contentLen,
-			ContentType:   &contentType,
-		},
-	}
-	switch strings.ToLower(filepath.Ext(filename)) {
-	case ".gz":
-		gzipEncoding := "gzip"
-		resp.ContentEncoding = &gzipEncoding
-	}
-	return resp
-}
-
-func TestS3ObjectProcessor(t *testing.T) {
+func TestS3Poller(t *testing.T) {
 	logp.TestingSetup()
+	const bucket = "bucket"
+	const numberOfWorkers = 5
+	const pollInterval = 2 * time.Second
+	const testTimeout = 1 * time.Second
 
-	t.Run("download text/plain file", func(t *testing.T) {
-		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
-	})
-
-	t.Run("multiline content", func(t *testing.T) {
-		sel := fileSelectorConfig{ReaderConfig: readerConfig{}}
-		sel.ReaderConfig.InitDefaults()
-
-		// Unfortunately the config structs for the parser package are not
-		// exported to use config parsing.
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
-			"parsers": []map[string]interface{}{
-				{
-					"multiline": map[string]interface{}{
-						"pattern": "^<Event",
-						"negate":  true,
-						"match":   "after",
-					},
-				},
-			},
-		})
-		require.NoError(t, cfg.Unpack(&sel.ReaderConfig.Parsers))
-
-		testProcessS3Object(t, "testdata/multiline.txt", "text/plain", 2, sel)
-	})
-
-	t.Run("application/json content-type", func(t *testing.T) {
-		testProcessS3Object(t, "testdata/log.json", "application/json", 2)
-	})
-
-	t.Run("application/x-ndjson content-type", func(t *testing.T) {
-		testProcessS3Object(t, "testdata/log.ndjson", "application/x-ndjson", 2)
-	})
-
-	t.Run("configured content-type", func(t *testing.T) {
-		sel := fileSelectorConfig{ReaderConfig: readerConfig{ContentType: contentTypeJSON}}
-		testProcessS3Object(t, "testdata/multiline.json", "application/octet-stream", 2, sel)
-	})
-
-	t.Run("uncompress application/zip content", func(t *testing.T) {
-		testProcessS3Object(t, "testdata/multiline.json.gz", "application/json", 2)
-	})
-
-	t.Run("unparsable json", func(t *testing.T) {
-		testProcessS3ObjectError(t, "testdata/invalid.json", "application/json", 0)
-	})
-
-	t.Run("split array", func(t *testing.T) {
-		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: "Events"}}
-		testProcessS3Object(t, "testdata/events-array.json", "application/json", 2, sel)
-	})
-
-	t.Run("split array error missing key", func(t *testing.T) {
-		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: "Records"}}
-		testProcessS3ObjectError(t, "testdata/events-array.json", "application/json", 0, sel)
-	})
-
-	t.Run("events have a unique repeatable _id", func(t *testing.T) {
-		// Hash of bucket ARN, object key, object versionId, and log offset.
-		events := testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
-
-		const idFieldName = "@metadata._id"
-		for _, event := range events {
-			v, _ := event.GetValue(idFieldName)
-			if assert.NotNil(t, v, idFieldName+" is nil") {
-				_id, ok := v.(string)
-				if assert.True(t, ok, idFieldName+" is not a string") {
-					assert.NotEmpty(t, _id, idFieldName+" is empty")
-				}
-			}
+	t.Run("Poll success", func(t *testing.T) {
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		store, err := storeReg.Get("test")
+		if err != nil {
+			t.Fatalf("Failed to access store: %v", err)
 		}
-	})
 
-	t.Run("download error", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
-		mockS3API := NewMockS3API(ctrl)
+		mockAPI := NewMockS3API(ctrl)
+		mockPager := NewMockS3Pager(ctrl)
 		mockPublisher := NewMockBeatClient(ctrl)
 
-		s3Event := newS3Event("log.txt")
+		gomock.InOrder(
+			mockAPI.EXPECT().
+				ListObjectsPaginator(gomock.Eq(bucket)).
+				Times(1).
+				DoAndReturn(func(_ string) s3Pager {
+					return mockPager
+				}),
+		)
 
-		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+		// Initial Poll
+		mockPager.EXPECT().
+			Next(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context) bool {
+				return true
+			})
+
+		mockPager.EXPECT().
+			CurrentPage().
+			Times(1).
+			DoAndReturn(func() *s3.ListObjectsOutput {
+				return &s3.ListObjectsOutput{
+					Contents: []s3.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag2"),
+							Key:          aws.String("key2"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag3"),
+							Key:          aws.String("key3"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag4"),
+							Key:          aws.String("key4"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag5"),
+							Key:          aws.String("key5"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}
+			})
+
+		mockPager.EXPECT().
+			Next(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context) bool {
+				return false
+			})
+
+		mockPager.EXPECT().
+			Err().
+			Times(1).
+			DoAndReturn(func() error {
+				return nil
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
-		ack := newEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
-		require.Error(t, err)
-		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "region", numberOfWorkers, pollInterval)
+		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
+		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})
-}
 
-func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
-	return _testProcessS3Object(t, file, contentType, numEvents, false, selectors)
-}
-
-func testProcessS3ObjectError(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
-	return _testProcessS3Object(t, file, contentType, numEvents, true, selectors)
-}
-
-func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int, expectErr bool, selectors []fileSelectorConfig) []beat.Event {
-	t.Helper()
-
-	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
-	defer cancel()
-
-	ctrl, ctx := gomock.WithContext(ctx, t)
-	defer ctrl.Finish()
-	mockS3API := NewMockS3API(ctrl)
-	mockPublisher := NewMockBeatClient(ctrl)
-
-	s3Event, s3Resp := newS3Object(t, file, contentType)
-	var events []beat.Event
-	gomock.InOrder(
-		mockS3API.EXPECT().
-			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
-			Return(s3Resp, nil),
-		mockPublisher.EXPECT().
-			Publish(gomock.Any()).
-			Do(func(event beat.Event) { events = append(events, event) }).
-			Times(numEvents),
-	)
-
-	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors)
-	ack := newEventACKTracker(ctx)
-	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
-
-	if !expectErr {
-		require.NoError(t, err)
-		assert.Equal(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.pendingACKs)
-	} else {
-		require.Error(t, err)
-	}
-
-	return events
-}
-
-// TestNewMockS3Pager verifies that newMockS3Pager is behaving similar to
-// the AWS S3 Pager.
-func TestNewMockS3Pager(t *testing.T) {
-	fakeObjects := []s3.Object{
-		{Key: awssdk.String("foo")},
-		{Key: awssdk.String("bar")},
-		{Key: awssdk.String("baz")},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
-	defer cancel()
-
-	ctrl, ctx := gomock.WithContext(ctx, t)
-	defer ctrl.Finish()
-	mockS3Pager := newMockS3Pager(ctrl, 1, fakeObjects)
-	mockS3API := NewMockS3API(ctrl)
-	mockS3API.EXPECT().ListObjectsPaginator(gomock.Any()).Return(mockS3Pager)
-
-	// Test the mock.
-	var keys []string
-	pager := mockS3API.ListObjectsPaginator("nombre")
-	for pager.Next(ctx) {
-		for _, s3Obj := range pager.CurrentPage().Contents {
-			keys = append(keys, *s3Obj.Key)
+	t.Run("retry after Poll error", func(t *testing.T) {
+		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
+		store, err := storeReg.Get("test")
+		if err != nil {
+			t.Fatalf("Failed to access store: %v", err)
 		}
-	}
-	if err := pager.Err(); err != nil {
-		t.Fatal(err)
-	}
 
-	assert.Equal(t, []string{"foo", "bar", "baz"}, keys)
-}
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout+pollInterval)
+		defer cancel()
 
-// newMockS3Pager returns a s3Pager that paginates the given s3Objects based on
-// the specified page size. It never returns an error.
-func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []s3.Object) *MockS3Pager {
-	mockS3Pager := NewMockS3Pager(ctrl)
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockS3API(ctrl)
+		mockPagerFirst := NewMockS3Pager(ctrl)
+		mockPagerSecond := NewMockS3Pager(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
 
-	currentPage := -1
-	numPages := len(s3Objects) / pageSize
-	if len(s3Objects)%pageSize != 0 {
-		numPages++
-	}
+		gomock.InOrder(
+			// Initial ListObjectPaginator gets an error.
+			mockAPI.EXPECT().
+				ListObjectsPaginator(gomock.Eq(bucket)).
+				Times(1).
+				DoAndReturn(func(_ string) s3Pager {
+					return mockPagerFirst
+				}),
+			// After waiting for pollInterval, it retries.
+			mockAPI.EXPECT().
+				ListObjectsPaginator(gomock.Eq(bucket)).
+				Times(1).
+				DoAndReturn(func(_ string) s3Pager {
+					return mockPagerSecond
+				}),
+		)
 
-	mockS3Pager.EXPECT().Next(gomock.Any()).Times(numPages + 1).DoAndReturn(func(_ context.Context) interface{} {
-		currentPage++
-		next := currentPage*pageSize < len(s3Objects)
-		return next
+		// Initial Next gets an error.
+		mockPagerFirst.EXPECT().
+			Next(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context) bool {
+				return false
+			})
+		mockPagerFirst.EXPECT().
+			Err().
+			Times(1).
+			DoAndReturn(func() error {
+				return errFakeConnectivityFailure
+			})
+
+		// After waiting for pollInterval, it retries.
+		mockPagerSecond.EXPECT().
+			Next(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context) bool {
+				return true
+			})
+		mockPagerSecond.EXPECT().
+			CurrentPage().
+			Times(1).
+			DoAndReturn(func() *s3.ListObjectsOutput {
+				return &s3.ListObjectsOutput{
+					Contents: []s3.Object{
+						{
+							ETag:         aws.String("etag1"),
+							Key:          aws.String("key1"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag2"),
+							Key:          aws.String("key2"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag3"),
+							Key:          aws.String("key3"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag4"),
+							Key:          aws.String("key4"),
+							LastModified: aws.Time(time.Now()),
+						},
+						{
+							ETag:         aws.String("etag5"),
+							Key:          aws.String("key5"),
+							LastModified: aws.Time(time.Now()),
+						},
+					},
+				}
+			})
+
+		mockPagerSecond.EXPECT().
+			Next(gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context) bool {
+				return false
+			})
+
+		mockPagerSecond.EXPECT().
+			Err().
+			Times(1).
+			DoAndReturn(func() error {
+				return nil
+			})
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			Return(nil, errFakeConnectivityFailure)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "region", numberOfWorkers, pollInterval)
+		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
+		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})
-	mockS3Pager.EXPECT().CurrentPage().AnyTimes().DoAndReturn(func() *s3.ListObjectsOutput {
-		startIdx := currentPage * pageSize
-		endIdx := currentPage + 1*pageSize
-		if endIdx > len(s3Objects) {
-			endIdx = len(s3Objects)
-		}
-		return &s3.ListObjectsOutput{
-			Contents: s3Objects[startIdx:endIdx],
-		}
-	})
-	mockS3Pager.EXPECT().Err().Return(nil)
-
-	return mockS3Pager
 }

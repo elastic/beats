@@ -1,0 +1,77 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "RDS Database Connections [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "10bc2760-d978-11e9-aff2-99c15d8b7da1"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f8196690-921a-11e9-badf-4b42bd1ef543"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hide_in_legend": 0,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Database Connections",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.rds.database_connections",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.rds.db_instance.identifier",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "RDS Database Connections [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "17fcda50-921b-11e9-aa19-159bf182e06f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:34.757Z",
+    "version": "WzM0MTEsMV0="
+}

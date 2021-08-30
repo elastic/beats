@@ -1,0 +1,167 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlight": {
+                    "fields": {
+                        "*": {}
+                    },
+                    "fragment_size": 2147483647,
+                    "post_tags": [
+                        "@/kibana-highlighted-field@"
+                    ],
+                    "pre_tags": [
+                        "@kibana-highlighted-field@"
+                    ],
+                    "require_field_match": false
+                },
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.module:docker AND metricset.name:cpu"
+                }
+            }
+        },
+        "title": "CPU usage [Metricbeat Docker] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Total CPU time",
+                        "field": "docker.cpu.total.pct",
+                        "percents": [
+                            75
+                        ]
+                    },
+                    "schema": "metric",
+                    "type": "percentiles"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Container name",
+                        "field": "container.name",
+                        "order": "desc",
+                        "orderBy": "1.75",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "defaultYExtents": false,
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "interpolate": "linear",
+                "legendPosition": "top",
+                "mode": "stacked",
+                "scale": "linear",
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "area",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "setYExtents": false,
+                "shareYAxis": true,
+                "smoothLines": true,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ],
+                "yAxis": {}
+            },
+            "title": "CPU usage [Metricbeat Docker] ECS",
+            "type": "area"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Docker-CPU-usage-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:07.529Z",
+    "version": "WzM3NjIsMV0="
+}

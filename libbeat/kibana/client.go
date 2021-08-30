@@ -24,15 +24,24 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
+	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"path"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+)
+
+var (
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	MinimumRequiredVersionSavedObjects = common.MustNewVersion("7.14.0")
 )
 
 type Connection struct {
@@ -60,19 +69,25 @@ func addToURL(_url, _path string, params url.Values) string {
 
 func extractError(result []byte) error {
 	var kibanaResult struct {
-		Objects []struct {
-			Error struct {
-				Message string
+		Message    string
+		Attributes struct {
+			Objects []struct {
+				Id    string
+				Error struct {
+					Message string
+				}
 			}
 		}
 	}
 	if err := json.Unmarshal(result, &kibanaResult); err != nil {
-		return errors.Wrap(err, "parsing kibana response")
+		return err
 	}
-	for _, o := range kibanaResult.Objects {
-		if o.Error.Message != "" {
-			return errors.New(kibanaResult.Objects[0].Error.Message)
+	var errs multierror.Errors
+	if kibanaResult.Message != "" {
+		for _, err := range kibanaResult.Attributes.Objects {
+			errs = append(errs, fmt.Errorf("id: %s, message: %s", err.Id, err.Error.Message))
 		}
+		return fmt.Errorf("%s: %+v", kibanaResult.Message, errs.Err())
 	}
 	return nil
 }
@@ -172,7 +187,9 @@ func (conn *Connection) Request(method, extraPath string,
 		return 0, nil, fmt.Errorf("fail to read response %s", err)
 	}
 
-	retError = extractError(result)
+	if resp.StatusCode >= 300 {
+		retError = extractError(result)
+	}
 	return resp.StatusCode, result, retError
 }
 
@@ -200,7 +217,12 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 
 	addHeaders(req.Header, conn.Headers)
 	addHeaders(req.Header, headers)
-	req.Header.Set("Content-Type", "application/json")
+
+	contentType := req.Header.Get("Content-Type")
+	contentType, _, _ = mime.ParseMediaType(contentType)
+	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
+		req.Header.Set("Content-Type", "application/json")
+	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("kbn-xsrf", "1")
 
@@ -269,33 +291,48 @@ func (client *Client) readVersion() error {
 // IgnoreVersion was set when creating the client.
 func (client *Client) GetVersion() common.Version { return client.Version }
 
-func (client *Client) ImportJSON(url string, params url.Values, jsonBody map[string]interface{}) error {
+func (client *Client) ImportMultiPartFormFile(url string, params url.Values, filename string, contents string) error {
+	buf := &bytes.Buffer{}
+	w := multipart.NewWriter(buf)
 
-	body, err := json.Marshal(jsonBody)
-	if err != nil {
-		client.log.Debugf("Failed to json encode body (%v): %#v", err, jsonBody)
-		return fmt.Errorf("fail to marshal the json content: %v", err)
-	}
+	pHeaders := textproto.MIMEHeader{}
+	pHeaders.Add("Content-Disposition", fmt.Sprintf(`form-data; name="file"; filename="%s"`, filename))
+	pHeaders.Add("Content-Type", "application/ndjson")
 
-	statusCode, response, err := client.Connection.Request("POST", url, params, nil, bytes.NewBuffer(body))
+	p, err := w.CreatePart(pHeaders)
 	if err != nil {
-		return fmt.Errorf("%v. Response: %s", err, truncateString(response))
+		return fmt.Errorf("failed to create multipart writer for payload: %+v", err)
 	}
-	if statusCode >= 300 {
+	_, err = io.Copy(p, strings.NewReader(contents))
+	if err != nil {
+		return fmt.Errorf("failed to copy contents of the object: %+v", err)
+	}
+	w.Close()
+
+	headers := http.Header{}
+	headers.Add("Content-Type", w.FormDataContentType())
+
+	statusCode, response, err := client.Connection.Request("POST", url, params, headers, buf)
+	if err != nil || statusCode >= 300 {
 		return fmt.Errorf("returned %d to import file: %v. Response: %s", statusCode, err, response)
 	}
+
+	client.log.Debugf("Imported multipart file to %s with params %v", url, params)
 	return nil
 }
 
 func (client *Client) Close() error { return nil }
 
 // GetDashboard returns the dashboard with the given id with the index pattern removed
-func (client *Client) GetDashboard(id string) (common.MapStr, error) {
-	params := url.Values{}
-	params.Add("dashboard", id)
-	_, response, err := client.Request("GET", "/api/kibana/dashboards/export", params, nil, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error exporting dashboard: %+v", err)
+func (client *Client) GetDashboard(id string) ([]byte, error) {
+	if client.Version.LessThan(MinimumRequiredVersionSavedObjects) {
+		return nil, fmt.Errorf("Kibana version must be at least " + MinimumRequiredVersionSavedObjects.String())
+	}
+
+	body := fmt.Sprintf(`{"objects": [{"type": "dashboard", "id": "%s" }], "includeReferencesDeep": true, "excludeExportDetails": true}`, id)
+	statusCode, response, err := client.Request("POST", "/api/saved_objects/_export", nil, nil, strings.NewReader(body))
+	if err != nil || statusCode >= 300 {
+		return nil, fmt.Errorf("error exporting dashboard: %+v, code: %d", err, statusCode)
 	}
 
 	result, err := RemoveIndexPattern(response)

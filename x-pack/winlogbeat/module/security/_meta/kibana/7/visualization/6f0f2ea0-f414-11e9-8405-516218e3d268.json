@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Group Management Events - Description [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "# **Group Management Events**\n\n#### This dashboard shows information about Group Management Events collected by winlogbeat\n",
+                "openLinksInNewTab": false
+            },
+            "title": "Group Management Events - Description [Winlogbeat Security]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:56.323Z",
+    "version": "WzIyMjgsMl0="
+}

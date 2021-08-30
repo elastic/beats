@@ -4,6 +4,9 @@ var:
   - name: input
     default: aws-s3
   - name: queue_url
+  - name: bucket_arn
+  - name: number_of_workers
+  - name: bucket_list_interval
   - name: shared_credential_file
   - name: credential_profile_name
   - name: visibility_timeout

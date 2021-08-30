@@ -1,0 +1,91 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Usage Details [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "1f64e4e0-c1c7-11ea-879f-d1f118e66220"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "20dbcd70-c1c7-11ea-879f-d1f118e66220"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "gauge_color_rules": [
+                    {
+                        "id": "22692430-c1c7-11ea-879f-d1f118e66220"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "24h",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "rgba(22,165,165,1)",
+                        "fill": "0.5",
+                        "formatter": "number",
+                        "id": "d09632c0-c120-11ea-b262-d3ff1f3885f8",
+                        "label": "Usage Details",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "agg_with": "sum",
+                                "field": "azure.billing.pretax_cost",
+                                "id": "d09632c1-c120-11ea-b262-d3ff1f3885f8",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "sum"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "azure.billing.usage_start",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Usage Details [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "05d5b3e0-c1c9-11ea-b7e7-0f48178cdb3c",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:43.912Z",
+    "version": "WzM1MDUsMV0="
+}

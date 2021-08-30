@@ -27,7 +27,7 @@ import (
 // that the dashboard loader code magically changes to the hostname on which the Beat
 // is running.
 func TestHostDashboardHasChangeableHost(t *testing.T) {
-	dashPath := "_meta/kibana/7/dashboard/Metricbeat-host-overview.json"
+	dashPath := "_meta/kibana/7/dashboard/79ffd6e0-faa0-11e6-947f-177f697178b8-ecs.json"
 	contents, err := ioutil.ReadFile(dashPath)
 	if err != nil {
 		t.Fatalf("Error reading file %s: %v", dashPath, err)

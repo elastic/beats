@@ -1,0 +1,27 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "linux.pressure",
+        "duration": 115000,
+        "module": "linux"
+    },
+    "linux": {
+        "pressure": {
+            "cpu": {
+                "some": {
+                    "10": 1.63,
+                    "300": 0.06,
+                    "60": 0.29,
+                    "total": 155911207
+                }
+            }
+        }
+    },
+    "metricset": {
+        "name": "pressure",
+        "period": 10000
+    },
+    "service": {
+        "type": "linux"
+    }
+}

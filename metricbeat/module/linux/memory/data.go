@@ -15,8 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build linux
-
 package memory
 
 import (
@@ -139,7 +137,7 @@ func GetVMStat() (*sysinfotypes.VMStatInfo, error) {
 	}
 	vmstatHandle, ok := h.(sysinfotypes.VMStat)
 	if !ok {
-		return nil, errors.Wrap(err, "VMStat not available for platform")
+		return nil, errors.New("VMStat not available for platform")
 	}
 	info, err := vmstatHandle.VMStat()
 	if err != nil {
