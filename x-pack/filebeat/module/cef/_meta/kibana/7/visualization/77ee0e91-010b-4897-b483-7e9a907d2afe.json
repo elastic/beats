@@ -1,0 +1,113 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Behaviors by Outcome [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 9,000": "rgb(255,255,204)",
+                    "18,000 - 27,000": "rgb(254,225,135)",
+                    "27,000 - 36,000": "rgb(254,201,101)",
+                    "36,000 - 45,000": "rgb(254,171,73)",
+                    "45,000 - 54,000": "rgb(253,141,60)",
+                    "54,000 - 63,000": "rgb(252,91,46)",
+                    "63,000 - 72,000": "rgb(237,47,34)",
+                    "72,000 - 81,000": "rgb(212,16,32)",
+                    "81,000 - 90,000": "rgb(176,0,38)",
+                    "9,000 - 18,000": "rgb(255,241,170)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Event Type",
+                        "field": "cef.extensions.categoryBehavior",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Event Outcome",
+                        "field": "cef.extensions.categoryOutcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Yellow to Red",
+                "colorsNumber": 10,
+                "colorsRange": [],
+                "enableHover": true,
+                "invertColors": false,
+                "legendPosition": "right",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "#555",
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Top 10 Behaviors by Outcome [Filebeat CEF]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "77ee0e91-010b-4897-b483-7e9a907d2afe",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e6cf2383-71f4-4db1-a791-1a7d4f110194",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ3MDAsMV0="
+}

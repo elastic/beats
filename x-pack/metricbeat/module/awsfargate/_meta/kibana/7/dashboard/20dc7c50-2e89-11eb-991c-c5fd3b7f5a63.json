@@ -1,0 +1,218 @@
+{
+    "attributes": {
+        "description": "Overview of AWS Fargate Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "2429ae11-ccb3-4016-b18d-c88140e29f67",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2429ae11-ccb3-4016-b18d-c88140e29f67",
+                "panelRefName": "panel_2429ae11-ccb3-4016-b18d-c88140e29f67",
+                "title": "ECS Task Filter",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
+                    "w": 39,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "735a25cb-f781-4a8b-99e6-2adf582f8a37",
+                "panelRefName": "panel_735a25cb-f781-4a8b-99e6-2adf582f8a37",
+                "title": "Containers",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5d4537e8-9aee-47e6-8580-1961d8a3a38e",
+                    "w": 24,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "5d4537e8-9aee-47e6-8580-1961d8a3a38e",
+                "panelRefName": "panel_5d4537e8-9aee-47e6-8580-1961d8a3a38e",
+                "title": "Total Number of Containers",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d3c9208e-c699-4514-a091-a731d28ab9af",
+                    "w": 24,
+                    "x": 24,
+                    "y": 14
+                },
+                "panelIndex": "d3c9208e-c699-4514-a091-a731d28ab9af",
+                "panelRefName": "panel_d3c9208e-c699-4514-a091-a731d28ab9af",
+                "title": "CPU Utilization Per Cluster",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "9dd2b002-5170-49ea-afc2-30b0b46b0fd7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "9dd2b002-5170-49ea-afc2-30b0b46b0fd7",
+                "panelRefName": "panel_9dd2b002-5170-49ea-afc2-30b0b46b0fd7",
+                "title": "Container Memory Usage Pct",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 44
+                },
+                "panelIndex": "89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+                "panelRefName": "panel_89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+                "title": "DiskIO Write",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d7a6623a-14cf-411c-ab73-ded3734a359b",
+                    "w": 24,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "d7a6623a-14cf-411c-ab73-ded3734a359b",
+                "panelRefName": "panel_d7a6623a-14cf-411c-ab73-ded3734a359b",
+                "title": "DiskIO Read",
+                "type": "lens",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a7a6e425-98fd-4210-b3d5-005268be6274",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "a7a6e425-98fd-4210-b3d5-005268be6274",
+                "panelRefName": "panel_a7a6e425-98fd-4210-b3d5-005268be6274",
+                "title": "Container CPU Total Norm Pct",
+                "type": "lens",
+                "version": "7.10.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWSFargate] Fargate Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "20dc7c50-2e89-11eb-991c-c5fd3b7f5a63",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "38eee240-2e90-11eb-a417-f961313c14f6",
+            "name": "2429ae11-ccb3-4016-b18d-c88140e29f67:panel_2429ae11-ccb3-4016-b18d-c88140e29f67",
+            "type": "visualization"
+        },
+        {
+            "id": "8cf592f0-2e8e-11eb-a417-f961313c14f6",
+            "name": "735a25cb-f781-4a8b-99e6-2adf582f8a37:panel_735a25cb-f781-4a8b-99e6-2adf582f8a37",
+            "type": "lens"
+        },
+        {
+            "id": "86720980-3966-11eb-a417-f961313c14f6",
+            "name": "5d4537e8-9aee-47e6-8580-1961d8a3a38e:panel_5d4537e8-9aee-47e6-8580-1961d8a3a38e",
+            "type": "lens"
+        },
+        {
+            "id": "b1837e70-396f-11eb-a417-f961313c14f6",
+            "name": "d3c9208e-c699-4514-a091-a731d28ab9af:panel_d3c9208e-c699-4514-a091-a731d28ab9af",
+            "type": "lens"
+        },
+        {
+            "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
+            "name": "9dd2b002-5170-49ea-afc2-30b0b46b0fd7:panel_9dd2b002-5170-49ea-afc2-30b0b46b0fd7",
+            "type": "lens"
+        },
+        {
+            "id": "c3952840-2e91-11eb-a417-f961313c14f6",
+            "name": "89b0cd8b-13d9-4a43-8f93-3410aff125c3:panel_89b0cd8b-13d9-4a43-8f93-3410aff125c3",
+            "type": "lens"
+        },
+        {
+            "id": "a7970500-2e91-11eb-a417-f961313c14f6",
+            "name": "d7a6623a-14cf-411c-ab73-ded3734a359b:panel_d7a6623a-14cf-411c-ab73-ded3734a359b",
+            "type": "lens"
+        },
+        {
+            "id": "60941700-2e88-11eb-991c-c5fd3b7f5a63",
+            "name": "a7a6e425-98fd-4210-b3d5-005268be6274:panel_a7a6e425-98fd-4210-b3d5-005268be6274",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0NzgsMV0="
+}
