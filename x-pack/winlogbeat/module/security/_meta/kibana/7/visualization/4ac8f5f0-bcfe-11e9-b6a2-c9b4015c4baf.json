@@ -1,0 +1,202 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": {
+                                "query": "4740"
+                            },
+                            "type": "phrase",
+                            "value": "4740"
+                        },
+                        "query": {
+                            "match": {
+                                "event.code": {
+                                    "query": "4740",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Users Locked Out - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Locked  User",
+                        "field": "winlog.event_data.TargetUserName",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 100
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Performed by",
+                        "field": "winlog.event_data.SubjectUserName",
+                        "missingBucket": true,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Performer LogonId",
+                        "field": "winlog.logon.id",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "accessor": 3,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "perPage": 10,
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Users Locked Out - Table [Winlogbeat Security]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "4ac8f5f0-bcfe-11e9-b6a2-c9b4015c4baf",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:19:00.386Z",
+    "version": "WzIzMTYsMl0="
+}

@@ -1,0 +1,142 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset :\"azure.activitylogs\" and azure.activitylogs.event_category : \"Alert\" "
+                }
+            }
+        },
+        "title": "Alerts Heatmap [Filebeat Azure]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0": "rgb(247,252,245)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Provider",
+                        "field": "azure.resource.provider",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Resource Group",
+                        "field": "azure.resource.group",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Greens",
+                "colorsNumber": 4,
+                "colorsRange": [],
+                "dimensions": {
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "terms",
+                        "format": {
+                            "id": "terms",
+                            "params": {
+                                "id": "string",
+                                "missingBucketLabel": "Missing",
+                                "otherBucketLabel": "Other"
+                            }
+                        },
+                        "params": {}
+                    },
+                    "y": [
+                        {
+                            "accessor": 1,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "enableHover": false,
+                "invertColors": false,
+                "legendPosition": "right",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "type": "heatmap",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "black",
+                            "overwriteColor": false,
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Alerts Heatmap [Filebeat Azure]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c704b050-f0de-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:01.505Z",
+    "version": "WzQzODQsMV0="
+}

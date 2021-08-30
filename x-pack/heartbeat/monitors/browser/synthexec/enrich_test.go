@@ -16,7 +16,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 )
@@ -151,7 +151,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "step/screenshot"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
 		},
 		{
@@ -160,7 +160,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "step/screenshot_ref"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
 		},
 		{
@@ -171,7 +171,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
 				require.Equal(t, "my_id", e.Meta["_id"])
 				require.Equal(t, events.OpTypeCreate, e.Meta[events.FieldMetaOpType])
-				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+				require.Equal(t, "browser.screenshot", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
 		},
 		{
@@ -180,7 +180,7 @@ func TestEnrichSynthEvent(t *testing.T) {
 			&SynthEvent{Type: "journey/network_info"},
 			false,
 			func(t *testing.T, e *beat.Event, je *journeyEnricher) {
-				require.Equal(t, "browser.network", e.Meta[add_data_stream_index.FieldMetaCustomDataset])
+				require.Equal(t, "browser.network", e.Meta[add_data_stream.FieldMetaCustomDataset])
 			},
 		},
 	}

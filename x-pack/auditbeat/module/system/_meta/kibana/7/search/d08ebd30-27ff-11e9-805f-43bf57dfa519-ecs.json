@@ -1,0 +1,110 @@
+{
+    "attributes": {
+        "columns": [
+            "host.hostname",
+            "event.dataset",
+            "event.action",
+            "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "system",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "system"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "system",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.kind",
+                            "negate": false,
+                            "params": {
+                                "query": "event",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "event"
+                        },
+                        "query": {
+                            "match": {
+                                "event.kind": {
+                                    "query": "event",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "System Events [Auditbeat System] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:36:02.960Z",
+    "version": "WzUwMTcsMV0="
+}

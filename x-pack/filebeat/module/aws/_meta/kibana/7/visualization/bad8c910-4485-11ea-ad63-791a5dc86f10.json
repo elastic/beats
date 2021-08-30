@@ -1,0 +1,172 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "VPC Flow Total Requests [Filebeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": "rgba(255,255,255,1)",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "right",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"vpcflow\" and aws.vpcflow.action : \"REJECT\" "
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "REJECT",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.vpcflow.action",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"vpcflow\" and aws.vpcflow.action : \"ACCEPT\"  "
+                        },
+                        "formatter": "number",
+                        "id": "7ec99260-4485-11ea-9ee9-2d27e9149ae8",
+                        "label": "ACCEPT",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "id": "7ec99261-4485-11ea-9ee9-2d27e9149ae8",
+                                "type": "count"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.vpcflow.action",
+                        "terms_order_by": "7ec99261-4485-11ea-9ee9-2d27e9149ae8",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"vpcflow\" and aws.vpcflow.action : \"-\" "
+                        },
+                        "formatter": "number",
+                        "id": "8d550580-4485-11ea-9ee9-2d27e9149ae8",
+                        "label": "-",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "id": "8d552c90-4485-11ea-9ee9-2d27e9149ae8",
+                                "type": "count"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.vpcflow.action",
+                        "terms_order_by": "8d552c90-4485-11ea-9ee9-2d27e9149ae8",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0.5",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"vpcflow\""
+                        },
+                        "formatter": "number",
+                        "id": "c8c27df0-4485-11ea-9ee9-2d27e9149ae8",
+                        "label": "Total Requests",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "id": "c8c27df1-4485-11ea-9ee9-2d27e9149ae8",
+                                "type": "count"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "filebeat-*",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "aws.vpcflow.action",
+                        "terms_order_by": "c8c27df1-4485-11ea-9ee9-2d27e9149ae8",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "VPC Flow Total Requests [Filebeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bad8c910-4485-11ea-ad63-791a5dc86f10",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:00.470Z",
+    "version": "WzQzNzcsMV0="
+}

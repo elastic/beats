@@ -1,0 +1,92 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Blocked Accounts TSVB [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(204,204,204,1)",
+                        "color": "rgba(51,51,51,1)",
+                        "id": "8d597960-ff18-11e9-8249-2371c695f3b0",
+                        "operator": "lte",
+                        "value": 0
+                    },
+                    {
+                        "background_color": "rgba(102,102,102,1)",
+                        "id": "a3f59730-ff18-11e9-8249-2371c695f3b0",
+                        "operator": "gte",
+                        "value": 1
+                    },
+                    {
+                        "background_color": "rgba(204,204,204,1)",
+                        "color": "rgba(51,51,51,1)",
+                        "id": "efbe538c-41df-4ea0-9072-09d71fb8c5d8",
+                        "operator": "empty",
+                        "value": null
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.code: \"4740\""
+                },
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "winlogbeat-*",
+                "interval": "90d",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Blocked Accounts",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "user.name",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Blocked Accounts TSVB [Winlogbeat Security]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "a79395f0-6aba-11ea-896f-0d70f7ec3956",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:53.287Z",
+    "version": "WzIxOTEsMl0="
+}
