@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "Select cluster/node based on its name",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Cluster/node selector [Metricbeat Redis Enterprise]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "prometheus.labels.cluster",
+                        "id": "1583159394252",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "cluster name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "prometheus.labels.node",
+                        "id": "1583250395046",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "node name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "Cluster/node selector [Metricbeat Redis Enterprise]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b96c3b00-5c92-11ea-b0b5-8133f1152545",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:50.654Z",
+    "version": "WzQxNDMsMV0="
+}

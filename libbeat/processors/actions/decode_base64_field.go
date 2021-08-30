@@ -20,6 +20,7 @@ package actions
 import (
 	"encoding/base64"
 	"fmt"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -110,7 +111,7 @@ func (f *decodeBase64Field) decodeField(event *beat.Event) error {
 		return fmt.Errorf("invalid type for `from`, expecting a string received %T", value)
 	}
 
-	decodedData, err := base64.StdEncoding.DecodeString(base64String)
+	decodedData, err := base64.RawStdEncoding.DecodeString(strings.TrimRight(base64String, "="))
 	if err != nil {
 		return fmt.Errorf("error trying to decode %s: %v", base64String, err)
 	}

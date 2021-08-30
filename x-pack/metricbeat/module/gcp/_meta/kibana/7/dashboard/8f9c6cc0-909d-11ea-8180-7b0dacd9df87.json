@@ -1,0 +1,144 @@
+{
+    "attributes": {
+        "description": "Overview of GCP Load Balancing L3 Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "8b86e712-4709-458a-b8e9-40e79305b1aa",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8b86e712-4709-458a-b8e9-40e79305b1aa",
+                "panelRefName": "panel_8b86e712-4709-458a-b8e9-40e79305b1aa",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "44d18a84-d060-4149-825d-eacc61f946f3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 6
+                },
+                "panelIndex": "44d18a84-d060-4149-825d-eacc61f946f3",
+                "panelRefName": "panel_44d18a84-d060-4149-825d-eacc61f946f3",
+                "title": "Egress Packets",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c38aeaae-69a7-4a6c-a35a-4bf5c8f70e86",
+                    "w": 24,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "c38aeaae-69a7-4a6c-a35a-4bf5c8f70e86",
+                "panelRefName": "panel_c38aeaae-69a7-4a6c-a35a-4bf5c8f70e86",
+                "title": "Egress Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c5782327-dc55-466d-97d8-b79618f0b47a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 21
+                },
+                "panelIndex": "c5782327-dc55-466d-97d8-b79618f0b47a",
+                "panelRefName": "panel_c5782327-dc55-466d-97d8-b79618f0b47a",
+                "title": "Ingress Packets",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "beaf5f45-5217-4aed-b663-69e5e9ca35c3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "beaf5f45-5217-4aed-b663-69e5e9ca35c3",
+                "panelRefName": "panel_beaf5f45-5217-4aed-b663-69e5e9ca35c3",
+                "title": "Ingress Bytes",
+                "type": "visualization",
+                "version": "7.6.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Load Balancing L3 Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8f9c6cc0-909d-11ea-8180-7b0dacd9df87",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3f4e9040-909d-11ea-8180-7b0dacd9df87",
+            "name": "8b86e712-4709-458a-b8e9-40e79305b1aa:panel_8b86e712-4709-458a-b8e9-40e79305b1aa",
+            "type": "visualization"
+        },
+        {
+            "id": "2f6b6740-909b-11ea-8180-7b0dacd9df87",
+            "name": "44d18a84-d060-4149-825d-eacc61f946f3:panel_44d18a84-d060-4149-825d-eacc61f946f3",
+            "type": "visualization"
+        },
+        {
+            "id": "e562eb50-909a-11ea-8180-7b0dacd9df87",
+            "name": "c38aeaae-69a7-4a6c-a35a-4bf5c8f70e86:panel_c38aeaae-69a7-4a6c-a35a-4bf5c8f70e86",
+            "type": "visualization"
+        },
+        {
+            "id": "543dac40-909b-11ea-8180-7b0dacd9df87",
+            "name": "c5782327-dc55-466d-97d8-b79618f0b47a:panel_c5782327-dc55-466d-97d8-b79618f0b47a",
+            "type": "visualization"
+        },
+        {
+            "id": "434f69f0-909b-11ea-8180-7b0dacd9df87",
+            "name": "beaf5f45-5217-4aed-b663-69e5e9ca35c3:panel_beaf5f45-5217-4aed-b663-69e5e9ca35c3",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:11.683Z",
+    "version": "WzM3OTIsMV0="
+}

@@ -1085,12 +1085,16 @@ func InitKibanaConfig(beatConfig beatConfig) *common.Config {
 	if esConfig.Enabled() {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)
+		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
 			kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
 			kibanaConfig.SetString("password", -1, password)
+		}
+		if !kibanaConfig.HasField("api_key") && api_key != "" {
+			kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig

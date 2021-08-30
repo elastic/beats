@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Pushes application availability md-2 [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 15,
+                "markdown": "**App Avail**\n**(99.9%)**",
+                "openLinksInNewTab": false
+            },
+            "title": "Pushes application availability md-2 [Metricbeat Cloud Foundry]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "93911f12-f851-11ea-9a0a-bb5ff28cf81a",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:59.416Z",
+    "version": "WzM2OTIsMV0="
+}

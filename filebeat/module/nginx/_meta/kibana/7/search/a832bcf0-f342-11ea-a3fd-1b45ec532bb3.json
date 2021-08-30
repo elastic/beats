@@ -1,0 +1,58 @@
+{
+    "attributes": {
+        "columns": [
+            "log.level",
+            "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlight": {
+                    "fields": {
+                        "*": {}
+                    },
+                    "fragment_size": 2147483647,
+                    "post_tags": [
+                        "@/kibana-highlighted-field@"
+                    ],
+                    "pre_tags": [
+                        "@kibana-highlighted-field@"
+                    ],
+                    "require_field_match": false
+                },
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.module:nginx AND message:*"
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Nginx Ingress Controller error logs [Filebeat Nginx]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a832bcf0-f342-11ea-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:16.767Z",
+    "version": "WzQ0ODUsMV0="
+}

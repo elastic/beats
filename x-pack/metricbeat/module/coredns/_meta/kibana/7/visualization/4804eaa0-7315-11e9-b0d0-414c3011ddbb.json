@@ -1,0 +1,86 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Avg Request Size (cumulative) [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(228,155,238,1)",
+                        "fill": "0.1",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Avg Request Size (bytes)",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "coredns.stats.dns.request.size.bytes.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "coredns.stats.dns.request.size.bytes.count",
+                                "id": "98fe65e0-7314-11e9-8e06-d9a616f1e6f2",
+                                "type": "sum"
+                            },
+                            {
+                                "id": "ab81ee30-7314-11e9-8e06-d9a616f1e6f2",
+                                "script": "params.sum / params.count",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "aeed53c0-7314-11e9-8e06-d9a616f1e6f2",
+                                        "name": "sum"
+                                    },
+                                    {
+                                        "field": "98fe65e0-7314-11e9-8e06-d9a616f1e6f2",
+                                        "id": "b84dd700-7314-11e9-8e06-d9a616f1e6f2",
+                                        "name": "count"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "coredns.stats.zone",
+                        "value_template": "{{value}} bytes"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Avg Request Size (cumulative) [Metricbeat CoreDNS] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4804eaa0-7315-11e9-b0d0-414c3011ddbb",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:04.459Z",
+    "version": "WzM3MzcsMV0="
+}

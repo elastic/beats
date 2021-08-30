@@ -1,0 +1,97 @@
+{
+    "attributes": {
+        "description": "This dashboard shows audit logs collected by the ActiveMQ filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "11105044-eb78-45ab-9206-571e86f5f10d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "11105044-eb78-45ab-9206-571e86f5f10d",
+                "panelRefName": "panel_11105044-eb78-45ab-9206-571e86f5f10d",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                "panelRefName": "panel_8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 23,
+                    "i": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                "panelRefName": "panel_f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+                "type": "search",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat ActiveMQ] Audit Events",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ffe86390-145f-11ea-8fd8-030a13064883",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "38011a70-145a-11ea-8fd8-030a13064883",
+            "name": "11105044-eb78-45ab-9206-571e86f5f10d:panel_11105044-eb78-45ab-9206-571e86f5f10d",
+            "type": "visualization"
+        },
+        {
+            "id": "38874920-1454-11ea-8fd8-030a13064883",
+            "name": "8f349d14-40d9-4a10-b7d5-0f57c2a69f69:panel_8f349d14-40d9-4a10-b7d5-0f57c2a69f69",
+            "type": "visualization"
+        },
+        {
+            "id": "896ef3a0-145f-11ea-8fd8-030a13064883",
+            "name": "f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54:panel_f2a1e6f8-cd1a-4fbd-a0b1-da4ee9db7c54",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:54.354Z",
+    "version": "WzQzMzMsMV0="
+}

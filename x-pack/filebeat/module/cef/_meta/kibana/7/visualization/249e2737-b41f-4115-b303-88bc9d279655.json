@@ -1,0 +1,123 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "DNS Metrics Overview [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 100": "rgb(0,104,55)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Event Count"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Threads",
+                        "field": "cef.extensions.deviceCustomString1"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "OpCodes",
+                        "field": "cef.extensions.deviceCustomString2"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Activity Types",
+                        "field": "cef.device.event_class_id"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "gauge": {
+                    "autoExtend": false,
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 100
+                        }
+                    ],
+                    "gaugeColorMode": "None",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Metric",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "#333",
+                        "labels": false,
+                        "show": false,
+                        "width": 2
+                    },
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": "32",
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "type": "simple",
+                    "useRange": false,
+                    "verticalSplit": false
+                },
+                "type": "gauge"
+            },
+            "title": "DNS Metrics Overview [Filebeat CEF]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "249e2737-b41f-4115-b303-88bc9d279655",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzIsMV0="
+}

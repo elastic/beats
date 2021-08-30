@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        },
+        "savedSearchRefName": "search_0",
+        "title": "TLS Cipher [Packetbeat] ECS",
+        "uiStateJSON": "{\"vis\": {\"params\": {\"sort\": {\"columnIndex\": null, \"direction\": null}}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Cipher\",\"field\":\"tls.cipher\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"bucket\",\"type\":\"terms\"}],\"params\":{\"perPage\":10,\"showMeticsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"showToolbar\":true},\"title\":\"TLS Cipher ECS\",\"type\":\"table\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "463d2bf0-d3a8-11e7-9081-ab2af08e9961-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyNDIsMV0="
+}

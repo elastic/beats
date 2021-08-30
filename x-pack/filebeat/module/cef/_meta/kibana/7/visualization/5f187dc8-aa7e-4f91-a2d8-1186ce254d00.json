@@ -1,0 +1,203 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Events by Source and Destination Users [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Event Count"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Timestamp",
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Source Users",
+                        "field": "source.user.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Destination Users",
+                        "field": "destination.user.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Timestamp"
+                        },
+                        "type": "category"
+                    }
+                ],
+                "defaultYExtents": false,
+                "drawLinesBetweenPoints": true,
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "interpolate": "linear",
+                "legendPosition": "right",
+                "radiusRatio": 9,
+                "scale": "linear",
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Event Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    },
+                    {
+                        "data": {
+                            "id": "3",
+                            "label": "Source Users"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "lineWidth": 3,
+                        "mode": "normal",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-2"
+                    },
+                    {
+                        "data": {
+                            "id": "4",
+                            "label": "Destination Users"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "lineWidth": 3,
+                        "mode": "normal",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-2"
+                    }
+                ],
+                "setYExtents": false,
+                "showCircles": true,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Event Count"
+                        },
+                        "type": "value"
+                    },
+                    {
+                        "id": "ValueAxis-2",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "RightAxis-1",
+                        "position": "right",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "square root"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": ""
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Events by Source and Destination Users [Filebeat CEF]",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5f187dc8-aa7e-4f91-a2d8-1186ce254d00",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "e6cf2383-71f4-4db1-a791-1a7d4f110194",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ3MDcsMV0="
+}

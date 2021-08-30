@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "DynamoDB Consumed Read Capacity Units [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "43e58670-7b05-11ea-8ef8-01625a2f68ac"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "3c733ea0-7b05-11ea-8ef8-01625a2f68ac"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "gauge_color_rules": [
+                    {
+                        "id": "499c62a0-7b05-11ea-8ef8-01625a2f68ac"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0.1",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Consumed Read Capacity Units",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.dynamodb.metrics.ConsumedReadCapacityUnits.avg",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "aws.dimensions.TableName",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "DynamoDB Consumed Read Capacity Units [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9d284bc0-7b08-11ea-9bb4-e958b64b5685",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:26.548Z",
+    "version": "WzMzMjQsMV0="
+}
