@@ -29,9 +29,11 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 		endTime = endTime.Add(latency * -1)
 	}
 
-	// Set startTime double the period earlier than the endtime in order to
-	// make sure GetMetricDataRequest gets the latest data point for each metric.
-	return endTime.Add(period * -2), endTime
+	// Set startTime double the period plus one second earlier than the endTime in order to
+	// make sure GetMetricDataRequest gets the latest data point for each metric. The plus
+	// one second is to make sure the startTime of the next collect period is one second later
+	// than the endTime of last collection period. This is to avoid collecting duplicate data.
+	return endTime.Add(period*-2 + time.Second), endTime
 }
 
 // GetListMetricsOutput function gets listMetrics results from cloudwatch per namespace for each region.
@@ -39,69 +41,58 @@ func GetStartTimeEndTime(period time.Duration, latency time.Duration) (time.Time
 // to obtain statistical data.
 func GetListMetricsOutput(namespace string, regionName string, svcCloudwatch cloudwatchiface.ClientAPI) ([]cloudwatch.Metric, error) {
 	var metricsTotal []cloudwatch.Metric
-	init := true
 	var nextToken *string
 
-	for init || nextToken != nil {
-		init = false
-		listMetricsInput := &cloudwatch.ListMetricsInput{
-			NextToken: nextToken,
-		}
-		if namespace != "*" {
-			listMetricsInput.Namespace = &namespace
-		}
-		reqListMetrics := svcCloudwatch.ListMetricsRequest(listMetricsInput)
-
-		// List metrics of a given namespace for each region
-		listMetricsOutput, err := reqListMetrics.Send(context.TODO())
-		if err != nil {
-			return nil, errors.Wrap(err, "ListMetricsRequest failed, skipping region "+regionName)
-		}
-		metricsTotal = append(metricsTotal, listMetricsOutput.Metrics...)
-		nextToken = listMetricsOutput.NextToken
+	listMetricsInput := &cloudwatch.ListMetricsInput{
+		NextToken: nextToken,
+	}
+	if namespace != "*" {
+		listMetricsInput.Namespace = &namespace
 	}
 
+	// List metrics of a given namespace for each region
+	req := svcCloudwatch.ListMetricsRequest(listMetricsInput)
+	paginator := cloudwatch.NewListMetricsPaginator(req)
+	for paginator.Next(context.TODO()) {
+		page := paginator.CurrentPage()
+		metricsTotal = append(metricsTotal, page.Metrics...)
+	}
+
+	if err := paginator.Err(); err != nil {
+		return metricsTotal, errors.Wrap(err, "error ListMetrics with Paginator, skipping region "+regionName)
+	}
 	return metricsTotal, nil
-}
-
-func getMetricDataPerRegion(metricDataQueries []cloudwatch.MetricDataQuery, nextToken *string, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) (*cloudwatch.GetMetricDataOutput, error) {
-	getMetricDataInput := &cloudwatch.GetMetricDataInput{
-		NextToken:         nextToken,
-		StartTime:         &startTime,
-		EndTime:           &endTime,
-		MetricDataQueries: metricDataQueries,
-	}
-
-	reqGetMetricData := svc.GetMetricDataRequest(getMetricDataInput)
-	getMetricDataResponse, err := reqGetMetricData.Send(context.TODO())
-	if err != nil {
-		return nil, errors.Wrap(err, "Error GetMetricDataInput")
-	}
-	return getMetricDataResponse.GetMetricDataOutput, nil
 }
 
 // GetMetricDataResults function uses MetricDataQueries to get metric data output.
 func GetMetricDataResults(metricDataQueries []cloudwatch.MetricDataQuery, svc cloudwatchiface.ClientAPI, startTime time.Time, endTime time.Time) ([]cloudwatch.MetricDataResult, error) {
-	init := true
 	maxQuerySize := 100
 	getMetricDataOutput := &cloudwatch.GetMetricDataOutput{NextToken: nil}
-	for init || getMetricDataOutput.NextToken != nil {
-		init = false
-		// Split metricDataQueries into smaller slices that length no longer than 100.
-		// 100 is defined in maxQuerySize.
-		// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
-		for i := 0; i < len(metricDataQueries); i += maxQuerySize {
-			metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
-			if len(metricDataQueriesPartial) == 0 {
-				return getMetricDataOutput.MetricDataResults, nil
-			}
 
-			output, err := getMetricDataPerRegion(metricDataQueriesPartial, getMetricDataOutput.NextToken, svc, startTime, endTime)
-			if err != nil {
-				return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "getMetricDataPerRegion failed")
-			}
+	// Split metricDataQueries into smaller slices that length no longer than 100.
+	// 100 is defined in maxQuerySize.
+	// To avoid ValidationError: The collection MetricDataQueries must not have a size greater than 100.
+	for i := 0; i < len(metricDataQueries); i += maxQuerySize {
+		metricDataQueriesPartial := metricDataQueries[i:int(math.Min(float64(i+maxQuerySize), float64(len(metricDataQueries))))]
+		if len(metricDataQueriesPartial) == 0 {
+			return getMetricDataOutput.MetricDataResults, nil
+		}
 
-			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, output.MetricDataResults...)
+		getMetricDataInput := &cloudwatch.GetMetricDataInput{
+			StartTime:         &startTime,
+			EndTime:           &endTime,
+			MetricDataQueries: metricDataQueriesPartial,
+		}
+
+		req := svc.GetMetricDataRequest(getMetricDataInput)
+		paginator := cloudwatch.NewGetMetricDataPaginator(req)
+		for paginator.Next(context.TODO()) {
+			page := paginator.CurrentPage()
+			getMetricDataOutput.MetricDataResults = append(getMetricDataOutput.MetricDataResults, page.MetricDataResults...)
+		}
+
+		if err := paginator.Err(); err != nil {
+			return getMetricDataOutput.MetricDataResults, errors.Wrap(err, "error GetMetricData with Paginator")
 		}
 	}
 	return getMetricDataOutput.MetricDataResults, nil

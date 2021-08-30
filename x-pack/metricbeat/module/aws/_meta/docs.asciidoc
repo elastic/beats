@@ -295,3 +295,42 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 
 [id="aws-credentials-config"]
 include::{libbeat-xpack-dir}/docs/aws-credentials-config.asciidoc[]
+
+[float]
+== Running on EKS
+
+* *WebIdentity authentication flow*
+
+See documentation in order to create a IAM Role for Service account:
+https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html
+
+Once you have create the IRSA you can annotate `metricbeat` service account with it
+[source,yaml]
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT_ID>:role/<IRSA_ID>
+  name: metricbeat
+  namespace: kube-system
+  labels:
+    k8s-app: metricbeat
+
+In order to enable WebIdentity authentication flow you need to add a trust relationship
+to the IRSA:
+[source,json]
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/oidc.eks.<REGION>.amazonaws.com/id/<OIDC_PROVIDER_ID>"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "oidc.eks.REGION.amazonaws.com/id/<OIDC_PROVIDER_ID>:sub": "system:serviceaccount:kube-system:metricbeat",
+          "oidc.eks.REGION.amazonaws.com/id/<OIDC_PROVIDER_ID>:aud": "sts.amazonaws.com"
+        }
+      }
+    }
+
+In this case there's no need to add `role_arn` to modules config.

@@ -5,8 +5,8 @@ import yaml
 
 if __name__ == "__main__":
 
-    print("| Beat  | Stage  | Command  | MODULE  | Platforms  | When |")
-    print("|-------|--------|----------|---------|------------|------|")
+    print("| Beat  | Stage  | Category | Command  | MODULE  | Platforms  | When |")
+    print("|-------|--------|----------|----------|---------|------------|------|")
     for root, dirs, files in os.walk("."):
         dirs.sort()
         for file in files:
@@ -18,6 +18,9 @@ if __name__ == "__main__":
                     withModule = False
                     platforms = [doc["platform"]]
                     when = "mandatory"
+                    category = 'default'
+                    if "stage" in doc["stages"][stage]:
+                        category = doc["stages"][stage]["stage"]
                     if "make" in doc["stages"][stage]:
                         command = doc["stages"][stage]["make"].replace("\n", " ")
                     if "mage" in doc["stages"][stage]:
@@ -33,5 +36,5 @@ if __name__ == "__main__":
                     if "when" in doc["stages"][stage]:
                         if "not_changeset_full_match" not in doc["stages"][stage]["when"]:
                             when = "optional"
-                    print("| {} | {} | `{}` | {} | `{}` | {} |".format(
-                        module, stage, command, withModule, platforms, when))
+                    print("| {} | {} | `{}` | `{}` | {} | `{}` | {} |".format(
+                        module, stage, category, command, withModule, platforms, when))

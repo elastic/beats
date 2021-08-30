@@ -65,7 +65,7 @@ func WithBinaryPath(binPath string) Option {
 
 func WithConfigRefresh(refreshInterval int) Option {
 	return func(q *OSQueryD) {
-		q.extensionsTimeout = refreshInterval
+		q.configRefreshInterval = refreshInterval
 	}
 }
 
@@ -109,6 +109,10 @@ func New(socketPath string, opts ...Option) *OSQueryD {
 	}
 
 	return q
+}
+
+func (q *OSQueryD) SocketPath() string {
+	return q.socketPath
 }
 
 func (q *OSQueryD) DataPath() string {
