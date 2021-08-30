@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Top URLs by response code [Filebeat IIS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "URL",
+                        "field": "url.path",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "split",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "http.response.status_code",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": false,
+                "labels": {
+                    "last_level": true,
+                    "show": false,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "row": false,
+                "type": "pie"
+            },
+            "title": "Top URLs by response code [Filebeat IIS] ECS",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c0d02cd0-fe1b-11e7-a3b0-d13028918f9f-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:09.583Z",
+    "version": "WzQ0MzQsMV0="
+}

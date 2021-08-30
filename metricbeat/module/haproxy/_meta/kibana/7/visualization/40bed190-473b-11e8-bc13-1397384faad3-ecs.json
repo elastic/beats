@@ -1,0 +1,85 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Downtime seconds [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "c86b8e00-4739-11e8-8953-55bbe33e1362"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "haproxy.stat.component_type:1"
+                },
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(255,0,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Downtime",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.downtime",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "91aa6a20-473a-11e8-8953-55bbe33e1362",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "91aa6a20-473a-11e8-8953-55bbe33e1362",
+                                "id": "a8ce7ca0-473a-11e8-8953-55bbe33e1362",
+                                "sigma": "",
+                                "type": "sum_bucket"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "haproxy.stat.proxy.name",
+                        "value_template": "{{value}}s"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy downtime seconds ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "40bed190-473b-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4MzksMV0="
+}

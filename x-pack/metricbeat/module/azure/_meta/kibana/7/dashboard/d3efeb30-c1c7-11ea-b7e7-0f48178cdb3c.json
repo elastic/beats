@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "This dashboard gives an overview of resource costs and forecast",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "3202a4c8-ed88-4592-9d39-73846426413b",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3202a4c8-ed88-4592-9d39-73846426413b",
+                "panelRefName": "panel_3202a4c8-ed88-4592-9d39-73846426413b",
+                "title": "",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "c18f8802-6189-4966-abe5-30bf2c7c6d63",
+                    "w": 15,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "c18f8802-6189-4966-abe5-30bf2c7c6d63",
+                "panelRefName": "panel_c18f8802-6189-4966-abe5-30bf2c7c6d63",
+                "title": "Subscriptions",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "0a93b125-de04-466e-a1d0-7b56d1b31b52",
+                    "w": 16,
+                    "x": 15,
+                    "y": 5
+                },
+                "panelIndex": "0a93b125-de04-466e-a1d0-7b56d1b31b52",
+                "panelRefName": "panel_0a93b125-de04-466e-a1d0-7b56d1b31b52",
+                "title": "Resource groups",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "f6b54b8f-b9e5-4c20-9e4c-8f83935ca739",
+                    "w": 17,
+                    "x": 31,
+                    "y": 5
+                },
+                "panelIndex": "f6b54b8f-b9e5-4c20-9e4c-8f83935ca739",
+                "panelRefName": "panel_f6b54b8f-b9e5-4c20-9e4c-8f83935ca739",
+                "title": "Resources",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "323f890e-c4d6-4c84-a3d8-f3d4277d3c2f",
+                    "w": 48,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "323f890e-c4d6-4c84-a3d8-f3d4277d3c2f",
+                "panelRefName": "panel_323f890e-c4d6-4c84-a3d8-f3d4277d3c2f",
+                "title": "Forecast",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "fb121db4-1343-4e4d-b1a3-e3f3531ae045",
+                    "w": 48,
+                    "x": 0,
+                    "y": 38
+                },
+                "panelIndex": "fb121db4-1343-4e4d-b1a3-e3f3531ae045",
+                "panelRefName": "panel_fb121db4-1343-4e4d-b1a3-e3f3531ae045",
+                "title": "Daily usage",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Billing overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d3efeb30-c1c7-11ea-b7e7-0f48178cdb3c",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "82a51dd0-c1d7-11ea-b7e7-0f48178cdb3c",
+            "name": "3202a4c8-ed88-4592-9d39-73846426413b:panel_3202a4c8-ed88-4592-9d39-73846426413b",
+            "type": "visualization"
+        },
+        {
+            "id": "6ffa7e20-c1da-11ea-b7e7-0f48178cdb3c",
+            "name": "c18f8802-6189-4966-abe5-30bf2c7c6d63:panel_c18f8802-6189-4966-abe5-30bf2c7c6d63",
+            "type": "visualization"
+        },
+        {
+            "id": "b18053b0-c1da-11ea-b7e7-0f48178cdb3c",
+            "name": "0a93b125-de04-466e-a1d0-7b56d1b31b52:panel_0a93b125-de04-466e-a1d0-7b56d1b31b52",
+            "type": "visualization"
+        },
+        {
+            "id": "c8016f70-c1da-11ea-b7e7-0f48178cdb3c",
+            "name": "f6b54b8f-b9e5-4c20-9e4c-8f83935ca739:panel_f6b54b8f-b9e5-4c20-9e4c-8f83935ca739",
+            "type": "visualization"
+        },
+        {
+            "id": "9142aca0-c1c7-11ea-b7e7-0f48178cdb3c",
+            "name": "323f890e-c4d6-4c84-a3d8-f3d4277d3c2f:panel_323f890e-c4d6-4c84-a3d8-f3d4277d3c2f",
+            "type": "visualization"
+        },
+        {
+            "id": "05d5b3e0-c1c9-11ea-b7e7-0f48178cdb3c",
+            "name": "fb121db4-1343-4e4d-b1a3-e3f3531ae045:panel_fb121db4-1343-4e4d-b1a3-e3f3531ae045",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:43.912Z",
+    "version": "WzM0OTksMV0="
+}

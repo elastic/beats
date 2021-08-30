@@ -1,0 +1,104 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "91e62734-6524-424c-b2b5-3974c835dd6c": {
+                            "columnOrder": [
+                                "6be62612-437b-448d-9631-c6cc0938225d",
+                                "ef2fc668-040b-4c82-9f65-5d3fb25c9536",
+                                "5424865c-c988-4e26-b00b-b3cf90e1e4cf"
+                            ],
+                            "columns": {
+                                "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Snapshot Number of Messages",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.pubsub.snapshot.num_messages.value"
+                                },
+                                "6be62612-437b-448d-9631-c6cc0938225d": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "ef2fc668-040b-4c82-9f65-5d3fb25c9536": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of gcp.labels.resource.snapshot_id",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.labels.resource.snapshot_id"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "5424865c-c988-4e26-b00b-b3cf90e1e4cf"
+                        ],
+                        "layerId": "91e62734-6524-424c-b2b5-3974c835dd6c",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "ef2fc668-040b-4c82-9f65-5d3fb25c9536",
+                        "xAccessor": "6be62612-437b-448d-9631-c6cc0938225d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Snapshot Number of Messages [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6de1f430-019d-11eb-b032-d59f894a5072",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-91e62734-6524-424c-b2b5-3974c835dd6c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:13.736Z",
+    "version": "WzM4MTMsMV0="
+}

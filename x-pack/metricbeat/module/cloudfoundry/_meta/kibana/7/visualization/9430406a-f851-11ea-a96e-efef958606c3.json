@@ -1,0 +1,111 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Top CPU user deployment [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "93965a18-f851-11ea-a8db-cf27e7c12197"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "bar_color": "rgba(244,78,59,1)",
+                        "id": "93bd39a8-f851-11ea-9b4f-0bee117f7e32",
+                        "operator": "gte",
+                        "value": 70
+                    },
+                    {
+                        "bar_color": "rgba(252,220,0,1)",
+                        "id": "93cc3e94-f851-11ea-8e33-6f86d8899090",
+                        "operator": "lt",
+                        "value": 70
+                    },
+                    {
+                        "bar_color": "rgba(105,192,111,1)",
+                        "id": "93e2a558-f851-11ea-a583-8ba487ea9a5e",
+                        "operator": "lt",
+                        "value": 50
+                    }
+                ],
+                "drilldown_url": "",
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and event.dataset: \"cloudfoundry.value\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "93e46942-f851-11ea-b627-9f9d893aa443"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "93aed944-f851-11ea-ba70-fbde5471d6c0",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name:\"system.cpu.user\"  "
+                        },
+                        "formatter": "number",
+                        "id": "93b3d516-f851-11ea-b4ca-c32dfcb647e2",
+                        "label": "Top CPU Users by Deployment",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "93b9bc2e-f851-11ea-8d20-9b7927512450",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "cloudfoundry.envelope.deployment",
+                        "terms_order_by": "93b9bc2e-f851-11ea-8d20-9b7927512450",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Top CPU user deployment [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9430406a-f851-11ea-a96e-efef958606c3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:59.416Z",
+    "version": "WzM2NzgsMV0="
+}

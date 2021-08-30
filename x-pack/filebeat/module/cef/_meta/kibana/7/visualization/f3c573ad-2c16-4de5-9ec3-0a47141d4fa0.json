@@ -1,0 +1,107 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Size [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.device.product:\"DNS Trace Log\""
+                },
+                "id": "6e634117-6b30-411c-b74c-75510befe42f",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "deviceDirection:\"0\""
+                        },
+                        "formatter": "bytes",
+                        "id": "28b1fb5b-0f16-4519-b901-4dd2dcc39915",
+                        "label": "Inbound Bytes",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "source.bytes",
+                                "id": "f613f33f-6459-4e46-a3a0-c36c48c46b2e",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "deviceDirection:\"1\""
+                        },
+                        "formatter": "bytes",
+                        "id": "5a5c2529-4990-4006-b039-c94069ff6b7e",
+                        "label": "Outbound Bytes",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "source.bytes",
+                                "id": "b69501e7-56d5-4c38-81d1-34d778c81e11",
+                                "type": "sum"
+                            },
+                            {
+                                "id": "0aaab374-5845-44ab-94f5-ac4fab25c287",
+                                "script": "params.outbound_bytes >= 0 ? params.outbound_bytes * -1 : 0",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "b69501e7-56d5-4c38-81d1-34d778c81e11",
+                                        "id": "23b8c41c-0e98-4ace-8bca-3593e46cd955",
+                                        "name": "outbound_bytes"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Size [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f3c573ad-2c16-4de5-9ec3-0a47141d4fa0",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3NDEsMV0="
+}
