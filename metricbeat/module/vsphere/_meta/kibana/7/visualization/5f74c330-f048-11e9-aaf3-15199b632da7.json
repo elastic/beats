@@ -1,0 +1,123 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Host top CPU util [Metricbeat VSphere] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module : \"vsphere\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": "rgba(252,220,0,1)",
+                        "id": "3e4e64a0-f047-11e9-8ffe-6377df51c23d",
+                        "operator": "gt",
+                        "value": 0.35
+                    },
+                    {
+                        "gauge": "rgba(251,158,0,1)",
+                        "id": "8e4a5090-f047-11e9-8ffe-6377df51c23d",
+                        "operator": "gte",
+                        "value": 0.7
+                    },
+                    {
+                        "gauge": "rgba(159,5,0,1)",
+                        "id": "93d7d2d0-f047-11e9-8ffe-6377df51c23d",
+                        "operator": "gte",
+                        "text": null,
+                        "value": 0.95
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "1",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(59,244,64,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "percent",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "vsphere.host.cpu.total.mhz",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            },
+                            {
+                                "field": "vsphere.host.cpu.used.mhz",
+                                "id": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                                "type": "max"
+                            },
+                            {
+                                "id": "5e69b140-f047-11e9-8ffe-6377df51c23d",
+                                "script": "params.used / params.total",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "5fadf110-f047-11e9-8ffe-6377df51c23d",
+                                        "name": "total"
+                                    },
+                                    {
+                                        "field": "51de05c0-f047-11e9-8ffe-6377df51c23d",
+                                        "id": "61c84590-f047-11e9-8ffe-6377df51c23d",
+                                        "name": "used"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "vsphere.host.name",
+                        "terms_order_by": "51de05c0-f047-11e9-8ffe-6377df51c23d"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Host top CPU util [Metricbeat VSphere] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5f74c330-f048-11e9-aaf3-15199b632da7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:58.868Z",
+    "version": "WzQyMTQsMV0="
+}

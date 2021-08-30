@@ -1,0 +1,231 @@
+{
+    "attributes": {
+        "description": "This dashboard visualized relevant metrics for VMs running on Azure cloud.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "aa881f9d-28d3-4722-822e-3e670021cf52",
+                    "w": 6,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "aa881f9d-28d3-4722-822e-3e670021cf52",
+                "panelRefName": "panel_aa881f9d-28d3-4722-822e-3e670021cf52",
+                "title": "VM Filters",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "e673f70c-f811-4290-9087-578c7dd13675",
+                    "w": 20,
+                    "x": 6,
+                    "y": 0
+                },
+                "panelIndex": "e673f70c-f811-4290-9087-578c7dd13675",
+                "panelRefName": "panel_e673f70c-f811-4290-9087-578c7dd13675",
+                "title": "VM CPU Utilization",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2473ef72-c56c-4783-a36a-f4b8efd66ab7",
+                    "w": 22,
+                    "x": 26,
+                    "y": 0
+                },
+                "panelIndex": "2473ef72-c56c-4783-a36a-f4b8efd66ab7",
+                "panelRefName": "panel_2473ef72-c56c-4783-a36a-f4b8efd66ab7",
+                "title": "VM Available Memory",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "14e225ef-6417-4377-b2cb-6b46b6693b78",
+                    "w": 12,
+                    "x": 36,
+                    "y": 12
+                },
+                "panelIndex": "14e225ef-6417-4377-b2cb-6b46b6693b78",
+                "panelRefName": "panel_14e225ef-6417-4377-b2cb-6b46b6693b78",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "535d70b3-3f3c-4a84-85ba-ab671b6d144f",
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "535d70b3-3f3c-4a84-85ba-ab671b6d144f",
+                "panelRefName": "panel_535d70b3-3f3c-4a84-85ba-ab671b6d144f",
+                "title": "VM Network In Total",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "6903a45e-bf11-4db2-9497-fd9692e83448",
+                    "w": 12,
+                    "x": 12,
+                    "y": 12
+                },
+                "panelIndex": "6903a45e-bf11-4db2-9497-fd9692e83448",
+                "panelRefName": "panel_6903a45e-bf11-4db2-9497-fd9692e83448",
+                "title": "VM Network Out Total",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
+                    "w": 12,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
+                "panelRefName": "panel_aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
+                "title": "VM Disk Writes",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "8879143b-ed83-45ec-8c58-b10dc1597c22",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "8879143b-ed83-45ec-8c58-b10dc1597c22",
+                "panelRefName": "panel_8879143b-ed83-45ec-8c58-b10dc1597c22",
+                "title": "VM Disk Read Operations/s",
+                "type": "visualization",
+                "version": "7.9.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "4071f2bf-1794-45ff-b76d-58864226d8b7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "4071f2bf-1794-45ff-b76d-58864226d8b7",
+                "panelRefName": "panel_4071f2bf-1794-45ff-b76d-58864226d8b7",
+                "title": "VM Disk Write Operations/s",
+                "type": "visualization",
+                "version": "7.9.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Compute VMs Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "eb3f05f0-ea9a-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "5031b220-eb61-11e9-90ec-112a988266d5",
+            "name": "aa881f9d-28d3-4722-822e-3e670021cf52:panel_aa881f9d-28d3-4722-822e-3e670021cf52",
+            "type": "visualization"
+        },
+        {
+            "id": "db9a3490-ea8f-11e9-90ec-112a988266d5",
+            "name": "e673f70c-f811-4290-9087-578c7dd13675:panel_e673f70c-f811-4290-9087-578c7dd13675",
+            "type": "visualization"
+        },
+        {
+            "id": "7205a4f0-ea95-11e9-90ec-112a988266d5",
+            "name": "2473ef72-c56c-4783-a36a-f4b8efd66ab7:panel_2473ef72-c56c-4783-a36a-f4b8efd66ab7",
+            "type": "visualization"
+        },
+        {
+            "id": "e8ca65c0-eb45-11e9-90ec-112a988266d5",
+            "name": "14e225ef-6417-4377-b2cb-6b46b6693b78:panel_14e225ef-6417-4377-b2cb-6b46b6693b78",
+            "type": "visualization"
+        },
+        {
+            "id": "8b6b9450-ea99-11e9-90ec-112a988266d5",
+            "name": "535d70b3-3f3c-4a84-85ba-ab671b6d144f:panel_535d70b3-3f3c-4a84-85ba-ab671b6d144f",
+            "type": "visualization"
+        },
+        {
+            "id": "abd32c30-ea99-11e9-90ec-112a988266d5",
+            "name": "6903a45e-bf11-4db2-9497-fd9692e83448:panel_6903a45e-bf11-4db2-9497-fd9692e83448",
+            "type": "visualization"
+        },
+        {
+            "id": "5c016810-ea9a-11e9-90ec-112a988266d5",
+            "name": "aa57fa8f-f6ea-45e3-9b2c-ba948d625813:panel_aa57fa8f-f6ea-45e3-9b2c-ba948d625813",
+            "type": "visualization"
+        },
+        {
+            "id": "3a50e950-eb46-11e9-90ec-112a988266d5",
+            "name": "8879143b-ed83-45ec-8c58-b10dc1597c22:panel_8879143b-ed83-45ec-8c58-b10dc1597c22",
+            "type": "visualization"
+        },
+        {
+            "id": "0892eaa0-ea9a-11e9-90ec-112a988266d5",
+            "name": "4071f2bf-1794-45ff-b76d-58864226d8b7:panel_4071f2bf-1794-45ff-b76d-58864226d8b7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:55.224Z",
+    "version": "WzM2MDksMV0="
+}

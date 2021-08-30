@@ -1,0 +1,635 @@
+{
+    "attributes": {
+        "description": "Anomali indicators ingested by the threat intel Filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "db6836db-8df5-4f4d-814b-7b1919eeb405",
+                    "w": 8,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "db6836db-8df5-4f4d-814b-7b1919eeb405",
+                "panelRefName": "panel_db6836db-8df5-4f4d-814b-7b1919eeb405",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "e6288d8d-2a04-4b53-9507-62e6bf79fa90",
+                    "w": 8,
+                    "x": 8,
+                    "y": 0
+                },
+                "panelIndex": "e6288d8d-2a04-4b53-9507-62e6bf79fa90",
+                "panelRefName": "panel_e6288d8d-2a04-4b53-9507-62e6bf79fa90",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "64186fc9-ecd9-461d-8b9f-2e38b7e10952",
+                    "w": 7,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "64186fc9-ecd9-461d-8b9f-2e38b7e10952",
+                "panelRefName": "panel_64186fc9-ecd9-461d-8b9f-2e38b7e10952",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "f54f6633-8185-43da-af7b-64729c6d19c4",
+                    "w": 8,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "f54f6633-8185-43da-af7b-64729c6d19c4",
+                "panelRefName": "panel_f54f6633-8185-43da-af7b-64729c6d19c4",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "b28f9576-c381-4b8e-a2c4-2f085477d9fe",
+                    "w": 8,
+                    "x": 31,
+                    "y": 0
+                },
+                "panelIndex": "b28f9576-c381-4b8e-a2c4-2f085477d9fe",
+                "panelRefName": "panel_b28f9576-c381-4b8e-a2c4-2f085477d9fe",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "bf8b3c50-9df8-4a80-b678-fe7f463f365c",
+                    "w": 9,
+                    "x": 39,
+                    "y": 0
+                },
+                "panelIndex": "bf8b3c50-9df8-4a80-b678-fe7f463f365c",
+                "panelRefName": "panel_bf8b3c50-9df8-4a80-b678-fe7f463f365c",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "30f2e620-6c9e-48a2-9111-0e641e5e999a",
+                    "w": 8,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "30f2e620-6c9e-48a2-9111-0e641e5e999a",
+                "panelRefName": "panel_30f2e620-6c9e-48a2-9111-0e641e5e999a",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "a220d0d1-d800-4539-955e-c0454b823c80",
+                    "w": 8,
+                    "x": 8,
+                    "y": 16
+                },
+                "panelIndex": "a220d0d1-d800-4539-955e-c0454b823c80",
+                "panelRefName": "panel_a220d0d1-d800-4539-955e-c0454b823c80",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-823b507c-03a2-413b-9fc6-ba86a0160d50",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "823b507c-03a2-413b-9fc6-ba86a0160d50": {
+                                            "columnOrder": [
+                                                "a89c7d23-2879-41d9-9f71-7f33c63cca60",
+                                                "1266faef-9fa3-4560-9dd0-7116e8b2a6de",
+                                                "43cd0668-5ea3-495f-97a5-1d2ddae02ef6"
+                                            ],
+                                            "columns": {
+                                                "1266faef-9fa3-4560-9dd0-7116e8b2a6de": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "43cd0668-5ea3-495f-97a5-1d2ddae02ef6": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "a89c7d23-2879-41d9-9f71-7f33c63cca60": {
+                                                    "customLabel": true,
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "Anomali Data Source",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": "event.dataset:(threatintel.anomalithreatstream or threatintel.anomali)"
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "curveType": "LINEAR",
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "43cd0668-5ea3-495f-97a5-1d2ddae02ef6"
+                                        ],
+                                        "layerId": "823b507c-03a2-413b-9fc6-ba86a0160d50",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "a89c7d23-2879-41d9-9f71-7f33c63cca60",
+                                        "xAccessor": "1266faef-9fa3-4560-9dd0-7116e8b2a6de"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "type": "lens"
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "2a0a608b-3d0d-4de6-8e82-0a34611c465f",
+                    "w": 23,
+                    "x": 16,
+                    "y": 16
+                },
+                "panelIndex": "2a0a608b-3d0d-4de6-8e82-0a34611c465f",
+                "panelRefName": "panel_2a0a608b-3d0d-4de6-8e82-0a34611c465f",
+                "type": "lens",
+                "version": "7.14.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "f96c5e71-869a-4cbd-a9b0-c0a83126d596",
+                    "w": 9,
+                    "x": 39,
+                    "y": 16
+                },
+                "panelIndex": "f96c5e71-869a-4cbd-a9b0-c0a83126d596",
+                "panelRefName": "panel_f96c5e71-869a-4cbd-a9b0-c0a83126d596",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 103.96437999999999,
+                        "maxLon": 422.73256,
+                        "minLat": -76.05418,
+                        "minLon": -422.73256
+                    },
+                    "mapCenter": {
+                        "lat": 19.94277,
+                        "lon": 0,
+                        "zoom": 2.08
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "dc602af3-264e-4086-9875-164baac7810f",
+                    "w": 48,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "dc602af3-264e-4086-9875-164baac7810f",
+                "panelRefName": "panel_dc602af3-264e-4086-9875-164baac7810f",
+                "type": "map",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "fbd74b73-06a8-4be1-bfd6-848b7f1c9f4f",
+                    "w": 14,
+                    "x": 0,
+                    "y": 56
+                },
+                "panelIndex": "fbd74b73-06a8-4be1-bfd6-848b7f1c9f4f",
+                "panelRefName": "panel_fbd74b73-06a8-4be1-bfd6-848b7f1c9f4f",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "2c4c65a4-7de7-4985-8516-592b1929770b",
+                    "w": 15,
+                    "x": 14,
+                    "y": 56
+                },
+                "panelIndex": "2c4c65a4-7de7-4985-8516-592b1929770b",
+                "panelRefName": "panel_2c4c65a4-7de7-4985-8516-592b1929770b",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "175715f8-9e3c-4f04-8c13-2658bee47e4f",
+                    "w": 11,
+                    "x": 29,
+                    "y": 56
+                },
+                "panelIndex": "175715f8-9e3c-4f04-8c13-2658bee47e4f",
+                "panelRefName": "panel_175715f8-9e3c-4f04-8c13-2658bee47e4f",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "9cbed687-e299-42a2-b966-1ac38d2ce178",
+                    "w": 8,
+                    "x": 40,
+                    "y": 56
+                },
+                "panelIndex": "9cbed687-e299-42a2-b966-1ac38d2ce178",
+                "panelRefName": "panel_9cbed687-e299-42a2-b966-1ac38d2ce178",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "c4bfc787-6b1e-48da-98a1-ffb40786e772",
+                    "w": 9,
+                    "x": 0,
+                    "y": 73
+                },
+                "panelIndex": "c4bfc787-6b1e-48da-98a1-ffb40786e772",
+                "panelRefName": "panel_c4bfc787-6b1e-48da-98a1-ffb40786e772",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "e6ecb6c4-565b-40b4-979f-42e2d200561a",
+                    "w": 10,
+                    "x": 9,
+                    "y": 73
+                },
+                "panelIndex": "e6ecb6c4-565b-40b4-979f-42e2d200561a",
+                "panelRefName": "panel_e6ecb6c4-565b-40b4-979f-42e2d200561a",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "1aa274fa-0c73-4475-b1b8-a1a2fde2350f",
+                    "w": 14,
+                    "x": 19,
+                    "y": 73
+                },
+                "panelIndex": "1aa274fa-0c73-4475-b1b8-a1a2fde2350f",
+                "panelRefName": "panel_1aa274fa-0c73-4475-b1b8-a1a2fde2350f",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "5a0c5e26-a71c-4217-9590-f2e7ffc6b4b1",
+                    "w": 7,
+                    "x": 33,
+                    "y": 73
+                },
+                "panelIndex": "5a0c5e26-a71c-4217-9590-f2e7ffc6b4b1",
+                "panelRefName": "panel_5a0c5e26-a71c-4217-9590-f2e7ffc6b4b1",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "ef43fef1-a2e4-4572-8f03-02738650b757",
+                    "w": 8,
+                    "x": 40,
+                    "y": 73
+                },
+                "panelIndex": "ef43fef1-a2e4-4572-8f03-02738650b757",
+                "panelRefName": "panel_ef43fef1-a2e4-4572-8f03-02738650b757",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "58a150f9-b99d-4040-8ae8-260ad7041086",
+                    "w": 9,
+                    "x": 0,
+                    "y": 90
+                },
+                "panelIndex": "58a150f9-b99d-4040-8ae8-260ad7041086",
+                "panelRefName": "panel_58a150f9-b99d-4040-8ae8-260ad7041086",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "486ad65a-6356-4b9d-8455-4c207f017eb8",
+                    "w": 16,
+                    "x": 9,
+                    "y": 90
+                },
+                "panelIndex": "486ad65a-6356-4b9d-8455-4c207f017eb8",
+                "panelRefName": "panel_486ad65a-6356-4b9d-8455-4c207f017eb8",
+                "type": "lens",
+                "version": "7.13.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] Anomali",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "68c48a30-739e-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "bfd2bfe0-de97-11eb-8f2b-753caedf727d",
+            "name": "db6836db-8df5-4f4d-814b-7b1919eeb405:panel_db6836db-8df5-4f4d-814b-7b1919eeb405",
+            "type": "lens"
+        },
+        {
+            "id": "9a61edc0-de93-11eb-8f2b-753caedf727d",
+            "name": "e6288d8d-2a04-4b53-9507-62e6bf79fa90:panel_e6288d8d-2a04-4b53-9507-62e6bf79fa90",
+            "type": "lens"
+        },
+        {
+            "id": "021ba940-de96-11eb-8f2b-753caedf727d",
+            "name": "64186fc9-ecd9-461d-8b9f-2e38b7e10952:panel_64186fc9-ecd9-461d-8b9f-2e38b7e10952",
+            "type": "lens"
+        },
+        {
+            "id": "3c40f4d0-de97-11eb-8f2b-753caedf727d",
+            "name": "f54f6633-8185-43da-af7b-64729c6d19c4:panel_f54f6633-8185-43da-af7b-64729c6d19c4",
+            "type": "lens"
+        },
+        {
+            "id": "bd28cb00-de96-11eb-8f2b-753caedf727d",
+            "name": "b28f9576-c381-4b8e-a2c4-2f085477d9fe:panel_b28f9576-c381-4b8e-a2c4-2f085477d9fe",
+            "type": "lens"
+        },
+        {
+            "id": "f5f18940-de96-11eb-8f2b-753caedf727d",
+            "name": "bf8b3c50-9df8-4a80-b678-fe7f463f365c:panel_bf8b3c50-9df8-4a80-b678-fe7f463f365c",
+            "type": "lens"
+        },
+        {
+            "id": "c91fcd10-de95-11eb-8f2b-753caedf727d",
+            "name": "30f2e620-6c9e-48a2-9111-0e641e5e999a:panel_30f2e620-6c9e-48a2-9111-0e641e5e999a",
+            "type": "lens"
+        },
+        {
+            "id": "36f61650-de96-11eb-8f2b-753caedf727d",
+            "name": "a220d0d1-d800-4539-955e-c0454b823c80:panel_a220d0d1-d800-4539-955e-c0454b823c80",
+            "type": "lens"
+        },
+        {
+            "id": "1d7a18c0-df54-11eb-8f2b-753caedf727d",
+            "name": "2a0a608b-3d0d-4de6-8e82-0a34611c465f:panel_2a0a608b-3d0d-4de6-8e82-0a34611c465f",
+            "type": "lens"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "2a0a608b-3d0d-4de6-8e82-0a34611c465f:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "2a0a608b-3d0d-4de6-8e82-0a34611c465f:indexpattern-datasource-layer-823b507c-03a2-413b-9fc6-ba86a0160d50",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d991e510-de96-11eb-8f2b-753caedf727d",
+            "name": "f96c5e71-869a-4cbd-a9b0-c0a83126d596:panel_f96c5e71-869a-4cbd-a9b0-c0a83126d596",
+            "type": "lens"
+        },
+        {
+            "id": "ec5aa090-df42-11eb-8f2b-753caedf727d",
+            "name": "dc602af3-264e-4086-9875-164baac7810f:panel_dc602af3-264e-4086-9875-164baac7810f",
+            "type": "map"
+        },
+        {
+            "id": "f52a9720-de93-11eb-8f2b-753caedf727d",
+            "name": "fbd74b73-06a8-4be1-bfd6-848b7f1c9f4f:panel_fbd74b73-06a8-4be1-bfd6-848b7f1c9f4f",
+            "type": "lens"
+        },
+        {
+            "id": "8a6f7b20-de94-11eb-8f2b-753caedf727d",
+            "name": "2c4c65a4-7de7-4985-8516-592b1929770b:panel_2c4c65a4-7de7-4985-8516-592b1929770b",
+            "type": "lens"
+        },
+        {
+            "id": "ae5934e0-de94-11eb-8f2b-753caedf727d",
+            "name": "175715f8-9e3c-4f04-8c13-2658bee47e4f:panel_175715f8-9e3c-4f04-8c13-2658bee47e4f",
+            "type": "lens"
+        },
+        {
+            "id": "5ef7b430-de94-11eb-8f2b-753caedf727d",
+            "name": "9cbed687-e299-42a2-b966-1ac38d2ce178:panel_9cbed687-e299-42a2-b966-1ac38d2ce178",
+            "type": "lens"
+        },
+        {
+            "id": "976620a0-de98-11eb-8f2b-753caedf727d",
+            "name": "c4bfc787-6b1e-48da-98a1-ffb40786e772:panel_c4bfc787-6b1e-48da-98a1-ffb40786e772",
+            "type": "lens"
+        },
+        {
+            "id": "aac00bc0-de98-11eb-8f2b-753caedf727d",
+            "name": "e6ecb6c4-565b-40b4-979f-42e2d200561a:panel_e6ecb6c4-565b-40b4-979f-42e2d200561a",
+            "type": "lens"
+        },
+        {
+            "id": "7ec83f60-de98-11eb-8f2b-753caedf727d",
+            "name": "1aa274fa-0c73-4475-b1b8-a1a2fde2350f:panel_1aa274fa-0c73-4475-b1b8-a1a2fde2350f",
+            "type": "lens"
+        },
+        {
+            "id": "7d9c70f0-de95-11eb-8f2b-753caedf727d",
+            "name": "5a0c5e26-a71c-4217-9590-f2e7ffc6b4b1:panel_5a0c5e26-a71c-4217-9590-f2e7ffc6b4b1",
+            "type": "lens"
+        },
+        {
+            "id": "9c78ade0-de95-11eb-8f2b-753caedf727d",
+            "name": "ef43fef1-a2e4-4572-8f03-02738650b757:panel_ef43fef1-a2e4-4572-8f03-02738650b757",
+            "type": "lens"
+        },
+        {
+            "id": "e5f07800-de94-11eb-8f2b-753caedf727d",
+            "name": "58a150f9-b99d-4040-8ae8-260ad7041086:panel_58a150f9-b99d-4040-8ae8-260ad7041086",
+            "type": "lens"
+        },
+        {
+            "id": "1136ceb0-de95-11eb-8f2b-753caedf727d",
+            "name": "486ad65a-6356-4b9d-8455-4c207f017eb8:panel_486ad65a-6356-4b9d-8455-4c207f017eb8",
+            "type": "lens"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1NzcsMV0="
+}

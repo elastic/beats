@@ -1,0 +1,73 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "S3 Total Error 5xx [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "59207fe0-4762-11e9-bf81-69a4e579cab5"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "5ad9a190-4762-11e9-bf81-69a4e579cab5"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total # of HTTP 5xx Errors",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.s3_request.errors.5xx",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "AWS S3 Total Error 5xx",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "58e17c10-7349-11e9-816b-07687310a99a",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:33.734Z",
+    "version": "WzMzOTksMV0="
+}

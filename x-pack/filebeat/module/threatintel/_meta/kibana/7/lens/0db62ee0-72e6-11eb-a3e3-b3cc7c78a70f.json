@@ -1,0 +1,171 @@
+{
+    "attributes": {
+        "description": "Abuse malware signatures ingested by the threat intel Filebeat module.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "dff48ab9-4cc8-4744-afe5-ee36a0a2065d": {
+                            "columnOrder": [
+                                "959db113-1ce6-46fc-97c3-dbf5fd5abb9a",
+                                "de396547-655b-4db2-8a21-e9850acff0b0"
+                            ],
+                            "columns": {
+                                "959db113-1ce6-46fc-97c3-dbf5fd5abb9a": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of threatintel.abusemalware.signature",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "de396547-655b-4db2-8a21-e9850acff0b0",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threatintel.abusemalware.signature"
+                                },
+                                "de396547-655b-4db2-8a21-e9850acff0b0": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.module",
+                        "negate": false,
+                        "params": {
+                            "query": "threatintel"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.module": "threatintel"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "threatintel.abusemalware"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "threatintel.abusemalware"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "exists": {
+                        "field": "threatintel.abusemalware.signature"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-2",
+                        "key": "threatintel.abusemalware.signature",
+                        "negate": false,
+                        "type": "exists",
+                        "value": "exists"
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "959db113-1ce6-46fc-97c3-dbf5fd5abb9a"
+                        ],
+                        "layerId": "dff48ab9-4cc8-4744-afe5-ee36a0a2065d",
+                        "legendDisplay": "default",
+                        "metric": "de396547-655b-4db2-8a21-e9850acff0b0",
+                        "nestedLegend": false,
+                        "numberDisplay": "percent"
+                    }
+                ],
+                "shape": "treemap"
+            }
+        },
+        "title": "Abuse Malware Signature [Filebeat Threat Intel]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0db62ee0-72e6-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-dff48ab9-4cc8-4744-afe5-ee36a0a2065d",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-2",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:29.041Z",
+    "version": "WzQ2MDMsMV0="
+}

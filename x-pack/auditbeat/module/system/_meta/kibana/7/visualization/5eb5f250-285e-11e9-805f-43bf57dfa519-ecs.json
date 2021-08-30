@@ -1,0 +1,149 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "login",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "login"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "login",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.outcome",
+                            "negate": false,
+                            "params": {
+                                "query": "success",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "success"
+                        },
+                        "query": {
+                            "match": {
+                                "event.outcome": {
+                                    "query": "success",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Login Success Table [Auditbeat System] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Successful Logins"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "User",
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "perPage": 8,
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Login Success Table [Auditbeat System] ECS",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5eb5f250-285e-11e9-805f-43bf57dfa519-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:36:01.915Z",
+    "version": "WzQ5OTQsMV0="
+}

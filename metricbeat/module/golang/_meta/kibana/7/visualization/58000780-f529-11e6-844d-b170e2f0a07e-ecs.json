@@ -1,0 +1,35 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Heap Summary [Metricbeat Golang] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "expression": ".es(index=\"metricbeat*\",metric=\"avg:golang.heap.system.total\").label(\"System Total Memory\").yaxis(label=\"Bytes\",units=bytes),.es(index=\"metricbeat*\",metric=\"min:golang.heap.allocations.allocated\").label(\"Bytes Allocated(min)\").movingaverage(30),.es(index=\"metricbeat*\",metric=\"max:golang.heap.allocations.allocated\").label(\"Bytes Allocated(max)\").movingaverage(30),.es(index=\"metricbeat*\",metric=\"avg:golang.heap.gc.next_gc_limit\").label(\"GC Limit\"),.es(index=\"metricbeat*\",metric=\"avg:golang.heap.gc.pause.count\").condition(lt,1, null).points().label(\"GC Cycles(count)\").yaxis(2,label=\"Count\")",
+                "interval": "10s"
+            },
+            "title": "Heap Summary [Metricbeat Golang] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "58000780-f529-11e6-844d-b170e2f0a07e-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:15.764Z",
+    "version": "WzM4MjMsMV0="
+}

@@ -1,0 +1,75 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Frontends per connection [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "b81d8640-47dc-11e8-9a25-99b107967d82"
+                    }
+                ],
+                "drilldown_url": "../app/kibana#/dashboard/e9057ae0-47c5-11e8-bc13-1397384faad3-ecs?_a=(query:(language:kuery,query:'haproxy.stat.proxy.name:\"{{ key }}\"'))",
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "haproxy.stat.component_type:0"
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Frontends",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.connection.total",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "haproxy.stat.proxy.name",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "terms_size": "20"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy frontends per connection ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f1e27ed0-47dc-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4NTAsMV0="
+}

@@ -1,0 +1,106 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "dc597043-d867-4f94-ae90-f31ffc0c2674": {
+                            "columnOrder": [
+                                "ea87bf3d-0a35-424b-b00b-3614c431b135",
+                                "faa5dba4-1fab-4f88-b67f-28bafa26a32d",
+                                "d54f4e58-d8dd-4404-8da9-12b667dd7910"
+                            ],
+                            "columns": {
+                                "d54f4e58-d8dd-4404-8da9-12b667dd7910": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Estimated Charges",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.billing.EstimatedCharges"
+                                },
+                                "ea87bf3d-0a35-424b-b00b-3614c431b135": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Service Names",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "d54f4e58-d8dd-4404-8da9-12b667dd7910",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.billing.ServiceName"
+                                },
+                                "faa5dba4-1fab-4f88-b67f-28bafa26a32d": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1d"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "d54f4e58-d8dd-4404-8da9-12b667dd7910"
+                        ],
+                        "layerId": "dc597043-d867-4f94-ae90-f31ffc0c2674",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "ea87bf3d-0a35-424b-b00b-3614c431b135",
+                        "xAccessor": "faa5dba4-1fab-4f88-b67f-28bafa26a32d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Top 10 Estimated Charges per Service Name [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "cde34840-e6f2-11ea-a5b5-d5a0accaec95",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-dc597043-d867-4f94-ae90-f31ffc0c2674",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:25.535Z",
+    "version": "WzMzMjAsMV0="
+}

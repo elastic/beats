@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Dashboard links  - Simple [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "[Winlogbeat General ECS Dashboard](#/dashboard/Winlogbeat-Dashboard-ecs) | [User Logon Information](#/dashboard/035846a0-a249-11e9-a422-d144027429da?) | [Logon failed and Account Lockout](#/dashboard/f49f3170-9ffc-11ea-87e4-49f31ec44891)  | [User Management Events](#/dashboard/8223bed0-b9e9-11e9-b6a2-c9b4015c4baf) | [Group Management Events](#/dashboard/01c54730-fee6-11e9-8405-516218e3d268)",
+                "openLinksInNewTab": false
+            },
+            "title": "Dashboard links  - Simple [Winlogbeat Security]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:59.362Z",
+    "version": "WzIzMDEsMl0="
+}

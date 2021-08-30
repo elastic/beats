@@ -1,0 +1,27 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"0b910b6c-77c8-4223-892a-1ebf69b0ccb4\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"type\":\"ES_GEO_GRID\",\"id\":\"3ba31ffc-7051-44bf-96a0-a684020cd2a3\",\"geoField\":\"source.geo.location\",\"requestType\":\"point\",\"resolution\":\"FINE\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"fillColor\":{\"type\":\"DYNAMIC\",\"options\":{\"color\":\"Yellow to Red\",\"colorCategory\":\"palette_0\",\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3},\"type\":\"ORDINAL\",\"useCustomColorRamp\":false}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":0}},\"iconSize\":{\"type\":\"DYNAMIC\",\"options\":{\"minSize\":8,\"maxSize\":32,\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3}}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"DYNAMIC\",\"options\":{\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"}}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"airfield\"}}},\"isTimeAware\":true},\"id\":\"acc53b7b-3411-406b-9371-6fa62b6b9365\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\"}]",
+        "mapStateJSON": "{\"zoom\":2.88,\"center\":{\"lon\":16.67387,\"lat\":30.87292},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"event.dataset:\\\"o365.audit\\\" \",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false}}",
+        "title": "Client Geo Map [Filebeat o365 audit]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dbae13c0-685c-11ea-8d6a-292ef5d68366",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:33:49.253Z",
+    "version": "WzQzMDksMV0="
+}

@@ -1,0 +1,384 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "HTTP Status Codes [Metricbeat CouchDB] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "c8c0f520-b94d-11e9-8899-f736e404b0e7",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f521-b94d-11e9-8899-f736e404b0e7",
+                        "label": "200 OK",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.200",
+                                "id": "c8c0f522-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f522-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f524-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f524-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f523-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#00B3A4",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f529-b94d-11e9-8899-f736e404b0e7",
+                        "label": "400 Bad Request",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.400",
+                                "id": "c8c0f52a-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f52a-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f52c-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f52c-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f52b-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#490092",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f52d-b94d-11e9-8899-f736e404b0e7",
+                        "label": "401 Unauthorized",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.401",
+                                "id": "c8c0f52e-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f52e-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f530-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f530-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f52f-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#461A0A",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f541-b94d-11e9-8899-f736e404b0e7",
+                        "label": "500  Internal Server Error",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.500",
+                                "id": "c8c0f542-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f542-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f544-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f544-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f543-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#FEB6DB",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f531-b94d-11e9-8899-f736e404b0e7",
+                        "label": "403 Forbidden",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.403",
+                                "id": "c8c0f532-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f532-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f534-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f534-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f533-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#E6C220",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f535-b94d-11e9-8899-f736e404b0e7",
+                        "label": "404 Not Found",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.404",
+                                "id": "c8c0f536-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f536-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f538-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f538-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f537-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f525-b94d-11e9-8899-f736e404b0e7",
+                        "label": "202 Accepted",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.202",
+                                "id": "c8c0f526-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f526-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f528-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f528-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f527-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#BFA180",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f539-b94d-11e9-8899-f736e404b0e7",
+                        "label": "405 Method Not Allowed",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.405",
+                                "id": "c8c0f53a-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f53a-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f53c-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f53c-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f53b-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#F98510",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f53d-b94d-11e9-8899-f736e404b0e7",
+                        "label": "409 Conflict",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.409",
+                                "id": "c8c0f53e-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f53e-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f540-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f540-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f53f-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#920000",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "c8c0f545-b94d-11e9-8899-f736e404b0e7",
+                        "label": "201 Created",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd_status_codes.201",
+                                "id": "c8c0f546-b94d-11e9-8899-f736e404b0e7",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c8c0f546-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f548-b94d-11e9-8899-f736e404b0e7",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "c8c0f548-b94d-11e9-8899-f736e404b0e7",
+                                "id": "c8c0f547-b94d-11e9-8899-f736e404b0e7",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "HTTP Status Codes [Metricbeat CouchDB] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8e15ece0-b94e-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTEsMV0="
+}

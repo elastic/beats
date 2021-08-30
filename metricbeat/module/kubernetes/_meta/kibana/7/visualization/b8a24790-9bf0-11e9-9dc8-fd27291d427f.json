@@ -1,0 +1,259 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Proxy network programming [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "4fb3cbb0-9be5-11e9-871d-d3c7d4c337ef"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "4b459c20-9be5-11e9-871d-d3c7d4c337ef"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "4de1cad0-9be5-11e9-871d-d3c7d4c337ef"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(63,112,2,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Under 16ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.16000",
+                                "id": "4dbb3a90-9be6-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "4dbb3a90-9be6-11e9-871d-d3c7d4c337ef",
+                                "id": "189688a0-9be7-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(138,223,24,1)",
+                        "fill": "0.4",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "a60dbe60-9be7-11e9-871d-d3c7d4c337ef",
+                        "label": "Under 512ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.512000",
+                                "id": "a60dbe61-9be7-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "a60dbe61-9be7-11e9-871d-d3c7d4c337ef",
+                                "id": "b55a1080-9be7-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(174,161,255,1)",
+                        "fill": "0.4",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "c5cc4f90-9be8-11e9-871d-d3c7d4c337ef",
+                        "label": "Under 1024 ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.1024000",
+                                "id": "c5cc4f91-9be8-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "c5cc4f91-9be8-11e9-871d-d3c7d4c337ef",
+                                "id": "f17cb2b0-9be8-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "e0901380-9be7-11e9-871d-d3c7d4c337ef",
+                        "label": "Under 4096 ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.4096000",
+                                "id": "e0901381-9be7-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "e0901381-9be7-11e9-871d-d3c7d4c337ef",
+                                "id": "f2b6fce0-9be7-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "id": "882fa5a0-9be9-11e9-871d-d3c7d4c337ef",
+                        "label": "Under 8192 ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.8192000",
+                                "id": "882fccb0-9be9-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "882fccb0-9be9-11e9-871d-d3c7d4c337ef",
+                                "id": "9adb9d80-9be9-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(209,119,103,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "86549550-9bef-11e9-871d-d3c7d4c337ef",
+                        "label": "Under 16384 ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.16384000",
+                                "id": "86549551-9bef-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "86549551-9bef-11e9-871d-d3c7d4c337ef",
+                                "id": "86549552-9bef-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "c66bf580-9be9-11e9-871d-d3c7d4c337ef",
+                        "label": "All",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.proxy.sync.networkprogramming.duration.us.bucket.+Inf",
+                                "id": "c66bf581-9be9-11e9-871d-d3c7d4c337ef",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "c66bf581-9be9-11e9-871d-d3c7d4c337ef",
+                                "id": "d48b3950-9be9-11e9-871d-d3c7d4c337ef",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Proxy network programming [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b8a24790-9bf0-11e9-9dc8-fd27291d427f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:38.365Z",
+    "version": "WzQwMzIsMV0="
+}

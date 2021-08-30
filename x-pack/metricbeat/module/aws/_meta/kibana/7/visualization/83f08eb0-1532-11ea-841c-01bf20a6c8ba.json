@@ -1,0 +1,100 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Total Estimated Charges [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "88a80e30-1530-11ea-961e-c1db9cc6166e"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "ebb52700-1531-11ea-961e-c1db9cc6166e"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "aws.billing.EstimatedCharges : * and not (aws.billing.ServiceName : * )"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "e8a045e0-1531-11ea-961e-c1db9cc6166e"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1d",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "aws.billing.EstimatedCharges : * and not (aws.billing.ServiceName : * )"
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total Estimated Charges",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.billing.EstimatedCharges",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "metricbeat-*",
+                        "series_interval": ">=1d",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none",
+                        "time_range_mode": "last_value",
+                        "value_template": "${{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "last_value",
+                "tooltip_mode": "show_all",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Total Estimated Charges [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "83f08eb0-1532-11ea-841c-01bf20a6c8ba",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:25.535Z",
+    "version": "WzMzMTcsMV0="
+}

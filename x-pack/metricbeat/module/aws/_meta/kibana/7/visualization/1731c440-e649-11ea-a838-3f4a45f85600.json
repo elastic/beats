@@ -1,0 +1,86 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Total Unblended Cost [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "cf04e620-e648-11ea-bdad-df8839db1393"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "aws.billing.group_definition.key : \"AZ\""
+                },
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=2d",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "aws.billing.group_definition.key : \"AZ\""
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total Unblended Cost",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.billing.UnblendedCost.amount",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "override_index_pattern": 1,
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "series_index_pattern": "metricbeat-*",
+                        "series_interval": ">=2d",
+                        "series_time_field": "@timestamp",
+                        "split_color_mode": "kibana",
+                        "split_mode": "filter",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "last_value",
+                "tooltip_mode": "show_all",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Total Unblended Cost [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "1731c440-e649-11ea-a838-3f4a45f85600",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:25.535Z",
+    "version": "WzMzMTUsMV0="
+}
