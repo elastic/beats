@@ -1,0 +1,132 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Heap memory usage [Metricbeat Tomcat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(159,5,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "9057a880-ec30-11e9-a38d-abb22848ef7c",
+                        "label": "Used",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.memory.heap.usage.used",
+                                "id": "9057a881-ec30-11e9-a38d-abb22848ef7c",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value/1024}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Committed",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.memory.heap.usage.committed",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value/1024}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "78d8a4c0-ec30-11e9-a38d-abb22848ef7c",
+                        "label": "Init",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.memory.heap.usage.init",
+                                "id": "78d8cbd0-ec30-11e9-a38d-abb22848ef7c",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value/1024}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,146,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "855cd630-ec30-11e9-a38d-abb22848ef7c",
+                        "label": "Max",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.memory.heap.usage.max",
+                                "id": "855cd631-ec30-11e9-a38d-abb22848ef7c",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value/1024}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Heap memory usage [Metricbeat Tomcat]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e037f620-ec30-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:22.513Z",
+    "version": "WzMyODcsMV0="
+}

@@ -1,0 +1,29 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Info OSSEC rootkit [Filebeat Osquery] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "This dashboard shows data collected by the ossec-rootkit pack from osquery."
+            },
+            "title": "Info OSSEC rootkit [Filebeat Osquery] ECS",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6ec10290-f4aa-11e7-8647-534bb4c21040-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:55.664Z",
+    "version": "WzQ5MzMsMV0="
+}

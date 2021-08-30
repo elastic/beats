@@ -1,0 +1,110 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Network - Event Throughput [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "3eadd451-5033-423f-88e3-814cc5e50b50"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "8d4596c5-49ad-429b-af54-5451b1c2e8d4"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "4d957654-cc7e-4ef3-8b29-61c0aeadd51a",
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "73968651-c41e-473e-a153-a025f49d1a1b",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "90d7621e-3265-4fe8-8882-8df9605ea659",
+                        "label": "Event Throughput",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "ba1830b9-9ce3-4bf1-8f4d-f7478b7f1bba",
+                                "type": "count"
+                            },
+                            {
+                                "field": "ba1830b9-9ce3-4bf1-8f4d-f7478b7f1bba",
+                                "id": "ca3a65d0-9f3d-42a9-9f4e-16f9e24cba19",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "ca3a65d0-9f3d-42a9-9f4e-16f9e24cba19",
+                                "id": "6db67bc1-7fff-47e7-a931-f797b1f76732",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "6db67bc1-7fff-47e7-a931-f797b1f76732",
+                                "gamma": 0.3,
+                                "id": "92bc1447-2b30-498c-ae8a-c67904fc82b2",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}  / s"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Network - Event Throughput [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "33747d52-ec4c-4d91-86d8-fbdf9b9c82db",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:40.331Z",
+    "version": "WzQ3NzYsMV0="
+}

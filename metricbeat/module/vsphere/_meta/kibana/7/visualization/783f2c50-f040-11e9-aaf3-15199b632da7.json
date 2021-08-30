@@ -1,0 +1,211 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Free vs Used Datastore [Metricbeat VSphere] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Used",
+                        "field": "vsphere.datastore.capacity.used.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "timeRange": {
+                            "from": "now-15m",
+                            "to": "now"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Free",
+                        "field": "vsphere.datastore.capacity.free.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "dimensions": {
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "date_histogram",
+                        "format": {
+                            "id": "date",
+                            "params": {
+                                "pattern": "HH:mm:ss"
+                            }
+                        },
+                        "params": {
+                            "bounds": {
+                                "max": "2019-10-16T18:11:40.605Z",
+                                "min": "2019-10-16T17:56:40.605Z"
+                            },
+                            "date": true,
+                            "format": "HH:mm:ss",
+                            "interval": "PT30S"
+                        }
+                    },
+                    "y": [
+                        {
+                            "accessor": 1,
+                            "aggType": "max",
+                            "format": {
+                                "id": "bytes"
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "max",
+                            "format": {
+                                "id": "bytes"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": false
+                },
+                "isVislibVis": true,
+                "labels": {},
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "2",
+                            "label": "Used"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "mode": "stacked",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "area",
+                        "valueAxis": "ValueAxis-1"
+                    },
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Free"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "area",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "thresholdLine": {
+                    "color": "#34130C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                },
+                "times": [],
+                "type": "area",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Free"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Free vs Used Datastore [Metricbeat VSphere] ECS",
+            "type": "area"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "783f2c50-f040-11e9-aaf3-15199b632da7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "1411b690-f017-11e9-aaf3-15199b632da7",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:58.868Z",
+    "version": "WzQyMTIsMV0="
+}

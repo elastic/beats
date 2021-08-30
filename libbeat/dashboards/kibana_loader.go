@@ -151,12 +151,23 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 
 	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 
-	if err := loader.client.ImportMultiPartFormFile(importAPI, params, filepath.Base(file), string(content)); err != nil {
-		return fmt.Errorf("error loading index pattern: %+v", err)
+	var obj common.MapStr
+	err = json.Unmarshal(content, &obj)
+	if err != nil {
+		return err
+	}
+
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), obj.String()); err != nil {
+		return fmt.Errorf("error dashboard asset: %+v", err)
 	}
 	return nil
 }
 
+func correctExtension(file string) string {
+	return filepath.Base(file[:len(file)-len("json")]) + "ndjson"
+}
+
+// Close closes the client
 func (loader KibanaLoader) Close() error {
 	return loader.client.Close()
 }
