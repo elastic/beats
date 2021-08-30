@@ -203,6 +203,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
 - Fix build constraint that caused issues with doc builds. {pull}27381[27381]
 - Do not try to load ILM policy if `check_exists` is `false`. {pull}27508[27508] {issue}26322[26322]
+- Fix bug with cgroups hierarchy override path in cgroups {pull}27620[27620]
 
 *Auditbeat*
 
