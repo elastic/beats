@@ -1,0 +1,234 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index"
+            }
+        },
+        "title": "Container Service Kube Node Status Condition [Metricbeat Azure]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 0.2": "rgb(165,0,38)",
+                    "0.2 - 0.4": "rgb(244,109,67)",
+                    "0.4 - 0.6": "rgb(254,224,139)",
+                    "0.6 - 0.8": "rgb(217,239,139)",
+                    "0.8 - 1": "rgb(102,189,99)"
+                },
+                "legendOpen": true
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "field": "azure.container_service.kube_node_status_condition.avg"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"Ready\"  and azure.dimensions.status : \"true\" "
+                                },
+                                "label": "Ready \"true\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"Ready\"  and azure.dimensions.status : \"false\"  "
+                                },
+                                "label": "Ready \"false\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"NetworkUnavailable\"  and azure.dimensions.status : \"true\"    "
+                                },
+                                "label": "Network Unavailable \"true\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"NetworkUnavailable\"  and azure.dimensions.status : \"false\"     "
+                                },
+                                "label": "NetworkUnavailable  \"false\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"OutOfDisk\"  and azure.dimensions.status : \"false\" "
+                                },
+                                "label": "OutOfDisk \"false\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"OutOfDisk\"  and azure.dimensions.status : \"true\"  "
+                                },
+                                "label": "OutOfDisk \"true\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"MemoryPressure\"  and azure.dimensions.status : \"true\"  "
+                                },
+                                "label": "MemoryPressure \"true\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"MemoryPressure\"  and azure.dimensions.status : \"false\"   "
+                                },
+                                "label": "MemoryPressure \"false\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"DiskPressure\"  and azure.dimensions.status : \"false\"   "
+                                },
+                                "label": "DiskPressure \"false\""
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "azure.dimensions.condition : \"DiskPressure\"  and azure.dimensions.status : \"true\"    "
+                                },
+                                "label": "DiskPressure \"true\""
+                            }
+                        ]
+                    },
+                    "schema": "segment",
+                    "type": "filters"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "azure.dimensions.node",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Green to Red",
+                "colorsNumber": 5,
+                "colorsRange": [
+                    {
+                        "from": 0,
+                        "to": 10
+                    }
+                ],
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other",
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "azure.dimensions.node: Descending",
+                            "params": {}
+                        }
+                    ],
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "filters",
+                        "format": {},
+                        "label": "filters",
+                        "params": {}
+                    },
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "avg",
+                            "format": {
+                                "id": "number",
+                                "params": {
+                                    "parsedUrl": {
+                                        "basePath": "",
+                                        "origin": "http://localhost:5601",
+                                        "pathname": "/app/kibana"
+                                    }
+                                }
+                            },
+                            "label": "Average azure.container_service.kube_node_status_condition.avg",
+                            "params": {}
+                        }
+                    ]
+                },
+                "enableHover": false,
+                "invertColors": true,
+                "legendPosition": "right",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "type": "heatmap",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "black",
+                            "overwriteColor": false,
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Container Service Kube Node Status Condition [Metricbeat Azure]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e79211c0-6d37-11ea-8fe8-71add5fd7c38",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:48.023Z",
+    "version": "WzM1MzksMV0="
+}

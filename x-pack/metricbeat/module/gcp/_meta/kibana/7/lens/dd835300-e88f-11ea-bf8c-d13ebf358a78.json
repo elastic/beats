@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "4cb00ce3-c62e-46f3-90ce-b69c876b9605": {
+                            "columnOrder": [
+                                "2f66b924-5392-4e5e-93fe-5b23a87068c1"
+                            ],
+                            "columns": {
+                                "2f66b924-5392-4e5e-93fe-5b23a87068c1": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "",
+                                    "operationType": "unique_count",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.project_id"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "2f66b924-5392-4e5e-93fe-5b23a87068c1",
+                "layerId": "4cb00ce3-c62e-46f3-90ce-b69c876b9605"
+            }
+        },
+        "title": "Total Number Of Projects [Metricbeat GCP]",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dd835300-e88f-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-4cb00ce3-c62e-46f3-90ce-b69c876b9605",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NzEsMV0="
+}

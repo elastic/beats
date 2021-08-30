@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Total requests [Metricbeat Tomcat]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "a2ae7420-ec33-11e9-a38d-abb22848ef7c",
+                        "label": "Total",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.requests.total",
+                                "id": "a2ae7421-ec33-11e9-a38d-abb22848ef7c",
+                                "mode": "raw",
+                                "sigma": "1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "a2ae7421-ec33-11e9-a38d-abb22848ef7c",
+                                "id": "40d82510-ee8c-11e9-a452-e36b1c5ca82b",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "40d82510-ee8c-11e9-a452-e36b1c5ca82b",
+                                "id": "a3934920-ee94-11e9-a452-e36b1c5ca82b",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Errors",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "tomcat.requests.errors.total",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "be872850-ee94-11e9-a452-e36b1c5ca82b",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "be872850-ee94-11e9-a452-e36b1c5ca82b",
+                                "id": "c2290730-ee94-11e9-a452-e36b1c5ca82b",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Total requests [Metricbeat Tomcat]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9d0616e0-ec33-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:22.513Z",
+    "version": "WzMyOTAsMV0="
+}

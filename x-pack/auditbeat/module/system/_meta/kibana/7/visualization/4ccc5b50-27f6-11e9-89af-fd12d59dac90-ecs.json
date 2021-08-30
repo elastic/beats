@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Dashboard Links [Auditbeat System] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "**Dashboards**: [System Overview](#/dashboard/2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs) | [Hosts](#/dashboard/dfe62590-18da-11e9-9094-c50574723088-ecs) | [Logins](#/dashboard/2a17f200-285e-11e9-805f-43bf57dfa519-ecs) | [Users](#/dashboard/ae96a660-2864-11e9-97cb-474beda9f119-ecs) | [Processes](#/dashboard/4c68f110-2863-11e9-97cb-474beda9f119-ecs) | [Sockets](#/dashboard/957a3ef0-2867-11e9-9d21-0be348776e6c-ecs) | [Packages](#/dashboard/137c52f0-286a-11e9-9d21-0be348776e6c-ecs)",
+                "openLinksInNewTab": false
+            },
+            "title": "Dashboard Links [Auditbeat System] ECS",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:36:07.028Z",
+    "version": "WzUwNTgsMV0="
+}

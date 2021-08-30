@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Throughput [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "57f0f3e0-b46b-11e9-88d3-b1e3cace09ae",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,204,202,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "57f11af0-b46b-11e9-88d3-b1e3cace09ae",
+                        "label": "read",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_status.traffic.read_bytes",
+                                "id": "57f11af1-b46b-11e9-88d3-b1e3cace09ae",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(176,188,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "57f11af2-b46b-11e9-88d3-b1e3cace09ae",
+                        "label": "write",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_status.traffic.write_bytes",
+                                "id": "57f11af3-b46b-11e9-88d3-b1e3cace09ae",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Throughput [Metricbeat Ceph] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "88d48440-b46b-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:57.280Z",
+    "version": "WzM2MzEsMV0="
+}

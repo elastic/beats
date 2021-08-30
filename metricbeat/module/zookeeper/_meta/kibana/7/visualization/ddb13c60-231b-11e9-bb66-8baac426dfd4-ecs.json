@@ -1,0 +1,110 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_min": "0",
+                        "axis_position": "left",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0.1",
+                        "formatter": "percent",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Used file descriptors",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "zookeeper.mntr.open_file_descriptor_count",
+                                "id": "b92e4550-231a-11e9-9e57-679640dc0c7c",
+                                "metric_agg": "avg",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "zookeeper.mntr.max_file_descriptor_count",
+                                "id": "918d0c60-231b-11e9-9e57-679640dc0c7c",
+                                "type": "avg"
+                            },
+                            {
+                                "id": "7e4d11e0-231b-11e9-9e57-679640dc0c7c",
+                                "script": "params.a/params.b",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "b92e4550-231a-11e9-9e57-679640dc0c7c",
+                                        "id": "81c03fa0-231b-11e9-9e57-679640dc0c7c",
+                                        "name": "a"
+                                    },
+                                    {
+                                        "field": "918d0c60-231b-11e9-9e57-679640dc0c7c",
+                                        "id": "8a3af6c0-231b-11e9-9e57-679640dc0c7c",
+                                        "name": "b"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_min": "0",
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,98,177,1)",
+                        "fill": "0",
+                        "formatter": "0,0.[00]",
+                        "id": "dffaffe0-23cc-11e9-b1ff-37c851471450",
+                        "label": "Open file descriptors",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "zookeeper.mntr.open_file_descriptor_count",
+                                "id": "dffaffe1-23cc-11e9-b1ff-37c851471450",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Used file descriptors [Metricbeat Zookeeper] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ddb13c60-231b-11e9-bb66-8baac426dfd4-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:53.758Z",
+    "version": "WzQxNzUsMV0="
+}
