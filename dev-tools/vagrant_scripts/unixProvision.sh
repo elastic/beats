@@ -41,23 +41,26 @@ function rhelProvision () {
     yum install -y make gcc git python3 python3-pip python3-venv git rpm-devel
 }
 
+function archProvision () {
+    pacman -Sy && pacman -S --noconfirm make gcc python python-pip git
+}
 
 case "${PROVISION_TYPE}" in
     "gvm")
         gvmProvision $ARCH $OS $GO_VERSION
     ;;
+    "archlinux")
+        archProvision
+    ;;
     "unix")
         unixProvision
     ;;
-    "rhel")
+    "centos")
         rhelProvision
     ;;
-    "debian")
+    "debian" | "ubuntu")
         debProvision
     ;;
     *)
-        echo "default case"
+        echo "No Extra provisioning steps for this platform"
 esac
-
-
-
