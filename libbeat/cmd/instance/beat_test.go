@@ -86,11 +86,13 @@ func TestInitKibanaConfig(t *testing.T) {
 	assert.NoError(t, err)
 	username, err := kibanaConfig.String("username", -1)
 	password, err := kibanaConfig.String("password", -1)
+	api_key, err := kibanaConfig.String("api_key", -1)
 	protocol, err := kibanaConfig.String("protocol", -1)
 	host, err := kibanaConfig.String("host", -1)
 
 	assert.Equal(t, "elastic-test-username", username)
 	assert.Equal(t, "elastic-test-password", password)
+	assert.Equal(t, "elastic-test-api-key", api_key)
 	assert.Equal(t, "https", protocol)
 	assert.Equal(t, "127.0.0.1:5601", host)
 }
