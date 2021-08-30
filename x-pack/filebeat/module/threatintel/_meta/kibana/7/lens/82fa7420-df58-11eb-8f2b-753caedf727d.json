@@ -1,0 +1,95 @@
+{
+    "attributes": {
+        "description": "Recorded Future indicators over time ingested by the threat intel Filebeat module.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "98644301-1cd1-4e54-9f5b-71a1cbcdd8c8": {
+                            "columnOrder": [
+                                "8f48381c-5786-43f4-8602-5c23ba146a60",
+                                "86e20fd3-86a5-4796-b4b8-f2461a9fa922"
+                            ],
+                            "columns": {
+                                "86e20fd3-86a5-4796-b4b8-f2461a9fa922": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "8f48381c-5786-43f4-8602-5c23ba146a60": {
+                                    "customLabel": true,
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "Recorded Future Indicators Over Time",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:\"threatintel.recordedfuture\" "
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "accessors": [
+                            "86e20fd3-86a5-4796-b4b8-f2461a9fa922"
+                        ],
+                        "layerId": "98644301-1cd1-4e54-9f5b-71a1cbcdd8c8",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "xAccessor": "8f48381c-5786-43f4-8602-5c23ba146a60"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "title": "Empty XY chart",
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Recorded Future Indicators Over Time [Filebeat Threat Intel]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "82fa7420-df58-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-98644301-1cd1-4e54-9f5b-71a1cbcdd8c8",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:33.127Z",
+    "version": "WzQ2NjgsMV0="
+}

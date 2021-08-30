@@ -1,0 +1,124 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "SQL Bytes [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(84,179,153,1)",
+                        "fill": "0.5",
+                        "formatter": "bytes",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Bytes In",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "e37c46b0-cd03-11ea-90ab-5112cd60bde7",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "50",
+                        "type": "timeseries",
+                        "value_template": "{{value}}/s"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(96,146,192,1)",
+                        "fill": "0.5",
+                        "formatter": "bytes",
+                        "id": "15553390-cd04-11ea-90ab-5112cd60bde7",
+                        "label": "Bytes Out",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "15553391-cd04-11ea-90ab-5112cd60bde7",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "6bc01490-2068-11eb-96da-17d67bb2d46d",
+                                "type": "series_agg"
+                            },
+                            {
+                                "id": "789ffa90-2068-11eb-96da-17d67bb2d46d",
+                                "script": "params.rate != null && params.rate > 0 ? params.rate * -1 : null",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "15553391-cd04-11ea-90ab-5112cd60bde7",
+                                        "id": "7ff173f0-2068-11eb-96da-17d67bb2d46d",
+                                        "name": "rate"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "100",
+                        "type": "timeseries",
+                        "value_template": "{{value}}/s"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SQL Bytes [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7d13f0d0-c763-11ea-8a94-61b423d19ae7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MTMsMV0="
+}

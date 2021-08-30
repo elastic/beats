@@ -1,0 +1,27 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"6908e81b-1695-4445-aee4-8bc8c9f65600\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"4b8bd321-4b90-4d97-83e0-2b12bf091f66\",\"geoField\":\"client.geo.location\",\"filterByMapBounds\":false,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSize\":1,\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\",\"scalingType\":\"LIMIT\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"dc52e707-92d7-4de7-becf-a3a8bfaa2c2d\",\"label\":\"Okta \",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"query\":{\"query\":\"event.dataset : \\\"okta.system\\\" \",\"language\":\"kuery\"}}]",
+        "mapStateJSON": "{\"zoom\":2.75,\"center\":{\"lon\":-44.69098,\"lat\":26.54701},\"timeFilters\":{\"from\":\"now-15w\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"okta.system\"},\"type\":\"phrase\"},\"query\":{\"match_phrase\":{\"event.dataset\":\"okta.system\"}}}],\"settings\":{\"autoFitToDataBounds\":false}}",
+        "title": "Geolocation [Filebeat Okta]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:33:39.099Z",
+    "version": "WzQyMzQsMV0="
+}

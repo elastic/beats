@@ -1,0 +1,291 @@
+{
+    "attributes": {
+        "description": "Top-level metrics of indicators and datasets ingested by the threat intel Filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+                "panelRefName": "panel_0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "eed57854-9d6a-4373-ab79-aba5025ab5ed",
+                    "w": 10,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "eed57854-9d6a-4373-ab79-aba5025ab5ed",
+                "panelRefName": "panel_eed57854-9d6a-4373-ab79-aba5025ab5ed",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "cecb5fce-b1c6-4121-a943-73c163554fff",
+                    "w": 13,
+                    "x": 30,
+                    "y": 7
+                },
+                "panelIndex": "cecb5fce-b1c6-4121-a943-73c163554fff",
+                "panelRefName": "panel_cecb5fce-b1c6-4121-a943-73c163554fff",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+                    "w": 5,
+                    "x": 43,
+                    "y": 7
+                },
+                "panelIndex": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+                "panelRefName": "panel_8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "81f493cc-5459-4baf-b57a-295f290debf3",
+                    "w": 8,
+                    "x": 10,
+                    "y": 7
+                },
+                "panelIndex": "81f493cc-5459-4baf-b57a-295f290debf3",
+                "panelRefName": "panel_81f493cc-5459-4baf-b57a-295f290debf3",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+                    "w": 12,
+                    "x": 18,
+                    "y": 7
+                },
+                "panelIndex": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+                "panelRefName": "panel_c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8788d810-774f-4190-bc01-16fb04c0b38c",
+                    "w": 19,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "8788d810-774f-4190-bc01-16fb04c0b38c",
+                "panelRefName": "panel_8788d810-774f-4190-bc01-16fb04c0b38c",
+                "type": "lens",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "51db6286-e72d-4a6c-99f5-363f17bb333a",
+                    "w": 10,
+                    "x": 19,
+                    "y": 22
+                },
+                "panelIndex": "51db6286-e72d-4a6c-99f5-363f17bb333a",
+                "panelRefName": "panel_51db6286-e72d-4a6c-99f5-363f17bb333a",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+                    "w": 19,
+                    "x": 29,
+                    "y": 22
+                },
+                "panelIndex": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+                "panelRefName": "panel_4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f7fb86cb-c07f-4489-afaa-942bcacfedda",
+                    "w": 19,
+                    "x": 0,
+                    "y": 37
+                },
+                "panelIndex": "f7fb86cb-c07f-4489-afaa-942bcacfedda",
+                "panelRefName": "panel_f7fb86cb-c07f-4489-afaa-942bcacfedda",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+                    "w": 10,
+                    "x": 19,
+                    "y": 37
+                },
+                "panelIndex": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+                "panelRefName": "panel_e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+                "type": "visualization",
+                "version": "7.13.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+                    "w": 19,
+                    "x": 29,
+                    "y": 37
+                },
+                "panelIndex": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+                "panelRefName": "panel_ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+                "type": "visualization",
+                "version": "7.13.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ad9c7430-72de-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
+            "name": "0a8c6e54-3d3a-4e88-a230-75d7a3856154:panel_0a8c6e54-3d3a-4e88-a230-75d7a3856154",
+            "type": "visualization"
+        },
+        {
+            "id": "f13f5650-df5b-11eb-8f2b-753caedf727d",
+            "name": "eed57854-9d6a-4373-ab79-aba5025ab5ed:panel_eed57854-9d6a-4373-ab79-aba5025ab5ed",
+            "type": "visualization"
+        },
+        {
+            "id": "1a1c60c0-72d5-11eb-a3e3-b3cc7c78a70f",
+            "name": "cecb5fce-b1c6-4121-a943-73c163554fff:panel_cecb5fce-b1c6-4121-a943-73c163554fff",
+            "type": "visualization"
+        },
+        {
+            "id": "c049e1c0-72d5-11eb-a3e3-b3cc7c78a70f",
+            "name": "8c2caa0d-fedc-406b-a4cc-87c09ba9e929:panel_8c2caa0d-fedc-406b-a4cc-87c09ba9e929",
+            "type": "visualization"
+        },
+        {
+            "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+            "name": "81f493cc-5459-4baf-b57a-295f290debf3:panel_81f493cc-5459-4baf-b57a-295f290debf3",
+            "type": "visualization"
+        },
+        {
+            "id": "81f16940-72d3-11eb-a3e3-b3cc7c78a70f",
+            "name": "c5d9284a-f44c-4cee-b9fd-9585dcaadc89:panel_c5d9284a-f44c-4cee-b9fd-9585dcaadc89",
+            "type": "visualization"
+        },
+        {
+            "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
+            "name": "8788d810-774f-4190-bc01-16fb04c0b38c:panel_8788d810-774f-4190-bc01-16fb04c0b38c",
+            "type": "lens"
+        },
+        {
+            "id": "f9f89660-72d9-11eb-a3e3-b3cc7c78a70f",
+            "name": "51db6286-e72d-4a6c-99f5-363f17bb333a:panel_51db6286-e72d-4a6c-99f5-363f17bb333a",
+            "type": "visualization"
+        },
+        {
+            "id": "9047e8b0-72de-11eb-a3e3-b3cc7c78a70f",
+            "name": "4dbff662-ebdd-4b6d-910b-1b80bd4e9045:panel_4dbff662-ebdd-4b6d-910b-1b80bd4e9045",
+            "type": "visualization"
+        },
+        {
+            "id": "b9aa1d70-72db-11eb-a3e3-b3cc7c78a70f",
+            "name": "f7fb86cb-c07f-4489-afaa-942bcacfedda:panel_f7fb86cb-c07f-4489-afaa-942bcacfedda",
+            "type": "visualization"
+        },
+        {
+            "id": "aebde030-72d2-11eb-a3e3-b3cc7c78a70f",
+            "name": "e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264:panel_e640ab8b-1aa8-4a33-9df9-bbb6cc1fe264",
+            "type": "visualization"
+        },
+        {
+            "id": "c813c5d0-72dd-11eb-a3e3-b3cc7c78a70f",
+            "name": "ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce:panel_ca86a2c7-7b2e-4c16-bbba-02e5a09aa7ce",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:32.145Z",
+    "version": "WzQ2NDYsMV0="
+}

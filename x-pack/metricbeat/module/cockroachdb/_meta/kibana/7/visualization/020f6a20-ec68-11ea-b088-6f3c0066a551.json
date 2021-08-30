@@ -1,0 +1,136 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Disk Metrics [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,146,0,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "e4489e50-976b-11e9-b3d5-07b0ab7d6354",
+                        "label": "Disk IOPS in Progress",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
+                                "type": "max",
+                                "unit": "1s"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "host.name",
+                        "terms_size": "100",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "c938f9c0-976b-11e9-b3d5-07b0ab7d6354",
+                        "label": "Disk Read Ops",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "b5a57e90-ec67-11ea-8a63-93b9b48262dc",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "100",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "0ed1bf80-976c-11e9-b3d5-07b0ab7d6354",
+                        "label": "Disk Write Ops",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "d6fb6e10-ec67-11ea-8a63-93b9b48262dc",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_order_by": "_key",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Disk Metrics [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "020f6a20-ec68-11ea-b088-6f3c0066a551",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:00.377Z",
+    "version": "WzM3MDUsMV0="
+}

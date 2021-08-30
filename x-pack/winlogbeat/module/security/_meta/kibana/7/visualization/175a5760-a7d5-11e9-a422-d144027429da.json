@@ -1,0 +1,142 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "winlog.provider_name",
+                            "negate": false,
+                            "params": {
+                                "query": "Microsoft-Windows-Security-Auditing"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "winlog.provider_name": "Microsoft-Windows-Security-Auditing"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Logon Successful vs Failed [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "Failed Logins": "#EF843C",
+                    "Failed Logons": "#EA6460",
+                    "Successful Login": "#B7DBAB",
+                    "Successful Logon": "#B7DBAB"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "event.code: 4624"
+                                },
+                                "label": "Successful Logon"
+                            },
+                            {
+                                "input": {
+                                    "language": "lucene",
+                                    "query": "event.code: 4625"
+                                },
+                                "label": "Failed Logons"
+                            }
+                        ]
+                    },
+                    "schema": "segment",
+                    "type": "filters"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "filters",
+                            "format": {},
+                            "params": {}
+                        }
+                    ],
+                    "metric": {
+                        "accessor": 1,
+                        "aggType": "count",
+                        "format": {
+                            "id": "number"
+                        },
+                        "params": {}
+                    }
+                },
+                "distinctColors": true,
+                "isDonut": false,
+                "labels": {
+                    "last_level": true,
+                    "show": false,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "bottom",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "Logon Successful vs Failed [Winlogbeat Security]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "175a5760-a7d5-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTQsMl0="
+}

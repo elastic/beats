@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Rows Inserted/Deleted/Updated [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "fc474800-b799-11e9-bfa6-bd2fe13c0445",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "fc474801-b799-11e9-bfa6-bd2fe13c0445",
+                        "label": "inserted",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.rows.inserted",
+                                "id": "fc474802-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "max"
+                            },
+                            {
+                                "field": "fc474802-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc474804-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "fc474804-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc474803-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "fc474805-b799-11e9-bfa6-bd2fe13c0445",
+                        "label": "deleted",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.rows.deleted",
+                                "id": "fc474806-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "max"
+                            },
+                            {
+                                "field": "fc474806-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc474808-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "fc474808-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc474807-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#00B3A4",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "fc476f10-b799-11e9-bfa6-bd2fe13c0445",
+                        "label": "updated",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.rows.updated",
+                                "id": "fc476f11-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "max"
+                            },
+                            {
+                                "field": "fc476f11-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc476f13-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "fc476f13-b799-11e9-bfa6-bd2fe13c0445",
+                                "id": "fc476f12-b799-11e9-bfa6-bd2fe13c0445",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}/s"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Rows Inserted/Deleted/Updated [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "20931ef0-b79a-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDYsMV0="
+}
