@@ -77,7 +77,7 @@ func main() {
 		Path:      u.Path,
 		SpaceID:   *spaceID,
 		Transport: transport,
-	}, "beat")
+	}, "Beat Development Tools")
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
