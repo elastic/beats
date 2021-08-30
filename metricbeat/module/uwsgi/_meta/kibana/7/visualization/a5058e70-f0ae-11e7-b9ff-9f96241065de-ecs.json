@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Overview [Metricbeat uWSGI] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "params": {
+                "expression": ".es(metric=avg:uwsgi.status.total.requests).derivative().label('Requests').title('Overview of requests per period'),\n.es(metric=avg:uwsgi.status.total.exceptions).derivative().label('Exceptions'),\n.es(metric=max:uwsgi.status.worker.avg_rt).label('Average response time').yaxis(2)",
+                "interval": "15s"
+            },
+            "title": "Overview [Metricbeat uWSGI] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a5058e70-f0ae-11e7-b9ff-9f96241065de-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:52.731Z",
+    "version": "WzQxNjYsMV0="
+}

@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "Overview of CoreDNS",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "1",
+                    "w": 41,
+                    "x": 4,
+                    "y": 7
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "2",
+                    "w": 20,
+                    "x": 4,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "3",
+                    "w": 21,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "4",
+                    "w": 41,
+                    "x": 4,
+                    "y": 21
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat CoreDNS] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "53aa1f70-443e-11e9-8548-ab7fbe04f038",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3ad75810-4429-11e9-8548-ab7fbe04f038",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "9dc640e0-4432-11e9-8548-ab7fbe04f038",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "75743f70-443c-11e9-8548-ab7fbe04f038",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "cfde7fb0-443d-11e9-8548-ab7fbe04f038",
+            "name": "4:panel_4",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:40.046Z",
+    "version": "WzQyNDAsMV0="
+}

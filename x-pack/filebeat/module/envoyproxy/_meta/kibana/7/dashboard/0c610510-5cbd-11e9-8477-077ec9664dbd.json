@@ -1,0 +1,160 @@
+{
+    "attributes": {
+        "description": "Filebeat Envoyproxy Overview Dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "1",
+                    "w": 22,
+                    "x": 22,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "2",
+                    "w": 22,
+                    "x": 22,
+                    "y": 7
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 22,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "4",
+                    "w": 22,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5",
+                    "w": 22,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "6",
+                    "w": 22,
+                    "x": 22,
+                    "y": 17
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Envoyproxy] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0c610510-5cbd-11e9-8477-077ec9664dbd",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "36f872a0-5c03-11e9-85b4-19d0072eb4f2",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "80844540-5c97-11e9-8477-077ec9664dbd",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "38f96190-5c99-11e9-8477-077ec9664dbd",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "7e4084e0-5c99-11e9-8477-077ec9664dbd",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "0a994af0-5c9d-11e9-8477-077ec9664dbd",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "ab48c3f0-5ca6-11e9-8477-077ec9664dbd",
+            "name": "6:panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:42.085Z",
+    "version": "WzQyNTYsMV0="
+}

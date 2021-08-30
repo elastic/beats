@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Cloudwatch ELB Latency [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "annotations": [],
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "23428b30-f7f2-11e8-bff8-21537b07dd44"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "2592bcc0-f7f2-11e8-bff8-21537b07dd44"
+                    }
+                ],
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0",
+                        "filter": "",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "AWS Cloudwatch ELB Latency",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.elb.metrics.Latency",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 1,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "aws.dimensions.LoadBalancerName",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "terms_size": "5"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "AWS Cloudwatch ELB Latency",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "42016bf0-728f-11e9-9a7b-4d62d5bcf4fc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:33.734Z",
+    "version": "WzM0MDMsMV0="
+}

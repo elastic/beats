@@ -1,0 +1,55 @@
+{
+    "attributes": {
+        "columns": [
+            "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlight": {
+                    "fields": {
+                        "*": {}
+                    },
+                    "fragment_size": 2147483647,
+                    "post_tags": [
+                        "@/kibana-highlighted-field@"
+                    ],
+                    "pre_tags": [
+                        "@kibana-highlighted-field@"
+                    ],
+                    "require_field_match": false
+                },
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.module:traefik"
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Traefik logs [Filebeat Traefik] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Filebeat-Traefik-module-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:34.139Z",
+    "version": "WzQ2ODYsMV0="
+}

@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "Average SQL execution latency",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Average Exec latency [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": 0.5,
+                        "filter": "",
+                        "formatter": "ns,ms,2",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Average log commit latency",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": null,
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "order": "desc",
+                                "size": 1,
+                                "type": "max"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": null,
+                                "id": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
+                                "type": "max",
+                                "unit": ""
+                            },
+                            {
+                                "field": "4a430120-976f-11e9-b3d5-07b0ab7d6354",
+                                "id": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "id": "6574b730-9770-11e9-b3d5-07b0ab7d6354",
+                                "script": "params.sum / params.count",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "581519e0-9770-11e9-b3d5-07b0ab7d6354",
+                                        "id": "6fbb54b0-9770-11e9-b3d5-07b0ab7d6354",
+                                        "name": "sum"
+                                    },
+                                    {
+                                        "field": "4346d3b0-976f-11e9-b3d5-07b0ab7d6354",
+                                        "id": "76cc90c0-9770-11e9-b3d5-07b0ab7d6354",
+                                        "name": "count"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "type": "timeseries",
+                        "value_template": "{{value}}ms"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Average Exec latency [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "89e96120-fe7a-11ea-a589-8d7d9f58c8fd",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MTEsMV0="
+}

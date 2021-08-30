@@ -1,0 +1,408 @@
+{
+    "attributes": {
+        "description": "Malware Bazaar indicators ingested by the threat intel Filebeat module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "1083ca13-ad6f-4814-8fbf-81b6e6e699ce",
+                    "w": 8,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1083ca13-ad6f-4814-8fbf-81b6e6e699ce",
+                "panelRefName": "panel_0",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 215.66666666666663
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "e5a1ac0c-48a9-445e-becf-865607f990e5",
+                    "w": 8,
+                    "x": 8,
+                    "y": 0
+                },
+                "panelIndex": "e5a1ac0c-48a9-445e-becf-865607f990e5",
+                "panelRefName": "panel_1",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "d3b51c89-ac94-4972-a47e-171a0ae635c2",
+                    "w": 7,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "d3b51c89-ac94-4972-a47e-171a0ae635c2",
+                "panelRefName": "panel_2",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "04c92d8e-6022-4734-96a2-75c51779da75",
+                    "w": 14,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "04c92d8e-6022-4734-96a2-75c51779da75",
+                "panelRefName": "panel_3",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0ba44fdb-d494-45ea-8890-1b9eb4e07e44",
+                    "w": 11,
+                    "x": 37,
+                    "y": 0
+                },
+                "panelIndex": "0ba44fdb-d494-45ea-8890-1b9eb4e07e44",
+                "panelRefName": "panel_4",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapCenter": {
+                        "lat": 19.94277,
+                        "lon": 0,
+                        "zoom": 1.08
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "f0c69f9f-856b-4a66-ac07-6f4f1836743e",
+                    "w": 27,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "f0c69f9f-856b-4a66-ac07-6f4f1836743e",
+                "panelRefName": "panel_5",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "30bc1259-fae6-4806-a4f7-de4e15a57599",
+                    "w": 12,
+                    "x": 27,
+                    "y": 18
+                },
+                "panelIndex": "30bc1259-fae6-4806-a4f7-de4e15a57599",
+                "panelRefName": "panel_6",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "3e41e9e7-2d9a-44ef-9092-3e14fc07f9ec",
+                    "w": 9,
+                    "x": 39,
+                    "y": 18
+                },
+                "panelIndex": "3e41e9e7-2d9a-44ef-9092-3e14fc07f9ec",
+                "panelRefName": "panel_7",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "ac98b880-f1a9-4682-8438-38058275209e",
+                    "w": 11,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "ac98b880-f1a9-4682-8438-38058275209e",
+                "panelRefName": "panel_8",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 661.6666666666666
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0086d444-b5bf-4330-bdc2-01aa8f7c06db",
+                    "w": 16,
+                    "x": 11,
+                    "y": 36
+                },
+                "panelIndex": "0086d444-b5bf-4330-bdc2-01aa8f7c06db",
+                "panelRefName": "panel_9",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": null,
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 944.6666666666666
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0d852939-66e7-4702-aeb3-886d3ae98e90",
+                    "w": 21,
+                    "x": 27,
+                    "y": 36
+                },
+                "panelIndex": "0d852939-66e7-4702-aeb3-886d3ae98e90",
+                "panelRefName": "panel_10",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 395.66666666666663
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "79426cc6-6f0b-4403-be33-77fe1c40656f",
+                    "w": 11,
+                    "x": 0,
+                    "y": 54
+                },
+                "panelIndex": "79426cc6-6f0b-4403-be33-77fe1c40656f",
+                "panelRefName": "panel_11",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "4394a033-cccf-46a6-83a6-ae5598fe1198",
+                    "w": 15,
+                    "x": 11,
+                    "y": 54
+                },
+                "panelIndex": "4394a033-cccf-46a6-83a6-ae5598fe1198",
+                "panelRefName": "panel_12",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 562.6666666666666
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "f09ad2ef-d681-44bf-834e-b5c85c39efe0",
+                    "w": 14,
+                    "x": 26,
+                    "y": 54
+                },
+                "panelIndex": "f09ad2ef-d681-44bf-834e-b5c85c39efe0",
+                "panelRefName": "panel_13",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 309.66666666666663
+                                }
+                            ]
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "7907e86f-a77d-47a5-8d35-d0805449b925",
+                    "w": 8,
+                    "x": 40,
+                    "y": 54
+                },
+                "panelIndex": "7907e86f-a77d-47a5-8d35-d0805449b925",
+                "panelRefName": "panel_14",
+                "version": "7.11.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] Malware Bazaar",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dee7be00-82ab-11eb-ac13-d5ca87cb8fa2",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f91e9620-82a8-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "d22c1090-82a5-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "737d4f30-82ac-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "8b2a64a0-82a8-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "c7d5db50-82a8-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "63365b50-82aa-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_5",
+            "type": "map"
+        },
+        {
+            "id": "bc4790b0-82aa-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "dbd199d0-82aa-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "7cbe5900-82ab-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "786546d0-82a5-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "7546ac40-82a6-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "21ff17c0-82a6-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "142fb6c0-82a8-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "5b4877b0-82a6-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "1d8002d0-82a7-11eb-ac13-d5ca87cb8fa2",
+            "name": "panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:30.070Z",
+    "version": "WzQ2MTMsMV0="
+}

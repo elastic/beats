@@ -1,0 +1,141 @@
+{
+    "attributes": {
+        "description": "This dashboard provides expanded alerts overview for Azure cloud",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "9d1a26e6-2ff0-4d3e-bab3-7bb3c50cd060",
+                    "w": 7,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "9d1a26e6-2ff0-4d3e-bab3-7bb3c50cd060",
+                "panelRefName": "panel_9d1a26e6-2ff0-4d3e-bab3-7bb3c50cd060",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "676fd632-a9c1-46ed-829b-ca5b55817379",
+                    "w": 14,
+                    "x": 7,
+                    "y": 0
+                },
+                "panelIndex": "676fd632-a9c1-46ed-829b-ca5b55817379",
+                "panelRefName": "panel_676fd632-a9c1-46ed-829b-ca5b55817379",
+                "title": "",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "096b4eaa-072e-455f-befa-3076f71be12d",
+                    "w": 27,
+                    "x": 21,
+                    "y": 0
+                },
+                "panelIndex": "096b4eaa-072e-455f-befa-3076f71be12d",
+                "panelRefName": "panel_096b4eaa-072e-455f-befa-3076f71be12d",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "162fb43e-fff3-4f50-aa9b-a713418bd651",
+                    "w": 27,
+                    "x": 21,
+                    "y": 15
+                },
+                "panelIndex": "162fb43e-fff3-4f50-aa9b-a713418bd651",
+                "panelRefName": "panel_162fb43e-fff3-4f50-aa9b-a713418bd651",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "36fb5c08-80d9-4a1c-8fde-9c063381fdd8",
+                    "w": 21,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "36fb5c08-80d9-4a1c-8fde-9c063381fdd8",
+                "panelRefName": "panel_36fb5c08-80d9-4a1c-8fde-9c063381fdd8",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Azure] Alerts Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0f559cc0-f0d5-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "46544960-f0d5-11e9-90ec-112a988266d5",
+            "name": "9d1a26e6-2ff0-4d3e-bab3-7bb3c50cd060:panel_9d1a26e6-2ff0-4d3e-bab3-7bb3c50cd060",
+            "type": "visualization"
+        },
+        {
+            "id": "097d74d0-f044-11e9-90ec-112a988266d5",
+            "name": "676fd632-a9c1-46ed-829b-ca5b55817379:panel_676fd632-a9c1-46ed-829b-ca5b55817379",
+            "type": "visualization"
+        },
+        {
+            "id": "52c2a4e0-ec1f-11e9-90ec-112a988266d5",
+            "name": "096b4eaa-072e-455f-befa-3076f71be12d:panel_096b4eaa-072e-455f-befa-3076f71be12d",
+            "type": "visualization"
+        },
+        {
+            "id": "f684a750-ec23-11e9-90ec-112a988266d5",
+            "name": "162fb43e-fff3-4f50-aa9b-a713418bd651:panel_162fb43e-fff3-4f50-aa9b-a713418bd651",
+            "type": "visualization"
+        },
+        {
+            "id": "c704b050-f0de-11e9-90ec-112a988266d5",
+            "name": "36fb5c08-80d9-4a1c-8fde-9c063381fdd8:panel_36fb5c08-80d9-4a1c-8fde-9c063381fdd8",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:01.505Z",
+    "version": "WzQzNzksMV0="
+}

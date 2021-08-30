@@ -1,0 +1,254 @@
+{
+    "attributes": {
+        "description": "Overview of GCP PubSub Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "3674673e-83e6-42df-8392-5284960a12ea",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3674673e-83e6-42df-8392-5284960a12ea",
+                "panelRefName": "panel_3674673e-83e6-42df-8392-5284960a12ea",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "c1d89f36-43ed-42e6-98a0-8820b28f7953",
+                    "w": 16,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "c1d89f36-43ed-42e6-98a0-8820b28f7953",
+                "panelRefName": "panel_c1d89f36-43ed-42e6-98a0-8820b28f7953",
+                "title": "Topic Send Request",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "b26a6238-b982-4082-9e4e-3e3d9361a865",
+                    "w": 16,
+                    "x": 16,
+                    "y": 6
+                },
+                "panelIndex": "b26a6238-b982-4082-9e4e-3e3d9361a865",
+                "panelRefName": "panel_b26a6238-b982-4082-9e4e-3e3d9361a865",
+                "title": "Topic Oldest Retained Acked Message Age",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "c7bbeabc-b158-4bdd-9ba3-9d45264d250b",
+                    "w": 16,
+                    "x": 32,
+                    "y": 6
+                },
+                "panelIndex": "c7bbeabc-b158-4bdd-9ba3-9d45264d250b",
+                "panelRefName": "panel_c7bbeabc-b158-4bdd-9ba3-9d45264d250b",
+                "title": "Topic Oldest Unacked Message Age",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "b822a795-7086-4559-b7c0-176dfcc7380e",
+                    "w": 16,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "b822a795-7086-4559-b7c0-176dfcc7380e",
+                "panelRefName": "panel_b822a795-7086-4559-b7c0-176dfcc7380e",
+                "title": "Subsciption Oldest Unacked Message",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "9c99d7bb-88f0-415c-abc1-c12ec1295236",
+                    "w": 16,
+                    "x": 16,
+                    "y": 19
+                },
+                "panelIndex": "9c99d7bb-88f0-415c-abc1-c12ec1295236",
+                "panelRefName": "panel_9c99d7bb-88f0-415c-abc1-c12ec1295236",
+                "title": "Subscription Number of Undelivered Messages",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "8cc0ccbd-5798-4d68-a519-07ef1d9693fd",
+                    "w": 16,
+                    "x": 32,
+                    "y": 32
+                },
+                "panelIndex": "8cc0ccbd-5798-4d68-a519-07ef1d9693fd",
+                "panelRefName": "panel_8cc0ccbd-5798-4d68-a519-07ef1d9693fd",
+                "title": "Snapshot Oldest Message",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "f9e45ec1-72e5-4f49-82cf-2132162d642c",
+                    "w": 16,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "f9e45ec1-72e5-4f49-82cf-2132162d642c",
+                "panelRefName": "panel_f9e45ec1-72e5-4f49-82cf-2132162d642c",
+                "title": "Snapshot Number of Messages",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "d8876e62-daf0-4654-8618-8746d5da43e0",
+                    "w": 16,
+                    "x": 16,
+                    "y": 32
+                },
+                "panelIndex": "d8876e62-daf0-4654-8618-8746d5da43e0",
+                "panelRefName": "panel_d8876e62-daf0-4654-8618-8746d5da43e0",
+                "title": "Snapshot Backlog Bytes",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "6079e9ed-da9f-4457-bb3a-7ed20f98605e",
+                    "w": 16,
+                    "x": 32,
+                    "y": 19
+                },
+                "panelIndex": "6079e9ed-da9f-4457-bb3a-7ed20f98605e",
+                "panelRefName": "panel_6079e9ed-da9f-4457-bb3a-7ed20f98605e",
+                "title": "Subscription Backlog Bytes",
+                "type": "lens",
+                "version": "7.9.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] PubSub Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2b0fd7b0-feac-11ea-b032-d59f894a5072",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f6e33a00-feaf-11ea-b032-d59f894a5072",
+            "name": "3674673e-83e6-42df-8392-5284960a12ea:panel_3674673e-83e6-42df-8392-5284960a12ea",
+            "type": "visualization"
+        },
+        {
+            "id": "bd399790-01a2-11eb-b032-d59f894a5072",
+            "name": "c1d89f36-43ed-42e6-98a0-8820b28f7953:panel_c1d89f36-43ed-42e6-98a0-8820b28f7953",
+            "type": "lens"
+        },
+        {
+            "id": "25b76dc0-01a2-11eb-b032-d59f894a5072",
+            "name": "b26a6238-b982-4082-9e4e-3e3d9361a865:panel_b26a6238-b982-4082-9e4e-3e3d9361a865",
+            "type": "lens"
+        },
+        {
+            "id": "5f97d300-01a1-11eb-b032-d59f894a5072",
+            "name": "c7bbeabc-b158-4bdd-9ba3-9d45264d250b:panel_c7bbeabc-b158-4bdd-9ba3-9d45264d250b",
+            "type": "lens"
+        },
+        {
+            "id": "403d81e0-01a0-11eb-b032-d59f894a5072",
+            "name": "b822a795-7086-4559-b7c0-176dfcc7380e:panel_b822a795-7086-4559-b7c0-176dfcc7380e",
+            "type": "lens"
+        },
+        {
+            "id": "11d06fc0-01a0-11eb-b032-d59f894a5072",
+            "name": "9c99d7bb-88f0-415c-abc1-c12ec1295236:panel_9c99d7bb-88f0-415c-abc1-c12ec1295236",
+            "type": "lens"
+        },
+        {
+            "id": "f3e92c10-019d-11eb-b032-d59f894a5072",
+            "name": "8cc0ccbd-5798-4d68-a519-07ef1d9693fd:panel_8cc0ccbd-5798-4d68-a519-07ef1d9693fd",
+            "type": "lens"
+        },
+        {
+            "id": "6de1f430-019d-11eb-b032-d59f894a5072",
+            "name": "f9e45ec1-72e5-4f49-82cf-2132162d642c:panel_f9e45ec1-72e5-4f49-82cf-2132162d642c",
+            "type": "lens"
+        },
+        {
+            "id": "0776dbf0-019f-11eb-b032-d59f894a5072",
+            "name": "d8876e62-daf0-4654-8618-8746d5da43e0:panel_d8876e62-daf0-4654-8618-8746d5da43e0",
+            "type": "lens"
+        },
+        {
+            "id": "79d80f10-01a0-11eb-b032-d59f894a5072",
+            "name": "6079e9ed-da9f-4457-bb3a-7ed20f98605e:panel_6079e9ed-da9f-4457-bb3a-7ed20f98605e",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:13.736Z",
+    "version": "WzM4MDUsMV0="
+}

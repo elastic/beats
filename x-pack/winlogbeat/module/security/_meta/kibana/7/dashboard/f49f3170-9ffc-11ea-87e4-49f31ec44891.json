@@ -1,0 +1,335 @@
+{
+    "attributes": {
+        "description": "Failed and blocked accounts.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "1",
+                    "w": 14,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "Failed Logins": "#EF843C",
+                        "Failed Logons": "#E24D42",
+                        "Successful Login": "#B7DBAB",
+                        "Successful Logon": "#9AC48A"
+                    },
+                    "enhancements": {},
+                    "legendOpen": true,
+                    "vis": {
+                        "colors": {
+                            "Failed Logins": "#EF843C",
+                            "Failed Logons": "#BF1B00",
+                            "Successful Login": "#B7DBAB",
+                            "Successful Logon": "#9AC48A"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "2",
+                    "w": 12,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Login Successful vs Failed",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "3",
+                    "w": 11,
+                    "x": 12,
+                    "y": 35
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Blocked Acoounts",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "Login Failed": "#F9934E",
+                        "Login OK": "#9AC48A",
+                        "Logon Failed": "#E24D42",
+                        "Logon Successful": "#9AC48A"
+                    },
+                    "enhancements": {},
+                    "legendOpen": true,
+                    "vis": {
+                        "colors": {
+                            "Login Failed": "#F9934E",
+                            "Login OK": "#9AC48A",
+                            "Logon Failed": "#BF1B00",
+                            "Logon Successful": "#9AC48A"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "4",
+                    "w": 23,
+                    "x": 12,
+                    "y": 7
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Logon Successful and Failed  Over time",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 21,
+                    "i": "5",
+                    "w": 12,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 5": "rgb(255,245,240)",
+                            "10 - 15": "rgb(252,138,106)",
+                            "15 - 20": "rgb(241,68,50)",
+                            "20 - 24": "rgb(188,20,26)",
+                            "5 - 10": "rgb(253,202,181)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 30,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 56
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Logon Failed  (Time Mosaic View)",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "8",
+                    "w": 48,
+                    "x": 0,
+                    "y": 86
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Logon Failed and Account Lockouts",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "10",
+                    "w": 13,
+                    "x": 35,
+                    "y": 7
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "Logon Failed Source IPs",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 31,
+                    "i": "11",
+                    "w": 25,
+                    "x": 23,
+                    "y": 25
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "title": "Failed Logins Table",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "a79ee89f-ff45-486c-9788-9446d39456c2",
+                    "w": 34,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "a79ee89f-ff45-486c-9788-9446d39456c2",
+                "panelRefName": "panel_a79ee89f-ff45-486c-9788-9446d39456c2",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "7765df59-11c4-476d-898f-9ebf98c369e2",
+                    "w": 11,
+                    "x": 12,
+                    "y": 25
+                },
+                "panelIndex": "7765df59-11c4-476d-898f-9ebf98c369e2",
+                "panelRefName": "panel_7765df59-11c4-476d-898f-9ebf98c369e2",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "b47c91d3-58c4-4b5b-b302-444b048efdfa",
+                    "w": 12,
+                    "x": 0,
+                    "y": 25
+                },
+                "panelIndex": "b47c91d3-58c4-4b5b-b302-444b048efdfa",
+                "panelRefName": "panel_b47c91d3-58c4-4b5b-b302-444b048efdfa",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] Failed and Blocked Accounts - Simple Metrics",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "f49f3170-9ffc-11ea-87e4-49f31ec44891",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "c2ea73f0-a4bd-11e9-a422-d144027429da",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "175a5760-a7d5-11e9-a422-d144027429da",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "7a329a00-a7d5-11e9-a422-d144027429da",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "162d7ab0-a7d6-11e9-a422-d144027429da",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "729443b0-a7d6-11e9-a422-d144027429da",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "4b683ac0-a7d7-11e9-a422-d144027429da",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "757510b0-a87f-11e9-a422-d144027429da",
+            "name": "8:panel_8",
+            "type": "search"
+        },
+        {
+            "id": "2084e300-a884-11e9-a422-d144027429da",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "421f0610-af98-11e9-a422-d144027429da",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+            "name": "a79ee89f-ff45-486c-9788-9446d39456c2:panel_a79ee89f-ff45-486c-9788-9446d39456c2",
+            "type": "visualization"
+        },
+        {
+            "id": "5d117970-9ffd-11ea-87e4-49f31ec44891",
+            "name": "7765df59-11c4-476d-898f-9ebf98c369e2:panel_7765df59-11c4-476d-898f-9ebf98c369e2",
+            "type": "visualization"
+        },
+        {
+            "id": "4bedf650-9ffd-11ea-87e4-49f31ec44891",
+            "name": "b47c91d3-58c4-4b5b-b302-444b048efdfa:panel_b47c91d3-58c4-4b5b-b302-444b048efdfa",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTIsMl0="
+}

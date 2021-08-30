@@ -1,0 +1,232 @@
+{
+    "attributes": {
+        "description": "Overview of AWS Transit Gateway Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "af1453d8-04d3-4b44-a3b0-138111255a23",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "af1453d8-04d3-4b44-a3b0-138111255a23",
+                "panelRefName": "panel_af1453d8-04d3-4b44-a3b0-138111255a23",
+                "title": "filters",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "14555108-559d-4c07-b240-6e6b14254f16",
+                    "w": 24,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "14555108-559d-4c07-b240-6e6b14254f16",
+                "panelRefName": "panel_14555108-559d-4c07-b240-6e6b14254f16",
+                "title": "Bytes In",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9c605367-60e3-4e9c-8036-a6191dbafe4a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 5
+                },
+                "panelIndex": "9c605367-60e3-4e9c-8036-a6191dbafe4a",
+                "panelRefName": "panel_9c605367-60e3-4e9c-8036-a6191dbafe4a",
+                "title": "Packets In",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "271558e6-b208-4e2c-abfb-0a6b2dbb0c66",
+                    "w": 24,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "271558e6-b208-4e2c-abfb-0a6b2dbb0c66",
+                "panelRefName": "panel_271558e6-b208-4e2c-abfb-0a6b2dbb0c66",
+                "title": "Bytes Out",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "41002ab1-845b-469e-9283-8a46a90e4662",
+                    "w": 24,
+                    "x": 24,
+                    "y": 17
+                },
+                "panelIndex": "41002ab1-845b-469e-9283-8a46a90e4662",
+                "panelRefName": "panel_41002ab1-845b-469e-9283-8a46a90e4662",
+                "title": "Packets Out",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "b141f90b-739e-46f3-83c9-9c4661183837",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "b141f90b-739e-46f3-83c9-9c4661183837",
+                "panelRefName": "panel_b141f90b-739e-46f3-83c9-9c4661183837",
+                "title": "Bytes Dropped - no route",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "c6a76f92-248b-4cae-a03f-7d34d58098ae",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "c6a76f92-248b-4cae-a03f-7d34d58098ae",
+                "panelRefName": "panel_c6a76f92-248b-4cae-a03f-7d34d58098ae",
+                "title": "Packets Dropped - no route",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1d08d3b8-3bd7-4f90-854d-be08cb119273",
+                    "w": 24,
+                    "x": 0,
+                    "y": 41
+                },
+                "panelIndex": "1d08d3b8-3bd7-4f90-854d-be08cb119273",
+                "panelRefName": "panel_1d08d3b8-3bd7-4f90-854d-be08cb119273",
+                "title": "Bytes Dropped - black hole",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "40e82e50-b30c-40eb-bbee-9bbfc3d3311f",
+                    "w": 24,
+                    "x": 24,
+                    "y": 41
+                },
+                "panelIndex": "40e82e50-b30c-40eb-bbee-9bbfc3d3311f",
+                "panelRefName": "panel_40e82e50-b30c-40eb-bbee-9bbfc3d3311f",
+                "title": "Packets Dropped - black hole",
+                "type": "visualization",
+                "version": "7.6.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] TransitGateway Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0eb5a6a0-694f-11ea-b0ac-95d4ecb1fecd",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "415fed40-694f-11ea-b0ac-95d4ecb1fecd",
+            "name": "af1453d8-04d3-4b44-a3b0-138111255a23:panel_af1453d8-04d3-4b44-a3b0-138111255a23",
+            "type": "visualization"
+        },
+        {
+            "id": "cd6419c0-6949-11ea-b0ac-95d4ecb1fecd",
+            "name": "14555108-559d-4c07-b240-6e6b14254f16:panel_14555108-559d-4c07-b240-6e6b14254f16",
+            "type": "visualization"
+        },
+        {
+            "id": "0a36b590-694c-11ea-b0ac-95d4ecb1fecd",
+            "name": "9c605367-60e3-4e9c-8036-a6191dbafe4a:panel_9c605367-60e3-4e9c-8036-a6191dbafe4a",
+            "type": "visualization"
+        },
+        {
+            "id": "dc5f65b0-6949-11ea-b0ac-95d4ecb1fecd",
+            "name": "271558e6-b208-4e2c-abfb-0a6b2dbb0c66:panel_271558e6-b208-4e2c-abfb-0a6b2dbb0c66",
+            "type": "visualization"
+        },
+        {
+            "id": "10e0f270-694c-11ea-b0ac-95d4ecb1fecd",
+            "name": "41002ab1-845b-469e-9283-8a46a90e4662:panel_41002ab1-845b-469e-9283-8a46a90e4662",
+            "type": "visualization"
+        },
+        {
+            "id": "01ed5990-694a-11ea-b0ac-95d4ecb1fecd",
+            "name": "b141f90b-739e-46f3-83c9-9c4661183837:panel_b141f90b-739e-46f3-83c9-9c4661183837",
+            "type": "visualization"
+        },
+        {
+            "id": "007ceec0-694c-11ea-b0ac-95d4ecb1fecd",
+            "name": "c6a76f92-248b-4cae-a03f-7d34d58098ae:panel_c6a76f92-248b-4cae-a03f-7d34d58098ae",
+            "type": "visualization"
+        },
+        {
+            "id": "f7c17000-6949-11ea-b0ac-95d4ecb1fecd",
+            "name": "1d08d3b8-3bd7-4f90-854d-be08cb119273:panel_1d08d3b8-3bd7-4f90-854d-be08cb119273",
+            "type": "visualization"
+        },
+        {
+            "id": "c1db9b80-694b-11ea-b0ac-95d4ecb1fecd",
+            "name": "40e82e50-b30c-40eb-bbee-9bbfc3d3311f:panel_40e82e50-b30c-40eb-bbee-9bbfc3d3311f",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:38.811Z",
+    "version": "WzM0NTIsMV0="
+}

@@ -1,0 +1,29 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Tip [Metricbeat System] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "**TIP:** To select another host, go to the [System Overview](#/dashboard/Metricbeat-system-overview-ecs) dashboard and double-click a host name."
+            },
+            "title": "Tip [Metricbeat System] ECS",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3d65d450-a9c3-11e7-af20-67db8aecb295-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:24.050Z",
+    "version": "WzM4NzQsMV0="
+}

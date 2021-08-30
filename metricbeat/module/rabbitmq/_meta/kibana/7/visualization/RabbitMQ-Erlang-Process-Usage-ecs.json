@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Erlang Process Usage [Metricbeat RabbitMQ] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Used Process",
+                        "field": "rabbitmq.node.proc.used"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "30s",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Node name",
+                        "field": "rabbitmq.node.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "defaultYExtents": false,
+                "drawLinesBetweenPoints": true,
+                "interpolate": "linear",
+                "legendPosition": "top",
+                "radiusRatio": 9,
+                "scale": "linear",
+                "setYExtents": false,
+                "shareYAxis": true,
+                "showCircles": false,
+                "smoothLines": true,
+                "times": [],
+                "yAxis": {}
+            },
+            "title": "RabbitMQ Erlang Process Usage ECS",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "RabbitMQ-Erlang-Process-Usage-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Metricbeat-Rabbitmq-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:47.567Z",
+    "version": "WzQxMjMsMV0="
+}

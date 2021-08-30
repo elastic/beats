@@ -1,0 +1,116 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "85644d0a-8011-45af-a751-7961b8bdd071": {
+                            "columnOrder": [
+                                "bcbccc16-d042-40fa-a9b2-0f09268281ff",
+                                "4d4c068a-0194-4d54-a1fa-3863c3df9331",
+                                "b5a75764-e98b-434b-a0f0-5658a4aa1cf6",
+                                "ab158cba-532f-47f8-8450-db883504dc0f"
+                            ],
+                            "columns": {
+                                "4d4c068a-0194-4d54-a1fa-3863c3df9331": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Url Path",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "azure.dimensions.browser_timing_url_path"
+                                },
+                                "ab158cba-532f-47f8-8450-db883504dc0f": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Processing duration",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "azure.app_state.browser_timings_processing_duration.avg"
+                                },
+                                "b5a75764-e98b-434b-a0f0-5658a4aa1cf6": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Networking duration",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "azure.app_state.browser_timings_network_duration.avg"
+                                },
+                                "bcbccc16-d042-40fa-a9b2-0f09268281ff": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "b5a75764-e98b-434b-a0f0-5658a4aa1cf6",
+                            "ab158cba-532f-47f8-8450-db883504dc0f"
+                        ],
+                        "layerId": "85644d0a-8011-45af-a751-7961b8bdd071",
+                        "position": "top",
+                        "seriesType": "bar",
+                        "showGridlines": false,
+                        "splitAccessor": "4d4c068a-0194-4d54-a1fa-3863c3df9331",
+                        "xAccessor": "bcbccc16-d042-40fa-a9b2-0f09268281ff"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar"
+            }
+        },
+        "title": "App state Browser Networking/Processing Duration [Metricbeat Azure]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0e74dee0-04a4-11eb-8034-63f2039e9d3f",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-85644d0a-8011-45af-a751-7961b8bdd071",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:42.950Z",
+    "version": "WzM0OTYsMV0="
+}

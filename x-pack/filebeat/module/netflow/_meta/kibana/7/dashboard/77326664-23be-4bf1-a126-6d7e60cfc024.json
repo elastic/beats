@@ -1,0 +1,174 @@
+{
+    "attributes": {
+        "description": "Netflow geo location",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "globalState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "input.type",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow"
+                            },
+                            "type": "phrase",
+                            "value": "netflow"
+                        },
+                        "query": {
+                            "match": {
+                                "input.type": {
+                                    "query": "netflow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        20.632784250388028,
+                        16.69921875
+                    ],
+                    "mapZoom": 2
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "16",
+                    "w": 32,
+                    "x": 16,
+                    "y": 4
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 16,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "18",
+                    "w": 16,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "19",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "20",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "20",
+                "panelRefName": "panel_20",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Netflow] Geo Location",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "77326664-23be-4bf1-a126-6d7e60cfc024",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "f4c8cb5a-7336-449e-ab99-6e867b435b85",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "2316bb53-d98a-4f0f-8cd8-51e9fb317823",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "aed09724-0a69-4331-84f5-3d2067c43930",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "f531f957-e8c0-497a-ad41-ef39c2d29671",
+            "name": "19:panel_19",
+            "type": "visualization"
+        },
+        {
+            "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+            "name": "20:panel_20",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:46.471Z",
+    "version": "WzQ4MTUsMV0="
+}

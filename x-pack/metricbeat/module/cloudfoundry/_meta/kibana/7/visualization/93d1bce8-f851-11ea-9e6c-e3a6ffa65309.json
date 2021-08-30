@@ -1,0 +1,125 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "VM disk used [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "93d69f74-f851-11ea-b007-0bb1f816b4f3",
+                        "operator": "gt",
+                        "value": 70
+                    },
+                    {
+                        "background_color": "rgba(252,220,0,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "93a1a36e-f851-11ea-840a-4ff3b85fd2ce",
+                        "operator": "gt",
+                        "value": 50
+                    },
+                    {
+                        "background_color": "rgba(105,192,111,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "93ce25ba-f851-11ea-a28d-3339e0be69a9",
+                        "operator": "lte",
+                        "value": 50
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "93a6b4d0-f851-11ea-9ff5-af33dba0a2b7"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and event.dataset:\"cloudfoundry.value\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "93941cda-f851-11ea-8449-bf49cca008e8",
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "1",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "93aed944-f851-11ea-ba70-fbde5471d6c0",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name:\"system.disk.system.percent\""
+                        },
+                        "formatter": "00.00",
+                        "hidden": false,
+                        "id": "93b3d516-f851-11ea-b4ca-c32dfcb647e2",
+                        "label": "VM Disk Used",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "93b9bc2e-f851-11ea-8d20-9b7927512450",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "9377407e-f851-11ea-a918-ab9d33748fd4"
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}} %"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "VM disk used [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "93d1bce8-f851-11ea-9e6c-e3a6ffa65309",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:59.416Z",
+    "version": "WzM2NjYsMV0="
+}

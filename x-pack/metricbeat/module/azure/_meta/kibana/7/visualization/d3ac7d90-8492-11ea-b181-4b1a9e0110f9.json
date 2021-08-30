@@ -1,0 +1,77 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Database Account Document Count [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "azure.resource.type : \"Microsoft.DocumentDb/databaseAccounts\"   "
+                },
+                "id": "e9a40230-32e9-11ea-bda2-69435df36a5c",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(102,102,102,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "e9a40231-32e9-11ea-bda2-69435df36a5c",
+                        "label": "Document Count",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "azure.database_account.document_count.total",
+                                "id": "e9a40232-32e9-11ea-bda2-69435df36a5c",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_exclude": "\"<empty>\"",
+                        "terms_field": "azure.dimensions.database_name",
+                        "terms_order_by": "_count",
+                        "type": "timeseries",
+                        "value_template": "{{value}} "
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Database Account Document Count [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d3ac7d90-8492-11ea-b181-4b1a9e0110f9",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:49.091Z",
+    "version": "WzM1NDYsMV0="
+}

@@ -1,0 +1,145 @@
+{
+    "attributes": {
+        "columns": [
+            "event.action",
+            "winlog.event_data.TargetUserName",
+            "user.domain",
+            "user.name",
+            "winlog.event_data.SubjectDomainName",
+            "winlog.logon.id",
+            "related.user"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4720",
+                                "4722",
+                                "4723",
+                                "4724",
+                                "4725",
+                                "4726",
+                                "4738",
+                                "4740",
+                                "4767",
+                                "4781",
+                                "4798"
+                            ],
+                            "type": "phrases",
+                            "value": "4720, 4722, 4723, 4724, 4725, 4726, 4738, 4740, 4767, 4781, 4798"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4720"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4722"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4723"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4724"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4725"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4726"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4738"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4740"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4767"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4781"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4798"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "User management Details - Search [Winlogbeat Security]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "324686c0-fefb-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-11T13:19:00.386Z",
+    "version": "WzIzMTgsMl0="
+}

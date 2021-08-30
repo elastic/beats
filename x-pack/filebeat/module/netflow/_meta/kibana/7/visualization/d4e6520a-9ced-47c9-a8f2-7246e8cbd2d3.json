@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "*"
+                    }
+                }
+            }
+        },
+        "title": "Dashboard Navigation [Filebeat Netflow]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "markdown": "[Overview](#/dashboard/34e26884-161a-4448-9556-43b5bf2f62a2) | [Conversation Partners](#/dashboard/acd7a630-0c71-4840-bc9e-4a3801374a32) | [Traffic Analysis](#/dashboard/38012abe-c611-4124-8497-381fcd85acc8) | [Top-N](#/dashboard/14387a13-53bc-43a4-b9cd-63977aa8d87c) | [Geo Location](#/dashboard/77326664-23be-4bf1-a126-6d7e60cfc024) | [Autonomous Systems](#/dashboard/c64665f9-d222-421e-90b0-c7310d944b8a) | [Flow Exporters](#/dashboard/feebb4e6-b13e-4e4e-b9fc-d3a178276425) | [Raw Flow Records](#/dashboard/94972700-de4a-4272-9143-2fa8d4981365)\n***"
+            },
+            "title": "Dashboard Navigation [Filebeat Netflow]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:49.565Z",
+    "version": "WzQ4NDcsMV0="
+}

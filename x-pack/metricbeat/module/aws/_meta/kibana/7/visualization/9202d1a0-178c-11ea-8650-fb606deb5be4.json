@@ -1,0 +1,162 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Usage ResourceCount [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "field": "aws.usage.metrics.ResourceCount.sum"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "aws.dimensions.Type : \"Resource\" "
+                                },
+                                "label": ""
+                            }
+                        ],
+                        "row": true
+                    },
+                    "schema": "split",
+                    "type": "filters"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "aws.dimensions.Service",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": true,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "field": "aws.dimensions.Resource",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": true,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 2,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 4,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "metric": {
+                        "accessor": 3,
+                        "aggType": "sum",
+                        "format": {
+                            "id": "number"
+                        },
+                        "params": {}
+                    },
+                    "splitRow": [
+                        {
+                            "accessor": 0,
+                            "aggType": "filters",
+                            "format": {},
+                            "params": {}
+                        }
+                    ]
+                },
+                "distinctColors": true,
+                "isDonut": true,
+                "labels": {
+                    "last_level": false,
+                    "show": true,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "Usage ResourceCount [Metricbeat AWS]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9202d1a0-178c-11ea-8650-fb606deb5be4",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:39.859Z",
+    "version": "WzM0NjQsMV0="
+}

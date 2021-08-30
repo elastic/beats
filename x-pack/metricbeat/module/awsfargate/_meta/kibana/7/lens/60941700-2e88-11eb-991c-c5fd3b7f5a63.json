@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "0749cbce-4a88-471d-9715-9f4f54510864": {
+                            "columnOrder": [
+                                "35481ca7-cebb-495c-974f-34ede5f3935c",
+                                "33d4857c-800a-4854-9369-dbf019501bdd",
+                                "ec425562-fe79-4326-b753-20b408c806fb"
+                            ],
+                            "columns": {
+                                "33d4857c-800a-4854-9369-dbf019501bdd": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Container Identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "ec425562-fe79-4326-b753-20b408c806fb",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "awsfargate.task_stats.identifier"
+                                },
+                                "35481ca7-cebb-495c-974f-34ede5f3935c": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "10s"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "ec425562-fe79-4326-b753-20b408c806fb": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Container CPU Total Norm Pct",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 2
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.cpu.total.norm.pct"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "ec425562-fe79-4326-b753-20b408c806fb"
+                        ],
+                        "layerId": "0749cbce-4a88-471d-9715-9f4f54510864",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "33d4857c-800a-4854-9369-dbf019501bdd",
+                        "xAccessor": "35481ca7-cebb-495c-974f-34ede5f3935c"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Container CPU Total Norm Pct [Metricbeat AWSFargate]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "60941700-2e88-11eb-991c-c5fd3b7f5a63",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-0749cbce-4a88-471d-9715-9f4f54510864",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0ODYsMV0="
+}

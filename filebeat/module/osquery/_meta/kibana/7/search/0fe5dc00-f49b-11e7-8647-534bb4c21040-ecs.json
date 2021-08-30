@@ -1,0 +1,133 @@
+{
+    "attributes": {
+        "columns": [
+            "osquery.result.name",
+            "osquery.result.columns.path",
+            "agent.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "query",
+                            "negate": false,
+                            "type": "custom",
+                            "value": "{\"prefix\":{\"osquery.result.name\":\"pack_ossec-rootkit\"}}"
+                        },
+                        "query": {
+                            "prefix": {
+                                "osquery.result.name": "pack_ossec-rootkit"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "osquery",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "osquery"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "osquery",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                            "key": "fileset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "result",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "result"
+                        },
+                        "query": {
+                            "match": {
+                                "fileset.name": {
+                                    "query": "result",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "OSSEC Rootkits [Filebeat Osquery] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0fe5dc00-f49b-11e7-8647-534bb4c21040-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:55.664Z",
+    "version": "WzQ5MzcsMV0="
+}

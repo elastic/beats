@@ -1,0 +1,210 @@
+{
+    "attributes": {
+        "description": "Overview of AWS SQS Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 12,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "SQS Messages Visible",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 12,
+                    "x": 36,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "SQS Oldest Message Age in Seconds",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "SQS Messages Received",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4",
+                    "w": 24,
+                    "x": 24,
+                    "y": 8
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "SQS Messages Deleted",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "7",
+                    "w": 24,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "SQS Messages Delayed",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 16
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "SQS Messages Sent",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "SQS Filters",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "10",
+                    "w": 12,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "SQS Empty Receives",
+                "type": "visualization",
+                "version": "7.6.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] SQS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "234aeda0-43b7-11e9-8697-530f39afc6eb",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f74eb760-41e8-11e9-b7a0-c99d9d127b61",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "53730d20-437e-11e9-8697-530f39afc6eb",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "1235fe50-41e7-11e9-b7a0-c99d9d127b61",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "be6c4180-41e6-11e9-b7a0-c99d9d127b61",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "dcd31cd0-41e5-11e9-b7a0-c99d9d127b61",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "dd2f2a10-41e6-11e9-b7a0-c99d9d127b61",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "b0afd3e0-43b7-11e9-8697-530f39afc6eb",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "bb82c4d0-6c25-11e9-81bc-7f4cd8b3d892",
+            "name": "10:panel_10",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:37.811Z",
+    "version": "WzM0NDMsMV0="
+}

@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Failed Logon and Account Lockout [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 10,
+                "markdown": "### **Failed Logons and Account Lockouts**",
+                "openLinksInNewTab": false
+            },
+            "title": "Failed Logon and Account Lockout [Winlogbeat Security]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "c2ea73f0-a4bd-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTMsMl0="
+}

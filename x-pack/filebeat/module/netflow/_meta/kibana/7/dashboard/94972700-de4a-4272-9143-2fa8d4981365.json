@@ -1,0 +1,168 @@
+{
+    "attributes": {
+        "description": "Netflow flow records",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "globalState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "input.type",
+                            "negate": false,
+                            "params": {
+                                "query": "netflow"
+                            },
+                            "type": "phrase",
+                            "value": "netflow"
+                        },
+                        "query": {
+                            "match": {
+                                "input.type": {
+                                    "query": "netflow",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 36,
+                    "x": 12,
+                    "y": 4
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "3",
+                    "w": 12,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "4",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "columns": [
+                        "source.ip",
+                        "source.port",
+                        "destination.ip",
+                        "destination.port",
+                        "network.transport",
+                        "network.bytes",
+                        "network.packets"
+                    ],
+                    "enhancements": {},
+                    "sort": [
+                        "@timestamp",
+                        "desc"
+                    ]
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "search",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Netflow] Flow records",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "94972700-de4a-4272-9143-2fa8d4981365",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "4bb0255e-18ed-45e4-bfb9-de8e35b12094",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "c27c6a3b-93ee-44d5-8d0c-9b097e575f52",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "a34c6611-79d8-4b50-ae3f-8b328d28e24a",
+            "name": "5:panel_5",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:45.451Z",
+    "version": "WzQ4MTAsMV0="
+}

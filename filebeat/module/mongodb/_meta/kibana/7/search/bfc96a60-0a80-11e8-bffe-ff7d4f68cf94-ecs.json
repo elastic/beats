@@ -1,0 +1,48 @@
+{
+    "attributes": {
+        "columns": [
+            "mongodb.log.timestamp",
+            "log.level",
+            "mongodb.log.component",
+            "mongodb.log.context",
+            "message"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "log.level: *"
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "mongodb.log.timestamp",
+                "asc"
+            ]
+        ],
+        "title": "All logs [Filebeat MongoDB] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:48.189Z",
+    "version": "WzQzMDIsMV0="
+}

@@ -1,0 +1,210 @@
+{
+    "attributes": {
+        "description": "This Azure Database Account dashboard visualizes the most important database account metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "fe2125b1-526c-4293-b488-86d8c15ea3fb",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "fe2125b1-526c-4293-b488-86d8c15ea3fb",
+                "panelRefName": "panel_fe2125b1-526c-4293-b488-86d8c15ea3fb",
+                "title": "",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "db895503-5a84-4b26-b889-c3c7ca964643",
+                    "w": 18,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "db895503-5a84-4b26-b889-c3c7ca964643",
+                "panelRefName": "panel_db895503-5a84-4b26-b889-c3c7ca964643",
+                "title": "Data Usage",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "0b986285-a5d0-4a31-bdb8-0f29cd50c2eb",
+                    "w": 21,
+                    "x": 27,
+                    "y": 0
+                },
+                "panelIndex": "0b986285-a5d0-4a31-bdb8-0f29cd50c2eb",
+                "panelRefName": "panel_0b986285-a5d0-4a31-bdb8-0f29cd50c2eb",
+                "title": "Index Usage",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "7d7b71ea-eb6b-43bf-be61-80235d1d4529",
+                    "w": 9,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "7d7b71ea-eb6b-43bf-be61-80235d1d4529",
+                "panelRefName": "panel_7d7b71ea-eb6b-43bf-be61-80235d1d4529",
+                "title": "",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
+                "panelRefName": "panel_f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
+                "title": "Total Requests",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c604014a-647f-4a1d-b2e9-0304fdacc363",
+                    "w": 24,
+                    "x": 24,
+                    "y": 18
+                },
+                "panelIndex": "c604014a-647f-4a1d-b2e9-0304fdacc363",
+                "panelRefName": "panel_c604014a-647f-4a1d-b2e9-0304fdacc363",
+                "title": "Document Count",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
+                    "w": 24,
+                    "x": 0,
+                    "y": 33
+                },
+                "panelIndex": "b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
+                "panelRefName": "panel_b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
+                "title": "Available Storage",
+                "type": "visualization",
+                "version": "7.6.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5e755432-3e55-405c-91cf-3348d5067a3a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 33
+                },
+                "panelIndex": "5e755432-3e55-405c-91cf-3348d5067a3a",
+                "panelRefName": "panel_5e755432-3e55-405c-91cf-3348d5067a3a",
+                "title": "Requests Per Status Code",
+                "type": "visualization",
+                "version": "7.6.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Database Account Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b232c220-8481-11ea-b181-4b1a9e0110f9",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "4177aab0-83cc-11ea-be84-f5d4d6b9a792",
+            "name": "fe2125b1-526c-4293-b488-86d8c15ea3fb:panel_fe2125b1-526c-4293-b488-86d8c15ea3fb",
+            "type": "visualization"
+        },
+        {
+            "id": "a49b4e20-8490-11ea-b181-4b1a9e0110f9",
+            "name": "db895503-5a84-4b26-b889-c3c7ca964643:panel_db895503-5a84-4b26-b889-c3c7ca964643",
+            "type": "visualization"
+        },
+        {
+            "id": "d2801d70-8490-11ea-b181-4b1a9e0110f9",
+            "name": "0b986285-a5d0-4a31-bdb8-0f29cd50c2eb:panel_0b986285-a5d0-4a31-bdb8-0f29cd50c2eb",
+            "type": "visualization"
+        },
+        {
+            "id": "674c1d70-83cc-11ea-be84-f5d4d6b9a792",
+            "name": "7d7b71ea-eb6b-43bf-be61-80235d1d4529:panel_7d7b71ea-eb6b-43bf-be61-80235d1d4529",
+            "type": "visualization"
+        },
+        {
+            "id": "a16b5900-8492-11ea-b181-4b1a9e0110f9",
+            "name": "f6ce8b48-a876-4031-a43f-3ca3704a4ad6:panel_f6ce8b48-a876-4031-a43f-3ca3704a4ad6",
+            "type": "visualization"
+        },
+        {
+            "id": "d3ac7d90-8492-11ea-b181-4b1a9e0110f9",
+            "name": "c604014a-647f-4a1d-b2e9-0304fdacc363:panel_c604014a-647f-4a1d-b2e9-0304fdacc363",
+            "type": "visualization"
+        },
+        {
+            "id": "81f16b40-32ea-11ea-a83e-25b8612d00cc",
+            "name": "b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9:panel_b0cbeaf7-8a12-4efa-b63b-5479c2cb39a9",
+            "type": "visualization"
+        },
+        {
+            "id": "037382e0-856e-11ea-91bc-ab084c7ec0e7",
+            "name": "5e755432-3e55-405c-91cf-3348d5067a3a:panel_5e755432-3e55-405c-91cf-3348d5067a3a",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:49.091Z",
+    "version": "WzM1NDAsMV0="
+}

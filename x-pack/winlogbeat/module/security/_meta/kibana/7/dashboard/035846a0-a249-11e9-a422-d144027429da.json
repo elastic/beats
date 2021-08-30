@@ -1,0 +1,314 @@
+{
+    "attributes": {
+        "description": "User logon activity dashboard with TSVB metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 28,
+                    "i": "1",
+                    "w": 18,
+                    "x": 0,
+                    "y": 38
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Sesiones Usuarios Admin",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "2",
+                    "w": 9,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "3",
+                    "w": 18,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Usuarios Adm",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "4",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 27,
+                    "i": "10",
+                    "w": 22,
+                    "x": 0,
+                    "y": 66
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "Network Logon Details",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "08245e0c-6afe-43ea-ba5f-76c3b17301fd",
+                    "w": 36,
+                    "x": 12,
+                    "y": 0
+                },
+                "panelIndex": "08245e0c-6afe-43ea-ba5f-76c3b17301fd",
+                "panelRefName": "panel_08245e0c-6afe-43ea-ba5f-76c3b17301fd",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "f403fdcc-6588-4573-a949-9e661783a2b8",
+                    "w": 9,
+                    "x": 9,
+                    "y": 6
+                },
+                "panelIndex": "f403fdcc-6588-4573-a949-9e661783a2b8",
+                "panelRefName": "panel_f403fdcc-6588-4573-a949-9e661783a2b8",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "51a9affa-8e96-42bd-98e9-80531bdefc53",
+                    "w": 30,
+                    "x": 18,
+                    "y": 6
+                },
+                "panelIndex": "51a9affa-8e96-42bd-98e9-80531bdefc53",
+                "panelRefName": "panel_51a9affa-8e96-42bd-98e9-80531bdefc53",
+                "title": "Logon Events Timeline",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "bbdca4de-11c5-4957-a74c-73769416a562",
+                    "w": 12,
+                    "x": 18,
+                    "y": 19
+                },
+                "panelIndex": "bbdca4de-11c5-4957-a74c-73769416a562",
+                "panelRefName": "panel_bbdca4de-11c5-4957-a74c-73769416a562",
+                "title": "Logon Types",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "4df66ae6-e047-47c7-b1a9-b15221eb9d90",
+                    "w": 18,
+                    "x": 30,
+                    "y": 19
+                },
+                "panelIndex": "4df66ae6-e047-47c7-b1a9-b15221eb9d90",
+                "panelRefName": "panel_4df66ae6-e047-47c7-b1a9-b15221eb9d90",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 28,
+                    "i": "454bb008-9720-455e-8ab9-b2f47d25aa4f",
+                    "w": 19,
+                    "x": 18,
+                    "y": 38
+                },
+                "panelIndex": "454bb008-9720-455e-8ab9-b2f47d25aa4f",
+                "panelRefName": "panel_454bb008-9720-455e-8ab9-b2f47d25aa4f",
+                "title": "RDP Reconnections and Desconnections",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 28,
+                    "i": "baec73e7-7166-4577-9483-1252bdd8773c",
+                    "w": 11,
+                    "x": 37,
+                    "y": 38
+                },
+                "panelIndex": "baec73e7-7166-4577-9483-1252bdd8773c",
+                "panelRefName": "panel_baec73e7-7166-4577-9483-1252bdd8773c",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 27,
+                    "i": "28115147-8399-4fcd-95ce-ed0a4f4239e3",
+                    "w": 26,
+                    "x": 22,
+                    "y": 66
+                },
+                "panelIndex": "28115147-8399-4fcd-95ce-ed0a4f4239e3",
+                "panelRefName": "panel_28115147-8399-4fcd-95ce-ed0a4f4239e3",
+                "title": "Logout Details",
+                "type": "search",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] User Logons - Simple Metrics",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "035846a0-a249-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "804dd400-a248-11e9-a422-d144027429da",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "5bb93ed0-a249-11e9-a422-d144027429da",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "e2516c10-a249-11e9-a422-d144027429da",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "18348f30-a24d-11e9-a422-d144027429da",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "ce71c9a0-a25e-11e9-a422-d144027429da",
+            "name": "10:panel_10",
+            "type": "search"
+        },
+        {
+            "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+            "name": "08245e0c-6afe-43ea-ba5f-76c3b17301fd:panel_08245e0c-6afe-43ea-ba5f-76c3b17301fd",
+            "type": "visualization"
+        },
+        {
+            "id": "2c71e0f0-9c0d-11ea-87e4-49f31ec44891",
+            "name": "f403fdcc-6588-4573-a949-9e661783a2b8:panel_f403fdcc-6588-4573-a949-9e661783a2b8",
+            "type": "visualization"
+        },
+        {
+            "id": "abd44840-9c0f-11ea-87e4-49f31ec44891",
+            "name": "51a9affa-8e96-42bd-98e9-80531bdefc53:panel_51a9affa-8e96-42bd-98e9-80531bdefc53",
+            "type": "visualization"
+        },
+        {
+            "id": "006d75f0-9c03-11ea-87e4-49f31ec44891",
+            "name": "bbdca4de-11c5-4957-a74c-73769416a562:panel_bbdca4de-11c5-4957-a74c-73769416a562",
+            "type": "visualization"
+        },
+        {
+            "id": "21aadac0-9c0b-11ea-87e4-49f31ec44891",
+            "name": "4df66ae6-e047-47c7-b1a9-b15221eb9d90:panel_4df66ae6-e047-47c7-b1a9-b15221eb9d90",
+            "type": "visualization"
+        },
+        {
+            "id": "6f4071a0-7a78-11ea-bc9a-0baf2ca323a3",
+            "name": "454bb008-9720-455e-8ab9-b2f47d25aa4f:panel_454bb008-9720-455e-8ab9-b2f47d25aa4f",
+            "type": "search"
+        },
+        {
+            "id": "25f31ee0-9c23-11ea-87e4-49f31ec44891",
+            "name": "baec73e7-7166-4577-9483-1252bdd8773c:panel_baec73e7-7166-4577-9483-1252bdd8773c",
+            "type": "visualization"
+        },
+        {
+            "id": "06b6b060-7a80-11ea-bc9a-0baf2ca323a3",
+            "name": "28115147-8399-4fcd-95ce-ed0a4f4239e3:panel_28115147-8399-4fcd-95ce-ed0a4f4239e3",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-11T13:18:57.330Z",
+    "version": "WzIyNDksMl0="
+}
