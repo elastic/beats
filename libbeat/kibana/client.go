@@ -224,7 +224,7 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 		req.SetBasicAuth(conn.Username, conn.Password)
 	}
 	if conn.APIKey != "" {
-		v := fmt.Sprintf("ApiKey %s", base64.StdEncoding.EncodeToString([]byte(conn.APIKey)))
+		v := "ApiKey "+base64.StdEncoding.EncodeToString([]byte(conn.APIKey))
 		req.Header.Set("Authorization", v)
 	}
 
