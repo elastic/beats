@@ -5,25 +5,24 @@ import argparse
 
 
 def transform_data(data, method):
-    for obj in data["objects"]:
-        if "attributes" not in obj:
-            continue
+    if "attributes" not in data:
+        return
 
-        if "uiStateJSON" in obj["attributes"]:
-            obj["attributes"]["uiStateJSON"] = method(obj["attributes"]["uiStateJSON"])
+    if "uiStateJSON" in data["attributes"]:
+        data["attributes"]["uiStateJSON"] = method(data["attributes"]["uiStateJSON"])
 
-        if "optionsJSON" in obj["attributes"]:
-            obj["attributes"]["optionsJSON"] = method(obj["attributes"]["optionsJSON"])
+    if "optionsJSON" in data["attributes"]:
+        data["attributes"]["optionsJSON"] = method(data["attributes"]["optionsJSON"])
 
-        if "panelsJSON" in obj["attributes"]:
-            obj["attributes"]["panelsJSON"] = method(obj["attributes"]["panelsJSON"])
+    if "panelsJSON" in data["attributes"]:
+        data["attributes"]["panelsJSON"] = method(data["attributes"]["panelsJSON"])
 
-        if "visState" in obj["attributes"]:
-            obj["attributes"]["visState"] = method(obj["attributes"]["visState"])
+    if "visState" in data["attributes"]:
+        data["attributes"]["visState"] = method(data["attributes"]["visState"])
 
-        if "kibanaSavedObjectMeta" in obj["attributes"] and "searchSourceJSON" in obj["attributes"]["kibanaSavedObjectMeta"]:
-            obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"] = method(
-                obj["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"])
+    if "kibanaSavedObjectMeta" in data["attributes"] and "searchSourceJSON" in data["attributes"]["kibanaSavedObjectMeta"]:
+        data["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"] = method(
+            data["attributes"]["kibanaSavedObjectMeta"]["searchSourceJSON"])
 
 
 def transform_file(path, method):

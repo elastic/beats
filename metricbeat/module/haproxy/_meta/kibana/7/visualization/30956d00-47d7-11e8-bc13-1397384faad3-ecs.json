@@ -1,0 +1,141 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Requests [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Requests",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.request.total",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "ad38e2c0-47d6-11e8-994c-81d2daeb7c86",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "ad38e2c0-47d6-11e8-994c-81d2daeb7c86",
+                                "id": "b1ca03a0-47d6-11e8-994c-81d2daeb7c86",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(255,0,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "c2f30500-47d6-11e8-994c-81d2daeb7c86",
+                        "label": "Request errors",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.request.errors",
+                                "id": "c2f30501-47d6-11e8-994c-81d2daeb7c86",
+                                "type": "max"
+                            },
+                            {
+                                "field": "c2f30501-47d6-11e8-994c-81d2daeb7c86",
+                                "id": "c2f30502-47d6-11e8-994c-81d2daeb7c86",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "c2f30502-47d6-11e8-994c-81d2daeb7c86",
+                                "id": "c2f30503-47d6-11e8-994c-81d2daeb7c86",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,0,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "11968ce0-47d7-11e8-994c-81d2daeb7c86",
+                        "label": "Denied requests",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.request.denied",
+                                "id": "11968ce1-47d7-11e8-994c-81d2daeb7c86",
+                                "type": "max"
+                            },
+                            {
+                                "field": "11968ce1-47d7-11e8-994c-81d2daeb7c86",
+                                "id": "11968ce2-47d7-11e8-994c-81d2daeb7c86",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "field": "11968ce2-47d7-11e8-994c-81d2daeb7c86",
+                                "id": "11968ce3-47d7-11e8-994c-81d2daeb7c86",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy requests ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "30956d00-47d7-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4NDQsMV0="
+}

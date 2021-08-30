@@ -33,6 +33,7 @@ import (
 func TestErrorJson(t *testing.T) {
 	// also common 200: {"objects":[{"id":"apm-*","type":"index-pattern","error":{"message":"[doc][index-pattern:test-*]: version conflict, document already exists (current version [1])"}}]}
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusUnauthorized)
 		w.Write([]byte(`{"message": "Cannot export dashboard", "attributes":{"objects":[{"id":"test-*","type":"index-pattern","error":{"message":"action [indices:data/write/bulk[s]] is unauthorized for user [test]"}}]}}`))
 	}))
 	defer kibanaTs.Close()
@@ -42,12 +43,13 @@ func TestErrorJson(t *testing.T) {
 		HTTP: http.DefaultClient,
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
-	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, http.StatusUnauthorized, code)
 	assert.Error(t, err)
 }
 
 func TestErrorBadJson(t *testing.T) {
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusGone)
 		w.Write([]byte(`{`))
 	}))
 	defer kibanaTs.Close()
@@ -57,7 +59,7 @@ func TestErrorBadJson(t *testing.T) {
 		HTTP: http.DefaultClient,
 	}
 	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
-	assert.Equal(t, http.StatusOK, code)
+	assert.Equal(t, http.StatusGone, code)
 	assert.Error(t, err)
 }
 

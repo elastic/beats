@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\": false}",
+        "panelsJSON": "[{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":36,\"x\":12,\"y\":0},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"2\",\"w\":24,\"x\":0,\"y\":35},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"3\",\"w\":24,\"x\":24,\"y\":35},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"4\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"4\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":12,\"x\":0,\"y\":20},\"panelIndex\":\"5\",\"embeddableConfig\":{\"vis\":{\"defaultColors\":{\"0 - 100\":\"rgb(0,104,55)\"}},\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":36,\"x\":12,\"y\":20},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":25,\"i\":\"7\",\"w\":48,\"x\":0,\"y\":50},\"panelIndex\":\"7\",\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}},\"enhancements\":{}},\"panelRefName\":\"panel_6\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] HTTP ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Packetbeat-HTTP-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Web-transactions-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "HTTP-error-codes-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "HTTP-error-codes-evolution-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "Navigation-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "Total-number-of-HTTP-transactions-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "HTTP-codes-for-the-top-queries-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "Top-10-HTTP-requests-ecs",
+            "name": "panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:41.048Z",
+    "version": "WzMxNTgsMV0="
+}

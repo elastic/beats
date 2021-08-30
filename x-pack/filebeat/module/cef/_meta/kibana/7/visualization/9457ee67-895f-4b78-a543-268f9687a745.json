@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Endpoint Average EPS [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "85a1c642-9781-430d-b84b-b28cb2a42fb4"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Host\" OR cef.extensions.categoryDeviceGroup:\"/Application\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "03a2fd72-fc9c-4582-9133-20af36217180"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "b7a85957-123e-4e25-9e8e-ff7992c9b2b9",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "b4373ffd-9660-4206-afd6-d4867ac7dbdf",
+                        "label": "Event Throughput",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "b1a48389-d799-4eba-8b98-7ee8ef0bb440",
+                                "type": "count"
+                            },
+                            {
+                                "field": "b1a48389-d799-4eba-8b98-7ee8ef0bb440",
+                                "id": "7c5c44cc-17bd-4206-a100-b8996cd3d11a",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "7c5c44cc-17bd-4206-a100-b8996cd3d11a",
+                                "id": "215c5225-5368-40e6-8fcd-2b0026babba0",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "215c5225-5368-40e6-8fcd-2b0026babba0",
+                                "gamma": 0.3,
+                                "id": "f4dfe09a-e397-4287-ab99-3206516cded3",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}} / s"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Endpoint Average EPS [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9457ee67-895f-4b78-a543-268f9687a745",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:37.252Z",
+    "version": "WzQ3MTYsMV0="
+}

@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Dashboards Navigation Platform Health [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "[Overview](#/dashboard/9c81cf34-f84e-11ea-a49d-f3f94f5e4fac) | **Platform Health**",
+                "openLinksInNewTab": false
+            },
+            "title": "Dashboards Navigation [Metricbeat Cloud Foundry]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f771b65c-f8d0-11ea-bf74-8bbda818957f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:59.416Z",
+    "version": "WzM2OTAsMV0="
+}
