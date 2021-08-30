@@ -1,0 +1,98 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Alert - Source Location [Filebeat Suricata]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "autoPrecision": true,
+                        "field": "source.geo.location",
+                        "isFilteredByCollar": true,
+                        "precision": 2,
+                        "useGeocentroid": true
+                    },
+                    "schema": "segment",
+                    "type": "geohash_grid"
+                }
+            ],
+            "params": {
+                "addTooltip": true,
+                "colorSchema": "Yellow to Red",
+                "heatClusterSize": 1.5,
+                "isDesaturated": true,
+                "legendPosition": "bottomright",
+                "mapCenter": [
+                    0,
+                    0
+                ],
+                "mapType": "Scaled Circle Markers",
+                "mapZoom": 2,
+                "wms": {
+                    "baseLayersAreLoaded": {},
+                    "enabled": false,
+                    "options": {
+                        "format": "image/png",
+                        "transparent": true
+                    },
+                    "selectedTmsLayer": {
+                        "attribution": "<p>&#169; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors | <a href=\"https://www.elastic.co/elastic-maps-service\">Elastic Maps Service</a></p>&#10;",
+                        "id": "road_map",
+                        "maxZoom": 18,
+                        "minZoom": 0,
+                        "subdomains": [],
+                        "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.3.0&license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+                    },
+                    "tmsLayers": [
+                        {
+                            "attribution": "<p>&#169; <a href=\"http://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors | <a href=\"https://www.elastic.co/elastic-maps-service\">Elastic Maps Service</a></p>&#10;",
+                            "id": "road_map",
+                            "maxZoom": 18,
+                            "minZoom": 0,
+                            "subdomains": [],
+                            "url": "https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.3.0&license=fc9de2c1-5f06-4080-8dd0-8a334171d89a"
+                        }
+                    ]
+                }
+            },
+            "title": "Alert - Source Location [Filebeat Suricata]",
+            "type": "tile_map"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "85fed080-86d7-11e8-b59d-21efb914e65c-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "1c2bcec0-86d1-11e8-b59d-21efb914e65c-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:52.614Z",
+    "version": "WzQ5MDcsMV0="
+}

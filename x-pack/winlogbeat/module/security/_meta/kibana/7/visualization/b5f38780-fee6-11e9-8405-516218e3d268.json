@@ -1,0 +1,192 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4735",
+                                "4737",
+                                "4755",
+                                "4750",
+                                "4760",
+                                "4745",
+                                "4791",
+                                "4784",
+                                "4764"
+                            ],
+                            "type": "phrases",
+                            "value": "4735, 4737, 4755, 4750, 4760, 4745, 4791, 4784, 4764"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4735"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4737"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4755"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4750"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4760"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4745"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4791"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4784"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4764"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Groups Changes - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Groups Changed"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "metrics": [
+                        {
+                            "accessor": 0,
+                            "format": {
+                                "id": "number",
+                                "params": {}
+                            },
+                            "type": "vis_dimension"
+                        }
+                    ]
+                },
+                "metric": {
+                    "colorSchema": "Yellow to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 1,
+                            "type": "range"
+                        },
+                        {
+                            "from": 1,
+                            "to": 5
+                        },
+                        {
+                            "from": 5,
+                            "to": 10
+                        },
+                        {
+                            "from": 10,
+                            "to": 15
+                        },
+                        {
+                            "from": 15,
+                            "to": 20
+                        },
+                        {
+                            "from": 20,
+                            "to": 100000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "Labels",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Groups Changes - Simple Metric [Winlogbeat Security]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "b5f38780-fee6-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:55.318Z",
+    "version": "WzIyMTcsMl0="
+}

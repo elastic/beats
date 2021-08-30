@@ -1,0 +1,285 @@
+{
+    "attributes": {
+        "description": "Istio traffic statistics based on metrics collected from istio proxies",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 3,
+                    "i": "fbc3815e-eb3a-46dd-b37a-a61b741b754e",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "fbc3815e-eb3a-46dd-b37a-a61b741b754e",
+                "panelRefName": "panel_fbc3815e-eb3a-46dd-b37a-a61b741b754e",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "1f88dc8b-1c21-40e0-8507-b468643d5507",
+                    "w": 15,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "1f88dc8b-1c21-40e0-8507-b468643d5507",
+                "panelRefName": "panel_1f88dc8b-1c21-40e0-8507-b468643d5507",
+                "title": "Number of requests per source",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "7c7c491b-c55c-4892-a73e-3bfb5af9a610",
+                    "w": 23,
+                    "x": 25,
+                    "y": 0
+                },
+                "panelIndex": "7c7c491b-c55c-4892-a73e-3bfb5af9a610",
+                "panelRefName": "panel_7c7c491b-c55c-4892-a73e-3bfb5af9a610",
+                "title": "Number of requests per destination",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "c87dc307-71f1-4642-8d2a-60066f5ab114",
+                    "w": 10,
+                    "x": 0,
+                    "y": 3
+                },
+                "panelIndex": "c87dc307-71f1-4642-8d2a-60066f5ab114",
+                "panelRefName": "panel_c87dc307-71f1-4642-8d2a-60066f5ab114",
+                "title": "Destination Apps",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "894e458b-c822-4df1-ae43-aa99d73bfedc",
+                    "w": 12,
+                    "x": 12,
+                    "y": 11
+                },
+                "panelIndex": "894e458b-c822-4df1-ae43-aa99d73bfedc",
+                "panelRefName": "panel_894e458b-c822-4df1-ae43-aa99d73bfedc",
+                "title": "Duration of requests per destination",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "28d6f60d-1b2c-4688-9cbc-5ebf3d587469",
+                    "w": 12,
+                    "x": 24,
+                    "y": 11
+                },
+                "panelIndex": "28d6f60d-1b2c-4688-9cbc-5ebf3d587469",
+                "panelRefName": "panel_28d6f60d-1b2c-4688-9cbc-5ebf3d587469",
+                "title": "Size of requests per source",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "1b1f0dcb-613d-4b71-a8a9-e30f79734ede",
+                    "w": 12,
+                    "x": 36,
+                    "y": 11
+                },
+                "panelIndex": "1b1f0dcb-613d-4b71-a8a9-e30f79734ede",
+                "panelRefName": "panel_1b1f0dcb-613d-4b71-a8a9-e30f79734ede",
+                "title": "Size of requests per destination",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "ae905bb4-456f-4122-8f5c-44a9ced608f1",
+                    "w": 12,
+                    "x": 0,
+                    "y": 11
+                },
+                "panelIndex": "ae905bb4-456f-4122-8f5c-44a9ced608f1",
+                "panelRefName": "panel_ae905bb4-456f-4122-8f5c-44a9ced608f1",
+                "title": "Duration of requests per source",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3f4222fc-a243-4141-8787-1dd41d9f1661",
+                    "w": 17,
+                    "x": 12,
+                    "y": 21
+                },
+                "panelIndex": "3f4222fc-a243-4141-8787-1dd41d9f1661",
+                "panelRefName": "panel_3f4222fc-a243-4141-8787-1dd41d9f1661",
+                "title": "Size of response per source",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "4c498b69-296c-4e30-8a35-1510566ea5ef",
+                    "w": 19,
+                    "x": 29,
+                    "y": 21
+                },
+                "panelIndex": "4c498b69-296c-4e30-8a35-1510566ea5ef",
+                "panelRefName": "panel_4c498b69-296c-4e30-8a35-1510566ea5ef",
+                "title": "Size of response per destination",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "2a128040-ef73-40a2-8b52-62c8180bcad7",
+                    "w": 12,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "2a128040-ef73-40a2-8b52-62c8180bcad7",
+                "panelRefName": "panel_2a128040-ef73-40a2-8b52-62c8180bcad7",
+                "title": "Response Codes",
+                "type": "visualization",
+                "version": "7.9.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Istio] Traffic",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3b88a120-0c7c-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "96c4a5c0-0c7c-11eb-a3fd-1b45ec532bb3",
+            "name": "fbc3815e-eb3a-46dd-b37a-a61b741b754e:panel_fbc3815e-eb3a-46dd-b37a-a61b741b754e",
+            "type": "visualization"
+        },
+        {
+            "id": "e14e3560-0c78-11eb-a3fd-1b45ec532bb3",
+            "name": "1f88dc8b-1c21-40e0-8507-b468643d5507:panel_1f88dc8b-1c21-40e0-8507-b468643d5507",
+            "type": "visualization"
+        },
+        {
+            "id": "c7468af0-0c78-11eb-a3fd-1b45ec532bb3",
+            "name": "7c7c491b-c55c-4892-a73e-3bfb5af9a610:panel_7c7c491b-c55c-4892-a73e-3bfb5af9a610",
+            "type": "visualization"
+        },
+        {
+            "id": "1d076a90-0c7e-11eb-a3fd-1b45ec532bb3",
+            "name": "c87dc307-71f1-4642-8d2a-60066f5ab114:panel_c87dc307-71f1-4642-8d2a-60066f5ab114",
+            "type": "visualization"
+        },
+        {
+            "id": "3ae9b3f0-0c7a-11eb-a3fd-1b45ec532bb3",
+            "name": "894e458b-c822-4df1-ae43-aa99d73bfedc:panel_894e458b-c822-4df1-ae43-aa99d73bfedc",
+            "type": "visualization"
+        },
+        {
+            "id": "60dacbe0-0c79-11eb-a3fd-1b45ec532bb3",
+            "name": "28d6f60d-1b2c-4688-9cbc-5ebf3d587469:panel_28d6f60d-1b2c-4688-9cbc-5ebf3d587469",
+            "type": "visualization"
+        },
+        {
+            "id": "78375380-0c79-11eb-a3fd-1b45ec532bb3",
+            "name": "1b1f0dcb-613d-4b71-a8a9-e30f79734ede:panel_1b1f0dcb-613d-4b71-a8a9-e30f79734ede",
+            "type": "visualization"
+        },
+        {
+            "id": "5fd462f0-0c7a-11eb-a3fd-1b45ec532bb3",
+            "name": "ae905bb4-456f-4122-8f5c-44a9ced608f1:panel_ae905bb4-456f-4122-8f5c-44a9ced608f1",
+            "type": "visualization"
+        },
+        {
+            "id": "b4235550-0c7a-11eb-a3fd-1b45ec532bb3",
+            "name": "3f4222fc-a243-4141-8787-1dd41d9f1661:panel_3f4222fc-a243-4141-8787-1dd41d9f1661",
+            "type": "visualization"
+        },
+        {
+            "id": "8d818070-0c7a-11eb-a3fd-1b45ec532bb3",
+            "name": "4c498b69-296c-4e30-8a35-1510566ea5ef:panel_4c498b69-296c-4e30-8a35-1510566ea5ef",
+            "type": "visualization"
+        },
+        {
+            "id": "09404610-0c7b-11eb-a3fd-1b45ec532bb3",
+            "name": "2a128040-ef73-40a2-8b52-62c8180bcad7:panel_2a128040-ef73-40a2-8b52-62c8180bcad7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:33.218Z",
+    "version": "WzM5NzYsMV0="
+}
