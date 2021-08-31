@@ -72,7 +72,11 @@ type ApplicationStatusHandler struct{}
 //
 // It updates the status of the application and handles restarting the application is needed.
 func (*ApplicationStatusHandler) OnStatusChange(s *server.ApplicationState, status proto.StateObserved_Status, msg string, payload map[string]interface{}) {
+	if state.IsStateFiltered(msg, payload) {
+		return
+	}
 	app, ok := s.App().(Application)
+
 	if !ok {
 		panic(errors.New("only Application can be registered when using the ApplicationStatusHandler", errors.TypeUnexpected))
 	}
