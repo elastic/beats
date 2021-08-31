@@ -151,6 +151,11 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 
 	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 
+	err = loader.importReferences(file, content)
+	if err != nil {
+		return fmt.Errorf("error loading references of dashboard: %+v", err)
+	}
+
 	var obj common.MapStr
 	err = json.Unmarshal(content, &obj)
 	if err != nil {
@@ -159,6 +164,35 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 
 	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), obj.String()); err != nil {
 		return fmt.Errorf("error dashboard asset: %+v", err)
+	}
+	return nil
+}
+
+type dashboardObj struct {
+	References []dashboardReference `json:"references"`
+}
+type dashboardReference struct {
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
+func (loader KibanaLoader) importReferences(path string, dashboard []byte) error {
+	var d dashboardObj
+	err := json.Unmarshal(dashboard, &d)
+	if err != nil {
+		return fmt.Errorf("failed to parse dashboard references: %+v", err)
+	}
+
+	base := filepath.Dir(path)
+	for _, ref := range d.References {
+		if ref.Type == "index-pattern" {
+			continue
+		}
+		referencePath := filepath.Join(base, "..", ref.Type, ref.ID+".json")
+		err := loader.ImportDashboard(referencePath)
+		if err != nil {
+			return fmt.Errorf("error loading reference of %s: %s %s: %+v", path, ref.Type, ref.ID, err)
+		}
 	}
 	return nil
 }
