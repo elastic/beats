@@ -62,7 +62,7 @@
                         "index": "filebeat-*", 
                         "query": {
                             "language": "kuery",
-                                "query": "event.action:EXECVE"
+                                "query": "event.action:execve"
                             }
                     }
                 }, 
