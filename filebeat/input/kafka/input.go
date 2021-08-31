@@ -82,7 +82,27 @@ type kafkaInput struct {
 
 func (input *kafkaInput) Name() string { return pluginName }
 
-func (input *kafkaInput) Test(_ input.TestContext) error {
+func (input *kafkaInput) Test(ctx input.TestContext) error {
+	client, err := sarama.NewClient(input.config.Hosts, input.saramaConfig)
+	if err != nil {
+		ctx.Logger.Error(err)
+	}
+	topics, err := client.Topics()
+	if err != nil {
+		ctx.Logger.Error(err)
+	}
+
+	var missingTopics []string
+	for _, neededTopic := range input.config.Topics {
+		if !contains(topics, neededTopic) {
+			missingTopics = append(missingTopics, neededTopic)
+		}
+	}
+
+	if len(missingTopics) > 0 {
+		return fmt.Errorf("Of configured topics %v, topics: %v are not in available topics %v", input.config.Topics, missingTopics, topics)
+	}
+
 	return nil
 }
 
@@ -442,4 +462,13 @@ func parseMultipleMessages(bMessage []byte, field string, log *logp.Logger) []st
 		}
 	}
 	return messages
+}
+
+func contains(elements []string, element string) bool {
+	for _, e := range elements {
+		if e == element {
+			return true
+		}
+	}
+	return false
 }

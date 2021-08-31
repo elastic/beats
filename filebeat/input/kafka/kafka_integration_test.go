@@ -316,6 +316,38 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	}
 }
 
+func TestTest(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":    getTestKafkaHost(),
+		"topics":   []string{testTopic},
+		"group_id": "filebeat",
+	})
+
+	inp, err := Plugin().Manager.Create(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = inp.Test(v2.TestContext{
+		Logger: logp.NewLogger("kafka_test"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func createTestTopicName() string {
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
 	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
@@ -340,23 +372,19 @@ func checkMatchingHeaders(
 ) {
 	kafka, err := event.Fields.GetValue("kafka")
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	kafkaMap, ok := kafka.(common.MapStr)
 	if !ok {
-		t.Error("event.Fields.kafka isn't MapStr")
-		return
+		t.Fatal("event.Fields.kafka isn't MapStr")
 	}
 	headers, err := kafkaMap.GetValue("headers")
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	headerArray, ok := headers.([]string)
 	if !ok {
-		t.Error("event.Fields.kafka.headers isn't a []string")
-		return
+		t.Fatal("event.Fields.kafka.headers isn't a []string")
 	}
 	assert.Equal(t, len(expected), len(headerArray))
 	for i := 0; i < len(expected); i++ {
