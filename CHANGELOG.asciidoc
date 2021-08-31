@@ -3,6 +3,141 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.14.1]]
+=== Beats version 7.14.1
+https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
+- Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
+- Fixes a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+
+*Metricbeat*
+
+- Change `server_status_path` default setting to `nginx_status` for the `nginx` module. {pull}26642[26642]
+- Fix cloudwatch metricset collecting duplicate data points. {pull}27327[27327]
+- Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
+- Fix flaky test TestAddCounterInvalidArgWhenQueryClosed. {issue}27312[27312] {pull}27313[27313]
+- Add percent formatters to system/process {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module {pull}27363[27363]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+- Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
 [[release-notes-7.14.0]]
 === Beats version 7.14.0
 https://github.com/elastic/beats/compare/v7.13.4...v7.14.0[View commits]
