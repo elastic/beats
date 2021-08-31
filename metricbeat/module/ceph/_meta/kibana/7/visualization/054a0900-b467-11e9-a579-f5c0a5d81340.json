@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "bar_color_rules": [
+                    {
+                        "id": "bd70f9c0-b472-11e9-ba7f-f52449624592"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "7b71f300-b466-11e9-841e-0ddf9a697c96",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(159,5,0,1)",
+                        "fill": "0",
+                        "formatter": "bytes",
+                        "hide_in_legend": 0,
+                        "id": "7b71f301-b466-11e9-841e-0ddf9a697c96",
+                        "label": "total",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_disk.total.bytes",
+                                "id": "7b71f302-b466-11e9-841e-0ddf9a697c96",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0.2",
+                        "formatter": "bytes",
+                        "id": "7b71f303-b466-11e9-841e-0ddf9a697c96",
+                        "label": "available",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_disk.available.bytes",
+                                "id": "7b71f304-b466-11e9-841e-0ddf9a697c96",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "64f99360-b472-11e9-ba7f-f52449624592",
+                        "label": "used",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_disk.used.bytes",
+                                "id": "64f99361-b472-11e9-ba7f-f52449624592",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Cluster Disk Stats [Metricbeat Ceph] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "054a0900-b467-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:57.280Z",
+    "version": "WzM2MzAsMV0="
+}

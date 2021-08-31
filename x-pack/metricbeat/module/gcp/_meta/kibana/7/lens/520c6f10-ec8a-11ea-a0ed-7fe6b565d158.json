@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e12171da-25a4-41ea-86d3-8fd71205c263": {
+                            "columnOrder": [
+                                "6011e524-4646-410b-8d1c-06c281e8f7ed",
+                                "f8ab301c-f139-4573-b233-ed8a3f717e24"
+                            ],
+                            "columns": {
+                                "6011e524-4646-410b-8d1c-06c281e8f7ed": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Invoice Month",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "f8ab301c-f139-4573-b233-ed8a3f717e24",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 12
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.invoice_month"
+                                },
+                                "f8ab301c-f139-4573-b233-ed8a3f717e24": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Billing Cost",
+                                    "operationType": "sum",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.total"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "6011e524-4646-410b-8d1c-06c281e8f7ed"
+                    },
+                    {
+                        "columnId": "f8ab301c-f139-4573-b233-ed8a3f717e24"
+                    }
+                ],
+                "layerId": "e12171da-25a4-41ea-86d3-8fd71205c263"
+            }
+        },
+        "title": "Total Cost Table [Metricbeat GCP]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "520c6f10-ec8a-11ea-a0ed-7fe6b565d158",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e12171da-25a4-41ea-86d3-8fd71205c263",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NjksMV0="
+}

@@ -1,0 +1,85 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": "rgba(226,115,0,1)",
+                        "id": "e681d700-b46b-11e9-9bdc-15c69a730d82",
+                        "operator": "gte",
+                        "value": 70
+                    },
+                    {
+                        "gauge": "rgba(247,58,26,1)",
+                        "id": "61b552b0-b513-11e9-81ce-0379c4621e40",
+                        "value": 90
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "e17a9bc0-b46b-11e9-9a02-5de45d117640",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": 0,
+                        "formatter": "percent",
+                        "id": "e17a9bc1-b46b-11e9-9a02-5de45d117640",
+                        "label": "OSD disk usage",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "ceph.osd_df.used.pct",
+                                "id": "e17a9bc2-b46b-11e9-9a02-5de45d117640",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "OSD Disk Usage [Metricbeat Ceph] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "13efa190-b46c-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:57.280Z",
+    "version": "WzM2MzMsMV0="
+}
