@@ -44,6 +44,8 @@ type KibanaLoader struct {
 	hostname      string
 	msgOutputter  MessageOutputter
 	defaultLogger *logp.Logger
+
+	loadedAssets map[string]bool
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
@@ -65,6 +67,7 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 		hostname:      hostname,
 		msgOutputter:  msgOutputter,
 		defaultLogger: logp.NewLogger("dashboards"),
+		loadedAssets:  make(map[string]bool, 0),
 	}
 
 	version := client.GetVersion()
@@ -151,7 +154,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	}
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
-
+	content = ConvertToStr(content)
 	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 
 	err = loader.importReferences(file, content)
@@ -168,6 +171,8 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), obj.String()); err != nil {
 		return fmt.Errorf("error dashboard asset: %+v", err)
 	}
+
+	loader.loadedAssets[file] = true
 	return nil
 }
 
@@ -192,6 +197,9 @@ func (loader KibanaLoader) importReferences(path string, dashboard []byte) error
 			continue
 		}
 		referencePath := filepath.Join(base, "..", ref.Type, ref.ID+".json")
+		if _, ok := loader.loadedAssets[referencePath]; ok {
+			continue
+		}
 		err := loader.ImportDashboard(referencePath)
 		if err != nil {
 			return fmt.Errorf("error loading reference of %s: %s %s: %+v", path, ref.Type, ref.ID, err)
