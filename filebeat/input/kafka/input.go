@@ -385,7 +385,7 @@ func (l *listFromFieldReader) Next() (reader.Message, error) {
 	}
 
 	timestamp, kafkaFields := composeEventMetadata(l.claim, l.groupHandler, msg)
-	messages := parseMultipleMessages(msg.Value, l.field, l.log)
+	messages := l.parseMultipleMessages(msg.Value)
 
 	neededAcks := atomic.MakeInt(len(messages))
 	ackHandler := func() {
@@ -406,6 +406,26 @@ func (l *listFromFieldReader) returnFromBuffer() (reader.Message, error) {
 	newBuffer := l.buffer[1:]
 	l.buffer = newBuffer
 	return next, nil
+}
+
+// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
+func (l *listFromFieldReader) parseMultipleMessages(bMessage []byte) []string {
+	var obj map[string][]interface{}
+	err := json.Unmarshal(bMessage, &obj)
+	if err != nil {
+		l.log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", l.field), "error", err)
+		return []string{}
+	}
+	var messages []string
+	for _, ms := range obj[l.field] {
+		js, err := json.Marshal(ms)
+		if err == nil {
+			messages = append(messages, string(js))
+		} else {
+			l.log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
+		}
+	}
+	return messages
 }
 
 func composeEventMetadata(claim sarama.ConsumerGroupClaim, handler *groupHandler, msg *sarama.ConsumerMessage) (time.Time, common.MapStr) {
@@ -442,26 +462,6 @@ func composeMessage(timestamp time.Time, content []byte, kafkaFields common.MapS
 			"ackHandler": ackHandler,
 		},
 	}
-}
-
-// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func parseMultipleMessages(bMessage []byte, field string, log *logp.Logger) []string {
-	var obj map[string][]interface{}
-	err := json.Unmarshal(bMessage, &obj)
-	if err != nil {
-		log.Errorw(fmt.Sprintf("Kafka desirializing multiple messages using the group object %s", field), "error", err)
-		return []string{}
-	}
-	var messages []string
-	for _, ms := range obj[field] {
-		js, err := json.Marshal(ms)
-		if err == nil {
-			messages = append(messages, string(js))
-		} else {
-			log.Errorw(fmt.Sprintf("Kafka serializing message %s", ms), "error", err)
-		}
-	}
-	return messages
 }
 
 func contains(elements []string, element string) bool {
