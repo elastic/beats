@@ -3,202 +3,225 @@
   description: >
     Contains fields from the TiDB slow logs.
   fields:
-    - name: lock_time.sec
-      type: float
+    - name: Time
+      type: date_nanos
       description: >
-        The amount of time the query waited for the lock to be available. The
-        value is in seconds, as a floating point number.
-    - name: rows_sent
-      type: long
+        The print time of log.
+    - name: Query_time
+      type: double
       description: >
-        The number of rows returned by the query.
-    - name: rows_examined
-      type: long
+        The execution time of a statement.
+    - name: Parse_time
+      type: double
       description: >
-        The number of rows scanned by the query.
-    - name: rows_affected
-      type: long
+        The parsing time for the statement.
+    - name: Compile_time
+      type: double
       description: >
-        The number of rows modified by the query.
-    - name: bytes_sent
-      type: long
-      format: bytes
+        The duration of the query optimization.
+    - name: Query
+      type: text
       description: >
-        The number of bytes sent to client.
-    - name: bytes_received
-      type: long
-      format: bytes
-      description: >
-        The number of bytes received from client.
-    - name: query
-      description: >
-        The slow query.
-    - name: id
-      type: alias
-      path: mysql.thread_id
-      migration: true
-    - name: schema
+        A SQL statement. This field is not printed as a key in the slow log.
+        It is the last line of the slow log.
+    - name: Digest
       type: keyword
       description: >
-        The schema where the slow query was executed.
-    - name: current_user
+        The fingerprint of the SQL statement.
+    - name: Txn_start_ts
       type: keyword
       description: >
-        Current authenticated user, used to determine access privileges. Can differ from the value for user.
-    - name: last_errno
-      type: keyword
-      description: >
-        Last SQL error seen.
-    - name: killed
-      type: keyword
-      description: >
-        Code of the reason if the query was killed.
-
-    - name: query_cache_hit
+        The start timestamp and the unique ID of a transaction.
+        You can use this value to search for the transaction-related logs.
+    - name: Is_internal
       type: boolean
       description: >
-        Whether the query cache was hit.
-    - name: tmp_table
+        Whether a SQL statement is TiDB internal.
+        True indicates that a SQL statement is executed internally in TiDB
+        and false indicates that a SQL statement is executed by the user.
+    - name: Index_ids
+      type: keyword
+      description: >
+        The IDs of the indexes involved in a statement.
+    - name: Succ
       type: boolean
       description: >
-        Whether a temporary table was used to resolve the query.
-    - name: tmp_table_on_disk
+        Whether a statement is executed successfully.
+    - name: Backoff_time
+      type: double
+      description: >
+        The waiting time before retry when a statement encounters errors that require a retry.
+        The common errors as such include: lock occurs, Region split, and TiKV server is busy.
+    - name: Plan
+      type: keyword
+      description: >
+        The execution plan of the statement.
+        Use the select tidb_decode_plan('xxx...') statement to parse the specific execution plan.
+    - name: Prepared
       type: boolean
       description: >
-        Whether the query needed temporary tables on disk.
-    - name: tmp_tables
-      type: long
+        Whether this statement is a Prepare or Execute request or not.
+    - name: Plan_from_cache
+      type: boolean
       description: >
-        Number of temporary tables created for this query
-    - name: tmp_disk_tables
-      type: long
+        Whether this statement hits the execution plan cache.
+    - name: Rewrite_time
+      type: double
       description: >
-        Number of temporary tables created on disk for this query.
-    - name: tmp_table_sizes
-      type: long
-      format: bytes
+        The time consumed for rewriting the query of this statement.
+    - name: Preproc_subqueries
+      type: double
+      description: >
+        The number of subqueries (in the statement) that are executed in advance.
+        For example, the where id in (select if from t) subquery might be executed in advance.
+    - name: Preproc_subqueries_time
+      type: double
+      description: >
+        The time consumed for executing the subquery of this statement in advance.
+    - name: Exec_retry_count
+      type: double
       description:
-        Size of temporary tables created for this query.
-    - name: filesort
-      type: boolean
+        The retry times of this statement.
+        This field is usually for pessimistic transactions in which the statement is retried when the lock is failed.
+    - name: Exec_retry_time
+      type: double
       description: >
-        Whether filesort optimization was used.
-    - name: filesort_on_disk
-      type: boolean
+        The execution retry duration of this statement.
+        For example, if a statement has been executed three times in total (failed for the first two times),
+        Exec_retry_time means the total duration of the first two executions.
+        The duration of the last execution is Query_time minus Exec_retry_time.
+    - name: Prewrite_time
+      type: double
       description: >
-        Whether filesort optimization was used and it needed temporary tables on disk.
-    - name: priority_queue
-      type: boolean
+        The duration of the first phase (prewrite) of the two-phase transaction commit.
+    - name: Commit_time
+      type: double
       description: >
-        Whether a priority queue was used for filesort.
-    - name: full_scan
-      type: boolean
+        The duration of the second phase (commit) of the two-phase transaction commit.
+    - name: Get_commit_ts_time
+      type: double
       description: >
-        Whether a full table scan was needed for the slow query.
-    - name: full_join
-      type: boolean
+        The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
+    - name: Local_latch_wait_time
+      type: double
       description: >
-        Whether a full join was needed for the slow query (no indexes were used for joins).
-    - name: merge_passes
-      type: long
+        The time that TiDB spends on waiting for the lock before the second phase (commit) of the two-phase transaction commit.
+    - name: Write_keys
+      type: double
       description: >
-        Number of merge passes executed for the query.
-    - name: sort_merge_passes
-      type: long
+        The count of keys that the transaction writes to the Write CF in TiKV.
+    - name: Write_size
+      type: double
       description: >
-        Number of merge passes that the sort algorithm has had to do.
-    - name: sort_range_count
-      type: long
+        The total size of the keys or values to be written when the transaction commits.
+    - name: Prewrite_region
+      type: double
       description: >
-        Number of sorts that were done using ranges.
-    - name: sort_rows
-      type: long
+        The number of TiKV Regions involved in the first phase (prewrite) of the two-phase transaction commit.
+        Each Region triggers a remote procedure call.
+    - name: Mem_max
+      type: double
       description: >
-        Number of sorted rows.
-    - name: sort_scan_count
-      type: long
+        The maximum memory space used during the execution period of a SQL statement (the unit is byte).
+    - name: Disk_max
+      type: double
       description: >
-        Number of sorts that were done by scanning the table.
-    - name: log_slow_rate_type
+        The maximum disk space used during the execution period of a SQL statement (the unit is byte).
+    - name: User
       type: keyword
       description: >
-        Type of slow log rate limit, it can be `session` if the rate limit
-        is applied per session, or `query` if it applies per query.
-    - name: log_slow_rate_limit
+        The name of the user who executes this statement.
+    - name: Conn_ID
       type: keyword
       description: >
-        Slow log rate limit, a value of 100 means that one in a hundred queries
-        or sessions are being logged.
-    - name: read_first
-      type: long
+        The Connection ID (session ID). For example, you can use the keyword con:3 to search for the log whose session ID is 3.
+    - name: DB
+      type: keyword
       description: >
-        The number of times the first entry in an index was read.
-    - name: read_last
-      type: long
+        The current database.
+    - name: Request_count
+      type: double
       description: >
-        The number of times the last key in an index was read.
-    - name: read_key
-      type: long
+        The number of Coprocessor requests that a statement sends.
+    - name: Total_keys
+      type: double
       description: >
-        The number of requests to read a row based on a key.
-    - name: read_next
-      type: long
+        The number of keys that Coprocessor has scanned.
+    - name: Process_time
+      type: double
       description: >
-        The number of requests to read the next row in key order.
-    - name: read_prev
-      type: long
+        The total processing time of a SQL statement in TiKV.
+        Because data is sent to TiKV concurrently, this value might exceed Query_time.
+    - name: Wait_time
+      type: double
       description: >
-        The number of requests to read the previous row in key order.
-    - name: read_rnd
-      type: long
+        The total waiting time of a statement in TiKV.
+        Because the Coprocessor of TiKV runs a limited number of threads,
+        requests might queue up when all threads of Coprocessor are working.
+        When a request in the queue takes a long time to process,
+        the waiting time of the subsequent requests increases.
+    - name: Process_keys
+      type: double
       description: >
-        The number of requests to read a row based on a fixed position.
-    - name: read_rnd_next
-      type: long
+        The number of keys that Coprocessor has processed.
+        Compared with total_keys, processed_keys does not include the old versions of MVCC.
+        A great difference between processed_keys and total_keys indicates that many old versions exist.
+    - name: Cop_proc_avg
+      type: double
       description: >
-        The number of requests to read the next row in the data file.
-
-    # https://www.percona.com/doc/percona-server/5.7/diagnostics/slow_extended.html
-    - name: innodb
-      type: group
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
       description: >
-        Contains fields relative to InnoDB engine
-      fields:
-        - name: trx_id
-          type: keyword
-          description: >
-            Transaction ID
-        - name: io_r_ops
-          type: long
-          description: >
-            Number of page read operations.
-        - name: io_r_bytes
-          type: long
-          format: bytes
-          description: >
-            Bytes read during page read operations.
-        - name: io_r_wait.sec
-          type: long
-          description: >
-            How long it took to read all needed data from storage.
-        - name: rec_lock_wait.sec
-          type: long
-          description: >
-            How long the query waited for locks.
-        - name: queue_wait.sec
-          type: long
-          description: >
-            How long the query waited to enter the InnoDB queue and to be executed once
-            in the queue.
-        - name: pages_distinct
-          type: long
-          description: >
-            Approximated count of pages accessed to execute the query.
-
-    - name: user
-      type: alias
-      path: user.name
-      migration: true
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
     - name: host
       type: alias
       path: source.domain
