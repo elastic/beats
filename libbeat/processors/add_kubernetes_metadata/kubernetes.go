@@ -88,6 +88,14 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 	}
 }
 
+// kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata
+func kubernetesMetadataExist(event *beat.Event) bool {
+	if _, err := event.GetValue("kubernetes.namespace"); err != nil {
+		return false
+	}
+	return true
+}
+
 // New constructs a new add_kubernetes_metadata processor.
 func New(cfg *common.Config) (processors.Processor, error) {
 	config, err := newProcessorConfig(cfg, Indexing)
@@ -251,12 +259,15 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	if !k.kubernetesAvailable {
 		return event, nil
 	}
+	if kubernetesMetadataExist(event) {
+		k.log.Debug("Skipping add_kubernetes_metadata processor as kubernetes metadata already exist")
+		return event, nil
+	}
 	index := k.matchers.MetadataIndex(event.Fields)
 	if index == "" {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
-
 	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
