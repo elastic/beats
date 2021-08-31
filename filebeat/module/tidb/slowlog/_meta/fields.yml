@@ -170,64 +170,32 @@
       type: double
       description: >
         The average execution time of cop-tasks.
-    - name: Cop_proc_avg
+    - name: Cop_proc_p90
       type: double
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
+        The P90 execution time of cop-tasks.
+    - name: Cop_proc_max
       type: double
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
+        The maximum execution time of cop-tasks.
+    - name: Cop_proc_addr
+      type: keyword
+      description: >
+        The address of the cop-task with the longest execution time.
+    - name: Cop_wait_avg
       type: double
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
+        The average waiting time of cop-tasks.
+    - name: Cop_wait_p90
       type: double
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
+        The P90 waiting time of cop-tasks.
+    - name: Cop_wait_max
       type: double
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
+        The maximum waiting time of cop-tasks.
+    - name: Cop_wait_addr
+      type: keyword
       description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: Cop_proc_avg
-      type: double
-      description: >
-        The average execution time of cop-tasks.
-    - name: host
-      type: alias
-      path: source.domain
-      migration: true
-    - name: ip
-      type: alias
-      path: source.ip
-      migration: true
+        The address of the cop-task whose waiting time is the longest.
 
