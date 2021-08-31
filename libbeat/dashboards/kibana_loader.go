@@ -154,7 +154,7 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	}
 
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
-	content = ConvertToStr(content)
+	content = EncodeJSONObjects(content)
 	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
 
 	err = loader.importReferences(file, content)

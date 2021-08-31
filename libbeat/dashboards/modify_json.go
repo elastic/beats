@@ -192,13 +192,11 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	}
 
 	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
-		ba := ReplaceIndexInSavedObject(logger, index, kibanaSavedObject)
-		attributes["kibanaSavedObjectMeta"] = ba
+		attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(logger, index, kibanaSavedObject)
 	}
 
 	if visState, ok := attributes["visState"].(string); ok {
-		nya := ReplaceIndexInVisState(logger, index, visState)
-		attributes["visState"] = nya
+		attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
 	}
 
 	b, err := json.Marshal(objectMap)
@@ -210,7 +208,7 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	return b
 }
 
-func ConvertToStr(content []byte) []byte {
+func EncodeJSONObjects(content []byte) []byte {
 	logger := logp.NewLogger("dashboards")
 
 	if len(bytes.TrimSpace(content)) == 0 {
