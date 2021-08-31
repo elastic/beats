@@ -185,10 +185,11 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	stats := StatsV1{}
-	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V1)
 	stats.Version = CgroupsV1
-	for conName, cgPath := range paths {
+	for conName, cgPath := range paths.V1 {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
 		}
@@ -209,9 +210,9 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 		return nil, err
 	}
 	stats := StatsV2{}
-	stats.Path, stats.ID = getCommonCgroupMetadata(paths)
+	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V2)
 	stats.Version = CgroupsV2
-	for conName, cgPath := range paths {
+	for conName, cgPath := range paths.V2 {
 		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
 			continue
 		}
@@ -225,10 +226,10 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 
 // ProcessCgroupPaths is a wrapper around Reader.ProcessCgroupPaths for libraries that only need the slimmer functionality from
 // the gosigar cgroups code. This does not have the same function signature, and consumers still need to distinguish between v1 and v2 cgroups.
-func ProcessCgroupPaths(hostfs string, pid int) (map[string]ControllerPath, error) {
+func ProcessCgroupPaths(hostfs string, pid int) (PathList, error) {
 	reader, err := NewReader(hostfs, false)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating cgroups reader")
+		return PathList{}, errors.Wrap(err, "error creating cgroups reader")
 	}
 	return reader.ProcessCgroupPaths(pid)
 }
@@ -267,7 +268,6 @@ func getStatsV2(path ControllerPath, name string, stats *StatsV2) error {
 }
 
 func getStatsV1(path ControllerPath, name string, stats *StatsV1) error {
-
 	id := filepath.Base(path.ControllerPath)
 
 	switch name {

@@ -171,16 +171,16 @@ func TestProcessCgroupPaths(t *testing.T) {
 	}
 
 	path := "/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
-	assert.Equal(t, path, paths["blkio"].ControllerPath)
-	assert.Equal(t, path, paths["cpu"].ControllerPath)
-	assert.Equal(t, path, paths["cpuacct"].ControllerPath)
-	assert.Equal(t, path, paths["cpuset"].ControllerPath)
-	assert.Equal(t, path, paths["devices"].ControllerPath)
-	assert.Equal(t, path, paths["freezer"].ControllerPath)
-	assert.Equal(t, path, paths["memory"].ControllerPath)
-	assert.Equal(t, path, paths["net_cls"].ControllerPath)
-	assert.Equal(t, path, paths["net_prio"].ControllerPath)
-	assert.Equal(t, path, paths["perf_event"].ControllerPath)
+	assert.Equal(t, path, paths.V1["blkio"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpu"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpuacct"].ControllerPath)
+	assert.Equal(t, path, paths.V1["cpuset"].ControllerPath)
+	assert.Equal(t, path, paths.V1["devices"].ControllerPath)
+	assert.Equal(t, path, paths.V1["freezer"].ControllerPath)
+	assert.Equal(t, path, paths.V1["memory"].ControllerPath)
+	assert.Equal(t, path, paths.V1["net_cls"].ControllerPath)
+	assert.Equal(t, path, paths.V1["net_prio"].ControllerPath)
+	assert.Equal(t, path, paths.V1["perf_event"].ControllerPath)
 	assert.Len(t, paths, 10)
 }
 
@@ -195,10 +195,10 @@ func TestProcessCgroupPathsV2(t *testing.T) {
 		t.Fatalf("error in ProcessCgroupPaths: %s", err)
 	}
 
-	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["cgroup"].FullPath)
-	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["cpu"].FullPath)
-	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["io"].FullPath)
-	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths["memory"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths.V2["cgroup"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths.V2["cpu"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths.V2["io"].FullPath)
+	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths.V2["memory"].FullPath)
 }
 
 func assertContains(t testing.TB, m map[string]struct{}, key string) {
