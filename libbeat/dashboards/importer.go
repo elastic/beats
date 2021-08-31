@@ -112,7 +112,7 @@ func (imp Importer) ImportDir(dirType string, dir string) error {
 
 	var errors []string
 
-	files, err := filepath.Glob(path.Join(dir, "*", "*.json"))
+	files, err := filepath.Glob(path.Join(dir, dirType, "*.json"))
 	if err != nil {
 		return fmt.Errorf("Failed to read directory %s. Error: %s", dir, err)
 	}
