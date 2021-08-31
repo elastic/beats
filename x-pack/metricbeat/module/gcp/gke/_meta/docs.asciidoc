@@ -1,8 +1,5 @@
-`gke` metricset is designed for collecting metrics from Google Kubernetes
-Engine. GKE is the industry's first fully managed Kubernetes service that
-implements full Kubernetes API, 4-way autoscaling, release channels and
-multi-cluster support.
-
+`gke` metricset is designed for collecting metrics from https://cloud.google.com/kubernetes-engine[Google Kubernetes
+Engine].
 Google Cloud Monitoring supports Google Kubernetes Engine metrics, as listed in
 https://cloud.google.com/monitoring/api/metrics_kubernetes[Google Cloud Monitoring Kubernetes metrics].
 
