@@ -222,7 +222,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
 func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
 	ecsm := make(ecs.Mapping)
 	for k, v := range m {
-		if "" == strings.TrimSpace(k) {
+		if strings.TrimSpace(k) == "" {
 			return nil, fmt.Errorf("empty key at depth 0: %w", ErrECSMappingIsInvalid)
 		}
 		err := traverseTree(0, ecsm, []string{k}, v)
@@ -240,7 +240,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 			if len(path) == 1 {
 				return fmt.Errorf("unexpected top level key '%s': %w", keyField, ErrECSMappingIsInvalid)
 			}
-			if "" == strings.TrimSpace(s) {
+			if strings.TrimSpace(s) == "" {
 				return fmt.Errorf("empty field value: %w", ErrECSMappingIsInvalid)
 			}
 			ecsm[strings.Join(path[:len(path)-1], ".")] = ecs.MappingInfo{
@@ -265,7 +265,7 @@ func traverseTree(depth int, ecsm ecs.Mapping, path []string, v interface{}) err
 	} else if m, ok := v.(map[string]interface{}); ok {
 		if depth < maxECSMappingDepth {
 			for k, v := range m {
-				if "" == strings.TrimSpace(k) {
+				if strings.TrimSpace(k) == "" {
 					return fmt.Errorf("empty key at depth %d: %w", depth+1, ErrECSMappingIsInvalid)
 				}
 				err := traverseTree(depth+1, ecsm, append(path, k), v)
