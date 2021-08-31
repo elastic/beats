@@ -5,217 +5,160 @@
 package beater
 
 import (
-	"errors"
+	"context"
+	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/gofrs/uuid"
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
 
-func TestActionDataFromRequest(t *testing.T) {
+type mockExecutor struct {
+	result []map[string]interface{}
+	err    error
+
+	receivedSql string
+}
+
+func (e *mockExecutor) Query(ctx context.Context, sql string) ([]map[string]interface{}, error) {
+	e.receivedSql = sql
+
+	return e.result, e.err
+}
+
+type mockPublisher struct {
+	index      string
+	actionID   string
+	responseID string
+	hits       []map[string]interface{}
+	ecsm       ecs.Mapping
+	reqData    interface{}
+}
+
+func (p *mockPublisher) Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{}) {
+	p.index = index
+	p.actionID = actionID
+	p.responseID = responseID
+	p.hits = hits
+	p.ecsm = ecsm
+	p.reqData = reqData
+}
+
+func TestActionHandlerExecute(t *testing.T) {
+	validLogger := logp.NewLogger("action_test")
+	inputType := osqueryInputType
+
+	ctx := context.Background()
+
+	actionID := uuid.Must(uuid.NewV4()).String()
+	actionSQL := "select * from uptime"
+	request := map[string]interface{}{
+		"id": actionID,
+		"data": map[string]interface{}{
+			"query": actionSQL,
+		},
+	}
 
 	tests := []struct {
-		Name       string
-		Req        map[string]interface{}
-		ActionData actionData
-		Err        error
+		Name          string
+		QueryExecutor queryExecutor
+		Publisher     publisher
+
+		Request map[string]interface{}
+		Err     error
 	}{
 		{
-			Name: "nil",
-			Req:  nil,
-			Err:  ErrActionRequest,
+			Name:    "no executor",
+			Request: request,
+			Err:     ErrNoQueryExecutor,
 		},
 		{
-			Name: "empty",
-			Req:  map[string]interface{}{},
-			Err:  ErrActionRequest,
+			Name:          "no publisher",
+			QueryExecutor: &mockExecutor{},
+			Request:       request,
+			Err:           ErrNoPublisher,
 		},
 		{
-			Name: "valid",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-				},
-			},
-			ActionData: actionData{
-				ID:    "214f219d-d67c-4744-8eb1-0a812594263f",
-				Query: "select * from users limit 2",
-			},
+			Name:          "valid",
+			QueryExecutor: &mockExecutor{},
+			Publisher:     &mockPublisher{},
+			Request:       request,
 		},
 		{
-			Name: "ECS mapping nil",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query":       "select * from users limit 2",
-					"ecs_mapping": nil,
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping empty string",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query":       "select * from users limit 2",
-					"ecs_mapping": "",
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping empty",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query":       "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{},
-				},
-			},
-			ActionData: actionData{
-				ID:         "214f219d-d67c-4744-8eb1-0a812594263f",
-				Query:      "select * from users limit 2",
-				ECSMapping: ecs.Mapping{},
-			},
-		},
-		{
-			Name: "ECS mapping invalid",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"foo": "bar",
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping invalid, field spaces string",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
-							"field": "      ",
-						},
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping invalid, key empty",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"": map[string]interface{}{
-							"field": "uid",
-						},
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping invalid, key spaces",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"  ": map[string]interface{}{
-							"field": "uid",
-						},
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping invalid, field non-string",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
-							"field": 123,
-						},
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping invalid, both field and value defined",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
-							"value": 48,
-							"field": "uid",
-						},
-					},
-				},
-			},
-			Err: ErrActionRequest,
-		},
-		{
-			Name: "ECS mapping valid",
-			Req: map[string]interface{}{
-				"id": "214f219d-d67c-4744-8eb1-0a812594263f",
-				"data": map[string]interface{}{
-					"query": "select * from users limit 2",
-					"ecs_mapping": map[string]interface{}{
-						"user.custom.shoeSize": map[string]interface{}{
-							"value": 48,
-						},
-						"user.id": map[string]interface{}{
-							"field": "uid",
-						},
-					},
-				},
-			},
-			ActionData: actionData{
-				ID:    "214f219d-d67c-4744-8eb1-0a812594263f",
-				Query: "select * from users limit 2",
-				ECSMapping: ecs.Mapping{
-					"user.custom.shoeSize": ecs.MappingInfo{
-						Value: int(48),
-					},
-					"user.id": ecs.MappingInfo{
-						Field: "uid",
-					},
-				},
-			},
+			Name:          "executor error",
+			QueryExecutor: &mockExecutor{err: osqdcli.ErrClientClosed},
+			Publisher:     &mockPublisher{},
+			Request:       request,
+			Err:           osqdcli.ErrClientClosed,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.Name, func(t *testing.T) {
-			ad, err := actionDataFromRequest(tc.Req)
-			if tc.Err != nil {
-				if !errors.Is(err, tc.Err) {
-					t.Fatalf("unexpected error, want:%v, got %v", tc.Err, err)
+			ac := &actionHandler{
+				log:       validLogger,
+				inputType: inputType,
+				queryExec: tc.QueryExecutor,
+				publisher: tc.Publisher,
+			}
+
+			diff := cmp.Diff(inputType, ac.Name())
+			if diff != "" {
+				t.Fatal(diff)
+			}
+
+			res, err := ac.Execute(ctx, tc.Request)
+
+			// The err here is only needed to comply with Action interface, should always be nil
+			if err != nil {
+				t.Fatal("Unexpected error:", err)
+			}
+
+			if res == nil {
+				t.Fatal("Unexpected result: nil")
+			}
+
+			errVal, ok := res["error"]
+
+			if tc.Err == nil {
+				if ok {
+					t.Fatal("Unexpected error:", errVal)
+				} else {
+					diff := cmp.Diff(tc.QueryExecutor.(*mockExecutor).receivedSql, actionSQL)
+					if diff != "" {
+						t.Error(diff)
+					}
+
+					diff = cmp.Diff(actionID, tc.Publisher.(*mockPublisher).actionID)
+					if diff != "" {
+						t.Error(diff)
+					}
+					diff = cmp.Diff("", tc.Publisher.(*mockPublisher).responseID)
+					if diff != "" {
+						t.Error(diff)
+					}
 				}
 			} else {
-				if err != nil {
-					t.Fatal("unexpected error:", err)
-				}
-				diff := cmp.Diff(tc.ActionData, ad)
-				if diff != "" {
-					t.Fatal(diff)
+				if ok {
+					errMsg, ok := errVal.(string)
+					if !ok {
+						t.Fatal("error message is not a string")
+					}
+					diff := cmp.Diff(tc.Err.Error(), errMsg)
+					if diff != "" {
+						t.Fatal(diff)
+					}
+				} else {
+					t.Fatal("Unexpected error, got none in the result")
 				}
 			}
+
+			fmt.Println(res)
+			_ = res
 		})
 	}
 }

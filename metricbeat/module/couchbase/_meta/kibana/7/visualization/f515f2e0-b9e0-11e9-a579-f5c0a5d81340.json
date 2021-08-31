@@ -1,0 +1,146 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Cluster HDD Usage [Metricbeat Couchbase] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "c7abd1d0-b9e0-11e9-8604-efdef550e653"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "c82f80c0-b9e0-11e9-8604-efdef550e653"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "c34f7c90-b9e0-11e9-ab08-bf43409c5a0d",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(67,191,147,1)",
+                        "fill": "0.2",
+                        "formatter": "bytes",
+                        "id": "c34f7c91-b9e0-11e9-ab08-bf43409c5a0d",
+                        "label": "Free",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "couchbase.cluster.hdd.free.bytes",
+                                "id": "c34f7c92-b9e0-11e9-ab08-bf43409c5a0d",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "8949ecc0-ba89-11e9-8d4d-f510918c2882",
+                        "label": "Data",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "couchbase.cluster.hdd.used.by_data.bytes",
+                                "id": "8949ecc1-ba89-11e9-8d4d-f510918c2882",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "ce3d98e0-ba89-11e9-8d4d-f510918c2882",
+                        "label": "Cluster",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "couchbase.cluster.hdd.used.value.bytes",
+                                "id": "ce3d98e1-ba89-11e9-8d4d-f510918c2882",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(159,5,0,1)",
+                        "fill": "0",
+                        "formatter": "bytes",
+                        "id": "2f4dbb20-ba89-11e9-8d4d-f510918c2882",
+                        "label": "Total",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "couchbase.cluster.hdd.total.bytes",
+                                "id": "2f4dbb21-ba89-11e9-8d4d-f510918c2882",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Cluster HDD Usage [Metricbeat Couchbase] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f515f2e0-b9e0-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:05.507Z",
+    "version": "WzM3NDQsMV0="
+}

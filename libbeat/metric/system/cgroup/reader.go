@@ -190,7 +190,7 @@ func (r *Reader) GetV1StatsForProcess(pid int) (*StatsV1, error) {
 	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V1)
 	stats.Version = CgroupsV1
 	for conName, cgPath := range paths.V1 {
-		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
+		if r.ignoreRootCgroups && (cgPath.ControllerPath == "/" && r.cgroupsHierarchyOverride != cgPath.ControllerPath) {
 			continue
 		}
 		err := getStatsV1(cgPath, conName, &stats)
@@ -213,7 +213,7 @@ func (r *Reader) GetV2StatsForProcess(pid int) (*StatsV2, error) {
 	stats.Path, stats.ID = getCommonCgroupMetadata(paths.V2)
 	stats.Version = CgroupsV2
 	for conName, cgPath := range paths.V2 {
-		if r.ignoreRootCgroups && cgPath.ControllerPath == "/" {
+		if r.ignoreRootCgroups && (cgPath.ControllerPath == "/" && r.cgroupsHierarchyOverride != cgPath.ControllerPath) {
 			continue
 		}
 		err := getStatsV2(cgPath, conName, &stats)

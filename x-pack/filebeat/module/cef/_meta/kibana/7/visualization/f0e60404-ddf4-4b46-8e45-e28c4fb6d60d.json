@@ -1,0 +1,117 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events Types by Severity [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.device.product:\"DNS Trace Log\""
+                },
+                "id": "db54ebce-9dd2-4a1e-b476-b3ddb9a9024e",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "81da76ca-1112-4d91-82f4-c66cd3156a84",
+                        "label": "Cumulative Bytes",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "field": "source.bytes",
+                                "id": "521d560c-321a-4410-9eb3-2b2bf3f4efee",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": "0",
+                        "seperate_axis": 1,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "(event.severity:\"2\" OR event.severity:\"3\" OR event.severity:\"5\" OR event.severity:\"16\" OR cef.extension.deviceCustomString4:\"SERVFAIL\" OR cef.extension.deviceCustomString4:\"NXDOMAIN\" OR cef.extension.deviceCustomString4:\"REFUSED\" OR cef.extension.deviceCustomString4:\"BADVERS\" OR cef.extension.deviceCustomString4:\"BADSIG\")"
+                                },
+                                "id": "3f31a7e4-acf3-4f2d-8b7d-e30522325b2a",
+                                "label": "HIGH"
+                            },
+                            {
+                                "color": "rgba(254,146,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "(event.severity:\"1\" OR  event.severity:\"4\" OR  event.severity:\"6\" OR  event.severity:\"7\" OR  event.severity:\"8\" OR  event.severity:\"9\" OR  event.severity:\"10\" OR event.severity:\"17\" OR  event.severity:\"18\" OR  event.severity:\"19\" OR  event.severity:\"20\" OR  event.severity:\"21\" OR  event.severity:\"22\" OR   cef.extension.deviceCustomString4:\"Error\" OR  cef.extension.deviceCustomString4:\"ERROR\" OR  cef.extension.deviceCustomString4:\"Warning\" OR  cef.extension.deviceCustomString4:\"WARNING\" OR  cef.extension.deviceCustomString4:\"FORMERR\" OR  cef.extension.deviceCustomString4:\"NOTIMP\" OR  cef.extension.deviceCustomString4:\"YXDOMAIN\" OR  cef.extension.deviceCustomString4:\"YXRRSET\" OR  cef.extension.deviceCustomString4:\"NXRRSET\" OR  cef.extension.deviceCustomString4:\"NOTAUTH\" OR  cef.extension.deviceCustomString4:\"NOTZONE\" OR  cef.extension.deviceCustomString4:\"BADKEY\" OR  cef.extension.deviceCustomString4:\"BADTIME\" OR  cef.extension.deviceCustomString4:\"BADMODE\" OR  cef.extension.deviceCustomString4:\"BADNAME\" OR  cef.extension.deviceCustomString4:\"BADALG\" OR  cef.extension.deviceCustomString4:\"BADTRUNC\")"
+                                },
+                                "id": "7949d31b-8aae-433a-b7cf-6939a8728cc9",
+                                "label": "MEDIUM"
+                            },
+                            {
+                                "color": "rgba(252,220,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "(NOT (event.severity:\"2\" OR event.severity:\"3\" OR event.severity:\"5\" OR event.severity:\"16\" OR cef.extension.deviceCustomString4:\"SERVFAIL\" OR cef.extension.deviceCustomString4:\"NXDOMAIN\" OR cef.extension.deviceCustomString4:\"REFUSED\" OR cef.extension.deviceCustomString4:\"BADVERS\" OR cef.extension.deviceCustomString4:\"BADSIG\" OR event.severity:\"1\" OR  event.severity:\"4\" OR  event.severity:\"6\" OR  event.severity:\"7\" OR  event.severity:\"8\" OR  event.severity:\"9\" OR  event.severity:\"10\" OR event.severity:\"17\" OR  event.severity:\"18\" OR  event.severity:\"19\" OR  event.severity:\"20\" OR  event.severity:\"21\" OR  event.severity:\"22\" OR cef.extension.deviceCustomString4:\"Error\" OR  cef.extension.deviceCustomString4:\"ERROR\" OR  cef.extension.deviceCustomString4:\"Warning\" OR  cef.extension.deviceCustomString4:\"WARNING\" OR  cef.extension.deviceCustomString4:\"FORMERR\" OR  cef.extension.deviceCustomString4:\"NOTIMP\" OR  cef.extension.deviceCustomString4:\"YXDOMAIN\" OR  cef.extension.deviceCustomString4:\"YXRRSET\" OR  cef.extension.deviceCustomString4:\"NXRRSET\" OR  cef.extension.deviceCustomString4:\"NOTAUTH\" OR  cef.extension.deviceCustomString4:\"NOTZONE\" OR  cef.extension.deviceCustomString4:\"BADKEY\" OR  cef.extension.deviceCustomString4:\"BADTIME\" OR  cef.extension.deviceCustomString4:\"BADMODE\" OR  cef.extension.deviceCustomString4:\"BADNAME\" OR  cef.extension.deviceCustomString4:\"BADALG\" OR  cef.extension.deviceCustomString4:\"BADTRUNC\"))"
+                                },
+                                "id": "d2627211-5f9e-4c65-8a47-1cd6f085939d",
+                                "label": "LOW"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "a5fda184-fdd6-4221-ab59-492eab162f0a",
+                        "label": "Count by Event Type",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "e147ba1c-b13a-496f-9841-b99ddee81c5a",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "cef.device.event_class_id",
+                        "terms_size": "20"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events Types by Severity [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f0e60404-ddf4-4b46-8e45-e28c4fb6d60d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzYsMV0="
+}

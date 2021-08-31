@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "Overview of AWS Usage Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "2ea7bd59-d748-4e4a-889d-f7e2ca1cfe36",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2ea7bd59-d748-4e4a-889d-f7e2ca1cfe36",
+                "panelRefName": "panel_2ea7bd59-d748-4e4a-889d-f7e2ca1cfe36",
+                "title": "AWS Region Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "00c2b1f6-3367-4b6f-ac01-7e48b76c262a",
+                    "w": 20,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "00c2b1f6-3367-4b6f-ac01-7e48b76c262a",
+                "panelRefName": "panel_00c2b1f6-3367-4b6f-ac01-7e48b76c262a",
+                "title": "Usage Resource Count",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "fecfe5d4-ef1c-4f38-954a-a2506d72bc5b",
+                    "w": 18,
+                    "x": 30,
+                    "y": 0
+                },
+                "panelIndex": "fecfe5d4-ef1c-4f38-954a-a2506d72bc5b",
+                "panelRefName": "panel_fecfe5d4-ef1c-4f38-954a-a2506d72bc5b",
+                "title": "Usage API Call Count",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "69ce7461-36ad-4e7c-b541-c6a1601bf089",
+                    "w": 9,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "69ce7461-36ad-4e7c-b541-c6a1601bf089",
+                "panelRefName": "panel_69ce7461-36ad-4e7c-b541-c6a1601bf089",
+                "title": "AWS Account Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "62e86407-6ae3-47d3-9136-dd61bdf3267a",
+                    "w": 9,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "62e86407-6ae3-47d3-9136-dd61bdf3267a",
+                "panelRefName": "panel_62e86407-6ae3-47d3-9136-dd61bdf3267a",
+                "title": "AWS Service Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "196a044c-5c20-4417-8aa0-f60fc502e46c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "196a044c-5c20-4417-8aa0-f60fc502e46c",
+                "panelRefName": "panel_196a044c-5c20-4417-8aa0-f60fc502e46c",
+                "title": "Usage Resource Count Per Service",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "022941b7-01a1-4570-86e9-d03451d4e102",
+                    "w": 48,
+                    "x": 0,
+                    "y": 25
+                },
+                "panelIndex": "022941b7-01a1-4570-86e9-d03451d4e102",
+                "panelRefName": "panel_022941b7-01a1-4570-86e9-d03451d4e102",
+                "title": "Usage API Call Count Per Service",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] Usage Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "917a07b0-178e-11ea-8650-fb606deb5be4",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "b5308940-7347-11e9-816b-07687310a99a",
+            "name": "2ea7bd59-d748-4e4a-889d-f7e2ca1cfe36:panel_2ea7bd59-d748-4e4a-889d-f7e2ca1cfe36",
+            "type": "visualization"
+        },
+        {
+            "id": "9202d1a0-178c-11ea-8650-fb606deb5be4",
+            "name": "00c2b1f6-3367-4b6f-ac01-7e48b76c262a:panel_00c2b1f6-3367-4b6f-ac01-7e48b76c262a",
+            "type": "visualization"
+        },
+        {
+            "id": "681aab60-178c-11ea-8650-fb606deb5be4",
+            "name": "fecfe5d4-ef1c-4f38-954a-a2506d72bc5b:panel_fecfe5d4-ef1c-4f38-954a-a2506d72bc5b",
+            "type": "visualization"
+        },
+        {
+            "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
+            "name": "69ce7461-36ad-4e7c-b541-c6a1601bf089:panel_69ce7461-36ad-4e7c-b541-c6a1601bf089",
+            "type": "visualization"
+        },
+        {
+            "id": "2929edb0-178e-11ea-8650-fb606deb5be4",
+            "name": "62e86407-6ae3-47d3-9136-dd61bdf3267a:panel_62e86407-6ae3-47d3-9136-dd61bdf3267a",
+            "type": "visualization"
+        },
+        {
+            "id": "59e2e110-178d-11ea-8650-fb606deb5be4",
+            "name": "196a044c-5c20-4417-8aa0-f60fc502e46c:panel_196a044c-5c20-4417-8aa0-f60fc502e46c",
+            "type": "visualization"
+        },
+        {
+            "id": "75ebfda0-1789-11ea-8650-fb606deb5be4",
+            "name": "022941b7-01a1-4570-86e9-d03451d4e102:panel_022941b7-01a1-4570-86e9-d03451d4e102",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:39.859Z",
+    "version": "WzM0NjIsMV0="
+}

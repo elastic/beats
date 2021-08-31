@@ -1,0 +1,89 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Groups Changed TSVB Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(200,201,197,1)",
+                        "id": "bfcaced0-f419-11e9-928e-8f5fd2b6c66e",
+                        "operator": "lte",
+                        "value": 0
+                    },
+                    {
+                        "background_color": "rgba(221,186,64,1)",
+                        "id": "a7d935e0-f497-11e9-928e-8f5fd2b6c66e",
+                        "operator": "gt",
+                        "value": 0
+                    },
+                    {
+                        "background_color": "rgba(200,201,197,1)",
+                        "id": "78de9594-840c-459f-b414-64ac93d3b1da",
+                        "operator": "empty",
+                        "value": null
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.code:4735 OR event.code:4737 OR event.code:\"4755\" OR event.code:\"4764\"  OR event.code:\"4750\" OR event.code:\"4760\" OR event.code:\"4745\" OR event.code:\"4784\" OR event.code:\"4791\" "
+                },
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "winlogbeat-*",
+                "interval": "60d",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Groups Changed",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "Groups Changed TSVB Metric [Winlogbeat Security]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "400b63e0-f49a-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:56.323Z",
+    "version": "WzIyMzIsMl0="
+}

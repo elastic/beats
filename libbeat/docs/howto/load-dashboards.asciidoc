@@ -77,6 +77,3 @@ endif::[]
 endif::no-output-logstash[]
 
 include::{libbeat-dir}/tab-widgets/load-dashboards-logstash-widget.asciidoc[]
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]

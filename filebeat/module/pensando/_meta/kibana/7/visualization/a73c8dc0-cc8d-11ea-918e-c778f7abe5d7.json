@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Client/Server - input list [Filebeat Pensando]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "client.ip",
+                        "id": "1595471403191",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Client",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 500,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "server.ip",
+                        "id": "1595471807689",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Server",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 500,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "log.source.address",
+                        "id": "1595471848091",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "DSC",
+                        "options": {
+                            "dynamicOptions": false,
+                            "multiselect": false,
+                            "order": "desc",
+                            "size": 500,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": true,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": true
+            },
+            "title": "Client/Server - input list [Filebeat Pensando]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a73c8dc0-cc8d-11ea-918e-c778f7abe5d7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:56.763Z",
+    "version": "WzQ5NDAsMV0="
+}

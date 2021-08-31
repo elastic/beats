@@ -109,6 +109,8 @@ func (p gosigarCidProvider) getProcessCgroups(pid int) (cgroup.PathList, error) 
 // ID is found then an empty string is returned.
 // Example:
 // /kubepods/besteffort/pod9b9e44c2-00fd-11ea-95e9-080027421ddf/2bb9fd4de339e5d4f094e78bb87636004acfe53f5668104addc761fe4a93588e
+// V2 Example:
+// /kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod1f306eaea646903787fd7cc4eb6be515.slice/crio-eac98011dea91157038ca797f2141754106e074b7242721c7170a642a2204a54.scope
 func (p gosigarCidProvider) getCid(cgroups cgroup.PathList) string {
 	// if regex defined use it to find cid
 	if len(p.cgroupRegex) != 0 {

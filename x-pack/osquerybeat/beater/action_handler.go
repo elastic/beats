@@ -6,107 +6,38 @@ package beater
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 )
+
+var (
+	ErrNoPublisher     = errors.New("no publisher configured")
+	ErrNoQueryExecutor = errors.New("no query executor configures")
+)
+
+type publisher interface {
+	Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+}
+
+type queryExecutor interface {
+	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
+}
 
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
-	bt        *osquerybeat
-	cli       *osqdcli.Client
+	publisher publisher
+	queryExec queryExecutor
 }
 
 func (a *actionHandler) Name() string {
 	return a.inputType
-}
-
-type actionData struct {
-	Query      string
-	ID         string
-	ECSMapping ecs.Mapping
-}
-
-func actionDataFromRequest(req map[string]interface{}) (ad actionData, err error) {
-	if len(req) == 0 {
-		return ad, ErrActionRequest
-	}
-	if v, ok := req["id"]; ok {
-		if id, ok := v.(string); ok {
-			ad.ID = id
-		}
-	}
-	if v, ok := req["data"]; ok {
-		if m, ok := v.(map[string]interface{}); ok {
-			if v, ok := m["query"]; ok {
-				if query, ok := v.(string); ok {
-					ad.Query = query
-				}
-			}
-			if v, ok := m["ecs_mapping"]; ok {
-				m, ok := v.(map[string]interface{})
-				if !ok {
-					return ad, ErrActionRequest
-				}
-				ecsm, err := convertActionDataECSMapping(m)
-				if err != nil {
-					return ad, err
-				}
-				ad.ECSMapping = ecsm
-			}
-		}
-	}
-	return ad, nil
-}
-
-func convertActionDataECSMapping(m map[string]interface{}) (ecsm ecs.Mapping, err error) {
-	ecsm = make(ecs.Mapping)
-	for k, v := range m {
-		k = strings.TrimSpace(k)
-		if k == "" {
-			return ecsm, ErrActionRequest
-		}
-		valmap, ok := v.(map[string]interface{})
-		if !ok {
-			return ecsm, ErrActionRequest
-		}
-
-		var (
-			val   interface{}
-			field string
-		)
-
-		if val, ok = valmap["field"]; ok {
-			// "field" can only be string
-			field, ok = val.(string)
-			if !ok {
-				return ecsm, ErrActionRequest
-			}
-			field = strings.TrimSpace(field)
-		}
-
-		value := valmap["value"]
-		if field != "" && value != nil {
-			return ecsm, ErrActionRequest
-		}
-
-		// Should have at field or value defined in the mapping object
-		if field == "" && value == nil {
-			return ecsm, ErrActionRequest
-		}
-		ecsm[k] = ecs.MappingInfo{
-			Field: field,
-			Value: value,
-		}
-	}
-	return
 }
 
 // Execute handles the action request.
@@ -128,20 +59,27 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 }
 
 func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) error {
-	ad, err := actionDataFromRequest(req)
+	ac, err := action.FromMap(req)
 	if err != nil {
 		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ad, "", req)
+	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ac, "", req)
 }
 
-func (a *actionHandler) executeQuery(ctx context.Context, index string, ad actionData, responseID string, req map[string]interface{}) error {
+func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) error {
 
-	a.log.Debugf("Execute query: %s", ad.Query)
+	if a.queryExec == nil {
+		return ErrNoQueryExecutor
+	}
+	if a.publisher == nil {
+		return ErrNoPublisher
+	}
+
+	a.log.Debugf("Execute query: %s", ac.Query)
 
 	start := time.Now()
 
-	hits, err := a.cli.Query(ctx, ad.Query)
+	hits, err := a.queryExec.Query(ctx, ac.Query)
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
@@ -150,17 +88,6 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ad actio
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	var ecsFields []common.MapStr
-	// If non-empty result and the ECSMapping is present
-	if len(hits) > 0 && len(ad.ECSMapping) > 0 {
-		ecsFields = make([]common.MapStr, len(hits))
-		for i, hit := range hits {
-			ecsFields[i] = common.MapStr(ad.ECSMapping.Map(ecs.Doc(hit)))
-		}
-	}
-	if err != nil {
-		return err
-	}
-	a.bt.publishEvents(index, ad.ID, responseID, hits, ecsFields, req["data"])
+	a.publisher.Publish(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
 	return nil
 }

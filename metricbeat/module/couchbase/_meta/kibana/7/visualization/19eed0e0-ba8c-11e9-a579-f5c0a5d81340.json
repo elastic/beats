@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Disk Fetches [Metricbeat Couchbase] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "ead970d0-ba8b-11e9-8d1e-992a5619d7be",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(176,188,0,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "ead970d1-ba8b-11e9-8d1e-992a5619d7be",
+                        "label": "Disk Fetches",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchbase.bucket.disk.fetches",
+                                "id": "ead970d2-ba8b-11e9-8d1e-992a5619d7be",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "couchbase.bucket.name",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Disk Fetches [Metricbeat Couchbase] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "19eed0e0-ba8c-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:05.507Z",
+    "version": "WzM3NDksMV0="
+}
