@@ -9,10 +9,10 @@ import (
 )
 
 type Source struct {
-	Local      *LocalSource  `config:"local"`
-	Inline     *InlineSource `config:"inline" json:"inline"`
-	ZipUrl     *ZipURLSource `config:"zip_url" json:"zip_url"`
-	ActiveMemo ISource       // cache for selected source
+	Local      *LocalSource      `config:"local"`
+	Inline     *InlineSource     `config:"inline" json:"inline"`
+	ZipUrl     *ZipURLSourceBase `config:"zip_url" json:"zip_url"`
+	ActiveMemo ISource           // cache for selected source
 }
 
 func (s *Source) Active() ISource {

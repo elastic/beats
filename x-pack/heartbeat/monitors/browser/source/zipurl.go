@@ -15,9 +15,51 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
+
+type ZipURLSourceBase struct {
+	zus *ZipURLSource
+}
+
+func (zb *ZipURLSourceBase) Fetch() error {
+	return zb.zus.Fetch()
+}
+
+func (zb *ZipURLSourceBase) Workdir() string {
+	return zb.zus.Workdir()
+}
+
+func (zb *ZipURLSourceBase) Close() error {
+	return zb.zus.Close()
+}
+
+func (zb *ZipURLSourceBase) Unpack(rawMap interface{}) error {
+	cfg, err := common.NewConfigFrom(rawMap)
+	if err != nil {
+		return fmt.Errorf("could create new config from interface for zip_url: %w", err)
+	}
+
+	zus := ZipURLSource{}
+	err = cfg.Unpack(&zus)
+	zb.zus = &zus
+	if err != nil {
+		return fmt.Errorf("could not unpack zip_url config: %w", err)
+	}
+
+	htsCfg := httpcommon.HTTPTransportSettings{}
+	err = cfg.Unpack(&htsCfg)
+	if err != nil {
+		return fmt.Errorf("could not unpack http common options from zip_url config: %w", err)
+	}
+
+	zb.zus.httpClient, err = htsCfg.Client()
+	if err != nil {
+		return fmt.Errorf("could not instantiate zip_url http client", err)
+	}
+	return nil
+}
 
 type ZipURLSource struct {
 	URL      string `config:"url" json:"url"`
@@ -28,27 +70,22 @@ type ZipURLSource struct {
 	BaseSource
 	TargetDirectory string `config:"target_directory" json:"target_directory"`
 
-	// Include the standard HTTP Transport settings, proxy, tls, timeout, etc
-	httpcommon.HTTPTransportSettings
-	httpClient *http.Client
-
 	// Etag from last successful fetch
 	etag string
+
+	httpClient *http.Client
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 // NewZipURLSource constructs a zip URL source, automatically validating it as go ucfg would.
-func NewZipURLSource(z ZipURLSource) (*ZipURLSource, error) {
-	zus := &z
+func NewZipURLSource(z *ZipURLSource) (*ZipURLSource, error) {
+	zus := z
 	err := zus.Validate()
 	return zus, err
 }
 
 func (z *ZipURLSource) Validate() (err error) {
-	// Validate and instantiate the HTTP client
-	//z.httpClient, err = z.HTTPTransportSettings.Client()
-	z.httpClient, _ = httpcommon.DefaultHTTPTransportSettings().Client()
 	return err
 }
 
@@ -210,9 +247,6 @@ func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
 	if z.Username != "" && z.Password != "" {
 		req.SetBasicAuth(z.Username, z.Password)
 	}
-	logp.Warn("EXEC REQ %#v", req)
-	logp.Warn("EXEC REQUE %#v", z.URL)
-	logp.Warn("EXEC REQUa %#v", z)
 	return z.httpClient.Do(req)
 }
 
