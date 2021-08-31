@@ -94,6 +94,36 @@ func extractError(result []byte) error {
 	return nil
 }
 
+func extractMessage(result []byte) error {
+	var kibanaResult struct {
+		Success bool
+		Errors  []struct {
+			Id    string
+			Type  string
+			Error struct {
+				Type       string
+				References []struct {
+					Type string
+					Id   string
+				}
+			}
+		}
+	}
+	if err := json.Unmarshal(result, &kibanaResult); err != nil {
+		return nil
+	}
+
+	if !kibanaResult.Success {
+		var errs multierror.Errors
+		for _, err := range kibanaResult.Errors {
+			errs = append(errs, fmt.Errorf("error: %s, asset ID=%s; asset type=%s; references=%+v", err.Error.Type, err.Id, err.Type, err.Error.References))
+		}
+		return errs.Err()
+	}
+
+	return nil
+}
+
 // NewKibanaClient builds and returns a new Kibana client
 func NewKibanaClient(cfg *common.Config) (*Client, error) {
 	config := DefaultClientConfig()
@@ -200,6 +230,8 @@ func (conn *Connection) Request(method, extraPath string,
 
 	if resp.StatusCode >= 300 {
 		retError = extractError(result)
+	} else {
+		retError = extractMessage(result)
 	}
 	return resp.StatusCode, result, retError
 }

@@ -63,6 +63,21 @@ func TestErrorBadJson(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestErrorJsonWithHTTPOK(t *testing.T) {
+	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"successCount":0,"success":false,"warnings":[],"errors":[{"id":"abcf35b0-0a82-11e8-bffe-ff7d4f68cf94-ecs","type":"dashboard","title":"[Filebeat MongoDB] Overview ECS","meta":{"title":"[Filebeat MongoDB] Overview ECS","icon":"dashboardApp"},"error":{"type":"missing_references","references":[{"type":"search","id":"e49fe000-0a7e-11e8-bffe-ff7d4f68cf94-ecs"},{"type":"search","id":"bfc96a60-0a80-11e8-bffe-ff7d4f68cf94-ecs"}]}}]}`))
+	}))
+	defer kibanaTs.Close()
+
+	conn := Connection{
+		URL:  kibanaTs.URL,
+		HTTP: http.DefaultClient,
+	}
+	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, nil, nil)
+	assert.Equal(t, http.StatusOK, code)
+	assert.Error(t, err)
+}
+
 func TestSuccess(t *testing.T) {
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"objects":[{"id":"test-*","type":"index-pattern","updated_at":"2018-01-24T19:04:13.371Z","version":1}]}`))
