@@ -90,14 +90,13 @@ Vagrant.configure("2") do |config|
       end
 
       if node[:platform] != "windows"
-        nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
+        nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
         nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: node[:platform]
       end
 
 
       # for BSDs
       if node[:platform] == "openbsd" or node[:platform] == "freebsd"
-        #nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "unix", privileged: false
         nodeconfig.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
         nodeconfig.vm.provider :virtualbox do |vbox|
           vbox.check_guest_additions = false
