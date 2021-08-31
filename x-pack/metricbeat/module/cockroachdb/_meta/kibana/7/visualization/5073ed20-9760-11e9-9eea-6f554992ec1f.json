@@ -1,0 +1,190 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "SQL queries [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "annotations": [],
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "88d6bda0-9760-11e9-b3d5-07b0ab7d6354",
+                        "label": "Selects",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.sql_select_count",
+                                "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                                "id": "658d2990-9762-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "658d2990-9762-11e9-b3d5-07b0ab7d6354",
+                                "function": "sum",
+                                "id": "ec698bc0-9762-11e9-b3d5-07b0ab7d6354",
+                                "sigma": "",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "stacked",
+                        "terms_field": "service.address",
+                        "terms_order_by": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "02d89100-9761-11e9-b3d5-07b0ab7d6354",
+                        "label": "Inserts",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.sql_insert_count",
+                                "id": "02d89101-9761-11e9-b3d5-07b0ab7d6354",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "02d89101-9761-11e9-b3d5-07b0ab7d6354",
+                                "id": "74eba420-9762-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "74eba420-9762-11e9-b3d5-07b0ab7d6354",
+                                "id": "54cb8aa0-9764-11e9-b3d5-07b0ab7d6354",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "stacked",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Updates",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.sql_update_count",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "9aa7ace0-9762-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "9aa7ace0-9762-11e9-b3d5-07b0ab7d6354",
+                                "id": "939af2c0-9764-11e9-b3d5-07b0ab7d6354",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "stacked",
+                        "terms_field": "service.address",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "03f6d240-9761-11e9-b3d5-07b0ab7d6354",
+                        "label": "Deletes",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.sql_delete_count",
+                                "id": "03f6d241-9761-11e9-b3d5-07b0ab7d6354",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "03f6d241-9761-11e9-b3d5-07b0ab7d6354",
+                                "id": "a3ed7c30-9762-11e9-b3d5-07b0ab7d6354",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "a3ed7c30-9762-11e9-b3d5-07b0ab7d6354",
+                                "id": "a13994e0-9764-11e9-b3d5-07b0ab7d6354",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "stacked",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SQL queries [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MTAsMV0="
+}

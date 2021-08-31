@@ -1,0 +1,160 @@
+{
+    "attributes": {
+        "description": "The dashboard presents metric data describing ActiveMQ broker. Metrics show statistics of enqueued and dequeued messages, consumers, producers and memory usage (broker, store, temp).",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "cd2b33a6-3c4c-4d97-9cfb-7c6e47f248dc",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "cd2b33a6-3c4c-4d97-9cfb-7c6e47f248dc",
+                "panelRefName": "panel_cd2b33a6-3c4c-4d97-9cfb-7c6e47f248dc",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "dc086d82-511a-45e3-b20e-6eef48e22ee1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "dc086d82-511a-45e3-b20e-6eef48e22ee1",
+                "panelRefName": "panel_dc086d82-511a-45e3-b20e-6eef48e22ee1",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "84a09081-449a-44f8-bc43-7119730dc74b",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "84a09081-449a-44f8-bc43-7119730dc74b",
+                "panelRefName": "panel_84a09081-449a-44f8-bc43-7119730dc74b",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "e5e43ead-2ed5-4290-86f3-5dd623500f87",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "e5e43ead-2ed5-4290-86f3-5dd623500f87",
+                "panelRefName": "panel_e5e43ead-2ed5-4290-86f3-5dd623500f87",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "f891ea87-7718-4820-a0dc-21b160c1e684",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "f891ea87-7718-4820-a0dc-21b160c1e684",
+                "panelRefName": "panel_f891ea87-7718-4820-a0dc-21b160c1e684",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "54a788b6-5ede-4217-a975-ba6bc57f5274",
+                    "w": 24,
+                    "x": 24,
+                    "y": 25
+                },
+                "panelIndex": "54a788b6-5ede-4217-a975-ba6bc57f5274",
+                "panelRefName": "panel_54a788b6-5ede-4217-a975-ba6bc57f5274",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat ActiveMQ] Broker Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "fc27a270-0b95-11ea-81bb-cf244189d349",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "55cacee0-0ba7-11ea-81bb-cf244189d349",
+            "name": "cd2b33a6-3c4c-4d97-9cfb-7c6e47f248dc:panel_cd2b33a6-3c4c-4d97-9cfb-7c6e47f248dc",
+            "type": "visualization"
+        },
+        {
+            "id": "ce456e60-0b99-11ea-81bb-cf244189d349",
+            "name": "dc086d82-511a-45e3-b20e-6eef48e22ee1:panel_dc086d82-511a-45e3-b20e-6eef48e22ee1",
+            "type": "visualization"
+        },
+        {
+            "id": "33cbfa60-0b95-11ea-81bb-cf244189d349",
+            "name": "84a09081-449a-44f8-bc43-7119730dc74b:panel_84a09081-449a-44f8-bc43-7119730dc74b",
+            "type": "visualization"
+        },
+        {
+            "id": "594db510-0b9c-11ea-81bb-cf244189d349",
+            "name": "e5e43ead-2ed5-4290-86f3-5dd623500f87:panel_e5e43ead-2ed5-4290-86f3-5dd623500f87",
+            "type": "visualization"
+        },
+        {
+            "id": "bfad8290-0d22-11ea-ba76-7fb26815d86c",
+            "name": "f891ea87-7718-4820-a0dc-21b160c1e684:panel_f891ea87-7718-4820-a0dc-21b160c1e684",
+            "type": "visualization"
+        },
+        {
+            "id": "cb475400-0d22-11ea-ba76-7fb26815d86c",
+            "name": "54a788b6-5ede-4217-a975-ba6bc57f5274:panel_54a788b6-5ede-4217-a975-ba6bc57f5274",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:54.803Z",
+    "version": "WzQxNzgsMV0="
+}

@@ -1,0 +1,254 @@
+{
+    "attributes": {
+        "description": "Overview of DynamoDB AWS Cloudwatch metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "9642fcd0-464b-46ea-815c-cd2d9efc056d",
+                "panelRefName": "panel_9642fcd0-464b-46ea-815c-cd2d9efc056d",
+                "title": "Region/Account Filters",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "bb4b0cfa-7d6f-48e3-913e-2713c5aa3fe0",
+                    "w": 14,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "bb4b0cfa-7d6f-48e3-913e-2713c5aa3fe0",
+                "panelRefName": "panel_bb4b0cfa-7d6f-48e3-913e-2713c5aa3fe0",
+                "title": "Consumed Read Capacity Units",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "09bdf20b-43b4-47a3-a113-d34ef3b2596c",
+                    "w": 14,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "09bdf20b-43b4-47a3-a113-d34ef3b2596c",
+                "panelRefName": "panel_09bdf20b-43b4-47a3-a113-d34ef3b2596c",
+                "title": "Consumed Write Capacity Units",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "1bd7141d-b410-4ca0-8550-f8f645d97983",
+                    "w": 10,
+                    "x": 38,
+                    "y": 0
+                },
+                "panelIndex": "1bd7141d-b410-4ca0-8550-f8f645d97983",
+                "panelRefName": "panel_1bd7141d-b410-4ca0-8550-f8f645d97983",
+                "title": "Max Read/Write Account Limits",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "073302ad-0e44-4cd1-b16d-58f017a71816",
+                    "w": 17,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "073302ad-0e44-4cd1-b16d-58f017a71816",
+                "panelRefName": "panel_073302ad-0e44-4cd1-b16d-58f017a71816",
+                "title": "Successful Request Latency",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "ddcbc858-d2a0-42c3-8074-74f7d08ecb60",
+                    "w": 16,
+                    "x": 17,
+                    "y": 9
+                },
+                "panelIndex": "ddcbc858-d2a0-42c3-8074-74f7d08ecb60",
+                "panelRefName": "panel_ddcbc858-d2a0-42c3-8074-74f7d08ecb60",
+                "title": "Read Throttle Events",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "95ffd42d-b28d-4f40-b3cb-6a6ac52943e1",
+                    "w": 15,
+                    "x": 33,
+                    "y": 9
+                },
+                "panelIndex": "95ffd42d-b28d-4f40-b3cb-6a6ac52943e1",
+                "panelRefName": "panel_95ffd42d-b28d-4f40-b3cb-6a6ac52943e1",
+                "title": "Throttle Requests",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "0a588a08-997a-422f-a5db-e56728bc6702",
+                    "w": 17,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "0a588a08-997a-422f-a5db-e56728bc6702",
+                "panelRefName": "panel_0a588a08-997a-422f-a5db-e56728bc6702",
+                "title": "Max Request Latency Per Operation",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "897ae224-d367-4fe0-aa23-5bb13165cc67",
+                    "w": 16,
+                    "x": 17,
+                    "y": 19
+                },
+                "panelIndex": "897ae224-d367-4fe0-aa23-5bb13165cc67",
+                "panelRefName": "panel_897ae224-d367-4fe0-aa23-5bb13165cc67",
+                "title": "Write Throttle Events",
+                "type": "visualization",
+                "version": "7.6.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "e81e9817-c971-454b-881a-09cec10da0e9",
+                    "w": 15,
+                    "x": 33,
+                    "y": 19
+                },
+                "panelIndex": "e81e9817-c971-454b-881a-09cec10da0e9",
+                "panelRefName": "panel_e81e9817-c971-454b-881a-09cec10da0e9",
+                "title": "Account Provisioned Write Capacity Utilization",
+                "type": "visualization",
+                "version": "7.6.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] DynamoDB Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "68ba7bd0-20b6-11ea-8f72-2f8d21e50b0c",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "bc8bd8f0-31fd-11ea-bcbf-59cb7eefc1f0",
+            "name": "9642fcd0-464b-46ea-815c-cd2d9efc056d:panel_9642fcd0-464b-46ea-815c-cd2d9efc056d",
+            "type": "visualization"
+        },
+        {
+            "id": "9d284bc0-7b08-11ea-9bb4-e958b64b5685",
+            "name": "bb4b0cfa-7d6f-48e3-913e-2713c5aa3fe0:panel_bb4b0cfa-7d6f-48e3-913e-2713c5aa3fe0",
+            "type": "visualization"
+        },
+        {
+            "id": "49379b70-7b07-11ea-9bb4-e958b64b5685",
+            "name": "09bdf20b-43b4-47a3-a113-d34ef3b2596c:panel_09bdf20b-43b4-47a3-a113-d34ef3b2596c",
+            "type": "visualization"
+        },
+        {
+            "id": "7d1e0870-7a3f-11ea-bfa4-dfea8c457654",
+            "name": "1bd7141d-b410-4ca0-8550-f8f645d97983:panel_1bd7141d-b410-4ca0-8550-f8f645d97983",
+            "type": "visualization"
+        },
+        {
+            "id": "8cf5fbe0-7b07-11ea-9bb4-e958b64b5685",
+            "name": "073302ad-0e44-4cd1-b16d-58f017a71816:panel_073302ad-0e44-4cd1-b16d-58f017a71816",
+            "type": "visualization"
+        },
+        {
+            "id": "7b93bab0-7b0a-11ea-9bb4-e958b64b5685",
+            "name": "ddcbc858-d2a0-42c3-8074-74f7d08ecb60:panel_ddcbc858-d2a0-42c3-8074-74f7d08ecb60",
+            "type": "visualization"
+        },
+        {
+            "id": "9f0425c0-7b0a-11ea-9bb4-e958b64b5685",
+            "name": "95ffd42d-b28d-4f40-b3cb-6a6ac52943e1:panel_95ffd42d-b28d-4f40-b3cb-6a6ac52943e1",
+            "type": "visualization"
+        },
+        {
+            "id": "3dee68c0-7b0c-11ea-9bb4-e958b64b5685",
+            "name": "0a588a08-997a-422f-a5db-e56728bc6702:panel_0a588a08-997a-422f-a5db-e56728bc6702",
+            "type": "visualization"
+        },
+        {
+            "id": "b403f7b0-7b15-11ea-9bb4-e958b64b5685",
+            "name": "897ae224-d367-4fe0-aa23-5bb13165cc67:panel_897ae224-d367-4fe0-aa23-5bb13165cc67",
+            "type": "visualization"
+        },
+        {
+            "id": "31ad4090-2003-11ea-8f72-2f8d21e50b0c",
+            "name": "e81e9817-c971-454b-881a-09cec10da0e9:panel_e81e9817-c971-454b-881a-09cec10da0e9",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:26.548Z",
+    "version": "WzMzMjIsMV0="
+}

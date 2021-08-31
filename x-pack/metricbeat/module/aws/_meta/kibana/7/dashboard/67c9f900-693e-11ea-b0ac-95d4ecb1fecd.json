@@ -1,0 +1,188 @@
+{
+    "attributes": {
+        "description": "Overview of AWS VPN Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "8ef52400-6eac-417b-936e-dce159dd5e89",
+                    "w": 8,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8ef52400-6eac-417b-936e-dce159dd5e89",
+                "panelRefName": "panel_8ef52400-6eac-417b-936e-dce159dd5e89",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "eb78041b-afc4-458e-af92-0951b1d0cadd",
+                    "w": 20,
+                    "x": 8,
+                    "y": 0
+                },
+                "panelIndex": "eb78041b-afc4-458e-af92-0951b1d0cadd",
+                "panelRefName": "panel_eb78041b-afc4-458e-af92-0951b1d0cadd",
+                "title": "Tunnel State Per VPN ID",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "39a9be08-98c6-470c-b76b-312a57e11e2d",
+                    "w": 20,
+                    "x": 28,
+                    "y": 0
+                },
+                "panelIndex": "39a9be08-98c6-470c-b76b-312a57e11e2d",
+                "panelRefName": "panel_39a9be08-98c6-470c-b76b-312a57e11e2d",
+                "title": "Tunnel State Per Tunnel IP",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5c8122a2-fbf0-4404-918e-249bf6fd7f07",
+                    "w": 24,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "5c8122a2-fbf0-4404-918e-249bf6fd7f07",
+                "panelRefName": "panel_5c8122a2-fbf0-4404-918e-249bf6fd7f07",
+                "title": "Tunnel Data In Per VPN ID",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8ecd0f73-146f-4aed-bfd1-5c236c5dfe8c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 14
+                },
+                "panelIndex": "8ecd0f73-146f-4aed-bfd1-5c236c5dfe8c",
+                "panelRefName": "panel_8ecd0f73-146f-4aed-bfd1-5c236c5dfe8c",
+                "title": "Tunnel Data In Per Tunnel IP",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "eb10ea7d-ffc9-4c51-9386-6f63be6322aa",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "eb10ea7d-ffc9-4c51-9386-6f63be6322aa",
+                "panelRefName": "panel_eb10ea7d-ffc9-4c51-9386-6f63be6322aa",
+                "title": "Tunnel Data Out Per VPN ID",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3b01a7e9-eb8b-43bb-977d-53d8bc9d21b7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "3b01a7e9-eb8b-43bb-977d-53d8bc9d21b7",
+                "panelRefName": "panel_3b01a7e9-eb8b-43bb-977d-53d8bc9d21b7",
+                "title": "Tunnel Data Out Per Tunnel IP",
+                "type": "visualization",
+                "version": "7.6.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] VPN Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "67c9f900-693e-11ea-b0ac-95d4ecb1fecd",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "fcfc8d80-693e-11ea-b0ac-95d4ecb1fecd",
+            "name": "8ef52400-6eac-417b-936e-dce159dd5e89:panel_8ef52400-6eac-417b-936e-dce159dd5e89",
+            "type": "visualization"
+        },
+        {
+            "id": "142ad600-693b-11ea-b0ac-95d4ecb1fecd",
+            "name": "eb78041b-afc4-458e-af92-0951b1d0cadd:panel_eb78041b-afc4-458e-af92-0951b1d0cadd",
+            "type": "visualization"
+        },
+        {
+            "id": "58f5a3c0-6943-11ea-b0ac-95d4ecb1fecd",
+            "name": "39a9be08-98c6-470c-b76b-312a57e11e2d:panel_39a9be08-98c6-470c-b76b-312a57e11e2d",
+            "type": "visualization"
+        },
+        {
+            "id": "2ee7f420-6943-11ea-b0ac-95d4ecb1fecd",
+            "name": "5c8122a2-fbf0-4404-918e-249bf6fd7f07:panel_5c8122a2-fbf0-4404-918e-249bf6fd7f07",
+            "type": "visualization"
+        },
+        {
+            "id": "ea9e3d40-693a-11ea-b0ac-95d4ecb1fecd",
+            "name": "8ecd0f73-146f-4aed-bfd1-5c236c5dfe8c:panel_8ecd0f73-146f-4aed-bfd1-5c236c5dfe8c",
+            "type": "visualization"
+        },
+        {
+            "id": "26b73e50-6943-11ea-b0ac-95d4ecb1fecd",
+            "name": "eb10ea7d-ffc9-4c51-9386-6f63be6322aa:panel_eb10ea7d-ffc9-4c51-9386-6f63be6322aa",
+            "type": "visualization"
+        },
+        {
+            "id": "f58f99b0-693a-11ea-b0ac-95d4ecb1fecd",
+            "name": "3b01a7e9-eb8b-43bb-977d-53d8bc9d21b7:panel_3b01a7e9-eb8b-43bb-977d-53d8bc9d21b7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:40.825Z",
+    "version": "WzM0NzAsMV0="
+}

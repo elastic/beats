@@ -1,0 +1,178 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4731",
+                                "4727",
+                                "4754",
+                                "4744",
+                                "4759",
+                                "4779",
+                                "4790",
+                                "4783"
+                            ],
+                            "type": "phrases",
+                            "value": "4731, 4727, 4754, 4744, 4759, 4779, 4790, 4783"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4731"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4727"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4754"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4744"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4759"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4779"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4790"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4783"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Groups Created - Simple Metric [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Groups Created"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "dimensions": {
+                    "metrics": [
+                        {
+                            "accessor": 0,
+                            "format": {
+                                "id": "number",
+                                "params": {}
+                            },
+                            "type": "vis_dimension"
+                        }
+                    ]
+                },
+                "metric": {
+                    "colorSchema": "Reds",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 1,
+                            "type": "range"
+                        },
+                        {
+                            "from": 1,
+                            "to": 10
+                        },
+                        {
+                            "from": 10,
+                            "to": 20
+                        },
+                        {
+                            "from": 20,
+                            "to": 9999
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "Labels",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Groups Created - Simple Metric [Winlogbeat Security]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "f42f3b20-fee6-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:55.318Z",
+    "version": "WzIyMTYsMl0="
+}

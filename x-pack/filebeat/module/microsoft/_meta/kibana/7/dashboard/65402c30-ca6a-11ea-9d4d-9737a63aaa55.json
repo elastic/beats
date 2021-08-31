@@ -1,0 +1,186 @@
+{
+    "attributes": {
+        "description": "Microsoft Defender ATP Alert Overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "8343f7ea-b977-44bf-bf81-6d41742093a4",
+                    "w": 4,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8343f7ea-b977-44bf-bf81-6d41742093a4",
+                "panelRefName": "panel_8343f7ea-b977-44bf-bf81-6d41742093a4",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "74d36139-4d22-44d4-bfc8-020c575febb1",
+                    "w": 25,
+                    "x": 4,
+                    "y": 0
+                },
+                "panelIndex": "74d36139-4d22-44d4-bfc8-020c575febb1",
+                "panelRefName": "panel_74d36139-4d22-44d4-bfc8-020c575febb1",
+                "type": "lens",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "a3e140ed-a0ed-4da0-8142-72d68fd7c5e5",
+                    "w": 19,
+                    "x": 29,
+                    "y": 0
+                },
+                "panelIndex": "a3e140ed-a0ed-4da0-8142-72d68fd7c5e5",
+                "panelRefName": "panel_a3e140ed-a0ed-4da0-8142-72d68fd7c5e5",
+                "title": "ATP Techniques [Filebeat Microsoft]",
+                "type": "lens",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "f3843ab0-8b0f-4f64-805c-4ab0d0965d8a",
+                    "w": 4,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "f3843ab0-8b0f-4f64-805c-4ab0d0965d8a",
+                "panelRefName": "panel_f3843ab0-8b0f-4f64-805c-4ab0d0965d8a",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "16e7059b-70a5-4ea4-b622-9015d7430419",
+                    "w": 4,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "16e7059b-70a5-4ea4-b622-9015d7430419",
+                "panelRefName": "panel_16e7059b-70a5-4ea4-b622-9015d7430419",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "d8a5a667-ed0b-42ed-ae7d-edbfa722677f",
+                    "w": 4,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "d8a5a667-ed0b-42ed-ae7d-edbfa722677f",
+                "panelRefName": "panel_d8a5a667-ed0b-42ed-ae7d-edbfa722677f",
+                "title": "",
+                "type": "visualization",
+                "version": "7.8.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "cb8de6bb-1096-427d-834e-210963aad3e5",
+                    "w": 48,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "cb8de6bb-1096-427d-834e-210963aad3e5",
+                "panelRefName": "panel_cb8de6bb-1096-427d-834e-210963aad3e5",
+                "type": "visualization",
+                "version": "7.8.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Microsoft] ATP Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "65402c30-ca6a-11ea-9d4d-9737a63aaa55",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3c64f400-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "8343f7ea-b977-44bf-bf81-6d41742093a4:panel_8343f7ea-b977-44bf-bf81-6d41742093a4",
+            "type": "visualization"
+        },
+        {
+            "id": "e415af10-ca67-11ea-9d4d-9737a63aaa55",
+            "name": "74d36139-4d22-44d4-bfc8-020c575febb1:panel_74d36139-4d22-44d4-bfc8-020c575febb1",
+            "type": "lens"
+        },
+        {
+            "id": "14d367f0-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "a3e140ed-a0ed-4da0-8142-72d68fd7c5e5:panel_a3e140ed-a0ed-4da0-8142-72d68fd7c5e5",
+            "type": "lens"
+        },
+        {
+            "id": "9e902dc0-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "f3843ab0-8b0f-4f64-805c-4ab0d0965d8a:panel_f3843ab0-8b0f-4f64-805c-4ab0d0965d8a",
+            "type": "visualization"
+        },
+        {
+            "id": "b9fcbf60-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "16e7059b-70a5-4ea4-b622-9015d7430419:panel_16e7059b-70a5-4ea4-b622-9015d7430419",
+            "type": "visualization"
+        },
+        {
+            "id": "62f081c0-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "d8a5a667-ed0b-42ed-ae7d-edbfa722677f:panel_d8a5a667-ed0b-42ed-ae7d-edbfa722677f",
+            "type": "visualization"
+        },
+        {
+            "id": "00e8fca0-ca68-11ea-9d4d-9737a63aaa55",
+            "name": "cb8de6bb-1096-427d-834e-210963aad3e5:panel_cb8de6bb-1096-427d-834e-210963aad3e5",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:12.667Z",
+    "version": "WzQ0NDYsMV0="
+}
