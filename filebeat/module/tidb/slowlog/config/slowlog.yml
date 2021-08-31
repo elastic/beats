@@ -1,6 +1,85 @@
+{{ if (eq .deployment_platform "baremetal")  }}
 type: log
 paths:
-{{ range $i, $path := .paths }}
+{{ range $i, $path := .baremetal_paths }}
  - {{$path}}
 {{ end }}
 exclude_files: [".gz$"]
+{{ end }}
+
+{{ if (eq .deployment_platform "container")  }}
+type: container
+paths:
+{{ range $i, $path := .container_paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+{{ end }}
+
+
+multiline:
+  type: pattern
+  pattern: '^# Time: '
+  negate: true
+  match: after
+  timeout: 3s
+
+processors:
+
+{{ if (eq .deployment_platform "container")  }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+
+  - script:
+      lang: javascript
+      id: tidb_slow_log_parser
+      params:
+        log_file_map_annotation: kubernetes.annotaions.debug.tidbcloud.com/log/file_name
+        log_file_map_fallback:
+          tidb:
+            stdout: tidb.log
+            stderr: tidb_stderr.log
+          slowlog: tidb-slow.log
+          tikv: tikv.log
+          raftlog: raftdb
+          rocksdblog: rocksdb
+          tiflash: tiflash_tikv.log
+          errorlog: tiflash_error.log
+          clusterlog: tiflash_cluster_manager.log
+          serverlog: tiflash.log
+          backup: backup.log
+          restore: restore.log
+          br: br_binary.log
+      source: >
+        var params = {};
+        function register(scriptParams) {
+          params = scriptParams;
+        }
+        function process(event) {
+          var logFileMap = event.Get(params.log_file_map_annotation)
+          if (logFileMap === null) {
+            logFileMap = params.log_file_map_fallback
+          }
+          var containerName = event.Get("container_name")
+          var logFile = logFileMap[containerName]
+          if (logFile) {
+            var stream = event.Get("stream")
+            var streamLogFile = logFile[stream]
+            if (streamLogFile) {
+              event.Put("log_file", streamLogFile)
+            } else {
+              event.Put("log_file", logFile)
+            }
+          }
+          return event
+        }
+        function test() {
+          var event = process(new Event({container_name: "slowlog"}));
+          if (event.Get("log_file") !== "tidb-slow.log") {
+            throw "expected log_file === tidb-slow.log";
+          }
+        }

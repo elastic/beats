@@ -1,9 +1,9 @@
 :modulename: tidb
-:has-dashboards: true
+:has-dashboards: false
 
-== tidb module
+== TiDB module
 
-This is the tidb module.
+This is the TiDB module.
 
 include::../include/what-happens.asciidoc[]
 
@@ -12,13 +12,11 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-TODO: document with what versions of the software is this tested
+The Elasticsearch module is compatible with TiDB 4.0.x and newer.
 
 include::../include/configuring-intro.asciidoc[]
 
-TODO: provide an example configuration
-
-:fileset_ex: {fileset}
+:fileset_ex: tidb
 
 include::../include/config-option-intro.asciidoc[]
 
@@ -27,17 +25,29 @@ that's common to other modules, you can reuse shared descriptions by including
 the relevant file. For example:
 
 [float]
-==== `{fileset}` log fileset settings
+==== `tidb` log fileset settings
 
 include::../include/var-paths.asciidoc[]
 
 [float]
-=== Example dashboard
+==== `slowlog` log fileset settings
 
-This module comes with a sample dashboard. For example:
+include::../include/var-paths.asciidoc[]
 
-TODO: include an image of a sample dashboard. If you do not include a dashboard,
-remove this section and set `:has-dashboards: false` at the top of this file.
+[float]
+==== `pd` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `tikv` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `tiflash` log fileset settings
+
+include::../include/var-paths.asciidoc[]
 
 :has-dashboards!:
 
