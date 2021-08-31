@@ -1,0 +1,107 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Webserver Process Current Files Cached [Metricbeat IIS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "71978870-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f11cfd90-32e5-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "drilldown_url": "",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "9c09ed50-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "gauge_inner_color": null,
+                "gauge_inner_width": "6",
+                "gauge_style": "circle",
+                "gauge_width": "10",
+                "hide_last_value_indicator": true,
+                "id": "61fb4190-32e4-11ea-b9f8-4d0b340ad993",
+                "index_pattern": "metricbeat-*",
+                "interval": "60m",
+                "isModelInvalid": false,
+                "pivot_id": "cloud.instance.name",
+                "pivot_label": "Resource Name",
+                "pivot_rows": "30",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(21,211,162,1)",
+                        "fill": "1.2",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "61fb4191-32e4-11ea-b9f8-4d0b340ad993",
+                        "label": "Current Files Cached",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "iis.webserver.cache.current_files_cached",
+                                "id": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "top_hit"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "cloud.instance.name",
+                        "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                        "type": "timeseries",
+                        "value_template": "{{value}} "
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Webserver Process Current Files Cached [Metricbeat IIS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d9dc78b0-8d56-11ea-817c-a9b6d42fd8a0",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:30.134Z",
+    "version": "WzM5MzcsMV0="
+}

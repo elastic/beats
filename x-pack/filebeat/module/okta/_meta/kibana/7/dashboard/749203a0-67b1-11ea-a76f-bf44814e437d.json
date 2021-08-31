@@ -1,0 +1,168 @@
+{
+    "attributes": {
+        "description": "Filebeat Okta module Kibana dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 26.54701,
+                        "lon": -44.69098,
+                        "zoom": 2.75
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 22,
+                    "i": "8013824b-5a66-494c-acc5-3df8b7678879",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8013824b-5a66-494c-acc5-3df8b7678879",
+                "panelRefName": "panel_8013824b-5a66-494c-acc5-3df8b7678879",
+                "type": "map",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                    "w": 10,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                "panelRefName": "panel_c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                    "w": 9,
+                    "x": 10,
+                    "y": 22
+                },
+                "panelIndex": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                "panelRefName": "panel_195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                    "w": 19,
+                    "x": 29,
+                    "y": 22
+                },
+                "panelIndex": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                "panelRefName": "panel_dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "a25a43ed-3262-486c-a482-1fac52f26128",
+                    "w": 10,
+                    "x": 19,
+                    "y": 22
+                },
+                "panelIndex": "a25a43ed-3262-486c-a482-1fac52f26128",
+                "panelRefName": "panel_a25a43ed-3262-486c-a482-1fac52f26128",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 33
+                },
+                "panelIndex": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                "panelRefName": "panel_c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                "type": "search",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Okta] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "749203a0-67b1-11ea-a76f-bf44814e437d",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
+            "name": "8013824b-5a66-494c-acc5-3df8b7678879:panel_8013824b-5a66-494c-acc5-3df8b7678879",
+            "type": "map"
+        },
+        {
+            "id": "545d6a00-67ae-11ea-a76f-bf44814e437d",
+            "name": "c6a66fe5-21a2-4308-8563-d4a7f5135d25:panel_c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+            "type": "visualization"
+        },
+        {
+            "id": "7c6ec080-67c6-11ea-a76f-bf44814e437d",
+            "name": "195db901-dc2b-4b7d-80c3-742e2712ac2a:panel_195db901-dc2b-4b7d-80c3-742e2712ac2a",
+            "type": "visualization"
+        },
+        {
+            "id": "cda883a0-67c6-11ea-a76f-bf44814e437d",
+            "name": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77:panel_dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+            "type": "visualization"
+        },
+        {
+            "id": "0a784b30-67c7-11ea-a76f-bf44814e437d",
+            "name": "a25a43ed-3262-486c-a482-1fac52f26128:panel_a25a43ed-3262-486c-a482-1fac52f26128",
+            "type": "visualization"
+        },
+        {
+            "id": "21028750-67ca-11ea-a76f-bf44814e437d",
+            "name": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9:panel_c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:39.099Z",
+    "version": "WzQyMzMsMV0="
+}

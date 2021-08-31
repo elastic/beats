@@ -41,17 +41,28 @@ var (
 // DecodeExported decodes an exported dashboard
 func DecodeExported(exported []byte) []byte {
 	// remove unsupported chars
-	var result []byte
+	var result bytes.Buffer
 	r := bufio.NewReader(bytes.NewReader(exported))
 	for {
 		line, err := r.ReadBytes('\n')
 		if err != nil {
 			if err == io.EOF {
-				return append(result, decodeLine(line)...)
+				_, err = result.Write(decodeLine(line))
+				if err != nil {
+					return exported
+				}
+				return result.Bytes()
 			}
 			return exported
 		}
-		result = append(result, decodeLine(line)...)
+		_, err = result.Write(decodeLine(line))
+		if err != nil {
+			return exported
+		}
+		_, err = result.WriteRune('\n')
+		if err != nil {
+			return exported
+		}
 	}
 }
 
@@ -65,7 +76,6 @@ func decodeLine(line []byte) []byte {
 	if err != nil {
 		return line
 	}
-	var result []byte
 	for _, key := range responseToDecode {
 		// All fields are optional, so errors are not caught
 		err := decodeValue(o, key)
@@ -73,9 +83,8 @@ func decodeLine(line []byte) []byte {
 			logger := logp.NewLogger("dashboards")
 			logger.Debugf("Error while decoding dashboard objects: %+v", err)
 		}
-		result = append(result, []byte(o.String())...)
 	}
-	return result
+	return []byte(o.String())
 }
 
 func decodeValue(data common.MapStr, key string) error {

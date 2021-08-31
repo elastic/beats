@@ -1,0 +1,82 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "NATGateway Bytes In From Destination [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "688b0480-688d-11ea-8b7d-fd9d15a13cd0"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "6b6b1a00-688d-11ea-8b7d-fd9d15a13cd0"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "bytes",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "aws.natgateway.metrics.BytesInFromDestination.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "aws.dimensions.NatGatewayId",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "last_value",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "NATGateway Bytes In From Destination [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b36532e0-688e-11ea-b0ac-95d4ecb1fecd",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:32.666Z",
+    "version": "WzMzODYsMV0="
+}

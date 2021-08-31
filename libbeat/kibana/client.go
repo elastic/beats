@@ -184,7 +184,9 @@ func (conn *Connection) Request(method, extraPath string,
 		return 0, nil, fmt.Errorf("fail to read response %s", err)
 	}
 
-	retError = extractError(result)
+	if resp.StatusCode >= 300 {
+		retError = extractError(result)
+	}
 	return resp.StatusCode, result, retError
 }
 
