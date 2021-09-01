@@ -16,8 +16,8 @@ https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
 *Filebeat*
 
 - Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
-- Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
-- Fixes a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
+- Fix the Snyk module to work with the new API changes. {pull}27358[27358]
+- Fix a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
 
 *Metricbeat*
 
@@ -25,14 +25,14 @@ https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
 - Change `startTime` and `endTime` of `GetMetricData` API in cloudwatch metricset to be only one collection period apart. {pull}27327[27327]
 - Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
 - Fix flaky test TestAddCounterInvalidArgWhenQueryClosed. {issue}27312[27312] {pull}27313[27313]
-- Add percent formatters to system/process {pull}27374[27374]
-- Fix instance machineType reporting in compute metricset of GCP module {pull}27363[27363]
+- Add percent formatters to system/process. {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module. {pull}27363[27363]
 
 ==== Added
 
 *Filebeat*
 
-- Update Elasticsearch module's ingest pipeline for parsing new deprecation logs {issue}26857[26857] {pull}26880[26880]
+- Update Elasticsearch module's ingest pipeline for parsing new deprecation logs. {issue}26857[26857] {pull}26880[26880]
 
 [[release-notes-7.14.0]]
 === Beats version 7.14.0
