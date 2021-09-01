@@ -94,7 +94,7 @@ func TestInput(t *testing.T) {
 	client := beattest.NewChanClient(100)
 	defer client.Close()
 	events := client.Channel
-	cancel, input := run(t, config, client)
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	for range messages {
@@ -157,7 +157,7 @@ func TestInputWithMultipleEvents(t *testing.T) {
 	client := beattest.NewChanClient(100)
 	defer client.Close()
 	events := client.Channel
-	cancel, input := run(t, config, client)
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	select {
@@ -219,7 +219,7 @@ func TestInputWithJsonPayload(t *testing.T) {
 	client := beattest.NewChanClient(100)
 	defer client.Close()
 	events := client.Channel
-	cancel, input := run(t, config, client)
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	select {
@@ -282,7 +282,7 @@ func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
 	client := beattest.NewChanClient(100)
 	defer client.Close()
 	events := client.Channel
-	cancel, input := run(t, config, client)
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	for i := 0; i < 2; i++ {
@@ -452,7 +452,7 @@ func writeToKafkaTopic(
 	}
 }
 
-func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (func(), *kafkaInput) {
+func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (*kafkaInput, func()) {
 	inp, err := Plugin().Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -464,7 +464,7 @@ func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (func(),
 	pipeline := beattest.ConstClient(client)
 	input := inp.(*kafkaInput)
 	go input.Run(ctx, pipeline)
-	return cancel, input
+	return input, cancel
 }
 
 func newV2Context() (v2.Context, func()) {
