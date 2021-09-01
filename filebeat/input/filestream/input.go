@@ -219,7 +219,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath)
+	r = readfile.NewFilemeta(r, fs.newPath, offset)
 
 	r = inp.parsers.Create(r)
 
