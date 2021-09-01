@@ -381,7 +381,7 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
-	// test with ine include and one exclude
+	// test with one include and one exclude
 	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
 	metricsToKeep = 0

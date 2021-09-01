@@ -54,14 +54,13 @@ type openmetricEventGenerator struct{}
 func (p *openmetricEventGenerator) Start() {}
 func (p *openmetricEventGenerator) Stop()  {}
 
-// DefaultopenmetricEventsGenerator stores all OpenMetrics metrics using
+// Default openmetricEventsGenerator stores all OpenMetrics metrics using
 // only double field type in Elasticsearch.
 func (p *openmetricEventGenerator) GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent {
 	var events []OpenMetricEvent
 
 	name := *mf.Name
 	metrics := mf.Metric
-	// info := *mf.Info
 	help := ""
 	unit := ""
 	if mf.Help != nil {

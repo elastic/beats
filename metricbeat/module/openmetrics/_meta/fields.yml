@@ -19,15 +19,11 @@
         - name: type
           type: keyword
           description: >
-            metric type
+            Metric type
         - name: unit
           type: keyword
           description: >
-            metric unit
-        - name: created
-          type: keyword
-          description: >
-            metric creation time in seconds
+            Metric unit
         - name: labels.*
           type: object
           object_type: keyword
@@ -48,4 +44,4 @@
           type: object
           object_type: keyword
           description: >
-            Openmetrics metric labels
+            Openmetrics metric exemplar labels

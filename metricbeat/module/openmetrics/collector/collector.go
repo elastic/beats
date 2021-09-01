@@ -47,7 +47,7 @@ var (
 	upMetricType          = textparse.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
-	upMetricJobValue      = "prometheus"
+	upMetricJobValue      = "openmetrics"
 )
 
 func init() {
@@ -63,7 +63,7 @@ type OpenMetricsEventsGenerator interface {
 	// Start must be called before using the generator
 	Start()
 
-	// converts a OpenMetrics metric family into a list of PromEvents
+	// converts a OpenMetrics metric family into a list of OpenMetricsEvents
 	GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent
 
 	// Stop must be called when the generator won't be used anymore
@@ -76,13 +76,13 @@ type OpenMetricsEventsGeneratorFactory func(ms mb.BaseMetricSet) (OpenMetricsEve
 // MetricSet for fetching openmetrics data
 type MetricSet struct {
 	mb.BaseMetricSet
-	openmetrics     p.OpenMetrics
-	includeMetrics  []*regexp.Regexp
-	excludeMetrics  []*regexp.Regexp
-	namespace       string
-	promEventsGen   OpenMetricsEventsGenerator
-	host            string
-	eventGenStarted bool
+	openmetrics          p.OpenMetrics
+	includeMetrics       []*regexp.Regexp
+	excludeMetrics       []*regexp.Regexp
+	namespace            string
+	openMetricsEventsGen OpenMetricsEventsGenerator
+	host                 string
+	eventGenStarted      bool
 }
 
 // MetricSetBuilder returns a builder function for a new OpenMetrics metricset using
@@ -98,17 +98,17 @@ func MetricSetBuilder(namespace string, genFactory OpenMetricsEventsGeneratorFac
 			return nil, err
 		}
 
-		promEventsGen, err := genFactory(base)
+		openMetricsEventsGen, err := genFactory(base)
 		if err != nil {
 			return nil, err
 		}
 
 		ms := &MetricSet{
-			BaseMetricSet:   base,
-			openmetrics:     openmetrics,
-			namespace:       namespace,
-			promEventsGen:   promEventsGen,
-			eventGenStarted: false,
+			BaseMetricSet:        base,
+			openmetrics:          openmetrics,
+			namespace:            namespace,
+			openMetricsEventsGen: openMetricsEventsGen,
+			eventGenStarted:      false,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
@@ -128,7 +128,7 @@ func MetricSetBuilder(namespace string, genFactory OpenMetricsEventsGeneratorFac
 // Fetch fetches data and reports it
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if !m.eventGenStarted {
-		m.promEventsGen.Start()
+		m.openMetricsEventsGen.Start()
 		m.eventGenStarted = true
 	}
 
@@ -149,42 +149,45 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if m.skipFamily(family) {
 			continue
 		}
-		promEvents := m.promEventsGen.GenerateOpenMetricsEvents(family)
+		openMetricsEvents := m.openMetricsEventsGen.GenerateOpenMetricsEvents(family)
 
-		for _, promEvent := range promEvents {
-			labelsHash := promEvent.LabelsHash()
-			if _, ok := eventList[promEvent.Type]; !ok {
-				eventList[promEvent.Type] = make(map[string]common.MapStr)
+		for _, openMetricEvent := range openMetricsEvents {
+			labelsHash := openMetricEvent.LabelsHash()
+			if _, ok := eventList[openMetricEvent.Type]; !ok {
+				eventList[openMetricEvent.Type] = make(map[string]common.MapStr)
 			}
-			if _, ok := eventList[promEvent.Type][labelsHash]; !ok {
-				eventList[promEvent.Type][labelsHash] = common.MapStr{}
+			if _, ok := eventList[openMetricEvent.Type][labelsHash]; !ok {
+				eventList[openMetricEvent.Type][labelsHash] = common.MapStr{}
 
 				// Add default instance label if not already there
-				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
+				if exists, _ := openMetricEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
+					openMetricEvent.Labels.Put(upMetricInstanceLabel, m.Host())
 				}
 				// Add default job label if not already there
-				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
-					promEvent.Labels.Put("job", m.Module().Name())
+				if exists, _ := openMetricEvent.Labels.HasKey("job"); !exists {
+					openMetricEvent.Labels.Put("job", m.Module().Name())
 				}
 				// Add labels
-				if len(promEvent.Labels) > 0 {
-					eventList[promEvent.Type][labelsHash]["labels"] = promEvent.Labels
+				if len(openMetricEvent.Labels) > 0 {
+					eventList[openMetricEvent.Type][labelsHash]["labels"] = openMetricEvent.Labels
 				}
 			}
 
-			if promEvent.Type != "" {
-				eventList[promEvent.Type][labelsHash]["type"] = promEvent.Type
+			if openMetricEvent.Help != "" {
+				eventList[openMetricEvent.Type][labelsHash]["help"] = openMetricEvent.Help
 			}
-			if promEvent.Unit != "" {
-				eventList[promEvent.Type][labelsHash]["unit"] = promEvent.Unit
+			if openMetricEvent.Type != "" {
+				eventList[openMetricEvent.Type][labelsHash]["type"] = openMetricEvent.Type
+			}
+			if openMetricEvent.Unit != "" {
+				eventList[openMetricEvent.Type][labelsHash]["unit"] = openMetricEvent.Unit
 			}
 
-			if len(promEvent.Exemplars) > 0 {
-				eventList[promEvent.Type][labelsHash]["exemplar"] = promEvent.Exemplars
+			if len(openMetricEvent.Exemplars) > 0 {
+				eventList[openMetricEvent.Type][labelsHash]["exemplar"] = openMetricEvent.Exemplars
 			}
 			// Accumulate metrics in the event
-			eventList[promEvent.Type][labelsHash].DeepUpdate(promEvent.Data)
+			eventList[openMetricEvent.Type][labelsHash].DeepUpdate(openMetricEvent.Data)
 		}
 	}
 
@@ -206,7 +209,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 // Close stops the metricset
 func (m *MetricSet) Close() error {
 	if m.eventGenStarted {
-		m.promEventsGen.Stop()
+		m.openMetricsEventsGen.Stop()
 	}
 	return nil
 }

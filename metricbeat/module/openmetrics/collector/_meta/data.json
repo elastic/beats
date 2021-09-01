@@ -10,8 +10,9 @@
         "period": 10000
     },
     "openmetrics": {
+        "help": "carrier value of /sys/class/net/\u003ciface\u003e.",
         "labels": {
-            "device": "br-3a285aa5e58c",
+            "device": "br-0cb306323b90",
             "job": "openmetrics"
         },
         "metrics": {

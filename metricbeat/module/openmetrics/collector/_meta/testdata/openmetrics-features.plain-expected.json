@@ -10,95 +10,14 @@
             "period": 10000
         },
         "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
             "labels": {
-                "device": "br-10229e3512d9",
-                "instance": "127.0.0.1:50135",
+                "instance": "127.0.0.1:55922",
                 "job": "openmetrics"
             },
-            "metrics": {
-                "node_network_carrier": 0
-            },
-            "type": "gauge"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
-            "labels": {
-                "device": "br-425cb4c454a6",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            },
-            "type": "gauge"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
-            "labels": {
-                "device": "br-38425a39f36b",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            },
-            "type": "gauge"
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }
-    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "labels": {
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
-            },
+            "type": "gauge",
             "metrics": {
                 "up": 1
-            },
-            "type": "gauge"
+            }
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -116,16 +35,15 @@
             "period": 10000
         },
         "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
             "labels": {
-                "device": "br-33d819d5f834",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "type": "netapp"
             },
             "metrics": {
-                "node_network_carrier": 0
+                "disk_errors_total": 17
             },
-            "type": "gauge"
+            "type": "counter"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -143,16 +61,16 @@
             "period": 10000
         },
         "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
             "labels": {
-                "device": "br-4e623477470e",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "name": "open metrics collector",
+                "version": "6.3.9"
             },
             "metrics": {
-                "node_network_carrier": 0
+                "app_info": 1
             },
-            "type": "gauge"
+            "type": "info"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -170,70 +88,16 @@
             "period": 10000
         },
         "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
             "labels": {
-                "device": "br-210476dc4ef8",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "name": "metrics collector",
+                "version": "8.2.7"
             },
             "metrics": {
-                "node_network_carrier": 0
+                "collector_info": 1
             },
-            "type": "gauge"
-
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
-            "labels": {
-                "device": "br-0cb306323b90",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            },
-            "type": "gauge"
-
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "openmetrics"
-        }    },
-    {
-        "event": {
-            "dataset": "openmetrics.collector",
-            "duration": 115000,
-            "module": "openmetrics"
-        },
-        "metricset": {
-            "name": "collector",
-            "period": 10000
-        },
-        "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
-            "labels": {
-                "device": "br-38feb0aad6ab",
-                "instance": "127.0.0.1:50135",
-                "job": "openmetrics"
-            },
-            "metrics": {
-                "node_network_carrier": 0
-            },
-            "type": "gauge"
+            "type": "info"
         },
         "service": {
             "address": "127.0.0.1:55555",
@@ -251,16 +115,157 @@
             "period": 10000
         },
         "openmetrics": {
-            "help":"carrier value of /sys/class/net/\u003ciface\u003e.",
             "labels": {
-                "device": "br-3a285aa5e58c",
-                "instance": "127.0.0.1:50135",
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shoes"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shirts"
+            },
+            "metrics": {
+                "enable_category": 1
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "category": "shades"
+            },
+            "metrics": {
+                "enable_category": 0
+            },
+            "type": "stateset"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "labels": {
+                "instance": "127.0.0.1:55922",
                 "job": "openmetrics"
             },
             "metrics": {
-                "node_network_carrier": 0
+                "connection_errors": 42
             },
-            "type": "gauge"
+            "type": "unknown"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "cnt_rulefires_deployment_total": 0.67,
+                "labels": {
+                        "trace_id": "KOO5S4vxi0o"
+                }
+            },
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "cnt_rulefires_deployment_total": 66666
+            },
+            "type": "counter"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
+            "exemplar": {
+                "labels": {
+                        "trace_id": "0d482-ac43e-d9320-debfe"
+                },
+                "process_cpu_seconds_total": 17.0,
+                "timestamp": 1622302012000
+            },
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics",
+                "entity": "controller",
+                "build": "8.2.7"
+            },
+            "metrics": {
+                "process_cpu_seconds_total": 11111
+            },
+            "type": "counter"
         },
         "service": {
             "address": "127.0.0.1:55555",
