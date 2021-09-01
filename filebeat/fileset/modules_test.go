@@ -492,3 +492,132 @@ func TestInterpretError(t *testing.T) {
 		})
 	}
 }
+
+func TestEnableFilesetsFromOverrides(t *testing.T) {
+	tests := []struct {
+		Name      string
+		Cfg       []*ModuleConfig
+		Overrides *ModuleOverrides
+		Expected  []*ModuleConfig
+	}{
+		{
+			Name: "add fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"baz": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+						"baz": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "defined fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "disabled module",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "nil overrides",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: nil,
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "no modules",
+			Cfg:  nil,
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			enableFilesetsFromOverrides(test.Cfg, test.Overrides)
+			assert.Equal(t, test.Expected, test.Cfg)
+		})
+	}
+
+}

@@ -141,7 +141,28 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 		return nil, err
 	}
 
+	enableFilesetsFromOverrides(mcfgs, modulesOverrides)
 	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
+}
+
+// enableFilesetsFromOverrides enables in mcfgs the filesets mentioned in overrides,
+// so that the overridden configuration can be applied.
+func enableFilesetsFromOverrides(mcfgs []*ModuleConfig, overrides *ModuleOverrides) {
+	if overrides == nil {
+		return
+	}
+	for _, mcfg := range mcfgs {
+		if modOvr, ok := (*overrides)[mcfg.Module]; ok {
+			for fset := range modOvr {
+				if _, ok = mcfg.Filesets[fset]; !ok {
+					if mcfg.Filesets == nil {
+						mcfg.Filesets = make(map[string]*FilesetConfig)
+					}
+					mcfg.Filesets[fset] = &FilesetConfig{}
+				}
+			}
+		}
+	}
 }
 
 func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
