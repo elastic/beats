@@ -19,23 +19,23 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
-type ZipURLSourceBase struct {
+type ZipURLSourceWrapper struct {
 	zus *ZipURLSource
 }
 
-func (zb *ZipURLSourceBase) Fetch() error {
+func (zb *ZipURLSourceWrapper) Fetch() error {
 	return zb.zus.Fetch()
 }
 
-func (zb *ZipURLSourceBase) Workdir() string {
+func (zb *ZipURLSourceWrapper) Workdir() string {
 	return zb.zus.Workdir()
 }
 
-func (zb *ZipURLSourceBase) Close() error {
+func (zb *ZipURLSourceWrapper) Close() error {
 	return zb.zus.Close()
 }
 
-func (zb *ZipURLSourceBase) Unpack(rawMap interface{}) error {
+func (zb *ZipURLSourceWrapper) Unpack(rawMap interface{}) error {
 	cfg, err := common.NewConfigFrom(rawMap)
 	if err != nil {
 		return fmt.Errorf("could create new config from interface for zip_url: %w", err)
@@ -56,7 +56,7 @@ func (zb *ZipURLSourceBase) Unpack(rawMap interface{}) error {
 
 	zb.zus.httpClient, err = htsCfg.Client()
 	if err != nil {
-		return fmt.Errorf("could not instantiate zip_url http client", err)
+		return fmt.Errorf("could not instantiate zip_url http client: %w", err)
 	}
 	return nil
 }
@@ -77,13 +77,6 @@ type ZipURLSource struct {
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
-
-// NewZipURLSource constructs a zip URL source, automatically validating it as go ucfg would.
-func NewZipURLSource(z *ZipURLSource) (*ZipURLSource, error) {
-	zus := z
-	err := zus.Validate()
-	return zus, err
-}
 
 func (z *ZipURLSource) Validate() (err error) {
 	return err

@@ -16,75 +16,89 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
 )
 
-func TestZipUrlFetchNoAuth(t *testing.T) {
+func TestSimpleCases(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:  "/",
-		Retries: 3,
-	})
-	require.NoError(t, err)
-	fetchAndCheckDir(t, zus)
-}
+	type testCase struct {
+		name         string
+		cfg          common.MapStr
+		wantFetchErr bool
+	}
+	testCases := []testCase{
+		{
+			"basics",
+			common.MapStr{
+				"url":     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+				"folder":  "/",
+				"retries": 3,
+			},
+			false,
+		},
+		{
+			"targetdir",
+			common.MapStr{
+				"url":              fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+				"folder":           "/",
+				"retries":          3,
+				"target_directory": "/tmp/synthetics/blah",
+			},
+			false,
+		},
+		{
+			"auth success",
+			common.MapStr{
+				"url":      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+				"folder":   "/",
+				"retries":  3,
+				"username": "testuser",
+				"password": "testpass",
+			},
+			false,
+		},
+		{
+			"auth failure",
+			common.MapStr{
+				"url":      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+				"folder":   "/",
+				"retries":  3,
+				"username": "testuser",
+				"password": "badpass",
+			},
+			true,
+		},
+	}
 
-func TestClientInstantiation(t *testing.T) {
-	address, teardown := setupTests()
-	defer teardown()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			zus, err := dummyZus(tc.cfg)
+			require.NoError(t, err)
 
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:  "/",
-		Retries: 3,
-	})
-	require.NoError(t, err)
+			require.NotNil(t, zus.httpClient)
 
-	require.NotNil(t, zus.httpClient)
+			if tc.wantFetchErr == true {
+				err := zus.Fetch()
+				require.Error(t, err)
+				return
+			}
 
-	fetchAndCheckDir(t, zus)
-}
-
-func TestZipUrlFetchWithAuth(t *testing.T) {
-	address, teardown := setupTests()
-	defer teardown()
-
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:   "/",
-		Retries:  3,
-		Username: "testuser",
-		Password: "testpass",
-	})
-	require.NoError(t, err)
-	fetchAndCheckDir(t, zus)
-}
-
-func TestZipUrlTargetDirectory(t *testing.T) {
-	address, teardown := setupTests()
-	defer teardown()
-
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:          "/",
-		Retries:         3,
-		TargetDirectory: "/tmp/synthetics/blah",
-	})
-	require.NoError(t, err)
-	fetchAndCheckDir(t, zus)
+			fetchAndCheckDir(t, zus)
+		})
+	}
 }
 
 func TestZipUrlWithSameEtag(t *testing.T) {
 	address, teardown := setupTests()
 	defer teardown()
 
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
-		Folder:  "/",
-		Retries: 3,
+	zus, err := dummyZus(common.MapStr{
+		"url":     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		"folder":  "/",
+		"retries": 3,
 	})
 	require.NoError(t, err)
 	err = zus.Fetch()
@@ -103,10 +117,10 @@ func TestZipUrlWithBadUrl(t *testing.T) {
 	_, teardown := setupTests()
 	defer teardown()
 
-	zus, err := NewZipURLSource(ZipURLSource{
-		URL:     "http://notahost.notadomaintoehutoeuhn",
-		Folder:  "/",
-		Retries: 2,
+	zus, err := dummyZus(common.MapStr{
+		"url":     "http://notahost.notadomaintoehutoeuhn",
+		"folder":  "/",
+		"retries": 2,
 	})
 	require.NoError(t, err)
 	err = zus.Fetch()
@@ -160,4 +174,10 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 	require.NoError(t, zip.Close())
 	_, err = os.Stat(zip.TargetDirectory)
 	require.True(t, os.IsNotExist(err), "TargetDirectory %s should have been deleted", zip.TargetDirectory)
+}
+
+func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
+	zusw := &ZipURLSourceWrapper{}
+	err := zusw.Unpack(conf)
+	return zusw.zus, err
 }
