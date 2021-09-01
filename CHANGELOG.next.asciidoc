@@ -464,6 +464,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
 
+
 *Heartbeat*
 
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
@@ -569,3 +570,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 ==== Known Issue
 
 *Journalbeat*
+
+
+
