@@ -181,7 +181,7 @@ func TestProcessCgroupPaths(t *testing.T) {
 	assert.Equal(t, path, paths.V1["net_cls"].ControllerPath)
 	assert.Equal(t, path, paths.V1["net_prio"].ControllerPath)
 	assert.Equal(t, path, paths.V1["perf_event"].ControllerPath)
-	assert.Len(t, paths, 10)
+	assert.Len(t, paths.Flatten(), 10)
 }
 
 func TestProcessCgroupPathsV2(t *testing.T) {

@@ -20,6 +20,7 @@
 package process
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
@@ -40,17 +41,22 @@ func TestFetch(t *testing.T) {
 
 	// We have root cgroups disabled
 	// This will pick a "populated" event to print
-	for _, evt := range events {
-		field := evt.BeatEvent("system", "process").Fields["system"].(common.MapStr)["process"].(common.MapStr)["cgroup"].(common.MapStr)["cpu"]
-		if field == nil {
-			continue
+	if runtime.GOOS == "linux" {
+		for _, evt := range events {
+			field := evt.BeatEvent("system", "process").Fields["system"].(common.MapStr)["process"].(common.MapStr)["cgroup"].(common.MapStr)["cpu"]
+			if field == nil {
+				continue
+			}
+			if field.(map[string]interface{})["path"].(string) == "/" {
+				continue
+			}
+			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
+				evt.BeatEvent("system", "process").Fields.StringToPrint())
+			return
 		}
-		if field.(map[string]interface{})["path"].(string) == "/" {
-			continue
-		}
+	} else {
 		t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-			evt.BeatEvent("system", "process").Fields.StringToPrint())
-		return
+			events[0].BeatEvent("system", "process").Fields.StringToPrint())
 	}
 
 }
