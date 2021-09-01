@@ -1,0 +1,69 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+[[filebeat-module-tidb]]
+:modulename: tidb
+:has-dashboards: false
+
+== TiDB module
+
+This is the TiDB module.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+The Elasticsearch module is compatible with TiDB 4.0.x and newer.
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: tidb
+
+include::../include/config-option-intro.asciidoc[]
+
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
+[float]
+==== `tidb` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `slowlog` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `pd` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `tikv` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+==== `tiflash` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-tidb,exported fields>> section.
+

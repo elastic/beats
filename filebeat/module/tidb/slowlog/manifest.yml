@@ -4,12 +4,12 @@ var:
   - name: deployment_platform
     # baremetal or container
     default: baremetal
-  - name: baremetal_paths
+  - name: paths
     default:
+      # the default path of tiup
       - /tidb-deploy/tidb-4000/log/*slowlog*.log
-  - name: container_paths
-    default:
+      # the default path of tidb-operator
       - /var/log/containers/*tidb*slowlog*.log
 
 ingest_pipeline: ingest/pipeline.json
-input: config/baremetal.yml
+input: config/{{ .deployment_platform }}.yml

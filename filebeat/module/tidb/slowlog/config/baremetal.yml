@@ -1,21 +1,11 @@
-{{ if (eq .deployment_platform "baremetal")  }}
 type: log
+
 paths:
-{{ range $i, $path := .baremetal_paths }}
- - {{$path}}
-{{ end }}
-exclude_files: [".gz$"]
+{{ range $i, $path := .paths }}
+ - {{ $path }}
 {{ end }}
 
-{{ if (eq .deployment_platform "container")  }}
-type: container
-paths:
-{{ range $i, $path := .container_paths }}
- - {{$path}}
-{{ end }}
 exclude_files: [".gz$"]
-{{ end }}
-
 
 multiline:
   type: pattern
@@ -25,15 +15,6 @@ multiline:
   timeout: 3s
 
 processors:
-
-{{ if (eq .deployment_platform "container")  }}
-  - add_kubernetes_metadata:
-    host: ${NODE_NAME}
-    matchers:
-      - logs_path:
-          logs_path: "/var/log/containers/"
-{{ end }}
-
   - script:
       lang: javascript
       id: tidb_slow_log_parser

@@ -1,15 +1,13 @@
-# The module level fields.yml contains descriptions for the module-level fields.
-# Please review and update the title and the descriptions in this file.
-# The title is used as a title in the docs, so it’s best to capitalize it.
 - key: tidb
   title: "TiDB"
   release: ga
   description: >
-    tidb Module
+    TiDB Module
   fields:
     - name: tidb
       type: group
       description: >
+        Common fields in the TiDB Module.
       fields:
         - name: host
           type: alias

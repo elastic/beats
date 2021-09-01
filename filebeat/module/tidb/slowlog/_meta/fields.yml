@@ -198,4 +198,3 @@
       type: keyword
       description: >
         The address of the cop-task whose waiting time is the longest.
-
