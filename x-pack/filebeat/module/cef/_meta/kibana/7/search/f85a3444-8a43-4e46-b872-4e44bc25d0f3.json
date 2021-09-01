@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.device.vendor",
+            "cef.device.product",
+            "cef.extensions.categoryBehavior",
+            "cef.extensions.categoryOutcome",
+            "destination.ip",
+            "destination.port",
+            "destination.domain",
+            "cef.device.event_class_id",
+            "cef.extensions.deviceCustomString1Label",
+            "cef.extensions.deviceCustomString1",
+            "cef.extensions.deviceCustomString2Label",
+            "cef.extensions.deviceCustomString2",
+            "cef.extension.cef.extension.deviceCustomString3Label",
+            "cef.extension.deviceCustomString3",
+            "cef.extension.cef.extension.deviceCustomString4Label",
+            "cef.extension.deviceCustomString4",
+            "cef.extensions.deviceEventCategory",
+            "event.severity",
+            "source.ip",
+            "source.port",
+            "network.transport",
+            "source.bytes",
+            "url.original"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.device.product:\"DNS Trace Log\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Microsoft DNS Events [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3NDQsMV0="
+}
