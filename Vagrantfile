@@ -68,7 +68,7 @@ Vagrant.configure("2") do |config|
     vbox.memory = 8192
     vbox.cpus = 6
   end
-
+  #  docker run -v $(pwd):"/go/src/github.com/elastic/beats" --entrypoint="/bin/bash" -it docker.elastic.co/beats-dev/golang-crossbuild:1.16.6-darwin-debian10
   # Docker config. Run with --provision-with docker,shell
   # For now this script is only going to work on the ubuntu images.
   config.vm.provision "docker", type: "shell", run: "never" do |s|
