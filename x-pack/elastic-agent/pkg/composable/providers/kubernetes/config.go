@@ -8,6 +8,7 @@
 package kubernetes
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -25,6 +26,8 @@ type Config struct {
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
+
+	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
 // Resources config section for resources' config blocks

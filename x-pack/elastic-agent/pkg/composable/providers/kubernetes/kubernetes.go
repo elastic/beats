@@ -6,7 +6,7 @@ package kubernetes
 
 import (
 	"fmt"
-
+	"github.com/elastic/beats/v7/libbeat/common"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
@@ -34,6 +34,7 @@ func init() {
 type dynamicProvider struct {
 	logger *logger.Logger
 	config *Config
+	rawConfig *common.Config
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
@@ -46,7 +47,11 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
-	return &dynamicProvider{logger, &cfg}, nil
+	rawConfig, err := common.NewConfigFrom(c)
+	if err != nil {
+		return nil, errors.New(err, "failed to unpack configuration")
+	}
+	return &dynamicProvider{logger, &cfg, rawConfig}, nil
 }
 
 // Run runs the kubernetes context provider.
@@ -130,7 +135,7 @@ func (p *dynamicProvider) newWatcher(
 	config *Config) (kubernetes.Watcher, error) {
 	switch resourceType {
 	case "pod":
-		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope)
+		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
 		if err != nil {
 			return nil, err
 		}

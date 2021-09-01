@@ -14,6 +14,7 @@ import (
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -25,6 +26,7 @@ type pod struct {
 	comm           composable.DynamicProviderComm
 	scope          string
 	config         *Config
+	metagen        metadata.MetaGen
 }
 
 type providerData struct {
@@ -39,7 +41,8 @@ func NewPodWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string,
+	rawConfig *common.Config) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -49,13 +52,43 @@ func NewPodWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&pod{logger, cfg.CleanupTimeout, comm, scope, cfg})
+
+	options := kubernetes.WatchOptions{
+		SyncTimeout: cfg.SyncPeriod,
+		Node:        cfg.Node,
+	}
+	metaConf := cfg.AddResourceMetadata
+	if metaConf == nil {
+		metaConf = metadata.GetDefaultResourceMetadataConfig()
+	}
+	nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+	if err != nil {
+		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+	}
+	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: cfg.SyncPeriod,
+	}, nil)
+	if err != nil {
+		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	}
+
+	metaGen := metadata.GetPodMetaGen(rawConfig, watcher, nodeWatcher, namespaceWatcher, metaConf)
+	watcher.AddEventHandler(&pod{
+		logger,
+		cfg.CleanupTimeout,
+		comm,
+		scope,
+		cfg,
+		metaGen,
+	})
 
 	return watcher, nil
 }
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
-	data := generatePodData(pod, p.config)
+
+	meta := p.metagen.Generate(pod)
+	data := generatePodData(pod, p.config, meta)
 	data.mapping["scope"] = p.scope
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
@@ -123,7 +156,7 @@ func (p *pod) OnDelete(obj interface{}) {
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
 }
 
-func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
+func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMeta common.MapStr) providerData {
 	// TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
@@ -138,16 +171,17 @@ func generatePodData(pod *kubernetes.Pod, cfg *Config) providerData {
 		safemapstr.Put(labels, k, v)
 	}
 
-	mapping := map[string]interface{}{
-		"namespace": pod.GetNamespace(),
-		"pod": map[string]interface{}{
-			"uid":         string(pod.GetUID()),
-			"name":        pod.GetName(),
-			"labels":      labels,
-			"annotations": annotations,
-			"ip":          pod.Status.PodIP,
-		},
-	}
+	//mapping := map[string]interface{}{
+	//	"namespace": pod.GetNamespace(),
+	//	"pod": map[string]interface{}{
+	//		"uid":         string(pod.GetUID()),
+	//		"name":        pod.GetName(),
+	//		"labels":      labels,
+	//		"annotations": annotations,
+	//		"ip":          pod.Status.PodIP,
+	//	},
+	//}
+	mapping := map[string]interface{}(kubeMeta)
 	return providerData{
 		uid:     string(pod.GetUID()),
 		mapping: mapping,
