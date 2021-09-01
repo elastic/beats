@@ -42,6 +42,8 @@ type KibanaLoader struct {
 	version      common.Version
 	hostname     string
 	msgOutputter MessageOutputter
+
+	loadedAssets map[string]bool
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
@@ -62,6 +64,7 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 		version:      client.GetVersion(),
 		hostname:     hostname,
 		msgOutputter: msgOutputter,
+		loadedAssets: make(map[string]bool, 0),
 	}
 
 	version := client.GetVersion()
@@ -147,24 +150,18 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
 	}
 
-	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
+	content = loader.formatDashboardAssets(content)
 
-	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
-
-	err = loader.importReferences(file, content)
+	dashboardWithReferences, err := loader.addReferences(file, content)
 	if err != nil {
-		return fmt.Errorf("error loading references of dashboard: %+v", err)
+		return fmt.Errorf("error getting references of dashboard: %+v", err)
 	}
 
-	var obj common.MapStr
-	err = json.Unmarshal(content, &obj)
-	if err != nil {
-		return err
-	}
-
-	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), obj.String()); err != nil {
+	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), dashboardWithReferences); err != nil {
 		return fmt.Errorf("error dashboard asset: %+v", err)
 	}
+
+	loader.loadedAssets[file] = true
 	return nil
 }
 
@@ -176,25 +173,52 @@ type dashboardReference struct {
 	Type string `json:"type"`
 }
 
-func (loader KibanaLoader) importReferences(path string, dashboard []byte) error {
+func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string, error) {
 	var d dashboardObj
 	err := json.Unmarshal(dashboard, &d)
 	if err != nil {
-		return fmt.Errorf("failed to parse dashboard references: %+v", err)
+		return "", fmt.Errorf("failed to parse dashboard references: %+v", err)
 	}
 
 	base := filepath.Dir(path)
+	var result string
 	for _, ref := range d.References {
 		if ref.Type == "index-pattern" {
 			continue
 		}
 		referencePath := filepath.Join(base, "..", ref.Type, ref.ID+".json")
-		err := loader.ImportDashboard(referencePath)
-		if err != nil {
-			return fmt.Errorf("error loading reference of %s: %s %s: %+v", path, ref.Type, ref.ID, err)
+		if _, ok := loader.loadedAssets[referencePath]; ok {
+			continue
 		}
+		refContents, err := ioutil.ReadFile(referencePath)
+		if err != nil {
+			return "", fmt.Errorf("fail to read referenced asset from file %s: %v", referencePath, err)
+		}
+		refContents = loader.formatDashboardAssets(refContents)
+		refContentsWithReferences, err := loader.addReferences(referencePath, refContents)
+		if err != nil {
+			return "", fmt.Errorf("failed to get references of %s: %+v", referencePath, err)
+		}
+
+		result += refContentsWithReferences
+		loader.loadedAssets[referencePath] = true
 	}
-	return nil
+
+	var res common.MapStr
+	err = json.Unmarshal(dashboard, &res)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert asset: %+v", err)
+	}
+	result += res.String() + "\n"
+
+	return result, nil
+}
+
+func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
+	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
+	content = EncodeJSONObjects(content)
+	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+	return content
 }
 
 func correctExtension(file string) string {
