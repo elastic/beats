@@ -1,0 +1,304 @@
+{
+    "attributes": {
+        "description": "Provides relevant app insights metrics for web applications",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "controlledBy": "1532342651170",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "azure.app_state.application_id",
+                            "negate": false,
+                            "params": {
+                                "query": "42cb59a9-d5be-400b-a5c4-69b0a0026ac6"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "azure.app_state.application_id": "42cb59a9-d5be-400b-a5c4-69b0a0026ac6"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "307a1ecd-284c-4f35-9a3c-d5b77c9a9c82",
+                    "w": 7,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "307a1ecd-284c-4f35-9a3c-d5b77c9a9c82",
+                "panelRefName": "panel_307a1ecd-284c-4f35-9a3c-d5b77c9a9c82",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "654e745f-360d-4898-89b6-57f788c5f540",
+                    "w": 20,
+                    "x": 7,
+                    "y": 0
+                },
+                "panelIndex": "654e745f-360d-4898-89b6-57f788c5f540",
+                "panelRefName": "panel_654e745f-360d-4898-89b6-57f788c5f540",
+                "title": "Exceptions",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5adca737-559d-4b4f-9fa7-58841daa99c5",
+                    "w": 21,
+                    "x": 27,
+                    "y": 0
+                },
+                "panelIndex": "5adca737-559d-4b4f-9fa7-58841daa99c5",
+                "panelRefName": "panel_5adca737-559d-4b4f-9fa7-58841daa99c5",
+                "title": "Available Memory",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "531cf244-45e0-43c3-9920-8f32397bd973",
+                    "w": 8,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "531cf244-45e0-43c3-9920-8f32397bd973",
+                "panelRefName": "panel_531cf244-45e0-43c3-9920-8f32397bd973",
+                "title": "",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "b9242495-babc-48a7-9ad7-56c62b1dc117",
+                    "w": 8,
+                    "x": 8,
+                    "y": 15
+                },
+                "panelIndex": "b9242495-babc-48a7-9ad7-56c62b1dc117",
+                "panelRefName": "panel_b9242495-babc-48a7-9ad7-56c62b1dc117",
+                "title": "",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d311025a-f5c5-4e48-9f1c-710f59264c43",
+                    "w": 8,
+                    "x": 16,
+                    "y": 15
+                },
+                "panelIndex": "d311025a-f5c5-4e48-9f1c-710f59264c43",
+                "panelRefName": "panel_d311025a-f5c5-4e48-9f1c-710f59264c43",
+                "title": "",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "48974418-b1f7-4050-921e-a83771e125ae",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "48974418-b1f7-4050-921e-a83771e125ae",
+                "panelRefName": "panel_48974418-b1f7-4050-921e-a83771e125ae",
+                "title": "Requests",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "39d20db1-316a-4ff3-811a-5571cb4497c3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "39d20db1-316a-4ff3-811a-5571cb4497c3",
+                "panelRefName": "panel_39d20db1-316a-4ff3-811a-5571cb4497c3",
+                "title": "Browser Send/Receive Duration",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "bc810208-0395-4c70-9057-d7307e064e43",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "bc810208-0395-4c70-9057-d7307e064e43",
+                "panelRefName": "panel_bc810208-0395-4c70-9057-d7307e064e43",
+                "title": "Browser Networking/Processing Duration",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ecf6fbfa-ba65-481e-af85-07fd9d5feb5f",
+                    "w": 24,
+                    "x": 0,
+                    "y": 45
+                },
+                "panelIndex": "ecf6fbfa-ba65-481e-af85-07fd9d5feb5f",
+                "panelRefName": "panel_ecf6fbfa-ba65-481e-af85-07fd9d5feb5f",
+                "title": "Process CPU Usage",
+                "type": "lens",
+                "version": "7.9.2"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "40a1b80b-cd62-446d-91aa-a971bb3769e7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 45
+                },
+                "panelIndex": "40a1b80b-cd62-446d-91aa-a971bb3769e7",
+                "panelRefName": "panel_40a1b80b-cd62-446d-91aa-a971bb3769e7",
+                "title": "Process Private Bytes",
+                "type": "lens",
+                "version": "7.9.2"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] App State Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d5fbd610-03d9-11eb-8034-63f2039e9d3f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "2e5183a0-03da-11eb-8034-63f2039e9d3f",
+            "name": "307a1ecd-284c-4f35-9a3c-d5b77c9a9c82:panel_307a1ecd-284c-4f35-9a3c-d5b77c9a9c82",
+            "type": "visualization"
+        },
+        {
+            "id": "1064f9a0-04a5-11eb-8034-63f2039e9d3f",
+            "name": "654e745f-360d-4898-89b6-57f788c5f540:panel_654e745f-360d-4898-89b6-57f788c5f540",
+            "type": "lens"
+        },
+        {
+            "id": "76cc1d70-04a7-11eb-8034-63f2039e9d3f",
+            "name": "5adca737-559d-4b4f-9fa7-58841daa99c5:panel_5adca737-559d-4b4f-9fa7-58841daa99c5",
+            "type": "lens"
+        },
+        {
+            "id": "a89c8fd0-03ec-11eb-8034-63f2039e9d3f",
+            "name": "531cf244-45e0-43c3-9920-8f32397bd973:panel_531cf244-45e0-43c3-9920-8f32397bd973",
+            "type": "lens"
+        },
+        {
+            "id": "cb5ec410-03ed-11eb-8034-63f2039e9d3f",
+            "name": "b9242495-babc-48a7-9ad7-56c62b1dc117:panel_b9242495-babc-48a7-9ad7-56c62b1dc117",
+            "type": "lens"
+        },
+        {
+            "id": "0df175c0-03ee-11eb-8034-63f2039e9d3f",
+            "name": "d311025a-f5c5-4e48-9f1c-710f59264c43:panel_d311025a-f5c5-4e48-9f1c-710f59264c43",
+            "type": "lens"
+        },
+        {
+            "id": "f0678020-04a2-11eb-8034-63f2039e9d3f",
+            "name": "48974418-b1f7-4050-921e-a83771e125ae:panel_48974418-b1f7-4050-921e-a83771e125ae",
+            "type": "lens"
+        },
+        {
+            "id": "e2704140-04a3-11eb-8034-63f2039e9d3f",
+            "name": "39d20db1-316a-4ff3-811a-5571cb4497c3:panel_39d20db1-316a-4ff3-811a-5571cb4497c3",
+            "type": "lens"
+        },
+        {
+            "id": "0e74dee0-04a4-11eb-8034-63f2039e9d3f",
+            "name": "bc810208-0395-4c70-9057-d7307e064e43:panel_bc810208-0395-4c70-9057-d7307e064e43",
+            "type": "lens"
+        },
+        {
+            "id": "cfa361a0-04a8-11eb-8034-63f2039e9d3f",
+            "name": "ecf6fbfa-ba65-481e-af85-07fd9d5feb5f:panel_ecf6fbfa-ba65-481e-af85-07fd9d5feb5f",
+            "type": "lens"
+        },
+        {
+            "id": "2b54b2c0-04a8-11eb-8034-63f2039e9d3f",
+            "name": "40a1b80b-cd62-446d-91aa-a971bb3769e7:panel_40a1b80b-cd62-446d-91aa-a971bb3769e7",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:42.950Z",
+    "version": "WzM0ODcsMV0="
+}

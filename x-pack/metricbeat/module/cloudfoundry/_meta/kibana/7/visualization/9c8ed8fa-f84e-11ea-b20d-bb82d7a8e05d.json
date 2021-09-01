@@ -1,0 +1,121 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Diego cell CPU utilization load [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "color": null,
+                        "id": "9c7cf130-f84e-11ea-bdee-833d96fe1a00",
+                        "operator": "gt",
+                        "value": 60000
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "9cb8a18a-f84e-11ea-bd11-836ecccfc401"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and cloudfoundry.envelope.origin :\"bosh-system-metrics-forwarder\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "9ca68d56-f84e-11ea-a6bb-f3164c0bb859",
+                        "text": null,
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "300000",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "9c8aab7c-f84e-11ea-b4a3-e31a518913fa",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name: \"system.cpu.user\" "
+                        },
+                        "formatter": "number",
+                        "hidden": false,
+                        "hide_in_legend": 0,
+                        "id": "9c8c18f4-f84e-11ea-97ff-b32117553dae",
+                        "label": "Max CPU utilization Load",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "9c8d7514-f84e-11ea-9457-93fdc9395544",
+                                "type": "max"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": "4",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "9c753c7e-f84e-11ea-96e9-33ff984da2c7",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": null,
+                        "terms_include": "",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Diego cell CPU utilization load [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c8ed8fa-f84e-11ea-b20d-bb82d7a8e05d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:58.327Z",
+    "version": "WzM2NTksMV0="
+}
