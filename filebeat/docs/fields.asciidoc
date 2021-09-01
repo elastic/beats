@@ -158487,7 +158487,7 @@ type: double
 *`tidb.slowlog.Plan`*::
 +
 --
-The execution plan of the statement. Use the select tidb_decode_plan('xxx...') statement to parse the specific execution plan.
+The execution plan of the statement. Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
 
 
 type: keyword

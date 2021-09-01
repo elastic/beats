@@ -1,11 +1,11 @@
 type: log
 
 paths:
-{{ range $i, $path := .paths }}
- - {{ $path }}
-{{ end }}
+  { { range $i, $path := .paths } }
+  - { { $path } }
+    { { end } }
 
-exclude_files: [".gz$"]
+exclude_files: [ ".gz$" ]
 
 multiline:
   type: pattern
@@ -18,49 +18,63 @@ processors:
   - script:
       lang: javascript
       id: tidb_slow_log_parser
-      params:
-        log_file_map_annotation: kubernetes.annotaions.debug.tidbcloud.com/log/file_name
-        log_file_map_fallback:
-          tidb:
-            stdout: tidb.log
-            stderr: tidb_stderr.log
-          slowlog: tidb-slow.log
-          tikv: tikv.log
-          raftlog: raftdb
-          rocksdblog: rocksdb
-          tiflash: tiflash_tikv.log
-          errorlog: tiflash_error.log
-          clusterlog: tiflash_cluster_manager.log
-          serverlog: tiflash.log
-          backup: backup.log
-          restore: restore.log
-          br: br_binary.log
+      params: {}
       source: >
-        var params = {};
+        let params = {
+            slowlog_plan_prefix: "tidb_decode_plan('",
+            slowlog_plan_suffix: "')",
+            kvRegex: new RegExp("(\S+): (\S+)"),
+        };
+
         function register(scriptParams) {
-          params = scriptParams;
+            params = scriptParams;
         }
+
         function process(event) {
-          var logFileMap = event.Get(params.log_file_map_annotation)
-          if (logFileMap === null) {
-            logFileMap = params.log_file_map_fallback
-          }
-          var containerName = event.Get("container_name")
-          var logFile = logFileMap[containerName]
-          if (logFile) {
-            var stream = event.Get("stream")
-            var streamLogFile = logFile[stream]
-            if (streamLogFile) {
-              event.Put("log_file", streamLogFile)
-            } else {
-              event.Put("log_file", logFile)
+            // get the message
+            var m0 = event.Get("message")
+            event.Delete("message")
+            if (m0 === null) {
+                event.Cancel();
+                return;
             }
-          }
-          return event
-        }
-        function test() {
-          var event = process(new Event({container_name: "slowlog"}));
-          if (event.Get("log_file") !== "tidb-slow.log") {
-            throw "expected log_file === tidb-slow.log";
-          }
+
+            // split lines
+            var lines = m0.match(/[^\r\n]+/g);
+            if (lines.length < 3) {
+                event.Cancel();
+                return;
+            }
+
+            // extract k-v's
+            for (var i = 0; i < lines.length - 1; i++) {
+                // for each line in a slow log
+                var match;
+                while (match = params.kvRegex.exec(lines[i])) {
+                    // for each k-v in a line
+                    if (match.length !== 3) {
+                        event.Cancel();
+                        return;
+                    }
+                    var k = match[1]
+                    var v = match[2]
+                    if (k === "Txn_start_ts" || k === "Conn_ID") {
+                        // no need to parse special keys
+                        event.Put(k, v)
+                        continue
+                    }
+                    // try to parse other fields to numbers
+                    var num = parseFloat(v)
+                    if (!isNaN(num)) {
+                        event.Put(k, num)
+                    } else {
+                        event.Put(k, v)
+                    }
+                }
+            }
+
+            // add Query
+            event.Put("Query", lines[lines.length - 1])
+
+            return event
         }
