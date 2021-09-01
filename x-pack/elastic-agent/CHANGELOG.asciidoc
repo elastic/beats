@@ -44,6 +44,7 @@
 - Fix windows installer during enroll {pull}24343[24343]
 - Logging to file disabled on enroll {issue}24173[24173]
 - Prevent uninstall failures on empty config {pull}24838[24838]
+- Fix issue with FLEET_CA not being used with Fleet Server in container {pull}26529[26529]
 
 ==== New features
 

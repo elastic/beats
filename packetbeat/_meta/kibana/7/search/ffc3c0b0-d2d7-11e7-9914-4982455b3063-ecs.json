@@ -1,0 +1,40 @@
+{
+    "attributes": {
+        "columns": [
+            "_source"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"exists\":{\"field\":\"tls.established\"},\"meta\":{\"alias\":\"TLS sessions\",\"disabled\":false,\"key\":\"tls.established\",\"negate\":false,\"type\":\"exists\",\"value\":\"exists\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"}}],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "TLS Sessions [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ffc3c0b0-d2d7-11e7-9914-4982455b3063-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyNDUsMV0="
+}

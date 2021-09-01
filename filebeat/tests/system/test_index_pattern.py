@@ -15,7 +15,7 @@ class Test(BaseTest):
             extra_args=["export", "index-pattern"])
 
         assert exit_code == 0
-        assert self.log_contains('"objects": [')
+        assert self.log_contains('"type": "index-pattern"')
         assert self.log_contains('beat.name') == False
 
     def test_export_index_pattern_migration(self):
@@ -28,5 +28,5 @@ class Test(BaseTest):
             extra_args=["export", "index-pattern", "-E", "migration.6_to_7.enabled:true"])
 
         assert exit_code == 0
-        assert self.log_contains('"objects": [')
+        assert self.log_contains('"type": "index-pattern"')
         assert self.log_contains('beat.name')

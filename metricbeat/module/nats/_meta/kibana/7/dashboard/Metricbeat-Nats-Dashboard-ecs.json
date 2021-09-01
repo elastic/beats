@@ -1,0 +1,369 @@
+{
+    "attributes": {
+        "description": "Overview of NATS server status",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 38
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Subscriptions Info",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 38
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "title": "Server Uptime",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "12",
+                    "w": 13,
+                    "x": 11,
+                    "y": 28
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "title": "Subscriptions Stats Timeline",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "18",
+                    "w": 12,
+                    "x": 24,
+                    "y": 28
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "title": "Cache Hit Rate Timeline",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4ffa8ccd-bd36-4eaf-973e-688b3025e95c",
+                    "w": 15,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "4ffa8ccd-bd36-4eaf-973e-688b3025e95c",
+                "panelRefName": "panel_4ffa8ccd-bd36-4eaf-973e-688b3025e95c",
+                "title": "Memory Usage",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "b07d6b97-c0b5-4663-8507-8d3cc2a63367",
+                    "w": 16,
+                    "x": 15,
+                    "y": 0
+                },
+                "panelIndex": "b07d6b97-c0b5-4663-8507-8d3cc2a63367",
+                "panelRefName": "panel_b07d6b97-c0b5-4663-8507-8d3cc2a63367",
+                "title": "Incoming Bytes Rate",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "eb420bb0-754e-4544-bc1f-027568db1c8c",
+                    "w": 17,
+                    "x": 31,
+                    "y": 0
+                },
+                "panelIndex": "eb420bb0-754e-4544-bc1f-027568db1c8c",
+                "panelRefName": "panel_eb420bb0-754e-4544-bc1f-027568db1c8c",
+                "title": "Connection Incoming Bytes",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5",
+                    "w": 15,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5",
+                "panelRefName": "panel_1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5",
+                "title": "Incoming Messages Rate",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "ed6181bc-4274-400a-a9d8-a84a027a4a77",
+                    "w": 16,
+                    "x": 15,
+                    "y": 8
+                },
+                "panelIndex": "ed6181bc-4274-400a-a9d8-a84a027a4a77",
+                "panelRefName": "panel_ed6181bc-4274-400a-a9d8-a84a027a4a77",
+                "title": "Connections",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "7862e4cd-22db-493b-a3be-247570eaaa8a",
+                    "w": 17,
+                    "x": 31,
+                    "y": 8
+                },
+                "panelIndex": "7862e4cd-22db-493b-a3be-247570eaaa8a",
+                "panelRefName": "panel_7862e4cd-22db-493b-a3be-247570eaaa8a",
+                "title": "Connections Uptime",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5c6f0fdf-67e6-4a39-8543-d46c3f833ac6",
+                    "w": 15,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "5c6f0fdf-67e6-4a39-8543-d46c3f833ac6",
+                "panelRefName": "panel_5c6f0fdf-67e6-4a39-8543-d46c3f833ac6",
+                "title": "Total Routes",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "258a5243-55f6-4195-90cb-ef3ec94707db",
+                    "w": 16,
+                    "x": 15,
+                    "y": 18
+                },
+                "panelIndex": "258a5243-55f6-4195-90cb-ef3ec94707db",
+                "panelRefName": "panel_258a5243-55f6-4195-90cb-ef3ec94707db",
+                "title": "Total Connections",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "0e68fd8a-abd9-4391-b2d0-026e79714835",
+                    "w": 17,
+                    "x": 31,
+                    "y": 18
+                },
+                "panelIndex": "0e68fd8a-abd9-4391-b2d0-026e79714835",
+                "panelRefName": "panel_0e68fd8a-abd9-4391-b2d0-026e79714835",
+                "title": "Connection Pending Bytes",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+                    "w": 11,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+                "panelRefName": "panel_3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+                "title": "Slow Consumers",
+                "type": "visualization",
+                "version": "7.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
+                    "w": 12,
+                    "x": 36,
+                    "y": 28
+                },
+                "panelIndex": "66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
+                "panelRefName": "panel_66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
+                "title": "Subscription Cache Actions",
+                "type": "visualization",
+                "version": "7.10.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat NATS] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Metricbeat-Nats-Dashboard-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "b129b220-1e44-11e9-a1b4-79a7ae42ab61-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "206f1bc0-1e45-11e9-a1b4-79a7ae42ab61-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "754215c0-1e46-11e9-a1b4-79a7ae42ab61-ecs",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "dff743a0-1f1c-11e9-a673-d9577e5e50eb-ecs",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "b877eb90-2988-11eb-8245-71f739a9f622",
+            "name": "4ffa8ccd-bd36-4eaf-973e-688b3025e95c:panel_4ffa8ccd-bd36-4eaf-973e-688b3025e95c",
+            "type": "visualization"
+        },
+        {
+            "id": "d3142a50-2987-11eb-8245-71f739a9f622",
+            "name": "b07d6b97-c0b5-4663-8507-8d3cc2a63367:panel_b07d6b97-c0b5-4663-8507-8d3cc2a63367",
+            "type": "visualization"
+        },
+        {
+            "id": "5146f2a0-2987-11eb-8245-71f739a9f622",
+            "name": "eb420bb0-754e-4544-bc1f-027568db1c8c:panel_eb420bb0-754e-4544-bc1f-027568db1c8c",
+            "type": "visualization"
+        },
+        {
+            "id": "eeb33da0-2987-11eb-8245-71f739a9f622",
+            "name": "1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5:panel_1ed3e570-4ece-42a4-92b1-fdc19e3e1ad5",
+            "type": "visualization"
+        },
+        {
+            "id": "431edfc0-2988-11eb-8245-71f739a9f622",
+            "name": "ed6181bc-4274-400a-a9d8-a84a027a4a77:panel_ed6181bc-4274-400a-a9d8-a84a027a4a77",
+            "type": "visualization"
+        },
+        {
+            "id": "898d2fe0-2986-11eb-8245-71f739a9f622",
+            "name": "7862e4cd-22db-493b-a3be-247570eaaa8a:panel_7862e4cd-22db-493b-a3be-247570eaaa8a",
+            "type": "visualization"
+        },
+        {
+            "id": "3a670a80-2986-11eb-8245-71f739a9f622",
+            "name": "5c6f0fdf-67e6-4a39-8543-d46c3f833ac6:panel_5c6f0fdf-67e6-4a39-8543-d46c3f833ac6",
+            "type": "visualization"
+        },
+        {
+            "id": "55c2d340-2986-11eb-8245-71f739a9f622",
+            "name": "258a5243-55f6-4195-90cb-ef3ec94707db:panel_258a5243-55f6-4195-90cb-ef3ec94707db",
+            "type": "visualization"
+        },
+        {
+            "id": "68d40020-2987-11eb-8245-71f739a9f622",
+            "name": "0e68fd8a-abd9-4391-b2d0-026e79714835:panel_0e68fd8a-abd9-4391-b2d0-026e79714835",
+            "type": "visualization"
+        },
+        {
+            "id": "84e60a90-2a79-11eb-952d-594e5c56d011",
+            "name": "3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c:panel_3141f1f6-d2d1-4b3f-8a7a-7d915bcb5d7c",
+            "type": "visualization"
+        },
+        {
+            "id": "d80d4c30-2a81-11eb-9625-31ed579c09b3",
+            "name": "66f0d0ac-bf45-40e3-ba8c-32d6360e8584:panel_66f0d0ac-bf45-40e3-ba8c-32d6360e8584",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:44.486Z",
+    "version": "WzQwODUsMV0="
+}

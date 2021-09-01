@@ -23,4 +23,5 @@ output.elasticsearch:
   # Optional protocol and basic auth credentials.
   username: "elastic-test-username"
   password: "elastic-test-password"
+  api_key: "elastic-test-api-key"
   protocal: "https"

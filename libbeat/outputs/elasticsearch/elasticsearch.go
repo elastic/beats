@@ -18,11 +18,8 @@
 package elasticsearch
 
 import (
-	"net/url"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -56,30 +53,31 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
+	policy, err := newNonIndexablePolicy(config.NonIndexablePolicy)
+	if err != nil {
+		log.Errorf("error while creating file identifier: %v", err)
+		return outputs.Fail(err)
+	}
+
 	hosts, err := outputs.ReadHostList(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return outputs.Fail(err)
-	}
-
-	var proxyURL *url.URL
-	if !config.ProxyDisable {
-		proxyURL, err = common.ParseURL(config.ProxyURL)
-		if err != nil {
-			return outputs.Fail(err)
-		}
-		if proxyURL != nil {
-			log.Infof("Using proxy URL: %s", proxyURL)
-		}
+	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil && !config.Transport.Proxy.Disable {
+		log.Infof("Using proxy URL: %s", proxyURL)
 	}
 
 	params := config.Params
 	if len(params) == 0 {
 		params = nil
+	}
+
+	if policy.action() == dead_letter_index {
+		index = DeadLetterSelector{
+			Selector:        index,
+			DeadLetterIndex: policy.index(),
+		}
 	}
 
 	clients := make([]outputs.NetworkClient, len(hosts))
@@ -94,23 +92,21 @@ func makeES(
 		client, err = NewClient(ClientSettings{
 			ConnectionSettings: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Proxy:            proxyURL,
-				ProxyDisable:     config.ProxyDisable,
-				TLS:              tlsConfig,
 				Kerberos:         config.Kerberos,
 				Username:         config.Username,
 				Password:         config.Password,
 				APIKey:           config.APIKey,
 				Parameters:       params,
 				Headers:          config.Headers,
-				Timeout:          config.Timeout,
 				CompressionLevel: config.CompressionLevel,
 				Observer:         observer,
 				EscapeHTML:       config.EscapeHTML,
+				Transport:        config.Transport,
 			},
-			Index:    index,
-			Pipeline: pipeline,
-			Observer: observer,
+			Index:              index,
+			Pipeline:           pipeline,
+			Observer:           observer,
+			NonIndexableAction: policy.action(),
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)

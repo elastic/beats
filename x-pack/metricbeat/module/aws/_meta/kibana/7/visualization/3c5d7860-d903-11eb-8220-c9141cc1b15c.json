@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "AWS Kinesis Filter [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "cloud.region",
+                        "id": "1549397251041",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "region name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "aws.dimensions.StreamName",
+                        "id": "1624989316975",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "stream name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": true,
+                "useTimeFilter": false
+            },
+            "title": "AWS Kinesis Filter [Metricbeat AWS]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3c5d7860-d903-11eb-8220-c9141cc1b15c",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:30.617Z",
+    "version": "WzMzNjQsMV0="
+}

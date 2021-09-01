@@ -1,0 +1,103 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "91e62734-6524-424c-b2b5-3974c835dd6c": {
+                            "columnOrder": [
+                                "f0d11f8d-e2f9-408a-9114-a0b9b18142d4",
+                                "89c8d41d-6896-470d-8318-c0a691fa638e",
+                                "27a71166-d245-471d-b550-ee0b1899ea88"
+                            ],
+                            "columns": {
+                                "27a71166-d245-471d-b550-ee0b1899ea88": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Topic Oldest Retained Acked Message Age By Region",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.pubsub.topic.oldest_retained_acked_message_age_by_region.value"
+                                },
+                                "89c8d41d-6896-470d-8318-c0a691fa638e": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of gcp.labels.metrics.region",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "27a71166-d245-471d-b550-ee0b1899ea88",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.labels.metrics.region"
+                                },
+                                "f0d11f8d-e2f9-408a-9114-a0b9b18142d4": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "27a71166-d245-471d-b550-ee0b1899ea88"
+                        ],
+                        "layerId": "91e62734-6524-424c-b2b5-3974c835dd6c",
+                        "seriesType": "line",
+                        "splitAccessor": "89c8d41d-6896-470d-8318-c0a691fa638e",
+                        "xAccessor": "f0d11f8d-e2f9-408a-9114-a0b9b18142d4"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Topic Oldest Retained Acked Message Age By Region [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "25b76dc0-01a2-11eb-b032-d59f894a5072",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-91e62734-6524-424c-b2b5-3974c835dd6c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:13.736Z",
+    "version": "WzM4MDgsMV0="
+}

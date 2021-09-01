@@ -49,7 +49,7 @@ type promEventGenerator struct{}
 func (p *promEventGenerator) Start() {}
 func (p *promEventGenerator) Stop()  {}
 
-// DefaultPromEventsGenerator stores all Prometheus metrics using
+// GeneratePromEvents DefaultPromEventsGenerator stores all Prometheus metrics using
 // only double field type in Elasticsearch.
 func (p *promEventGenerator) GeneratePromEvents(mf *dto.MetricFamily) []PromEvent {
 	var events []PromEvent

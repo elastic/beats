@@ -1233,6 +1233,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1241,7 +1242,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -1259,6 +1266,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1276,6 +1284,7 @@ func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.Li
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1284,7 +1293,13 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -1302,6 +1317,7 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1309,7 +1325,15 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
 	return resourcegroupstaggingapi.GetResourcesRequest{
+		Input: input,
+		Copy:  m.GetResourcesRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:       "GetResources",
+				HTTPMethod: "POST",
+				HTTPPath:   "/",
+				Paginator:  nil,
+			},
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
 				PaginationToken: awssdk.String(""),
 				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
@@ -1325,6 +1349,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1593,4 +1618,13 @@ func TestCreateEventsTimestamp(t *testing.T) {
 	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
 	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
+}
+
+func TestGetStartTimeEndTime(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
+	m.logger = logp.NewLogger("test")
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }

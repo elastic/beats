@@ -192,6 +192,7 @@ processors:
   - lowercase:
       field: network.transport
       ignore_missing: true
+  # Suricata alert and metadata
   - convert:
       field: suricata.eve.alert.category
       target_field: message
@@ -223,6 +224,132 @@ processors:
   - rename:
       field: suricata.eve.alert.severity
       target_field: event.severity
+      ignore_missing: true
+  # All defined keys for metadata is moved out, leaving the metadata field as flattened for any custom fields introduced
+  # by suricata rules, to prevent the defined keys to be set as flattened type:
+  # https://better-schema.readthedocs.io/en/latest/schema.html#defined-keys
+  - rename:
+      field: suricata.eve.alert.metadata.protocols
+      target_field: suricata.eve.alert.protocols
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.attack_target
+      target_field: suricata.eve.alert.attack_target
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.capec_id
+      target_field: suricata.eve.alert.capec_id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cwe_id
+      target_field: suricata.eve.alert.cwe_id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.malware
+      target_field: suricata.eve.alert.malware
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cve
+      target_field: suricata.eve.alert.cve
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v2_base
+      target_field: suricata.eve.alert.cvss_v2_base
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v2_temporal
+      target_field: suricata.eve.alert.cvss_v2_temporal
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v3_base
+      target_field: suricata.eve.alert.cvss_v3_base
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v3_temporal
+      target_field: suricata.eve.alert.cvss_v3_temporal
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.priority
+      target_field: suricata.eve.alert.priority
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.hostile
+      target_field: suricata.eve.alert.hostile
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.infected
+      target_field: suricata.eve.alert.infected
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.created_at
+      target_field: _tmp_.created_at
+      ignore_missing: true
+  - join:
+      field: _tmp_.created_at
+      description: Converts date field to string
+      separator: ","
+      if: ctx._tmp_?.created_at != null
+  - date:
+      field: _tmp_.created_at
+      target_field: suricata.eve.alert.created_at
+      formats:
+        - yyyy-MM-dd
+        - yyyy_MM_dd
+      if: ctx._tmp_?.created_at != null
+      ignore_failure: true
+  - rename:
+      field: suricata.eve.alert.metadata.updated_at
+      target_field: _tmp_.updated_at
+      ignore_missing: true
+  - join:
+      field: _tmp_.updated_at
+      description: Converts date field to string
+      separator: ","
+      if: ctx._tmp_?.updated_at != null
+  - date:
+      field: _tmp_.updated_at
+      target_field: suricata.eve.alert.updated_at
+      formats:
+        - yyyy-MM-dd
+        - yyyy_MM_dd
+      if: ctx._tmp_?.updated_at != null
+      ignore_failure: true
+  - rename:
+      field: suricata.eve.alert.metadata.filename
+      target_field: file.name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.classtype
+      target_field: suricata.eve.alert.classtype
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.rule_source
+      target_field: suricata.eve.alert.rule_source
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.sid
+      target_field: suricata.eve.alert.sid
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_attack
+      target_field: threat.tactic.id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_tactic_id
+      target_field: threat.tactic.id
+      ignore_missing: true
+      if: ctx.threat?.tactic?.id == null
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_tactic_name
+      target_field: threat.tactic.name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_technique_id
+      target_field: threat.technique.id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_technique_id
+      target_field: threat.technique.name
       ignore_missing: true
   - rename:
       field: suricata.eve.flow.pkts_toclient
@@ -363,6 +490,7 @@ processors:
         - suricata.eve.flow.start
         - suricata.eve.http.http_method
         - suricata.eve.http.http_user_agent
+        - _tmp_
       ignore_missing: true
 on_failure:
   - append:
@@ -396,4 +524,5 @@ on_failure:
         - suricata.eve.proto
         - suricata.eve.src_ip
         - suricata.eve.src_port
+        - _tmp_
       ignore_missing: true

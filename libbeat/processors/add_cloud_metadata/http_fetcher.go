@@ -75,7 +75,7 @@ func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Cli
 
 	// Apply schema.
 	res.metadata = f.conv(res.metadata)
-	res.metadata["provider"] = f.provider
+	res.metadata.Put("cloud.provider", f.provider)
 
 	return res
 }

@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetIcinga returns asset data.
-// This is the base64 encoded gzipped contents of module/icinga.
+// This is the base64 encoded zlib format compressed contents of module/icinga.
 func AssetIcinga() string {
 	return "eJzsksFqwzAQRO/+iiH35AN06KWnHnrqF2yttbJEloS0TvDfFztO6hinUGihhexxBs08wWxx4N5AagmOKkBFPRtsXkZhUwGWS50lqcRg8FQBwNnEa7Sd5wpohL0tZvS2CNTyLHE47RMbuBy7NCkrqbc58yzL7527qmtxdyPP9xyDkoQyNaCJGbrny0fGfPjoym72bEkzJ2qoFi/a35gXsAP3p5jtwvsCb7i3xLU0wgWnPSnq2KYYOChic8H00Tm2I3jLpZDjT9xVysJHzvcoyQuVhZNI92bo2Xk+sl+4rbhMZ37NHa9WTmDfbFx/da/v2kUSfnEVQ/xjFP9tFEUp680CfnoXU8NjGn99Gh8BAAD//xYdyXI="
 }

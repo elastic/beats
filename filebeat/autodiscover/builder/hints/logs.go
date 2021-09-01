@@ -52,15 +52,14 @@ var validModuleNames = regexp.MustCompile("[^a-zA-Z0-9\\_\\-]+")
 type logHints struct {
 	config   *config
 	registry *fileset.ModuleRegistry
+	log      *logp.Logger
 }
 
 // NewLogHints builds a log hints builder
 func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 	config := defaultConfig()
-	err := cfg.Unpack(&config)
-
-	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
 	moduleRegistry, err := fileset.NewModuleRegistry(nil, beat.Info{}, false)
@@ -68,39 +67,33 @@ func NewLogHints(cfg *common.Config) (autodiscover.Builder, error) {
 		return nil, err
 	}
 
-	return &logHints{&config, moduleRegistry}, nil
+	return &logHints{&config, moduleRegistry, logp.NewLogger("hints.builder")}, nil
 }
 
 // Create config based on input hints in the bus event
 func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
 	var hints common.MapStr
-	hIface, ok := event["hints"]
-	if ok {
-		hints, _ = hIface.(common.MapStr)
+	if hintsIfc, found := event["hints"]; found {
+		hints, _ = hintsIfc.(common.MapStr)
 	}
 
-	inputConfig := l.getInputsConfigs(hints)
-
-	// If default config is disabled return nothing unless it's explicty enabled
-	if !l.config.DefaultConfig.Enabled() && !builder.IsEnabled(hints, l.config.Key) {
-		logp.Debug("hints.builder", "default config is disabled: %+v", event)
-		return []*common.Config{}
+	// Hint must be explicitly enabled when default_config sets enabled=false.
+	if !l.config.DefaultConfig.Enabled() && !builder.IsEnabled(hints, l.config.Key) ||
+		builder.IsDisabled(hints, l.config.Key) {
+		l.log.Debugw("Hints config is not enabled.", "autodiscover.event", event)
+		return nil
 	}
 
-	// If explictly disabled, return nothing
-	if builder.IsDisabled(hints, l.config.Key) {
-		logp.Debug("hints.builder", "logs disabled by hint: %+v", event)
-		return []*common.Config{}
-	}
-
-	if inputConfig != nil {
-		configs := []*common.Config{}
+	if inputConfig := l.getInputsConfigs(hints); inputConfig != nil {
+		var configs []*common.Config
 		for _, cfg := range inputConfig {
 			if config, err := common.NewConfigFrom(cfg); err == nil {
 				configs = append(configs, config)
+			} else {
+				l.log.Warnw("Failed to create config from input.", "error", err)
 			}
 		}
-		logp.Debug("hints.builder", "generated config %+v", configs)
+		l.log.Debugf("Generated %d input configs from hint.", len(configs))
 		// Apply information in event to the template to generate the final config
 		return template.ApplyConfigTemplate(event, configs)
 	}

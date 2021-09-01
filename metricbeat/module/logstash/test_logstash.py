@@ -25,6 +25,7 @@ class Test(metricbeat.BaseTest):
         self.check_metricset("logstash", "node", self.get_hosts(), self.FIELDS + ["process"])
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @unittest.skip("flaky test: https://github.com/elastic/beats/issues/26432")
     def test_node_stats(self):
         """
         logstash node_stats metricset test

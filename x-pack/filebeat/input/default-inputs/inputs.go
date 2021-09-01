@@ -30,6 +30,6 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		http_endpoint.Plugin(),
 		httpjson.Plugin(log, store),
 		o365audit.Plugin(log, store),
-		awss3.Plugin(),
+		awss3.Plugin(store),
 	}
 }

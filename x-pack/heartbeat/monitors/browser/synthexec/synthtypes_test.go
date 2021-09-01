@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
@@ -62,8 +61,8 @@ func TestToMap(t *testing.T) {
 			common.MapStr{
 				"type":            "step/start",
 				"package_version": "1.2.3",
-				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-				"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42},
+				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
+				"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42, "duration": common.MapStr{"us": int64(1232131)}},
 				"root_fields": map[string]interface{}{
 					"synthetics": map[string]interface{}{
 						"nested": "v1",
@@ -76,8 +75,8 @@ func TestToMap(t *testing.T) {
 					"type":            "step/start",
 					"package_version": "1.2.3",
 					"nested":          "v1",
-					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-					"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42},
+					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney", "tags": []string{"foo"}},
+					"step":            common.MapStr{"name": "MyStep", "status": "success", "index": 42, "duration": common.MapStr{"us": int64(1232131)}},
 				},
 				"truly_at_root": "v2",
 			},
@@ -88,7 +87,7 @@ func TestToMap(t *testing.T) {
 				"type":            "someType",
 				"package_version": "1.2.3",
 				"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-				"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
+				"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down", "duration": common.MapStr{"us": int64(1000)}},
 				"error": common.MapStr{
 					"name":    "MyErrorName",
 					"message": "MyErrorMessage",
@@ -102,7 +101,7 @@ func TestToMap(t *testing.T) {
 					"type":            "someType",
 					"package_version": "1.2.3",
 					"journey":         common.MapStr{"name": "MyJourney", "id": "MyJourney"},
-					"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down"},
+					"step":            common.MapStr{"name": "MyStep", "index": 42, "status": "down", "duration": common.MapStr{"us": int64(1000)}},
 					"error": common.MapStr{
 						"name":    "MyErrorName",
 						"message": "MyErrorMessage",

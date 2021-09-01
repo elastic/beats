@@ -1,0 +1,129 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": {
+                                "query": "4625"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.code": "4625"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "winlog.provider_name",
+                            "negate": false,
+                            "params": {
+                                "query": "Microsoft-Windows-Security-Auditing"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "winlog.provider_name": "Microsoft-Windows-Security-Auditing"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": " Failed Logons  [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Failed Logons"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": " Failed Logons  [Winlogbeat Security]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "4bedf650-9ffd-11ea-87e4-49f31ec44891",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIyMDQsMl0="
+}

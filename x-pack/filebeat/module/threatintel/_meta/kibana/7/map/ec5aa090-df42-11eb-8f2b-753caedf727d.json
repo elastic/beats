@@ -1,0 +1,32 @@
+{
+    "attributes": {
+        "description": "Geographic location of Anomali indicators ingested by the threat intel Filebeat module.",
+        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"9027343a-f725-4467-9b08-8566ad0b2a52\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{\"type\":\"TILE\"},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"geoField\":\"threatintel.indicator.geo.location\",\"filterByMapBounds\":true,\"scalingType\":\"LIMIT\",\"id\":\"a3ecc6af-0299-4cb9-a29c-0b70f666b011\",\"type\":\"ES_SEARCH\",\"applyGlobalQuery\":true,\"applyGlobalTime\":true,\"tooltipProperties\":[\"threatintel.indicator.as.number\",\"threatintel.indicator.as.organization.name\",\"threatintel.indicator.geo.country_iso_code\"],\"sortField\":\"\",\"sortOrder\":\"desc\",\"topHitsSplitField\":\"\",\"topHitsSize\":1,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"id\":\"83ede860-fe89-43c9-8e74-fa2703efbb85\",\"label\":\"Indicator Geographic Location\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"danger\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#D36086\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"type\":\"VECTOR\",\"joins\":[]}]",
+        "mapStateJSON": "{\"zoom\":2.08,\"center\":{\"lon\":0,\"lat\":19.94277},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":true,\"interval\":0},\"query\":{\"query\":\"event.dataset:\\\"threatintel.anomalithreatstream\\\" \",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false,\"backgroundColor\":\"#ffffff\",\"disableInteractive\":false,\"disableTooltipControl\":false,\"hideToolbarOverlay\":false,\"hideLayerControl\":false,\"hideViewControl\":false,\"initialLocation\":\"LAST_SAVED_LOCATION\",\"fixedLocation\":{\"lat\":0,\"lon\":0,\"zoom\":2},\"browserLocation\":{\"zoom\":2},\"maxZoom\":24,\"minZoom\":0,\"showScaleControl\":false,\"showSpatialFilters\":true,\"spatialFiltersAlpa\":0.3,\"spatialFiltersFillColor\":\"#DA8B45\",\"spatialFiltersLineColor\":\"#DA8B45\"}}",
+        "title": "Anomali Indicator Geographic Location [Filebeat Threat Intel]",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ec5aa090-df42-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:34:28.102Z",
+    "version": "WzQ1ODgsMV0="
+}

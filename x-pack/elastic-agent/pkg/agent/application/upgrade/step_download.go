@@ -61,7 +61,7 @@ func (u *Upgrader) downloadArtifact(ctx context.Context, version, sourceURI stri
 
 func newDownloader(version string, log *logger.Logger, settings *artifact.Config) (download.Downloader, error) {
 	if !strings.HasSuffix(version, "-SNAPSHOT") {
-		return downloader.NewDownloader(log, settings), nil
+		return downloader.NewDownloader(log, settings)
 	}
 
 	// try snapshot repo before official
@@ -70,11 +70,12 @@ func newDownloader(version string, log *logger.Logger, settings *artifact.Config
 		return nil, err
 	}
 
-	return composed.NewDownloader(
-		fs.NewDownloader(settings),
-		snapDownloader,
-		http.NewDownloader(settings),
-	), nil
+	httpDownloader, err := http.NewDownloader(settings)
+	if err != nil {
+		return nil, err
+	}
+
+	return composed.NewDownloader(fs.NewDownloader(settings), snapDownloader, httpDownloader), nil
 }
 
 func newVerifier(version string, log *logger.Logger, settings *artifact.Config) (download.Verifier, error) {

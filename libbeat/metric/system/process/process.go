@@ -32,9 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/memory"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	sysinfo "github.com/elastic/go-sysinfo"
 	sigar "github.com/elastic/gosigar"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 // ProcsMap is a map where the keys are the names of processes and the value is the Process with that name
@@ -65,8 +65,7 @@ type Process struct {
 	cpuTotalPctNorm float64
 
 	// cgroup stats
-	RawStats *cgroup.Stats
-	PctStats CgroupPctStats
+	RawStats cgroup.CGStats
 }
 
 // CgroupPctStats stores rendered percent values from cgroup CPU data
@@ -108,8 +107,13 @@ type Ticks struct {
 // are known they should be passed in to avoid re-fetching the information.
 func newProcess(pid int, cmdline string, env common.MapStr) (*Process, error) {
 	state := sigar.ProcState{}
-	if err := state.Get(pid); err != nil {
-		return nil, fmt.Errorf("error getting process state for pid=%d: %v", pid, err)
+	err := state.Get(pid)
+	// we have to keep up that behavior somewhat, as there are numerous cases where ProcState could "normally" fail
+	// If something has failed this early, assume the PID is bad, invalid, or dead in some way, and just continue.
+	// Instead, log the error.
+	if err != nil {
+		logp.L().Debugf("Could not fetch info for PID %d: %s", pid, err)
+		return nil, nil
 	}
 
 	exe := sigar.ProcExe{}
@@ -288,12 +292,20 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 
+	// This is a holdover until we migrate this library to metricbeat/internal
+	// At which point we'll use the memory code there.
 	var totalPhyMem uint64
-	baseMem, err := memory.Get()
+	host, err := sysinfo.Host()
 	if err != nil {
-		procStats.logger.Warnf("Getting memory details: %v", err)
+		procStats.logger.Warnf("Getting host details: %v", err)
 	} else {
-		totalPhyMem = baseMem.Mem.Total
+		memStats, err := host.Memory()
+		if err != nil {
+			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
+			totalPhyMem = memStats.Total
+		}
+
 	}
 
 	proc := common.MapStr{
@@ -360,10 +372,14 @@ func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 		}
 	}
 
-	if procStats.EnableCgroups {
-		if statsMap := cgroupStatsToMap(process); statsMap != nil {
+	if procStats.EnableCgroups && process.RawStats != nil {
+		statsMap, err := process.RawStats.Format()
+		if err != nil {
+			procStats.logger.Warnf("Getting memory details: %v", err)
+		} else {
 			proc["cgroup"] = statsMap
 		}
+
 	}
 
 	return proc
@@ -393,52 +409,6 @@ func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64
 			common.Round(float64(s1.CPU.Total), common.DefaultDecimalPlacesCount)
 	}
 	return 0, 0, 0
-}
-
-// GetCgroupPercentage returns CPU usage percentages for a given cgroup
-// see GetProcCPUPercentage for implementation details, as the two are conceptually similar.
-// Note that the cgroup controller reports system and user times in USER_HZ, while
-// totals are reported in nanoseconds. Because of this, any math that mixes the two might be slightly off,
-// as USER_HZ is less precise value that will get rounded up to nanseconds.
-// Because of that, `user` and `system` metrics reflect a precentage of overall CPU time, but can't be compared to the total pct values.
-func GetCgroupPercentage(s0, s1 *Process) CgroupPctStats {
-	if s0 == nil || s1 == nil || s0.RawStats == nil || s1.RawStats == nil || s0.RawStats.CPUAccounting == nil || s1.RawStats.CPUAccounting == nil {
-		return CgroupPctStats{}
-	}
-	timeDelta := s1.SampleTime.Sub(s0.SampleTime)
-	timeDeltaNanos := timeDelta / time.Nanosecond
-	totalCPUDeltaNanos := int64(s1.RawStats.CPUAccounting.TotalNanos - s0.RawStats.CPUAccounting.TotalNanos)
-
-	pct := float64(totalCPUDeltaNanos) / float64(timeDeltaNanos)
-	// Avoid using NumCPU unless we need to; the values in UsagePerCPU are more likely to reflect the running conditions of the cgroup
-	// NumCPU can vary based on the conditions of the running metricbeat process, as it uses Affinity Masks, not hardware data.
-	var cpuCount int
-	if len(s1.RawStats.CPUAccounting.UsagePerCPU) > 0 {
-		cpuCount = len(s1.RawStats.CPUAccounting.UsagePerCPU)
-	} else {
-		cpuCount = runtime.NumCPU()
-	}
-
-	// if you look at the raw cgroup stats, the following normalized value is literally an average of per-cpu numbers.
-	normalizedPct := pct / float64(cpuCount)
-	userCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.UserNanos - s0.RawStats.CPUAccounting.Stats.UserNanos)
-	systemCPUDeltaMillis := int64(s1.RawStats.CPUAccounting.Stats.SystemNanos - s0.RawStats.CPUAccounting.Stats.SystemNanos)
-
-	userPct := float64(userCPUDeltaMillis) / float64(timeDeltaNanos)
-	systemPct := float64(systemCPUDeltaMillis) / float64(timeDeltaNanos)
-
-	normalizedUser := userPct / float64(cpuCount)
-	normalizedSystem := systemPct / float64(cpuCount)
-
-	pctValues := CgroupPctStats{
-		CPUTotalPct:      common.Round(pct, common.DefaultDecimalPlacesCount),
-		CPUTotalPctNorm:  common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
-		CPUUserPct:       common.Round(userPct, common.DefaultDecimalPlacesCount),
-		CPUUserPctNorm:   common.Round(normalizedUser, common.DefaultDecimalPlacesCount),
-		CPUSystemPct:     common.Round(systemPct, common.DefaultDecimalPlacesCount),
-		CPUSystemPctNorm: common.Round(normalizedSystem, common.DefaultDecimalPlacesCount),
-	}
-	return pctValues
 }
 
 // matchProcess checks if the provided process name matches any of the process regexes
@@ -536,7 +506,7 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 	newProcs := make(ProcsMap, 1)
 	p := procStats.getSingleProcess(pid, newProcs)
 	if p == nil {
-		return nil, fmt.Errorf("cannot find matching process for pid=%d", pid)
+		return common.MapStr{}, nil
 	}
 
 	e := procStats.getProcessEvent(p)
@@ -548,6 +518,9 @@ func (procStats *Stats) GetOne(pid int) (common.MapStr, error) {
 func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	var cmdline string
 	var env common.MapStr
+	// In the future we really should find a better way of distinguishing between serious and non-serious errors
+	// for now, just log and continue
+	logger := logp.L()
 	if previousProc := procStats.ProcsMap[pid]; previousProc != nil {
 		if procStats.CacheCmdLine {
 			cmdline = previousProc.CmdLine
@@ -557,30 +530,36 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 
 	process, err := newProcess(pid, cmdline, env)
 	if err != nil {
-		procStats.logger.Debugf("Skip process pid=%d: %v", pid, err)
+		logger.Debugf("Skip process pid=%d; err=%s", pid, err)
+	}
+	// The process is now gone. Skip.
+	if process == nil {
 		return nil
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		procStats.logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s: %v", pid, process.Name, err)
+		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
 		return nil
 	}
 
 	err = process.getDetails(procStats.isWhitelistedEnvVar)
 	if err != nil {
-		procStats.logger.Debugf("Error getting details for process %s with pid=%d: %v", process.Name, process.Pid, err)
+		logger.Debugf("Error getting details for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
 		return nil
 	}
 
 	if procStats.EnableCgroups {
-		cgStats, err := procStats.cgroups.GetStatsForProcess(pid)
+		cgStats, err := procStats.cgroups.GetStatsForPid(pid)
 		if err != nil {
-			procStats.logger.Debug("Error fetching cgroup data for process %s with pid=%d: %v", process.Name, process.Pid, err)
-			return nil
+			logger.Debugf("Error fetching cgroup data for process %s with pid=%d; err=%s", process.Name, process.Pid, err)
+		} else {
+			process.RawStats = cgStats
+			last := procStats.ProcsMap[process.Pid]
+			if last != nil {
+				process.RawStats.FillPercentages(last.RawStats, process.SampleTime, last.SampleTime)
+			}
 		}
-		process.RawStats = cgStats
-		last := procStats.ProcsMap[process.Pid]
-		process.PctStats = GetCgroupPercentage(last, process)
+
 	}
 
 	newProcs[process.Pid] = process

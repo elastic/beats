@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "SNS Messages and Notifications [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "s,s,3",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Messages Published",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.sns.metrics.NumberOfMessagesPublished.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "5",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0",
+                        "formatter": "s,s,3",
+                        "id": "204ff2b0-1b77-11ea-9357-231d0e09a8a9",
+                        "label": "Notifications Delivered",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.sns.metrics.NumberOfNotificationsDelivered.sum",
+                                "id": "204ff2b1-1b77-11ea-9357-231d0e09a8a9",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "5",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_order_by": "204ff2b1-1b77-11ea-9357-231d0e09a8a9",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": "0",
+                        "formatter": "s,s,3",
+                        "id": "32e925e0-1b77-11ea-9357-231d0e09a8a9",
+                        "label": "Notifications Failed",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.sns.metrics.NumberOfNotificationsFailed.sum",
+                                "id": "32e925e1-1b77-11ea-9357-231d0e09a8a9",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "5",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_order_by": "32e925e1-1b77-11ea-9357-231d0e09a8a9",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SNS Messages and Notifications [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "13e624c0-180e-11ea-8e91-03c7047cbb9d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:36.824Z",
+    "version": "WzM0MzMsMV0="
+}

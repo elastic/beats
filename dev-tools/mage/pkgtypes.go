@@ -48,7 +48,7 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip and tar.gz.
-	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}-{{if .Variant}}{{.Variant}}-{{end}}{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -90,6 +90,7 @@ type PackageSpec struct {
 	Files             map[string]PackageFile `yaml:"files"`
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
+	Variants          []string               `yaml:"variants"`              // Optional
 
 	evalContext            map[string]interface{}
 	packageDir             string
@@ -328,8 +329,10 @@ func (s *PackageSpec) ExtraVar(key, value string) {
 
 // Expand expands a templated string using data from the spec.
 func (s PackageSpec) Expand(in string, args ...map[string]interface{}) (string, error) {
+	// Assign a default value for variant since it's not always passed in
 	return expandTemplate("inline", in, FuncMap,
-		EnvMap(append([]map[string]interface{}{s.evalContext, s.toMap()}, args...)...))
+
+		EnvMap(append([]map[string]interface{}{s.evalContext, {"Variant": ""}, s.toMap()}, args...)...))
 }
 
 // MustExpand expands a templated string using data from the spec. It panics if
@@ -721,7 +724,10 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		"--architecture", spec.Arch,
 	)
 	if packageType == RPM {
-		args = append(args, "--rpm-rpmbuild-define", "_build_id_links none")
+		args = append(args,
+			"--rpm-rpmbuild-define", "_build_id_links none",
+			"--rpm-digest", "sha256",
+		)
 	}
 	if spec.Version != "" {
 		args = append(args, "--version", spec.Version)

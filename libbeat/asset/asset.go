@@ -56,7 +56,7 @@ func init() {
 }
 
 // Asset{{ .GoTypeName }} returns asset data.
-// This is the base64 encoded gzipped contents of {{ .Path }}.
+// This is the base64 encoded zlib format compressed contents of {{ .Path }}.
 func Asset{{ .GoTypeName }}() string {
 	return "{{ .Data }}"
 }
@@ -85,7 +85,7 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 
 	goTypeName := goTypeName(name)
 	var buf bytes.Buffer
-	Template.Execute(&buf, Data{
+	err = Template.Execute(&buf, Data{
 		License:    license,
 		Beat:       beat,
 		Name:       name,
@@ -95,10 +95,13 @@ func CreateAsset(license string, beat string, name string, pkg string, data []by
 		Path:       path,
 		GoTypeName: goTypeName,
 	})
+	if err != nil {
+		return nil, errors.Wrap(err, "error creating golang file from template")
+	}
 
 	bs, err := format.Source(buf.Bytes())
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating golang file from template")
+		return nil, errors.Wrap(err, "error formatting golang file from template")
 	}
 
 	return bs, nil

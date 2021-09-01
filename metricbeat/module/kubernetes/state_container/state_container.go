@@ -47,8 +47,20 @@ var (
 	// Mapping of state metrics
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_pod_info":                                     p.InfoMetric(),
-			"kube_pod_container_info":                           p.InfoMetric(),
+			"kube_pod_info":           p.InfoMetric(),
+			"kube_pod_container_info": p.InfoMetric(),
+			"kube_pod_container_resource_requests": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.request.cores",
+					"memory": "memory.request.bytes",
+				},
+			)),
+			"kube_pod_container_resource_limits": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.limit.cores",
+					"memory": "memory.limit.bytes",
+				},
+			)),
 			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
 			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
 			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
@@ -78,9 +90,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_container", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_container", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -133,15 +145,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Calculate deprecated nanocores values
 	for _, event := range events {
-		if request, ok := event["cpu.request.cores"]; ok {
+		if request, err := event.GetValue("cpu.request.cores"); err == nil {
 			if requestCores, ok := request.(float64); ok {
-				event["cpu.request.nanocores"] = requestCores * nanocores
+				event.Put("cpu.request.nanocores", requestCores*nanocores)
 			}
 		}
 
-		if limit, ok := event["cpu.limit.cores"]; ok {
+		if limit, err := event.GetValue("cpu.limit.cores"); err == nil {
 			if limitCores, ok := limit.(float64); ok {
-				event["cpu.limit.nanocores"] = limitCores * nanocores
+				event.Put("cpu.limit.nanocores", limitCores*nanocores)
 			}
 		}
 

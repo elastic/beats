@@ -20,7 +20,7 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -85,19 +85,6 @@ func Plugin(log *logp.Logger, store cursor.StateStore) inputv2.Plugin {
 	}
 }
 
-func newTLSConfig(config config) (*tlscommon.TLSConfig, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	return tlsConfig, nil
-}
-
 func test(url *url.URL) error {
 	port := func() string {
 		if url.Port() != "" {
@@ -121,7 +108,6 @@ func test(url *url.URL) error {
 func run(
 	ctx inputv2.Context,
 	config config,
-	tlsConfig *tlscommon.TLSConfig,
 	publisher cursor.Publisher,
 	cursor *cursor.Cursor,
 ) error {
@@ -129,7 +115,7 @@ func run(
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	httpClient, err := newHTTPClient(stdCtx, config, tlsConfig)
+	httpClient, err := newHTTPClient(stdCtx, config)
 	if err != nil {
 		return err
 	}
@@ -169,19 +155,21 @@ func run(
 	return nil
 }
 
-func newHTTPClient(ctx context.Context, config config, tlsConfig *tlscommon.TLSConfig) (*http.Client, error) {
+func newHTTPClient(ctx context.Context, config config) (*http.Client, error) {
+	config.Transport.Timeout = config.HTTPClientTimeout
+
+	httpClient, err :=
+		config.Transport.Client(
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithKeepaliveSettings{Disable: true},
+		)
+	if err != nil {
+		return nil, err
+	}
+
 	// Make retryable HTTP client
 	client := &retryablehttp.Client{
-		HTTPClient: &http.Client{
-			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout: config.HTTPClientTimeout,
-				}).DialContext,
-				TLSClientConfig:   tlsConfig.ToConfig(),
-				DisableKeepAlives: true,
-			},
-			Timeout: config.HTTPClientTimeout,
-		},
+		HTTPClient:   httpClient,
 		Logger:       newRetryLogger(),
 		RetryWaitMin: config.RetryWaitMin,
 		RetryWaitMax: config.RetryWaitMax,
