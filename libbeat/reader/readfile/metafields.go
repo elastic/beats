@@ -27,18 +27,21 @@ import (
 type FileMetaReader struct {
 	reader reader.Reader
 	path   string
+	offset int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string) reader.Reader {
-	return &FileMetaReader{r, path}
+func NewFilemeta(r reader.Reader, path string, offset int64) reader.Reader {
+	return &FileMetaReader{r, path, offset}
 }
 
 // Next reads the next line from it's initial io.Reader
 // This converts a io.Reader to a reader.reader
-func (r FileMetaReader) Next() (reader.Message, error) {
+func (r *FileMetaReader) Next() (reader.Message, error) {
 	message, err := r.reader.Next()
+
+	r.offset += int64(message.Bytes)
 
 	// if the message is empty, there is no need to enrich it with file metadata
 	if message.IsEmpty() {
@@ -47,13 +50,13 @@ func (r FileMetaReader) Next() (reader.Message, error) {
 
 	message.Fields.DeepUpdate(common.MapStr{
 		"log": common.MapStr{
-			"offset": message.Bytes,
+			"offset": r.offset,
 			"path":   r.path,
 		},
 	})
 	return message, err
 }
 
-func (r FileMetaReader) Close() error {
+func (r *FileMetaReader) Close() error {
 	return r.reader.Close()
 }
