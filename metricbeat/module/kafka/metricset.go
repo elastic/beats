@@ -61,8 +61,6 @@ func NewMetricSet(base mb.BaseMetricSet, options MetricSetOptions) (*MetricSet, 
 		Retries:     config.Retries,
 		Backoff:     config.Backoff,
 		TLS:         tls,
-		Username:    config.Username,
-		Password:    config.Password,
 		Version:     Version(options.Version),
 		Sasl:        config.Sasl,
 	}

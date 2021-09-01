@@ -19,20 +19,22 @@ package kafka
 
 import (
 	"fmt"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"strings"
 
 	"github.com/Shopify/sarama"
-)
 
+)
+var debugf = logp.MakeDebug("kafka")
 type SaslConfig struct {
+    UserName           string `config:"username"`
+	PassWord           string `config:"password"`
 	SaslMechanism      string `config:"mechanism"`
 	ServiceName        string `config:"serviceName"`
 	Realm              string `config:"realm"`
 	KerberosConfigPath string `config:"kerberosConfigPath"`
-	SaslUsername       string `config:"saslUserName"`
 	KerberosAuthType   string `config:"kerberosAuthType"`
 	KeyTabPath         string `config:"keyTabPath"`
-	SaslPassword       string `config:"saslPassWord"`
 }
 
 const (
@@ -48,15 +50,21 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 		// SASL is not enabled
 		return
 	case saslTypePlaintext:
+		config.Net.SASL.User = c.UserName
+		config.Net.SASL.Password = c.PassWord
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypePlaintext)
 	case saslTypeSCRAMSHA256:
 		config.Net.SASL.Handshake = true
+		config.Net.SASL.User = c.UserName
+		config.Net.SASL.Password = c.PassWord
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA256)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA256}
 		}
 	case saslTypeSCRAMSHA512:
 		config.Net.SASL.Handshake = true
+		config.Net.SASL.User = c.UserName
+		config.Net.SASL.Password = c.PassWord
 		config.Net.SASL.Mechanism = sarama.SASLMechanism(sarama.SASLTypeSCRAMSHA512)
 		config.Net.SASL.SCRAMClientGeneratorFunc = func() sarama.SCRAMClient {
 			return &XDGSCRAMClient{HashGeneratorFcn: SHA512}
@@ -66,13 +74,13 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 		config.Net.SASL.GSSAPI.ServiceName = c.ServiceName
 		config.Net.SASL.GSSAPI.KerberosConfigPath = c.KerberosConfigPath
 		config.Net.SASL.GSSAPI.Realm = c.Realm
-		config.Net.SASL.GSSAPI.Username = c.SaslUsername
+		config.Net.SASL.GSSAPI.Username = c.UserName
 		if c.KerberosAuthType == "keytabAuth" {
 			config.Net.SASL.GSSAPI.AuthType = sarama.KRB5_KEYTAB_AUTH
 			config.Net.SASL.GSSAPI.KeyTabPath = c.KeyTabPath
 		} else {
 			config.Net.SASL.GSSAPI.AuthType = sarama.KRB5_USER_AUTH
-			config.Net.SASL.GSSAPI.Password = c.SaslPassword
+			config.Net.SASL.GSSAPI.Password = c.PassWord
 		}
 	default:
 		// This should never happen because `SaslMechanism` is checked on `Validate()`, keeping a panic to detect it earlier if it happens.
@@ -82,9 +90,9 @@ func (c *SaslConfig) ConfigureSarama(config *sarama.Config) {
 
 func (c *SaslConfig) Validate() error {
 	switch strings.ToUpper(c.SaslMechanism) { // try not to force users to use all upper case
-	case "", saslTypePlaintext, saslTypeSCRAMSHA256, saslTypeSCRAMSHA512:
+	case "", saslTypePlaintext, saslTypeSCRAMSHA256, saslTypeSCRAMSHA512, saslTypeGSSAPI:
 	default:
-		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256", c.SaslMechanism)
+		return fmt.Errorf("not valid SASL mechanism '%v', only supported with PLAIN|SCRAM-SHA-512|SCRAM-SHA-256|GSSAPI", c.SaslMechanism)
 	}
 	return nil
 }

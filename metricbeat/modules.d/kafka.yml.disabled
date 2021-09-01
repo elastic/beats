@@ -29,14 +29,17 @@
   # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
   #ssl.key_passphrase: "yourKeyPassphrase"
 
-  # SASL authentication
-  #username: ""
-  #password: ""
-
-  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512 or GSSAPI.
   # Defaults to PLAIN when `username` and `password` are configured.
-  #sasl.mechanism: ''
-
+  #sasl.username: ""
+  #sasl.password: ""
+  #sasl.mechanism: ""
+  #sasl.serviceName: ""
+  #sasl.realm: ""
+  #sasl.kerberosConfigPath: ""
+  #sasl.kerberosAuthType: ""
+  #sasl.keyTabPath: ""
+#
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka
 #  metricsets:
