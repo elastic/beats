@@ -18,11 +18,9 @@
 package dashboards
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 
 	"github.com/pkg/errors"
 
@@ -40,6 +38,7 @@ type JSONObjectAttribute struct {
 	KibanaSavedObjectMeta map[string]interface{} `json:"kibanaSavedObjectMeta"`
 	Title                 string                 `json:"title"`
 	Type                  string                 `json:"type"`
+	UiStateJSON           map[string]interface{} `json:"uiStateJSON"`
 }
 
 type JSONObject struct {
@@ -170,37 +169,21 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		return content
 	}
 
-	var result []byte
-	r := bufio.NewReader(bytes.NewReader(content))
-	for {
-		line, err := r.ReadBytes('\n')
-		if err != nil {
-			if err == io.EOF {
-				return append(result, replaceInNDJSON(index, line)...)
-			}
-			logp.Err("Error reading bytes from raw dashboard object: %+v", err)
-			return content
-		}
-		result = append(result, replaceInNDJSON(index, line)...)
-	}
-}
-
-func replaceInNDJSON(index string, line []byte) []byte {
-	if len(bytes.TrimSpace(line)) == 0 {
-		return line
+	if len(bytes.TrimSpace(content)) == 0 {
+		return content
 	}
 
 	objectMap := make(map[string]interface{}, 0)
-	err := json.Unmarshal(line, &objectMap)
+	err := json.Unmarshal(content, &objectMap)
 	if err != nil {
 		logp.Err("Failed to convert bytes to map[string]interface: %+v", err)
-		return line
+		return content
 	}
 
 	attributes, ok := objectMap["attributes"].(map[string]interface{})
 	if !ok {
 		logp.Err("Object does not have attributes key")
-		return line
+		return content
 	}
 
 	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
@@ -214,10 +197,69 @@ func replaceInNDJSON(index string, line []byte) []byte {
 	b, err := json.Marshal(objectMap)
 	if err != nil {
 		logp.Err("Error marshaling modified dashboard: %+v", err)
-		return line
+		return content
 	}
 
-	return append(b, newline...)
+	return b
+}
+
+func EncodeJSONObjects(content []byte) []byte {
+	logger := logp.NewLogger("dashboards")
+
+	if len(bytes.TrimSpace(content)) == 0 {
+		return content
+	}
+
+	objectMap := make(map[string]interface{}, 0)
+	err := json.Unmarshal(content, &objectMap)
+	if err != nil {
+		logger.Errorf("Failed to convert bytes to map[string]interface: %+v", err)
+		return content
+	}
+
+	attributes, ok := objectMap["attributes"].(map[string]interface{})
+	if !ok {
+		logger.Errorf("Object does not have attributes key")
+		return content
+	}
+
+	if kibanaSavedObject, ok := attributes["kibanaSavedObjectMeta"].(map[string]interface{}); ok {
+		if searchSourceJSON, ok := kibanaSavedObject["searchSourceJSON"].(map[string]interface{}); ok {
+			b, err := json.Marshal(searchSourceJSON)
+			if err != nil {
+				return content
+			}
+			kibanaSavedObject["searchSourceJSON"] = string(b)
+		}
+	}
+
+	fieldsToStr := []string{"visState", "uiStateJSON", "optionsJSON"}
+	for _, field := range fieldsToStr {
+		if rootField, ok := attributes[field].(map[string]interface{}); ok {
+			b, err := json.Marshal(rootField)
+			if err != nil {
+				return content
+			}
+			attributes[field] = string(b)
+		}
+	}
+
+	if panelsJSON, ok := attributes["panelsJSON"].([]interface{}); ok {
+		b, err := json.Marshal(panelsJSON)
+		if err != nil {
+			return content
+		}
+		attributes["panelsJSON"] = string(b)
+
+	}
+
+	b, err := json.Marshal(objectMap)
+	if err != nil {
+		logger.Error("Error marshaling modified dashboard: %+v", err)
+		return content
+	}
+
+	return b
 
 }
 
