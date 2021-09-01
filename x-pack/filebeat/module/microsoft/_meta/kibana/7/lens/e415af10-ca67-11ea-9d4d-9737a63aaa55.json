@@ -1,0 +1,164 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "ac550ae9-6e17-4944-9545-25bbe83d9dbb": {
+                            "columnOrder": [
+                                "19ade524-0042-4ecd-ac59-9696c8c2e225",
+                                "677e5501-ca31-435c-8eab-38b5297e54c2",
+                                "27212c7c-83ee-4292-a4c6-396d9b77dce6"
+                            ],
+                            "columns": {
+                                "19ade524-0042-4ecd-ac59-9696c8c2e225": {
+                                    "dataType": "number",
+                                    "isBucketed": true,
+                                    "label": "Top values of event.severity",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "27212c7c-83ee-4292-a4c6-396d9b77dce6",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 6
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "event.severity"
+                                },
+                                "27212c7c-83ee-4292-a4c6-396d9b77dce6": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Number of incidents",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "microsoft.defender_atp.incidentId"
+                                },
+                                "677e5501-ca31-435c-8eab-38b5297e54c2": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "24h"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.module",
+                        "negate": false,
+                        "params": {
+                            "query": "microsoft"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.module": "microsoft"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "event.dataset",
+                        "negate": false,
+                        "params": {
+                            "query": "microsoft.defender_atp"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.dataset": "microsoft.defender_atp"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "accessors": [
+                            "27212c7c-83ee-4292-a4c6-396d9b77dce6"
+                        ],
+                        "layerId": "ac550ae9-6e17-4944-9545-25bbe83d9dbb",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "19ade524-0042-4ecd-ac59-9696c8c2e225",
+                        "xAccessor": "677e5501-ca31-435c-8eab-38b5297e54c2"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "ATP New Incidents [Filebeat Microsoft]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e415af10-ca67-11ea-9d4d-9737a63aaa55",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-ac550ae9-6e17-4944-9545-25bbe83d9dbb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:12.667Z",
+    "version": "WzQ0NDgsMV0="
+}

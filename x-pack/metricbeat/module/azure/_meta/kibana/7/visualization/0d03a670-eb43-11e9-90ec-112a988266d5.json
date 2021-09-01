@@ -1,0 +1,71 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "VMSS Disk Writes [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "azure.resource.type :\"Microsoft.Compute/virtualMachineScaleSets\" "
+                },
+                "id": "39b6adc0-ea99-11e9-8328-799c817fb96b",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,180,251,1)",
+                        "fill": 0,
+                        "formatter": "bytes",
+                        "id": "39b6adc1-ea99-11e9-8328-799c817fb96b",
+                        "label": "VM Disk Writes bytes",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm_scaleset.disk_write_bytes.total",
+                                "id": "39b6adc2-ea99-11e9-8328-799c817fb96b",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "azure.resource.name",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "VMSS Disk Writes [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0d03a670-eb43-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:56.299Z",
+    "version": "WzM2MjYsMV0="
+}

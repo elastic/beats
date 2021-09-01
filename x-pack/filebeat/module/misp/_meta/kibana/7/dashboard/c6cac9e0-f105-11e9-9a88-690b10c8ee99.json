@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "Overview dashboard for Filebeat MISP module.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "mapCenter": [
+                        24.686952411999155,
+                        12.128906250000002
+                    ],
+                    "mapZoom": 3
+                },
+                "gridData": {
+                    "h": 24,
+                    "i": "3",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat MISP] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c6cac9e0-f105-11e9-9a88-690b10c8ee99",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8fc4b140-ed36-11e9-9a88-690b10c8ee99",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "7d369390-f105-11e9-9a88-690b10c8ee99",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "73287f70-f1fb-11e9-9a88-690b10c8ee99",
+            "name": "3:panel_3",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:47.233Z",
+    "version": "WzQyOTYsMV0="
+}

@@ -1,0 +1,134 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Broker Store Memory Usage [Metricbeat ActiveMQ]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "a19e8b60-0b9b-11ea-8e0f-4970006b3ce7"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f6955680-0b9b-11ea-8e0f-4970006b3ce7"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "9acca240-0b9b-11ea-8e0f-4970006b3ce7"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "1",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "percent",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Store Memory",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "activemq.broker.memory.store.pct",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": ""
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,204,202,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "7716c9c0-0b9b-11ea-8e0f-4970006b3ce7",
+                        "label": "Store Memory",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "activemq.broker.memory.store.pct",
+                                "id": "7716c9c1-0b9b-11ea-8e0f-4970006b3ce7",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(174,161,255,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "13799400-0b9c-11ea-8e0f-4970006b3ce7",
+                        "label": "Temp Memory",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "activemq.broker.memory.temp.pct",
+                                "id": "13799401-0b9c-11ea-8e0f-4970006b3ce7",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Broker Store Memory Usage [Metricbeat ActiveMQ]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "cb475400-0d22-11ea-ba76-7fb26815d86c",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:54.803Z",
+    "version": "WzQxODQsMV0="
+}

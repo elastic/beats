@@ -1,0 +1,175 @@
+{
+    "attributes": {
+        "description": "Process executions on macOS monitored by Google Santa.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "1",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "2",
+                    "w": 38,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "3",
+                    "w": 10,
+                    "x": 8,
+                    "y": 12
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "4",
+                    "w": 12,
+                    "x": 36,
+                    "y": 12
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5",
+                    "w": 8,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "6",
+                    "w": 18,
+                    "x": 18,
+                    "y": 12
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_5",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "7",
+                    "w": 48,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_6",
+                "version": "7.0.0-alpha1-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Santa] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "161855f0-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "dad521d0-ff69-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "1579d690-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "51677b80-ff6b-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "30962fe0-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "b06c0460-ff6c-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "11858000-ff6d-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "6d56a010-ff6a-11e8-93c5-d5ecd1b3e307-ecs",
+            "name": "panel_6",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:51.587Z",
+    "version": "WzQ5MDIsMV0="
+}

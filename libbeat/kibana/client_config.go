@@ -18,6 +18,8 @@
 package kibana
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
@@ -29,6 +31,7 @@ type ClientConfig struct {
 	SpaceID  string `config:"space.id" yaml:"space.id,omitempty"`
 	Username string `config:"username" yaml:"username,omitempty"`
 	Password string `config:"password" yaml:"password,omitempty"`
+	APIKey   string `config:"api_key" yaml:"api_key,omitempty"`
 
 	// Headers holds headers to include in every request sent to Kibana.
 	Headers map[string]string `config:"headers" yaml:"headers,omitempty"`
@@ -47,6 +50,15 @@ func DefaultClientConfig() ClientConfig {
 		SpaceID:   "",
 		Username:  "",
 		Password:  "",
+		APIKey:    "",
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
+}
+
+func (c *ClientConfig) Validate() error {
+	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
+		return fmt.Errorf("cannot set both api_key and username/password")
+	}
+
+	return nil
 }
