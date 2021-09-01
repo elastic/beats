@@ -1,0 +1,47 @@
+# Time: 2021-07-27T08:48:41.65181068Z
+# Txn_start_ts: 426606780115058697
+# Query_time: 4.031495087
+# Parse_time: 0
+# Compile_time: 0.000078406
+# Rewrite_time: 0.000020653
+# Optimize_time: 0
+# Wait_TS: 0.000394724
+# Prewrite_time: 2.632370077 Commit_time: 1.397391608 Get_commit_ts_time: 0.000472376 Write_keys: 1 Write_size: 122 Prewrite_region: 1
+# Is_internal: true
+# Digest: 61f4cce222f1a26d6b0650865051ebed3d077412ae053636e2f5acf9dc426a42
+# Num_cop_tasks: 0
+# Mem_max: 426
+# Prepared: false
+# Plan_from_cache: false
+# Plan_from_binding: false
+# Has_more_results: false
+# KV_total: 0
+# PD_total: 0
+# Backoff_total: 0
+# Write_sql_response_total: 0
+# Succ: true
+# Plan: tidb_decode_plan('5wPwYTAJMjdfMQkwCTAJTi9BCTAJdGltZToxLjEzbXMsIGxvb3BzOjEsIHByZXBhcmU6NDA0LjjCtXMsIGNoZWNrX2luc2VydDoge3RvdGFsX3RpbWU6IDcyNy4zwrVzLCBtZW1fCSMNGww0MC4zBRowcHJlZmV0Y2g6IDY4NwUSSHJwYzp7QmF0Y2hHZXQ6e251bV8BExAyLCB0bxVcXDY2Mi4ywrVzfSwgc2Nhbl9kZXRhaWw6IA2ANHByb2Nlc3Nfa2V5czogFTsVD5hyb2Nrc2RiOiB7ZGVsZXRlX3NraXBwZWRfY291bnQ6IDAsIGtleV9GFgBAYmxvY2s6IHtjYWNoZV9oaXQRMhQ0LCByZWEuQQAFDzRieXRlOiAwIEJ5dGVzfQEBgCwgY29tbWl0X3R4bjoge3ByZXdyaXRlOjIuNjNzLCBnZQFTCSEYczo0NzIuNCUWCTUQOjEuNHMBahxnaW9uX251bSGUBUAAXwXcBDEsDQ4FeEgxMjJ9CTQyNiBCeXRlcwlOL0EK')
+insert high_priority into `mysql` . `tidb` values ( ... ) on duplicate key update `variable_value` = ? , comment = ?;
+# Time: 2021-07-27T09:12:13.248952382Z
+# Txn_start_ts: 426607150957592581
+# Query_time: 0.978201407
+# Parse_time: 0
+# Compile_time: 0.000060346
+# Rewrite_time: 0.000051286
+# Optimize_time: 0.000106638
+# Wait_TS: 0.00093993
+# Is_internal: true
+# Digest: eb0c9baca7c61312b753f264dfc7490def2c8148368f80007e02c1731bd2954f
+# Num_cop_tasks: 0
+# Prepared: false
+# Plan_from_cache: false
+# Plan_from_binding: false
+# Has_more_results: false
+# KV_total: 0.977094998
+# PD_total: 0.000938541
+# Backoff_total: 0
+# Write_sql_response_total: 0
+# Succ: true
+# Plan: tidb_decode_plan('tQLAMAkzNl8xCTAJMQl0YWJsZTpHTE9CQUxfVkFSSUFCTEVTLCBpbmRleDpQUklNQVJZKBEZFF9OQU1FKQE3sGltZTo5NzcuMm1zLCBsb29wczoyLCBHZXQ6e251bV9ycGM6MiwgdG90YWxfdBEtUDFtc30sIHNjYW5fZGV0YWlsOiB7dAUjNHByb2Nlc3Nfa2V5czogFToVD5hyb2Nrc2RiOiB7ZGVsZXRlX3NraXBwZWRfY291bnQ6IDAsIGtleV9GFgBAYmxvY2s6IHtjYWNoZV9oaXQRMhgxNCwgcmVhLkIABQ9gYnl0ZTogMCBCeXRlc319fQlOL0EJTi9BCg==')
+# Plan_digest: 2cf7bebc039a0af1d53dba47467e97ece2c54e8a3ab5195ee0c3f61acec580a9
+SELECT VARIABLE_VALUE FROM `mysql`.`GLOBAL_VARIABLES` WHERE VARIABLE_NAME='tidb_partition_prune_mode';

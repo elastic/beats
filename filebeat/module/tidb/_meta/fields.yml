@@ -1,19 +1,11 @@
 - key: tidb
   title: "TiDB"
-  release: ga
   description: >
     TiDB Module
+  short_config: true
   fields:
     - name: tidb
       type: group
       description: >
         Common fields in the TiDB Module.
       fields:
-        - name: host
-          type: alias
-          path: source.domain
-          migration: true
-        - name: ip
-          type: alias
-          path: source.ip
-          migration: true

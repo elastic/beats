@@ -158349,24 +158349,6 @@ Common fields in the TiDB Module.
 
 
 
-*`tidb.host`*::
-+
---
-type: alias
-
-alias to: source.domain
-
---
-
-*`tidb.ip`*::
-+
---
-type: alias
-
-alias to: source.ip
-
---
-
 [float]
 === slowlog
 
@@ -158388,6 +158370,33 @@ type: date_nanos
 +
 --
 The execution time of a statement.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Optimize_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Wait_TS`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Num_cop_tasks`*::
++
+--
 
 
 type: double
@@ -158424,10 +158433,28 @@ type: text
 
 --
 
+*`tidb.slowlog.Prev_stmt`*::
++
+--
+
+
+type: text
+
+--
+
 *`tidb.slowlog.Digest`*::
 +
 --
 The fingerprint of the SQL statement.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Stats`*::
++
+--
 
 
 type: keyword
@@ -158484,10 +158511,28 @@ type: double
 
 --
 
+*`tidb.slowlog.LockKeys_time`*::
++
+--
+
+
+type: double
+
+--
+
 *`tidb.slowlog.Plan`*::
 +
 --
 The execution plan of the statement. Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Plan_digest`*::
++
+--
 
 
 type: keyword
@@ -158508,6 +158553,24 @@ type: boolean
 +
 --
 Whether this statement hits the execution plan cache.
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Plan_from_binding`*::
++
+--
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Has_more_results`*::
++
+--
 
 
 type: boolean
@@ -158573,6 +158636,15 @@ type: double
 
 --
 
+*`tidb.slowlog.Wait_prewrite_binlog_time`*::
++
+--
+
+
+type: double
+
+--
+
 *`tidb.slowlog.Commit_time`*::
 +
 --
@@ -158587,6 +158659,33 @@ type: double
 +
 --
 The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Commit_backoff_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_types`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Resolve_lock_time`*::
++
+--
 
 
 type: double
@@ -158633,6 +158732,24 @@ type: double
 
 --
 
+*`tidb.slowlog.Txn_retry`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_time`*::
++
+--
+
+
+type: double
+
+--
+
 *`tidb.slowlog.Mem_max`*::
 +
 --
@@ -158673,10 +158790,28 @@ type: keyword
 
 --
 
+*`tidb.slowlog.Host`*::
++
+--
+
+
+type: keyword
+
+--
+
 *`tidb.slowlog.DB`*::
 +
 --
 The current database.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Index_names`*::
++
+--
 
 
 type: keyword
@@ -158697,6 +158832,51 @@ type: double
 +
 --
 The number of keys that Coprocessor has scanned.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.KV_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.PD_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_Detail`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Write_sql_response_total`*::
++
+--
 
 
 type: double
@@ -158810,6 +158990,51 @@ The address of the cop-task whose waiting time is the longest.
 
 
 type: keyword
+
+--
+
+*`tidb.slowlog.Rocksdb_delete_skipped_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_key_skipped_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_cache_hit_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_read_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_read_byte`*::
++
+--
+
+
+type: double
 
 --
 

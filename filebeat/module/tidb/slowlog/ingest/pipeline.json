@@ -1,7 +1,11 @@
 {
   "description": "Pipeline for parsing tidb slowlog logs",
-  "processors": [
-    ],
+  "processors": [{
+    "set": {
+      "field": "event.ingested",
+      "value": "{{_ingest.timestamp}}"
+    }
+  }],
   "on_failure" : [{
     "set" : {
       "field" : "error.message",

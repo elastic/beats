@@ -1,11 +1,11 @@
 type: log
 
 paths:
-  { { range $i, $path := .paths } }
-  - { { $path } }
-    { { end } }
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
 
-exclude_files: [ ".gz$" ]
+exclude_files: ['.gz$']
 
 multiline:
   type: pattern
@@ -18,12 +18,12 @@ processors:
   - script:
       lang: javascript
       id: tidb_slow_log_parser
-      params: {}
+      params: { }
       source: >
-        let params = {
-            slowlog_plan_prefix: "tidb_decode_plan('",
-            slowlog_plan_suffix: "')",
-            kvRegex: new RegExp("(\S+): (\S+)"),
+        var params = {
+            lineRegex: /[^\r\n]+/g,
+            kvRegex: /(\S+): (\S+)/g,
+            keyPrefix: "tidb.slowlog."
         };
 
         function register(scriptParams) {
@@ -40,15 +40,23 @@ processors:
             }
 
             // split lines
-            var lines = m0.match(/[^\r\n]+/g);
+            var lines = m0.match(params.lineRegex);
             if (lines.length < 3) {
                 event.Cancel();
                 return;
             }
 
+            // a var handling multiline query
+            var query = ""
+
             // extract k-v's
-            for (var i = 0; i < lines.length - 1; i++) {
+            for (var i = 0; i < lines.length; i++) {
                 // for each line in a slow log
+                // if a line does not start with a "#" char, treat it as a part of query
+                if (lines[i].lastIndexOf("#", 0) !== 0) {
+                    query = query + lines[i]
+                    continue
+                }
                 var match;
                 while (match = params.kvRegex.exec(lines[i])) {
                     // for each k-v in a line
@@ -58,23 +66,16 @@ processors:
                     }
                     var k = match[1]
                     var v = match[2]
-                    if (k === "Txn_start_ts" || k === "Conn_ID") {
-                        // no need to parse special keys
-                        event.Put(k, v)
-                        continue
-                    }
-                    // try to parse other fields to numbers
-                    var num = parseFloat(v)
-                    if (!isNaN(num)) {
-                        event.Put(k, num)
-                    } else {
-                        event.Put(k, v)
-                    }
+                    event.Put(params.keyPrefix + k, v)
                 }
             }
 
-            // add Query
-            event.Put("Query", lines[lines.length - 1])
+            // put the final query
+            event.Put(params.keyPrefix + "Query", query)
 
             return event
         }
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.11.0

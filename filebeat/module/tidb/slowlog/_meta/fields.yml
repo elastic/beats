@@ -11,6 +11,15 @@
       type: double
       description: >
         The execution time of a statement.
+    - name: Optimize_time
+      type: double
+      description: >
+    - name: Wait_TS
+      type: double
+      description: >
+    - name: Num_cop_tasks
+      type: double
+      description: >
     - name: Parse_time
       type: double
       description: >
@@ -24,10 +33,16 @@
       description: >
         A SQL statement. This field is not printed as a key in the slow log.
         It is the last line of the slow log.
+    - name: Prev_stmt
+      type: text
+      description: >
     - name: Digest
       type: keyword
       description: >
         The fingerprint of the SQL statement.
+    - name: Stats
+      type: keyword
+      description: >
     - name: Txn_start_ts
       type: keyword
       description: >
@@ -52,11 +67,17 @@
       description: >
         The waiting time before retry when a statement encounters errors that require a retry.
         The common errors as such include: lock occurs, Region split, and TiKV server is busy.
+    - name: LockKeys_time
+      type: double
+      description: >
     - name: Plan
       type: keyword
       description: >
         The execution plan of the statement.
         Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
+    - name: Plan_digest
+      type: keyword
+      description: >
     - name: Prepared
       type: boolean
       description: >
@@ -65,6 +86,12 @@
       type: boolean
       description: >
         Whether this statement hits the execution plan cache.
+    - name: Plan_from_binding
+      type: boolean
+      description: >
+    - name: Has_more_results
+      type: boolean
+      description: >
     - name: Rewrite_time
       type: double
       description: >
@@ -94,6 +121,9 @@
       type: double
       description: >
         The duration of the first phase (prewrite) of the two-phase transaction commit.
+    - name: Wait_prewrite_binlog_time
+      type: double
+      description: >
     - name: Commit_time
       type: double
       description: >
@@ -102,6 +132,15 @@
       type: double
       description: >
         The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
+    - name: Commit_backoff_time
+      type: double
+      description: >
+    - name: Backoff_types
+      type: keyword
+      description: >
+    - name: Resolve_lock_time
+      type: double
+      description: >
     - name: Local_latch_wait_time
       type: double
       description: >
@@ -119,6 +158,12 @@
       description: >
         The number of TiKV Regions involved in the first phase (prewrite) of the two-phase transaction commit.
         Each Region triggers a remote procedure call.
+    - name: Txn_retry
+      type: double
+      description: >
+    - name: Cop_time
+      type: double
+      description: >
     - name: Mem_max
       type: double
       description: >
@@ -135,10 +180,16 @@
       type: keyword
       description: >
         The Connection ID (session ID). For example, you can use the keyword con:3 to search for the log whose session ID is 3.
+    - name: Host
+      type: keyword
+      description: >
     - name: DB
       type: keyword
       description: >
         The current database.
+    - name: Index_names
+      type: keyword
+      description: >
     - name: Request_count
       type: double
       description: >
@@ -147,6 +198,21 @@
       type: double
       description: >
         The number of keys that Coprocessor has scanned.
+    - name: KV_total
+      type: double
+      description: >
+    - name: PD_total
+      type: double
+      description: >
+    - name: Backoff_total
+      type: double
+      description: >
+    - name: Backoff_Detail
+      type: keyword
+      description: >
+    - name: Write_sql_response_total
+      type: double
+      description: >
     - name: Process_time
       type: double
       description: >
@@ -198,3 +264,18 @@
       type: keyword
       description: >
         The address of the cop-task whose waiting time is the longest.
+    - name: Rocksdb_delete_skipped_count
+      type: double
+      description: >
+    - name: Rocksdb_key_skipped_count
+      type: double
+      description: >
+    - name: Rocksdb_block_cache_hit_count
+      type: double
+      description: >
+    - name: Rocksdb_block_read_count
+      type: double
+      description: >
+    - name: Rocksdb_block_read_byte
+      type: double
+      description: >
