@@ -71,6 +71,15 @@ func TestSimpleCases(t *testing.T) {
 			},
 			true,
 		},
+		{
+			"bad proxy",
+			common.MapStr{
+				"url":     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+				"folder":  "/",
+				"retries": 3,
+			},
+			true,
+		},
 	}
 
 	for _, tc := range testCases {
