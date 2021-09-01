@@ -72,18 +72,14 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 		expected  []byte
 	}{
 		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"metricbeat-*\"}"}}}
-`),
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"metricbeat-*\"}"}}}`),
 			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}
-`),
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}`),
 		},
 		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}
-`),
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}`),
 			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}
-`),
+			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}`),
 		},
 	}
 
