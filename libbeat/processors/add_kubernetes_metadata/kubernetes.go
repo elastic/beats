@@ -268,6 +268,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		k.log.Debug("No container match string, not adding kubernetes data")
 		return event, nil
 	}
+
 	k.log.Debugf("Using the following index key %s", index)
 	metadata := k.cache.get(index)
 	if metadata == nil {
