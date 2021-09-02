@@ -793,7 +793,7 @@ func createFleetServerBootstrapConfig(
 		}
 	}
 	es.ProxyURL = proxyURL
-	es.ProxyDisabled = proxyDisabled
+	es.ProxyDisable = proxyDisabled
 	es.ProxyHeaders = proxyHeaders
 
 	cfg := configuration.DefaultFleetAgentConfig()
