@@ -1,0 +1,86 @@
+[
+    {
+        "@timestamp": "2021-09-01T16:19:40.379Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 0,
+        "service.type": "tidb",
+        "tidb.tikv.level": "INFO",
+        "tidb.tikv.log_message": "[\"gc_worker: finished auto gc\"] [processed_regions=899]",
+        "tidb.tikv.source_line": "gc_manager.rs:456"
+    },
+    {
+        "@timestamp": "2021-09-01T16:29:40.394Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 116,
+        "service.type": "tidb",
+        "tidb.tikv.level": "INFO",
+        "tidb.tikv.log_message": "[\"gc_worker: start auto gc\"] [safe_point=427361418349903872]",
+        "tidb.tikv.source_line": "gc_manager.rs:416"
+    },
+    {
+        "@timestamp": "2021-09-01T16:29:41.097Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 237,
+        "service.type": "tidb",
+        "tidb.tikv.level": "INFO",
+        "tidb.tikv.log_message": "[\"gc_worker: finished auto gc\"] [processed_regions=899]",
+        "tidb.tikv.source_line": "gc_manager.rs:456"
+    },
+    {
+        "@timestamp": "2021-09-01T16:39:23.493Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 353,
+        "service.type": "tidb",
+        "tidb.tikv.level": "WARN",
+        "tidb.tikv.log_message": "[error-response] [err=\"Key is locked (will clean up) primary_lock: 748000000000001BD55F728000000000007531 lock_version: 427429557295644678 key: 748000000000001BD55F728000000000007531 lock_ttl: 20002 txn_size: 1 lock_for_update_ts: 427429557295644678\"]",
+        "tidb.tikv.source_line": "endpoint.rs:540"
+    },
+    {
+        "@timestamp": "2021-09-01T16:39:23.494Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 663,
+        "service.type": "tidb",
+        "tidb.tikv.level": "WARN",
+        "tidb.tikv.log_message": "[error-response] [err=\"Key is locked (will clean up) primary_lock: 748000000000001BD55F728000000000007531 lock_version: 427429557295644678 key: 748000000000001BD55F728000000000007531 lock_ttl: 20002 txn_size: 1 lock_for_update_ts: 427429557295644678\"]",
+        "tidb.tikv.source_line": "endpoint.rs:540"
+    },
+    {
+        "@timestamp": "2021-09-01T16:39:23.494Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 973,
+        "service.type": "tidb",
+        "tidb.tikv.level": "WARN",
+        "tidb.tikv.log_message": "[error-response] [err=\"Key is locked (will clean up) primary_lock: 748000000000001BD55F728000000000007531 lock_version: 427429557295644678 key: 748000000000001BD55F728000000000007531 lock_ttl: 20002 txn_size: 1 lock_for_update_ts: 427429557295644678\"]",
+        "tidb.tikv.source_line": "endpoint.rs:540"
+    },
+    {
+        "@timestamp": "2021-09-02T07:25:01.698Z",
+        "event.dataset": "tidb.tikv",
+        "event.module": "tidb",
+        "fileset.name": "tikv",
+        "input.type": "log",
+        "log.offset": 1283,
+        "service.type": "tidb",
+        "tidb.tikv.level": "INFO",
+        "tidb.tikv.log_message": "[\"[db/db_impl/db_impl.cc:636] STATISTICS:\\n rocksdb.block.cache.miss COUNT : 0\\nrocksdb.block.cache.hit COUNT : 25\\nrocksdb.block.cache.add COUNT : 0\\nrocksdb.block.cache.add.failures COUNT : 0\\nrocksdb.block.cache.index.miss COUNT : 0\\nrocksdb.block.cache.index.hit COUNT : 4\\nrocksdb.block.cache.index.add COUNT : 0\\nrocksdb.block.cache.index.bytes.insert COUNT : 0\\nrocksdb.block.cache.index.bytes.evict COUNT : 0\\nrocksdb.block.cache.filter.miss COUNT : 0\\nrocksdb.block.cache.filter.hit COUNT : 0\\nrocksdb.block.cache.filter.add COUNT : 0\\nrocksdb.block.cache.filter.bytes.insert COUNT : 0\\nrocksdb.block.cache.filter.bytes.evict COUNT : 0\\nrocksdb.block.cache.data.miss COUNT : 0\\nrocksdb.block.cache.data.hit COUNT : 21\\nrocksdb.block.cache.data.add COUNT : 0\\nrocksdb.block.cache.data.bytes.insert COUNT : 0\\nrocksdb.block.cache.bytes.read COUNT : 1126608\\nrocksdb.block.cache.bytes.write COUNT : 0\\nrocksdb.bloom.filter.useful COUNT : 0\\nrocksdb.bloom.filter.full.positive COUNT : 0\\nrocksdb.bloom.filter.full.true.positive COUNT : 0\\nrocksdb.bloom.filter.micros COUNT : 0\\nrocksdb.persistent.cache.hit COUNT : 0\\nrocksdb.persistent.cache.miss COUNT : 0\\nrocksdb.sim.block.cache.hit COUNT : 0\\nrocksdb.sim.block.cache.miss COUNT : 0\\nrocksdb.memtable.hit COUNT : 10\\nrocksdb.memtable.miss COUNT : 14\\nrocksdb.l0.hit COUNT : 0\\nrocksdb.l1.hit COUNT : 0\\nrocksdb.l2andup.hit COUNT : 0\\nrocksdb.compaction.key.drop.new COUNT : 0\\nrocksdb.compaction.key.drop.obsolete COUNT : 0\\nrocksdb.compaction.key.drop.range_del COUNT : 0\\nrocksdb.compaction.key.drop.user COUNT : 0\\nrocksdb.compaction.range_del.drop.obsolete COUNT : 0\\nrocksdb.compaction.optimized.del.drop.obsolete COUNT : 0\\nrocksdb.compaction.cancelled COUNT : 0\\nrocksdb.number.keys.written COUNT : 0\\nrocksdb.number.keys.read COUNT : 24\\nrocksdb.number.keys.updated COUNT : 0\\nrocksdb.bytes.written COUNT : 0\\nrocksdb.bytes.read COUNT : 120\\nrocksdb.number.db.seek COUNT : 26\\nrocksdb.number.db.next COUNT : 2\\nrocksdb.number.db.prev COUNT : 0\\nrocksdb.number.db.seek.found COUNT : 18\\nrocksdb.number.db.next.found COUNT : 0\\nrocksdb.number.db.prev.found COUNT : 0\\nrocksdb.db.iter.bytes.read COUNT : 1495\\nrocksdb.no.file.closes COUNT : 0\\nrocksdb.no.file.opens COUNT : 0\\nrocksdb.no.file.errors COUNT : 0\\nrocksdb.l0.slowdown.micros COUNT : 0\\nrocksdb.memtable.compaction.micros COUNT : 0\\nrocksdb.l0.num.files.stall.micros COUNT : 0\\nrocksdb.stall.micros COUNT : 0\\nrocksdb.db.mutex.wait.micros COUNT : 0\\nrocksdb.rate.limit.delay.millis COUNT : 0\\nrocksdb.num.iterators COUNT : 0\\nrocksdb.number.multiget.get COUNT : 0\\nrocksdb.number.multiget.keys.read COUNT : 0\\nrocksdb.number.multiget.bytes.read COUNT : 0\\nrocksdb.number.deletes.filtered COUNT : 0\\nrocksdb.number.merge.failures COUNT : 0\\nrocksdb.bloom.filter.prefix.checked COUNT : 18\\nrocksdb.bloom.filter.prefix.useful COUNT : 2\\nrocksdb.number.reseeks.iteration COUNT : 0\\nrocksdb.getupdatessince.calls COUNT : 0\\nrocksdb.block.cachecompressed.miss COUNT : 0\\nrocksdb.block.cachecompressed.hit COUNT : 0\\nrocksdb.block.cachecompressed.add COUNT : 0\\nrocksdb.block.cachecompressed.add.failures COUNT : 0\\nrocksdb.wal.synced COUNT : 0\\nrocksdb.wal.bytes COUNT : 0\\nrocksdb.write.self COUNT : 0\\nrocksdb.write.other COUNT : 0\\nrocksdb.write.timeout COUNT : 0\\nrocksdb.write.wal COUNT : 0\\nrocksdb.compact.read.bytes COUNT : 0\\nrocksdb.compact.write.bytes COUNT : 0\\nrocksdb.flush.write.bytes COUNT : 0\\nrocksdb.number.direct.load.table.properties COUNT : 0\\nrocksdb.number.superversion_acquires COUNT : 0\\nrocksdb.number.superversion_releases COUNT : 0\\nrocksdb.number.superversion_cleanups COUNT : 0\\nrocksdb.number.block.compressed COUNT : 0\\nrocksdb.number.block.decompressed COUNT : 0\\nrocksdb.number.block.not_compressed COUNT : 0\\nrocksdb.merge.operation.time.nanos COUNT : 0\\nrocksdb.filter.operation.time.nanos COUNT : 0\\nrocksdb.row.cache.hit COUNT : 0\\nrocksdb.row.cache.miss COUNT : 0\\nrocksdb.read.amp.estimate.useful.bytes COUNT : 0\\nrocksdb.read.amp.total.read.bytes COUNT : 0\\nrocksdb.number.rate_limiter.drains COUNT : 0\\nrocksdb.number.iter.skip COUNT : 16\\nrocksdb.blobdb.num.put COUNT : 0\\nrocksdb.blobdb.num.write COUNT : 0\\nrocksdb.blobdb.num.get COUNT : 0\\nrocksdb.blobdb.num.multiget COUNT : 0\\nrocksdb.blobdb.num.seek COUNT : 0\\nrocksdb.blobdb.num.next COUNT : 0\\nrocksdb.blobdb.num.prev COUNT : 0\\nrocksdb.blobdb.num.keys.written COUNT : 0\\nrocksdb.blobdb.num.keys.read COUNT : 0\\nrocksdb.blobdb.bytes.written COUNT : 0\\nrocksdb.blobdb.bytes.read COUNT : 0\\nrocksdb.blobdb.write.inlined COUNT : 0\\nrocksdb.blobdb.write.inlined.ttl COUNT : 0\\nrocksdb.blobdb.write.blob COUNT : 0\\nrocksdb.blobdb.write.blob.ttl COUNT : 0\\nrocksdb.blobdb.blob.file.bytes.written COUNT : 0\\nrocksdb.blobdb.blob.file.bytes.read COUNT : 0\\nrocksdb.blobdb.blob.file.synced COUNT : 0\\nrocksdb.blobdb.blob.index.expired.count COUNT : 0\\nrocksdb.blobdb.blob.index.expired.size COUNT : 0\\nrocksdb.blobdb.blob.index.evicted.count COUNT : 0\\nrocksdb.blobdb.blob.index.evicted.size COUNT : 0\\nrocksdb.blobdb.gc.num.files COUNT : 0\\nrocksdb.blobdb.gc.num.new.files COUNT : 0\\nrocksdb.blobdb.gc.failures COUNT : 0\\nrocksdb.blobdb.gc.num.keys.overwritten COUNT : 0\\nrocksdb.blobdb.gc.num.keys.expired COUNT : 0\\nrocksdb.blobdb.gc.num.keys.relocated COUNT : 0\\nrocksdb.blobdb.gc.bytes.overwritten COUNT : 0\\nrocksdb.blobdb.gc.bytes.expired COUNT : 0\\nrocksdb.blobdb.gc.bytes.relocated COUNT : 0\\nrocksdb.blobdb.fifo.num.files.evicted COUNT : 0\\nrocksdb.blobdb.fifo.num.keys.evicted COUNT : 0\\nrocksdb.blobdb.fifo.bytes.evicted COUNT : 0\\nrocksdb.txn.overhead.mutex.prepare COUNT : 0\\nrocksdb.txn.overhead.mutex.old.commit.map COUNT : 0\\nrocksdb.txn.overhead.duplicate.key COUNT : 0\\nrocksdb.txn.overhead.mutex.snapshot COUNT : 0\\nrocksdb.number.multiget.keys.found COUNT : 0\\nrocksdb.num.iterator.created COUNT : 116\\nrocksdb.num.iterator.deleted COUNT : 116\\nrocksdb.block.cache.compression.dict.miss COUNT : 0\\nrocksdb.block.cache.compression.dict.hit COUNT : 0\\nrocksdb.block.cache.compression.dict.add COUNT : 0\\nrocksdb.block.cache.compression.dict.bytes.insert COUNT : 0\\nrocksdb.block.cache.compression.dict.bytes.evict COUNT : 0\\nrocksdb.db.get.micros P50 : 0.582251 P95 : 9.100000 P99 : 20.567333 P100 : 54.000000 COUNT : 807 SUM : 1628\\nrocksdb.db.write.micros P50 : 45.333333 P95 : 54.000000 P99 : 54.000000 P100 : 54.000000 COUNT : 4 SUM : 182\\nrocksdb.compaction.times.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.compaction.times.cpu_micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.subcompaction.setup.times.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.table.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.compaction.outfile.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.wal.file.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.manifest.file.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.table.open.io.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.db.multiget.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.read.block.compaction.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.read.block.get.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.write.raw.block.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.l0.slowdown.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.memtable.compaction.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.num.files.stall.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.hard.rate.limit.delay.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.soft.rate.limit.delay.count P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.numfiles.in.singlecompaction P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.db.seek.micros P50 : 1.477752 P95 : 21.193939 P99 : 33.536000 P100 : 52.000000 COUNT : 816 SUM : 3587\\nrocksdb.db.write.stall P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.sst.read.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.num.subcompactions.scheduled P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.bytes.per.read P50 : 0.518638 P95 : 0.985411 P99 : 20.300400 P100 : 69.000000 COUNT : 807 SUM : 653\\nrocksdb.bytes.per.write P50 : 130.000000 P95 : 157.000000 P99 : 157.000000 P100 : 157.000000 COUNT : 4 SUM : 498\\nrocksdb.bytes.per.multiget P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.bytes.compressed P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.bytes.decompressed P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.compression.times.nanos P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.decompression.times.nanos P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.read.num.merge_operands P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.key.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.value.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.write.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.get.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.multiget.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.seek.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.next.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.prev.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.blob.file.write.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.blob.file.read.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.blob.file.sync.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.gc.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.compression.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.blobdb.decompression.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.db.flush.micros P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.sst.batch.size P50 : 0.000000 P95 : 0.000000 P99 : 0.000000 P100 : 0.000000 COUNT : 0 SUM : 0\\nrocksdb.db.write.wal.time P50 : 15.000000 P95 : 28.000000 P99 : 28.000000 P100 : 28.000000 COUNT : 4 SUM : 77\\n\"]",
+        "tidb.tikv.source_line": "logger.rs:13"
+    }
+]
