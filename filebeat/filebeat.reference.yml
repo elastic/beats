@@ -416,6 +416,12 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
+  tiflash:
+    enabled: true
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik
   # Access logs

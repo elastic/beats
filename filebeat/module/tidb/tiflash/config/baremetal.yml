@@ -1,19 +1,16 @@
-type: container
+type: log
 
 paths:
-  - /var/log/containers/*tikv*.log
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
 
 exclude_files:
   - '.gz$'
 
 processors:
-  - add_kubernetes_metadata:
-    host: ${NODE_NAME}
-    matchers:
-      - logs_path:
-          logs_path: "/var/log/containers/"
   - dissect:
-      tokenizer: '[%{time}] [%{tidb.tikv.level}] [%{tidb.tikv.source_line}] %{tidb.tikv.log_message}'
+      tokenizer: '[%{time}] [%{tidb.tiflash.level}] [%{tidb.tiflash.source_line}] %{tidb.tiflash.log_message}'
       field: "message"
       target_prefix: ""
       ignore_failure: true
@@ -26,7 +23,7 @@ processors:
         - '2021/09/02 04:08:27.541 +00:00'
   - drop_fields:
       when:
-        has_fields: [ 'tidb.tikv.source_line' ]
+        has_fields: [ 'tidb.tiflash.source_line' ]
       fields: [ "message", "time" ]
   - add_fields:
       target: ''
