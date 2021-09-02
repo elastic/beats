@@ -25,6 +25,10 @@ import (
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
 )
 
+var notReportedErrors = []error{
+	context.Canceled,
+}
+
 // Manager handles internal config updates. By retrieving
 // new configs from Kibana and applying them to the Beat.
 type Manager struct {
@@ -147,6 +151,22 @@ func (cm *Manager) UpdateStatus(status lbmanagement.Status, msg string) {
 	}
 }
 
+// updateStatusWithError updates the manager with the current status for the beat with error.
+func (cm *Manager) updateStatusWithError(err error) {
+	if err == nil {
+		return
+	}
+
+	for _, e := range notReportedErrors {
+		if errors.Is(err, e) {
+			return
+		}
+	}
+
+	cm.logger.Error(err)
+	cm.UpdateStatus(lbmanagement.Failed, err.Error())
+}
+
 func (cm *Manager) OnConfig(s string) {
 	cm.UpdateStatus(lbmanagement.Configuring, "Updating configuration")
 
@@ -154,30 +174,27 @@ func (cm *Manager) OnConfig(s string) {
 	uconfig, err := common.NewConfigFrom(s)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
-		cm.logger.Error(err)
-		cm.UpdateStatus(lbmanagement.Failed, err.Error())
+		cm.updateStatusWithError(err)
 		return
 	}
 
 	err = uconfig.Unpack(&configMap)
 	if err != nil {
 		err = errors.Wrap(err, "config blocks unsuccessfully generated")
-		cm.logger.Error(err)
-		cm.UpdateStatus(lbmanagement.Failed, err.Error())
+		cm.updateStatusWithError(err)
 		return
 	}
 
 	blocks, err := cm.toConfigBlocks(configMap)
 	if err != nil {
 		err = errors.Wrap(err, "failed to parse configuration")
-		cm.logger.Error(err)
-		cm.UpdateStatus(lbmanagement.Failed, err.Error())
+		cm.updateStatusWithError(err)
 		return
 	}
 
 	if errs := cm.apply(blocks); errs != nil {
 		// `cm.apply` already logs the errors; currently allow beat to run degraded
-		cm.UpdateStatus(lbmanagement.Failed, errs.Error())
+		cm.updateStatusWithError(err)
 		return
 	}
 
