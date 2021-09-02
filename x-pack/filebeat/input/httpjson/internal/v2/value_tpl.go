@@ -56,6 +56,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"div":                 div,
 			"hmac":                hmacString,
 			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -252,6 +253,15 @@ func base64Encode(values ...string) string {
 	}
 
 	return base64.StdEncoding.EncodeToString([]byte(data))
+}
+
+func base64EncodeNoPad(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.RawStdEncoding.EncodeToString([]byte(data))
 }
 
 func hmacString(hmacType string, hmacKey string, values ...string) string {
