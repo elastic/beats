@@ -15,51 +15,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
-
-type ZipURLSourceWrapper struct {
-	zus *ZipURLSource
-}
-
-func (zb *ZipURLSourceWrapper) Fetch() error {
-	return zb.zus.Fetch()
-}
-
-func (zb *ZipURLSourceWrapper) Workdir() string {
-	return zb.zus.Workdir()
-}
-
-func (zb *ZipURLSourceWrapper) Close() error {
-	return zb.zus.Close()
-}
-
-func (zb *ZipURLSourceWrapper) Unpack(rawMap interface{}) error {
-	cfg, err := common.NewConfigFrom(rawMap)
-	if err != nil {
-		return fmt.Errorf("could create new config from interface for zip_url: %w", err)
-	}
-
-	zus := ZipURLSource{}
-	err = cfg.Unpack(&zus)
-	zb.zus = &zus
-	if err != nil {
-		return fmt.Errorf("could not unpack zip_url config: %w", err)
-	}
-
-	htsCfg := httpcommon.HTTPTransportSettings{}
-	err = cfg.Unpack(&htsCfg)
-	if err != nil {
-		return fmt.Errorf("could not unpack http common options from zip_url config: %w", err)
-	}
-
-	zb.zus.httpClient, err = htsCfg.Client()
-	if err != nil {
-		return fmt.Errorf("could not instantiate zip_url http client: %w", err)
-	}
-	return nil
-}
 
 type ZipURLSource struct {
 	URL      string `config:"url" json:"url"`
@@ -73,12 +30,17 @@ type ZipURLSource struct {
 	// Etag from last successful fetch
 	etag string
 
+	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
+
 	httpClient *http.Client
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
 
 func (z *ZipURLSource) Validate() (err error) {
+	if z.httpClient == nil {
+		z.httpClient, _ = z.Transport.Client()
+	}
 	return err
 }
 
@@ -233,6 +195,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
+
 	req, err := http.NewRequest(method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
