@@ -5,3 +5,6 @@ metricsets:
   - loadbalancing
   - storage
   - gke
+dashboards:
+  - id: Metricbeat-gcp-gke-overview
+    file: 1ae960c0-f9f8-11eb-bc38-79936db7c106.json
