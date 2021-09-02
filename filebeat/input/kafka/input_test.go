@@ -20,10 +20,12 @@
 package kafka
 
 import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
-	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestNewInputDone(t *testing.T) {
