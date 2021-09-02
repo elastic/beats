@@ -18,10 +18,3 @@
       type: keyword
       description: >
         The Log Message Section contains a customized message describing the log line.
-    - name: log_fields
-      type: text
-      description: >
-        The Log Fields Section contains zero or more Log Field(s),
-        with each one concatenated by one whitespace character U+0020 (SPACE).
-        The number and the content of Log Fields are left to the application.
-        Additionally, Log Field content and orders are not required to be identical for different log lines.

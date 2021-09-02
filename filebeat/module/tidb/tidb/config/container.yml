@@ -14,17 +14,20 @@ processors:
       - logs_path:
           logs_path: "/var/log/containers/"
   - dissect:
-      tokenizer: '[%{time}] [%{tidb.tidb.level}] [%{tidb.tidb.source_line}] ["%{tidb.tidb.log_message}"] %{tidb.tidb.log_fields}'
+      tokenizer: '[%{time}] [%{tidb.tidb.level}] [%{tidb.tidb.source_line}] %{tidb.tidb.log_message}'
       field: "message"
       target_prefix: ""
       ignore_failure: true
   - timestamp:
       field: time
+      ignore_missing: true
       layouts:
         - '2006/01/02 15:04:05.999 -07:00'
       test:
         - '2021/09/02 04:08:27.541 +00:00'
   - drop_fields:
+      when:
+        has_fields: [ 'tidb.tidb.log_message', 'time' ]
       fields: [ "message", "time" ]
   - add_fields:
       target: ''

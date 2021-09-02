@@ -8,8 +8,7 @@
         "log.offset": 0,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[service-id=gc_worker] [expire-at=-9223372035224211918] [safepoint=427442383531016192]",
-        "tidb.pd.log_message": "update service GC safe point",
+        "tidb.pd.log_message": "[\"update service GC safe point\"] [service-id=gc_worker] [expire-at=-9223372035224211918] [safepoint=427442383531016192]",
         "tidb.pd.source_line": "grpc_service.go:764"
     },
     {
@@ -21,8 +20,7 @@
         "log.offset": 182,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[safe-point=427442383531016192]",
-        "tidb.pd.log_message": "updated gc safe point",
+        "tidb.pd.log_message": "[\"updated gc safe point\"] [safe-point=427442383531016192]",
         "tidb.pd.source_line": "grpc_service.go:716"
     },
     {
@@ -34,8 +32,7 @@
         "log.offset": 302,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[revision=3670862] [compact-period=1h0m0s]",
-        "tidb.pd.log_message": "starting auto periodic compaction",
+        "tidb.pd.log_message": "[\"starting auto periodic compaction\"] [revision=3670862] [compact-period=1h0m0s]",
         "tidb.pd.source_line": "periodic.go:135"
     },
     {
@@ -47,8 +44,7 @@
         "log.offset": 441,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[revision=3670862]",
-        "tidb.pd.log_message": "compact tree index",
+        "tidb.pd.log_message": "[\"compact tree index\"] [revision=3670862]",
         "tidb.pd.source_line": "index.go:189"
     },
     {
@@ -60,8 +56,7 @@
         "log.offset": 538,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[revision=3670862] [compact-period=1h0m0s] [took=1h0m0.003057499s]",
-        "tidb.pd.log_message": "completed auto periodic compaction",
+        "tidb.pd.log_message": "[\"completed auto periodic compaction\"] [revision=3670862] [compact-period=1h0m0s] [took=1h0m0.003057499s]",
         "tidb.pd.source_line": "periodic.go:146"
     },
     {
@@ -73,8 +68,7 @@
         "log.offset": 702,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[compact-revision=3670862] [took=13.098004ms]",
-        "tidb.pd.log_message": "finished scheduled compaction",
+        "tidb.pd.log_message": "[\"finished scheduled compaction\"] [compact-revision=3670862] [took=13.098004ms]",
         "tidb.pd.source_line": "kvstore_compaction.go:55"
     },
     {
@@ -86,8 +80,7 @@
         "log.offset": 849,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[safe-point=427442540817416192]",
-        "tidb.pd.log_message": "updated gc safe point",
+        "tidb.pd.log_message": "[\"updated gc safe point\"] [safe-point=427442540817416192]",
         "tidb.pd.source_line": "grpc_service.go:716"
     },
     {
@@ -99,8 +92,7 @@
         "log.offset": 969,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[service-id=gc_worker] [expire-at=-9223372035224210718] [safepoint=427442698103816192]",
-        "tidb.pd.log_message": "update service GC safe point",
+        "tidb.pd.log_message": "[\"update service GC safe point\"] [service-id=gc_worker] [expire-at=-9223372035224210718] [safepoint=427442698103816192]",
         "tidb.pd.source_line": "grpc_service.go:764"
     },
     {
@@ -112,8 +104,7 @@
         "log.offset": 1151,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[safe-point=427442698103816192]",
-        "tidb.pd.log_message": "updated gc safe point",
+        "tidb.pd.log_message": "[\"updated gc safe point\"] [safe-point=427442698103816192]",
         "tidb.pd.source_line": "grpc_service.go:716"
     },
     {
@@ -125,8 +116,7 @@
         "log.offset": 1271,
         "service.type": "tidb",
         "tidb.pd.level": "INFO",
-        "tidb.pd.log_fields": "[safe-point=427442855390216192]",
-        "tidb.pd.log_message": "updated gc safe point",
+        "tidb.pd.log_message": "[\"updated gc safe point\"] [safe-point=427442855390216192]",
         "tidb.pd.source_line": "grpc_service.go:716"
     }
 ]
