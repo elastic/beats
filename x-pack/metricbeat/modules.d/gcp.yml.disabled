@@ -54,7 +54,7 @@
   period: 1m
   metrics:
     - aligner: ALIGN_NONE
-      service: kubernetes
+      service: gke
       service_metric_prefix: kubernetes.io/
       metric_types:
         - "container/cpu/core_usage_time"
