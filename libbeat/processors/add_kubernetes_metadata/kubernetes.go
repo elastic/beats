@@ -90,7 +90,7 @@ func isKubernetesAvailableWithRetry(client k8sclient.Interface) bool {
 
 // kubernetesMetadataExist checks whether an event is already enriched with kubernetes metadata
 func kubernetesMetadataExist(event *beat.Event) bool {
-	if _, err := event.GetValue("kubernetes.namespace"); err != nil {
+	if _, err := event.GetValue("kubernetes"); err != nil {
 		return false
 	}
 	return true
