@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for parsing TiDB slowlog logs",
+  "description": "Pipeline for parsing TiDB logs",
   "processors": [{
     "set": {
       "field": "event.ingested",

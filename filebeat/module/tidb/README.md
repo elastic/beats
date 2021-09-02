@@ -54,7 +54,7 @@ source ./build/python-env/bin/activate
 ```shell
 make update
 make filebeat.test
-GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb TESTING_FILEBEAT_FILESETS=slowlog pytest tests/system/test_modules.py
+GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb TESTING_FILEBEAT_FILESETS=tidb pytest tests/system/test_modules.py
 ```
 
 ### Getting records in elasticsearch

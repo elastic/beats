@@ -17,7 +17,9 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The Elasticsearch module is compatible with TiDB 4.0.x and newer.
+The TiDB module is compatible with TiDB 4.0.x and newer.
+
+The fields of the `slowlog` may change as the TiDB version changes. These changes may not be recorded in the documentation in time, but they do not affect normal ingesting and querying of `slowlog`.
 
 include::../include/configuring-intro.asciidoc[]
 
