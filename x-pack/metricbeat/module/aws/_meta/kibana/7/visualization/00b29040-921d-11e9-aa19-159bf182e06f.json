@@ -34,7 +34,7 @@
                     },
                     {
                         "background_color": "rgba(164,221,0,1)",
-                        "id": "6bb4d634-1d42-47fc-9c42-3f8269c8f509",
+                        "id": "9e88cbc5-05c5-4a95-ac8d-2ee74816e8df",
                         "operator": "empty",
                         "value": null
                     }
@@ -91,13 +91,13 @@
             "type": "metrics"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.14.0",
     "id": "00b29040-921d-11e9-aa19-159bf182e06f",
     "migrationVersion": {
         "visualization": "7.14.0"
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:30:34.757Z",
-    "version": "WzM0MTIsMV0="
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTEsMl0="
 }
