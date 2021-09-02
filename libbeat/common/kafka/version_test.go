@@ -19,7 +19,44 @@ package kafka
 
 import (
 	"testing"
+
+	"github.com/Shopify/sarama"
 )
+
+func TestVersionGet(t *testing.T) {
+	valid := map[Version]sarama.KafkaVersion{
+		"0.11":  sarama.V0_11_0_2,
+		"1":     sarama.V1_1_1_0,
+		"2.0.0": sarama.V2_0_0_0,
+		"2.0.1": sarama.V2_0_1_0,
+		"2.0":   sarama.V2_0_1_0,
+		"2.5":   sarama.V2_5_0_0,
+	}
+	invalid := []Version{
+		"1.1.2",
+		"1.2.3",
+		"1.3",
+		"hello",
+		"2.0.3",
+	}
+	for s, expect := range valid {
+		got, ok := s.Get()
+		if !ok {
+			t.Errorf("'%v' should parse as Kafka version %v, got nothing",
+				s, expect)
+		} else if got != expect {
+			t.Errorf("'%v' should parse as Kafka version %v, got %v",
+				s, expect, got)
+		}
+	}
+	for _, s := range invalid {
+		got, ok := s.Get()
+		if ok {
+			t.Errorf("'%v' is not a valid Kafka version but parsed as %v",
+				s, got)
+		}
+	}
+}
 
 func TestSaramaUpdate(t *testing.T) {
 	// If any of these versions are considered valid by our parsing code,
