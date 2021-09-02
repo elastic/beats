@@ -78,10 +78,6 @@
 - Remove symlink.prev from previously failed upgrade {pull}26785[26785]
 - Fix apm-server supported outputs not being in sync with supported output types. {pull}26885[26885]
 - Set permissions during installation {pull}26665[26665]
-- Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
-- Fix issue with atomic extract running in K8s {pull}27396[27396]
-- Fix issue with install directory in state path in K8s {pull}27396[27396]
-- Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
 - Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
 
 ==== New features
@@ -130,9 +126,3 @@
 - Add proxy support to enroll command. {pull}26514[26514]
 - Enable configuring monitoring namespace {issue}26439[26439]
 - Communicate with Fleet Server over HTTP2. {pull}26474[26474]
-- Pass logging.metrics.enabled to beats to stop beats from adding metrics into their logs. {issue}26758[26758] {pull}26828[26828]
-- Support Node and Service autodiscovery in kubernetes dynamic provider. {pull}26801[26801]
-- Increase Agent's mem limits in k8s. {pull}27153[27153]
-- Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
-- Add link to troubleshooting guide on fatal exits. {issue}26367[26367] {pull}27236[27236]
-- Agent now adapts the beats queue size based on output settings. {issue}26638[26638] {pull}27429[27429]
