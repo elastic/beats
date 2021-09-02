@@ -158350,6 +158350,53 @@ Common fields in the TiDB Module.
 
 
 [float]
+=== pd
+
+Contains fields from the PD instance logs.
+
+
+
+*`tidb.pd.level`*::
++
+--
+The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
+
+
+type: keyword
+
+--
+
+*`tidb.pd.source_line`*::
++
+--
+The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
+
+
+type: keyword
+
+--
+
+*`tidb.pd.log_message`*::
++
+--
+The Log Message Section contains a customized message describing the log line.
+
+
+type: keyword
+
+--
+
+*`tidb.pd.log_fields`*::
++
+--
+The Log Fields Section contains zero or more Log Field(s), with each one concatenated by one whitespace character U+0020 (SPACE). The number and the content of Log Fields are left to the application. Additionally, Log Field content and orders are not required to be identical for different log lines.
+
+
+type: text
+
+--
+
+[float]
 === slowlog
 
 Contains fields from the TiDB slow logs.

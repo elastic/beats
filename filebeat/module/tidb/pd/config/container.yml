@@ -1,0 +1,31 @@
+type: container
+
+paths:
+  - /var/log/containers/*pd*.log
+
+exclude_files:
+  - '.gz$'
+
+processors:
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+  - dissect:
+      tokenizer: '[%{time}] [%{tidb.pd.level}] [%{tidb.pd.source_line}] ["%{tidb.pd.log_message}"] %{tidb.pd.log_fields}'
+      field: "message"
+      target_prefix: ""
+      ignore_failure: true
+  - timestamp:
+      field: time
+      layouts:
+        - '2006/01/02 15:04:05.999 -07:00'
+      test:
+        - '2021/09/02 04:08:27.541 +00:00'
+  - drop_fields:
+      fields: [ "message", "time" ]
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.11.0
