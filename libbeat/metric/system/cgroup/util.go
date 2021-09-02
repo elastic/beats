@@ -60,6 +60,26 @@ type ControllerPath struct {
 	IsV2           bool
 }
 
+// PathList contains the V1 and V2 controller paths in a process
+// Separate the V1 and V2 cgroups so we don't have hybrid cgroups fighting for one namespace
+type PathList struct {
+	V1 map[string]ControllerPath
+	V2 map[string]ControllerPath
+}
+
+// Flatten combines the V1 and V2 cgroups in cases where we don't need a map with keys
+func (pl PathList) Flatten() []ControllerPath {
+	list := []ControllerPath{}
+	for _, v1 := range pl.V1 {
+		list = append(list, v1)
+	}
+	for _, v2 := range pl.V2 {
+		list = append(list, v2)
+	}
+
+	return list
+}
+
 // parseMountinfoLine parses a line from the /proc/[pid]/mountinfo file on
 // Linux. The format of the line is specified in section 3.5 of
 // https://www.kernel.org/doc/Documentation/filesystems/proc.txt.
@@ -217,14 +237,14 @@ func SubsystemMountpoints(rootfsMountpoint string, subsystems map[string]struct{
 
 // ProcessCgroupPaths returns the cgroups to which a process belongs and the
 // pathname of the cgroup relative to the mountpoint of the subsystem.
-func (r Reader) ProcessCgroupPaths(pid int) (map[string]ControllerPath, error) {
+func (r Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 	cgroup, err := os.Open(filepath.Join(r.rootfsMountpoint, "proc", strconv.Itoa(pid), "cgroup"))
 	if err != nil {
-		return nil, err //return a blank error so other events can use any file not found errors
+		return PathList{}, err //return a blank error so other events can use any file not found errors
 	}
 	defer cgroup.Close()
 
-	cPaths := map[string]ControllerPath{}
+	cPaths := PathList{V1: map[string]ControllerPath{}, V2: map[string]ControllerPath{}}
 	sc := bufio.NewScanner(cgroup)
 	for sc.Scan() {
 		// http://man7.org/linux/man-pages/man7/cgroups.7.html
@@ -265,14 +285,14 @@ the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostf
 
 			cgpaths, err := ioutil.ReadDir(controllerPath)
 			if err != nil {
-				return nil, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
+				return cPaths, errors.Wrapf(err, "error fetching cgroupV2 controllers for cgroup location '%s' and path line '%s'", r.cgroupMountpoints.V2Loc, line)
 			}
 			// In order to produce the same kind of data for cgroups V1 and V2 controllers,
 			// We iterate over the group, and look for controllers, since the V2 unified system doesn't list them under the PID
 			for _, singlePath := range cgpaths {
 				if strings.Contains(singlePath.Name(), "stat") {
 					controllerName := strings.TrimSuffix(singlePath.Name(), ".stat")
-					cPaths[controllerName] = ControllerPath{ControllerPath: path, FullPath: controllerPath, IsV2: true}
+					cPaths.V2[controllerName] = ControllerPath{ControllerPath: path, FullPath: controllerPath, IsV2: true}
 				}
 			}
 			// cgroup v1
@@ -280,7 +300,7 @@ the container as /sys/fs/cgroup/unified and start metricbeat with --system.hostf
 			subsystems := strings.Split(fields[1], ",")
 			for _, subsystem := range subsystems {
 				fullPath := filepath.Join(r.cgroupMountpoints.V1Mounts[subsystem], path)
-				cPaths[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
+				cPaths.V1[subsystem] = ControllerPath{ControllerPath: path, FullPath: fullPath, IsV2: false}
 			}
 		}
 	}
