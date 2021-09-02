@@ -832,8 +832,10 @@ def withCloudTestEnv(Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
 
-  // AWS
-  if (params.allCloudTests || params.awsCloudTests) {
+  // Allow AWS credentials when the build was configured to do so with:
+  //   - the cloudtests build parameters
+  //   - the aws github label
+  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws')) {
     testTags = "${testTags},aws"
     def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
     if (!aws.containsKey('access_key')) {
