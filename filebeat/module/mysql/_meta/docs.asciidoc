@@ -13,7 +13,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The  +{modulename}+ module was tested with logs from MySQL 5.5, 5.7 and 8.0,
+The +{modulename}+ module was tested with logs from MySQL 5.5, 5.7 and 8.0,
 MariaDB 10.1, 10.2 and 10.3, and Percona 5.7 and 8.0.
 
 On Windows, the module was tested with MySQL installed from the Chocolatey
@@ -43,7 +43,7 @@ To specify the same settings at the command line, you use:
 -M "mysql.error.var.paths=[/path/to/log/mysql/error.log*]" -M "mysql.slowlog.var.paths=[/path/to/log/mysql/mysql-slow.log*]"
 -----
 
- 
+
 
 //set the fileset name used in the included example
 :fileset_ex: error

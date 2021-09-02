@@ -3,7 +3,8 @@
 
 == TiDB module
 
-This is the TiDB module.
+The +{modulename}+ module collects and parses the slow logs and other runtime logs
+created by https://pingcap.com/products/[tidb].
 
 include::../include/what-happens.asciidoc[]
 
@@ -12,19 +13,45 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-The TiDB module is compatible with TiDB 4.0.x and newer.
+The +{modulename}+ module is compatible with TiDB 4.0.x and newer.
 
-The fields of the `slowlog` may change as the TiDB version changes. These changes may not be recorded in the documentation in time, but they do not affect normal ingesting and querying of `slowlog`.
+The fields of the `slowlog` may change as the TiDB version changes. These changes may not be recorded in the documentation in time, but they do not affect daily ingesting and querying usage of `slowlog`.
 
 include::../include/configuring-intro.asciidoc[]
 
-:fileset_ex: tidb
+The following example shows how to set paths in the +modules.d/{modulename}.yml+
+file to override the default paths for slow logs and error logs:
+
+["source","yaml",subs="attributes"]
+-----
+- module: tidb
+  slowlog:
+    enabled: true
+    var.paths: ["/tidb-deploy/tidb-4000/log/*slowlog*.log"]
+  tidb:
+    enabled: true
+    var.paths: ["/tidb-deploy/tidb-4000/log/*.log"]
+  pd:
+    enabled: true
+    var.paths: ["/tidb-deploy/pd-2379/log/*.log"]
+  tikv:
+    enabled: true
+    var.paths: ["/tidb-deploy/tikv-20160/log/*.log"]
+  tiflash:
+    enabled: true
+    var.paths: ["/tidb-deploy/tiflash-9000/log/*.log"]
+-----
+
+To specify the same settings at the command line, you use:
+
+["source","sh",subs="attributes"]
+-----
+-M "tidb.slowlog.var.paths=[/tidb-deploy/tidb-4000/log/*slowlog*.log]" -M "tidb.pd.var.paths=[/tidb-deploy/pd-2379/log/*.log]"
+-----
+
+:fileset_ex: slowlog
 
 include::../include/config-option-intro.asciidoc[]
-
-TODO: document the variables from each fileset. If you're describing a variable
-that's common to other modules, you can reuse shared descriptions by including
-the relevant file. For example:
 
 [float]
 ==== `tidb` log fileset settings
