@@ -7,7 +7,7 @@
   fields:
     - name: openmetrics
       type: group
-      #      release: beta/ga
+      release: beta
       description: >
         `openmetrics` contains metrics from endpoints that are following Openmetrics format.
       fields:

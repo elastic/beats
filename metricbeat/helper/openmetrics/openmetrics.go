@@ -400,8 +400,7 @@ func (p *openmetrics) GetFamilies() ([]*OpenMetricFamily, error) {
 }
 
 const (
-	suffixInfo = "_info"
-	//suffixCreated = "_created"
+	suffixInfo   = "_info"
 	suffixTotal  = "_total"
 	suffixGCount = "_gcount"
 	suffixGSum   = "_gsum"
@@ -413,10 +412,6 @@ const (
 func isInfo(name string) bool {
 	return len(name) > 5 && name[len(name)-5:] == suffixInfo
 }
-
-//func isCreated(name string) bool {
-//	return len(name) > 8 && name[len(name)-8:] == suffixCreated
-//}
 
 // Counters have _total suffix
 func isTotal(name string) bool {
@@ -447,7 +442,6 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	var summary = &Summary{}
 	var quantile = []*Quantile{}
 	var quant = &Quantile{}
-	//var created = isCreated(name)
 
 	switch {
 	case isCount(name):
@@ -457,8 +451,6 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 	case isSum(name):
 		summary.SampleSum = &s
 		name = name[:len(name)-4]
-	//case created:
-	//	name = name[:len(name)-8]
 	default:
 		f, err := strconv.ParseFloat(qv, 64)
 		if err != nil {
@@ -488,10 +480,6 @@ func summaryMetricName(name string, s float64, qv string, lbls string, t *int64,
 		metric.Summary.Quantile = append(metric.Summary.Quantile, quant)
 	}
 
-	//if created {
-	//	metric.CreatedMs = t
-	//}
-
 	return name, metric
 }
 
@@ -499,7 +487,6 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	var histogram = &Histogram{}
 	var bucket = []*Bucket{}
 	var bkt = &Bucket{}
-	//var created = isCreated(name)
 
 	switch {
 	case isCount(name):
@@ -516,8 +503,6 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	case isGaugeHistogram && isGSum(name):
 		histogram.SampleSum = &s
 		name = name[:len(name)-5]
-	//case created:
-	//	name = name[:len(name)-8]
 	default:
 		if isBucket(name) {
 			name = name[:len(name)-7]
@@ -557,9 +542,6 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	} else if bkt.UpperBound != nil {
 		metric.Histogram.Bucket = append(metric.Histogram.Bucket, bkt)
 	}
-	//if created {
-	//	metric.CreatedMs = t
-	//}
 
 	return name, metric
 }
@@ -673,9 +655,6 @@ loop:
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			//if isCreated(metricName) {
-			//	metric.CreatedMs = &t
-			//}
 			lookupMetricName = metricName
 			break
 		case textparse.MetricTypeGauge:

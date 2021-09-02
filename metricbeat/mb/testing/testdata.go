@@ -455,7 +455,7 @@ func server(t *testing.T, path string, url string, contentType string) *httptest
 			if contentType != "" {
 				w.Header().Set("Content-Type", contentType)
 			} else {
-				w.Header().Set("Content-Type", "application/json;")
+				w.Header().Set("Content-Type", "application/json")
 			}
 			w.WriteHeader(200)
 			w.Write(body)

@@ -24,10 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
-	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/golang/protobuf/proto"
-	lbl "github.com/prometheus/prometheus/pkg/labels"
+	prometheuslabels "github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
 
@@ -56,7 +55,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				Metric: []*openmetrics.OpenMetric{
 					{
 						Name: proto.String("http_request_duration_microseconds_total"),
-						Label: []*lbl.Label{
+						Label: []*prometheuslabels.Label{
 							{
 								Name:  "handler",
 								Value: "query",
@@ -202,7 +201,7 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 				Type: textparse.MetricTypeUnknown,
 				Metric: []*openmetrics.OpenMetric{
 					{
-						Label: []*lbl.Label{
+						Label: []*prometheuslabels.Label{
 							{
 								Name:  "handler",
 								Value: "query",
@@ -244,7 +243,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Type: textparse.MetricTypeCounter,
 			Metric: []*openmetrics.OpenMetric{
 				{
-					Label: []*lbl.Label{
+					Label: []*prometheuslabels.Label{
 						{
 							Name:  "handler",
 							Value: "query",
@@ -262,7 +261,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Type: textparse.MetricTypeCounter,
 			Metric: []*openmetrics.OpenMetric{
 				{
-					Label: []*lbl.Label{
+					Label: []*prometheuslabels.Label{
 						{
 							Name:  "handler",
 							Value: "query",
@@ -330,7 +329,7 @@ func TestSkipMetricFamily(t *testing.T) {
 			Type: textparse.MetricTypeUnknown,
 			Metric: []*openmetrics.OpenMetric{
 				{
-					Label: []*lbl.Label{
+					Label: []*prometheuslabels.Label{
 						{
 							Name:  "handler",
 							Value: "query",
@@ -349,8 +348,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	}
 
 	// test with no filters
-	ms.includeMetrics, _ = p.CompilePatternList(&[]string{})
-	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
+	ms.includeMetrics, _ = openmetrics.CompilePatternList(&[]string{})
+	ms.excludeMetrics, _ = openmetrics.CompilePatternList(&[]string{})
 	metricsToKeep := 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -360,8 +359,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, metricsToKeep, len(testFamilies))
 
 	// test with only one include filter
-	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{})
+	ms.includeMetrics, _ = openmetrics.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = openmetrics.CompilePatternList(&[]string{})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -371,8 +370,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, metricsToKeep, 2)
 
 	// test with only one exclude filter
-	ms.includeMetrics, _ = p.CompilePatternList(&[]string{""})
-	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.includeMetrics, _ = openmetrics.CompilePatternList(&[]string{""})
+	ms.excludeMetrics, _ = openmetrics.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
@@ -382,8 +381,8 @@ func TestSkipMetricFamily(t *testing.T) {
 	assert.Equal(t, len(testFamilies)-2, metricsToKeep)
 
 	// test with one include and one exclude
-	ms.includeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
-	ms.excludeMetrics, _ = p.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
+	ms.includeMetrics, _ = openmetrics.CompilePatternList(&[]string{"http_request_duration_microseconds_a_*"})
+	ms.excludeMetrics, _ = openmetrics.CompilePatternList(&[]string{"http_request_duration_microseconds_a_b_*"})
 	metricsToKeep = 0
 	for _, testFamily := range testFamilies {
 		if !ms.skipFamily(testFamily) {
