@@ -63,7 +63,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | URL Threat Intel Fields    | ECS Fields
-| url                        | threat.indicator.url.full
+| url                        | threatintel.indicator.url.full
 | date_added                 | @timestamp
 | host                       | threatintel.indicator.ip/domain
 |==============================================================
