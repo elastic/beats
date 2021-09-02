@@ -246,7 +246,7 @@ func div(a, b int64) int64 {
 }
 
 func base64Encode(values ...string) string {
-	data := strings.Join(values[:], "")
+	data := strings.Join(values, "")
 	if data == "" {
 		return ""
 	}
