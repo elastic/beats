@@ -25,6 +25,7 @@ import (
 )
 
 var RootCmd = cmd.GenRootCmdWithSettings(mock.New, mock.Settings)
+var SomethingToTriggerTheCI = "fae was here"
 
 func main() {
 	if err := RootCmd.Execute(); err != nil {
