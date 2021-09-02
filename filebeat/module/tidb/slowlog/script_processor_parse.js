@@ -24,6 +24,10 @@ function process(event) {
         return;
     }
 
+    function safePut(k, v) {
+        event.Put(params.keyPrefix + k, v)
+    }
+
     // a var handling multiline query
     var query = ""
 
@@ -44,12 +48,27 @@ function process(event) {
             }
             var k = match[1]
             var v = match[2]
-            event.Put(params.keyPrefix + k, v)
+            if (k === "Txn_start_ts" || k === "Conn_ID") {
+                // no need to parse special keys
+                safePut(k, v)
+                continue
+            }
+            // try to parse other fields to numbers
+            if (isSimpleNumber(v)) {
+                safePut(k, parseFloat(v))
+            } else {
+                safePut(k, v)
+            }
         }
     }
 
     // put the final query
-    event.Put(params.keyPrefix + "Query", query)
+    safePut("Query", query)
 
     return event
+}
+
+function isSimpleNumber(str) {
+    if (typeof str != "string") return false
+    return !isNaN(str) && !isNaN(parseFloat(str))
 }

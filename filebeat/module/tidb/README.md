@@ -1,6 +1,6 @@
 # Dev Guide
 
-## Debugging scripts processors
+### Debugging scripts processors
 
 - Configure the filebeat to accept stdin input and output results to stdout
 - Add your script processor
@@ -32,8 +32,6 @@ logging.metrics.enabled: false
 ```
 
 Use this configuration to start filebeat process.
-
-## Tests of this module
 
 ### Preparations
 
