@@ -155,6 +155,9 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, beatname 
 		headers.Set(k, v)
 	}
 
+	if beatname == "" {
+		beatname = "Libbeat"
+	}
 	userAgent := useragent.UserAgent(beatname)
 	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {

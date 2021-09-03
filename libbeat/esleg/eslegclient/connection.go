@@ -112,6 +112,9 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
+	if s.Beatname == "" {
+		s.Beatname == "Libbeat"
+	}
 	userAgent := useragent.UserAgent(s.Beatname)
 
 	httpClient, err := s.Transport.Client(
