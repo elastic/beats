@@ -1,4 +1,9 @@
+# HELP my_counter_last_increment_timestamp_milliseconds When my_counter was last incremented
+# TYPE my_counter_last_increment_timestamp_milliseconds gauge
+# UNIT my_counter_last_increment_timestamp_milliseconds milliseconds
+my_counter_last_increment_timestamp_milliseconds 123
 # TYPE disk_errors counter
+# HELP disk_errors Count total disk errors
 disk_errors_total{type="netapp"} 17.0 1520879607.789
 # TYPE app info
 app_info{name="open metrics collector",version="6.3.9"} 1

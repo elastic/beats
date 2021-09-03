@@ -12,7 +12,7 @@
     "openmetrics": {
         "help": "carrier value of /sys/class/net/\u003ciface\u003e.",
         "labels": {
-            "device": "br-210476dc4ef8",
+            "device": "br-4e623477470e",
             "job": "openmetrics"
         },
         "metrics": {

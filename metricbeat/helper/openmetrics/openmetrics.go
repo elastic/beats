@@ -573,8 +573,8 @@ loop:
 		}
 		switch et {
 		case textparse.EntryType:
-			b, t := parser.Type()
-			s := string(b)
+			buf, t := parser.Type()
+			s := string(buf)
 			fam, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &OpenMetricFamily{Name: &s, Type: t}
@@ -583,24 +583,24 @@ loop:
 			mt = t
 			continue
 		case textparse.EntryHelp:
-			b, t := parser.Help()
-			s := string(b)
+			buf, t := parser.Help()
+			s := string(buf)
 			h := string(t)
 			fam, ok = metricFamiliesByName[s]
 			if !ok {
-				fam = &OpenMetricFamily{Name: &s, Type: textparse.MetricTypeUnknown}
+				fam = &OpenMetricFamily{Name: &s, Help: &h, Type: textparse.MetricTypeUnknown}
 				metricFamiliesByName[s] = fam
 			}
 			fam.Help = &h
 			continue
 		case textparse.EntryUnit:
-			b, t := parser.Unit()
-			s := string(b)
+			buf, t := parser.Unit()
+			s := string(buf)
 			u := string(t)
 			fam, ok = metricFamiliesByName[s]
 			if !ok {
 				fam = &OpenMetricFamily{Name: &s, Unit: &u, Type: textparse.MetricTypeUnknown}
-				metricFamiliesByName[string(b)] = fam
+				metricFamiliesByName[string(buf)] = fam
 			}
 			fam.Unit = &u
 			continue
@@ -650,12 +650,15 @@ loop:
 		var lookupMetricName string
 		var exm *exemplar.Exemplar
 
+		// Suffixes - https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#suffixes
 		switch mt {
 		case textparse.MetricTypeCounter:
 			var counter = &Counter{Value: &v}
 			mn := lset.Get(labels.MetricName)
 			metric = &OpenMetric{Name: &mn, Counter: counter, Label: labelPairs}
-			lookupMetricName = metricName
+			if isTotal(metricName) { // Remove suffix _total, get lookup metricname
+				lookupMetricName = metricName[:len(metricName)-6]
+			}
 			break
 		case textparse.MetricTypeGauge:
 			var gauge = &Gauge{Value: &v}

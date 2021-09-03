@@ -10,6 +10,33 @@
             "period": 10000
         },
         "openmetrics": {
+            "help": "When my_counter was last incremented",
+            "labels": {
+                "instance": "127.0.0.1:55922",
+                "job": "openmetrics"
+            },
+            "metrics": {
+                "my_counter_last_increment_timestamp_milliseconds": 123
+            },
+            "type": "gauge",
+            "unit": "milliseconds"
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "openmetrics"
+        }
+    },
+    {
+        "event": {
+            "dataset": "openmetrics.collector",
+            "duration": 115000,
+            "module": "openmetrics"
+        },
+        "metricset": {
+            "name": "collector",
+            "period": 10000
+        },
+        "openmetrics": {
             "labels": {
                 "instance": "127.0.0.1:55922",
                 "job": "openmetrics"
@@ -35,6 +62,7 @@
             "period": 10000
         },
         "openmetrics": {
+            "help":"Count total disk errors",
             "labels": {
                 "instance": "127.0.0.1:55922",
                 "job": "openmetrics",
@@ -256,6 +284,7 @@
                 "process_cpu_seconds_total": 17.0,
                 "timestamp": 1622302012000
             },
+            "help":"Total user and system CPU time spent in seconds. Exemplar with timestamp and labels.",
             "labels": {
                 "instance": "127.0.0.1:55922",
                 "job": "openmetrics",
@@ -265,7 +294,8 @@
             "metrics": {
                 "process_cpu_seconds_total": 11111
             },
-            "type": "counter"
+            "type": "counter",
+            "unit":"seconds"
         },
         "service": {
             "address": "127.0.0.1:55555",
