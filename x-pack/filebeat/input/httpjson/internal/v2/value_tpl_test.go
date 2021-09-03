@@ -276,6 +276,21 @@ func TestValueTpl(t *testing.T) {
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
 		},
+		{
+			name:        "func base64Encode 2 strings",
+			value:       `[[base64Encode "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "c3RyaW5nMXN0cmluZzI=",
+		},
+		{
+			name:          "func base64Encode no value",
+			value:         `[[base64Encode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
 	}
 
 	for _, tc := range cases {
