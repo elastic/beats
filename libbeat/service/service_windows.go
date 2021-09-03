@@ -133,6 +133,11 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 // WaitExecutionDone returns only after stop was reported to service manager.
 // If response is not retrieved within 500 millisecond wait is aborted.
 func WaitExecutionDone() {
+	if isWinService, err := svc.IsWindowsService(); err != nil || !isWinService {
+		// not a service, don't wait
+		return
+	}
+
 	select {
 	case <-serviceInstance.executeFinished:
 	case <-time.After(500 * time.Millisecond):
