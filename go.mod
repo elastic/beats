@@ -91,10 +91,10 @@ require (
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.4.3
-	github.com/golang/snappy v0.0.1
+	github.com/golang/snappy v0.0.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.7.2-0.20170925184458-7a6b2bf521e9
-	github.com/google/go-cmp v0.5.2
+	github.com/google/go-cmp v0.5.4
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -140,7 +140,7 @@ require (
 	github.com/prometheus/common v0.7.0
 	github.com/prometheus/procfs v0.0.11
 	github.com/prometheus/prometheus v2.5.0+incompatible
-	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0
+	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
@@ -156,7 +156,7 @@ require (
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
-	github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c
+	github.com/xdg/scram v1.0.3
 	github.com/yuin/gopher-lua v0.0.0-20170403160031-b402f3114ec7 // indirect
 	go.elastic.co/apm v1.11.0
 	go.elastic.co/apm/module/apmelasticsearch v1.7.2
@@ -169,11 +169,11 @@ require (
 	go.uber.org/zap v1.14.0
 	golang.org/x/crypto v0.0.0-20210616213533-5ff15b29337e
 	golang.org/x/lint v0.0.0-20200130185559-910be7a94367
-	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
+	golang.org/x/net v0.0.0-20210614182718-04defd469f4e
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
 	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
-	golang.org/x/text v0.3.5
+	golang.org/x/text v0.3.6
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/tools v0.1.1
 	google.golang.org/api v0.15.0
@@ -181,7 +181,11 @@ require (
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/inf.v0 v0.9.1
+	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
+	gopkg.in/jcmturner/goidentity.v3 v3.0.0 // indirect
 	gopkg.in/jcmturner/gokrb5.v7 v7.5.0
+	gopkg.in/jcmturner/rpc.v1 v1.1.0 // indirect
 	gopkg.in/mgo.v2 v2.0.0-20160818020120-3f83fa500528
 	gopkg.in/yaml.v2 v2.3.0
 	gotest.tools v2.2.0+incompatible
@@ -195,7 +199,7 @@ require (
 replace (
 	github.com/Azure/go-autorest => github.com/Azure/go-autorest v12.2.0+incompatible
 	github.com/Microsoft/go-winio => github.com/bi-zone/go-winio v0.4.15
-	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210120173147-5c8cb347d877
+	github.com/Shopify/sarama => github.com/elastic/sarama v1.19.1-0.20210823122811-11c3ef800752
 	github.com/cucumber/godog => github.com/cucumber/godog v0.8.1
 	github.com/docker/docker => github.com/docker/engine v0.0.0-20191113042239-ea84732a7725
 	github.com/docker/go-plugins-helpers => github.com/elastic/go-plugins-helpers v0.0.0-20200207104224-bdf17607b79f
