@@ -19,16 +19,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/external"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/s3manager"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -36,6 +36,7 @@ import (
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -365,4 +366,21 @@ func drainSQS(t *testing.T, tfConfig terraformOutputData) {
 		}
 	}
 	t.Logf("Drained %d SQS messages.", deletedCount)
+}
+
+func TestGetRegionForBucketARN(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to setup S3 and must be executed manually.
+	tfConfig := getTerraformOutputs(t)
+
+	awsConfig, err := external.LoadDefaultAWSConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+
+	regionName, err := getRegionForBucketARN(context.Background(), s3Client, tfConfig.BucketName)
+	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }

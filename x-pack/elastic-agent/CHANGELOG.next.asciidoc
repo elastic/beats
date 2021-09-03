@@ -81,6 +81,7 @@
 - Fix issue with atomic extract running in K8s {pull}27396[27396]
 - Fix issue with install directory in state path in K8s {pull}27396[27396]
 - Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
+- Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
 
 ==== New features
 
