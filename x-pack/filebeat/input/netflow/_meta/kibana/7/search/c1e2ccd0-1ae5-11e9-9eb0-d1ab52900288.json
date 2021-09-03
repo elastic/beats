@@ -1,0 +1,62 @@
+{
+  "attributes": {
+    "columns": [
+      "source.ip",
+      "destination.ip",
+      "network.direction",
+      "network.transport",
+      "network.bytes"
+    ],
+    "description": "",
+    "hits": 0,
+    "kibanaSavedObjectMeta": {
+      "searchSourceJSON": {
+        "filter": [
+          {
+            "$state": {
+              "store": "appState"
+            },
+            "meta": {
+              "alias": null,
+              "disabled": false,
+              "index": "filebeat-*",
+              "key": "event.action",
+              "negate": false,
+              "params": {
+                "query": "netflow_flow",
+                "type": "phrase"
+              },
+              "type": "phrase",
+              "value": "netflow_flow"
+            },
+            "query": {
+              "match": {
+                "event.action": {
+                  "query": "netflow_flow",
+                  "type": "phrase"
+                }
+              }
+            }
+          }
+        ],
+        "highlightAll": true,
+        "index": "filebeat-*",
+        "query": {
+          "language": "kuery",
+          "query": ""
+        },
+        "version": true
+      }
+    },
+    "sort": [
+      "@timestamp",
+      "desc"
+    ],
+    "title": "Network Flow Search [Filebeat]",
+    "version": 1
+  },
+  "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
+  "type": "search",
+  "updated_at": "2019-01-18T16:16:16.527Z",
+  "version": 2
+}
