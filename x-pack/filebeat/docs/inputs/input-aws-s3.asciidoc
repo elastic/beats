@@ -304,12 +304,13 @@ sqs:ChangeMessageVisibility
 sqs:DeleteMessage
 ----
 
-Reduced specific AWS permissions are required for IAM user to access S3
+Reduced specific S3 AWS permissions are required for IAM user to access S3
 when using the polling list of S3 bucket objects:
 
 ----
 s3:GetObject
 s3:ListBucket
+s3:GetBucketLocation
 ----
 
 [float]
