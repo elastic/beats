@@ -21,6 +21,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 - Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 - Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dashboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
+- Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dasbhboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
+- Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
 
 *Auditbeat*
 
