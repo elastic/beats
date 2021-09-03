@@ -258,7 +258,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	}
 
 	config := getConfig(dir)
-	config["include_files"] = []string{`\.ssh\/`}
+	config["include_files"] = []string{`\.ssh`}
 	config["recursive"] = true
 	ms := mbtest.NewPushMetricSetV2(t, config)
 
