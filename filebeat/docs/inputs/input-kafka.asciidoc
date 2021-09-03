@@ -51,7 +51,7 @@ link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecos
 [[kafka-input-compatibility]]
 ==== Compatibility
 
-This input works with all Kafka versions in between 0.11 and 2.1.0. Older versions
+This input works with all Kafka versions in between 0.11 and 2.8.0. Older versions
 might work as well, but are not supported.
 
 [id="{beatname_lc}-input-{type}-options"]
