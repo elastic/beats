@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Disk Space [Metricbeat Aerospike] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "8f321e10-bac9-11e9-a715-c7f36757ae84",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": 0,
+                        "formatter": "bytes",
+                        "id": "8f321e11-bac9-11e9-a715-c7f36757ae84",
+                        "label": "Total",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.device.total.bytes",
+                                "id": "8f321e12-bac9-11e9-a715-c7f36757ae84",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(22,165,165,1)",
+                        "fill": "0.2",
+                        "formatter": "bytes",
+                        "id": "8f321e13-bac9-11e9-a715-c7f36757ae84",
+                        "label": "Used",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "aerospike.namespace.device.used.bytes",
+                                "id": "8f321e14-bac9-11e9-a715-c7f36757ae84",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Disk Space [Metricbeat Aerospike] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "bd767280-bac9-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:23.479Z",
+    "version": "WzMzMDAsMV0="
+}

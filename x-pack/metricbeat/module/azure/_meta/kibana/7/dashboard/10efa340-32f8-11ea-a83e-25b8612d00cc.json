@@ -1,0 +1,303 @@
+{
+    "attributes": {
+        "description": "This dashboard shows metrics for queue storage type in Azure.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "queue",
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "azure.namespace",
+                            "negate": false,
+                            "params": {
+                                "query": "Microsoft.Storage/storageAccounts/queueServices"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "azure.namespace": "Microsoft.Storage/storageAccounts/queueServices"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "933a427d-a8b7-48ff-ac53-337f32b340ea",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "933a427d-a8b7-48ff-ac53-337f32b340ea",
+                "panelRefName": "panel_933a427d-a8b7-48ff-ac53-337f32b340ea",
+                "title": "",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "a9456b9b-efa6-410d-a56c-4b66aa8c499e",
+                    "w": 5,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "a9456b9b-efa6-410d-a56c-4b66aa8c499e",
+                "panelRefName": "panel_a9456b9b-efa6-410d-a56c-4b66aa8c499e",
+                "title": "Availability",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "0b4107a7-6a3d-4092-9813-00edb56bc838",
+                    "w": 5,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "0b4107a7-6a3d-4092-9813-00edb56bc838",
+                "panelRefName": "panel_0b4107a7-6a3d-4092-9813-00edb56bc838",
+                "title": "",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "cf022a47-2314-4ab6-b397-b1d860944179",
+                    "w": 5,
+                    "x": 19,
+                    "y": 0
+                },
+                "panelIndex": "cf022a47-2314-4ab6-b397-b1d860944179",
+                "panelRefName": "panel_cf022a47-2314-4ab6-b397-b1d860944179",
+                "title": "",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "9d84188c-5a30-41ac-81cc-fe4fed360dd3",
+                    "w": 5,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "9d84188c-5a30-41ac-81cc-fe4fed360dd3",
+                "panelRefName": "panel_9d84188c-5a30-41ac-81cc-fe4fed360dd3",
+                "title": "",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "1d623c03-4d02-4a81-b91e-49e82e112016",
+                    "w": 19,
+                    "x": 29,
+                    "y": 0
+                },
+                "panelIndex": "1d623c03-4d02-4a81-b91e-49e82e112016",
+                "panelRefName": "panel_1d623c03-4d02-4a81-b91e-49e82e112016",
+                "title": "Transactions",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ff6441f8-d66d-4399-bae5-25d3d861b299",
+                    "w": 9,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "ff6441f8-d66d-4399-bae5-25d3d861b299",
+                "panelRefName": "panel_ff6441f8-d66d-4399-bae5-25d3d861b299",
+                "title": "",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "87066244-7840-4555-9d12-026d64977f1a",
+                    "w": 20,
+                    "x": 9,
+                    "y": 9
+                },
+                "panelIndex": "87066244-7840-4555-9d12-026d64977f1a",
+                "panelRefName": "panel_87066244-7840-4555-9d12-026d64977f1a",
+                "title": "Success Server Latency",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "756da375-e6a2-4668-af43-0cd294878254",
+                    "w": 19,
+                    "x": 29,
+                    "y": 9
+                },
+                "panelIndex": "756da375-e6a2-4668-af43-0cd294878254",
+                "panelRefName": "panel_756da375-e6a2-4668-af43-0cd294878254",
+                "title": "Success E2E Latency",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "a715fafc-ca38-410c-9253-12ba506eabc0",
+                    "w": 20,
+                    "x": 9,
+                    "y": 24
+                },
+                "panelIndex": "a715fafc-ca38-410c-9253-12ba506eabc0",
+                "panelRefName": "panel_a715fafc-ca38-410c-9253-12ba506eabc0",
+                "title": "Egress Traffic by APIName",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "75f72920-be71-47a9-a967-f1c862ab2961",
+                    "w": 19,
+                    "x": 29,
+                    "y": 24
+                },
+                "panelIndex": "75f72920-be71-47a9-a967-f1c862ab2961",
+                "panelRefName": "panel_75f72920-be71-47a9-a967-f1c862ab2961",
+                "title": "Ingress Traffic by APIName",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Azure] Queue Storage Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "10efa340-32f8-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "09f05e00-32f7-11ea-a83e-25b8612d00cc",
+            "name": "933a427d-a8b7-48ff-ac53-337f32b340ea:panel_933a427d-a8b7-48ff-ac53-337f32b340ea",
+            "type": "visualization"
+        },
+        {
+            "id": "40dbc0d0-32e3-11ea-a83e-25b8612d00cc",
+            "name": "a9456b9b-efa6-410d-a56c-4b66aa8c499e:panel_a9456b9b-efa6-410d-a56c-4b66aa8c499e",
+            "type": "visualization"
+        },
+        {
+            "id": "e159b990-339c-11ea-a83e-25b8612d00cc",
+            "name": "0b4107a7-6a3d-4092-9813-00edb56bc838:panel_0b4107a7-6a3d-4092-9813-00edb56bc838",
+            "type": "visualization"
+        },
+        {
+            "id": "2bedaca0-339d-11ea-a83e-25b8612d00cc",
+            "name": "cf022a47-2314-4ab6-b397-b1d860944179:panel_cf022a47-2314-4ab6-b397-b1d860944179",
+            "type": "visualization"
+        },
+        {
+            "id": "0241cc10-339d-11ea-a83e-25b8612d00cc",
+            "name": "9d84188c-5a30-41ac-81cc-fe4fed360dd3:panel_9d84188c-5a30-41ac-81cc-fe4fed360dd3",
+            "type": "visualization"
+        },
+        {
+            "id": "553f9320-32e9-11ea-a83e-25b8612d00cc",
+            "name": "1d623c03-4d02-4a81-b91e-49e82e112016:panel_1d623c03-4d02-4a81-b91e-49e82e112016",
+            "type": "visualization"
+        },
+        {
+            "id": "acced050-32d1-11ea-a83e-25b8612d00cc",
+            "name": "ff6441f8-d66d-4399-bae5-25d3d861b299:panel_ff6441f8-d66d-4399-bae5-25d3d861b299",
+            "type": "visualization"
+        },
+        {
+            "id": "81f16b40-32ea-11ea-a83e-25b8612d00cc",
+            "name": "87066244-7840-4555-9d12-026d64977f1a:panel_87066244-7840-4555-9d12-026d64977f1a",
+            "type": "visualization"
+        },
+        {
+            "id": "685fbeb0-32eb-11ea-a83e-25b8612d00cc",
+            "name": "756da375-e6a2-4668-af43-0cd294878254:panel_756da375-e6a2-4668-af43-0cd294878254",
+            "type": "visualization"
+        },
+        {
+            "id": "599c62c0-32d7-11ea-a83e-25b8612d00cc",
+            "name": "a715fafc-ca38-410c-9253-12ba506eabc0:panel_a715fafc-ca38-410c-9253-12ba506eabc0",
+            "type": "visualization"
+        },
+        {
+            "id": "4eaef260-32e1-11ea-a83e-25b8612d00cc",
+            "name": "75f72920-be71-47a9-a967-f1c862ab2961:panel_75f72920-be71-47a9-a967-f1c862ab2961",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:51.088Z",
+    "version": "WzM1NjMsMV0="
+}

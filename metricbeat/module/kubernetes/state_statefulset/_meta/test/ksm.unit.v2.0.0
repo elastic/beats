@@ -1,0 +1,42 @@
+kube_pod_info{namespace="default",pod="web-1",uid="046dd18d-2592-4518-ad5f-4ecf4131beba",host_ip="172.20.0.3",pod_ip="10.244.1.41",node="kind-worker2",created_by_kind="StatefulSet",created_by_name="web",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="default",pod="web-0",uid="0a3d9136-30af-48a2-8151-cb93b66607a4",host_ip="172.20.0.4",pod_ip="10.244.2.56",node="kind-worker",created_by_kind="StatefulSet",created_by_name="web",priority_class="",host_network="false"} 1
+kube_pod_owner{namespace="default",pod="web-1",uid="046dd18d-2592-4518-ad5f-4ecf4131beba",owner_kind="StatefulSet",owner_name="web",owner_is_controller="true"} 1
+kube_pod_owner{namespace="default",pod="web-0",uid="0a3d9136-30af-48a2-8151-cb93b66607a4",owner_kind="StatefulSet",owner_name="web",owner_is_controller="true"} 1
+kube_secret_info{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1
+kube_secret_type{namespace="kube-system",secret="statefulset-controller-token-9lkhz",type="kubernetes.io/service-account-token"} 1
+kube_secret_labels{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1
+kube_secret_created{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1.628778298e+09
+kube_secret_metadata_resource_version{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 284
+# HELP kube_statefulset_created Unix creation timestamp
+# TYPE kube_statefulset_created gauge
+kube_statefulset_created{namespace="default",statefulset="web"} 1.629966737e+09
+# HELP kube_statefulset_status_replicas The number of replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas gauge
+kube_statefulset_status_replicas{namespace="default",statefulset="web"} 2
+# HELP kube_statefulset_status_replicas_current The number of current replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_current gauge
+kube_statefulset_status_replicas_current{namespace="default",statefulset="web"} 2
+# HELP kube_statefulset_status_replicas_ready The number of ready replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_ready gauge
+kube_statefulset_status_replicas_ready{namespace="default",statefulset="web"} 2
+# HELP kube_statefulset_status_replicas_updated The number of updated replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_updated gauge
+kube_statefulset_status_replicas_updated{namespace="default",statefulset="web"} 2
+# HELP kube_statefulset_status_observed_generation The generation observed by the StatefulSet controller.
+# TYPE kube_statefulset_status_observed_generation gauge
+kube_statefulset_status_observed_generation{namespace="default",statefulset="web"} 1
+# HELP kube_statefulset_replicas Number of desired pods for a StatefulSet.
+# TYPE kube_statefulset_replicas gauge
+kube_statefulset_replicas{namespace="default",statefulset="web"} 2
+# HELP kube_statefulset_metadata_generation Sequence number representing a specific generation of the desired state for the StatefulSet.
+# TYPE kube_statefulset_metadata_generation gauge
+kube_statefulset_metadata_generation{namespace="default",statefulset="web"} 1
+# HELP kube_statefulset_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_statefulset_labels gauge
+kube_statefulset_labels{namespace="default",statefulset="web"} 1
+# HELP kube_statefulset_status_current_revision Indicates the version of the StatefulSet used to generate Pods in the sequence [0,currentReplicas).
+# TYPE kube_statefulset_status_current_revision gauge
+kube_statefulset_status_current_revision{namespace="default",statefulset="web",revision="web-b46f789c4"} 1
+# HELP kube_statefulset_status_update_revision Indicates the version of the StatefulSet used to generate Pods in the sequence [replicas-updatedReplicas,replicas)
+# TYPE kube_statefulset_status_update_revision gauge
+kube_statefulset_status_update_revision{namespace="default",statefulset="web",revision="web-b46f789c4"} 1
