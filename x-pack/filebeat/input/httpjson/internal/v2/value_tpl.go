@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"hash"
 	"reflect"
 	"regexp"
@@ -57,6 +58,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmac":                hmacString,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
+			"join":                strings.Join,
+			"sprintf":             fmt.Sprintf,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)

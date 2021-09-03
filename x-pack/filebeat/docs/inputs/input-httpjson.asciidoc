@@ -206,6 +206,8 @@ Some built-in helper functions are provided to work with the input state inside 
 - `hmac`: calculates the hmac signature of a list of strings concatenated together. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
 - `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
+- `join`: joins a list of strings using the specified separator. Example: `[[join .body.arr ","]]`
+- `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
