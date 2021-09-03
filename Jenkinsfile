@@ -278,9 +278,9 @@ def generateStages(Map args = [:]) {
 
 def cloud(Map args = [:]) {
   withNode(labels: args.label, forceWorkspace: true){
-    startCloudTestEnv(name: args.directory, dirs: args.dirs, context: args.context)
+    startCloudTestEnv(name: args.directory, dirs: args.dirs)
   }
-  withCloudTestEnv(args) {
+  withCloudTestEnv() {
     try {
       target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
     } finally {
@@ -834,34 +834,32 @@ def tarAndUploadArtifacts(Map args = [:]) {
 * This method executes a closure with credentials for cloud test
 * environments.
 */
-def withCloudTestEnv(Map args = [:], Closure body) {
+def withCloudTestEnv(Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
 
-  withGithubNotify(context: "${args.context}") {
-    // AWS
-    if (params.allCloudTests || params.awsCloudTests) {
-      testTags = "${testTags},aws"
-      def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
-      if (!aws.containsKey('access_key')) {
-        error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
-      }
-      if (!aws.containsKey('secret_key')) {
-        error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
-      }
-      maskedVars.addAll([
-        [var: "AWS_REGION", password: "${env.AWS_REGION}"],
-        [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
-        [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
-      ])
+  // AWS
+  if (params.allCloudTests || params.awsCloudTests) {
+    testTags = "${testTags},aws"
+    def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
+    if (!aws.containsKey('access_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'access_key'")
     }
+    if (!aws.containsKey('secret_key')) {
+      error("${AWS_ACCOUNT_SECRET} doesn't contain 'secret_key'")
+    }
+    maskedVars.addAll([
+      [var: "AWS_REGION", password: "${env.AWS_REGION}"],
+      [var: "AWS_ACCESS_KEY_ID", password: aws.access_key],
+      [var: "AWS_SECRET_ACCESS_KEY", password: aws.secret_key],
+    ])
+  }
 
-    withEnv([
-      "TEST_TAGS=${testTags}",
-    ]) {
-      withEnvMask(vars: maskedVars) {
-        body()
-      }
+  withEnv([
+    "TEST_TAGS=${testTags}",
+  ]) {
+    withEnvMask(vars: maskedVars) {
+      body()
     }
   }
 }
@@ -880,7 +878,7 @@ def startCloudTestEnv(Map args = [:]) {
   String name = normalise(args.name)
   def dirs = args.get('dirs',[])
   stage("${name}-prepare-cloud-env"){
-    withCloudTestEnv(args) {
+    withCloudTestEnv() {
       withBeatsEnv(archive: false, withModule: false) {
         try {
           dirs?.each { folder ->
