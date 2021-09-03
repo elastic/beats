@@ -78,6 +78,7 @@
 - Remove symlink.prev from previously failed upgrade {pull}26785[26785]
 - Fix apm-server supported outputs not being in sync with supported output types. {pull}26885[26885]
 - Set permissions during installation {pull}26665[26665]
+- Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
 
 ==== New features
 
