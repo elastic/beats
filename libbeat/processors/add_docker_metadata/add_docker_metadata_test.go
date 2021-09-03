@@ -38,21 +38,26 @@ import (
 
 func init() {
 	// Stub out the procfs.
-	processCgroupPaths = func(_ string, pid int) (map[string]cgroup.ControllerPath, error) {
+	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+
 		switch pid {
 		case 1000:
-			return map[string]cgroup.ControllerPath{
-				"cpu": {ControllerPath: "/docker/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b", IsV2: false},
+			return cgroup.PathList{
+				V1: map[string]cgroup.ControllerPath{
+					"cpu": {ControllerPath: "/docker/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b", IsV2: false},
+				},
 			}, nil
 		case 2000:
-			return map[string]cgroup.ControllerPath{
-				"memory": {ControllerPath: "/user.slice", IsV2: false},
+			return cgroup.PathList{
+				V1: map[string]cgroup.ControllerPath{
+					"memory": {ControllerPath: "/user.slice", IsV2: false},
+				},
 			}, nil
 		case 3000:
 			// Parser error (hopefully this never happens).
-			return nil, fmt.Errorf("cgroup parse failure")
+			return cgroup.PathList{}, fmt.Errorf("cgroup parse failure")
 		default:
-			return nil, os.ErrNotExist
+			return cgroup.PathList{}, os.ErrNotExist
 		}
 	}
 }
