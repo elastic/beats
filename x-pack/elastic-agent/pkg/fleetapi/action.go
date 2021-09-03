@@ -211,6 +211,7 @@ type ActionApp struct {
 	ActionID    string          `json:"id" mapstructure:"id"`
 	ActionType  string          `json:"type" mapstructure:"type"`
 	InputType   string          `json:"input_type" mapstructure:"input_type"`
+	Timeout     int64           `json:"timeout,omitempty" mapstructure:"timeout,omitempty"`
 	Data        json.RawMessage `json:"data" mapstructure:"data"`
 	StartedAt   string          `json:"started_at,omitempty" mapstructure:"started_at,omitempty"`
 	CompletedAt string          `json:"completed_at,omitempty" mapstructure:"completed_at,omitempty"`
@@ -284,6 +285,7 @@ func (a *Actions) UnmarshalJSON(data []byte) error {
 				ActionID:   response.ActionID,
 				ActionType: response.ActionType,
 				InputType:  response.InputType,
+				Timeout:    response.Timeout,
 				Data:       response.Data,
 			}
 		case ActionTypeUnenroll:

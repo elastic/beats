@@ -1,0 +1,72 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Startup Errors [Filebeat Icinga] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "Count": "#BF1B00"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "defaultYExtents": false,
+                "legendPosition": "right",
+                "mode": "stacked",
+                "scale": "linear",
+                "setYExtents": false,
+                "times": []
+            },
+            "title": "Icinga Startup Errors ECS",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a59b5e00-2417-11e7-a83b-d5f4cebac9ff-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "710043e0-2417-11e7-a83b-d5f4cebac9ff-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:08.576Z",
+    "version": "WzQ0MjYsMV0="
+}

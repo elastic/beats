@@ -5,7 +5,6 @@
 package metrics
 
 import (
-	"regexp"
 	"strings"
 	"time"
 
@@ -18,12 +17,13 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 )
 
-func newIncomingFieldExtractor(l *logp.Logger) *incomingFieldExtractor {
-	return &incomingFieldExtractor{logger: l}
+func newIncomingFieldExtractor(l *logp.Logger, mc metricsConfig) *incomingFieldExtractor {
+	return &incomingFieldExtractor{logger: l, mc: mc}
 }
 
 type incomingFieldExtractor struct {
 	logger *logp.Logger
+	mc     metricsConfig
 }
 
 // KeyValuePoint is a struct to capture the information parsed in an instant of a single metric
@@ -48,7 +48,7 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 		}
 
 		p := KeyValuePoint{
-			Key:       cleanMetricNameString(resp.Metric.Type, aligner),
+			Key:       cleanMetricNameString(resp.Metric.Type, aligner, e.mc),
 			Value:     getValueFromPoint(point),
 			Timestamp: ts,
 		}
@@ -71,17 +71,13 @@ func (e *incomingFieldExtractor) getTimestamp(p *monitoring.Point) (ts time.Time
 	return time.Time{}, errors.New("error trying to extract the timestamp from the point data")
 }
 
-var rx = regexp.MustCompile(`^[a-z_-]+\.googleapis.com\/`)
-
-func cleanMetricNameString(s string, aligner string) string {
+func cleanMetricNameString(s string, aligner string, mc metricsConfig) string {
 	if s == "" {
 		return "unknown"
 	}
 
-	prefix := rx.FindString(s)
-
-	removedPrefix := strings.TrimPrefix(s, prefix)
-	replacedChars := strings.Replace(removedPrefix, "/", ".", -1)
+	unprefixedMetric := mc.RemovePrefixFrom(s)
+	replacedChars := strings.Replace(unprefixedMetric, "/", ".", -1)
 
 	metricName := replacedChars + gcp.AlignersMapToSuffix[aligner]
 	return metricName

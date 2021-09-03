@@ -1,0 +1,612 @@
+{
+    "attributes": {
+        "description": "Overview of Cloud Foundry",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 2,
+                    "i": "614e3c18-7b1d-4510-9308-a7c64077076b",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "614e3c18-7b1d-4510-9308-a7c64077076b",
+                "panelRefName": "panel_614e3c18-7b1d-4510-9308-a7c64077076b",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 1,
+                    "i": "efc5cc53-f0f5-4d09-850f-36baed6cea70",
+                    "w": 15,
+                    "x": 0,
+                    "y": 2
+                },
+                "panelIndex": "efc5cc53-f0f5-4d09-850f-36baed6cea70",
+                "panelRefName": "panel_efc5cc53-f0f5-4d09-850f-36baed6cea70",
+                "title": "Components health",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "77151f90-5dd1-4c52-bbc8-eae071029c74",
+                    "w": 14,
+                    "x": 15,
+                    "y": 2
+                },
+                "panelIndex": "77151f90-5dd1-4c52-bbc8-eae071029c74",
+                "panelRefName": "panel_77151f90-5dd1-4c52-bbc8-eae071029c74",
+                "title": "Job queue length",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "e3830a7f-00ba-4133-9be0-5bf881956830",
+                    "w": 7,
+                    "x": 29,
+                    "y": 2
+                },
+                "panelIndex": "e3830a7f-00ba-4133-9be0-5bf881956830",
+                "panelRefName": "panel_e3830a7f-00ba-4133-9be0-5bf881956830",
+                "title": "Top CPU usage",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "f9d0d4bf-f7b3-45f1-9bde-2ed389ecffe0",
+                    "w": 6,
+                    "x": 36,
+                    "y": 2
+                },
+                "panelIndex": "f9d0d4bf-f7b3-45f1-9bde-2ed389ecffe0",
+                "panelRefName": "panel_f9d0d4bf-f7b3-45f1-9bde-2ed389ecffe0",
+                "title": "Top ephemeral disk usage",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "e00759d3-5853-4e0e-bb74-9c6be0f0cafe",
+                    "w": 6,
+                    "x": 42,
+                    "y": 2
+                },
+                "panelIndex": "e00759d3-5853-4e0e-bb74-9c6be0f0cafe",
+                "panelRefName": "panel_e00759d3-5853-4e0e-bb74-9c6be0f0cafe",
+                "title": "Top persistent disk usage",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "8ba21983-ee6b-464a-b9e6-083b8f9af911",
+                    "w": 3,
+                    "x": 0,
+                    "y": 3
+                },
+                "panelIndex": "8ba21983-ee6b-464a-b9e6-083b8f9af911",
+                "panelRefName": "panel_8ba21983-ee6b-464a-b9e6-083b8f9af911",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "ffb54b2e-36b9-477e-a722-96d4c4c6f493",
+                    "w": 3,
+                    "x": 3,
+                    "y": 3
+                },
+                "panelIndex": "ffb54b2e-36b9-477e-a722-96d4c4c6f493",
+                "panelRefName": "panel_ffb54b2e-36b9-477e-a722-96d4c4c6f493",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "1695ac40-80fd-4164-8db3-41b31604c757",
+                    "w": 3,
+                    "x": 6,
+                    "y": 3
+                },
+                "panelIndex": "1695ac40-80fd-4164-8db3-41b31604c757",
+                "panelRefName": "panel_1695ac40-80fd-4164-8db3-41b31604c757",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "8f111936-e953-45c2-859f-7adc28161741",
+                    "w": 3,
+                    "x": 9,
+                    "y": 3
+                },
+                "panelIndex": "8f111936-e953-45c2-859f-7adc28161741",
+                "panelRefName": "panel_8f111936-e953-45c2-859f-7adc28161741",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "040843ca-cc51-4b6e-b15f-6cf8684ee63d",
+                    "w": 3,
+                    "x": 12,
+                    "y": 3
+                },
+                "panelIndex": "040843ca-cc51-4b6e-b15f-6cf8684ee63d",
+                "panelRefName": "panel_040843ca-cc51-4b6e-b15f-6cf8684ee63d",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "207fe6aa-ca8e-4931-abae-7c2b0f78cc1d",
+                    "w": 14,
+                    "x": 15,
+                    "y": 9
+                },
+                "panelIndex": "207fe6aa-ca8e-4931-abae-7c2b0f78cc1d",
+                "panelRefName": "panel_207fe6aa-ca8e-4931-abae-7c2b0f78cc1d",
+                "title": "Outstanding requests",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "c4e3338c-f3d9-4c7d-bac7-e784f706bb57",
+                    "w": 5,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "c4e3338c-f3d9-4c7d-bac7-e784f706bb57",
+                "panelRefName": "panel_c4e3338c-f3d9-4c7d-bac7-e784f706bb57",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "30ed1180-cf4b-41b2-a60a-5332de7f6e46",
+                    "w": 5,
+                    "x": 5,
+                    "y": 10
+                },
+                "panelIndex": "30ed1180-cf4b-41b2-a60a-5332de7f6e46",
+                "panelRefName": "panel_30ed1180-cf4b-41b2-a60a-5332de7f6e46",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "d77bfe2e-7057-4cfb-829b-c4011640ae2d",
+                    "w": 5,
+                    "x": 10,
+                    "y": 10
+                },
+                "panelIndex": "d77bfe2e-7057-4cfb-829b-c4011640ae2d",
+                "panelRefName": "panel_d77bfe2e-7057-4cfb-829b-c4011640ae2d",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "b1ba0667-de29-4458-95d6-49217a6875cb",
+                    "w": 5,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "b1ba0667-de29-4458-95d6-49217a6875cb",
+                "panelRefName": "panel_b1ba0667-de29-4458-95d6-49217a6875cb",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "ff23d11d-8396-4245-a334-ddafc5cbc198",
+                    "w": 5,
+                    "x": 5,
+                    "y": 15
+                },
+                "panelIndex": "ff23d11d-8396-4245-a334-ddafc5cbc198",
+                "panelRefName": "panel_ff23d11d-8396-4245-a334-ddafc5cbc198",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "ee0d79d3-92f8-4360-b724-e9ebfd73b53e",
+                    "w": 5,
+                    "x": 10,
+                    "y": 15
+                },
+                "panelIndex": "ee0d79d3-92f8-4360-b724-e9ebfd73b53e",
+                "panelRefName": "panel_ee0d79d3-92f8-4360-b724-e9ebfd73b53e",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "da31ae1e-e713-4d4f-b225-59824b203797",
+                    "w": 19,
+                    "x": 29,
+                    "y": 15
+                },
+                "panelIndex": "da31ae1e-e713-4d4f-b225-59824b203797",
+                "panelRefName": "panel_da31ae1e-e713-4d4f-b225-59824b203797",
+                "title": "GoRouter latency PAS",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "a7138e23-fa21-42b8-8d09-d124c2640293",
+                    "w": 14,
+                    "x": 15,
+                    "y": 16
+                },
+                "panelIndex": "a7138e23-fa21-42b8-8d09-d124c2640293",
+                "panelRefName": "panel_a7138e23-fa21-42b8-8d09-d124c2640293",
+                "title": "Diego cell time to sync",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 3,
+                    "i": "2b4f53d8-a91c-447d-a8e4-f94589abe07f",
+                    "w": 7,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "2b4f53d8-a91c-447d-a8e4-f94589abe07f",
+                "panelRefName": "panel_2b4f53d8-a91c-447d-a8e4-f94589abe07f",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 3,
+                    "i": "fdd1c5d5-bd8f-41db-8d16-9d0b8adcb3a4",
+                    "w": 8,
+                    "x": 7,
+                    "y": 20
+                },
+                "panelIndex": "fdd1c5d5-bd8f-41db-8d16-9d0b8adcb3a4",
+                "panelRefName": "panel_fdd1c5d5-bd8f-41db-8d16-9d0b8adcb3a4",
+                "title": "",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "e2291bb2-2b6d-452b-8bb0-652ed6b4ea7b",
+                    "w": 7,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "e2291bb2-2b6d-452b-8bb0-652ed6b4ea7b",
+                "panelRefName": "panel_e2291bb2-2b6d-452b-8bb0-652ed6b4ea7b",
+                "title": "Maximum CPU utilization",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "5db37b04-577a-4703-a8ef-07d70299023e",
+                    "w": 8,
+                    "x": 7,
+                    "y": 23
+                },
+                "panelIndex": "5db37b04-577a-4703-a8ef-07d70299023e",
+                "panelRefName": "panel_5db37b04-577a-4703-a8ef-07d70299023e",
+                "title": "Available disk space",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "dfb10794-82ba-4da3-80b7-5e4aa82dfd5c",
+                    "w": 14,
+                    "x": 15,
+                    "y": 23
+                },
+                "panelIndex": "dfb10794-82ba-4da3-80b7-5e4aa82dfd5c",
+                "panelRefName": "panel_dfb10794-82ba-4da3-80b7-5e4aa82dfd5c",
+                "title": "Available memory by cell",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "a6c34327-7e71-4bf3-a057-f43de540247c",
+                    "w": 19,
+                    "x": 29,
+                    "y": 23
+                },
+                "panelIndex": "a6c34327-7e71-4bf3-a057-f43de540247c",
+                "panelRefName": "panel_a6c34327-7e71-4bf3-a057-f43de540247c",
+                "title": "Total routes in GoRouter",
+                "type": "visualization",
+                "version": "7.9.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-15m",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Metricbeat Cloud Foundry] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c81cf34-f84e-11ea-a49d-f3f94f5e4fac",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "435133e4-f8d2-11ea-a49e-d36460a01dbe",
+            "name": "614e3c18-7b1d-4510-9308-a7c64077076b:panel_614e3c18-7b1d-4510-9308-a7c64077076b",
+            "type": "visualization"
+        },
+        {
+            "id": "9ca39c36-f84e-11ea-9b0e-af32e8072a87",
+            "name": "efc5cc53-f0f5-4d09-850f-36baed6cea70:panel_efc5cc53-f0f5-4d09-850f-36baed6cea70",
+            "type": "visualization"
+        },
+        {
+            "id": "9ca9737c-f84e-11ea-b8a5-9f245d6f7121",
+            "name": "77151f90-5dd1-4c52-bbc8-eae071029c74:panel_77151f90-5dd1-4c52-bbc8-eae071029c74",
+            "type": "visualization"
+        },
+        {
+            "id": "9c9f12b0-f84e-11ea-bfe0-8f64de3dbbbd",
+            "name": "e3830a7f-00ba-4133-9be0-5bf881956830:panel_e3830a7f-00ba-4133-9be0-5bf881956830",
+            "type": "visualization"
+        },
+        {
+            "id": "9c5e5c7a-f84e-11ea-9c79-3f5f46484ce3",
+            "name": "f9d0d4bf-f7b3-45f1-9bde-2ed389ecffe0:panel_f9d0d4bf-f7b3-45f1-9bde-2ed389ecffe0",
+            "type": "visualization"
+        },
+        {
+            "id": "9c975020-f84e-11ea-9d35-0ba5b289cee7",
+            "name": "e00759d3-5853-4e0e-bb74-9c6be0f0cafe:panel_e00759d3-5853-4e0e-bb74-9c6be0f0cafe",
+            "type": "visualization"
+        },
+        {
+            "id": "9caafdaa-f84e-11ea-8c78-43aac4b09aa5",
+            "name": "8ba21983-ee6b-464a-b9e6-083b8f9af911:panel_8ba21983-ee6b-464a-b9e6-083b8f9af911",
+            "type": "visualization"
+        },
+        {
+            "id": "9c7b602c-f84e-11ea-8762-e7aef60b5522",
+            "name": "ffb54b2e-36b9-477e-a722-96d4c4c6f493:panel_ffb54b2e-36b9-477e-a722-96d4c4c6f493",
+            "type": "visualization"
+        },
+        {
+            "id": "9cb33038-f84e-11ea-8929-07701f2b1c26",
+            "name": "1695ac40-80fd-4164-8db3-41b31604c757:panel_1695ac40-80fd-4164-8db3-41b31604c757",
+            "type": "visualization"
+        },
+        {
+            "id": "9ca526aa-f84e-11ea-aad5-ef2777854f3d",
+            "name": "8f111936-e953-45c2-859f-7adc28161741:panel_8f111936-e953-45c2-859f-7adc28161741",
+            "type": "visualization"
+        },
+        {
+            "id": "9caf798e-f84e-11ea-ac4b-4795663aee6b",
+            "name": "040843ca-cc51-4b6e-b15f-6cf8684ee63d:panel_040843ca-cc51-4b6e-b15f-6cf8684ee63d",
+            "type": "visualization"
+        },
+        {
+            "id": "9cbb8cd8-f84e-11ea-9a20-af708256c3a9",
+            "name": "207fe6aa-ca8e-4931-abae-7c2b0f78cc1d:panel_207fe6aa-ca8e-4931-abae-7c2b0f78cc1d",
+            "type": "visualization"
+        },
+        {
+            "id": "9c69684a-f84e-11ea-bf59-4bba486da283",
+            "name": "c4e3338c-f3d9-4c7d-bac7-e784f706bb57:panel_c4e3338c-f3d9-4c7d-bac7-e784f706bb57",
+            "type": "visualization"
+        },
+        {
+            "id": "9c93270c-f84e-11ea-8b23-c7a1cc31369e",
+            "name": "30ed1180-cf4b-41b2-a60a-5332de7f6e46:panel_30ed1180-cf4b-41b2-a60a-5332de7f6e46",
+            "type": "visualization"
+        },
+        {
+            "id": "9c7328ee-f84e-11ea-9259-772ddb1805fb",
+            "name": "d77bfe2e-7057-4cfb-829b-c4011640ae2d:panel_d77bfe2e-7057-4cfb-829b-c4011640ae2d",
+            "type": "visualization"
+        },
+        {
+            "id": "9c99314c-f84e-11ea-92d5-9bcd6abdce0f",
+            "name": "b1ba0667-de29-4458-95d6-49217a6875cb:panel_b1ba0667-de29-4458-95d6-49217a6875cb",
+            "type": "visualization"
+        },
+        {
+            "id": "9c635824-f84e-11ea-9b02-735b8407166a",
+            "name": "ff23d11d-8396-4245-a334-ddafc5cbc198:panel_ff23d11d-8396-4245-a334-ddafc5cbc198",
+            "type": "visualization"
+        },
+        {
+            "id": "9caddb24-f84e-11ea-b008-df9bd2aed7cc",
+            "name": "ee0d79d3-92f8-4360-b724-e9ebfd73b53e:panel_ee0d79d3-92f8-4360-b724-e9ebfd73b53e",
+            "type": "visualization"
+        },
+        {
+            "id": "9c58b248-f84e-11ea-87a9-67d346210280",
+            "name": "da31ae1e-e713-4d4f-b225-59824b203797:panel_da31ae1e-e713-4d4f-b225-59824b203797",
+            "type": "visualization"
+        },
+        {
+            "id": "9ca805fa-f84e-11ea-ab90-2b00dd50450c",
+            "name": "a7138e23-fa21-42b8-8d09-d124c2640293:panel_a7138e23-fa21-42b8-8d09-d124c2640293",
+            "type": "visualization"
+        },
+        {
+            "id": "9c89336e-f84e-11ea-bbcd-23e329286ac7",
+            "name": "2b4f53d8-a91c-447d-a8e4-f94589abe07f:panel_2b4f53d8-a91c-447d-a8e4-f94589abe07f",
+            "type": "visualization"
+        },
+        {
+            "id": "9c9d9c14-f84e-11ea-a575-a30e017a09e9",
+            "name": "fdd1c5d5-bd8f-41db-8d16-9d0b8adcb3a4:panel_fdd1c5d5-bd8f-41db-8d16-9d0b8adcb3a4",
+            "type": "visualization"
+        },
+        {
+            "id": "9c8ed8fa-f84e-11ea-b20d-bb82d7a8e05d",
+            "name": "e2291bb2-2b6d-452b-8bb0-652ed6b4ea7b:panel_e2291bb2-2b6d-452b-8bb0-652ed6b4ea7b",
+            "type": "visualization"
+        },
+        {
+            "id": "9c948fb6-f84e-11ea-96f5-dff115716ba4",
+            "name": "5db37b04-577a-4703-a8ef-07d70299023e:panel_5db37b04-577a-4703-a8ef-07d70299023e",
+            "type": "visualization"
+        },
+        {
+            "id": "9cac69e2-f84e-11ea-b8d4-4b40313a5eb0",
+            "name": "dfb10794-82ba-4da3-80b7-5e4aa82dfd5c:panel_dfb10794-82ba-4da3-80b7-5e4aa82dfd5c",
+            "type": "visualization"
+        },
+        {
+            "id": "9c77cf84-f84e-11ea-a3ff-7f7f73eabd57",
+            "name": "a6c34327-7e71-4bf3-a057-f43de540247c:panel_a6c34327-7e71-4bf3-a057-f43de540247c",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:58.327Z",
+    "version": "WzM2MzYsMV0="
+}

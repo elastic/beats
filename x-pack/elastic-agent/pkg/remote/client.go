@@ -191,6 +191,7 @@ func (c *Client) Send(
 	}
 
 	requester.lastUsed = time.Now().UTC()
+
 	resp, err := requester.client.Do(req.WithContext(ctx))
 	if err != nil {
 		requester.lastErr = err

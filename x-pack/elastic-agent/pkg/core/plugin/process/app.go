@@ -149,12 +149,9 @@ func (a *Application) Stop() {
 		return
 	}
 
-	stopSig := os.Interrupt
 	if srvState != nil {
-		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
-			// kill the process if stop through GRPC doesn't work
-			stopSig = os.Kill
-		}
+		// signal stop through GRPC, wait and kill is performed later in gracefulKill
+		srvState.Stop(a.processConfig.StopTimeout)
 	}
 
 	a.appLock.Lock()
@@ -164,10 +161,8 @@ func (a *Application) Stop() {
 	if a.state.ProcessInfo != nil {
 		// stop and clean watcher
 		a.stopWatcher(a.state.ProcessInfo)
-		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
-			// no error on signal, so wait for it to stop
-			_, _ = a.state.ProcessInfo.Process.Wait()
-		}
+		a.gracefulKill(a.state.ProcessInfo)
+
 		a.state.ProcessInfo = nil
 
 		// cleanup drops
@@ -207,7 +202,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		defer a.appLock.Unlock()
 		if a.state.ProcessInfo != proc {
 			// already another process started, another watcher is watching instead
-			gracefulKill(proc)
+			a.gracefulKill(proc)
 			return
 		}
 
@@ -261,6 +256,10 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 
 func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
 	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		if state.IsStateFiltered(msg, payload) {
+			return
+		}
+
 		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload
@@ -275,7 +274,7 @@ func (a *Application) cleanUp() {
 	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
 }
 
-func gracefulKill(proc *process.Info) {
+func (a *Application) gracefulKill(proc *process.Info) {
 	if proc == nil || proc.Process == nil {
 		return
 	}
@@ -288,7 +287,11 @@ func gracefulKill(proc *process.Info) {
 	wg.Add(1)
 	go func() {
 		wg.Done()
-		_, _ = proc.Process.Wait()
+
+		if _, err := proc.Process.Wait(); err != nil {
+			// process is not a child - some OSs requires process to be child
+			a.externalProcess(proc.Process)
+		}
 		close(doneChan)
 	}()
 
@@ -296,9 +299,11 @@ func gracefulKill(proc *process.Info) {
 	wg.Wait()
 
 	// kill in case it's still running after timeout
+	t := time.NewTimer(procExitTimeout)
+	defer t.Stop()
 	select {
 	case <-doneChan:
-	case <-time.After(procExitTimeout):
+	case <-t.C:
 		_ = proc.Process.Kill()
 	}
 }

@@ -13,21 +13,20 @@ import (
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
-	"github.com/kolide/osquery-go"
-	kconfig "github.com/kolide/osquery-go/plugin/config"
-	klogger "github.com/kolide/osquery-go/plugin/logger"
+	"github.com/osquery/osquery-go"
+	kconfig "github.com/osquery/osquery-go/plugin/config"
+	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/processors"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 )
 
 var (
@@ -35,13 +34,12 @@ var (
 	ErrAlreadyRunning     = errors.New("already running")
 	ErrQueryExecution     = errors.New("failed query execution")
 	ErrActionRequest      = errors.New("invalid action request")
+	ErrOsquerydExited     = errors.New("osqueryd exited")
 )
 
 const (
 	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
 	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
-
-	limitQueryAtTime = 1 // Always run only one osquery query at a time. Addresses the issue: https://github.com/elastic/beats/issues/25297
 
 	// The interval in second for configuration refresh;
 	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
@@ -61,7 +59,8 @@ const (
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
-	client beat.Client
+
+	pub *pub.Publisher
 
 	log *logp.Logger
 
@@ -76,13 +75,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
 	bt := &osquerybeat{
 		b:      b,
 		config: c,
 		log:    log,
+		pub:    pub.New(b, log),
 	}
 
 	return bt, nil
@@ -102,9 +102,8 @@ func (bt *osquerybeat) initContext() (context.Context, error) {
 func (bt *osquerybeat) close() {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	if bt.client != nil {
-		bt.client.Close()
-		bt.client = nil
+	if bt.pub != nil {
+		bt.pub.Close()
 	}
 	if bt.cancel != nil {
 		bt.cancel()
@@ -121,7 +120,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
+	inputConfigCh := config.WatchInputs(ctx, bt.log)
 
 	// Install osqueryd if needed
 	err = installOsquery(ctx)
@@ -161,7 +160,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 			g.Go(func() error {
 				err := bt.runOsquery(ctx, b, osq, inputCh)
 				if err != nil {
-					bt.log.Errorf("Failed to run osqueryd: %v", err)
+					if errors.Is(err, context.Canceled) {
+						bt.log.Errorf("Osquery exited: %v", err)
+					} else {
+						bt.log.Errorf("Failed to run osquery: %v", err)
+					}
 				}
 				return err
 			})
@@ -181,14 +184,11 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Run main loop
 	g.Go(func() error {
-		// Set initial queries from beats config if defined
-		var processors *processors.Processors
-		if len(bt.config.Inputs) > 0 {
-			// Connect publisher
-			processors, err = bt.reconnectPublisher(b, bt.config.Inputs)
-			if err != nil {
-				return err
-			}
+
+		// Configure publisher from initial input
+		err := bt.pub.Configure(bt.config.Inputs)
+		if err != nil {
+			return err
 		}
 
 		for {
@@ -197,14 +197,10 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				bt.log.Info("context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
-				// Only set processor if it was not set before
-				// TODO: implement a proper input/streams/processors manager, one publisher per input stream
-				if processors == nil {
-					processors, err = bt.reconnectPublisher(b, inputConfigs)
-					if err != nil {
-						bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
-						return err
-					}
+				bt.pub.Configure(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
+					return err
 				}
 				startOsqueryIfNotStarted()
 				inputCh <- inputConfigs
@@ -231,7 +227,16 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	g.Go(func() error {
 		err := osq.Run(ctx)
 		if err != nil {
-			bt.log.Errorf("Failed to run osqueryd: %v", err)
+			if errors.Is(err, context.Canceled) {
+				bt.log.Errorf("Osqueryd exited: %v", err)
+			} else {
+				bt.log.Errorf("Failed to run osqueryd: %v", err)
+			}
+		} else {
+			// When osqueryd is killed for example there is no error returned
+			// but we can't continue running. Exiting.
+			bt.log.Info("osqueryd process exited")
+			err = ErrOsquerydExited
 		}
 		return err
 	})
@@ -278,7 +283,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 				bt.log.Info("context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputCh:
-				configPlugin.Set(inputConfigs)
+				err = configPlugin.Set(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("failed to set configuration from inputs: %v", err)
+					return err
+				}
 				cache.Resize(configPlugin.Count())
 			}
 		}
@@ -318,20 +327,28 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 }
 
 func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
-	sql, ok := configPlugin.ResolveName(res.Name)
+	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
-		bt.log.Errorf("failed to resolve query name: %s", res.Name)
+		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
+		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
+		// and the API key would not have permissions for that namespaces datastream to create the index
 		return
 	}
 
-	hits, err := cli.ResolveResult(ctx, sql, res.Hits)
-	if err != nil {
-		bt.log.Errorf("failed to resolve query types: %s", res.Name)
+	qi, ok := configPlugin.LookupQueryInfo(res.Name)
+	if !ok {
+		bt.log.Errorf("failed to lookup query info: %s", res.Name)
 		return
 	}
-	_ = hits
+
+	hits, err := cli.ResolveResult(ctx, qi.QueryConfig.Query, res.Hits)
+	if err != nil {
+		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
+		return
+	}
+
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.publishEvents(config.DefaultStreamIndex, res.Name, responseID, hits, nil)
+	bt.pub.Publish(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -340,50 +357,6 @@ func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
 			"osquery_version": distro.OsquerydVersion(),
 		})
 	}
-}
-
-func (bt *osquerybeat) reconnectPublisher(b *beat.Beat, inputs []config.InputConfig) (*processors.Processors, error) {
-	processors, err := processorsForInputsConfig(inputs)
-	if err != nil {
-		return nil, err
-	}
-
-	bt.log.Debugf("Connect publisher with processors: %d", len(processors.All()))
-	// Connect publisher
-	client, err := b.Publisher.ConnectWith(beat.ClientConfig{
-		Processing: beat.ProcessingConfig{
-			Processor: processors,
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	// Swap client
-	bt.mx.Lock()
-	defer bt.mx.Unlock()
-	oldclient := bt.client
-	bt.client = client
-	if oldclient != nil {
-		oldclient.Close()
-	}
-	return processors, nil
-}
-
-func processorsForInputsConfig(inputs []config.InputConfig) (procs *processors.Processors, err error) {
-	// Use only first input processor
-	// Every input will have a processor that adds the elastic_agent info, we need only one
-	// Not expecting other processors at the moment and this needs to work for 7.13
-	for _, input := range inputs {
-		if len(input.Processors) > 0 {
-			procs, err = processors.New(input.Processors)
-			if err != nil {
-				return nil, err
-			}
-			return procs, nil
-		}
-	}
-	return nil, nil
 }
 
 // Stop stops osquerybeat.
@@ -399,8 +372,8 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client) 
 	ah := &actionHandler{
 		log:       bt.log,
 		inputType: osqueryInputType,
-		bt:        bt,
-		cli:       cli,
+		publisher: bt.pub,
+		queryExec: cli,
 	}
 	b.Manager.RegisterAction(ah)
 	return ah
@@ -410,33 +383,4 @@ func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) 
 	if b.Manager != nil && ah != nil {
 		b.Manager.UnregisterAction(ah)
 	}
-}
-
-func (bt *osquerybeat) publishEvents(index, actionID, responseID string, hits []map[string]interface{}, reqData interface{}) {
-	bt.mx.Lock()
-	defer bt.mx.Unlock()
-	for _, hit := range hits {
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"type":      bt.b.Info.Name,
-				"action_id": actionID,
-				"osquery":   hit,
-			},
-		}
-
-		if reqData != nil {
-			event.Fields["action_data"] = reqData
-		}
-
-		if responseID != "" {
-			event.Fields["response_id"] = responseID
-		}
-		if index != "" {
-			event.Meta = common.MapStr{events.FieldMetaRawIndex: index}
-		}
-
-		bt.client.Publish(event)
-	}
-	bt.log.Infof("The %d events sent to index %s", len(hits), index)
 }

@@ -6,7 +6,15 @@ package v2
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"hash"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -45,6 +53,13 @@ func (t *valueTpl) Unpack(in string) error {
 			"getRFC5988Link":      getRFC5988Link,
 			"toInt":               toInt,
 			"add":                 add,
+			"mul":                 mul,
+			"div":                 div,
+			"hmac":                hmacString,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"join":                strings.Join,
+			"sprintf":             fmt.Sprintf,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -201,15 +216,76 @@ func getRFC5988Link(rel string, links []string) string {
 	return ""
 }
 
-func toInt(s string) int {
-	i, _ := strconv.ParseInt(s, 10, 64)
-	return int(i)
+func toInt(v interface{}) int64 {
+	vv := reflect.ValueOf(v)
+	switch vv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return int64(vv.Int())
+	case reflect.Float32, reflect.Float64:
+		return int64(vv.Float())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return int64(vv.Uint())
+	case reflect.String:
+		f, _ := strconv.ParseFloat(vv.String(), 64)
+		return int64(f)
+	default:
+		return 0
+	}
 }
 
-func add(vs ...int) int {
-	var sum int
+func add(vs ...int64) int64 {
+	var sum int64
 	for _, v := range vs {
 		sum += v
 	}
 	return sum
+}
+
+func mul(a, b int64) int64 {
+	return a * b
+}
+
+func div(a, b int64) int64 {
+	return a / b
+}
+
+func base64Encode(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(data))
+}
+
+func base64EncodeNoPad(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.RawStdEncoding.EncodeToString([]byte(data))
+}
+
+func hmacString(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	// Create a new HMAC by defining the hash type and the key (as byte array)
+	var mac hash.Hash
+	switch hmacType {
+	case "sha256":
+		mac = hmac.New(sha256.New, []byte(hmacKey))
+	case "sha1":
+		mac = hmac.New(sha1.New, []byte(hmacKey))
+	default:
+		// Upstream config validation prevents this from happening.
+		return ""
+	}
+	// Write Data to it
+	mac.Write([]byte(data))
+
+	// Get result and encode as hexadecimal string
+	return hex.EncodeToString(mac.Sum(nil))
 }

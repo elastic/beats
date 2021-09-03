@@ -21,6 +21,8 @@ outputs:
   default:
     type: elasticsearch
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    bulk_max_size: 23
+    worker: 10
     username: elastic
     password: changeme
     api_key: TiNAGG4BaaMdaH1tRfuU:KnR6yE41RrSowb0kQ0HWoA

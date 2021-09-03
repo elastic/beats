@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream_index"
+	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
 
 	"github.com/gofrs/uuid"
 
@@ -102,6 +102,15 @@ func (je *journeyEnricher) enrich(event *beat.Event, se *SynthEvent) error {
 }
 
 func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) error {
+	var jobErr error
+	if se.Error != nil {
+		jobErr = stepError(se.Error)
+		je.errorCount++
+		if je.firstError == nil {
+			je.firstError = jobErr
+		}
+	}
+
 	switch se.Type {
 	case "journey/end":
 		je.journeyComplete = true
@@ -113,9 +122,9 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 	case "step/screenshot_ref":
 		fallthrough
 	case "screenshot/block":
-		add_data_stream_index.SetEventDataset(event, "browser_screenshot")
+		add_data_stream.SetEventDataset(event, "browser.screenshot")
 	case "journey/network_info":
-		add_data_stream_index.SetEventDataset(event, "browser_network")
+		add_data_stream.SetEventDataset(event, "browser.network")
 	}
 
 	if se.Id != "" {
@@ -133,16 +142,6 @@ func (je *journeyEnricher) enrichSynthEvent(event *beat.Event, se *SynthEvent) e
 			}
 		}
 	}
-
-	var jobErr error
-	if se.Error != nil {
-		jobErr = stepError(se.Error)
-		je.errorCount++
-		if je.firstError == nil {
-			je.firstError = jobErr
-		}
-	}
-
 	return jobErr
 }
 

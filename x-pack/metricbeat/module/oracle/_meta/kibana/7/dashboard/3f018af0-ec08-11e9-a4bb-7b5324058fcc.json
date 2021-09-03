@@ -1,0 +1,342 @@
+{
+    "attributes": {
+        "description": "An overview of key metrics from all Metricsets in the Oracle database Metricbeat module",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 17,
+                    "x": 18,
+                    "y": 31
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Tablespace Total Size",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 12,
+                    "x": 28,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Ratio of used space in Tablespaces",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "3",
+                    "w": 28,
+                    "x": 20,
+                    "y": 18
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Avg data file size by filename",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "5",
+                    "w": 20,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Total Cursors by machine (Top 10)",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 8,
+                    "x": 20,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Cache Buffer Hit Ratio gauge",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9",
+                    "w": 20,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "Current opened cursors",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "10",
+                    "w": 13,
+                    "x": 35,
+                    "y": 31
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "Session cache hits",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "11",
+                    "w": 20,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "title": "Average Cursors by machine (Top 10)",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "12",
+                    "w": 18,
+                    "x": 0,
+                    "y": 31
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "title": "Max Cursors by machine (Top 10)",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "13",
+                    "w": 20,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "title": "DB Blocks Gets by buffer pool (Top 10)",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "14",
+                    "w": 30,
+                    "x": 18,
+                    "y": 39
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "title": "Consistent Gets by buffer pool (Top 10)",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "15",
+                    "w": 18,
+                    "x": 0,
+                    "y": 39
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "title": "Total / Real parsed cursors",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "16",
+                    "w": 28,
+                    "x": 20,
+                    "y": 8
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "title": "Lock/Pin requests and IO reloads ratios",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "17",
+                    "w": 8,
+                    "x": 40,
+                    "y": 0
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "title": "Cursors cache hit ratio gauge",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Oracle] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3f018af0-ec08-11e9-a4bb-7b5324058fcc",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "05acae50-9bf0-11e9-a61b-f742ed613c57",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "981779d0-9bfc-11e9-a61b-f742ed613c57",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "c92efe60-9bef-11e9-a61b-f742ed613c57",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "62fb9430-ec0f-11e9-a4bb-7b5324058fcc",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "ec2b2010-ec0d-11e9-a4bb-7b5324058fcc",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "43369a60-ec0e-11e9-a4bb-7b5324058fcc",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "234013d0-ec0e-11e9-a4bb-7b5324058fcc",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "5a422660-ec0f-11e9-a4bb-7b5324058fcc",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "4f569650-ec0f-11e9-a4bb-7b5324058fcc",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "68ce1940-ec10-11e9-a4bb-7b5324058fcc",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "3ae419d0-ec10-11e9-a4bb-7b5324058fcc",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "c46de8c0-ec10-11e9-a4bb-7b5324058fcc",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "0b1da750-ec12-11e9-a4bb-7b5324058fcc",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "bc977600-ec12-11e9-a4bb-7b5324058fcc",
+            "name": "17:panel_17",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:19.365Z",
+    "version": "WzMyNjEsMV0="
+}
