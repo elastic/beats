@@ -277,14 +277,16 @@ def generateStages(Map args = [:]) {
 }
 
 def cloud(Map args = [:]) {
-  withNode(labels: args.label, forceWorkspace: true){
-    startCloudTestEnv(name: args.directory, dirs: args.dirs)
-  }
-  withCloudTestEnv() {
-    try {
-      target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
-    } finally {
-      terraformCleanup(name: args.directory, dir: args.directory)
+  withGithubNotify(context: args.context) {
+    withNode(labels: args.label, forceWorkspace: true){
+      startCloudTestEnv(name: args.directory, dirs: args.dirs)
+    }
+    withCloudTestEnv() {
+      try {
+        target(context: args.context, command: args.command, directory: args.directory, label: args.label, withModule: args.withModule, isMage: true, id: args.id)
+      } finally {
+        terraformCleanup(name: args.directory, dir: args.directory)
+      }
     }
   }
 }
