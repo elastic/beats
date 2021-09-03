@@ -103,10 +103,9 @@ The state has the following elements:
 - `last_response.page`: A number indicating the page number of the last response.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
-- `url.value`: The full URL with params and fragments.
-- `url.params`: A map containing the URL params.
-- `header`: A map containing the headers. References request headers when used in <<request-transforms>> or <<request-rate-limit>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
-- `body`: A map containing the body. References request body when used in <<request-transforms>> configuration section, and to the last response body when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
+- `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
+- `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
 All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
@@ -461,7 +460,7 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`header.*`, `url.params.*`, `body.*`].
 
@@ -581,7 +580,7 @@ List of transforms that will be applied to the response to every new page reques
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 
