@@ -152067,6 +152067,16 @@ type: keyword
 
 --
 
+*`threatintel.indicator.reference`*::
++
+--
+Reference URL linking to additional information about this indicator.
+
+
+type: keyword
+
+--
+
 *`threatintel.indicator.ip`*::
 +
 --
@@ -152077,7 +152087,7 @@ type: ip
 
 --
 
-*`threatintel.indicator.domain`*::
+*`threatintel.indicator.url.domain`*::
 +
 --
 Identifies a threat indicator as a domain (irrespective of direction).
