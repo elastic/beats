@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 :modulename: crowdstrike
 :has-dashboards: true
 
-== Crowdstrike module
+== CrowdStrike module
 
 This is the {beatname_uc} module for CrowdStrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
 
@@ -21,7 +21,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
+This input supports CrowdStrike Falcon SIEM-Connector-v2.0.
 
 include::../include/configuring-intro.asciidoc[]
 
