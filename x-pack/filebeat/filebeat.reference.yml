@@ -837,32 +837,32 @@ filebeat.modules:
 - module: elasticsearch
   # Server log
   server:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   gc:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   audit:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   slowlog:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   deprecation:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -1239,7 +1239,7 @@ filebeat.modules:
 - module: haproxy
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input:
@@ -1433,7 +1433,7 @@ filebeat.modules:
 - module: kafka
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for Kafka. If left empty,
     # Filebeat will look under /opt.
@@ -1447,7 +1447,7 @@ filebeat.modules:
 - module: kibana
   # Server logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1455,7 +1455,7 @@ filebeat.modules:
 
   # Audit logs
   audit:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1616,7 +1616,7 @@ filebeat.modules:
 - module: nats
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1759,9 +1759,9 @@ filebeat.modules:
     #var.paths: ["/home/user/oracleauditlogs/*.aud"]
 
 #------------------------------- Osquery Module -------------------------------
-- module: osquery
-  result:
-    enabled: true
+#- module: osquery
+  #result:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1797,7 +1797,7 @@ filebeat.modules:
 - module: pensando
 # Firewall logs
   dfw:
-    enabled: true
+    enabled: false
     var.syslog_host: 0.0.0.0
     var.syslog_port: 9001
 
@@ -1894,7 +1894,7 @@ filebeat.modules:
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the the default path.
     #var.paths:
