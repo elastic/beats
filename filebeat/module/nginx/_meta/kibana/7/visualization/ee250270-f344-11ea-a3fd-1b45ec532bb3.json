@@ -1,0 +1,74 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Ingress Controller top pages [Filebeat Nginx]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "bar_color_rules": [
+                    {
+                        "id": "6252c320-a1f5-11e7-92ba-5d0b8663aece"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:nginx AND fileset.name:ingress_controller"
+                },
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "url.original",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "value_template": ""
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Ingress Controller top pages [Filebeat Nginx]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ee250270-f344-11ea-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:17.806Z",
+    "version": "WzQ0OTQsMV0="
+}

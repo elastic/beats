@@ -1,0 +1,90 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "IOPS [Metricbeat Ceph] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "0fc1f2e0-b46b-11e9-9488-8bde5ab143f4",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "0fc1f2e1-b46b-11e9-9488-8bde5ab143f4",
+                        "label": "read",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_status.traffic.read_op_per_sec",
+                                "id": "0fc1f2e2-b46b-11e9-9488-8bde5ab143f4",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#DB1374",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "0fc1f2e3-b46b-11e9-9488-8bde5ab143f4",
+                        "label": "write",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "ceph.cluster_status.traffic.write_op_per_sec",
+                                "id": "0fc1f2e4-b46b-11e9-9488-8bde5ab143f4",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "IOPS [Metricbeat Ceph] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "346d00d0-b46b-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:57.280Z",
+    "version": "WzM2MzIsMV0="
+}

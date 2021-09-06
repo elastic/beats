@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Workers [Metricbeat uWSGI] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "params": {
+                "expression": ".es(split=uwsgi.status.core.id:16,metric=max:uwsgi.status.core.requests.total).derivative().bars().title('Requests handled by each thread (core) per period')",
+                "interval": "15s"
+            },
+            "title": "Workers [Metricbeat uWSGI] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8c5f96e0-f0ae-11e7-b9ff-9f96241065de-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:52.731Z",
+    "version": "WzQxNjgsMV0="
+}

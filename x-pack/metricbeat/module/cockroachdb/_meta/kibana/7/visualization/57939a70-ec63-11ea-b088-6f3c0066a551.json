@@ -1,0 +1,155 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Capacity Usage [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "68be3790-ec65-11ea-8a63-93b9b48262dc"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "6eabb420-ec65-11ea-8a63-93b9b48262dc"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "71a5ba40-ec65-11ea-8a63-93b9b48262dc"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "hidden": false,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Total Capacity",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "0464ddc0-ec66-11ea-8a63-93b9b48262dc"
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_direction": "desc",
+                        "terms_field": "service.address",
+                        "terms_order_by": "_count",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "775782d0-ec64-11ea-8a63-93b9b48262dc",
+                        "label": "Capacity Available",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "775782d1-ec64-11ea-8a63-93b9b48262dc",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_direction": "desc",
+                        "terms_field": "service.address",
+                        "terms_order_by": "_count",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(254,146,0,1)",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "78322b60-ec64-11ea-8a63-93b9b48262dc",
+                        "label": "Capacity Used",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "78322b61-ec64-11ea-8a63-93b9b48262dc",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_direction": "desc",
+                        "terms_field": "service.address",
+                        "terms_order_by": "_count",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Capacity Usage [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "57939a70-ec63-11ea-b088-6f3c0066a551",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:00.377Z",
+    "version": "WzM3MDQsMV0="
+}

@@ -1,0 +1,103 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Endpoint - OS Average EPS [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "ce9549a0-3af0-4070-b169-4b6d145d4c39"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Operating System\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "03a2fd72-fc9c-4582-9133-20af36217180"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "94161c6c-4f48-4beb-9d78-f79f29c02a34",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "b4373ffd-9660-4206-afd6-d4867ac7dbdf",
+                        "label": "Event Throughput",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "b1a48389-d799-4eba-8b98-7ee8ef0bb440",
+                                "type": "count"
+                            },
+                            {
+                                "field": "b1a48389-d799-4eba-8b98-7ee8ef0bb440",
+                                "id": "89f8286e-4aec-4cb4-83ad-b139692edf3d",
+                                "type": "cumulative_sum"
+                            },
+                            {
+                                "field": "89f8286e-4aec-4cb4-83ad-b139692edf3d",
+                                "id": "1df39e5f-3e98-4ed7-ab08-47f3ca2ee915",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "1df39e5f-3e98-4ed7-ab08-47f3ca2ee915",
+                                "gamma": 0.3,
+                                "id": "f46a6e6e-444f-4c7e-b5eb-e1a59568f2eb",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "offset_time": "1m",
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}} / s"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "gauge",
+                "use_kibana_indexes": false
+            },
+            "title": "Endpoint - OS Average EPS [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "76c088c3-486e-4420-8840-5ede667edffe",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:36.211Z",
+    "version": "WzQ3MDYsMV0="
+}

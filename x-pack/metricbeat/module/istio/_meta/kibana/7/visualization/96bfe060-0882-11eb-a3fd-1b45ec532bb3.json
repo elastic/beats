@@ -1,0 +1,102 @@
+{
+    "attributes": {
+        "description": "Total virtual  services known to pilot.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Pilot Virtual Services [Metricbeat Istio]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Pilot Virtual Services",
+                        "field": "prometheus.pilot_virt_services.value"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "gauge": {
+                    "alignment": "automatic",
+                    "backStyle": "Full",
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 50
+                        },
+                        {
+                            "from": 50,
+                            "to": 75
+                        },
+                        {
+                            "from": 75,
+                            "to": 100
+                        }
+                    ],
+                    "extendRange": true,
+                    "gaugeColorMode": "Labels",
+                    "gaugeStyle": "Full",
+                    "gaugeType": "Arc",
+                    "invertColors": false,
+                    "labels": {
+                        "color": "black",
+                        "show": true
+                    },
+                    "orientation": "vertical",
+                    "percentageMode": false,
+                    "scale": {
+                        "color": "rgba(105,112,125,0.2)",
+                        "labels": false,
+                        "show": true
+                    },
+                    "style": {
+                        "bgColor": true,
+                        "bgFill": "rgba(105,112,125,0.2)",
+                        "bgMask": false,
+                        "bgWidth": 0.9,
+                        "fontSize": 60,
+                        "mask": false,
+                        "maskBars": 50,
+                        "subText": "",
+                        "width": 0.9
+                    },
+                    "type": "meter"
+                },
+                "isDisplayWarning": false,
+                "type": "gauge"
+            },
+            "title": "Pilot Virtual Services [Metricbeat Istio]",
+            "type": "gauge"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "96bfe060-0882-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:32.143Z",
+    "version": "WzM5NzAsMV0="
+}

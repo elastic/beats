@@ -36,7 +36,7 @@ func newReExecWindowsCommand(_ []string, streams *cli.IOStreams) *cobra.Command 
 			}
 			err = reExec(serviceName, servicePid)
 			if err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},

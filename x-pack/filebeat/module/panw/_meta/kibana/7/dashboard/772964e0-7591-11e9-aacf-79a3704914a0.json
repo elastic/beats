@@ -1,0 +1,172 @@
+{
+    "attributes": {
+        "description": "Palo Alto Networks PAN-OS Threats Overview",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 31,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Threat outcome histogram",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "title": "Top threats by name",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Top threats by resource",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "title": "Top attackers (clients)",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Top attackers (servers)",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6",
+                    "w": 17,
+                    "x": 31,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Outcome by threat type",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat PANW] Threats Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "772964e0-7591-11e9-aacf-79a3704914a0",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "0bd2a0c0-7574-11e9-976e-65a8f47cc4c1",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "3eca1070-7589-11e9-aacf-79a3704914a0",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "5bd32b20-7575-11e9-976e-65a8f47cc4c1",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "90ce3300-758a-11e9-aacf-79a3704914a0",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "a95aaf20-758a-11e9-aacf-79a3704914a0",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "6dce7930-758c-11e9-aacf-79a3704914a0",
+            "name": "6:panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:21.950Z",
+    "version": "WzQ1MjMsMV0="
+}

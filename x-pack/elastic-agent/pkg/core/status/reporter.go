@@ -267,6 +267,10 @@ func (r *reporter) Update(s state.Status, message string, payload map[string]int
 	if !r.isRegistered {
 		return
 	}
+	if state.IsStateFiltered(message, payload) {
+		return
+	}
+
 	if r.status != s || r.message != message || !reflect.DeepEqual(r.payload, payload) {
 		r.status = s
 		r.message = message

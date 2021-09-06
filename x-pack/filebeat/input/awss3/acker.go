@@ -28,8 +28,8 @@ func newEventACKTracker(ctx context.Context) *eventACKTracker {
 	return &eventACKTracker{ctx: ctx, cancel: cancel}
 }
 
-// Add increments the number of pending ACKs by the specified amount.
-func (a *eventACKTracker) Add(messageCount int64) {
+// Add increments the number of pending ACKs.
+func (a *eventACKTracker) Add() {
 	a.Lock()
 	a.pendingACKs++
 	a.Unlock()
@@ -51,6 +51,10 @@ func (a *eventACKTracker) ACK() {
 }
 
 // Wait waits for the number of pending ACKs to be zero.
+// Wait must be called sequentially only after every expected
+// `Add` calls are made. Failing to do so could reset the pendingACKs
+// property to 0 and would results in Wait returning after additional
+// calls to `Add` are made without a corresponding `ACK` call.
 func (a *eventACKTracker) Wait() {
 	// If there were never any pending ACKs then cancel the context. (This can
 	// happen when a document contains no events or cannot be read due to an error).

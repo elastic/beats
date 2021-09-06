@@ -1,0 +1,147 @@
+{
+    "attributes": {
+        "description": null,
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "5a1e8135-28e5-4e15-a675-bf9f840fca1c": {
+                            "columnOrder": [
+                                "748501ab-c222-4695-9062-93c70e72a864",
+                                "191b027e-d3d1-41da-b3fb-29315f99f4ee",
+                                "98446733-f0c0-4666-8491-52b6eae923ed",
+                                "98446733-f0c0-4666-8491-52b6eae923edX0"
+                            ],
+                            "columns": {
+                                "191b027e-d3d1-41da-b3fb-29315f99f4ee": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "auto"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "748501ab-c222-4695-9062-93c70e72a864": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of aws.rds.db_instance.identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "aws.rds.db_instance.identifier"
+                                },
+                                "98446733-f0c0-4666-8491-52b6eae923ed": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Read Latency (Milliseconds)",
+                                    "operationType": "formula",
+                                    "params": {
+                                        "formula": "average(aws.rds.latency.read)",
+                                        "isFormulaBroken": false
+                                    },
+                                    "references": [
+                                        "98446733-f0c0-4666-8491-52b6eae923edX0"
+                                    ],
+                                    "scale": "ratio"
+                                },
+                                "98446733-f0c0-4666-8491-52b6eae923edX0": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Part of average(aws.rds.latency.read)",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "aws.rds.latency.read"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "98446733-f0c0-4666-8491-52b6eae923ed"
+                        ],
+                        "layerId": "5a1e8135-28e5-4e15-a675-bf9f840fca1c",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "748501ab-c222-4695-9062-93c70e72a864",
+                        "xAccessor": "191b027e-d3d1-41da-b3fb-29315f99f4ee"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yLeftExtent": {
+                    "mode": "full"
+                },
+                "yRightExtent": {
+                    "mode": "full"
+                }
+            }
+        },
+        "title": "RDS Read Latency in Milliseconds [Metricbeat AWS]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "f9ff3450-f094-11eb-b61f-a53cb4913361",
+    "migrationVersion": {
+        "lens": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-5a1e8135-28e5-4e15-a675-bf9f840fca1c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTMsMl0="
+}
