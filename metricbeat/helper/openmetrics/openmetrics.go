@@ -45,7 +45,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-const acceptHeader = `application/openmetrics-text; version=0.0.1,text/plain;version=0.0.4;q=0.5,*/*;q=0.1`
+const acceptHeader = `application/openmetrics-text; version=1.0.0; charset=utf-8,text/plain`
 
 var errNameLabelMandatory = fmt.Errorf("missing metric name (%s label)", labels.MetricName)
 
@@ -603,6 +603,8 @@ loop:
 				metricFamiliesByName[string(buf)] = fam
 			}
 			fam.Unit = &u
+			continue
+		case textparse.EntryComment:
 			continue
 		default:
 		}

@@ -43,6 +43,7 @@ import (
 
 const (
 	expectedExtension = "-expected.json"
+	applicationJson   = "application/json"
 )
 
 // DataConfig is the configuration for testdata tests
@@ -74,6 +75,9 @@ type DataConfig struct {
 
 	// URL of the endpoint that must be tested depending on each module
 	URL string
+
+	// ContentType of the data being returned by server
+	ContentType string `yaml:"content_type"`
 
 	// Suffix is the extension of the source file with the input contents. Defaults to `json`, `plain` is also a common use.
 	Suffix string
@@ -107,9 +111,10 @@ type DataConfig struct {
 
 func defaultDataConfig() DataConfig {
 	return DataConfig{
-		Path:      ".",
-		WritePath: ".",
-		Suffix:    "json",
+		Path:        ".",
+		WritePath:   ".",
+		Suffix:      "json",
+		ContentType: applicationJson,
 	}
 }
 
@@ -138,19 +143,15 @@ func TestDataConfig(t *testing.T) DataConfig {
 }
 
 // TestDataFiles run tests with config from the usual path (`_meta/testdata`)
-func TestDataFiles(t *testing.T, module, metricSet string, contentType ...string) {
+func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
 	config := TestDataConfig(t)
-	ct := ""
-	if len(contentType) > 0 {
-		ct = contentType[0]
-	}
 
-	TestDataFilesWithConfig(t, module, metricSet, config, ct)
+	TestDataFilesWithConfig(t, module, metricSet, config)
 }
 
 // TestDataFilesWithConfig run tests for a testdata config
-func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, contentType string) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
 	t.Helper()
 	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
 	if err != nil {
@@ -171,7 +172,7 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 
 	for _, f := range files {
 		t.Run(filepath.Base(f), func(t *testing.T) {
-			runTest(t, f, module, metricSet, config, contentType)
+			runTest(t, f, module, metricSet, config)
 		})
 	}
 }
@@ -192,9 +193,9 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 
 }
 
-func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig, contentType string) {
+func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
 	// starts a server serving the given file under the given url
-	s := server(t, file, config.URL, contentType)
+	s := server(t, file, config.URL, config.ContentType)
 	defer s.Close()
 
 	moduleConfig := getConfig(module, metricSetName, s.URL, config)
@@ -452,11 +453,7 @@ func server(t *testing.T, path string, url string, contentType string) *httptest
 		}
 
 		if r.URL.Path+query == url {
-			if contentType != "" {
-				w.Header().Set("Content-Type", contentType)
-			} else {
-				w.Header().Set("Content-Type", "application/json")
-			}
+			w.Header().Set("Content-Type", contentType)
 			w.WriteHeader(200)
 			w.Write(body)
 		} else {

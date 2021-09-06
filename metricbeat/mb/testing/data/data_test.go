@@ -42,12 +42,7 @@ func TestAll(t *testing.T) {
 
 		t.Run(fmt.Sprintf("%s.%s", moduleName, metricSetName), func(t *testing.T) {
 			config := mbtest.ReadDataConfig(t, f)
-			mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config, "application/json")
-		})
-
-		t.Run(fmt.Sprintf("%s.%s", moduleName, metricSetName), func(t *testing.T) {
-			config := mbtest.ReadDataConfig(t, f)
-			mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config, "application/openmetrics-text")
+			mbtest.TestDataFilesWithConfig(t, moduleName, metricSetName, config)
 		})
 	}
 }

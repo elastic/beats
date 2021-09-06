@@ -1,4 +1,8 @@
 type: http
 url: "/metrics"
+content_type: "application/openmetrics-text"
 suffix: plain
 remove_fields_from_comparison: ["openmetrics.labels.instance"]
+module:
+  enable_exemplars: true
+  enable_metadata: true
