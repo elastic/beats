@@ -10,15 +10,14 @@
         "period": 10000
     },
     "openmetrics": {
-        "help": "carrier value of /sys/class/net/\u003ciface\u003e.",
         "labels": {
-            "device": "br-4e623477470e",
-            "job": "openmetrics"
+            "job": "openmetrics",
+            "listener_name": "http"
         },
         "metrics": {
-            "node_network_carrier": 0
-        },
-        "type": "gauge"
+            "net_conntrack_listener_conn_accepted_total": 3,
+            "net_conntrack_listener_conn_closed_total": 0
+        }
     },
     "service": {
         "address": "127.0.0.1:55555",

@@ -83,6 +83,8 @@ type MetricSet struct {
 	openMetricsEventsGen OpenMetricsEventsGenerator
 	host                 string
 	eventGenStarted      bool
+	enableExemplars      bool
+	enableMetadata       bool
 }
 
 // MetricSetBuilder returns a builder function for a new OpenMetrics metricset using
@@ -109,6 +111,8 @@ func MetricSetBuilder(namespace string, genFactory OpenMetricsEventsGeneratorFac
 			namespace:            namespace,
 			openMetricsEventsGen: openMetricsEventsGen,
 			eventGenStarted:      false,
+			enableExemplars:      config.EnableExemplars,
+			enableMetadata:       config.EnableMetadata,
 		}
 		// store host here to use it as a pointer when building `up` metric
 		ms.host = ms.Host()
@@ -152,7 +156,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		openMetricsEvents := m.openMetricsEventsGen.GenerateOpenMetricsEvents(family)
 
 		for _, openMetricEvent := range openMetricsEvents {
-			labelsHash := openMetricEvent.LabelsHash()
+			var labelsHash string
+			if m.enableMetadata {
+				labelsHash = openMetricEvent.MetaDataHash()
+			} else {
+				labelsHash = openMetricEvent.LabelsHash()
+			}
 			if _, ok := eventList[openMetricEvent.Type]; !ok {
 				eventList[openMetricEvent.Type] = make(map[string]common.MapStr)
 			}
@@ -173,17 +182,19 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				}
 			}
 
-			if openMetricEvent.Help != "" {
-				eventList[openMetricEvent.Type][labelsHash]["help"] = openMetricEvent.Help
-			}
-			if openMetricEvent.Type != "" {
-				eventList[openMetricEvent.Type][labelsHash]["type"] = openMetricEvent.Type
-			}
-			if openMetricEvent.Unit != "" {
-				eventList[openMetricEvent.Type][labelsHash]["unit"] = openMetricEvent.Unit
+			if m.enableMetadata {
+				if openMetricEvent.Help != "" {
+					eventList[openMetricEvent.Type][labelsHash]["help"] = openMetricEvent.Help
+				}
+				if openMetricEvent.Type != "" {
+					eventList[openMetricEvent.Type][labelsHash]["type"] = openMetricEvent.Type
+				}
+				if openMetricEvent.Unit != "" {
+					eventList[openMetricEvent.Type][labelsHash]["unit"] = openMetricEvent.Unit
+				}
 			}
 
-			if len(openMetricEvent.Exemplars) > 0 {
+			if m.enableExemplars && len(openMetricEvent.Exemplars) > 0 {
 				eventList[openMetricEvent.Type][labelsHash]["exemplar"] = openMetricEvent.Exemplars
 			}
 			// Accumulate metrics in the event

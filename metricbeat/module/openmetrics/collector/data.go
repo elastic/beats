@@ -43,6 +43,20 @@ type OpenMetricEvent struct {
 func (p *OpenMetricEvent) LabelsHash() string {
 	return labelhash.LabelHash(p.Labels)
 }
+func (p *OpenMetricEvent) MetaDataHash() string {
+	m := common.MapStr{}
+	m.DeepUpdate(p.Labels)
+	if len(p.Help) > 0 {
+		m["help"] = p.Help
+	}
+	if len(p.Type) > 0 {
+		m["type"] = p.Type
+	}
+	if len(p.Unit) > 0 {
+		m["unit"] = p.Unit
+	}
+	return labelhash.LabelHash(m)
+}
 
 // DefaultOpenMetricEventsGeneratorFactory returns the default OpenMetrics events generator
 func DefaultOpenMetricsEventsGeneratorFactory(ms mb.BaseMetricSet) (OpenMetricsEventsGenerator, error) {

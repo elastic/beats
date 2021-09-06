@@ -18,7 +18,9 @@
 package collector
 
 type metricsetConfig struct {
-	MetricsFilters MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
+	MetricsFilters  MetricFilters `config:"metrics_filters" yaml:"metrics_filters,omitempty"`
+	EnableExemplars bool          `config:"enable_exemplars" yaml:"enable_exemplars,omitempty"`
+	EnableMetadata  bool          `config:"enable_metadata" yaml:"enable_metadata,omitempty"`
 }
 
 type MetricFilters struct {
@@ -30,6 +32,8 @@ var defaultConfig = metricsetConfig{
 	MetricsFilters: MetricFilters{
 		IncludeMetrics: nil,
 		ExcludeMetrics: nil},
+	EnableExemplars: false,
+	EnableMetadata:  false,
 }
 
 func (c *metricsetConfig) Validate() error {
