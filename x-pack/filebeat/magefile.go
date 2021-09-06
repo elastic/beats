@@ -130,6 +130,7 @@ func ExportDashboard() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, devtools.GenerateDirModulesD)
+	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {
