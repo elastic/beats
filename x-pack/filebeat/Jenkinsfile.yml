@@ -93,6 +93,19 @@ stages:
         platforms:             ## override default labels in this specific stage.
             - "windows-7"
         stage: extended
+    cloud:
+      cloud: "mage build test"
+      withModule: true       ## run the ITs only if the changeset affects a specific module.
+      dirs:                  ## apply terraform for the given directory.
+        - "x-pack/filebeat/input/awss3/_meta/terraform"
+      when:                  ## Override the top-level when.
+        parameters:
+          - "awsCloudTests"
+        comments:
+          - "/test x-pack/filebeat for aws cloud"
+        labels:
+          - "aws"
+      stage: extended
     #windows-7-32:  See https://github.com/elastic/beats/issues/22315
     #    mage: "mage build unitTest"
     #    platforms:             ## override default labels in this specific stage.
