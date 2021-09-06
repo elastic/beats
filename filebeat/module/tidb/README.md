@@ -1,6 +1,6 @@
 # Dev Guide
 
-### Debugging scripts processors
+### Debug scripts processors
 
 - Configure the filebeat to accept stdin input and output results to stdout
 - Add your script processor
@@ -33,25 +33,64 @@ logging.metrics.enabled: false
 
 Use this configuration to start filebeat process.
 
-### Preparations
+### Prepare an elasticsearch instance
 
-```shell
-docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.14.0
-curl -X PUT --location "http://localhost:9200/_cluster/settings" \
-    -H "Content-Type: application/json" \
-    -d "{
-          \"transient\": {
-            \"logger.org.elasticsearch.cluster\": \"DEBUG\"
-          }
-        }"
-make clean
-make python-env
-source ./build/python-env/bin/activate
+Use docker-compose to start an elasticsearch instance and a kibana instance.
+
+`docker-compose.yml`:
+
+```yaml
+version: '2.2'
+services:
+  es01:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.14.1
+    container_name: es01
+    environment:
+      - node.name=es01
+      - cluster.name=es-docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - data01:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks:
+      - elastic
+
+  kib01:
+    image: docker.elastic.co/kibana/kibana:7.14.1
+    container_name: kib01
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://es01:9200
+      ELASTICSEARCH_HOSTS: '["http://es01:9200"]'
+    networks:
+      - elastic
+
+volumes:
+  data01:
+    driver: local
+
+networks:
+  elastic:
+    driver: bridge
 ```
 
 ### Running Tests
 
 ```shell
+# Just run once
+make clean
+make python-env
+source ./build/python-env/bin/activate
+
+# Run after each code change
 make update
 make filebeat.test
 GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb TESTING_FILEBEAT_FILESETS=tiflash pytest tests/system/test_modules.py

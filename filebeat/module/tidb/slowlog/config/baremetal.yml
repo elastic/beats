@@ -5,7 +5,10 @@ paths:
  - {{$path}}
 {{ end }}
 
-exclude_files: ['.gz$']
+exclude_files:
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
 
 multiline:
   type: pattern

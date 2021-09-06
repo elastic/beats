@@ -6,8 +6,9 @@ paths:
 {{ end }}
 
 exclude_files:
-  - '.gz$'
-  - '.*slowlog.*\.log$'
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
 
 processors:
   - dissect:

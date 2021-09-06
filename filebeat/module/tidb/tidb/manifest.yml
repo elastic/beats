@@ -8,6 +8,10 @@ var:
     default:
       # the default path of tiup
       - /tidb-deploy/tidb-4000/log/*.log
+  - name: exclude_files
+    default:
+      - '.gz$'
+      - '.*slowlog.*\.log$'
 
 ingest_pipeline: ingest/pipeline.json
 input: config/{{.deployment}}.yml

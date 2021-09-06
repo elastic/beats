@@ -158817,6 +158817,16 @@ type: keyword
 
 --
 
+*`tidb.slowlog.User@Host`*::
++
+--
+The name of the user who executes this statement.
+
+
+type: keyword
+
+--
+
 *`tidb.slowlog.Conn_ID`*::
 +
 --

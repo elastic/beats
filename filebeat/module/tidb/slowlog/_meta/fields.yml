@@ -176,6 +176,10 @@
       type: keyword
       description: >
         The name of the user who executes this statement.
+    - name: User@Host
+      type: keyword
+      description: >
+        The name of the user who executes this statement.
     - name: Conn_ID
       type: keyword
       description: >

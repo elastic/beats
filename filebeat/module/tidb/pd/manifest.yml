@@ -8,6 +8,9 @@ var:
     default:
       # the default path of tiup
       - /tidb-deploy/pd-2379/log/*.log
+  - name: exclude_files
+    default:
+      - '.gz$'
 
 ingest_pipeline: ingest/pipeline.json
 input: config/{{.deployment}}.yml

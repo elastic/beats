@@ -3,6 +3,11 @@ type: container
 paths:
   - /var/log/containers/*tidb*slowlog*.log
 
+exclude_files:
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
+
 multiline:
   type: pattern
   pattern: '^# Time: '

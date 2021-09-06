@@ -6,7 +6,9 @@ paths:
 {{ end }}
 
 exclude_files:
-  - '.gz$'
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
 
 processors:
   - dissect:

@@ -4,7 +4,9 @@ paths:
   - /var/log/containers/*pd*.log
 
 exclude_files:
-  - '.gz$'
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
 
 processors:
   - add_kubernetes_metadata:

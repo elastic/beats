@@ -4,8 +4,9 @@ paths:
   - /var/log/containers/*tidb*.log
 
 exclude_files:
-  - '.gz$'
-  - '.*slowlog.*\.log$'
+{{ range $i, $files := .exclude_files }}
+ - {{$files}}
+{{ end }}
 
 processors:
   - add_kubernetes_metadata:
