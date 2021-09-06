@@ -158,7 +158,7 @@ metric prefix, as for GKE metrics the required prefix is `kubernetes.io/`
   exclude_labels: false
   period: 1m
   metrics:
-    - service: kubernetes
+    - service: gke
       service_metric_prefix: kubernetes.io/
       metric_types:
         - "container/cpu/core_usage_time"

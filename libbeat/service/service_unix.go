@@ -25,3 +25,6 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 
 func notifyWindowsServiceStopped() {
 }
+
+// WaitExecutionDone is not used on non-windows platforms.
+func WaitExecutionDone() {}
