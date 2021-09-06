@@ -130,7 +130,7 @@ func (m *MetricSet) retrieveFetcher() (err error) {
 	case 2:
 		m.fetcher = &V2{}
 	case 3:
-		m.fetcher = &V2{} // the stats endpoint api did not change from couchdb version 2 to 3
+		m.fetcher = &V3{}
 	default:
 		m.fetcher = nil
 	}
