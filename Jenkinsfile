@@ -22,7 +22,7 @@ pipeline {
     RUNBLD_DISABLE_NOTIFICATIONS = 'true'
     SLACK_CHANNEL = "#beats-build"
     SNAPSHOT = 'true'
-    TERRAFORM_VERSION = "0.12.30"
+    TERRAFORM_VERSION = "0.13.7"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
   }
   options {
@@ -832,8 +832,10 @@ def withCloudTestEnv(Closure body) {
   def maskedVars = []
   def testTags = "${env.TEST_TAGS}"
 
-  // AWS
-  if (params.allCloudTests || params.awsCloudTests) {
+  // Allow AWS credentials when the build was configured to do so with:
+  //   - the cloudtests build parameters
+  //   - the aws github label
+  if (params.allCloudTests || params.awsCloudTests || matchesPrLabel(label: 'aws')) {
     testTags = "${testTags},aws"
     def aws = getVaultSecret(secret: "${AWS_ACCOUNT_SECRET}").data
     if (!aws.containsKey('access_key')) {
@@ -885,6 +887,7 @@ def startCloudTestEnv(Map args = [:]) {
             // If it failed then cleanup without failing the build
             sh(label: 'Terraform Cleanup', script: ".ci/scripts/terraform-cleanup.sh ${folder}", returnStatus: true)
           }
+          error('startCloudTestEnv: terraform apply failed.')
         } finally {
           // Archive terraform states in case manual cleanup is needed.
           archiveArtifacts(allowEmptyArchive: true, artifacts: '**/terraform.tfstate')
