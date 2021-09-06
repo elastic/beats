@@ -87,7 +87,7 @@
             "type": "table"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.15.0",
     "id": "036aef95-ec90-468d-ad7c-3cc4405e9e81",
     "migrationVersion": {
         "visualization": "7.14.0"
@@ -100,6 +100,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:34:48.527Z",
-    "version": "WzQ4NDIsMV0="
+    "updated_at": "2021-09-06T11:51:12.575Z",
+    "version": "WzQ0MDEsMV0="
 }
