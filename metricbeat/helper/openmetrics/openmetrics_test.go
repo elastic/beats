@@ -76,13 +76,13 @@ target_info 1
 target_with_labels_info{env="prod",hostname="myhost"} 1
 `
 
-	promGaugeKeyLabel = `# TYPE metrics_one_count_total gauge
+	openMetricsGaugeKeyLabel = `# TYPE metrics_one_count_total gauge
 metrics_one_count_total{name="jane",surname="foster"} 1
 metrics_one_count_total{name="john",surname="williams"} 2
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
-	promGaugeKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors gauge
+	openMetricsGaugeKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors gauge
 metrics_one_count_errors{name="jane",surname="foster"} 0
 # TYPE metrics_one_count_total gauge
 metrics_one_count_total{name="jane",surname="foster"} NaN
@@ -91,13 +91,13 @@ metrics_one_count_total{name="john",surname="williams"} -Inf
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
-	promCounterKeyLabel = `# TYPE metrics_one_count_total counter
+	openMetricsCounterKeyLabel = `# TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} 1
 metrics_one_count_total{name="john",surname="williams"} 2
 metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 `
 
-	promCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors counter
+	openMetricsCounterKeyLabelWithNaNInf = `# TYPE metrics_one_count_errors counter
 metrics_one_count_errors{name="jane",surname="foster"} 1
 # TYPE metrics_one_count_total counter
 metrics_one_count_total{name="jane",surname="foster"} NaN
@@ -106,7 +106,7 @@ metrics_one_count_total{name="jahn",surname="baldwin",age="30"} 3
 
 `
 
-	promHistogramKeyLabel = `# TYPE metrics_one_midichlorians histogram
+	openMetricsHistogramKeyLabel = `# TYPE metrics_one_midichlorians histogram
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="2000"} 52
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="4000"} 70
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="8000"} 78
@@ -125,7 +125,7 @@ metrics_one_midichlorians_sum{rank="padawan",alive="yes"} 800001
 metrics_one_midichlorians_count{rank="padawan",alive="yes"} 28
 `
 
-	promHistogramKeyLabelWithNaNInf = `# TYPE metrics_one_midichlorians histogram
+	openMetricsHistogramKeyLabelWithNaNInf = `# TYPE metrics_one_midichlorians histogram
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="2000"} NaN
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="4000"} +Inf
 metrics_one_midichlorians_bucket{rank="youngling",alive="yes",le="8000"} -Inf
@@ -136,7 +136,7 @@ metrics_one_midichlorians_sum{rank="youngling",alive="yes"} 1000001
 metrics_one_midichlorians_count{rank="youngling",alive="yes"} 86
 `
 
-	promSummaryKeyLabel = `# TYPE metrics_force_propagation_ms summary
+	openMetricsSummaryKeyLabel = `# TYPE metrics_force_propagation_ms summary
 metrics_force_propagation_ms{kind="jedi",quantile="0"} 35
 metrics_force_propagation_ms{kind="jedi",quantile="0.25"} 22
 metrics_force_propagation_ms{kind="jedi",quantile="0.5"} 7
@@ -153,7 +153,7 @@ metrics_force_propagation_ms_sum{kind="sith"} 112
 metrics_force_propagation_ms_count{kind="sith"} 711
 `
 
-	promSummaryKeyLabelWithNaNInf = `# TYPE metrics_force_propagation_ms summary
+	openMetricsSummaryKeyLabelWithNaNInf = `# TYPE metrics_force_propagation_ms summary
 metrics_force_propagation_ms{kind="jedi",quantile="0"} NaN
 metrics_force_propagation_ms{kind="jedi",quantile="0.25"} +Inf
 metrics_force_propagation_ms{kind="jedi",quantile="0.5"} -Inf
@@ -163,13 +163,13 @@ metrics_force_propagation_ms_sum{kind="jedi"} 50
 metrics_force_propagation_ms_count{kind="jedi"} 651
 `
 
-	promGaugeLabeled = `# TYPE metrics_that_inform_labels gauge
+	openMetricsGaugeLabeled = `# TYPE metrics_that_inform_labels gauge
 metrics_that_inform_labels{label1="I am 1",label2="I am 2"} 1
 metrics_that_inform_labels{label1="I am 1",label3="I am 3"} 1
 # TYPE metrics_that_use_labels gauge
 metrics_that_use_labels{label1="I am 1"} 20
 `
-	promStateset = `# TYPE enable_category stateset
+	openMetricsStateset = `# TYPE enable_category stateset
 enable_category{category="shoes"} 0
 enable_category{category="collectibles"} 1
 `
@@ -601,7 +601,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 	}{
 		{
 			testName:            "Test gauge with KeyLabel",
-			openmetricsResponse: promGaugeKeyLabel,
+			openmetricsResponse: openMetricsGaugeKeyLabel,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_count_total": Metric("metrics.one.count"),
@@ -652,7 +652,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test gauge with KeyLabel With NaN Inf",
-			openmetricsResponse: promGaugeKeyLabelWithNaNInf,
+			openmetricsResponse: openMetricsGaugeKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_count_errors": Metric("metrics.one.count"),
@@ -693,7 +693,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test counter with KeyLabel",
-			openmetricsResponse: promCounterKeyLabel,
+			openmetricsResponse: openMetricsCounterKeyLabel,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_count_total": Metric("metrics.one.count"),
@@ -744,7 +744,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test counter with KeyLabel With NaN Inf",
-			openmetricsResponse: promCounterKeyLabelWithNaNInf,
+			openmetricsResponse: openMetricsCounterKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_count_errors": Metric("metrics.one.count"),
@@ -785,7 +785,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test histogram with KeyLabel",
-			openmetricsResponse: promHistogramKeyLabel,
+			openmetricsResponse: openMetricsHistogramKeyLabel,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_midichlorians": Metric("metrics.one.midichlorians"),
@@ -842,7 +842,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test histogram with KeyLabel With NaN Inf",
-			openmetricsResponse: promHistogramKeyLabelWithNaNInf,
+			openmetricsResponse: openMetricsHistogramKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_one_midichlorians": Metric("metrics.one.midichlorians"),
@@ -876,7 +876,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test summary with KeyLabel",
-			openmetricsResponse: promSummaryKeyLabel,
+			openmetricsResponse: openMetricsSummaryKeyLabel,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
@@ -935,7 +935,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test summary with KeyLabel With NaN Inf",
-			openmetricsResponse: promSummaryKeyLabelWithNaNInf,
+			openmetricsResponse: openMetricsSummaryKeyLabelWithNaNInf,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_force_propagation_ms": Metric("metrics.force.propagation.ms"),
@@ -969,7 +969,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 
 		{
 			testName:            "Test gauge InfoMetrics using ExtendedInfoMetric",
-			openmetricsResponse: promGaugeLabeled,
+			openmetricsResponse: openMetricsGaugeLabeled,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "metrics.other_labels"}),
@@ -994,7 +994,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 		},
 		{
 			testName:            "Test gauge InfoMetrics using ExtendedInfoMetric and extra fields",
-			openmetricsResponse: promGaugeLabeled,
+			openmetricsResponse: openMetricsGaugeLabeled,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"metrics_that_inform_labels": ExtendedInfoMetric(Configuration{
@@ -1029,7 +1029,7 @@ func TestOpenMetricsKeyLabels(t *testing.T) {
 		},
 		{
 			testName:            "Stateset metric with labels",
-			openmetricsResponse: promStateset,
+			openmetricsResponse: openMetricsStateset,
 			mapping: &MetricsMapping{
 				Metrics: map[string]MetricMap{
 					"enable_category": Metric("metrics.count"),

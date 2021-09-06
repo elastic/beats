@@ -146,7 +146,6 @@ func TestDataConfig(t *testing.T) DataConfig {
 func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
 	config := TestDataConfig(t)
-
 	TestDataFilesWithConfig(t, module, metricSet, config)
 }
 

@@ -39,7 +39,7 @@ func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
 
-func TestGetPromEventsFromMetricFamily(t *testing.T) {
+func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 	labels := common.MapStr{
 		"handler": "query",
 	}
