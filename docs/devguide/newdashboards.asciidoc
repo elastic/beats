@@ -255,11 +255,11 @@ MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 
 [source,shell]
 ---------------
-./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.ndjson
+./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -folder module/redis
 ---------------
 
-This generates a `AV4REOpp5NkDleZmzKkE.ndjson` file inside dashboard directory in the redis module.
-It contains all dependencies like visualizations and searches.
+This generates an appropriate folder under module/redis for the dashboard, separating assets into dashboards, searches, vizualizations, etc.
+Each exported file is a JSON and their names are the IDs of the assets.
 
 NOTE: The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is
 `app/kibana#/dashboard/AV4REOpp5NkDleZmzKkE?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `AV4REOpp5NkDleZmzKkE`.
@@ -291,7 +291,7 @@ By passing the yml file to the `export_dashboards.go` script or to the Beat, you
 
 [source,shell]
 -------------------
-go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml
+go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml -folder dashboards
 -------------------
 
 [source,shell]
