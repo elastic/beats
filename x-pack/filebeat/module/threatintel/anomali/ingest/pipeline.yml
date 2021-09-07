@@ -139,15 +139,6 @@ processors:
               }
           }
         }
-<<<<<<< HEAD
-      }
-      handleMap(ctx);
-- remove:
-    field:
-    - threatintel.anomali.created
-    - message
-    ignore_missing: true
-=======
         handleMap(ctx);
   - remove:
       field:
@@ -155,7 +146,6 @@ processors:
         - message
         - _tmp
       ignore_missing: true
->>>>>>> 4be26943b4 ([Filebeat] Threatintel compatibility updates (#27323))
 on_failure:
   - set:
       field: error.message
