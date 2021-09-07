@@ -92,7 +92,7 @@ func makeES(
 		client, err = NewClient(ClientSettings{
 			ConnectionSettings: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Beatname:         beat.Name,
+				Beatname:         beat.Beat,
 				Kerberos:         config.Kerberos,
 				Username:         config.Username,
 				Password:         config.Password,

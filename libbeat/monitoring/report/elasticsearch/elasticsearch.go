@@ -127,7 +127,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	var clients []outputs.NetworkClient
 	for _, host := range hosts {
-		client, err := makeClient(host, params, &config, beat.Name)
+		client, err := makeClient(host, params, &config, beat.Beat)
 		if err != nil {
 			return nil, err
 		}

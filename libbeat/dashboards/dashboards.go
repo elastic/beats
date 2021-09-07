@@ -54,7 +54,7 @@ func ImportDashboards(
 		return errors.New("kibana configuration missing for loading dashboards")
 	}
 
-	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, beatInfo.Name, kibanaConfig, &dashConfig, msgOutputter, pattern)
+	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, beatInfo.Beat, kibanaConfig, &dashConfig, msgOutputter, pattern)
 }
 
 func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *common.Config,

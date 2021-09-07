@@ -58,7 +58,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 			// part of the initialization.
 			initConfig := instance.InitKibanaConfig(b.Config)
 
-			client, err := kibana.NewKibanaClient(initConfig, b.Info.Name)
+			client, err := kibana.NewKibanaClient(initConfig, b.Info.Beat)
 			if err != nil {
 				fatalf("Error creating Kibana client: %+v.\n", err)
 			}
