@@ -2,15 +2,17 @@ module_version: 1.0
 
 var:
   - name: deployment
-    # baremetal or container
-    default: baremetal
+    # log or container
+    default: log
   - name: paths
     default:
       # the default path of tiup
       - /tidb-deploy/cdc-8300/log/*.log
+      # the default path of tidb operator
+      - /var/log/containers/*cdc*.log
   - name: exclude_files
     default:
       - '.gz$'
 
 ingest_pipeline: ingest/pipeline.json
-input: config/{{.deployment}}.yml
+input: config/input.yml

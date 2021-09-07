@@ -1,4 +1,4 @@
-type: log
+type: {{.deployment}}
 
 paths:
 {{ range $i, $path := .paths }}
@@ -11,8 +11,16 @@ exclude_files:
 {{ end }}
 
 processors:
+{{ if eq .deployment "container" }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+  - add_cloud_metadata: ~
   - dissect:
-      tokenizer: '[%{time}] [%{tidb.pd.level}] [%{tidb.pd.source_line}] %{tidb.pd.log_message}'
+      tokenizer: '[%{time}] [%{tidb.level}] [%{tidb.source_line}] %{tidb.log_message}'
       field: "message"
       target_prefix: ""
       ignore_failure: true
@@ -25,7 +33,7 @@ processors:
         - '2021/09/02 04:08:27.541 +00:00'
   - drop_fields:
       when:
-        has_fields: [ 'tidb.pd.log_message', 'time' ]
+        has_fields: [ 'tidb.log_message', 'time' ]
       fields: [ "message", "time" ]
   - add_fields:
       target: ''

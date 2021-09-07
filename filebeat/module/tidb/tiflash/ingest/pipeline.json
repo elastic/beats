@@ -1,5 +1,5 @@
 {
-  "description": "Pipeline for parsing TiKV logs",
+  "description": "Pipeline for parsing TiFlash logs",
   "processors": [{
     "set": {
       "field": "event.ingested",

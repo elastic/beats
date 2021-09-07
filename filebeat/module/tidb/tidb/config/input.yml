@@ -1,4 +1,4 @@
-type: log
+type: {{.deployment}}
 
 paths:
 {{ range $i, $path := .paths }}
@@ -11,6 +11,14 @@ exclude_files:
 {{ end }}
 
 processors:
+{{ if eq .deployment "container" }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+  - add_cloud_metadata: ~
   - dissect:
       tokenizer: '[%{time}] [%{tidb.level}] [%{tidb.source_line}] %{tidb.log_message}'
       field: "message"

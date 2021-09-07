@@ -1,4 +1,4 @@
-type: log
+type: {{.deployment}}
 
 paths:
 {{ range $i, $path := .paths }}
@@ -18,6 +18,14 @@ multiline:
   timeout: 3s
 
 processors:
+{{ if eq .deployment "container" }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+  - add_cloud_metadata: ~
   - script:
       lang: javascript
       id: tidb_slow_log_parser
