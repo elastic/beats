@@ -36,6 +36,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -673,4 +674,29 @@ func mustParseURL(t *testing.T, url string) *url.URL {
 		t.Fatal(err)
 	}
 	return parsed
+}
+
+func TestUserAgentInject(t *testing.T) {
+	ua := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ua = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	cfg, err := common.NewConfigFrom(map[string]interface{}{
+		"urls": ts.URL,
+	})
+	require.NoError(t, err)
+
+	p, err := create("ua", cfg)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+	assert.Contains(t, ua, "Heartbeat")
 }
