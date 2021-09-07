@@ -81,10 +81,6 @@
           type: ip
           description: >
             Identifies a threat indicator as an IP address (irrespective of direction).
-        - name: indicator.url.domain
-          type: keyword
-          description: >
-            Identifies a threat indicator as a domain (irrespective of direction).
         - name: indicator.port
           type: long
           description: >
