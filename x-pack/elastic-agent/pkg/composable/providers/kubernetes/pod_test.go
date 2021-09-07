@@ -166,6 +166,79 @@ func TestGenerateContainerPodData(t *testing.T) {
 
 }
 
+func TestGetEphemeralContainers(t *testing.T) {
+	name := "filebeat"
+	namespace := "default"
+	podIP := "127.0.0.1"
+	containerID := "docker://foobar"
+	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
+	containerImage := "elastic/filebeat:6.3.0"
+	node := "node"
+
+	expectedEphemeralContainers :=
+		[]kubernetes.Container{
+			{
+				Name:  "filebeat",
+				Image: "elastic/filebeat:6.3.0",
+			},
+		}
+	expectedephemeralContainersStatuses :=
+		[]kubernetes.PodContainerStatus{
+			{
+				Name: "filebeat",
+				State: v1.ContainerState{
+					Running: &v1.ContainerStateRunning{
+						StartedAt: metav1.Time{},
+					},
+				},
+				Ready:       false,
+				ContainerID: "docker://foobar",
+			},
+		}
+
+	pod :=
+		&kubernetes.Pod{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:        name,
+				UID:         types.UID(uid),
+				Namespace:   namespace,
+				Labels:      map[string]string{},
+				Annotations: map[string]string{},
+			},
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Pod",
+				APIVersion: "v1",
+			},
+			Status: v1.PodStatus{
+				PodIP: podIP,
+				Phase: kubernetes.PodRunning,
+				EphemeralContainerStatuses: []kubernetes.PodContainerStatus{
+					{
+						Name:        name,
+						ContainerID: containerID,
+						State: v1.ContainerState{
+							Running: &v1.ContainerStateRunning{},
+						},
+					},
+				},
+			},
+			Spec: v1.PodSpec{
+				NodeName: node,
+				EphemeralContainers: []v1.EphemeralContainer{
+					{
+						EphemeralContainerCommon: v1.EphemeralContainerCommon{
+							Image: containerImage,
+							Name:  name,
+						},
+					},
+				},
+			},
+		}
+	ephContainers, ephContainersStatuses := getEphemeralContainers(pod)
+	assert.Equal(t, expectedEphemeralContainers, ephContainers)
+	assert.Equal(t, expectedephemeralContainersStatuses, ephContainersStatuses)
+}
+
 // MockDynamicComm is used in tests.
 type MockDynamicComm struct {
 	context.Context
