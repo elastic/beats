@@ -96,15 +96,6 @@ processors:
               }
           }
         }
-<<<<<<< HEAD
-      }
-      handleMap(ctx);
-- remove:
-    field:
-    - threatintel.abuseurl.date_added
-    - message
-    ignore_missing: true
-=======
         handleMap(ctx);
   - remove:
       field:
@@ -113,7 +104,6 @@ processors:
         - threatintel.abuseurl.host
         - message
       ignore_missing: true
->>>>>>> 4be26943b4 ([Filebeat] Threatintel compatibility updates (#27323))
 on_failure:
   - set:
       field: error.message
