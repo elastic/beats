@@ -727,14 +727,14 @@ loop:
 
 		fam.Name = &metricName
 
-		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram {
+		if hasExemplar := parser.Exemplar(&e); hasExemplar && mt != textparse.MetricTypeHistogram && metric != nil {
 			if !e.HasTs {
 				e.Ts = t
 			}
 			metric.Exemplar = &e
 		}
 
-		if tp != nil {
+		if tp != nil && metric != nil {
 			t = *tp
 			metric.TimestampMs = &t
 		}

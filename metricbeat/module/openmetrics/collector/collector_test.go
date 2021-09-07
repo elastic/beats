@@ -39,6 +39,10 @@ func TestData(t *testing.T) {
 	mbtest.TestDataFiles(t, "openmetrics", "collector")
 }
 
+func TestSameLabels(t *testing.T) {
+	dataConfig := mbtest.ReadDataConfig(t, "_meta/samelabeltestdata/config.yml")
+	mbtest.TestDataFilesWithConfig(t, "openmetrics", "collector", dataConfig)
+}
 func TestGetOpenMetricsEventsFromMetricFamily(t *testing.T) {
 	labels := common.MapStr{
 		"handler": "query",

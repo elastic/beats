@@ -45,7 +45,7 @@ type MetricMap interface {
 
 // Configuration for mappings that needs extended treatment
 type Configuration struct {
-	// StoreNonMappedLables indicates if labels found at the metric that are
+	// StoreNonMappedLabels indicates if labels found at the metric that are
 	// not found at the label map should be part of the resulting event.
 	// This setting should be used when the label name is not known beforehand
 	StoreNonMappedLabels bool
@@ -58,7 +58,7 @@ type Configuration struct {
 	//
 	// given a metric family in a Openmetrics resource in the form:
 	// 		metric1{label1="value1",label2="value2"} 1
-	// and not mapping labels but using this entry on a the MetriMap definition:
+	// and not mapping labels but using this entry on a the MetricMap definition:
 	// 		"metric1": ExtendedInfoMetric(Configuration{StoreNonMappedLabels: true, NonMappedLabelsPlacement: "mypath"}),
 	// would output an event that contains a metricset field as follows
 	// 		"mypath": {"label1":"value1","label2":"value2"}
