@@ -152087,16 +152087,6 @@ type: ip
 
 --
 
-*`threatintel.indicator.url.domain`*::
-+
---
-Identifies a threat indicator as a domain (irrespective of direction).
-
-
-type: keyword
-
---
-
 *`threatintel.indicator.port`*::
 +
 --

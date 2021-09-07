@@ -473,7 +473,7 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | date_first  | threatintel.indicator.first_seen
 | date_last   | threatintel.indicator.last_seen
 | detail      | tags
-| domain      | threatintel.indicator.domain
+| domain      | threatintel.indicator.url.domain
 | email       | threatintel.indicator.email.address
 | itype<<a,[1]>> | threatintel.indicator.type
 | lat         | threatintel.indicator.geo.location.lat
