@@ -36,6 +36,8 @@ import (
 	"github.com/joeshaw/multierror"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -124,22 +126,22 @@ func extractMessage(result []byte) error {
 }
 
 // NewKibanaClient builds and returns a new Kibana client
-func NewKibanaClient(cfg *common.Config) (*Client, error) {
+func NewKibanaClient(cfg *common.Config, beatname string) (*Client, error) {
 	config := DefaultClientConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
-	return NewClientWithConfig(&config)
+	return NewClientWithConfig(&config, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfig(config *ClientConfig) (*Client, error) {
-	return NewClientWithConfigDefault(config, 5601)
+func NewClientWithConfig(config *ClientConfig, beatname string) (*Client, error) {
+	return NewClientWithConfigDefault(config, 5601, beatname)
 }
 
 // NewClientWithConfig creates and returns a kibana client using the given config
-func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client, error) {
+func NewClientWithConfigDefault(config *ClientConfig, defaultPort int, beatname string) (*Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -181,7 +183,11 @@ func NewClientWithConfigDefault(config *ClientConfig, defaultPort int) (*Client,
 		headers.Set(k, v)
 	}
 
-	rt, err := config.Transport.Client()
+	if beatname == "" {
+		beatname = "Libbeat"
+	}
+	userAgent := useragent.UserAgent(beatname)
+	rt, err := config.Transport.Client(httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}))
 	if err != nil {
 		return nil, err
 	}

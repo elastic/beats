@@ -181,7 +181,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
@@ -521,7 +521,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}
