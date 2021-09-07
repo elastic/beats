@@ -416,7 +416,7 @@ func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) 
 	return processor, nil
 }
 
-// removeDescription removes the descriptnio config option so ES less than 7.12 will work.
+// removeDescription removes the description config option so ES less than 7.9 will work.
 func removeDescription(processor Processor, log *logp.Logger) (Processor, error) {
 	_, ok := processor.GetString("description")
 	if !ok {
