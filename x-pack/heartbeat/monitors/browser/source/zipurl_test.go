@@ -125,7 +125,7 @@ func TestZipUrlWithSameEtag(t *testing.T) {
 	defer teardown()
 
 	zus, err := dummyZus(common.MapStr{
-		"url":     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		"url":     fmt.Sprintf("%s/fixtures/todos.zip", address),
 		"folder":  "/",
 		"retries": 3,
 	})
