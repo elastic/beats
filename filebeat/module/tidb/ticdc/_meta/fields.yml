@@ -1,0 +1,5 @@
+- name: ticdc
+  type: group
+  description: >
+    Contains fields from the TiCDC instance logs.
+  fields:
