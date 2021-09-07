@@ -1,4 +1,4 @@
-version: '2.3'
+version: "2.3"
 
 services:
   couchdb:
@@ -7,5 +7,8 @@ services:
       context: ./_meta
       args:
         COUCHDB_VERSION: ${COUCHDB_VERSION:-1.7}
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: password
     ports:
       - 5984
