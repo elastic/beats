@@ -113,7 +113,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	}
 
 	if s.Beatname == "" {
-		s.Beatname == "Libbeat"
+		s.Beatname = "Libbeat"
 	}
 	userAgent := useragent.UserAgent(s.Beatname)
 
