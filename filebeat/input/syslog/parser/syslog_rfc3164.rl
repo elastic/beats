@@ -17,7 +17,7 @@
   month = ( "Jan" ("uary")? | "Feb" "ruary"? | "Mar" "ch"? | "Apr" "il"? | "Ma" "y"? | "Jun" "e"? | "Jul" "y"? | "Aug" "ust"? | "Sep" ("tember")? | "Oct" "ober"? | "Nov" "ember"? | "Dec" "ember"?) >tok %month;
 
   # Match: " 5" and "10" as the day
-  multiple_digits_day = (([12][0-9]) | ("3"[01]))>tok %day;
+  multiple_digits_day = (([012][0-9]) | ("3"[01]))>tok %day;
   single_digit_day = [1-9]>tok %day;
   day = (space? single_digit_day | multiple_digits_day);
 
