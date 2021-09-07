@@ -158349,14 +158349,7 @@ Common fields in the TiDB Module.
 
 
 
-[float]
-=== pd
-
-Contains fields from the PD instance logs.
-
-
-
-*`tidb.pd.level`*::
+*`tidb.level`*::
 +
 --
 The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
@@ -158366,7 +158359,7 @@ type: keyword
 
 --
 
-*`tidb.pd.source_line`*::
+*`tidb.source_line`*::
 +
 --
 The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
@@ -158376,7 +158369,7 @@ type: keyword
 
 --
 
-*`tidb.pd.log_message`*::
+*`tidb.log_message`*::
 +
 --
 The Log Message Section contains a customized message describing the log line.
@@ -158385,6 +158378,18 @@ The Log Message Section contains a customized message describing the log line.
 type: keyword
 
 --
+
+[float]
+=== binlog
+
+Contains fields from the binlog(pump and drainer) instance logs.
+
+
+[float]
+=== pd
+
+Contains fields from the PD instance logs.
+
 
 [float]
 === slowlog
@@ -159086,41 +159091,16 @@ type: double
 --
 
 [float]
+=== ticdc
+
+Contains fields from the TiCDC instance logs.
+
+
+[float]
 === tidb
 
 Contains fields from the TiDB instance logs.
 
-
-
-*`tidb.tidb.level`*::
-+
---
-The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
-
-
-type: keyword
-
---
-
-*`tidb.tidb.source_line`*::
-+
---
-The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
-
-
-type: keyword
-
---
-
-*`tidb.tidb.log_message`*::
-+
---
-The Log Message Section contains a customized message describing the log line.
-
-
-type: keyword
-
---
 
 [float]
 === tiflash
@@ -159128,73 +159108,17 @@ type: keyword
 Contains fields from the TiFlash instance logs.
 
 
-
-*`tidb.tiflash.level`*::
-+
---
-The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
-
-
-type: keyword
-
---
-
-*`tidb.tiflash.source_line`*::
-+
---
-The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
-
-
-type: keyword
-
---
-
-*`tidb.tiflash.log_message`*::
-+
---
-The Log Message Section contains a customized message describing the log line.
-
-
-type: keyword
-
---
-
 [float]
 === tikv
 
 Contains fields from the TiKV instance logs.
 
 
+[float]
+=== tispark
 
-*`tidb.tikv.level`*::
-+
---
-The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
+Contains fields from the TiSpark instance logs.
 
-
-type: keyword
-
---
-
-*`tidb.tikv.source_line`*::
-+
---
-The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
-
-
-type: keyword
-
---
-
-*`tidb.tikv.log_message`*::
-+
---
-The Log Message Section contains a customized message describing the log line.
-
-
-type: keyword
-
---
 
 [[exported-fields-tomcat]]
 == Apache Tomcat fields

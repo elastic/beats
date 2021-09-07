@@ -1,0 +1,113 @@
+#- module: tidb
+#
+#  slowlog:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  tidb:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  pd:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  tikv:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  tiflash:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  binlog:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  ticdc:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
+#
+#  tispark:
+#    enabled: true
+#    # Set custom paths for the log files. If left empty,
+#    # Filebeat will choose the default TiUP cluster path.
+#    #var.paths:
+#
+#    # Set custom excluded files for the log files. If left empty,
+#    # Filebeat will exclude the default ".gz" files.
+#    #var.exclude_files:
+#
+#    # Set custom deployment environment. If left empty,
+#    # Filebeat will choose TiUP on bare-metal hosts.
+#    #var.deployment:
