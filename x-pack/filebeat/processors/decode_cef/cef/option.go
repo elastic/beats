@@ -4,6 +4,10 @@
 
 package cef
 
+import (
+	"time"
+)
+
 // Option controls Setting used in unpacking messages.
 type Option interface {
 	Apply(*Settings)
@@ -12,6 +16,8 @@ type Option interface {
 // Settings for unpacking messages.
 type Settings struct {
 	fullExtensionNames bool
+
+	timezone *time.Location
 }
 
 type withFullExtensionNames struct{}
@@ -24,4 +30,18 @@ func (w withFullExtensionNames) Apply(s *Settings) {
 // their full key names (e.g. src -> sourceAddress).
 func WithFullExtensionNames() Option {
 	return withFullExtensionNames{}
+}
+
+type withTimezone struct {
+	timezone *time.Location
+}
+
+func (w withTimezone) Apply(s *Settings) {
+	s.timezone = w.timezone
+}
+
+// WithTimezone causes CEF timestamps that do not contain a timezone to be
+// parsed in the specified timezone.
+func WithTimezone(timezone *time.Location) Option {
+	return withTimezone{timezone}
 }
