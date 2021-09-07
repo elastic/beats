@@ -736,6 +736,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
 - Add `timezone` config option to the `decode_cef` processor. {issue}27232[27232] {pull}27727[27727]
+- Add `timezone` config option to the `syslog` input. {pull}27727[27727]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
