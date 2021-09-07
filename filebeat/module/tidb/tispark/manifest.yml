@@ -1,0 +1,19 @@
+module_version: 1.0
+
+var:
+  - name: deployment
+    # log or container
+    default: log
+  - name: paths
+    default:
+      # the default path of tiup
+      - /tidb-deploy/tispark-master-7077/log/*.log
+      - /tidb-deploy/tispark-worker-7078/log/*.log
+      # the default path of tidb operator
+      - /var/log/containers/*tispark*.log
+  - name: exclude_files
+    default:
+      - '.gz$'
+
+ingest_pipeline: ingest/pipeline.json
+input: config/input.yml

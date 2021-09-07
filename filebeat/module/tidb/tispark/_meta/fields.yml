@@ -1,0 +1,5 @@
+- name: tispark
+  type: group
+  description: >
+    Contains fields from the TiSpark instance logs.
+  fields:
