@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 - Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 - Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dasbhboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
+- Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
 
 *Auditbeat*
 
@@ -83,6 +84,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
 - Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
+- Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -308,6 +310,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
 - Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
+- Fix `httpjson` input rate limit processing and documentation. {pull}[]
 
 *Heartbeat*
 
@@ -517,6 +520,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 - The disk queue is now GA. {pull}27515[27515]
 - Allow non-padded base64 data to be decoded by decode_base64_field {pull}27311[27311], {issue}27021[27021]
+- The Kafka support library Sarama has been updated to 1.29.1. {pull}27717[27717]
+- Kafka is now supported up to version 2.8.0. {pull}27720[27720]
 
 *Auditbeat*
 
@@ -736,6 +741,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
+- Add base64 Encode functionality to httpjson input. {pull}27681[27681]
+- Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
 
 
 *Heartbeat*
