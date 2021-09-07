@@ -21,18 +21,22 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- name: Todos
-  id: todos
-  type: browser
-  enabled: true
-  schedule: "@every 3m"
-  tags: todos-app
-  params:
-    url: "https://elastic.github.io/synthetics-demo/"
-  source:
-    zip_url: 
-      url: "https://github.com/elastic/synthetics-demo/archive/refs/heads/main.zip"
-      folder: "todos/synthetics-tests"
+- type: http
+  # Set enabled to true (or delete the following line) to enable this example monitor
+  enabled: false
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-monitor
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My Monitor
+  # List or urls to query
+  urls: ["http://localhost:9200"]
+  # Configure task schedule
+  schedule: '@every 10s'
+  # Total test connection and data exchange timeout
+  #timeout: 16s
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service.name: my-apm-service-name
+
 # ======================= Elasticsearch template setting =======================
 
 setup.template.settings:
@@ -89,11 +93,11 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-output.console: ~
+
 # ---------------------------- Elasticsearch Output ----------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-  #hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
