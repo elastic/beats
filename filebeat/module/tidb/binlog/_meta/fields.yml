@@ -1,0 +1,5 @@
+- name: binlog
+  type: group
+  description: >
+    Contains fields from the binlog(pump and drainer) instance logs.
+  fields:
