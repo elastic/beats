@@ -4,16 +4,14 @@
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
                 "filter": [],
-                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
                 "query": {
-                    "query_string": {
-                        "analyze_wildcard": true,
-                        "query": "*"
-                    }
+                    "language": "kuery",
+                    "query": ""
                 }
             }
         },
-        "title": "Top Autonomous Systems [Filebeat Netflow]",
+        "savedSearchRefName": "search_0",
+        "title": "Top Sources Table [Filebeat Netflow]",
         "uiStateJSON": {
             "vis": {
                 "params": {
@@ -29,7 +27,7 @@
             "aggs": [
                 {
                     "enabled": true,
-                    "id": "2",
+                    "id": "1",
                     "params": {
                         "customLabel": "Bytes",
                         "field": "network.bytes"
@@ -39,7 +37,7 @@
                 },
                 {
                     "enabled": true,
-                    "id": "3",
+                    "id": "2",
                     "params": {
                         "customLabel": "Packets",
                         "field": "network.packets"
@@ -49,57 +47,78 @@
                 },
                 {
                     "enabled": true,
-                    "id": "1",
+                    "id": "3",
                     "params": {
-                        "customLabel": "Flow Records"
+                        "customLabel": "Duration",
+                        "field": "event.duration"
                     },
                     "schema": "metric",
-                    "type": "count"
+                    "type": "sum"
                 },
                 {
                     "enabled": true,
                     "id": "4",
                     "params": {
-                        "customLabel": "Autonomous System",
-                        "field": "destination.as.organization.name",
+                        "customLabel": "Source IP",
+                        "field": "source.ip",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
                         "order": "desc",
-                        "orderBy": "2",
-                        "size": 500
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 30
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Domain",
+                        "field": "source.domain",
+                        "missingBucket": true,
+                        "missingBucketLabel": "",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 1
                     },
                     "schema": "bucket",
                     "type": "terms"
                 }
             ],
-            "listeners": {},
             "params": {
                 "perPage": 10,
-                "showMeticsAtAllLevels": false,
+                "showMetricsAtAllLevels": false,
                 "showPartialRows": false,
                 "showToolbar": true,
-                "showTotal": true,
+                "showTotal": false,
                 "sort": {
                     "columnIndex": null,
                     "direction": null
                 },
                 "totalFunc": "sum"
             },
-            "title": "Top Autonomous Systems [Filebeat Netflow]",
+            "title": "Top Sources Table [Filebeat Netflow]",
             "type": "table"
         }
     },
     "coreMigrationVersion": "7.15.0",
-    "id": "036aef95-ec90-468d-ad7c-3cc4405e9e81",
+    "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
     "migrationVersion": {
         "visualization": "7.14.0"
     },
     "references": [
         {
-            "id": "filebeat-*",
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "type": "index-pattern"
+            "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
+            "name": "search_0",
+            "type": "search"
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-09-06T11:51:12.575Z",
-    "version": "WzQ0MDEsMV0="
+    "updated_at": "2021-09-06T11:51:14.710Z",
+    "version": "WzQ0NDksMV0="
 }

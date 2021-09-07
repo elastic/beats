@@ -25,13 +25,13 @@
             "type": "markdown"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.15.0",
     "id": "d4e6520a-9ced-47c9-a8f2-7246e8cbd2d3",
     "migrationVersion": {
         "visualization": "7.14.0"
     },
     "references": [],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:34:49.565Z",
-    "version": "WzQ4NDcsMV0="
+    "updated_at": "2021-09-06T11:51:13.616Z",
+    "version": "WzQ0MDYsMV0="
 }

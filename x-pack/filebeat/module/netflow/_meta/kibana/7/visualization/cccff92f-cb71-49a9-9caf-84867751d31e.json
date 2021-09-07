@@ -61,7 +61,7 @@
                     "id": "4",
                     "params": {
                         "customLabel": "Flow Exporter",
-                        "field": "agent.name",
+                        "field": "agent.hostname",
                         "order": "desc",
                         "orderBy": "2",
                         "size": 500
@@ -87,7 +87,7 @@
             "type": "table"
         }
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.15.0",
     "id": "cccff92f-cb71-49a9-9caf-84867751d31e",
     "migrationVersion": {
         "visualization": "7.14.0"
@@ -100,6 +100,6 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-04T16:34:48.527Z",
-    "version": "WzQ4NDQsMV0="
+    "updated_at": "2021-09-06T11:51:12.575Z",
+    "version": "WzQ0MDMsMV0="
 }
