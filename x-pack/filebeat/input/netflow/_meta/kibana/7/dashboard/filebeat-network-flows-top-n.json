@@ -1,869 +1,161 @@
 {
-  "objects": [
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Source Port and Transport [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Transport",
-                "field": "network.transport",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Source Port",
-                "field": "source.port",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 15
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Source Port and Transport [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "3bc31900-1ae7-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:16:16.527Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "controlledBy": "1547791659064",
-                  "disabled": false,
-                  "index": "filebeat-*",
-                  "key": "network.direction",
-                  "negate": false,
-                  "params": [
-                    "inbound",
-                    "outbound"
-                  ],
-                  "type": "phrases",
-                  "value": "inbound, outbound"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "network.direction": "inbound"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "network.direction": "outbound"
-                        }
-                      }
-                    ]
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "controlledBy": "1547791714688",
-                  "disabled": false,
-                  "index": "filebeat-*",
-                  "key": "flow.locality",
-                  "negate": false,
-                  "params": {
-                    "query": "public",
-                    "type": "phrase"
-                  },
-                  "type": "phrase",
-                  "value": "public"
-                },
-                "query": {
-                  "match": {
-                    "flow.locality": {
-                      "query": "public",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Flow Selectors [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "controls": [
-              {
-                "fieldName": "network.direction",
-                "id": "1547791659064",
-                "indexPattern": "filebeat-*",
-                "label": "Network Direction",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              },
-              {
-                "fieldName": "flow.locality",
-                "id": "1547791714688",
-                "indexPattern": "filebeat-*",
-                "label": "Locality",
-                "options": {
-                  "dynamicOptions": true,
-                  "multiselect": true,
-                  "order": "desc",
-                  "size": 5,
-                  "type": "terms"
-                },
-                "parent": "",
-                "type": "list"
-              }
-            ],
-            "pinFilters": false,
-            "updateFiltersOnChange": false,
-            "useTimeFilter": false
-          },
-          "title": "Flow Selectors [Filebeat Netflow]",
-          "type": "input_control_vis"
-        }
-      },
-      "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:16:16.527Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Destination Port and Transport [Filebeat Netflow]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Transport",
-                "field": "network.transport",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Destination Port",
-                "field": "destination.port",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 15
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Destination Port and Transport [Filebeat Netflow]",
-          "type": "pie"
-        }
-      },
-      "id": "44042280-1ae7-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:16:16.527Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Top Sources Table [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "params": {
-              "sort": {
-                "columnIndex": null,
-                "direction": null
-              }
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Packets",
-                "field": "network.packets"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Duration",
-                "field": "event.duration"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "Source IP",
-                "field": "source.ip",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 30
-              },
-              "schema": "bucket",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Domain",
-                "field": "source.domain",
-                "missingBucket": true,
-                "missingBucketLabel": "",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 1
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showTotal": false,
-            "sort": {
-              "columnIndex": null,
-              "direction": null
-            },
-            "totalFunc": "sum"
-          },
-          "title": "Top Sources Table [Filebeat Netflow]",
-          "type": "table"
-        }
-      },
-      "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:39:24.499Z",
-      "version": 3
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Top Destinations Table [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "params": {
-              "sort": {
-                "columnIndex": null,
-                "direction": null
-              }
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Packets",
-                "field": "network.packets"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Duration",
-                "field": "event.duration"
-              },
-              "schema": "metric",
-              "type": "sum"
-            },
-            {
-              "enabled": true,
-              "id": "4",
-              "params": {
-                "customLabel": "Destination IP",
-                "field": "destination.ip",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 30
-              },
-              "schema": "bucket",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "5",
-              "params": {
-                "customLabel": "Domain",
-                "field": "destination.domain",
-                "missingBucket": true,
-                "missingBucketLabel": "",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 1
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showTotal": false,
-            "sort": {
-              "columnIndex": null,
-              "direction": null
-            },
-            "totalFunc": "sum"
-          },
-          "title": "Top Destinations Table [Filebeat Netflow]",
-          "type": "table"
-        }
-      },
-      "id": "8d0c61f0-1ae6-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:39:44.417Z",
-      "version": 3
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchId": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-        "title": "Flows Over Time [Filebeat Netflow]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "Bytes": "#82B5D8",
-              "Count": "#052B51",
-              "Event Count": "#3F2B5B"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "Event Count"
-              },
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customInterval": "2h",
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "time_zone": "America/New_York",
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "customLabel": "Bytes",
-                "field": "network.bytes"
-              },
-              "schema": "metric",
-              "type": "sum"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false,
-              "style": {
-                "color": "#eee"
-              }
-            },
-            "legendPosition": "top",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Event Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "cardinal",
-                "mode": "stacked",
-                "show": "true",
-                "showCircles": true,
-                "type": "line",
-                "valueAxis": "ValueAxis-2"
-              },
-              {
-                "data": {
-                  "id": "3",
-                  "label": "Bytes"
-                },
-                "drawLinesBetweenPoints": true,
-                "interpolate": "cardinal",
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "area",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "times": [],
-            "type": "area",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Bytes"
-                },
-                "type": "value"
-              },
-              {
-                "id": "ValueAxis-2",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "RightAxis-1",
-                "position": "right",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Event Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Flows Over Time [Filebeat Netflow]",
-          "type": "area"
-        }
-      },
-      "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
-      "type": "visualization",
-      "updated_at": "2019-01-18T16:16:16.527Z",
-      "version": 2
-    },
-    {
-      "attributes": {
-        "columns": [
-          "source.ip",
-          "destination.ip",
-          "network.direction",
-          "network.transport",
-          "network.bytes"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "index": "filebeat-*",
-                  "key": "event.action",
-                  "negate": false,
-                  "params": {
-                    "query": "netflow_flow",
-                    "type": "phrase"
-                  },
-                  "type": "phrase",
-                  "value": "netflow_flow"
-                },
-                "query": {
-                  "match": {
-                    "event.action": {
-                      "query": "netflow_flow",
-                      "type": "phrase"
-                    }
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "index": "filebeat-*",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          "@timestamp",
-          "desc"
-        ],
-        "title": "Network Flow Search [Filebeat]",
-        "version": 1
-      },
-      "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
-      "type": "search",
-      "updated_at": "2019-01-18T16:16:16.527Z",
-      "version": 2
-    },
-    {
-      "attributes": {
+    "attributes": {
         "description": "Top N network flows",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "darkTheme": false,
-          "hidePanelTitles": false,
-          "useMargins": true
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "1",
-              "w": 24,
-              "x": 0,
-              "y": 8
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "id": "3bc31900-1ae7-11e9-9eb0-d1ab52900288",
-            "panelIndex": "1",
-            "type": "visualization",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "2",
-              "w": 24,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
-            "panelIndex": "2",
-            "type": "visualization",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "3",
-              "w": 24,
-              "x": 24,
-              "y": 8
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 8
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "id": "44042280-1ae7-11e9-9eb0-d1ab52900288",
-            "panelIndex": "3",
-            "type": "visualization",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "4",
-              "w": 24,
-              "x": 0,
-              "y": 23
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 23
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
-            "panelIndex": "4",
-            "type": "visualization",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 15,
-              "i": "5",
-              "w": 24,
-              "x": 24,
-              "y": 23
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 23
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
             },
-            "id": "8d0c61f0-1ae6-11e9-9eb0-d1ab52900288",
-            "panelIndex": "5",
-            "type": "visualization",
-            "version": "7.0.0"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 8,
-              "i": "6",
-              "w": 24,
-              "x": 24,
-              "y": 0
-            },
-            "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
-            "panelIndex": "6",
-            "type": "visualization",
-            "version": "7.0.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Netflow] Top-N Flows",
         "version": 1
-      },
-      "id": "1374fe40-1ae8-11e9-9eb0-d1ab52900288",
-      "type": "dashboard",
-      "updated_at": "2019-01-18T16:40:54.334Z",
-      "version": 4
-    }
-  ],
-  "version": "7.0.0-SNAPSHOT"
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "1374fe40-1ae8-11e9-9eb0-d1ab52900288",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "3bc31900-1ae7-11e9-9eb0-d1ab52900288",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "b957b010-1ae7-11e9-9eb0-d1ab52900288",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "44042280-1ae7-11e9-9eb0-d1ab52900288",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "846bac40-1ae6-11e9-9eb0-d1ab52900288",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "8d0c61f0-1ae6-11e9-9eb0-d1ab52900288",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
+            "name": "6:panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-09-06T13:06:21.081Z",
+    "version": "WzUyNzgsMV0="
 }
