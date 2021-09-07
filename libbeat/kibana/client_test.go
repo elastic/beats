@@ -114,7 +114,7 @@ headers:
   content-type: text/plain
   accept: text/plain
   kbn-xsrf: 0
-`, kibanaTs.Listener.Addr().String())))
+`, kibanaTs.Listener.Addr().String())), "Testbeat")
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
@@ -154,7 +154,7 @@ headers:
   content-type: multipart/form-data; boundary=46bea21be603a2c2ea6f51571a5e1baf5ea3be8ebd7101199320607b36ff
   accept: text/plain
   kbn-xsrf: 0
-`, kibanaTs.Listener.Addr().String())))
+`, kibanaTs.Listener.Addr().String())), "Testbeat")
 	require.NoError(t, err)
 	require.NotNil(t, client)
 
