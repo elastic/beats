@@ -75,7 +75,6 @@
             "tlp:white",
             "type:OSINT"
         ],
-        "threatintel.indicator.domain": "your-ip.getmyip.com",
         "threatintel.indicator.ip": "178.128.103.74",
         "threatintel.indicator.marking.tlp": [
             "white"
@@ -83,6 +82,7 @@
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "your-ip.getmyip.com",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "1st stage",
         "threatintel.misp.attribute.deleted": false,
@@ -300,13 +300,13 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threatintel.indicator.domain": "xenserver.ddns.net",
         "threatintel.indicator.marking.tlp": [
             "green"
         ],
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "xenserver.ddns.net",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -465,13 +465,13 @@
             "tlp:green",
             "type:OSINT"
         ],
-        "threatintel.indicator.domain": "whatsapp.com",
         "threatintel.indicator.marking.tlp": [
             "green"
         ],
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "whatsapp.com",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
