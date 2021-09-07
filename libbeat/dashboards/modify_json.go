@@ -46,11 +46,6 @@ type JSONObject struct {
 	Attributes JSONObjectAttribute `json:"attributes"`
 }
 
-// JSONFormat contains a list of JSON object
-type JSONFormat struct {
-	Objects []JSONObject `json:"objects"`
-}
-
 // ReplaceIndexInIndexPattern replaces an index in a dashboard content body
 func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error) {
 	if index == "" {
@@ -115,6 +110,23 @@ func replaceIndexInSearchObject(index string, savedObject string) (string, error
 	}
 
 	return string(searchSourceJSON), nil
+}
+
+func replaceIndexInPanelsJSON(index string, panelsJSON []map[string]interface{}) []map[string]interface{} {
+	for _, panel := range panelsJSON {
+		if config, ok := panelsJSON["embeddableConfig"]; ok {
+			if configAttr, ok := config["attributes"]; ok {
+				if refs, ok := configAttr["references"]; ok {
+					if references, ok := refs.([]map[string]interface{}); ok {
+						for _, ref := range references {
+
+						}
+					}
+				}
+			}
+		}
+	}
+	return panelsJSON
 }
 
 // ReplaceIndexInSavedObject replaces an index in a kibana object
@@ -199,6 +211,10 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
 	}
 
+	if references, ok := objectMap["references"].([]map[string]interface{}); ok {
+		references = replaceIndexInReferences(index, references)
+	}
+
 	b, err := json.Marshal(objectMap)
 	if err != nil {
 		logger.Error("Error marshaling modified dashboard: %+v", err)
@@ -206,6 +222,18 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	}
 
 	return b
+}
+
+func replaceIndexInReferences(index, references []map[string]interface{}) []map[string]interface{} {
+	for _, ref := range references {
+		if refType, ok := ref["type"]; ok {
+			if refType == "index-pattern" {
+				ref["id"] = index
+			}
+		}
+	}
+	return references
+
 }
 
 func EncodeJSONObjects(content []byte) []byte {
