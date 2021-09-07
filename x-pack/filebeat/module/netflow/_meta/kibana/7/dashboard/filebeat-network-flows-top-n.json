@@ -256,10 +256,10 @@
         "title": "[Filebeat Netflow] Top-N",
         "version": 1
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.15.0",
     "id": "14387a13-53bc-43a4-b9cd-63977aa8d87c",
     "migrationVersion": {
-        "dashboard": "7.14.0"
+        "dashboard": "7.15.0"
     },
     "references": [
         {
@@ -314,6 +314,6 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-04T16:34:48.527Z",
-    "version": "WzQ4MzUsMV0="
+    "updated_at": "2021-09-06T11:51:12.575Z",
+    "version": "WzQzOTQsMV0="
 }
