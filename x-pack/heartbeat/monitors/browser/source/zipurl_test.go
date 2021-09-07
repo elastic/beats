@@ -75,7 +75,6 @@ func TestSimpleCases(t *testing.T) {
 			common.MapStr{
 				"folder":  "/",
 				"retries": 3,
-				"timeout": 123,
 				"ssl": common.MapStr{
 					"enabled":           "true",
 					"verification_mode": "none",
