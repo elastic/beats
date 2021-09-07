@@ -1,7 +1,3 @@
-4d63.com/embedfiles v0.0.0-20190311033909-995e0740726f h1:oyYjGRBNq1TxAIG8aHqtxlvqUfzdZf+MbcRb/oweNfY=
-4d63.com/embedfiles v0.0.0-20190311033909-995e0740726f/go.mod h1:HxEsUxoVZyRxsZML/S6e2xAuieFMlGO0756ncWx1aXE=
-4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b h1:+TO4EgK74+Qo/ilRDiF2WpY09Jk9VSJSLe3wEn+dJBw=
-4d63.com/tz v1.1.1-0.20191124060701-6d37baae851b/go.mod h1:SHGqVdL7hd2ZaX2T9uEiOZ/OFAUfCCLURdLPJsd8ZNs=
 bazil.org/fuse v0.0.0-20160811212531-371fbbdaa898/go.mod h1:Xbm+BRKSBEpa4q4hTSxohYNQpsxXPbPry4JJWOB3LB8=
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
