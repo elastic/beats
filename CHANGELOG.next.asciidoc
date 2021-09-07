@@ -309,6 +309,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
 - Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
+- Fix `httpjson` input rate limit processing and documentation. {pull}[]
 
 *Heartbeat*
 
@@ -518,6 +519,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 - The disk queue is now GA. {pull}27515[27515]
 - Allow non-padded base64 data to be decoded by decode_base64_field {pull}27311[27311], {issue}27021[27021]
+- The Kafka support library Sarama has been updated to 1.29.1. {pull}27717[27717]
+- Kafka is now supported up to version 2.8.0. {pull}27720[27720]
 
 *Auditbeat*
 
@@ -738,6 +741,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
+- Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
 
 
 *Heartbeat*
