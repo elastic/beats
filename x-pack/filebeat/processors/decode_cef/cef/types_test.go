@@ -6,8 +6,10 @@ package cef
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestToTimestamp(t *testing.T) {
@@ -61,9 +63,21 @@ func TestToTimestamp(t *testing.T) {
 	}
 
 	for _, timeValue := range times {
-		_, err := toTimestamp(timeValue)
+		_, err := toTimestamp(timeValue, nil)
 		assert.NoError(t, err, timeValue)
 	}
+}
+
+func TestToTimestampWithTimezone(t *testing.T) {
+	const offsetHour, offsetMin = 2, 15 // +0215
+
+	ct, err := toTimestamp("Jun 23 10:30:03.004", &Settings{timezone: time.FixedZone("", offsetHour*60*60+offsetMin*60)})
+	require.NoError(t, err)
+
+	// 2021-06-23 08:15:03.004 +0000 UTC
+	ts := time.Time(ct).UTC()
+	assert.Equal(t, 10-offsetHour, ts.Hour())
+	assert.Equal(t, 30-offsetMin, ts.Minute())
 }
 
 func TestToMACAddress(t *testing.T) {

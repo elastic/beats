@@ -46,6 +46,13 @@ A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[cef, forwarded]`.
 
+*`var.timezone`*::
+
+IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g.
+`+0200`) to use when parsing times from the CEF message that do not contain a
+time zone. `Local` may be specified to use the machine's local time zone.
+Defaults to `UTC`.
+
 [float]
 ==== Forcepoint NGFW Security Management Center
 
