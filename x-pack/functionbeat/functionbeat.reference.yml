@@ -296,6 +296,60 @@ functionbeat.provider.aws.functions:
     # Set to true to publish fields with null values in events.
     #keep_null: false
 
+    # Create a function that accepts events from S3 notifications events.
+    - name: s3
+      enabled: false
+      type: s3
+
+      # Description of the method to help identify them when you run multiples functions.
+      description: "lambda function for S3 notification events"
+
+      # Concurrency, is the reserved number of instances for that function.
+      # Default is 5.
+      #
+      # Note: There is a hard limit of 1000 functions of any kind per account.
+      #concurrency: 5
+
+      # The maximum memory allocated for this function, the configured size must be a factor of 64.
+      # There is a hard limit of 3008MiB for each function. Default is 128MiB.
+      #memory_size: 128MiB
+
+      # The amount of time the function is allowed to run.
+      #timeout: 3s
+
+      # Execution role of the function.
+      #role: arn:aws:iam::123456789012:role/MyFunction
+
+      # Connect to private resources in an Amazon VPC.
+      #virtual_private_cloud:
+      #  security_group_ids: []
+      #  subnet_ids: []
+
+      # Tags are key-value pairs attached to the function.
+      #tags:
+      #  department: ops
+
+      # Optional fields that you can specify to add additional information to the
+      # output. Fields can be scalar values, arrays, dictionaries, or any nested
+      # combination of these.
+      #fields:
+      #  env: staging
+
+      # List of S3 buckets with notifications.
+      triggers:
+          # Arn for the S3 bucket with notifications.
+        - event_source_arn: arn:aws:s3:::mybucket
+
+      # Define custom processors for this function.
+      #processors:
+      #  - decode_json_fields:
+      #      fields: ["message"]
+      #      process_array: false
+      #      max_depth: 1
+      #      target: ""
+      #      overwrite_keys: false
+      #
+
 # Configure functions to run on Google Cloud Platform, currently we assume that the credentials
 # are present in the environment to correctly create the function when using the CLI.
 #

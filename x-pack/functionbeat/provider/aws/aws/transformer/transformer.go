@@ -10,7 +10,6 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/url"
@@ -223,22 +222,18 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 	var evts []beat.Event
 	svc := s3.New(session.New())
 	for _, record := range request.Records {
-		unescaped_key, err := url.QueryUnescape(record.S3.Object.Key)
+		unescapedKey, err := url.QueryUnescape(record.S3.Object.Key)
 
 		if err != nil {
-			fmt.Println("Got error unescaping key: %s", record.S3.Object.Key)
-			fmt.Println(err.Error())
 			return nil, err
 		}
 
 		result, err := svc.GetObject(&s3.GetObjectInput{
 			Bucket: aws.String(record.S3.Bucket.Name),
-			Key:    aws.String(unescaped_key),
+			Key:    aws.String(unescapedKey),
 		})
 
 		if err != nil {
-			fmt.Println("Got error calling GetObject:")
-			fmt.Println(err.Error())
 			return nil, err
 		}
 
@@ -246,11 +241,10 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 		obj, err := ioutil.ReadAll(result.Body)
 
 		if err != nil {
-			fmt.Println(err)
 			return nil, err
 		}
 
-		if obj[0] == 31 && obj[1] == 139 {
+		if obj[0] == 31 && obj[1] == 139 { //gzipped data detection
 			inBuf := bytes.NewBuffer(obj)
 			r, err := gzip.NewReader(inBuf)
 			if err != nil {
@@ -271,10 +265,10 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 			obj = outBuf.Bytes()
 		}
 
-		obj_r := bytes.NewReader(obj)
-		obj_line := bufio.NewScanner(obj_r)
+		objR := bytes.NewReader(obj)
+		objLine := bufio.NewScanner(objR)
 
-		for obj_line.Scan() {
+		for objLine.Scan() {
 			s3evt := beat.Event{
 				Timestamp: time.Now(),
 				Fields: common.MapStr{
@@ -285,10 +279,10 @@ func S3GetEvents(request events.S3Event) ([]beat.Event, error) {
 						"provider": "aws",
 						"region":   record.AWSRegion,
 					},
-					"message":      obj_line.Text(),
+					"message":      objLine.Text(),
 					"event_source": record.EventSource,
 					"bucket_name":  record.S3.Bucket.Name,
-					"bucket_key":   unescaped_key,
+					"bucket_key":   unescapedKey,
 					"aws_region":   record.AWSRegion,
 				},
 			}
