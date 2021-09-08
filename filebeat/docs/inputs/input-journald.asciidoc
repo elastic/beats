@@ -66,7 +66,7 @@ The `journald` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-[id="{beatname_lc}-id"]
+[id="{beatname_lc}-input-{type}-id"]
 ==== `id`
 
 An optional unique identifier for the input. By providing a unique `id` you can
@@ -88,7 +88,7 @@ be persisted independently in the registry file.
 ----
 
 [float]
-[id="{beatname_lc}-paths"]
+[id="{beatname_lc}-input-{type}-paths"]
 ==== `paths`
 
 A list of paths that will be crawled and fetched. Each path can be a directory
@@ -99,21 +99,21 @@ into a single journal and reads them.
 If no paths are specified, {beatname_uc} reads from the default journal.
 
 [float]
-[id="{beatname_lc}-backoff"]
+[id="{beatname_lc}-input-{type}-backoff"]
 ==== `backoff`
 
 The number of seconds to wait before trying to read again from journals. The
 default is 1s.
 
 [float]
-[id="{beatname_lc}-max-backoff"]
+[id="{beatname_lc}-input-{type}-max-backoff"]
 ==== `max_backoff`
 
 The maximum number of seconds to wait before attempting to read again from
 journals. The default is 60s.
 
 [float]
-[id="seek"]
+[id="{beatname_lc}-input-{type}-seek"]
 ==== `seek`
 
 The position to start reading the journal from. Valid settings are:
@@ -127,16 +127,12 @@ only the last log message is sent on restart.
 * `cursor`: On first read, starts reading at the beginning of the journal. After
 a reload or restart, continues reading at the last known position.
 
-When specified under `paths`, the `seek` setting applies to all journals under
-the configured paths. When specified directly under the +{beatname_lc}+
-namespace, the setting applies to all journals read by {beatname_uc}.
-
 If you have old log files and want to skip lines, start {beatname_uc} with
 `seek: tail` specified. Then stop {beatname_uc}, set `seek: cursor`, and restart
 {beatname_uc}.
 
 [float]
-[id="include-matches"]
+[id="{beatname_lc}-input-{type}-include-matches"]
 ==== `include_matches`
 
 A list of filter expressions used to match fields. The format of the expression
@@ -147,18 +143,13 @@ To reference fields, use one of the following:
 
 * The field name used by the systemd journal. For example,
 `CONTAINER_TAG=redis`.
-* The <<translated-fields,translated field name>> used by {beatname_uc}. For
-example, `container.image.tag=redis`. {beatname_uc} does not translate all
-fields from the journal. For custom fields, use the name specified in the
-systemd journal.
-
-When specified under `paths`, the `include_matches` filter is applied to all
-journals under the configured paths. When specified directly under the
-+{beatname_lc}+ namespace, the setting applies to all journals read by
-{beatname_uc}.
+* The <<{beatname_lc}-input-{type}-translated-fields,translated field name>>
+used by {beatname_uc}. For example, `container.image.tag=redis`. {beatname_uc}
+does not translate all fields from the journal. For custom fields, use the name
+specified in the systemd journal.
 
 [float]
-[[translated-fields]]
+[id="{beatname_lc}-input-{type}-translated-fields"]
 === Translated field names
 
 You can use the following translated names in filter expressions to reference
