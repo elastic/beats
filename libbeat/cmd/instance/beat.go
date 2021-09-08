@@ -532,7 +532,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config())
+			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}
@@ -822,7 +822,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
 		}
 
-		client, err := kibana.NewKibanaClient(kibanaConfig)
+		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %v", err)
 		}
