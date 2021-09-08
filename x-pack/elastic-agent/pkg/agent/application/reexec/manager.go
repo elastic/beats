@@ -12,7 +12,7 @@ import (
 type ExecManager interface {
 	// ReExec asynchronously re-executes command in the same PID and memory address
 	// as the currently running application.
-	ReExec(argOverrides ...string)
+	ReExec(callback ShutdownCallbackFn, argOverrides ...string)
 
 	// ShutdownChan returns the shutdown channel the main function should use to
 	// handle shutdown of the current running application.
@@ -31,6 +31,9 @@ type manager struct {
 	complete chan bool
 }
 
+// ShutdownCallbackFn is called once everything is shutdown and allows cleanup during reexec process.
+type ShutdownCallbackFn func() error
+
 // NewManager returns the reexec manager.
 func NewManager(log *logger.Logger, exec string) ExecManager {
 	return &manager{
@@ -42,10 +45,17 @@ func NewManager(log *logger.Logger, exec string) ExecManager {
 	}
 }
 
-func (m *manager) ReExec(argOverrides ...string) {
+func (m *manager) ReExec(shutdownCallback ShutdownCallbackFn, argOverrides ...string) {
 	go func() {
 		close(m.trigger)
 		<-m.shutdown
+
+		if shutdownCallback != nil {
+			if err := shutdownCallback(); err != nil {
+				// panic; because there is no going back, everything is shutdown
+				panic(err)
+			}
+		}
 
 		if err := reexec(m.logger, m.exec, argOverrides...); err != nil {
 			// panic; because there is no going back, everything is shutdown
