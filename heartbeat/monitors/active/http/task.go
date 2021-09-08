@@ -45,11 +45,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-<<<<<<< HEAD
-var userAgent = useragent.UserAgent("Heartbeat", true)
-
-=======
->>>>>>> 8a5dac67f9 (Add a header round tripper option to httpcommon (#27509))
 func newHTTPMonitorHostJob(
 	addr string,
 	config *Config,

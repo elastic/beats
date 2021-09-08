@@ -34,7 +34,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-var userAgent = useragent.UserAgent("Metricbeat")
+var userAgent = useragent.UserAgent("Metricbeat", true)
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.

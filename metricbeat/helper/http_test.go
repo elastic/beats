@@ -283,7 +283,7 @@ func TestUserAgentCheck(t *testing.T) {
 		SanitizedURI: ts.URL,
 	}
 
-	h, err := NewHTTPFromConfig(cfg, hostData)
+	h, err := newHTTPFromConfig(cfg, "test", hostData)
 	require.NoError(t, err)
 
 	res, err := h.FetchResponse()

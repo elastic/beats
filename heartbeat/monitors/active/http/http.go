@@ -39,7 +39,7 @@ func init() {
 
 var debugf = logp.MakeDebug("http")
 
-var userAgent = useragent.UserAgent("Heartbeat")
+var userAgent = useragent.UserAgent("Heartbeat", true)
 
 // Create makes a new HTTP monitor
 func create(

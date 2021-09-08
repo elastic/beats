@@ -172,16 +172,6 @@ func TestRequestBuildingWithCustomHost(t *testing.T) {
 	}
 }
 
-<<<<<<< HEAD
-func TestRequestBuildingWithNoUserAgent(t *testing.T) {
-	request, err := buildRequest("localhost", &Config{}, nilEncoder{})
-
-	require.Nil(t, err)
-	assert.Equal(t, useragent.UserAgent("Heartbeat", true), request.Header.Get("User-Agent"))
-}
-
-=======
->>>>>>> 8a5dac67f9 (Add a header round tripper option to httpcommon (#27509))
 func TestRequestBuildingWithExplicitUserAgent(t *testing.T) {
 	expectedUserAgent := "some-user-agent"
 
