@@ -922,7 +922,6 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 								"^%{IP:bar}$",
 							},
 							"ignore_missing": true,
-							"description":    "foo bar",
 							"if":             "condition",
 							"ignore_failure": false,
 							"tag":            "myTag",
@@ -1319,6 +1318,121 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 									},
 								},
 							},
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+	}
+
+	for _, test := range cases {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			t.Parallel()
+			err := adaptPipelineForCompatibility(*test.esVersion, "foo-pipeline", test.content, logp.NewLogger(logName))
+			if test.isErrExpected {
+				assert.Error(t, err)
+			} else {
+				require.NoError(t, err)
+				assert.Equal(t, test.expected, test.content, test.name)
+			}
+		})
+	}
+}
+
+func TestRemoveDescription(t *testing.T) {
+	cases := []struct {
+		name          string
+		esVersion     *common.Version
+		content       map[string]interface{}
+		expected      map[string]interface{}
+		isErrExpected bool
+	}{
+		{
+			name:      "ES < 7.9.0",
+			esVersion: common.MustNewVersion("7.8.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":       "rule.name",
+							"value":       "{{panw.panos.ruleset}}",
+							"description": "This is a description",
+						},
+					},
+					map[string]interface{}{
+						"script": map[string]interface{}{
+							"source":      "abcd",
+							"lang":        "painless",
+							"description": "This is a description",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field": "rule.name",
+							"value": "{{panw.panos.ruleset}}",
+						},
+					},
+					map[string]interface{}{
+						"script": map[string]interface{}{
+							"source": "abcd",
+							"lang":   "painless",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES == 7.9.0",
+			esVersion: common.MustNewVersion("7.9.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":       "rule.name",
+							"value":       "{{panw.panos.ruleset}}",
+							"description": "This is a description",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":       "rule.name",
+							"value":       "{{panw.panos.ruleset}}",
+							"description": "This is a description",
+						},
+					},
+				},
+			},
+			isErrExpected: false,
+		},
+		{
+			name:      "ES > 7.9.0",
+			esVersion: common.MustNewVersion("8.0.0"),
+			content: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":       "rule.name",
+							"value":       "{{panw.panos.ruleset}}",
+							"description": "This is a description",
+						},
+					},
+				}},
+			expected: map[string]interface{}{
+				"processors": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"field":       "rule.name",
+							"value":       "{{panw.panos.ruleset}}",
+							"description": "This is a description",
 						},
 					},
 				},
