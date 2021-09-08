@@ -97,12 +97,7 @@ func TestInitKibanaConfig(t *testing.T) {
 	username, err := kibanaConfig.String("username", -1)
 	assert.NoError(t, err)
 	password, err := kibanaConfig.String("password", -1)
-<<<<<<< HEAD
-=======
 	assert.NoError(t, err)
-	api_key, err := kibanaConfig.String("api_key", -1)
-	assert.NoError(t, err)
->>>>>>> 627b7a8b3a (libbeat/cmd/instance: ensure test config file has appropriate permissions (#27178))
 	protocol, err := kibanaConfig.String("protocol", -1)
 	assert.NoError(t, err)
 	host, err := kibanaConfig.String("host", -1)
