@@ -378,6 +378,15 @@ func TestJsonBody(t *testing.T) {
 			"could not parse JSON",
 			"text/plain; charset=utf-8",
 		},
+		{
+			"complex type match json",
+			"{\"number\": 3, \"bool\": true}",
+			common.MapStr{
+				"equals": common.MapStr{"number": 3, "bool": true},
+			},
+			"",
+			"application/json",
+		},
 	}
 
 	for _, tc := range testCases {
