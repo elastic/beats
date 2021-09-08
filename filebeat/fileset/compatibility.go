@@ -127,6 +127,13 @@ var processorCompatibilityChecks = []processorCompatibility{
 		},
 		adaptConfig: deleteProcessor,
 	},
+	{
+		procType: "*",
+		checkVersion: func(esVersion *common.Version) bool {
+			return esVersion.LessThan(common.MustNewVersion("7.9.0"))
+		},
+		adaptConfig: removeDescription,
+	},
 }
 
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
@@ -153,8 +160,14 @@ nextProcessor:
 				return fmt.Errorf("processor at index %d is not an object, got %T", i, obj)
 			}
 
+<<<<<<< HEAD
 			configIfc, found := processor[proc.procType]
 			if !found {
+=======
+		// Run compatibility checks on the processor.
+		for _, proc := range processorCompatibilityChecks {
+			if processor.Name() != proc.procType && proc.procType != "*" {
+>>>>>>> 6e290c8156 ([Filebeat] Update compatibility function to remove processor description on ES < 7.9.0 (#27774))
 				continue
 			}
 			config, ok := configIfc.(map[string]interface{})
@@ -166,10 +179,14 @@ nextProcessor:
 				continue
 			}
 
+<<<<<<< HEAD
 			act := proc.adaptConfig(config, log.With("processor_type", proc.procType, "processor_index", i))
 			obj, err = act(obj)
+=======
+			processor, err = proc.adaptConfig(processor, log.With("processor_type", processor.Name(), "processor_index", i))
+>>>>>>> 6e290c8156 ([Filebeat] Update compatibility function to remove processor description on ES < 7.9.0 (#27774))
 			if err != nil {
-				return fmt.Errorf("failed to adapt %q processor at index %d: %w", proc.procType, i, err)
+				return fmt.Errorf("failed to adapt %q processor at index %d: %w", processor.Name(), i, err)
 			}
 			if obj == nil {
 				continue nextProcessor
@@ -295,4 +312,17 @@ func replaceConvertIP(config map[string]interface{}, log *logp.Logger) compatAct
 	}
 	log.Debug("processor output=", grok)
 	return replaceProcessor(grok)
+}
+
+// removeDescription removes the description config option so ES less than 7.9 will work.
+func removeDescription(processor Processor, log *logp.Logger) (Processor, error) {
+	_, ok := processor.GetString("description")
+	if !ok {
+		return processor, nil
+	}
+
+	log.Debug("Removing unsupported 'description' from processor.")
+	processor.Delete("description")
+
+	return processor, nil
 }
