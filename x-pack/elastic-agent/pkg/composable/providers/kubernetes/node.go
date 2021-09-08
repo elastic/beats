@@ -5,6 +5,7 @@
 package kubernetes
 
 import (
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -25,6 +25,7 @@ type node struct {
 	comm           composable.DynamicProviderComm
 	scope          string
 	config         *Config
+	metagen        metadata.MetaGen
 }
 
 type nodeData struct {
@@ -39,7 +40,8 @@ func NewNodeWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string,
+	rawConfig *common.Config) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -49,13 +51,21 @@ func NewNodeWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&node{logger, cfg.CleanupTimeout, comm, scope, cfg})
+
+	metaGen := metadata.NewNodeMetadataGenerator(rawConfig, watcher.Store(), client)
+	watcher.AddEventHandler(&node{
+		logger,
+		cfg.CleanupTimeout,
+		comm,
+		scope,
+		cfg,
+		metaGen})
 
 	return watcher, nil
 }
 
 func (n *node) emitRunning(node *kubernetes.Node) {
-	data := generateNodeData(node, n.config)
+	data := generateNodeData(node, n.config, n.metagen)
 	if data == nil {
 		return
 	}
@@ -165,7 +175,7 @@ func isNodeReady(node *kubernetes.Node) bool {
 	return false
 }
 
-func generateNodeData(node *kubernetes.Node, cfg *Config) *nodeData {
+func generateNodeData(node *kubernetes.Node, cfg *Config, kubeMetaGen metadata.MetaGen) *nodeData {
 	host := getAddress(node)
 
 	// If a node doesn't have an IP then dont monitor it
@@ -178,41 +188,31 @@ func generateNodeData(node *kubernetes.Node, cfg *Config) *nodeData {
 		return nil
 	}
 
-	//TODO: add metadata here too ie -> meta := n.metagen.Generate(node)
-
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
-	for k, v := range node.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+	meta := kubeMetaGen.Generate(node)
+	kubemetaMap, err := meta.GetValue("kubernetes")
+	if err != nil {
+		return &nodeData{}
 	}
 
-	labels := common.MapStr{}
-	for k, v := range node.GetObjectMeta().GetLabels() {
-		// TODO: add dedoting option
-		safemapstr.Put(labels, k, v)
-	}
+	// k8sMapping includes only the metadata that fall under kubernetes.*
+	// and these are available as dynamic vars through the provider
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
 
-	mapping := map[string]interface{}{
-		"node": map[string]interface{}{
-			"uid":         string(node.GetUID()),
-			"name":        node.GetName(),
-			"labels":      labels,
-			"annotations": annotations,
-			"ip":          host,
-		},
-	}
-
-	processors := []map[string]interface{}{
-		{
+	processors := []map[string]interface{}{}
+	// meta map includes metadata that go under kubernetes.*
+	// but also other ECS fields like orchestrator.*
+	for field, metaMap := range meta {
+		processor := map[string]interface{}{
 			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes",
+				"fields": metaMap,
+				"target": field,
 			},
-		},
+		}
+		processors = append(processors, processor)
 	}
 	return &nodeData{
 		node:       node,
-		mapping:    mapping,
+		mapping:    k8sMapping,
 		processors: processors,
 	}
 }

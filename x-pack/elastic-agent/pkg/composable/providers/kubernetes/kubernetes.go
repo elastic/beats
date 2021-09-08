@@ -141,13 +141,13 @@ func (p *dynamicProvider) newWatcher(
 		}
 		return watcher, nil
 	case "node":
-		watcher, err := NewNodeWatcher(comm, config, p.logger, client, p.config.Scope)
+		watcher, err := NewNodeWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
 		if err != nil {
 			return nil, err
 		}
 		return watcher, nil
 	case "service":
-		watcher, err := NewServiceWatcher(comm, config, p.logger, client, p.config.Scope)
+		watcher, err := NewServiceWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
 		if err != nil {
 			return nil, err
 		}

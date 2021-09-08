@@ -5,6 +5,8 @@
 package kubernetes
 
 import (
+	"fmt"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
 
 	k8s "k8s.io/client-go/kubernetes"
@@ -23,6 +25,7 @@ type service struct {
 	comm           composable.DynamicProviderComm
 	scope          string
 	config         *Config
+	metagen        metadata.MetaGen
 }
 
 type serviceData struct {
@@ -37,7 +40,8 @@ func NewServiceWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string,
+	rawConfig *common.Config) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -46,13 +50,31 @@ func NewServiceWatcher(
 	if err != nil {
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
-	watcher.AddEventHandler(&service{logger, cfg.CleanupTimeout, comm, scope, cfg})
+
+	metaConf := metadata.GetDefaultResourceMetadataConfig()
+	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		SyncTimeout: cfg.SyncPeriod,
+		Namespace:   cfg.Namespace,
+	}, nil)
+	if err != nil {
+		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	}
+	namespaceMeta := metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+	metaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, client)
+	watcher.AddEventHandler(&service{
+		logger,
+		cfg.CleanupTimeout,
+		comm,
+		scope,
+		cfg,
+		metaGen,
+	})
 
 	return watcher, nil
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
-	data := generateServiceData(service, s.config)
+	data := generateServiceData(service, s.config, s.metagen)
 	if data == nil {
 		return
 	}
@@ -92,7 +114,7 @@ func (s *service) OnDelete(obj interface{}) {
 	time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
 }
 
-func generateServiceData(service *kubernetes.Service, cfg *Config) *serviceData {
+func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen metadata.MetaGen) *serviceData {
 	host := service.Spec.ClusterIP
 
 	// If a service doesn't have an IP then dont monitor it
@@ -100,41 +122,33 @@ func generateServiceData(service *kubernetes.Service, cfg *Config) *serviceData 
 		return nil
 	}
 
-	//TODO: add metadata here too ie -> meta := s.metagen.Generate(service)
 
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
-	for k, v := range service.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+	meta := kubeMetaGen.Generate(service)
+	kubemetaMap, err := meta.GetValue("kubernetes")
+	if err != nil {
+		return &serviceData{}
 	}
 
-	labels := common.MapStr{}
-	for k, v := range service.GetObjectMeta().GetLabels() {
-		// TODO: add dedoting option
-		safemapstr.Put(labels, k, v)
-	}
+	// k8sMapping includes only the metadata that fall under kubernetes.*
+	// and these are available as dynamic vars through the provider
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
 
-	mapping := map[string]interface{}{
-		"service": map[string]interface{}{
-			"uid":         string(service.GetUID()),
-			"name":        service.GetName(),
-			"labels":      labels,
-			"annotations": annotations,
-			"ip":          host,
-		},
-	}
-
-	processors := []map[string]interface{}{
-		{
+	processors := []map[string]interface{}{}
+	// meta map includes metadata that go under kubernetes.*
+	// but also other ECS fields like orchestrator.*
+	for field, metaMap := range meta {
+		processor := map[string]interface{}{
 			"add_fields": map[string]interface{}{
-				"fields": mapping,
-				"target": "kubernetes",
+				"fields": metaMap,
+				"target": field,
 			},
-		},
+		}
+		processors = append(processors, processor)
 	}
+	
 	return &serviceData{
 		service:    service,
-		mapping:    mapping,
+		mapping:    k8sMapping,
 		processors: processors,
 	}
 }
