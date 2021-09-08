@@ -49,8 +49,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "ip.anysrc.net",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "ip.anysrc.net"
     },
     {
         "event.category": "threat",
@@ -796,8 +796,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "maper.info",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "maper.info"
     },
     {
         "event.category": "threat",
@@ -1144,8 +1144,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "fotmailz.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "fotmailz.com"
     },
     {
         "event.category": "threat",
@@ -1161,8 +1161,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "pori89g5jqo3v8.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "pori89g5jqo3v8.com"
     },
     {
         "event.category": "threat",
@@ -1178,8 +1178,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "sebco.co.ke",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "sebco.co.ke"
     },
     {
         "event.category": "threat",
@@ -1213,8 +1213,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "chishir.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "chishir.com"
     },
     {
         "event.category": "threat",
@@ -1230,8 +1230,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "kostunivo.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "kostunivo.com"
     },
     {
         "event.category": "threat",
@@ -1247,8 +1247,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "mangoclone.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "mangoclone.com"
     },
     {
         "event.category": "threat",
@@ -1264,8 +1264,8 @@
             "forwarded",
             "threatintel-otx"
         ],
-        "threatintel.indicator.domain": "onixcellent.com",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "onixcellent.com"
     },
     {
         "event.category": "threat",

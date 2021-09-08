@@ -21,6 +21,7 @@ package process
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/pkg/errors"
@@ -90,6 +91,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		perCPU:  config.IncludePerCPU,
 		IsAgent: systemModule.IsAgent,
 	}
+
+	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
+	if len(paths.Paths.Hostfs) < 2 {
+		override, isset := os.LookupEnv("LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE")
+		if isset {
+			m.stats.CgroupOpts.CgroupsHierarchyOverride = override
+		}
+	}
+
 	err := m.stats.Init()
 	if err != nil {
 		return nil, err

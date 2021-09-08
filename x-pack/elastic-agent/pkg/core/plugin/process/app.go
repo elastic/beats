@@ -256,6 +256,10 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 
 func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
 	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		if state.IsStateFiltered(msg, payload) {
+			return
+		}
+
 		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload

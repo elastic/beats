@@ -99,7 +99,11 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 
 	// TODO: deal with init containers stopping after initialization
 	p.emitContainers(pod, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
-	// TODO: deal with ephemeral containers
+
+	// Get ephemeral containers and their status
+	ephContainers, ephContainersStatuses := getEphemeralContainers(pod)
+	p.emitContainers(pod, ephContainers, ephContainersStatuses)
+
 }
 
 func (p *pod) emitContainers(
@@ -272,4 +276,17 @@ func generateContainerData(
 		}
 		comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 	}
+}
+
+func getEphemeralContainers(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
+	var ephContainers []kubernetes.Container
+	var ephContainersStatuses []kubernetes.PodContainerStatus
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := kubernetes.Container(c.EphemeralContainerCommon)
+		ephContainers = append(ephContainers, c)
+	}
+	for _, s := range pod.Status.EphemeralContainerStatuses {
+		ephContainersStatuses = append(ephContainersStatuses, s)
+	}
+	return ephContainers, ephContainersStatuses
 }

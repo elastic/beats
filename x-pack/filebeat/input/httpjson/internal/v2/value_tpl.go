@@ -9,8 +9,10 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"hash"
 	"reflect"
 	"regexp"
@@ -54,6 +56,10 @@ func (t *valueTpl) Unpack(in string) error {
 			"mul":                 mul,
 			"div":                 div,
 			"hmac":                hmacString,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"join":                strings.Join,
+			"sprintf":             fmt.Sprintf,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -241,6 +247,24 @@ func mul(a, b int64) int64 {
 
 func div(a, b int64) int64 {
 	return a / b
+}
+
+func base64Encode(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(data))
+}
+
+func base64EncodeNoPad(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.RawStdEncoding.EncodeToString([]byte(data))
 }
 
 func hmacString(hmacType string, hmacKey string, values ...string) string {
