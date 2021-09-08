@@ -32,8 +32,8 @@ const (
 	TimestampType
 )
 
-// ToType converts the given value string value to the specified data type.
-func ToType(value string, typ DataType) (interface{}, error) {
+// toType converts the given value string value to the specified data type.
+func toType(value string, typ DataType, settings *Settings) (interface{}, error) {
 	switch typ {
 	case StringType:
 		return value, nil
@@ -52,7 +52,7 @@ func ToType(value string, typ DataType) (interface{}, error) {
 	case MACAddressType:
 		return toMACAddress(value)
 	case TimestampType:
-		return toTimestamp(value)
+		return toTimestamp(value, settings)
 	default:
 		return nil, errors.Errorf("invalid data type: %v", typ)
 	}
@@ -166,15 +166,21 @@ var timeLayouts = []string{
 	"Jan _2 2006 15:04:05",
 }
 
-func toTimestamp(v string) (common.Time, error) {
+func toTimestamp(v string, settings *Settings) (common.Time, error) {
 	if unixMs, err := toLong(v); err == nil {
 		return common.Time(time.Unix(0, unixMs*int64(time.Millisecond))), nil
 	}
 
+	// Use this timezone when one is not included in the time string.
+	defaultLocation := time.UTC
+	if settings != nil && settings.timezone != nil {
+		defaultLocation = settings.timezone
+	}
+
 	for _, layout := range timeLayouts {
-		ts, err := time.ParseInLocation(layout, v, time.UTC)
+		ts, err := time.ParseInLocation(layout, v, defaultLocation)
 		if err == nil {
-			// Use current year if no year is zero.
+			// Use current year if year is zero.
 			if ts.Year() == 0 {
 				currentYear := time.Now().In(ts.Location()).Year()
 				ts = ts.AddDate(currentYear, 0, 0)

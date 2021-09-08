@@ -107,6 +107,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
 - Add Linux pressure metricset {pull}27355[27355]
 - Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
+- Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Add support for CouchDB v3 {issue}22743[22743] {pull}26950[26950]
 
 *Packetbeat*
@@ -738,9 +739,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
 - Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
+- Add `timezone` config option to the `decode_cef` processor. {issue}27232[27232] {pull}27727[27727]
+- Add `timezone` config option to the `syslog` input. {pull}27727[27727]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
+- Added support for parsing syslog dates containing a leading 0 (e.g. `Sep 01`) rather than a space. {pull}27775[27775]
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
 
