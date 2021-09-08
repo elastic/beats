@@ -942,6 +942,10 @@ func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
 		}
 	}
 
+	if len(versionSet) == 0 {
+		return nil, errors.New("no GLIBC symbols found in binary (is this a static binary?)")
+	}
+
 	var versions []SemanticVersion
 	for ver := range versionSet {
 		versions = append(versions, ver)
