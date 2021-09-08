@@ -752,7 +752,8 @@ endif::no_dashboards[]
 
 ifdef::has_ml_jobs[]
 * The machine learning jobs contain the configuration information and metadata
-necessary to analyze data for anomalies.
+necessary to analyze data for anomalies. You can only load the jobs to Elasticsearch
+of major version 7. For newer, please use the Machine learning UI in Kibana.
 endif::[]
 
 This command sets up the environment without actually running
@@ -783,6 +784,7 @@ Shows help for the `setup` command.
 
 ifdef::has_ml_jobs[]
 *`--machine-learning`*::
+deprecated:[7.12]
 Sets up machine learning job configurations only.
 endif::[]
 
