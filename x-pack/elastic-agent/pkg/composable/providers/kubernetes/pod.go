@@ -87,8 +87,7 @@ func NewPodWatcher(
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
 
-	meta := p.metagen.Generate(pod)
-	data := generatePodData(pod, p.config, meta)
+	data := generatePodData(pod, p.config, p.metagen)
 	data.mapping["scope"] = p.scope
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
@@ -103,8 +102,11 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	// TODO: deal with ephemeral containers
 }
 
-func (p *pod) emitContainers(pod *kubernetes.Pod, containers []kubernetes.Container, containerstatuses []kubernetes.PodContainerStatus) {
-	generateContainerData(p.comm, pod, containers, containerstatuses, p.config)
+func (p *pod) emitContainers(
+	pod *kubernetes.Pod,
+	containers []kubernetes.Container,
+	containerstatuses []kubernetes.PodContainerStatus) {
+	generateContainerData(p.comm, pod, containers, containerstatuses, p.config, p.metagen)
 }
 
 func (p *pod) emitStopped(pod *kubernetes.Pod) {
@@ -156,43 +158,35 @@ func (p *pod) OnDelete(obj interface{}) {
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
 }
 
-func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMeta common.MapStr) providerData {
-	// TODO: add metadata here too ie -> meta := s.metagen.Generate(pod)
+func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMetaGen metadata.MetaGen) providerData {
 
-	// Pass annotations to all events so that it can be used in templating and by annotation builders.
-	annotations := common.MapStr{}
-	for k, v := range pod.GetObjectMeta().GetAnnotations() {
-		safemapstr.Put(annotations, k, v)
+	meta := kubeMetaGen.Generate(pod)
+	kubemetaMap, err := meta.GetValue("kubernetes")
+	if err != nil {
+		return providerData{}
 	}
 
-	labels := common.MapStr{}
-	for k, v := range pod.GetObjectMeta().GetLabels() {
-		// TODO: add dedoting option
-		safemapstr.Put(labels, k, v)
+	// k8sMapping includes only the metadata that fall under kubernetes.*
+	// and these are available as dynamic vars through the provider
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+
+	processors := []map[string]interface{}{}
+	// meta map includes metadata that go under kubernetes.*
+	// but also other ECS fields like orchestrator.*
+	for field, metaMap := range meta {
+		processor := map[string]interface{}{
+			"add_fields": map[string]interface{}{
+				"fields": metaMap,
+				"target": field,
+			},
+		}
+		processors = append(processors, processor)
 	}
 
-	//mapping := map[string]interface{}{
-	//	"namespace": pod.GetNamespace(),
-	//	"pod": map[string]interface{}{
-	//		"uid":         string(pod.GetUID()),
-	//		"name":        pod.GetName(),
-	//		"labels":      labels,
-	//		"annotations": annotations,
-	//		"ip":          pod.Status.PodIP,
-	//	},
-	//}
-	mapping := map[string]interface{}(kubeMeta)
 	return providerData{
 		uid:     string(pod.GetUID()),
-		mapping: mapping,
-		processors: []map[string]interface{}{
-			{
-				"add_fields": map[string]interface{}{
-					"fields": mapping,
-					"target": "kubernetes",
-				},
-			},
-		},
+		mapping: k8sMapping,
+		processors: processors,
 	}
 }
 
@@ -201,8 +195,8 @@ func generateContainerData(
 	pod *kubernetes.Pod,
 	containers []kubernetes.Container,
 	containerstatuses []kubernetes.PodContainerStatus,
-	cfg *Config) {
-	//TODO: add metadata here too ie -> meta := s.metagen.Generate()
+	cfg *Config,
+	kubeMetaGen metadata.MetaGen) {
 
 	containerIDs := map[string]string{}
 	runtimes := map[string]string{}
@@ -229,30 +223,53 @@ func generateContainerData(
 		// ID is the combination of pod UID + container name
 		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
 
-		mapping := map[string]interface{}{
-			"namespace": pod.GetNamespace(),
-			"pod": map[string]interface{}{
-				"uid":    string(pod.GetUID()),
-				"name":   pod.GetName(),
-				"labels": labels,
-				"ip":     pod.Status.PodIP,
-			},
-			"container": map[string]interface{}{
-				"id":      cid,
-				"name":    c.Name,
-				"image":   c.Image,
-				"runtime": runtimes[c.Name],
+		meta := kubeMetaGen.Generate(pod, metadata.WithFields("container.name", c.Name))
+		kubemetaMap, err := meta.GetValue("kubernetes")
+		if err != nil {
+			continue
+		}
+
+		// k8sMapping includes only the metadata that fall under kubernetes.*
+		// and these are available as dynamic vars through the provider
+		k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+
+		// add container metadata under kubernetes.container.* to
+		// make them available to dynamics var resolution
+		k8sMapping["container"] = common.MapStr{
+			"id":      cid,
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
+		}
+
+		//container ECS fields
+		cmeta := common.MapStr{
+			"id":      cid,
+			"runtime": runtimes[c.Name],
+			"image": common.MapStr{
+				"name": c.Image,
 			},
 		}
 
 		processors := []map[string]interface{}{
 			{
 				"add_fields": map[string]interface{}{
-					"fields": mapping,
-					"target": "kubernetes",
+					"fields": cmeta,
+					"target": "container",
 				},
 			},
 		}
-		comm.AddOrUpdate(eventID, ContainerPriority, mapping, processors)
+		// meta map includes metadata that go under kubernetes.*
+		// but also other ECS fields like orchestrator.*
+		for field, metaMap := range meta {
+			processor := map[string]interface{}{
+				"add_fields": map[string]interface{}{
+					"fields": metaMap,
+					"target": field,
+				},
+			}
+			processors = append(processors, processor)
+		}
+		comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 	}
 }
