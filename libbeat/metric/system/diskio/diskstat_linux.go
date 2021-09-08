@@ -20,9 +20,10 @@
 package diskio
 
 import (
-	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/disk"
+
+	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 )
 
 // GetCLKTCK emulates the _SC_CLK_TCK syscall
