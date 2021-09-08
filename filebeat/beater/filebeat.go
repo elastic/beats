@@ -235,7 +235,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	}
 
 	esConfig := b.Config.Output.Config()
-	esClient, err := eslegclient.NewConnectedClient(esConfig)
+	esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
@@ -256,7 +256,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		}
 	}
 
-	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
+	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Kibana client: %v", err)
 	}
