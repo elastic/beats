@@ -414,17 +414,18 @@ processors:
 - remove:
     field:
       - _temp
+      - host
       - syslog5424_sd
       - syslog5424_pri
-      - fortinet.firewall.tz
+      - fortinet.firewall.agent
       - fortinet.firewall.date
       - fortinet.firewall.devid
-      - fortinet.firewall.eventtime
-      - fortinet.firewall.time
       - fortinet.firewall.duration
-      - host
+      - fortinet.firewall.eventtime
       - fortinet.firewall.hostname
-      - fortinet.firewall.agent
+      - fortinet.firewall.time
+      - fortinet.firewall.tz
+      - fortinet.firewall.url
     ignore_missing: true
 - script:
     lang: painless
