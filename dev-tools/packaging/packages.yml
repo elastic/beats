@@ -451,6 +451,7 @@ shared:
 
   - &agent_docker_complete_spec
     extra_vars:
+      dockerfile: 'Dockerfile.elastic-agent.tmpl'
       image_name: '{{.BeatName}}-complete'
 
   # Deb/RPM spec for community beats.
