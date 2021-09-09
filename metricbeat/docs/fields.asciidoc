@@ -50920,7 +50920,7 @@ type: object
 *`openmetrics.exemplar.labels.*`*::
 +
 --
-Openmetrics metric labels
+Openmetrics metric exemplar labels
 
 
 type: object
