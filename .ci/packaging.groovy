@@ -434,7 +434,11 @@ def triggerE2ETests(String suite) {
     booleanParam(name: 'forceSkipGitChecks', value: true),
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+<<<<<<< HEAD
     booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
+=======
+    string(name: 'BEAT_VERSION', value: beatVersion),
+>>>>>>> 3bb2681984 (chore(ci): remove not used param when triggering e2e tests (#27823))
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
