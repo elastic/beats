@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
@@ -27,7 +29,9 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/authority"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -79,19 +83,24 @@ type enrollCmdFleetServerOption struct {
 	CertKey         string
 	Insecure        bool
 	SpawnAgent      bool
+	Headers         map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.
 type enrollCmdOption struct {
-	ID                   string
-	URL                  string
-	CAs                  []string
-	CASha256             []string
-	Insecure             bool
-	UserProvidedMetadata map[string]interface{}
-	EnrollAPIKey         string
-	Staging              string
-	FleetServer          enrollCmdFleetServerOption
+	URL                  string                     `yaml:"url,omitempty"`
+	CAs                  []string                   `yaml:"ca,omitempty"`
+	CASha256             []string                   `yaml:"ca_sha256,omitempty"`
+	Insecure             bool                       `yaml:"insecure,omitempty"`
+	EnrollAPIKey         string                     `yaml:"enrollment_key,omitempty"`
+	Staging              string                     `yaml:"staging,omitempty"`
+	ProxyURL             string                     `yaml:"proxy_url,omitempty"`
+	ProxyDisabled        bool                       `yaml:"proxy_disabled,omitempty"`
+	ProxyHeaders         map[string]string          `yaml:"proxy_headers,omitempty"`
+	UserProvidedMetadata map[string]interface{}     `yaml:"-"`
+	FixPermissions       bool                       `yaml:"-"`
+	DelayEnroll          bool                       `yaml:"-"`
+	FleetServer          enrollCmdFleetServerOption `yaml:"-"`
 }
 
 func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
@@ -103,18 +112,25 @@ func (e *enrollCmdOption) remoteConfig() (remote.Config, error) {
 		return remote.Config{}, fmt.Errorf("connection to fleet-server is insecure, strongly recommended to use a secure connection (override with --insecure)")
 	}
 
+	var tlsCfg tlscommon.Config
+
 	// Add any SSL options from the CLI.
 	if len(e.CAs) > 0 || len(e.CASha256) > 0 {
-		cfg.TLS = &tlscommon.Config{
-			CAs:      e.CAs,
-			CASha256: e.CASha256,
-		}
+		tlsCfg.CAs = e.CAs
+		tlsCfg.CASha256 = e.CASha256
 	}
 	if e.Insecure {
-		cfg.TLS = &tlscommon.Config{
-			VerificationMode: tlscommon.VerifyNone,
-		}
+		tlsCfg.VerificationMode = tlscommon.VerifyNone
 	}
+
+	cfg.Transport.TLS = &tlsCfg
+
+	proxySettings, err := httpcommon.NewHTTPClientProxySettings(e.ProxyURL, e.ProxyHeaders, e.ProxyDisabled)
+	if err != nil {
+		return remote.Config{}, err
+	}
+
+	cfg.Transport.Proxy = *proxySettings
 
 	return cfg, nil
 }
@@ -157,7 +173,7 @@ func newEnrollCmdWithStore(
 }
 
 // Execute tries to enroll the agent into Fleet.
-func (c *enrollCmd) Execute(ctx context.Context) error {
+func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	var err error
 	defer c.stopAgent() // ensure its stopped no matter what
 
@@ -166,7 +182,11 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
+	// localFleetServer indicates that we start our internal fleet server. Agent
+	// will communicate to the internal fleet server on localhost only.
+	// Connection setup should disable proxies in that case.
+	localFleetServer := c.options.FleetServer.ConnStr != ""
+	if localFleetServer && !c.options.DelayEnroll {
 		token, err := c.fleetServerBootstrap(ctx)
 		if err != nil {
 			return err
@@ -183,6 +203,11 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.TypeConfig,
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
+	if localFleetServer {
+		// Ensure that the agent does not use a proxy configuration
+		// when connecting to the local fleet server.
+		c.remoteConfig.Transport.Proxy.Disable = true
+	}
 
 	c.client, err = fleetclient.NewWithConfig(c.log, c.remoteConfig)
 	if err != nil {
@@ -192,19 +217,60 @@ func (c *enrollCmd) Execute(ctx context.Context) error {
 			errors.M(errors.MetaKeyURI, c.options.URL))
 	}
 
+	if c.options.DelayEnroll {
+		if c.options.FleetServer.Host != "" {
+			return errors.New("--delay-enroll cannot be used with --fleet-server-es", errors.TypeConfig)
+		}
+		return c.writeDelayEnroll(streams)
+	}
+
 	err = c.enrollWithBackoff(ctx, persistentConfig)
 	if err != nil {
 		return errors.New(err, "fail to enroll")
 	}
 
+	if c.options.FixPermissions {
+		err = install.FixPermissions()
+		if err != nil {
+			return errors.New(err, "failed to fix permissions")
+		}
+	}
+
+	defer func() {
+		fmt.Fprintln(streams.Out, "Successfully enrolled the Elastic Agent.")
+	}()
+
 	if c.agentProc == nil {
 		if c.daemonReload(ctx) != nil {
 			c.log.Info("Elastic Agent might not be running; unable to trigger restart")
+		} else {
+			c.log.Info("Successfully triggered restart on running Elastic Agent.")
 		}
-		c.log.Info("Successfully triggered restart on running Elastic Agent.")
 		return nil
 	}
 	c.log.Info("Elastic Agent has been enrolled; start Elastic Agent")
+	return nil
+}
+
+func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
+	enrollPath := paths.AgentEnrollFile()
+	data, err := yaml.Marshal(c.options)
+	if err != nil {
+		return errors.New(
+			err,
+			"failed to marshall enrollment options",
+			errors.TypeConfig,
+			errors.M("path", enrollPath))
+	}
+	err = ioutil.WriteFile(enrollPath, data, 0600)
+	if err != nil {
+		return errors.New(
+			err,
+			"failed to write enrollment options file",
+			errors.TypeFilesystem,
+			errors.M("path", enrollPath))
+	}
+	fmt.Fprintf(streams.Out, "Successfully wrote %s for delayed enrollment of the Elastic Agent.\n", enrollPath)
 	return nil
 }
 
@@ -233,7 +299,12 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
-		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
+		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
+		c.options.FleetServer.Headers,
+		c.options.ProxyURL,
+		c.options.ProxyDisabled,
+		c.options.ProxyHeaders,
+	)
 	if err != nil {
 		return "", err
 	}
@@ -358,6 +429,7 @@ func (c *enrollCmd) daemonReload(ctx context.Context) error {
 func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[string]interface{}) error {
 	delay(ctx, enrollDelay)
 
+	c.log.Infof("Starting enrollment to URL: %s", c.client.URI())
 	err := c.enroll(ctx, persistentConfig)
 	signal := make(chan struct{})
 	backExp := backoff.NewExpBackoff(signal, 60*time.Second, 10*time.Minute)
@@ -375,7 +447,7 @@ func (c *enrollCmd) enrollWithBackoff(ctx context.Context, persistentConfig map[
 			break
 		}
 		backExp.Wait()
-		c.log.Info("Retrying to enroll...")
+		c.log.Infof("Retrying enrollment to URL: %s", c.client.URI())
 		err = c.enroll(ctx, persistentConfig)
 	}
 
@@ -393,7 +465,6 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 
 	r := &fleetapi.EnrollRequest{
 		EnrollAPIKey: c.options.EnrollAPIKey,
-		SharedID:     c.options.ID,
 		Type:         fleetapi.PermanentEnroll,
 		Metadata: fleetapi.Metadata{
 			Local:        metadata,
@@ -413,17 +484,20 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		return err
 	}
 
-	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig)
+	agentConfig, err := c.createAgentConfig(resp.Item.ID, persistentConfig, c.options.FleetServer.Headers)
 	if err != nil {
 		return err
 	}
 
-	if c.options.FleetServer.ConnStr != "" {
+	localFleetServer := c.options.FleetServer.ConnStr != ""
+	if localFleetServer {
 		serverConfig, err := createFleetServerBootstrapConfig(
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
-			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA)
+			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
+			c.options.FleetServer.Headers,
+			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders)
 		if err != nil {
 			return err
 		}
@@ -471,6 +545,12 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 		"run", "-e", "-c", paths.ConfigFile(),
 		"--path.home", paths.Top(), "--path.config", paths.Config(),
 		"--path.logs", paths.Logs(),
+	}
+	if paths.Downloads() != "" {
+		args = append(args, "--path.downloads", paths.Downloads())
+	}
+	if paths.Install() != "" {
+		args = append(args, "--path.install", paths.Install())
 	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
@@ -718,7 +798,17 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	return nil
 }
 
-func createFleetServerBootstrapConfig(connStr string, serviceToken string, policyID string, host string, port uint16, cert string, key string, esCA string) (*configuration.FleetAgentConfig, error) {
+func createFleetServerBootstrapConfig(
+	connStr, serviceToken, policyID, host string,
+	port uint16,
+	cert, key, esCA string,
+	headers map[string]string,
+	proxyURL string,
+	proxyDisabled bool,
+	proxyHeaders map[string]string,
+) (*configuration.FleetAgentConfig, error) {
+	localFleetServer := connStr != ""
+
 	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
 	if err != nil {
 		return nil, err
@@ -734,6 +824,19 @@ func createFleetServerBootstrapConfig(connStr string, serviceToken string, polic
 	if port == 0 {
 		port = defaultFleetServerPort
 	}
+	if len(headers) > 0 {
+		if es.Headers == nil {
+			es.Headers = make(map[string]string)
+		}
+		// overwrites previously set headers
+		for k, v := range headers {
+			es.Headers[k] = v
+		}
+	}
+	es.ProxyURL = proxyURL
+	es.ProxyDisable = proxyDisabled
+	es.ProxyHeaders = proxyHeaders
+
 	cfg := configuration.DefaultFleetAgentConfig()
 	cfg.Enabled = true
 	cfg.Server = &configuration.FleetServerConfig{
@@ -756,6 +859,10 @@ func createFleetServerBootstrapConfig(connStr string, serviceToken string, polic
 		}
 	}
 
+	if localFleetServer {
+		cfg.Client.Transport.Proxy.Disable = true
+	}
+
 	if err := cfg.Valid(); err != nil {
 		return nil, errors.New(err, "invalid enrollment options", errors.TypeConfig)
 	}
@@ -774,9 +881,13 @@ func createFleetConfigFromEnroll(accessAPIKey string, cli remote.Config) (*confi
 	return cfg, nil
 }
 
-func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{}) (map[string]interface{}, error) {
+func (c *enrollCmd) createAgentConfig(agentID string, pc map[string]interface{}, headers map[string]string) (map[string]interface{}, error) {
 	agentConfig := map[string]interface{}{
 		"id": agentID,
+	}
+
+	if len(headers) > 0 {
+		agentConfig["headers"] = headers
 	}
 
 	if c.options.Staging != "" {

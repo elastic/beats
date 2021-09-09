@@ -96,6 +96,18 @@ Validate a HMAC signature from a specific header
   hmac.prefix: "sha256="
 ----
 
+Preserving original event and including headers in document
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  preserve_original_event: true
+  include_headers: ["TestHeader"]
+----
+
 ==== Configuration options
 
 The `http_endpoint` input supports the following configuration options plus the
@@ -181,6 +193,19 @@ This options specific which URL path to accept requests on. Defaults to `/`
 ==== `prefix`
 
 This option specifies which prefix the incoming request will be mapped to.
+
+[float]
+==== `include_headers`
+
+This options specifies a list of HTTP headers that should be copied from the incoming request and included in the document.
+All configured headers will always be canonicalized to match the headers of the incoming request.
+For example, `["content-type"]` will become `["Content-Type"]` when the filebeat is running.
+
+[float]
+==== `preserve_original_event`
+
+This option copies the raw unmodified body of the incoming request to the event.original field as a string before sending the event to Elasticsearch.
+
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]

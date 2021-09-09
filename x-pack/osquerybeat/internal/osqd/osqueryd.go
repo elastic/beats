@@ -18,13 +18,16 @@ import (
 	"time"
 
 	"github.com/dolmen-go/contextio"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 )
 
 const (
 	osqueryDName    = "osqueryd"
 	osqueryAutoload = "osquery.autoload"
+	osqueryFlagfile = "osquery.flags"
 )
 
 const (
@@ -64,7 +67,7 @@ func WithBinaryPath(binPath string) Option {
 
 func WithConfigRefresh(refreshInterval int) Option {
 	return func(q *OSQueryD) {
-		q.extensionsTimeout = refreshInterval
+		q.configRefreshInterval = refreshInterval
 	}
 }
 
@@ -108,6 +111,10 @@ func New(socketPath string, opts ...Option) *OSQueryD {
 	}
 
 	return q
+}
+
+func (q *OSQueryD) SocketPath() string {
+	return q.socketPath
 }
 
 func (q *OSQueryD) DataPath() string {
@@ -254,14 +261,30 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 		if os.IsNotExist(err) {
 			return nil, errors.Wrapf(err, "extension path does not exist: %s", extensionPath)
 		} else {
-			return nil, errors.Wrapf(err, "could not stat extension path")
+			return nil, errors.Wrapf(err, "failed to stat extension path")
 		}
 	}
 
 	// Write the autoload file
 	extensionAutoloadPath := q.osqueryAutoloadPath()
 	if err := ioutil.WriteFile(extensionAutoloadPath, []byte(extensionPath), 0644); err != nil {
-		return nil, errors.Wrap(err, "could not write osquery extension autoload file")
+		return nil, errors.Wrap(err, "failed write osquery extension autoload file")
+	}
+
+	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
+	// Otherwise the osqueryi and osqueryd will try to load the default flags file,
+	// for example from /var/osquery/osquery.flags.default on Mac, and can potentially mess up configuration of our osquery instance.
+	flagsfilePath := q.osqueryFlagfilePath()
+	exists, err := fileutil.FileExists(flagsfilePath)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to check flagsfile path")
+	}
+	if !exists {
+		f, err := os.OpenFile(flagsfilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
+		if err != nil {
+			return nil, errors.Wrapf(err, "failed to create flagsfile")
+		}
+		f.Close()
 	}
 
 	return func() {}, nil
@@ -308,6 +331,7 @@ func (q *OSQueryD) createCommand() *exec.Cmd {
 		"--extensions_socket="+q.socketPath,
 		"--logger_path="+q.dataPath,
 		"--extensions_autoload="+q.osqueryAutoloadPath(),
+		"--flagfile="+q.osqueryFlagfilePath(),
 		"--extensions_interval=3",
 		fmt.Sprint("--extensions_timeout=", q.extensionsTimeout),
 	)
@@ -347,6 +371,10 @@ func osqueryExtensionPath(dir string) string {
 
 func (q *OSQueryD) osqueryAutoloadPath() string {
 	return filepath.Join(q.dataPath, osqueryAutoload)
+}
+
+func (q *OSQueryD) osqueryFlagfilePath() string {
+	return filepath.Join(q.dataPath, osqueryFlagfile)
 }
 
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {

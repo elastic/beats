@@ -20,8 +20,6 @@ package state_node
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -50,8 +48,22 @@ var (
 			"kube_node_status_allocatable_memory_bytes": p.Metric("memory.allocatable.bytes"),
 			"kube_node_status_capacity_cpu_cores":       p.Metric("cpu.capacity.cores"),
 			"kube_node_status_allocatable_cpu_cores":    p.Metric("cpu.allocatable.cores"),
-			"kube_node_spec_unschedulable":              p.BooleanMetric("status.unschedulable"),
-			"kube_node_status_ready":                    p.LabelMetric("status.ready", "condition"),
+			"kube_node_status_capacity": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"pods":   "pod.capacity.total",
+					"cpu":    "cpu.capacity.cores",
+					"memory": "memory.capacity.bytes",
+				},
+			)),
+			"kube_node_status_allocatable": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"pods":   "pod.allocatable.total",
+					"cpu":    "cpu.allocatable.cores",
+					"memory": "memory.allocatable.bytes",
+				},
+			)),
+			"kube_node_spec_unschedulable": p.BooleanMetric("status.unschedulable"),
+			"kube_node_status_ready":       p.LabelMetric("status.ready", "condition"),
 			"kube_node_status_condition": p.LabelMetric("status", "status", p.OpFilterMap(
 				"condition", map[string]string{
 					"Ready":          "ready",
@@ -71,9 +83,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_node", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_node", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -110,28 +122,37 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
+func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	m.enricher.Start()
 
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'state_node' Metricset data")
+		m.Logger().Error(err)
+		reporter.Error(err)
+		return
 	}
 
 	m.enricher.Enrich(events)
 	for _, event := range events {
-		event[mb.NamespaceKey] = "node"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
-			return nil
+
+		e, err := util.CreateEvent(event, "kubernetes.node")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
+		if reported := reporter.Event(e); !reported {
+			m.Logger().Debug("error trying to emit event")
+			return
 		}
 	}
 
-	return nil
+	return
 }
 
 // Close stops this metricset

@@ -19,6 +19,7 @@ type AgentInfo interface {
 	AgentID() string
 	Version() string
 	Snapshot() bool
+	Headers() map[string]string
 }
 
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
@@ -90,6 +91,10 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "fix_stream"
 		case *InsertDefaultsRule:
 			name = "insert_defaults"
+		case *InjectHeadersRule:
+			name = "inject_headers"
+		case *InjectQueueRule:
+			name = "inject_queue"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -175,6 +180,10 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &FixStreamRule{}
 		case "insert_defaults":
 			r = &InsertDefaultsRule{}
+		case "inject_headers":
+			r = &InjectHeadersRule{}
+		case "inject_queue":
+			r = &InjectQueueRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -770,7 +779,7 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			return errors.New("InjectAgentInfoRule: processors is not a list")
 		}
 
-		// elastic.agent
+		// elastic_agent
 		processorMap := &Dict{value: make([]Node, 0)}
 		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
 		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
@@ -779,6 +788,15 @@ func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
 			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
 		}}})
 		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+
+		// agent.id
+		processorMap = &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+		}}})
+		addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
 		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
 	}
 
@@ -1503,6 +1521,169 @@ func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
 		Selectors: selectors,
 		Path:      path,
 	}
+}
+
+// InjectQueueRule injects inferred queue parameters into program
+// configurations.
+type InjectQueueRule struct{}
+
+// InjectQueue creates a InjectQueueRule
+func InjectQueue() *InjectQueueRule {
+	return &InjectQueueRule{}
+}
+
+// Apply adds queue parameters to a program configuration based on the
+// output settings "worker" and "bulk_max_size".
+func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject queue parameters into configuration")
+		}
+	}()
+
+	outputNode, found := Lookup(ast, "output")
+	if !found {
+		return nil
+	}
+
+	outputDict, ok := outputNode.Value().(*Dict)
+	if !ok || len(outputDict.value) == 0 {
+		return nil
+	}
+	outputChild := outputDict.value[0]
+
+	// Initialize the bulk_max_size and worker parameters to the global defaults,
+	// then override them if there's an explicit setting.
+	bulkMaxSize := 50
+	worker := 1
+
+	if bulkMaxSizeNode, ok := outputChild.Find("bulk_max_size"); ok {
+		if bulkMaxSizeInt, ok := bulkMaxSizeNode.Value().(*IntVal); ok {
+			bulkMaxSize = bulkMaxSizeInt.value
+		}
+	}
+
+	if workerNode, ok := outputChild.Find("worker"); ok {
+		if workerInt, ok := workerNode.Value().(*IntVal); ok {
+			worker = workerInt.value
+		}
+	}
+
+	// Insert memory queue settings based on the output params.
+	queueNode := queueDictFromOutputSettings(bulkMaxSize, worker)
+	if err := Insert(ast, queueNode, "queue.mem"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
+	events, minEvents := queueParamsFromOutputSettings(bulkMaxSize, worker)
+	dict := &Dict{
+		value: []Node{
+			&Key{
+				name:  "events",
+				value: &IntVal{value: events},
+			},
+			&Key{
+				name: "flush",
+				value: &Dict{
+					value: []Node{
+						&Key{
+							name:  "min_events",
+							value: &IntVal{value: minEvents},
+						},
+						&Key{
+							name:  "timeout",
+							value: &StrVal{value: "1s"},
+						},
+					},
+				},
+			},
+		},
+	}
+	return dict
+}
+
+// Given output settings, returns inferred values for queue.mem.events
+// and queue.mem.flush.min_events.
+// See https://github.com/elastic/beats/issues/26638.
+func queueParamsFromOutputSettings(bulkMaxSize, worker int) (int, int) {
+	// Create space in the queue for each worker to have a full batch in flight
+	// and another one pending, plus a correction factor so users with the
+	// default worker count of 1 aren't surprised by an unreasonably small queue.
+	// These formulas could and perhaps should be customized further based on
+	// the specific beats being called, but their default behavior is already to
+	// significantly reduce the queue size, so let's get some experience using
+	// these baselines before optimizing further.
+	events := bulkMaxSize * (2*worker + 5)
+	minEvents := bulkMaxSize
+	return events, minEvents
+}
+
+// InjectHeadersRule injects headers into output.
+type InjectHeadersRule struct{}
+
+// Apply injects headers into output.
+func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject headers into configuration")
+		}
+	}()
+
+	headers := agentInfo.Headers()
+	if len(headers) == 0 {
+		return nil
+	}
+
+	outputNode, found := Lookup(ast, "output")
+	if !found {
+		return nil
+	}
+
+	elasticsearchNode, found := outputNode.Find("elasticsearch")
+	if found {
+		headersNode, found := elasticsearchNode.Find("headers")
+		if found {
+			headersDict, ok := headersNode.Value().(*Dict)
+			if !ok {
+				return errors.New("headers not a dictionary")
+			}
+
+			for k, v := range headers {
+				headersDict.value = append(headersDict.value, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+		} else {
+			nodes := make([]Node, 0, len(headers))
+			for k, v := range headers {
+				nodes = append(nodes, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+			headersDict := NewDict(nodes)
+			elasticsearchDict, ok := elasticsearchNode.Value().(*Dict)
+			if !ok {
+				return errors.New("elasticsearch output is not a dictionary")
+			}
+			elasticsearchDict.value = append(elasticsearchDict.value, &Key{
+				name:  "headers",
+				value: headersDict,
+			})
+		}
+	}
+
+	return nil
+}
+
+// InjectHeaders creates a InjectHeadersRule
+func InjectHeaders() *InjectHeadersRule {
+	return &InjectHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.

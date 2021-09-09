@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Query Durations [Metricbeat Prometheus]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "prometheus.labels.quantile : \"0.99\""
+                },
+                "id": "0fa40ac0-b2e3-11e9-9d48-591d2f459020",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "prometheus.labels.quantile : \"0.99\" "
+                        },
+                        "formatter": "'0.0[0000]'",
+                        "id": "0fa40ac1-b2e3-11e9-9d48-591d2f459020",
+                        "label": "Query Durations p99",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "prometheus.metrics.prometheus_engine_query_duration_seconds",
+                                "id": "0fa40ac2-b2e3-11e9-9d48-591d2f459020",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#3185FC",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": "prometheus.labels.slice : \"inner_eval\" "
+                                },
+                                "id": "5089a8b0-b2e3-11e9-a478-1744b9617108",
+                                "label": "Inner"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "prometheus.labels.slice",
+                        "terms_order_by": "_count",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Query Durations [Metricbeat Prometheus]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f77c5900-b2e4-11e9-9a23-67ee28886a4b",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:46.559Z",
+    "version": "WzQxMTQsMV0="
+}

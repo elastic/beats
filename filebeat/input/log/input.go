@@ -231,14 +231,13 @@ func (p *Input) Run() {
 
 	// It is important that a first scan is run before cleanup to make sure all new states are read first
 	if p.config.CleanInactive > 0 || p.config.CleanRemoved {
-		beforeCount := p.states.Count()
-		cleanedStates, pendingClean := p.states.Cleanup()
-		logger.Debugf("input states cleaned up. Before: %d, After: %d, Pending: %d",
-			beforeCount, beforeCount-cleanedStates, pendingClean)
+		p.cleanupStates()
 	}
 
-	// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first
+	// Marking removed files to be cleaned up.
 	if p.config.CleanRemoved {
+		var removed uint
+
 		for _, state := range p.states.GetStates() {
 			stateLogger := loggerWithState(logger, state)
 
@@ -246,6 +245,7 @@ func (p *Input) Run() {
 			stat, err := os.Stat(state.Source)
 			if err != nil {
 				if os.IsNotExist(err) {
+					removed++
 					p.removeState(stateLogger, state)
 					stateLogger.Debugf("Remove state for file as file removed: %s", state.Source)
 				} else {
@@ -259,12 +259,25 @@ func (p *Input) Run() {
 					state.Id, state.IdentifierName = p.fileStateIdentifier.GenerateID(state)
 				}
 				if !state.IsEqual(&newState) {
+					removed++
 					p.removeState(stateLogger, state)
 					stateLogger.Debugf("Remove state of file as its identity has changed: %s", state.Source)
 				}
 			}
 		}
+
+		if removed > 0 {
+			logger.Debugf("%v entries marked as removed. Trigger state cleanup.", removed)
+			p.cleanupStates()
+		}
 	}
+}
+
+func (p *Input) cleanupStates() {
+	beforeCount := p.states.Count()
+	cleanedStates, pendingClean := p.states.Cleanup()
+	p.logger.Debugf("input states cleaned up. Before: %d, After: %d, Pending: %d",
+		beforeCount, beforeCount-cleanedStates, pendingClean)
 }
 
 func (p *Input) removeState(logger *logp.Logger, state file.State) {

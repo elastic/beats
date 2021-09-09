@@ -39,7 +39,8 @@ type Config struct {
 	ToFiles     bool `config:"to_files" yaml:"to_files"`
 	ToEventLog  bool `config:"to_eventlog" yaml:"to_eventlog"`
 
-	Files FileConfig `config:"files"`
+	Files   FileConfig    `config:"files"`
+	Metrics MetricsConfig `config:"metrics"`
 
 	environment Environment
 	addCaller   bool // Adds package and line number info to messages.
@@ -59,6 +60,14 @@ type FileConfig struct {
 	RedirectStderr  bool            `config:"redirect_stderr" yaml:"redirect_stderr"`
 }
 
+// MetricsConfig contains configuration used by the monitor to output metrics into the logstream.
+//
+// Currently these options are not used through this object in beats (as monitoring is setup elsewhere).
+type MetricsConfig struct {
+	Enabled bool          `config:"enabled"`
+	Period  time.Duration `config:"period"`
+}
+
 const (
 	defaultLevel = InfoLevel
 )
@@ -76,7 +85,22 @@ func DefaultConfig(environment Environment) Config {
 			Interval:        0,
 			RotateOnStartup: true,
 		},
+		Metrics: MetricsConfig{
+			Enabled: true,
+			Period:  30 * time.Second,
+		},
 		environment: environment,
 		addCaller:   true,
 	}
+}
+
+// LogFilename returns the base filename to which logs will be written for
+// the "files" log output. If another log output is used, or `logging.files.name`
+// is unspecified, then the beat name will be returned.
+func (cfg Config) LogFilename() string {
+	name := cfg.Beat
+	if cfg.Files.Name != "" {
+		name = cfg.Files.Name
+	}
+	return name
 }

@@ -24,6 +24,14 @@ stages:
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
+        withModule: true
+        stage: mandatory
+    pythonIntegTest:
+        mage: "mage pythonIntegTest"
+        withModule: true
+        stage: mandatory
     cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.

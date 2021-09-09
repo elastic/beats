@@ -1,0 +1,286 @@
+{
+    "attributes": {
+        "description": "Overview of Redis Enterprise dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "bdd26554-0293-4928-9751-f7304d9fbc74",
+                    "w": 9,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "bdd26554-0293-4928-9751-f7304d9fbc74",
+                "panelRefName": "panel_0",
+                "title": "",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4aa7a92c-1705-40ee-9f53-478610ea34f0",
+                    "w": 8,
+                    "x": 9,
+                    "y": 0
+                },
+                "panelIndex": "4aa7a92c-1705-40ee-9f53-478610ea34f0",
+                "panelRefName": "panel_1",
+                "title": "System CPU time",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "431e4d28-f8be-46a3-8079-d562e644bae1",
+                    "w": 8,
+                    "x": 17,
+                    "y": 0
+                },
+                "panelIndex": "431e4d28-f8be-46a3-8079-d562e644bae1",
+                "panelRefName": "panel_2",
+                "title": "User CPU time",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "192540d9-3c81-495d-ba22-2b1d96841ba7",
+                    "w": 7,
+                    "x": 25,
+                    "y": 0
+                },
+                "panelIndex": "192540d9-3c81-495d-ba22-2b1d96841ba7",
+                "panelRefName": "panel_3",
+                "title": "Node free memory",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "666f6222-3542-42b0-9085-7e93224c3998",
+                    "w": 8,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "666f6222-3542-42b0-9085-7e93224c3998",
+                "panelRefName": "panel_4",
+                "title": "Free persistent disk space",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9d84abb9-cc6d-4d78-b2a4-ca77b942cf5c",
+                    "w": 8,
+                    "x": 40,
+                    "y": 0
+                },
+                "panelIndex": "9d84abb9-cc6d-4d78-b2a4-ca77b942cf5c",
+                "panelRefName": "panel_5",
+                "title": "Free ephemeral disk space",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "86afca72-c2a2-4d20-af63-7e74220df79c",
+                    "w": 16,
+                    "x": 0,
+                    "y": 8
+                },
+                "panelIndex": "86afca72-c2a2-4d20-af63-7e74220df79c",
+                "panelRefName": "panel_6",
+                "title": "Rate of incoming/outgoing network traffic",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "aab5878f-0105-4be9-aaea-1951de591ec8",
+                    "w": 16,
+                    "x": 16,
+                    "y": 8
+                },
+                "panelIndex": "aab5878f-0105-4be9-aaea-1951de591ec8",
+                "panelRefName": "panel_7",
+                "title": "Total requests",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "c520c103-f16f-4490-ab07-3fbd38681c94",
+                    "w": 16,
+                    "x": 32,
+                    "y": 8
+                },
+                "panelIndex": "c520c103-f16f-4490-ab07-3fbd38681c94",
+                "panelRefName": "panel_8",
+                "title": "Connections",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "52d5e0f2-8c7d-42a0-b0d7-3bff758034bd",
+                    "w": 16,
+                    "x": 0,
+                    "y": 25
+                },
+                "panelIndex": "52d5e0f2-8c7d-42a0-b0d7-3bff758034bd",
+                "panelRefName": "panel_9",
+                "title": "GET/SET commands",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "8d97e4fa-7929-42b6-bcd1-c73a0ec6ceea",
+                    "w": 16,
+                    "x": 16,
+                    "y": 25
+                },
+                "panelIndex": "8d97e4fa-7929-42b6-bcd1-c73a0ec6ceea",
+                "panelRefName": "panel_10",
+                "title": "Other commands",
+                "version": "7.1.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "0f739671-dfbe-4ec9-8468-d5b2b9aad001",
+                    "w": 16,
+                    "x": 32,
+                    "y": 25
+                },
+                "panelIndex": "0f739671-dfbe-4ec9-8468-d5b2b9aad001",
+                "panelRefName": "panel_11",
+                "title": "Listener latency",
+                "version": "7.1.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Redis Enterprise] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8da53a40-5a2f-11ea-bc69-cdcc68092a57",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "b96c3b00-5c92-11ea-b0b5-8133f1152545",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "8cba84c0-5a32-11ea-bc69-cdcc68092a57",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "9ddea420-5a32-11ea-bc69-cdcc68092a57",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "49c7dbf0-5a36-11ea-bc69-cdcc68092a57",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "14f6de30-5c7a-11ea-b0b5-8133f1152545",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "2d7ec670-5c7a-11ea-b0b5-8133f1152545",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "f6c6d0e0-5a36-11ea-bc69-cdcc68092a57",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "6c861200-5c7b-11ea-b0b5-8133f1152545",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "b5621150-5c7a-11ea-b0b5-8133f1152545",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "3c776b90-5c80-11ea-b0b5-8133f1152545",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "837f9fd0-5c80-11ea-b0b5-8133f1152545",
+            "name": "panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "a452c8c0-5c96-11ea-b0b5-8133f1152545",
+            "name": "panel_11",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:50.654Z",
+    "version": "WzQxNDIsMV0="
+}

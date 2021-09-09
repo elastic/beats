@@ -5,6 +5,7 @@
 package info
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
@@ -12,6 +13,7 @@ import (
 type AgentInfo struct {
 	agentID  string
 	logLevel string
+	headers  map[string]string
 }
 
 // NewAgentInfoWithLog creates a new agent information.
@@ -29,6 +31,7 @@ func NewAgentInfoWithLog(level string, createAgentID bool) (*AgentInfo, error) {
 	return &AgentInfo{
 		agentID:  agentInfo.ID,
 		logLevel: agentInfo.LogLevel,
+		headers:  agentInfo.Headers,
 	}, nil
 }
 
@@ -41,8 +44,16 @@ func NewAgentInfo(createAgentID bool) (*AgentInfo, error) {
 	return NewAgentInfoWithLog(defaultLogLevel, createAgentID)
 }
 
-// LogLevel updates log level of agent.
-func (i *AgentInfo) LogLevel(level string) error {
+// LogLevel retrieves a log level.
+func (i *AgentInfo) LogLevel() string {
+	if i.logLevel == "" {
+		return logger.DefaultLogLevel.String()
+	}
+	return i.logLevel
+}
+
+// SetLogLevel updates log level of agent.
+func (i *AgentInfo) SetLogLevel(level string) error {
 	if err := updateLogLevel(level); err != nil {
 		return err
 	}
@@ -74,4 +85,9 @@ func (*AgentInfo) Version() string {
 // Snapshot returns if this version is a snapshot.
 func (*AgentInfo) Snapshot() bool {
 	return release.Snapshot()
+}
+
+// Headers returns custom headers used to communicate with elasticsearch.
+func (i *AgentInfo) Headers() map[string]string {
+	return i.headers
 }

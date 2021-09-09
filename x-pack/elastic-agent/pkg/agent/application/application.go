@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -64,7 +63,6 @@ func createApplication(
 	uc upgraderControl,
 	agentInfo *info.AgentInfo,
 ) (Application, error) {
-	warn.LogNotGA(log)
 	log.Info("Detecting execution mode")
 	ctx := context.Background()
 
@@ -75,7 +73,7 @@ func createApplication(
 
 	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file

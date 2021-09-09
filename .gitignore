@@ -51,5 +51,5 @@ x-pack/elastic-agent/pkg/agent/operation/tests/scripts/serviceable-1.0-darwin-x8
 *.terraform
 *.tfstate*
 
-# Files generated with the bump elastic stack version automation
-testing/environments/*.bck
+# Files generated with the bump version automations
+*.bck

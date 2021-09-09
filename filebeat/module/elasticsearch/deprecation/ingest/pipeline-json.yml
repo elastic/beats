@@ -8,7 +8,7 @@ processors:
     field: message
     target_field: elasticsearch.deprecation
 - drop:
-    if: ctx.elasticsearch.deprecation.type != 'deprecation'
+    if: '!["deprecation", "deprecation.elasticsearch"].contains(ctx.elasticsearch.deprecation.type)'
 - remove:
     field: elasticsearch.deprecation.type
 - dot_expander:
@@ -78,17 +78,20 @@ processors:
 - rename:
     field: elasticsearch.deprecation.message
     target_field: message
-- rename:
-    field: elasticsearch.deprecation.@timestamp
-    target_field: '@timestamp'
-    ignore_missing: true
-- rename:
-    field: elasticsearch.deprecation.timestamp
-    target_field: '@timestamp'
-    ignore_missing: true
 - date:
-    field: '@timestamp'
-    target_field: '@timestamp'
+    field: 'elasticsearch.deprecation.@timestamp'
     formats:
     - ISO8601
     ignore_failure: true
+    if: 'ctx.elasticsearch?.deprecation["@timestamp"] != null'
+- date:
+    field: 'elasticsearch.deprecation.timestamp'
+    formats:
+    - ISO8601
+    ignore_failure: true
+    if: 'ctx.elasticsearch?.deprecation?.timestamp != null'
+- remove:
+    field:
+      - elasticsearch.deprecation.timestamp
+      - elasticsearch.deprecation.@timestamp
+    ignore_missing: true

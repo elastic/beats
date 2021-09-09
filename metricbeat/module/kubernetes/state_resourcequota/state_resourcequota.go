@@ -76,7 +76,7 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
 // module rooted fields at the event that gets reported
 func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
-	families, err := m.mod.GetSharedFamilies(m.prometheus)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
 		m.Logger().Error(err)
 		reporter.Error(err)

@@ -5,13 +5,16 @@
 package config
 
 const defaultPort = 6791
+const defaultNamespace = "default"
 
 // MonitoringConfig describes a configuration of a monitoring
 type MonitoringConfig struct {
 	Enabled        bool                  `yaml:"enabled" config:"enabled"`
 	MonitorLogs    bool                  `yaml:"logs" config:"logs"`
 	MonitorMetrics bool                  `yaml:"metrics" config:"metrics"`
+	LogMetrics     bool                  `yaml:"-" config:"-"`
 	HTTP           *MonitoringHTTPConfig `yaml:"http" config:"http"`
+	Namespace      string                `yaml:"namespace" config:"namespace"`
 }
 
 // MonitoringHTTPConfig is a config defining HTTP endpoint published by agent
@@ -29,9 +32,11 @@ func DefaultConfig() *MonitoringConfig {
 		Enabled:        true,
 		MonitorLogs:    true,
 		MonitorMetrics: true,
+		LogMetrics:     true,
 		HTTP: &MonitoringHTTPConfig{
 			Enabled: false,
 			Port:    defaultPort,
 		},
+		Namespace: defaultNamespace,
 	}
 }

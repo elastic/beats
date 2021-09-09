@@ -224,6 +224,113 @@ func TestValueTpl(t *testing.T) {
 			paramTr:     transformable{},
 			expectedVal: "2020-11-05T12:25:32Z",
 		},
+		{
+			name:        "func toInt",
+			value:       `[[(toInt "1")]] [[(toInt 1.0)]] [[(toInt "1,0")]] [[(toInt 2)]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "1 1 0 2",
+		},
+		{
+			name:        "func add",
+			value:       `[[add 1 2 3 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "10",
+		},
+		{
+			name:        "func mul",
+			value:       `[[mul 4 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "16",
+		},
+		{
+			name:        "func div",
+			value:       `[[div 16 4]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "4",
+		},
+		{
+			name:        "func sha1 hmac",
+			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "87eca1e7cba012b2dd4a907c2ad4345a252a38f4",
+		},
+		{
+			name:        "func sha256 hmac",
+			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			teardown:    func() { timeNow = time.Now },
+			value:       `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "adc61cd206e146f2d1337504e760ea70f3d2e34bedf28d07802e0e776568a06b",
+		},
+		{
+			name:          "func invalid hmac",
+			value:         `[[hmac "md5" "secret" "string1" "string2"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:        "func base64Encode 2 strings",
+			value:       `[[base64Encode "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "c3RyaW5nMXN0cmluZzI=",
+		},
+		{
+			name:          "func base64Encode no value",
+			value:         `[[base64Encode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:  "func join",
+			value: `[[join .last_response.body.arr ","]]`,
+			paramCtx: &transformContext{
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
+				lastResponse: newTestResponse(
+					common.MapStr{
+						"arr": []string{
+							"foo",
+							"bar",
+						},
+					},
+					http.Header{},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "foo,bar",
+		},
+		{
+			name:  "func sprintf",
+			value: `[[sprintf "%q:%d" (join .last_response.body.arr ",") 1]]`,
+			paramCtx: &transformContext{
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
+				lastResponse: newTestResponse(
+					common.MapStr{
+						"arr": []string{
+							"foo",
+							"bar",
+						},
+					},
+					http.Header{},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: `"foo,bar":1`,
+		},
 	}
 
 	for _, tc := range cases {

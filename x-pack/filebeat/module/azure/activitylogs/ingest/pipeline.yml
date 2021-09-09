@@ -12,6 +12,11 @@ processors:
     params:
       empty_field_name: '"":"",'
     ignore_failure: true
+- gsub:
+    field: message
+    pattern: "\\e"
+    replacement: ""
+    ignore_missing: true
 - json:
     field: message
     target_field: azure.activitylogs
@@ -31,9 +36,17 @@ processors:
     field: azure.activitylogs.resourceId
     target_field: azure.resource_id
     ignore_missing: true
-- rename:
+- grok:
     field: azure.activitylogs.callerIpAddress
-    target_field: source.ip
+    patterns:
+      - \[%{IPORHOST:source.ip}\]:%{INT:source.port:int}
+      - "%{IPORHOST:source.ip}:%{INT:source.port:int}"
+      - "%{IPORHOST:source.ip}"
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: azure.activitylogs.callerIpAddress
+    if: 'ctx.source?.ip != null'
     ignore_missing: true
 - set:
     field: client.ip
@@ -63,6 +76,14 @@ processors:
     field: azure.activitylogs.location
     target_field: geo.name
     ignore_missing: true
+- json:
+    field: azure.activitylogs.identity
+    if: "ctx.azure?.activitylogs?.identity instanceof String"
+    ignore_failure: true
+- json:
+    field: azure.activitylogs.properties
+    if: "ctx.azure?.activitylogs?.properties instanceof String"
+    ignore_failure: true
 - script:
     lang: painless
     source: >-
@@ -76,6 +97,10 @@ processors:
         ctx.azure.activitylogs.event_category = 'Administrative';
       }
     ignore_failure: true
+- remove:
+    field: azure.activitylogs.properties.eventCategory
+    if: 'ctx.azure.activitylogs.event_category != null'
+    ignore_missing: true
 - rename:
     field: azure.activitylogs.resultType
     target_field: azure.activitylogs.result_type

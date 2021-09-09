@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Navigation [Filebeat Suricata]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 18,
+                "markdown": "![Hello World](data:image/png;base64,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) [Events](/app/dashboards#/view/78289c40-86da-11e8-b59d-21efb914e65c-ecs) | [Alerts](/app/dashboards#/view/05268ee0-86d1-11e8-b59d-21efb914e65c-ecs)",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation [Filebeat Suricata]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "908e8c90-d296-11ea-90e3-8767fe7ccf14",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:53.687Z",
+    "version": "WzQ5MjIsMV0="
+}

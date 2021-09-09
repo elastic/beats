@@ -1,0 +1,118 @@
+{
+    "attributes": {
+        "description": "Firewall denies and allows plotted against each other in time series",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "DFW Deny vs Allow [Filebeat Pensando]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.dataset:\"pensando.dfw\" "
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "pensando.dfw.action : \"allow\" "
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "pensando.dfw.action"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(150,10,3,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "pensando.dfw.action : \"deny\"  "
+                        },
+                        "formatter": "number",
+                        "id": "b6c562c0-cc84-11ea-a4da-c770c13b4387",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "b6c562c1-cc84-11ea-a4da-c770c13b4387",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "pensando.dfw.action"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(188,186,0,1)",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "pensando.dfw.action :\"none\" "
+                        },
+                        "formatter": "number",
+                        "id": "2dd6bef0-cd1f-11ea-98bc-ef8e168e330d",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "2dd6bef1-cd1f-11ea-98bc-ef8e168e330d",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "pensando.dfw.action"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "DFW Deny vs Allow [Filebeat Pensando]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2aa5d850-cc85-11ea-918e-c778f7abe5d7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:56.763Z",
+    "version": "WzQ5NDgsMV0="
+}

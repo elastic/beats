@@ -93,7 +93,7 @@ func init() {
 		feature.MakeDetails(
 			"Disk queue",
 			"Buffer events on disk before sending to the output.",
-			feature.Beta))
+			feature.Stable))
 }
 
 // queueFactory matches the queue.Factory interface, and is used to add the
@@ -111,7 +111,7 @@ func queueFactory(
 
 // NewQueue returns a disk-based queue configured with the given logger
 // and settings, creating it if it doesn't exist.
-func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
+func NewQueue(logger *logp.Logger, settings Settings) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
 		"Initializing disk queue at path %v", settings.directoryPath())
@@ -137,6 +137,15 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		// warning and fall back on the oldest existing segment, if any.
 		logger.Warnf("Couldn't load most recent queue position: %v", err)
 	}
+	if nextReadPosition.frameIndex == 0 {
+		// If the previous state was written by an older version, it may lack
+		// the frameIndex field. In this case we reset the read offset within
+		// the segment, which may cause one-time retransmission of some events
+		// from a previous version, but ensures that our metrics are consistent.
+		// In the more common case that frameIndex is 0 because this segment
+		// simply hasn't been read yet, setting byteIndex to 0 is a no-op.
+		nextReadPosition.byteIndex = 0
+	}
 	positionFile, err := os.OpenFile(
 		settings.stateFilePath(), os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
@@ -150,7 +159,8 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 	}
 
 	// Index any existing data segments to be placed in segments.reading.
-	initialSegments, err := scanExistingSegments(settings.directoryPath())
+	initialSegments, err :=
+		scanExistingSegments(logger, settings.directoryPath())
 	if err != nil {
 		return nil, err
 	}
@@ -177,14 +187,29 @@ func NewQueue(logger *logp.Logger, settings Settings) (queue.Queue, error) {
 		nextReadPosition = queuePosition{segmentID: initialSegments[0].id}
 	}
 
+	// We can compute the active frames right now but still need a way to report
+	// them to the global beat metrics. For now, just log the total.
+	// Note that for consistency with existing queue behavior, this excludes
+	// events that are still present on disk but were already sent and
+	// acknowledged on a previous run (we probably want to track these as well
+	// in the future.)
+	// TODO: pass in a context that queues can use to report these events.
+	activeFrameCount := 0
+	for _, segment := range initialSegments {
+		activeFrameCount += int(segment.frameCount)
+	}
+	activeFrameCount -= int(nextReadPosition.frameIndex)
+	logger.Infof("Found %d existing events on queue start", activeFrameCount)
+
 	queue := &diskQueue{
 		logger:   logger,
 		settings: settings,
 
 		segments: diskQueueSegments{
-			reading:        initialSegments,
-			nextID:         nextSegmentID,
-			nextReadOffset: nextReadPosition.offset,
+			reading:          initialSegments,
+			acked:            ackedSegments,
+			nextID:           nextSegmentID,
+			nextReadPosition: nextReadPosition.byteIndex,
 		},
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
@@ -250,5 +275,5 @@ func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (dq *diskQueue) Consumer() queue.Consumer {
-	return &diskQueueConsumer{queue: dq}
+	return &diskQueueConsumer{queue: dq, done: make(chan struct{})}
 }

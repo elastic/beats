@@ -42,6 +42,7 @@ type Spec struct {
 	When                  string               `yaml:"when"`
 	Constraints           string               `yaml:"constraints"`
 	RestartOnOutputChange bool                 `yaml:"restart_on_output_change,omitempty"`
+	ExprtedMetrics        []string             `yaml:"exported_metrics,omitempty"`
 }
 
 // ReadSpecs reads all the specs that match the provided globbing path.

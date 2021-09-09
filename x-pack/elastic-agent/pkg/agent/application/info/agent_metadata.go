@@ -158,7 +158,7 @@ func (i *AgentInfo) ECSMetadata() (*ECSMeta, error) {
 				// only upgradeable if running from Agent installer and running under the
 				// control of the system supervisor (or built specifically with upgrading enabled)
 				Upgradeable: release.Upgradeable() || (RunningInstalled() && RunningUnderSupervisor()),
-				LogLevel:    i.logLevel,
+				LogLevel:    i.LogLevel(),
 			},
 		},
 		Host: &HostECSMeta{

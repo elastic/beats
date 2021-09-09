@@ -58,9 +58,9 @@ func TestInput(t *testing.T) {
 			baseConfig: map[string]interface{}{
 				"interval":                     1,
 				"http_method":                  "GET",
-				"request.rate_limit.limit":     `[[.last_request.header.Get "X-Rate-Limit-Limit"]]`,
-				"request.rate_limit.remaining": `[[.last_request.header.Get "X-Rate-Limit-Remaining"]]`,
-				"request.rate_limit.reset":     `[[.last_request.header.Get "X-Rate-Limit-Reset"]]`,
+				"request.rate_limit.limit":     `[[.last_response.header.Get "X-Rate-Limit-Limit"]]`,
+				"request.rate_limit.remaining": `[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`,
+				"request.rate_limit.reset":     `[[.last_response.header.Get "X-Rate-Limit-Reset"]]`,
 			},
 			handler:  rateLimitHandler(),
 			expected: []string{`{"hello":"world"}`},
@@ -215,7 +215,7 @@ func TestInput(t *testing.T) {
 				t.Cleanup(server.Close)
 			},
 			baseConfig: map[string]interface{}{
-				"interval":       1,
+				"interval":       time.Second,
 				"request.method": "GET",
 				"response.split": map[string]interface{}{
 					"target": "body.items",
@@ -230,7 +230,50 @@ func TestInput(t *testing.T) {
 				},
 			},
 			handler:  paginationHandler(),
-			expected: []string{`{"foo":"bar"}`, `{"foo":"bar"}`},
+			expected: []string{`{"foo":"a"}`, `{"foo":"b"}`},
+		},
+		{
+			name: "Test first event",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerPaginationTransforms()
+				registerResponseTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "GET",
+				"response.split": map[string]interface{}{
+					"target": "body.items",
+					"transforms": []interface{}{
+						map[string]interface{}{
+							"set": map[string]interface{}{
+								"target":  "body.first",
+								"value":   "[[.cursor.first]]",
+								"default": "none",
+							},
+						},
+					},
+				},
+				"response.pagination": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target":                 "url.params.page",
+							"value":                  "[[.last_response.body.nextPageToken]]",
+							"fail_on_template_error": true,
+						},
+					},
+				},
+				"cursor": map[string]interface{}{
+					"first": map[string]interface{}{
+						"value": "[[.first_event.foo]]",
+					},
+				},
+			},
+			handler:  paginationHandler(),
+			expected: []string{`{"first":"none", "foo":"a"}`, `{"first":"a", "foo":"b"}`, `{"first":"a", "foo":"c"}`, `{"first":"c", "foo":"d"}`},
 		},
 		{
 			name: "Test pagination with array response",
@@ -276,6 +319,75 @@ func TestInput(t *testing.T) {
 			},
 			handler:  oauth2Handler,
 			expected: []string{`{"hello": "world"}`},
+		},
+		{
+			name: "Test request transforms can access state from previous transforms",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL + "/test-path"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "POST",
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "header.X-Foo",
+							"value":  "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.bar",
+							"value":  `[[.header.Get "X-Foo"]]`,
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.url.path",
+							"value":  `[[.url.Path]]`,
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("POST", `{"bar":"foo","url":{"path":"/test-path"}}`),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test response transforms can't access request state from previous transforms",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				registerResponseTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       10,
+				"request.method": "GET",
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "header.X-Foo",
+							"value":  "foo",
+						},
+					},
+				},
+				"response.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.bar",
+							"value":  `[[.header.Get "X-Foo"]]`,
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 	}
 
@@ -492,14 +604,18 @@ func paginationHandler() http.HandlerFunc {
 		w.Header().Set("content-type", "application/json")
 		switch count {
 		case 0:
-			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"bar"}]}`))
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:00Z","nextPageToken":"bar","items":[{"foo":"a"}]}`))
 		case 1:
 			if r.URL.Query().Get("page") != "bar" {
 				w.WriteHeader(http.StatusBadRequest)
 				_, _ = w.Write([]byte(`{"error":"wrong page token value"}`))
 				return
 			}
-			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","items":[{"foo":"bar"}]}`))
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:01Z","items":[{"foo":"b"}]}`))
+		case 2:
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:02Z","items":[{"foo":"c"}]}`))
+		case 3:
+			_, _ = w.Write([]byte(`{"@timestamp":"2002-10-02T15:00:03Z","items":[{"foo":"d"}]}`))
 		}
 		count += 1
 	}

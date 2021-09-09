@@ -716,8 +716,10 @@ func load(val reflect.Value) (Node, error) {
 		return loadSliceOrArray(val)
 	case reflect.String:
 		return &StrVal{value: val.Interface().(string)}, nil
-	case reflect.Int, reflect.Int64:
+	case reflect.Int:
 		return &IntVal{value: val.Interface().(int)}, nil
+	case reflect.Int64:
+		return &IntVal{value: int(val.Interface().(int64))}, nil
 	case reflect.Uint:
 		return &UIntVal{value: uint64(val.Interface().(uint))}, nil
 	case reflect.Uint64:
@@ -1021,6 +1023,21 @@ func Lookup(a *AST, selector Selector) (Node, bool) {
 	}
 
 	return current, true
+}
+
+// LookupString accepts an AST and a selector and return the matching node at that position as a string.
+func LookupString(a *AST, selector Selector) (string, bool) {
+	n, ok := Lookup(a, selector)
+	if !ok {
+		return "", false
+	}
+
+	v, ok := n.Value().(*StrVal)
+	if !ok {
+		return "", false
+	}
+
+	return v.String(), true
 }
 
 // Insert inserts a node into an existing AST, will return and error if the target position cannot
