@@ -312,6 +312,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
 - Fix `httpjson` input rate limit processing and documentation. {pull}[]
 - Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
+- Fix Filebeat Sophos XG module. It referred to a non existing pipeline for systemhealth. {pull}27826[27826]
 
 *Heartbeat*
 
