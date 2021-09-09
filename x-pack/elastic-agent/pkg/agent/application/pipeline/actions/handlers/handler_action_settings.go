@@ -9,6 +9,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage/store"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -16,7 +17,7 @@ import (
 )
 
 type reexecManager interface {
-	ReExec(argOverrides ...string)
+	ReExec(cb reexec.ShutdownCallbackFn, argOverrides ...string)
 }
 
 // Settings handles settings change coming from fleet and updates log level.
@@ -61,7 +62,7 @@ func (h *Settings) Handle(ctx context.Context, a fleetapi.Action, acker store.Fl
 		h.log.Errorf("failed to commit acker after acknowledging action with id '%s'", action.ActionID)
 	}
 
-	h.reexec.ReExec()
+	h.reexec.ReExec(nil)
 	return nil
 }
 
