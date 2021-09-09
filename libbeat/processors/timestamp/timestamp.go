@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"4d63.com/tz"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -57,16 +56,11 @@ func New(cfg *common.Config) (processors.Processor, error) {
 }
 
 func newFromConfig(c config) (*processor, error) {
-	loc, err := loadLocation(c.Timezone)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to load timezone")
-	}
-
 	p := &processor{
 		config:  c,
 		log:     logp.NewLogger(logName),
 		isDebug: logp.IsDebug(logName),
-		tz:      loc,
+		tz:      c.Timezone.Location(),
 	}
 	if c.ID != "" {
 		p.log = p.log.With("instance_id", c.ID)
@@ -82,21 +76,6 @@ func newFromConfig(c config) (*processor, error) {
 	}
 
 	return p, nil
-}
-
-var timezoneFormats = []string{"-07", "-0700", "-07:00"}
-
-func loadLocation(timezone string) (*time.Location, error) {
-	for _, format := range timezoneFormats {
-		t, err := time.Parse(format, timezone)
-		if err == nil {
-			name, offset := t.Zone()
-			return time.FixedZone(name, offset), nil
-		}
-	}
-
-	// Rest of location formats
-	return tz.LoadLocation(timezone)
 }
 
 func (p *processor) String() string {
