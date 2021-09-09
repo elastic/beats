@@ -173,7 +173,7 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ ree
 		return nil, errors.New("failed to invoke rollback watcher", err)
 	}
 
-	cb := shutdownCallback(u.log, release.Version(), a.Version(), release.TrimCommit(newHash))
+	cb := shutdownCallback(u.log, paths.Home(), release.Version(), a.Version(), release.TrimCommit(newHash))
 	if reexecNow {
 		u.reexec.ReExec(cb)
 		return nil, nil
@@ -288,21 +288,21 @@ func copyActionStore(newHash string) error {
 // shutdownCallback returns a callback function to be executing during shutdown once all processes are closed.
 // this goes through runtime directory of agent and copies all the state files created by processes to new versioned
 // home directory with updated process name to match new version.
-func shutdownCallback(log *logger.Logger, prevVersion, newVersion, newHash string) reexec.ShutdownCallbackFn {
+func shutdownCallback(log *logger.Logger, homePath, prevVersion, newVersion, newHash string) reexec.ShutdownCallbackFn {
 	if release.Snapshot() {
 		// SNAPSHOT is part of newVersion
 		prevVersion += "-SNAPSHOT"
 	}
 
 	return func() error {
-		runtimeDir := filepath.Join(paths.Home(), "run")
+		runtimeDir := filepath.Join(homePath, "run")
 		processDirs, err := readProcessDirs(log, runtimeDir)
 		if err != nil {
 			return err
 		}
 
-		oldHome := paths.Home()
-		newHome := filepath.Join(filepath.Dir(paths.Home()), fmt.Sprintf("%s-%s", agentName, newHash))
+		oldHome := homePath
+		newHome := filepath.Join(filepath.Dir(homePath), fmt.Sprintf("%s-%s", agentName, newHash))
 		for _, processDir := range processDirs {
 			newDir := strings.ReplaceAll(processDir, prevVersion, newVersion)
 			newDir = strings.ReplaceAll(newDir, oldHome, newHome)
