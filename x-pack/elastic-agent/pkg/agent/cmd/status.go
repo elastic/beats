@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"text/tabwriter"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -96,14 +97,16 @@ func humanOutput(w io.Writer, status *client.AgentStatus) error {
 		fmt.Fprint(w, "Applications: (none)\n")
 	} else {
 		fmt.Fprint(w, "Applications:\n")
+		tw := tabwriter.NewWriter(w, 4, 1, 2, ' ', 0)
 		for _, app := range status.Applications {
-			fmt.Fprintf(w, "  * %s\t(%s)\n", app.Name, app.Status)
+			fmt.Fprintf(tw, "  * %s\t(%s)\n", app.Name, app.Status)
 			if app.Message == "" {
-				fmt.Fprint(w, "    (no message)\n")
+				fmt.Fprint(tw, "\t(no message)\n")
 			} else {
-				fmt.Fprintf(w, "    %s\n", app.Message)
+				fmt.Fprintf(tw, "\t%s\t\n", app.Message)
 			}
 		}
+		tw.Flush()
 	}
 	return nil
 }
