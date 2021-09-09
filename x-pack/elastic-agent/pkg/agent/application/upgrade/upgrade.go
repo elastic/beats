@@ -285,6 +285,9 @@ func copyActionStore(newHash string) error {
 	return nil
 }
 
+// shutdownCallback returns a callback function to be executing during shutdown once all processes are closed.
+// this goes through runtime directory of agent and copies all the state files created by processes to new versioned
+// home directory with updated process name to match new version.
 func shutdownCallback(log *logger.Logger, prevVersion, newVersion, newHash string) reexec.ShutdownCallbackFn {
 	if release.Snapshot() {
 		// SNAPSHOT is part of newVersion
