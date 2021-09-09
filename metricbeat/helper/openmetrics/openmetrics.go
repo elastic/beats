@@ -959,8 +959,6 @@ func MatchMetricFamily(family string, matchMetrics []*regexp.Regexp) bool {
 	return false
 }
 
-//type Format string
-
 const (
 	TextVersion     = "0.0.4"
 	OpenMetricsType = `application/openmetrics-text`
@@ -972,7 +970,6 @@ const (
 
 const (
 	hdrContentType = "Content-Type"
-	hdrAccept      = "Accept"
 )
 
 func getContentType(h http.Header) string {
