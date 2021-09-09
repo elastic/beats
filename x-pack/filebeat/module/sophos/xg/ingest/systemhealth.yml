@@ -8,146 +8,146 @@ processors:
     field: event.kind
     value: event
 - rename:
-    field: sophosxg.firewall.idle
-    target_field: sophosxg.firewall.idle_cpu
+    field: sophos.xg.firewall.idle
+    target_field: sophos.xg.firewall.idle_cpu
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.idle !=null"
+    if: "ctx.sophos?.xg?.firewall?.idle !=null"
 - gsub:
-    field: sophosxg.firewall.idle_cpu
+    field: sophos.xg.firewall.idle_cpu
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
 - convert:
-    field: sophosxg.firewall.idle_cpu
-    target_field: sophosxg.firewall.idle_cpu
+    field: sophos.xg.firewall.idle_cpu
+    target_field: sophos.xg.firewall.idle_cpu
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.idle_cpu != null"
+    if: "ctx.sophos?.xg?.firewall?.idle_cpu != null"
 - rename:
-    field: sophosxg.firewall.system
-    target_field: sophosxg.firewall.system_cpu
+    field: sophos.xg.firewall.system
+    target_field: sophos.xg.firewall.system_cpu
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.system !=null"
+    if: "ctx.sophos?.xg?.firewall?.system !=null"
 - gsub:
-    field: sophosxg.firewall.system_cpu
+    field: sophos.xg.firewall.system_cpu
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
 - convert:
-    field: sophosxg.firewall.system_cpu
-    target_field: sophosxg.firewall.system_cpu
+    field: sophos.xg.firewall.system_cpu
+    target_field: sophos.xg.firewall.system_cpu
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.system_cpu != null"
+    if: "ctx.sophos?.xg?.firewall?.system_cpu != null"
 - rename:
-    field: sophosxg.firewall.user
-    target_field: sophosxg.firewall.user_cpu
+    field: sophos.xg.firewall.user
+    target_field: sophos.xg.firewall.user_cpu
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.user !=null"
+    if: "ctx.sophos?.xg?.firewall?.user !=null"
 - gsub:
-    field: sophosxg.firewall.user_cpu
+    field: sophos.xg.firewall.user_cpu
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
 - convert:
-    field: sophosxg.firewall.user_cpu
-    target_field: sophosxg.firewall.user_cpu
+    field: sophos.xg.firewall.user_cpu
+    target_field: sophos.xg.firewall.user_cpu
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.user_cpu != null"
+    if: "ctx.sophos?.xg?.firewall?.user_cpu != null"
 - convert:
-    field: sophosxg.firewall.used
-    target_field: sophosxg.firewall.used
+    field: sophos.xg.firewall.used
+    target_field: sophos.xg.firewall.used
     type: integer
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.used != null"
+    if: "ctx.sophos?.xg?.firewall?.used != null"
 - convert:
-    field: sophosxg.firewall.total_memory
-    target_field: sophosxg.firewall.total_memory
+    field: sophos.xg.firewall.total_memory
+    target_field: sophos.xg.firewall.total_memory
     type: integer
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.total_memory != null"
+    if: "ctx.sophos?.xg?.firewall?.total_memory != null"
 - convert:
-    field: sophosxg.firewall.free
-    target_field: sophosxg.firewall.free
+    field: sophos.xg.firewall.free
+    target_field: sophos.xg.firewall.free
     type: integer
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.free != null"
+    if: "ctx.sophos?.xg?.firewall?.free != null"
 - gsub:
-    field: sophosxg.firewall.Configuration
+    field: sophos.xg.firewall.Configuration
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
 - convert:
-    field: sophosxg.firewall.Configuration
-    target_field: sophosxg.firewall.configuration
+    field: sophos.xg.firewall.Configuration
+    target_field: sophos.xg.firewall.configuration
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.Configuration != null"
+    if: "ctx.sophos?.xg?.firewall?.Configuration != null"
 - gsub:
-    field: sophosxg.firewall.Reports
+    field: sophos.xg.firewall.Reports
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
 - convert:
-    field: sophosxg.firewall.Reports
-    target_field: sophosxg.firewall.Reports
+    field: sophos.xg.firewall.Reports
+    target_field: sophos.xg.firewall.Reports
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.Reports != null"
+    if: "ctx.sophos?.xg?.firewall?.Reports != null"
 - gsub:
-    field: sophosxg.firewall.Temp
+    field: sophos.xg.firewall.Temp
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
 - convert:
-    field: sophosxg.firewall.Temp
-    target_field: sophosxg.firewall.Temp
+    field: sophos.xg.firewall.Temp
+    target_field: sophos.xg.firewall.Temp
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.Temp != null"
+    if: "ctx.sophos?.xg?.firewall?.Temp != null"
 - gsub:
-    field: sophosxg.firewall.Signature
+    field: sophos.xg.firewall.Signature
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophosxg?.firewall?.log_component == "Disk"'
+    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
 - convert:
-    field: sophosxg.firewall.Signature
-    target_field: sophosxg.firewall.Signature
+    field: sophos.xg.firewall.Signature
+    target_field: sophos.xg.firewall.Signature
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.Signature != null"
+    if: "ctx.sophos?.xg?.firewall?.Signature != null"
 - convert:
-    field: sophosxg.firewall.users
-    target_field: sophosxg.firewall.users
+    field: sophos.xg.firewall.users
+    target_field: sophos.xg.firewall.users
     type: integer
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.users != null"
+    if: "ctx.sophos?.xg?.firewall?.users != null"
 - convert:
-    field: sophosxg.firewall.transmittedkbits
-    target_field: sophosxg.firewall.transmittedkbits
+    field: sophos.xg.firewall.transmittedkbits
+    target_field: sophos.xg.firewall.transmittedkbits
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.transmittedkbits != null"
+    if: "ctx.sophos?.xg?.firewall?.transmittedkbits != null"
 - convert:
-    field: sophosxg.firewall.receivedkbits
-    target_field: sophosxg.firewall.receivedkbits
+    field: sophos.xg.firewall.receivedkbits
+    target_field: sophos.xg.firewall.receivedkbits
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophosxg?.firewall?.receivedkbits != null"
+    if: "ctx.sophos?.xg?.firewall?.receivedkbits != null"
 
 #############
 ## Cleanup ##
