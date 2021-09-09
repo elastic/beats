@@ -18,7 +18,7 @@ logs in syslog format or from a file for the following devices:
 
 To configure a remote syslog destination, please reference the https://community.sophos.com/kb/en-us/123184[SophosXG/SFOS Documentation].
 
-The syslog format choosen should be `Default`.
+The syslog format choosen in Sophos configuration should be `Central Reporting Format`.
 
 include::../include/gs-link.asciidoc[]
 
