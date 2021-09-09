@@ -457,6 +457,7 @@ shared:
       repository: 'docker.elastic.co/beats-ci'
 
   - &agent_docker_complete_spec
+    <<: *agent_docker_spec
     extra_vars:
       image_name: '{{.BeatName}}-complete'
 
