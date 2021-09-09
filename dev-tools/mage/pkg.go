@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 
@@ -240,5 +241,40 @@ func TestPackages(options ...TestPackagesOption) error {
 		return err
 	}
 
+	return nil
+}
+
+// TestLinuxForCentosGLIBC checks the GLIBC requirements of linux/amd64 and
+// linux/386 binaries to ensure they meet the requirements for RHEL 6 which has
+// glibc 2.12.
+func TestLinuxForCentosGLIBC() error {
+	switch Platform.Name {
+	case "linux/amd64", "linux/386":
+		return TestBinaryGLIBCVersion(filepath.Join("build/golang-crossbuild", BeatName+"-linux-"+Platform.GOARCH), "2.12")
+	default:
+		return nil
+	}
+}
+
+func TestBinaryGLIBCVersion(elfPath, maxGlibcVersion string) error {
+	requiredGlibc, err := ReadGLIBCRequirement(elfPath)
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return nil
+		}
+		return err
+	}
+
+	upperBound, err := NewSemanticVersion(maxGlibcVersion)
+	if err != nil {
+		return err
+	}
+
+	if !requiredGlibc.LessThanOrEqual(upperBound) {
+		return fmt.Errorf("dynamically linked binary %q requires glibc "+
+			"%v, but maximum allowed glibc is %v",
+			elfPath, requiredGlibc, upperBound)
+	}
+	fmt.Printf(">> testBinaryGLIBCVersion: %q requires glibc %v or greater\n", elfPath, requiredGlibc)
 	return nil
 }
