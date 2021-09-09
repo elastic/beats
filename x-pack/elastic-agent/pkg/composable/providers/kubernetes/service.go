@@ -6,14 +6,15 @@ package kubernetes
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -60,7 +61,7 @@ func NewServiceWatcher(
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
-	metaGen := metadata.NewServiceMetadataGenerator(cfg, watcher.Store(), namespaceMeta, client)
+	metaGen := metadata.NewServiceMetadataGenerator(rawConfig, watcher.Store(), namespaceMeta, client)
 	watcher.AddEventHandler(&service{
 		logger,
 		cfg.CleanupTimeout,
@@ -122,16 +123,24 @@ func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen m
 		return nil
 	}
 
-
 	meta := kubeMetaGen.Generate(service)
 	kubemetaMap, err := meta.GetValue("kubernetes")
 	if err != nil {
 		return &serviceData{}
 	}
 
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range service.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
 	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+
+	// add annotations to be discoverable by templates
+	k8sMapping["annotations"] = annotations
 
 	processors := []map[string]interface{}{}
 	// meta map includes metadata that go under kubernetes.*
@@ -145,7 +154,7 @@ func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen m
 		}
 		processors = append(processors, processor)
 	}
-	
+
 	return &serviceData{
 		service:    service,
 		mapping:    k8sMapping,

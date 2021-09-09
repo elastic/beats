@@ -5,8 +5,10 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -194,9 +196,18 @@ func generateNodeData(node *kubernetes.Node, cfg *Config, kubeMetaGen metadata.M
 		return &nodeData{}
 	}
 
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range node.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
 	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+
+	// add annotations to be discoverable by templates
+	k8sMapping["annotations"] = annotations
 
 	processors := []map[string]interface{}{}
 	// meta map includes metadata that go under kubernetes.*

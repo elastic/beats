@@ -8,8 +8,9 @@
 package kubernetes
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -28,8 +29,8 @@ type Config struct {
 	Node string `config:"node"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
-	IncludeLabels      []string `config:"include_labels"`
-	ExcludeLabels      []string `config:"exclude_labels"`
+	IncludeLabels       []string                            `config:"include_labels"`
+	ExcludeLabels       []string                            `config:"exclude_labels"`
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`

@@ -188,8 +188,8 @@ func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMetaGen metadata.Meta
 	}
 
 	return providerData{
-		uid:     string(pod.GetUID()),
-		mapping: k8sMapping,
+		uid:        string(pod.GetUID()),
+		mapping:    k8sMapping,
 		processors: processors,
 	}
 }
@@ -210,9 +210,10 @@ func generateContainerData(
 		runtimes[c.Name] = runtime
 	}
 
-	labels := common.MapStr{}
-	for k, v := range pod.GetObjectMeta().GetLabels() {
-		safemapstr.Put(labels, k, v)
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
 	}
 
 	for _, c := range containers {
@@ -237,14 +238,8 @@ func generateContainerData(
 		// and these are available as dynamic vars through the provider
 		k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
 
-		// add container metadata under kubernetes.container.* to
-		// make them available to dynamics var resolution
-		k8sMapping["container"] = common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
-		}
+		// add annotations to be discoverable by templates
+		k8sMapping["annotations"] = annotations
 
 		//container ECS fields
 		cmeta := common.MapStr{
@@ -274,7 +269,26 @@ func generateContainerData(
 			}
 			processors = append(processors, processor)
 		}
-		comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
+
+		// add container metadata under kubernetes.container.* to
+		// make them available to dynamic var resolution
+		containerMeta := common.MapStr{
+			"id":      cid,
+			"name":    c.Name,
+			"image":   c.Image,
+			"runtime": runtimes[c.Name],
+		}
+		if len(c.Ports) > 0 {
+			for _, port := range c.Ports {
+				containerMeta.Put("port", port.ContainerPort)
+				containerMeta.Put("port_name", port.Name)
+				k8sMapping["container"] = containerMeta
+				comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
+			}
+		} else {
+			k8sMapping["container"] = containerMeta
+			comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
+		}
 	}
 }
 
