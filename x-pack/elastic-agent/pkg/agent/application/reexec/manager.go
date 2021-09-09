@@ -5,6 +5,7 @@
 package reexec
 
 import (
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -53,7 +54,7 @@ func (m *manager) ReExec(shutdownCallback ShutdownCallbackFn, argOverrides ...st
 		if shutdownCallback != nil {
 			if err := shutdownCallback(); err != nil {
 				// panic; because there is no going back, everything is shutdown
-				panic(err)
+				panic(errors.New(errors.TypeUnexpected, err, "failure occured during shutdown cleanup"))
 			}
 		}
 
