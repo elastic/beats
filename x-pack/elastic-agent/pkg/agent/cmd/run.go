@@ -179,7 +179,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 		case sig := <-signals:
 			if sig == syscall.SIGHUP {
 				rexLogger.Infof("SIGHUP triggered re-exec")
-				rex.ReExec()
+				rex.ReExec(nil)
 			} else {
 				breakout = true
 			}
