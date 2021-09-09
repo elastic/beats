@@ -179,7 +179,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 
 	case syslogFormatRFC5424:
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
-			ev := parseAndCreateEvent5424(data, metadata, time.Local, log)
+			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
 			forwarder.Send(ev)
 		}
 
@@ -187,9 +187,9 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
 			var ev beat.Event
 			if IsRFC5424Format(data) {
-				ev = parseAndCreateEvent5424(data, metadata, time.Local, log)
+				ev = parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
 			} else {
-				ev = parseAndCreateEvent3164(data, metadata, time.Local, log)
+				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 			}
 			forwarder.Send(ev)
 		}
@@ -198,7 +198,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 	}
 
 	return func(data []byte, metadata inputsource.NetworkMetadata) {
-		ev := parseAndCreateEvent3164(data, metadata, time.Local, log)
+		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 		forwarder.Send(ev)
 	}
 }
@@ -287,7 +287,7 @@ func parseAndCreateEvent3164(data []byte, metadata inputsource.NetworkMetadata, 
 			"message": string(data),
 		})
 	}
-	return createEvent(ev, metadata, time.Local, log)
+	return createEvent(ev, metadata, timezone, log)
 }
 
 func parseAndCreateEvent5424(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
@@ -299,7 +299,7 @@ func parseAndCreateEvent5424(data []byte, metadata inputsource.NetworkMetadata, 
 			"message": string(data),
 		})
 	}
-	return createEvent(ev, metadata, time.Local, log)
+	return createEvent(ev, metadata, timezone, log)
 }
 
 func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields common.MapStr) beat.Event {

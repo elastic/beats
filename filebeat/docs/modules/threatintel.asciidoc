@@ -68,7 +68,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | URL Threat Intel Fields    | ECS Fields
-| url                        | threat.indicator.url.full
+| url                        | threatintel.indicator.url.full
 | date_added                 | @timestamp
 | host                       | threatintel.indicator.ip/domain
 |==============================================================
@@ -473,7 +473,7 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | date_first  | threatintel.indicator.first_seen
 | date_last   | threatintel.indicator.last_seen
 | detail      | tags
-| domain      | threatintel.indicator.domain
+| domain      | threatintel.indicator.url.domain
 | email       | threatintel.indicator.email.address
 | itype<<a,[1]>> | threatintel.indicator.type
 | lat         | threatintel.indicator.geo.location.lat
