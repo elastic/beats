@@ -217,6 +217,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
+- file_integrity: honor include_files when doing initial scan. {issue}27273[27273] {pull}27722[27722]
 
 *Filebeat*
 
@@ -747,6 +748,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Added support for parsing syslog dates containing a leading 0 (e.g. `Sep 01`) rather than a space. {pull}27775[27775]
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
+- Improve memory usage of line reader of `log` and `filestream` input. {pull}27782[27782]
 
 
 *Heartbeat*
