@@ -28,6 +28,13 @@ processors:
 - set:
     field: _temp_.time
     value: "{{sophos.xg.date}} {{sophos.xg.time}}"
+    if: "ctx?.sophos?.xg?.date != null && ctx?.sophos?.xg?.time != null"
+
+- set:
+    field: _temp_.time
+    value: "{{sophos.xg.timestamp}}"
+    if: "ctx?.sophos?.xg?.timestamp != null"
+
 - date:
     if: "ctx?.event?.timezone == null"
     field: _temp_.time
