@@ -50860,7 +50860,7 @@ type: keyword
 *`openmetrics.type`*::
 +
 --
-metric type
+Metric type
 
 
 type: keyword
@@ -50870,7 +50870,7 @@ type: keyword
 *`openmetrics.unit`*::
 +
 --
-metric unit
+Metric unit
 
 
 type: keyword
@@ -50880,7 +50880,7 @@ type: keyword
 *`openmetrics.created`*::
 +
 --
-metric creation time in seconds
+Metric creation time in seconds
 
 
 type: keyword
