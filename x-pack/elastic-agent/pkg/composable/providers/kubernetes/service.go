@@ -137,7 +137,7 @@ func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen m
 
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
 	// add annotations to be discoverable by templates
 	k8sMapping["annotations"] = annotations
