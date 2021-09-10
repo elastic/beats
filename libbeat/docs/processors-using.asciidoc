@@ -398,11 +398,14 @@ For example, to configure the condition
 
 [source,yaml]
 ------
-or:
-  - equals:
-      http.response.code: 304
-  - equals:
-      http.response.code: 404
+processors:
+  - <processor_name>:
+      when:
+        or:
+          - equals:
+              http.response.code: 304
+          - equals:
+              http.response.code: 404
 ------
 
 [float]
@@ -426,11 +429,14 @@ For example, to configure the condition
 
 [source,yaml]
 ------
-and:
-  - equals:
-      http.response.code: 200
-  - equals:
-      status: OK
+processors:
+  - <processor_name>:
+      when:
+        and:
+          - equals:
+              http.response.code: 200
+          - equals:
+              status: OK
 ------
 
 To configure a condition like `<condition1> OR <condition2> AND <condition3>`:
