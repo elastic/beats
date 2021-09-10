@@ -103,7 +103,7 @@ func humanOutput(w io.Writer, status *client.AgentStatus) error {
 			if app.Message == "" {
 				fmt.Fprint(tw, "\t(no message)\n")
 			} else {
-				fmt.Fprintf(tw, "\t%s\t\n", app.Message)
+				fmt.Fprintf(tw, "\t%s\n", app.Message)
 			}
 		}
 		tw.Flush()
