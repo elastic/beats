@@ -96,7 +96,7 @@ processors:
   - set:
       field: threatintel.indicator.type
       value: file
-      if: "['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename')"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && (['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename'))"
   - rename:
       field: threatintel.misp.attribute.value
       target_field: "threatintel.indicator.file.hash.{{threatintel.misp.attribute.type}}"
@@ -112,17 +112,17 @@ processors:
       patterns:
         - "%{WORD}\\|%{WORD:_tmp.hashtype}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - grok:
       field: threatintel.misp.attribute.value
       patterns:
         - "%{DATA:threatintel.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - set:
       field: threatintel.indicator.file.hash.{{_tmp.hashtype}}
       value: "{{_tmp.hashvalue}}"
-      if: "ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
 
   ## URL/URI indicator operations
   - set:
