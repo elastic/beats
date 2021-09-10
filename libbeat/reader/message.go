@@ -20,6 +20,7 @@ package reader
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
@@ -74,4 +75,22 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 	}
 
 	return common.AddTagsWithKey(m.Fields, key, flags)
+}
+
+func (m *Message) ToEvent() beat.Event {
+	if m.Fields == nil {
+		m.Fields = common.MapStr{}
+	}
+
+	if len(m.Content) > 0 {
+		if _, ok := m.Fields["message"]; !ok {
+			m.Fields["message"] = string(m.Content)
+		}
+	}
+
+	return beat.Event{
+		Timestamp: m.Ts,
+		Meta:      m.Meta,
+		Fields:    m.Fields,
+	}
 }
