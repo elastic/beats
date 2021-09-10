@@ -77,6 +77,8 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 	return common.AddTagsWithKey(m.Fields, key, flags)
 }
 
+// ToEvent converts a Message to an Event that can be published
+// to the output.
 func (m *Message) ToEvent() beat.Event {
 	if m.Fields == nil {
 		m.Fields = common.MapStr{}
