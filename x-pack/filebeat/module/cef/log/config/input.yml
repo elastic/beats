@@ -24,6 +24,9 @@ processors:
         - {from: "message", to: "event.original"}
   - decode_cef:
       field: event.original
+{{ if .timezone }}
+      timezone: '{{ .timezone }}'
+{{ end }}
   - community_id:
   - add_fields:
       target: ''

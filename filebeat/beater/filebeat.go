@@ -181,7 +181,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
@@ -235,7 +235,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	}
 
 	esConfig := b.Config.Output.Config()
-	esClient, err := eslegclient.NewConnectedClient(esConfig)
+	esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
@@ -256,7 +256,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		}
 	}
 
-	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
+	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Kibana client: %v", err)
 	}
@@ -521,7 +521,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}

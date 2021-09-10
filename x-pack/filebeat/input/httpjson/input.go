@@ -162,6 +162,7 @@ func newHTTPClient(ctx context.Context, config config) (*http.Client, error) {
 		config.Transport.Client(
 			httpcommon.WithAPMHTTPInstrumentation(),
 			httpcommon.WithKeepaliveSettings{Disable: true},
+			httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 		)
 	if err != nil {
 		return nil, err
