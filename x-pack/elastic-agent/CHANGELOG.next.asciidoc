@@ -84,7 +84,7 @@
 - Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
 - Add validation for certificate flags to ensure they are absolute paths. {pull}27779[27779]
 - Migrate state on upgrade {pull}27825[27825]
-- Ignore ErrNotExists on Windows machines when fixing permissions. {issue}27836[27836] {pull}27846[27846]
+- Ignore ErrNotExists when fixing permissions. {issue}27836[27836] {pull}27846[27846]
 
 ==== New features
 
