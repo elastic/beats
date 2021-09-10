@@ -442,14 +442,13 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
+	generatedFilesDir := filepath.Join("testdata", "generated")
+
 	// Cleanup all generated files to make sure not having any left overs
 	if *generateFlag {
-		generatedFiles, err := filepath.Glob(filepath.Join("testdata", "*.generated.yml"))
-		require.NoError(t, err)
 
-		for _, file := range generatedFiles {
-			fmt.Println(file)
-		}
+		err := os.RemoveAll(generatedFilesDir)
+		require.NoError(t, err)
 	}
 
 	for name, test := range testcases {
@@ -484,7 +483,7 @@ func TestConfiguration(t *testing.T) {
 			// TODO: If generate, remove all generated files first
 			for _, program := range defPrograms {
 				generatedPath := filepath.Join(
-					"testdata",
+					"testdata", "generated",
 					name+"-"+strings.ToLower(program.Spec.Cmd)+".generated.yml",
 				)
 
@@ -495,6 +494,8 @@ func TestConfiguration(t *testing.T) {
 				if *generateFlag {
 					d, _ := yaml.Marshal(&compareMap.Content)
 					fmt.Println(string(d))
+
+					os.MkdirAll(generatedFilesDir, 0755)
 					err := ioutil.WriteFile(generatedPath, d, 0644)
 					require.NoError(t, err)
 				}
