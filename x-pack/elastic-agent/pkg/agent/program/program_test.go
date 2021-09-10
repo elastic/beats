@@ -5,6 +5,8 @@
 package program
 
 import (
+	"flag"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -19,6 +21,10 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+)
+
+var (
+	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
 func TestGroupBy(t *testing.T) {
@@ -465,20 +471,35 @@ func TestConfiguration(t *testing.T) {
 			require.True(t, ok)
 			require.Equal(t, test.expected, len(defPrograms))
 
+			if *generateFlag {
+
+			}
+
+			// TODO: If generate, remove all generated files first
 			for _, program := range defPrograms {
-				programConfig, err := ioutil.ReadFile(filepath.Join(
+				generatedPath := filepath.Join(
 					"testdata",
-					name+"-"+strings.ToLower(program.Spec.Cmd)+".yml",
-				))
+					name+"-"+strings.ToLower(program.Spec.Cmd)+".generated.yml",
+				)
+
+				compareMap := &transpiler.MapVisitor{}
+				program.Config.Accept(compareMap)
+
+				if *generateFlag {
+					d, _ := yaml.Marshal(&compareMap.Content)
+					fmt.Println(string(d))
+					ioutil.WriteFile(generatedPath, d, 0644)
+					// TODO: Close writing file / flush
+				}
+
+				programConfig, err := ioutil.ReadFile(generatedPath)
 
 				require.NoError(t, err)
 				var m map[string]interface{}
 				err = yamltest.FromYAML(programConfig, &m)
 				require.NoError(t, errors.Wrap(err, program.Cmd()))
 
-				compareMap := &transpiler.MapVisitor{}
-				program.Config.Accept(compareMap)
-
+				fmt.Println(compareMap.Content)
 				if !assert.True(t, cmp.Equal(m, compareMap.Content)) {
 					diff := cmp.Diff(m, compareMap.Content)
 					if diff != "" {
@@ -487,10 +508,11 @@ func TestConfiguration(t *testing.T) {
 				}
 			}
 		})
+
 	}
 }
 
-type fakeAgentInfo struct{}
+type fakeAgentInfo struct {}
 
 func (*fakeAgentInfo) AgentID() string {
 	return "agent-id"
