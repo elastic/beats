@@ -38,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 func defaultConfig() Config {
@@ -64,7 +65,7 @@ func TestErrorOnInvalidSocketType(t *testing.T) {
 func TestErrorOnEmptyLineDelimiter(t *testing.T) {
 	config := &Config{
 		SocketType:    StreamSocket,
-		LineDelimiter: "",
+		LineDelimiter: readfile.InvalidTerminator,
 	}
 	_, err := New(logp.L(), config, nil)
 	assert.Error(t, err)
