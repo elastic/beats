@@ -411,7 +411,7 @@ func LongField(v int64) *Field {
 }
 func UndocumentedField(v string) *Field { return &Field{String: v} }
 func TimestampField(v string) *Field {
-	ts, err := toTimestamp(v)
+	ts, err := toTimestamp(v, nil)
 	if err != nil {
 		panic(err)
 	}
