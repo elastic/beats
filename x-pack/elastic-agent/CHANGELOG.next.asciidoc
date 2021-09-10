@@ -79,6 +79,8 @@
 - Fix apm-server supported outputs not being in sync with supported output types. {pull}26885[26885]
 - Set permissions during installation {pull}26665[26665]
 - Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
+- Add validation for certificate flags to ensure they are absolute paths. {pull}27779[27779]
+- Migrate state on upgrade {pull}27825[27825]
 
 ==== New features
 

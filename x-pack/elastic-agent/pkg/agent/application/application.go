@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -30,7 +31,7 @@ type Application interface {
 }
 
 type reexecManager interface {
-	ReExec(argOverrides ...string)
+	ReExec(callback reexec.ShutdownCallbackFn, argOverrides ...string)
 }
 
 type upgraderControl interface {
