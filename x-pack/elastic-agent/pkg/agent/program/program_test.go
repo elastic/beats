@@ -442,6 +442,16 @@ func TestConfiguration(t *testing.T) {
 		},
 	}
 
+	// Cleanup all generated files to make sure not having any left overs
+	if *generateFlag {
+		generatedFiles, err := filepath.Glob(filepath.Join("testdata", "*.generated.yml"))
+		require.NoError(t, err)
+
+		for _, file := range generatedFiles {
+			fmt.Println(file)
+		}
+	}
+
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -471,10 +481,6 @@ func TestConfiguration(t *testing.T) {
 			require.True(t, ok)
 			require.Equal(t, test.expected, len(defPrograms))
 
-			if *generateFlag {
-
-			}
-
 			// TODO: If generate, remove all generated files first
 			for _, program := range defPrograms {
 				generatedPath := filepath.Join(
@@ -485,21 +491,21 @@ func TestConfiguration(t *testing.T) {
 				compareMap := &transpiler.MapVisitor{}
 				program.Config.Accept(compareMap)
 
+				// Generate new file file for programm
 				if *generateFlag {
 					d, _ := yaml.Marshal(&compareMap.Content)
 					fmt.Println(string(d))
-					ioutil.WriteFile(generatedPath, d, 0644)
-					// TODO: Close writing file / flush
+					err := ioutil.WriteFile(generatedPath, d, 0644)
+					require.NoError(t, err)
 				}
 
 				programConfig, err := ioutil.ReadFile(generatedPath)
-
 				require.NoError(t, err)
+
 				var m map[string]interface{}
 				err = yamltest.FromYAML(programConfig, &m)
 				require.NoError(t, errors.Wrap(err, program.Cmd()))
 
-				fmt.Println(compareMap.Content)
 				if !assert.True(t, cmp.Equal(m, compareMap.Content)) {
 					diff := cmp.Diff(m, compareMap.Content)
 					if diff != "" {
@@ -512,7 +518,7 @@ func TestConfiguration(t *testing.T) {
 	}
 }
 
-type fakeAgentInfo struct {}
+type fakeAgentInfo struct{}
 
 func (*fakeAgentInfo) AgentID() string {
 	return "agent-id"
