@@ -61,7 +61,7 @@ filebeat.inputs:
         value: 5m
 ----
 
-Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+Additionally, it supports authentication via Basic auth, HTTP Headers, oauth2, or Akamai EdgeGrid.
 
 Example configurations with authentication:
 
@@ -86,6 +86,19 @@ filebeat.inputs:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
     token_url: http://localhost/oauth2/token
+  request.url: http://localhost
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  config_version: 2
+  auth.edgegrid:
+    client_token: 12345678901234567890abcdef
+    client_secret: abcdef12345678901234567890
+    access_token: 1qaz2wsx3edc4rfv
+    host: localhost
   request.url: http://localhost
 ----
 
@@ -346,6 +359,35 @@ The JWT Account Key file for Google.
 NOTE: Only one of the credentials settings can be set at once. If none is provided, loading
 default credentials from the environment will be attempted via ADC. For more information about
 how to provide Google credentials, please refer to https://cloud.google.com/docs/authentication.
+
+[float]
+==== `auth.edgegrid.enabled`
+
+When set to `false`, disables the EdgeGrid auth configuration. Default: `true`.
+
+NOTE: EdgeGrid auth settings are disabled if either `enabled` is set to `false` or
+the `auth.edgegrid` section is missing.
+
+[float]
+==== `auth.edgegrid.client_token`
+
+Client Token generated from https://control.akamai.com/
+
+[float]
+==== `auth.edgegrid.client_secret`
+
+Client Secret generated from https://control.akamai.com/
+
+[float]
+==== `auth.edgegrid.access_token`
+
+Access Token generated from https://control.akamai.com/
+
+[float]
+==== `auth.edgegrid.host`
+
+Unique API host generated from https://control.akamai.com/.  In the format of `akaa-xxxxxxxxxxxxxxxx-xxxxxxxxxxxxxxxx.luna.akamaiapis.net`
+with no path or scheme
 
 [float]
 ==== `request.url`
