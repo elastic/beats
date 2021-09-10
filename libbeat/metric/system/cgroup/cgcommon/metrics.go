@@ -58,7 +58,6 @@ func (p Pressure) IsZero() bool {
 // See https://github.com/torvalds/linux/blob/master/Documentation/accounting/psi.rst
 func GetPressure(path string) (map[string]Pressure, error) {
 	pressureData := make(map[string]Pressure)
-
 	f, err := os.Open(path)
 	// pass along any OS open errors directly
 	if err != nil {
