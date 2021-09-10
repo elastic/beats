@@ -78,6 +78,9 @@ func newPaginationRequestFactory(method, encodeAs string, url url.URL, body *com
 		rf.user = authConfig.Basic.User
 		rf.password = authConfig.Basic.Password
 	}
+	if authConfig != nil && authConfig.EdgeGrid.isEnabled() {
+		rf.EdgeGridConfig = authConfig.EdgeGrid.config()
+	}
 	return rf
 }
 
@@ -135,7 +138,7 @@ func (iter *pageIterator) next() (*response, bool, error) {
 		return nil, false, err
 	}
 
-	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq)
+	resp, err := iter.pagination.httpClient.do(iter.stdCtx, iter.trCtx, httpReq, iter.pagination.requestFactory)
 	if err != nil {
 		return nil, false, err
 	}
