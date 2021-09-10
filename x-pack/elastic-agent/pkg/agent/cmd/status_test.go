@@ -41,7 +41,7 @@ var testStatus = &client.AgentStatus{
 	},
 }
 
-func ExampleHumanOutput() {
+func ExamplehumanOutput() {
 	humanOutput(os.Stdout, testStatus)
 	// Output:
 	// Status: HEALTHY
@@ -57,7 +57,7 @@ func ExampleHumanOutput() {
 	//                            Running
 }
 
-func ExampleJSONOutput() {
+func ExamplejsonOutput() {
 	jsonOutput(os.Stdout, testStatus)
 	// Output:
 	// {
@@ -96,7 +96,7 @@ func ExampleJSONOutput() {
 	// }
 }
 
-func ExampleYAMLOutput() {
+func ExampleyamlOutput() {
 	yamlOutput(os.Stdout, testStatus)
 	// Output:
 	// status: 2
