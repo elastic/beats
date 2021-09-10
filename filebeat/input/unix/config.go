@@ -23,10 +23,13 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 type config struct {
 	unix.Config `config:",inline"`
+	Parsers     parser.Config `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -35,7 +38,7 @@ func defaultConfig() config {
 			Timeout:        time.Minute * 5,
 			MaxMessageSize: 20 * humanize.MiByte,
 			SocketType:     unix.StreamSocket,
-			LineDelimiter:  "\n",
+			LineDelimiter:  readfile.LineFeed,
 		},
 	}
 }

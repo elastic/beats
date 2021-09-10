@@ -52,7 +52,7 @@ type datagramServer struct {
 func New(log *logp.Logger, config *Config, nf inputsource.NetworkFunc) (Server, error) {
 	switch config.SocketType {
 	case StreamSocket:
-		splitFunc, err := streaming.SplitFunc(config.Framing, []byte(config.LineDelimiter))
+		splitFunc, err := streaming.SplitFunc(config.Framing, config.LineDelimiter.Bytes())
 		if err != nil {
 			return nil, err
 		}

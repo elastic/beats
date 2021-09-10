@@ -83,3 +83,14 @@ func (l *LineTerminator) Unpack(option string) error {
 
 	return nil
 }
+
+func (l *LineTerminator) Bytes() []byte {
+	if b, ok := lineTerminatorCharacters[*l]; ok {
+		return b
+	}
+	return nil
+}
+
+func (l *LineTerminator) String() string {
+	return string(l.Bytes())
+}

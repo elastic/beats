@@ -32,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 type config struct {
@@ -88,7 +89,7 @@ func defaultUnix() syslogUnix {
 		Config: unix.Config{
 			Timeout:        time.Minute * 5,
 			MaxMessageSize: 20 * humanize.MiByte,
-			LineDelimiter:  "\n",
+			LineDelimiter:  readfile.LineFeed,
 		},
 	}
 }

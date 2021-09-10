@@ -75,9 +75,16 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
+	dataReader := &inputsource.NetworkMessageReader{}
+	parsers := s.config.Parsers.Create(dataReader)
+
 	cb := inputsource.NetworkFunc(func(data []byte, metadata inputsource.NetworkMetadata) {
-		event := createEvent(data, metadata)
-		publisher.Publish(event)
+		dataReader.SetData(data, inputsource.NetworkMetadata{})
+		msg, err := parsers.Next()
+		if err != nil {
+			// TODO
+		}
+		publisher.Publish(msg.ToEvent())
 	})
 
 	server, err := unix.New(log, &s.config.Config, cb)

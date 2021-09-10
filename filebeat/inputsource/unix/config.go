@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
+	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 )
 
 type SocketType uint8
@@ -46,15 +47,15 @@ var socketTypes = map[string]SocketType{
 
 // Config exposes the unix configuration.
 type Config struct {
-	Path           string                `config:"path"`
-	Group          *string               `config:"group"`
-	Mode           *string               `config:"mode"`
-	Timeout        time.Duration         `config:"timeout" validate:"nonzero,positive"`
-	MaxMessageSize cfgtype.ByteSize      `config:"max_message_size" validate:"nonzero,positive"`
-	MaxConnections int                   `config:"max_connections"`
-	LineDelimiter  string                `config:"line_delimiter"`
-	Framing        streaming.FramingType `config:"framing"`
-	SocketType     SocketType            `config:"socket_type"`
+	Path           string                  `config:"path"`
+	Group          *string                 `config:"group"`
+	Mode           *string                 `config:"mode"`
+	Timeout        time.Duration           `config:"timeout" validate:"nonzero,positive"`
+	MaxMessageSize cfgtype.ByteSize        `config:"max_message_size" validate:"nonzero,positive"`
+	MaxConnections int                     `config:"max_connections"`
+	LineDelimiter  readfile.LineTerminator `config:"line_delimiter"`
+	Framing        streaming.FramingType   `config:"framing"`
+	SocketType     SocketType              `config:"socket_type"`
 }
 
 // Validate validates the Config option for the unix input.
@@ -63,7 +64,7 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("need to specify the path to the unix socket")
 	}
 
-	if c.SocketType == StreamSocket && c.LineDelimiter == "" {
+	if c.SocketType == StreamSocket && c.LineDelimiter == readfile.InvalidTerminator {
 		return fmt.Errorf("line_delimiter cannot be empty when using stream socket")
 	}
 	return nil
