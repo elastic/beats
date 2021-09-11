@@ -10,6 +10,7 @@ import (
 	"os/user"
 	"runtime"
 	"strconv"
+	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
@@ -27,7 +28,14 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("could not parse UID '%s' as int: %s", localUser.Uid, err))
 			}
-
+			localUserGid, err := strconv.Atoi(localUser.Gid)
+			if err != nil {
+				panic(fmt.Sprintf("could not parse GID '%s' as int: %s", localUser.Uid, err))
+			}
+			err = syscall.Setgid(localUserGid)
+			if err != nil {
+				panic(fmt.Sprintf("could not set gid to %d: %s", localUserGid, err))
+			}
 			// Note this is not the regular SetUID! Look at the package docs for it, it preserves
 			// capabilities post-SetUID, which we use to lock things down immediately
 			err = cap.SetUID(localUserUid)
@@ -39,11 +47,11 @@ func init() {
 			newcaps := cap.NewSet()
 			// Both permitted and effective are required! Permitted makes the permmission
 			// possible to get, effective makes it 'active'
-			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW)
+			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.SETUID)
 			if err != nil {
 				panic(fmt.Sprintf("error setting permitted setcap: %s", err))
 			}
-			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW)
+			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.SETUID)
 			if err != nil {
 				panic(fmt.Sprintf("error setting effective setcap: %s", err))
 			}
@@ -71,6 +79,7 @@ func init() {
 			"bind",
 			"brk",
 			"clone",
+			"chdir",
 			"close",
 			"epoll_ctl",
 			"epoll_pwait",

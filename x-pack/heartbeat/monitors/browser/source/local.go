@@ -11,6 +11,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"syscall"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 
@@ -142,6 +143,7 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	cmd.Dir = dir
 	logp.Info("Running %s in %s", cmd, dir)
 	output, err := cmd.CombinedOutput()
-	logp.Info("Ran %s got %s", cmd, string(output))
+	logp.Info("Ran %s got '%s': (%s) as (%d/%d)", cmd, string(output), err, syscall.Getuid(), syscall.Geteuid())
+	os.Exit(123)
 	return err
 }
