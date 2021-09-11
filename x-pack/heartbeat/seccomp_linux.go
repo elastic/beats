@@ -119,19 +119,5 @@ func init() {
 			panic(err)
 		}
 		fmt.Printf("Installed seccomp policy")
-
-		// //err := newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.SETUID)
-		// //err = newcaps.SetFlag(cap.Inheritable, true, cap.NET_RAW, cap.SETUID)
-		// //err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.SETUID)
-		// if err != nil {
-		// 	panic(fmt.Sprintf("could not set caps: %s", err))
-		// }
-		// err = newcaps.SetProc()
-		// if err != nil {
-		// 	panic(fmt.Sprintf("could net set new process caps: %s", err))
-		// }
-		//err = syscall.Setuid(1000)
-
-		//fmt.Printf("SET USER ID %s\n", newcaps)
 	}
 }
