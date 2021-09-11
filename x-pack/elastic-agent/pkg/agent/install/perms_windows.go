@@ -7,6 +7,7 @@
 package install
 
 import (
+	"errors"
 	"io/fs"
 	"path/filepath"
 
@@ -30,6 +31,8 @@ func recursiveSystemAdminPermissions(path string) error {
 				inherit = false
 			}
 			err = systemAdministratorsOnly(name, inherit)
+		} else if errors.Is(err, fs.ErrNotExist) {
+			return nil
 		}
 		return err
 	})
