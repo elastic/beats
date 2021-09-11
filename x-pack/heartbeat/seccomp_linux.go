@@ -39,17 +39,17 @@ func init() {
 			newcaps := cap.NewSet()
 			// Both permitted and effective are required! Permitted makes the permmission
 			// possible to get, effective makes it 'active'
-			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW)
 			if err != nil {
 				panic(fmt.Sprintf("error setting permitted setcap: %s", err))
 			}
-			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW)
 			if err != nil {
 				panic(fmt.Sprintf("error setting effective setcap: %s", err))
 			}
 
 			// We do not want these capabilities to be inherited by subprocesses
-			err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW)
 			if err != nil {
 				panic(fmt.Sprintf("error setting inheritable setcap: %s", err))
 			}
