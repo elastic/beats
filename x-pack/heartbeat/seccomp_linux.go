@@ -7,7 +7,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/user"
 	"runtime"
+	"strconv"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
@@ -16,53 +18,51 @@ import (
 func init() {
 	switch runtime.GOARCH {
 	case "amd64", "386":
+		if localUserName := os.Getenv("BEAT_LOCAL_USER"); localUserName != "" {
+			localUser, err := user.Lookup(localUserName)
+			if err != nil {
+				panic(fmt.Sprintf("could not lookup BEAT_LOCAL_USER=%s: %s", localUser, err))
+			}
+			localUserUid, err := strconv.Atoi(localUser.Uid)
+			if err != nil {
+				panic(fmt.Sprintf("could not parse UID '%s' as int: %s", localUser.Uid, err))
+			}
+
+			err = cap.SetUID(localUserUid)
+			if err != nil {
+				panic(fmt.Sprintf("could not setuid to %d: %s", localUserUid, err))
+			}
+
+			// Start with an empty capability set
+			newcaps := cap.NewSet()
+			// Both permitted and effective are required! Permitted makes the permmission
+			// possible to get, effective makes it 'active'
+			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			if err != nil {
+				panic(fmt.Sprintf("error setting permitted setcap: %s", err))
+			}
+			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			if err != nil {
+				panic(fmt.Sprintf("error setting effective setcap: %s", err))
+			}
+
+			// We do not want these capabilities to be inherited by subprocesses
+			err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			if err != nil {
+				panic(fmt.Sprintf("error setting inheritable setcap: %s", err))
+			}
+
+			newcaps.SetProc()
+			if err != nil {
+				panic(fmt.Sprintf("error setting new process capabilities via setcap: %s", err))
+			}
+		}
+
 		// We require a number of syscalls to run. This list was generated with
 		// mage build && env ELASTIC_SYNTHETICS_CAPABLE=true strace --output=syscalls  ./heartbeat --path.config sample-synthetics-config/ -e
 		// then filtered through:  cat syscalls | cut -d '(' -f 1 | egrep '\w+' -o | sort | uniq | xargs -n1 -IFF echo \"FF\"
 		// We should tighten this up before GA. While it is true that there are probably duplicate
 		// syscalls here vs. the base, this is probably OK for now.
-		var err error
-		if os.Getuid() == 0 {
-			err = cap.SetUID(1000)
-			if err != nil {
-				panic(err)
-			}
-
-			newcaps := cap.NewSet()
-			/*
-				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
-				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
-				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
-				if err != nil {
-					panic(err)
-				}
-			*/
-			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
-			err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW, cap.NET_BIND_SERVICE)
-			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
-			if err != nil {
-				panic(err)
-			}
-			newcaps.SetProc()
-			if err != nil {
-				panic(err)
-			}
-			curcaps := cap.GetProc()
-			e, _ := curcaps.GetFlag(cap.Effective, cap.NET_RAW)
-			i, _ := curcaps.GetFlag(cap.Inheritable, cap.NET_RAW)
-			p, _ := curcaps.GetFlag(cap.Permitted, cap.NET_RAW)
-
-			fmt.Printf("\nCHECK EIP=%v|%v|%v mode:%v\n", e, i, p, cap.GetMode())
-			fmt.Printf("CAPS=%v | %s\n", curcaps, curcaps)
-			fmt.Printf("NCAPS=%v | %s\n", newcaps, newcaps)
-
-			/*
-				err = cap.SetUID(0)
-				if err != nil {
-					panic(err)
-				}
-			*/
-		}
 		syscalls := []string{
 			"access",
 			"arch_prctl",
