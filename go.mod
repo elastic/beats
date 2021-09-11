@@ -192,7 +192,7 @@ require (
 	k8s.io/api v0.19.4
 	k8s.io/apimachinery v0.19.4
 	k8s.io/client-go v0.19.4
-	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57 // indirect
+	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
 replace (

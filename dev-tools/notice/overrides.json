@@ -11,3 +11,4 @@
 {"name": "github.com/munnerz/goautoneg", "licenceType": "BSD-3-Clause"}
 {"name": "github.com/pelletier/go-buffruneio", "licenceType": "MIT"}
 {"name": "github.com/urso/magetools", "licenceType": "Apache-2.0"}
+{"name": "kernel.org/pub/linux/libs/security/libcap/cap", "licenseFile": "License", "licenseType": "BSD-3-Clause", "note": "Dual licensed as BSD-3-Clause / GPL-2.0. See https://git.kernel.org/pub/scm/libs/libcap/libcap.git/tree/License"}
