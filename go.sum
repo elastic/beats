@@ -1054,6 +1054,10 @@ k8s.io/kube-openapi v0.0.0-20200805222855-6aeccd4b50c6/go.mod h1:UuqjUnNftUyPE5H
 k8s.io/kubernetes v1.13.0/go.mod h1:ocZa8+6APFNC2tX1DZASIbocyYT5jHzqFVsY5aoB7Jk=
 k8s.io/utils v0.0.0-20200729134348-d5654de09c73 h1:uJmqzgNWG7XyClnU/mLPBWwfKKF1K8Hf8whTseBgJcg=
 k8s.io/utils v0.0.0-20200729134348-d5654de09c73/go.mod h1:jPW/WVKK9YHAvNhRxK0md/EJ228hCsBRufyofKtW8HA=
+kernel.org/pub/linux/libs/security/libcap/cap v1.2.57 h1:2nmqI+aw7EQZuelYktkQHBE4jESD2tOR+lOJEnv/Apo=
+kernel.org/pub/linux/libs/security/libcap/cap v1.2.57/go.mod h1:uI99C3r4SXvJeuqoEtx/eWt7UbmfqqZ80H8q+9t/A7I=
+kernel.org/pub/linux/libs/security/libcap/psx v1.2.57 h1:NOFATXSf5z/cMR3HIwQ3Xrd3nwnWl5xThmNr5U/F0pI=
+kernel.org/pub/linux/libs/security/libcap/psx v1.2.57/go.mod h1:+l6Ee2F59XiJ2I6WR5ObpC1utCQJZ/VLsEbQCD8RG24=
 rsc.io/binaryregexp v0.2.0/go.mod h1:qTv7/COck+e2FymRvadv62gMdZztPaShugOCi3I+8D8=
 sigs.k8s.io/structured-merge-diff/v4 v4.0.1 h1:YXTMot5Qz/X1iBRJhAt+vI+HVttY0WkSqqhKxQ0xVbA=
 sigs.k8s.io/structured-merge-diff/v4 v4.0.1/go.mod h1:bJZC9H9iH24zzfZ/41RGcq60oK1F7G282QMXDPYydCw=

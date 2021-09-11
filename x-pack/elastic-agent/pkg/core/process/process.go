@@ -55,6 +55,7 @@ func StartContext(ctx context.Context, logger *logger.Logger, path string, confi
 	}
 
 	// start process
+	panic(fmt.Sprintf("STARTING %v", cmd))
 	if err := cmd.Start(); err != nil {
 		return nil, errors.New(err, fmt.Sprintf("failed to start '%s'", path))
 	}
