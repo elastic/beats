@@ -85,6 +85,7 @@
 - Add validation for certificate flags to ensure they are absolute paths. {pull}27779[27779]
 - Migrate state on upgrade {pull}27825[27825]
 - Add "_monitoring" suffix to monitoring instance names to remove ambiguity with the status command. {issue}25449[25449]
+- Ignore ErrNotExists when fixing permissions. {issue}27836[27836] {pull}27846[27846]
 
 ==== New features
 
