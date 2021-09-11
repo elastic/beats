@@ -1,0 +1,94 @@
+# These files contain a list of monitor configurations identical
+# to the heartbeat.monitors section in heartbeat.yml
+# The .example extension on this file must be removed for it to
+# be loaded.
+
+- type: http # monitor type `http`. Connect via HTTP an optionally verify response
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: my-http-monitor
+
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: My HTTP Monitor
+
+  # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
+  #service.name: my-apm-service-name
+
+  # Enable/Disable monitor
+  #enabled: true
+
+  # Configure task schedule
+  schedule: '@every 5s' # every 5 seconds from start of beat
+
+  # Configure URLs to ping
+  hosts: ["http://localhost:9200"]
+
+  # Configure IP protocol types to ping on if hostnames are configured.
+  # Ping all resolvable IPs if `mode` is `all`, or only one IP if `mode` is `any`.
+  ipv4: true
+  ipv6: true
+  mode: any
+
+  # Optional HTTP proxy url.
+  #proxy_url: ''
+
+  # Total test connection and data exchange timeout
+  #timeout: 16s
+
+  # Optional Authentication Credentials
+  #username: ''
+  #password: ''
+
+  # TLS/SSL connection settings for use with HTTPS endpoint. If not configured
+  # system defaults will be used.
+  #ssl:
+  # Certificate Authorities
+  #certificate_authorities: ['']
+
+  # Required TLS protocols
+  #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
+
+  # Request settings:
+  #check.request:
+  # Configure HTTP method to use. Only 'HEAD', 'GET' and 'POST' methods are allowed.
+  #method: "GET"
+
+  # Dictionary of additional HTTP headers to send:
+  #headers:
+
+  # Optional request body content
+  #body:
+
+  # Expected response settings
+  #check.response:
+    # Expected status code. If not configured or set to 0 any status code not
+    # being 404 is accepted.
+    #status: 0
+
+    # Required response headers.
+    #headers:
+
+    # Required response contents.
+    #body:
+
+    # Parses the body as JSON, then checks against the given condition expression
+    #json:
+    #- description: Explanation of what the check does
+    #  condition:
+    #    equals:
+    #      myField: expectedValue
+
+  # The tags of the monitors are included in their own field with each
+  # transaction published. Tags make it easy to group servers by different
+  # logical properties.
+  #tags: ["service-X", "web-tier"]
+
+  # Optional fields that you can specify to add additional information to the
+  # monitor output. Fields can be scalar values, arrays, dictionaries, or any nested
+  # combination of these.
+  #fields:
+  #  env: staging
+
+  # If this option is set to true, the custom fields are stored as top-level
+  # fields in the output document instead of being grouped under a fields
+  # sub-dictionary. Default is false.
+  #fields_under_root: false

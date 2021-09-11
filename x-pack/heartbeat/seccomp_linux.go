@@ -5,9 +5,12 @@
 package main
 
 import (
+	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/elastic/beats/v7/libbeat/common/seccomp"
+	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
 func init() {
@@ -18,6 +21,48 @@ func init() {
 		// then filtered through:  cat syscalls | cut -d '(' -f 1 | egrep '\w+' -o | sort | uniq | xargs -n1 -IFF echo \"FF\"
 		// We should tighten this up before GA. While it is true that there are probably duplicate
 		// syscalls here vs. the base, this is probably OK for now.
+		var err error
+		if os.Getuid() == 0 {
+			err = cap.SetUID(1000)
+			if err != nil {
+				panic(err)
+			}
+
+			newcaps := cap.NewSet()
+			/*
+				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
+				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
+				err = newcaps.SetFlag(cap.Effective, false, cap.CHOWN, cap.DAC_OVERRIDE, cap.DAC_READ_SEARCH, cap.FOWNER, cap.FSETID, cap.KILL, cap.SETGID, cap.SETUID, cap.SETPCAP, cap.LINUX_IMMUTABLE, cap.SYS_MODULE, cap.SYS_CHROOT, cap.SYS_PTRACE, cap.SYS_PACCT, cap.SYS_ADMIN, cap.SETUID)
+				if err != nil {
+					panic(err)
+				}
+			*/
+			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.NET_BIND_SERVICE)
+			if err != nil {
+				panic(err)
+			}
+			newcaps.SetProc()
+			if err != nil {
+				panic(err)
+			}
+			curcaps := cap.GetProc()
+			e, _ := curcaps.GetFlag(cap.Effective, cap.NET_RAW)
+			i, _ := curcaps.GetFlag(cap.Inheritable, cap.NET_RAW)
+			p, _ := curcaps.GetFlag(cap.Permitted, cap.NET_RAW)
+
+			fmt.Printf("\nCHECK EIP=%v|%v|%v mode:%v\n", e, i, p, cap.GetMode())
+			fmt.Printf("CAPS=%v | %s\n", curcaps, curcaps)
+			fmt.Printf("NCAPS=%v | %s\n", newcaps, newcaps)
+
+			/*
+				err = cap.SetUID(0)
+				if err != nil {
+					panic(err)
+				}
+			*/
+		}
 		syscalls := []string{
 			"access",
 			"arch_prctl",
@@ -28,7 +73,7 @@ func init() {
 			"epoll_ctl",
 			"epoll_pwait",
 			"execve",
-			"exited",
+			"exit",
 			"fcntl",
 			"flock",
 			"fstat",
@@ -61,23 +106,30 @@ func init() {
 			"sendto",
 			"set_robust_list",
 			"set_tid_address",
-			"si_code",
 			"sigaltstack",
-			"SIGINT",
-			"SIGURG",
-			"SI_KERNEL",
-			"si_pid",
-			"si_signo",
-			"SI_TKILL",
-			"si_uid",
 			"socket",
 			"umask",
 			"uname",
-			"with",
-			"write"}
+			"write",
+		}
 
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
 			panic(err)
 		}
+		fmt.Printf("Installed seccomp policy")
+
+		// //err := newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.SETUID)
+		// //err = newcaps.SetFlag(cap.Inheritable, true, cap.NET_RAW, cap.SETUID)
+		// //err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.SETUID)
+		// if err != nil {
+		// 	panic(fmt.Sprintf("could not set caps: %s", err))
+		// }
+		// err = newcaps.SetProc()
+		// if err != nil {
+		// 	panic(fmt.Sprintf("could net set new process caps: %s", err))
+		// }
+		//err = syscall.Setuid(1000)
+
+		//fmt.Printf("SET USER ID %s\n", newcaps)
 	}
 }
