@@ -23,7 +23,7 @@ heartbeat.config.monitors:
 heartbeat.monitors:
 - type: http
   # Set enabled to true (or delete the following line) to enable this example monitor
-  enabled: true
+  enabled: false
   # ID used to uniquely identify this monitor in elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere
@@ -93,11 +93,11 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-output.console: ~
+
 # ---------------------------- Elasticsearch Output ----------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-#  hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
@@ -194,4 +194,3 @@ processors:
 # This allows to enable 6.7 migration aliases
 #migration.6_to_7.enabled: true
 
-          #seccomp.enabled: false

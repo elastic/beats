@@ -20,7 +20,6 @@ package beater
 import (
 	"errors"
 	"fmt"
-	"os"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
@@ -51,20 +50,6 @@ type Heartbeat struct {
 
 // New creates a new heartbeat.
 func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
-	if os.Geteuid() == 0 {
-		//capset := cap.NewSet()
-
-		//capset.SetFlag(cap.Effective, true, cap.NET_RAW)
-		//if err := capset.SetProc(); err != nil {
-		//return nil, fmt.Errorf("could not drop capabilities: %w", err)
-		//}
-		//err := cap.SetUID(1000)
-		//if err != nil {
-		//return nil, fmt.Errorf("could not change UID: %w", err)
-		//}
-
-	}
-
 	parsedConfig := config.DefaultConfig
 	if err := rawConfig.Unpack(&parsedConfig); err != nil {
 		return nil, fmt.Errorf("Error reading config file: %v", err)
