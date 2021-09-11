@@ -28,6 +28,8 @@ func init() {
 				panic(fmt.Sprintf("could not parse UID '%s' as int: %s", localUser.Uid, err))
 			}
 
+			// Note this is not the regular SetUID! Look at the package docs for it, it preserves
+			// capabilities post-SetUID, which we use to lock things down immediately
 			err = cap.SetUID(localUserUid)
 			if err != nil {
 				panic(fmt.Sprintf("could not setuid to %d: %s", localUserUid, err))
