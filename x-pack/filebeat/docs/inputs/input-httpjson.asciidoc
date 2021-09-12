@@ -567,6 +567,11 @@ Required if using split type of `string`.  This is the sub string used to split 
 Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
+==== `response.split[].ignore_error`
+
+If set to true, failure to find a non-empty target will pass operation on to the next nested split operation instead of failing with an error. Default: `false`.
+
+[float]
 ==== `response.split[].split`
 
 Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.

@@ -31,6 +31,7 @@ type splitConfig struct {
 	KeepParent      bool             `config:"keep_parent"`
 	KeyField        string           `config:"key_field"`
 	DelimiterString string           `config:"delimiter"`
+	IgnoreError     bool             `config:"ignore_error"`
 }
 
 func (c *responseConfig) Validate() error {

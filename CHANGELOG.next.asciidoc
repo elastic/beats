@@ -749,6 +749,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
 - Improve memory usage of line reader of `log` and `filestream` input. {pull}27782[27782]
+- Add `ignore_error` flag to `httpjson` `split` processor. {pull}27880[27880]
 
 
 *Heartbeat*
