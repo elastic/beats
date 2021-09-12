@@ -32,15 +32,78 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("could not parse GID '%s' as int: %s", localUser.Uid, err))
 			}
-			err = syscall.Setgid(localUserGid)
-			if err != nil {
-				panic(fmt.Sprintf("could not set gid to %d: %s", localUserGid, err))
+			if os.Getenv("PRESETGROUPS") != "" {
+				err := syscall.Setgroups([]int{1000, 0})
+				if err != nil {
+					panic(fmt.Sprintf("could not prsetgroups: %s", err))
+				}
 			}
+			if os.Getenv("PRESETGROUPSREV") != "" {
+				err := syscall.Setgroups([]int{0, 1})
+				if err != nil {
+					panic(fmt.Sprintf("could not prsetgroups: %s", err))
+				}
+			}
+			if os.Getenv("BEFORE_G") != "" {
+				err = syscall.Setgid(1000)
+				if err != nil {
+					panic(fmt.Sprintf("could not set gid to %d: %s", localUserGid, err))
+				}
+			}
+
+			if os.Getenv("BEFORE_EG") != "" {
+				err = syscall.Setegid(1000)
+				if err != nil {
+					panic(fmt.Sprintf("could not set egid to %d: %s", 0, err))
+				}
+			}
+
 			// Note this is not the regular SetUID! Look at the package docs for it, it preserves
 			// capabilities post-SetUID, which we use to lock things down immediately
 			err = cap.SetUID(localUserUid)
 			if err != nil {
 				panic(fmt.Sprintf("could not setuid to %d: %s", localUserUid, err))
+			}
+
+			uid := syscall.Getuid()
+			euid := syscall.Geteuid()
+			gid := syscall.Getgid()
+			egid := syscall.Getegid()
+			groups, _ := syscall.Getgroups()
+
+			fmt.Printf("SetUID/GRPS(%d|%d/%d|%d) (%v) without error\n", uid, euid, gid, egid, groups)
+
+			if os.Getenv("AFTER_G") != "" {
+				err = syscall.Setgid(1000)
+				if err != nil {
+					panic(fmt.Sprintf("after could not set gid to %d: %s", localUserGid, err))
+				}
+			}
+
+			if os.Getenv("AFTER_EG") != "" {
+				err = syscall.Setegid(1000)
+				if err != nil {
+					panic(fmt.Sprintf("after could not set egid to %d: %s", 0, err))
+				}
+			}
+
+			u, err := user.Lookup(localUserName)
+			if err != nil {
+				panic(fmt.Sprintf("could not lookup local username: %s", err))
+			}
+			os.Setenv("HOME", u.HomeDir)
+
+			if os.Getenv("SETGROUPS") != "" {
+				err := syscall.Setgroups([]int{1000, 0})
+				if err != nil {
+					panic(fmt.Sprintf("could setgroups: %s", err))
+				}
+			}
+			if os.Getenv("SETGROUPS2") != "" {
+				err := syscall.Setgroups([]int{0, 100})
+				if err != nil {
+					panic(fmt.Sprintf("could setgroups: %s", err))
+				}
 			}
 
 			// Start with an empty capability set
@@ -66,6 +129,11 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("error setting new process capabilities via setcap: %s", err))
 			}
+			fmt.Printf("Dropped capabilities without error\n")
+
+			fmt.Printf("SetUID/GRPS(%d|%d/%d|%d) (%v) without error\n", uid, euid, gid, egid, groups)
+			syscall.Exec("/bin/bash", nil, nil)
+
 		}
 
 		// We require a number of syscalls to run. This list was generated with
@@ -90,6 +158,7 @@ func init() {
 			"fstat",
 			"futex",
 			"geteuid",
+			"getegid",
 			"getgid",
 			"getpid",
 			"getppid",
@@ -104,7 +173,9 @@ func init() {
 			"munmap",
 			"newfstatat",
 			"openat",
+			"eventfd2",
 			"prctl",
+			"mkdtemp",
 			"pread64",
 			"prlimit64",
 			"read",
@@ -122,6 +193,7 @@ func init() {
 			"umask",
 			"uname",
 			"write",
+			"eouueouoe",
 		}
 
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {

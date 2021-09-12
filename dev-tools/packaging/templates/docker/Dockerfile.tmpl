@@ -8,7 +8,7 @@ FROM {{ .buildFrom }} AS home
 
 COPY beat {{ $beatHome }}
 
-ENV BEAT_LOCAL_USER={ .user }
+ENV BEAT_LOCAL_USER={{ .user }}
 
 RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     chown -R root:root {{ $beatHome }} && \

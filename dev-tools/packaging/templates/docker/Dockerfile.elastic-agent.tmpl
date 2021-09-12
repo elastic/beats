@@ -30,7 +30,7 @@ FROM {{ .from }}
 # Contains the elastic agent image variant, an empty string for the standard variant
 # or "complete" for the bigger one.
 ENV ELASTIC_AGENT_IMAGE_VARIANT={{.Variant}}
-ENV BEAT_LOCAL_USER={ .user }
+ENV BEAT_LOCAL_USER={{ .user }}
 
 {{- if contains .from "ubi-minimal" }}
 RUN for iter in {1..10}; do microdnf update -y && microdnf install -y shadow-utils jq &&  microdnf clean all && exit_code=0 && break || exit_code=$? && echo "microdnf error: retry $iter in 10s" && sleep 10; done; (exit $exit_code)

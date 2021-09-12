@@ -432,7 +432,7 @@ shared:
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
-      linux_capabilities: ''
+      linux_capabilities: 'net_raw+eip'
     files:
       'elastic-agent.yml':
         source: 'elastic-agent.docker.yml'

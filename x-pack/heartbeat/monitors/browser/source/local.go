@@ -101,6 +101,14 @@ func setupOnlineDir(dir string) (err error) {
 		}
 	}
 
+	/*
+		cacheDir := path.Join(dir, "npm-cache")
+		err = os.MkdirAll(cacheDir, 0777)
+		if err != nil {
+			return fmt.Errorf("could not make npm cache dir: %w", err)
+		}
+	*/
+
 	// Ensure all deps installed
 	err = runSimpleCommand(exec.Command("npm", "install"), dir)
 	if err != nil {
@@ -143,7 +151,11 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	cmd.Dir = dir
 	logp.Info("Running %s in %s", cmd, dir)
 	output, err := cmd.CombinedOutput()
-	logp.Info("Ran %s got '%s': (%s) as (%d/%d)", cmd, string(output), err, syscall.Getuid(), syscall.Geteuid())
-	os.Exit(123)
+	logp.Info("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
+	if cmd.ProcessState.ExitCode() != 0 {
+
+		syscall.Exec("/bin/bash", nil, nil)
+		os.Exit(123)
+	}
 	return err
 }
