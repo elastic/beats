@@ -191,6 +191,9 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		event.MetricSetFields.Put("name", name)
 		delete(event.MetricSetFields, "index")
 
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+
 		r.Event(event)
 	}
 

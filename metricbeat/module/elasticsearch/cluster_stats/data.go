@@ -327,6 +327,9 @@ func eventMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.I
 
 	event.MetricSetFields = metricSetFields
 
+	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	event.Index = index
+
 	r.Event(event)
 
 	return nil

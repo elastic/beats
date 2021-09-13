@@ -339,6 +339,9 @@ func eventsMapping(r mb.ReporterV2, m elasticsearch.MetricSetAPI, info elasticse
 		event.ModuleFields.Put("node.name", nameStr)
 		event.MetricSetFields.Delete("name")
 
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+
 		r.Event(event)
 	}
 	return errs.Err()

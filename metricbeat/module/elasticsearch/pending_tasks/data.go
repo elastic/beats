@@ -71,6 +71,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 			continue
 		}
 
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
+
 		r.Event(event)
 	}
 

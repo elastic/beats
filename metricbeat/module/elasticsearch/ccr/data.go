@@ -19,6 +19,7 @@ package ccr
 
 import (
 	"encoding/json"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 
@@ -155,6 +156,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 
 			autoFollow, _ := autoFollowSchema.Apply(data.AutoFollowStats)
 			event.MetricSetFields["auto_follow"] = autoFollow
+
+			index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+			event.Index = index
 
 			r.Event(event)
 		}

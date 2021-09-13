@@ -19,6 +19,7 @@ package index_summary
 
 import (
 	"encoding/json"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/pkg/errors"
 
@@ -111,6 +112,10 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) erro
 
 	event.MetricSetFields = fields
 
+	index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+	event.Index = index
+
 	r.Event(event)
+
 	return nil
 }

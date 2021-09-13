@@ -131,6 +131,9 @@ func eventsMapping(r mb.ReporterV2, content []byte) error {
 				event.MetricSetFields.Put("relocating_node.name", relocatingNode)
 				event.MetricSetFields.Put("relocating_node.id", relocatingNode)
 
+				index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+				event.Index = index
+
 				r.Event(event)
 			}
 		}

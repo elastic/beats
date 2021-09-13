@@ -19,6 +19,7 @@ package node
 
 import (
 	"encoding/json"
+	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 
 	"github.com/joeshaw/multierror"
 	"github.com/pkg/errors"
@@ -90,6 +91,9 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte) err
 		}
 
 		event.MetricSetFields["id"] = id
+
+		index := elastic.MakeXPackMonitoringIndexName(elastic.Elasticsearch)
+		event.Index = index
 
 		r.Event(event)
 	}
