@@ -6,7 +6,6 @@ package program
 
 import (
 	"flag"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -380,7 +379,7 @@ func TestGroupBy(t *testing.T) {
 	})
 }
 
-/*func TestConfiguration(t *testing.T) {
+func TestConfiguration(t *testing.T) {
 	defer os.Remove("fleet.yml")
 
 	testcases := map[string]struct {
@@ -442,15 +441,6 @@ func TestGroupBy(t *testing.T) {
 		},
 	}
 
-	generatedFilesDir := filepath.Join("testdata", "generated")
-
-	// Cleanup all generated files to make sure not having any left overs
-	if *generateFlag {
-
-		err := os.RemoveAll(generatedFilesDir)
-		require.NoError(t, err)
-	}
-
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -480,32 +470,19 @@ func TestGroupBy(t *testing.T) {
 			require.True(t, ok)
 			require.Equal(t, test.expected, len(defPrograms))
 
-			// TODO: If generate, remove all generated files first
 			for _, program := range defPrograms {
-				generatedPath := filepath.Join(
-					"testdata", "generated",
-					name+"-"+strings.ToLower(program.Spec.Cmd)+".generated.yml",
-				)
+				programConfig, err := ioutil.ReadFile(filepath.Join(
+					"testdata",
+					name+"-"+strings.ToLower(program.Spec.Cmd)+".yml",
+				))
 
-				compareMap := &transpiler.MapVisitor{}
-				program.Config.Accept(compareMap)
-
-				// Generate new file file for programm
-				if *generateFlag {
-					d, _ := yaml.Marshal(&compareMap.Content)
-					fmt.Println(string(d))
-
-					os.MkdirAll(generatedFilesDir, 0755)
-					err := ioutil.WriteFile(generatedPath, d, 0644)
-					require.NoError(t, err)
-				}
-
-				programConfig, err := ioutil.ReadFile(generatedPath)
 				require.NoError(t, err)
-
 				var m map[string]interface{}
 				err = yamltest.FromYAML(programConfig, &m)
 				require.NoError(t, errors.Wrap(err, program.Cmd()))
+
+				compareMap := &transpiler.MapVisitor{}
+				program.Config.Accept(compareMap)
 
 				if !assert.True(t, cmp.Equal(m, compareMap.Content)) {
 					diff := cmp.Diff(m, compareMap.Content)
@@ -515,9 +492,8 @@ func TestGroupBy(t *testing.T) {
 				}
 			}
 		})
-
 	}
-}*/
+}
 
 func TestUseCases(t *testing.T) {
 	defer os.Remove("fleet.yml")
@@ -565,13 +541,14 @@ func TestUseCases(t *testing.T) {
 				compareMap := &transpiler.MapVisitor{}
 				program.Config.Accept(compareMap)
 
-				// Generate new file file for programm
+				// Generate new golden file for programm
 				if *generateFlag {
-					d, _ := yaml.Marshal(&compareMap.Content)
-					fmt.Println(string(d))
+					d, err := yaml.Marshal(&compareMap.Content)
+					require.NoError(t, err)
 
-					os.MkdirAll(generatedFilesDir, 0755)
-					err := ioutil.WriteFile(generatedPath, d, 0644)
+					err := os.MkdirAll(generatedFilesDir, 0755)
+					require.NoError(t, err)
+					err = ioutil.WriteFile(generatedPath, d, 0644)
 					require.NoError(t, err)
 				}
 
@@ -590,7 +567,6 @@ func TestUseCases(t *testing.T) {
 				}
 			}
 		})
-
 	}
 }
 
