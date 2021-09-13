@@ -494,6 +494,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add dashboard for pubsub metricset in googlecloud module. {pull}21326[21326] {issue}17137[17137]
 - Enrich events of `state_service` metricset with kubernetes services' metadata. {pull}23730[23730]
 - Check fields are documented in aws metricsets. {pull}23887[23887]
+- Enable `journald` input type in Filebeat. {issue}7955[7955] {pull}27351[27351]
 - Move openmetrics module to oss. {pull}26561[26561]
 - Fix release state of kubernetes metricsets. {pull}26864[26864]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
