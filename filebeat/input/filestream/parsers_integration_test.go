@@ -505,7 +505,7 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 // test_consecutive_newline from test_multiline.py
 func TestParsersConsecutiveNewline(t *testing.T) {
-	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27895")
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27085")
 
 	env := newInputTestingEnvironment(t)
 
