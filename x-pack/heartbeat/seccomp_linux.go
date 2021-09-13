@@ -33,7 +33,7 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("could not parse GID '%s' as int: %s", localUser.Uid, err))
 			}
-			err = syscall.Setgroups([]int{1000, 0})
+			err = syscall.Setgroups([]int{localUserUid, 0})
 			if err != nil {
 				panic(fmt.Sprintf("could not prsetgroups: %s", err))
 			}
@@ -60,11 +60,11 @@ func init() {
 			newcaps := cap.NewSet()
 			// Both permitted and effective are required! Permitted makes the permmission
 			// possible to get, effective makes it 'active'
-			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW, cap.SETUID)
+			err = newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW)
 			if err != nil {
 				panic(fmt.Sprintf("error setting permitted setcap: %s", err))
 			}
-			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW, cap.SETUID)
+			err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW)
 			if err != nil {
 				panic(fmt.Sprintf("error setting effective setcap: %s", err))
 			}
