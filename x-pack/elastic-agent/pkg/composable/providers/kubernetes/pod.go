@@ -42,6 +42,13 @@ type providerData struct {
 	processors []map[string]interface{}
 }
 
+type containerInPod struct {
+	id      string
+	runtime string
+	spec    kubernetes.Container
+	status  kubernetes.PodContainerStatus
+}
+
 // podUpdaterHandlerFunc is a function that handles pod updater notifications.
 type podUpdaterHandlerFunc func(interface{})
 
@@ -187,12 +194,9 @@ func (p *pod) unlockedUpdate(obj interface{}) {
 	pod := obj.(*kubernetes.Pod)
 
 	p.logger.Debugf("pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
-	switch pod.Status.Phase {
-	case kubernetes.PodSucceeded, kubernetes.PodFailed:
+
+	if podTerminated(pod, getContainersInPod(pod)) {
 		time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
-		return
-	case kubernetes.PodPending:
-		p.logger.Debugf("pod update (pending): don't know what to do with this pod yet, skipping for now: %+v", obj)
 		return
 	}
 
@@ -431,3 +435,70 @@ func (*namespacePodUpdater) OnAdd(interface{}) {}
 // OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
 // namespace they will generate their own delete events.
 func (*namespacePodUpdater) OnDelete(interface{}) {}
+
+// podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
+func podTerminating(pod *kubernetes.Pod) bool {
+	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
+		return true
+	}
+
+	switch pod.Status.Phase {
+	case kubernetes.PodRunning, kubernetes.PodPending:
+	default:
+		return true
+	}
+
+	return false
+}
+
+// podTerminated returns true if a pod is terminated, this method considers a
+// pod as terminated if none of its containers are running (or going to be running).
+func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
+	// Pod is not marked for termination, so it is not terminated.
+	if !podTerminating(pod) {
+		return false
+	}
+
+	// If any container is running, the pod is not terminated yet.
+	for _, container := range containers {
+		if container.status.State.Running != nil {
+			return false
+		}
+	}
+
+	return true
+}
+
+// getContainersInPod returns all the containers defined in a pod and their statuses.
+// It includes init and ephemeral containers.
+func getContainersInPod(pod *kubernetes.Pod) []*containerInPod {
+	var containers []*containerInPod
+	for _, c := range pod.Spec.Containers {
+		containers = append(containers, &containerInPod{spec: c})
+	}
+	for _, c := range pod.Spec.InitContainers {
+		containers = append(containers, &containerInPod{spec: c})
+	}
+	for _, c := range pod.Spec.EphemeralContainers {
+		c := kubernetes.Container(c.EphemeralContainerCommon)
+		containers = append(containers, &containerInPod{spec: c})
+	}
+
+	statuses := make(map[string]*kubernetes.PodContainerStatus)
+	mapStatuses := func(s []kubernetes.PodContainerStatus) {
+		for i := range s {
+			statuses[s[i].Name] = &s[i]
+		}
+	}
+	mapStatuses(pod.Status.ContainerStatuses)
+	mapStatuses(pod.Status.InitContainerStatuses)
+	mapStatuses(pod.Status.EphemeralContainerStatuses)
+	for _, c := range containers {
+		if s, ok := statuses[c.spec.Name]; ok {
+			c.id, c.runtime = kubernetes.ContainerIDWithRuntime(*s)
+			c.status = *s
+		}
+	}
+
+	return containers
+}
