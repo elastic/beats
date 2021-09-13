@@ -46,7 +46,6 @@ func (z *ZipURLSource) Validate() (err error) {
 }
 
 func (z *ZipURLSource) Fetch() error {
-	logp.Info("fetch1")
 	changed, err := checkIfChanged(z)
 	if err != nil {
 		return fmt.Errorf("could not check if zip source changed for %s: %w", z.URL, err)
@@ -55,20 +54,17 @@ func (z *ZipURLSource) Fetch() error {
 		return nil
 	}
 
-	logp.Info("fetch2")
 	// remove target directory if etag changed
 	if z.TargetDirectory != "" {
 		os.RemoveAll(z.TargetDirectory)
 	}
 
-	logp.Info("fetch3")
 	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
 	}
 	defer os.Remove(tf.Name())
 
-	logp.Info("fetch4")
 	newEtag, err := download(z, tf)
 	if err != nil {
 		return fmt.Errorf("could not download %s: %w", z.URL, err)
@@ -76,7 +72,6 @@ func (z *ZipURLSource) Fetch() error {
 	// We are guaranteed an etag
 	z.etag = newEtag
 
-	logp.Info("fetch5")
 	if z.TargetDirectory != "" {
 		os.MkdirAll(z.TargetDirectory, 0755)
 	} else {
@@ -86,14 +81,12 @@ func (z *ZipURLSource) Fetch() error {
 		}
 	}
 
-	logp.Info("fetch6")
 	err = unzip(tf, z.TargetDirectory, z.Folder)
 	if err != nil {
 		z.Close()
 		return err
 	}
 
-	logp.Info("fetch7")
 	// run as the local job after extracting the files
 	if !Offline() {
 		err = setupOnlineDir(z.TargetDirectory)
@@ -206,7 +199,6 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
-
 	req, err := http.NewRequest(method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)

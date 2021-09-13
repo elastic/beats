@@ -12,7 +12,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
@@ -96,15 +95,11 @@ func (s *Suite) jobs() []jobs.Job {
 		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), s.extraArgs()...)
 	} else {
 		j = func(event *beat.Event) ([]jobs.Job, error) {
-			logp.Info("RUN JOB")
 			err := s.Fetch()
-			logp.Info("FETCHED")
 			if err != nil {
 				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
 			}
-			logp.Info("EXEC")
 			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), s.extraArgs()...)
-			logp.Info("DONE")
 			if err != nil {
 				return nil, err
 			}
