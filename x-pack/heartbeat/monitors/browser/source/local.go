@@ -101,14 +101,6 @@ func setupOnlineDir(dir string) (err error) {
 		}
 	}
 
-	/*
-		cacheDir := path.Join(dir, "npm-cache")
-		err = os.MkdirAll(cacheDir, 0777)
-		if err != nil {
-			return fmt.Errorf("could not make npm cache dir: %w", err)
-		}
-	*/
-
 	// Ensure all deps installed
 	err = runSimpleCommand(exec.Command("npm", "install"), dir)
 	if err != nil {

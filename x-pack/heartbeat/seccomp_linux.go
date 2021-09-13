@@ -154,6 +154,7 @@ func init() {
 			"utimensat",
 			"futimens",
 			"write",
+			"oeu",
 		}
 
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
