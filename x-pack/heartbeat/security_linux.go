@@ -17,6 +17,10 @@ import (
 )
 
 func init() {
+	// Here we set a bunch of linux specific security stuff.
+	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
+	// and add capabilities to make this actually run as a regular user. This also helps node in synthetics, which
+	// does not want to run as root. It's also just generally more secure.
 	if localUserName := os.Getenv("BEAT_SETUID_AS"); localUserName != "" && syscall.Geteuid() == 0 {
 		err := changeUser(localUserName)
 		if err != nil {
