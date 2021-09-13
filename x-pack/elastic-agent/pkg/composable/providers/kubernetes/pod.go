@@ -119,7 +119,9 @@ func NewPodWatcher(
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {
 
-	data := generatePodData(pod, p.config, p.metagen, p.namespaceWatcher)
+	namespaceAnnotations := podNamespaceAnnotations(pod, p.namespaceWatcher)
+
+	data := generatePodData(pod, p.config, p.metagen, namespaceAnnotations)
 	data.mapping["scope"] = p.scope
 	// Emit the pod
 	// We emit Pod + containers to ensure that configs matching Pod only
@@ -208,7 +210,11 @@ func (p *pod) OnDelete(obj interface{}) {
 	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
 }
 
-func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMetaGen metadata.MetaGen, namespaceWatcher kubernetes.Watcher) providerData {
+func generatePodData(
+	pod *kubernetes.Pod,
+	cfg *Config,
+	kubeMetaGen metadata.MetaGen,
+	namespaceAnnotations common.MapStr) providerData {
 
 	meta := kubeMetaGen.Generate(pod)
 	kubemetaMap, err := meta.GetValue("kubernetes")
@@ -218,12 +224,18 @@ func generatePodData(pod *kubernetes.Pod, cfg *Config, kubeMetaGen metadata.Meta
 
 	// k8sMapping includes only the metadata that fall under kubernetes.*
 	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr))
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
-	namespaceAnnotations := podNamespaceAnnotations(pod, namespaceWatcher)
 	if len(namespaceAnnotations) != 0 {
 		k8sMapping["namespace_annotations"] = namespaceAnnotations
 	}
+
+	// Pass annotations to all events so that it can be used in templating and by annotation builders.
+	annotations := common.MapStr{}
+	for k, v := range pod.GetObjectMeta().GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	k8sMapping["annotations"] = annotations
 
 	processors := []map[string]interface{}{}
 	// meta map includes metadata that go under kubernetes.*
