@@ -30,11 +30,13 @@ import (
 
 var (
 	responseToDecode = []string{
-		"attributes.uiStateJSON",
-		"attributes.visState",
+		"attributes.kibanaSavedObjectMeta.searchSourceJSON",
+		"attributes.layerListJSON",
+		"attributes.mapStateJSON",
 		"attributes.optionsJSON",
 		"attributes.panelsJSON",
-		"attributes.kibanaSavedObjectMeta.searchSourceJSON",
+		"attributes.uiStateJSON",
+		"attributes.visState",
 	}
 )
 
