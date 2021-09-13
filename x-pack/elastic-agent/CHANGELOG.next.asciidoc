@@ -136,4 +136,5 @@
 - Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
 - Add link to troubleshooting guide on fatal exits. {issue}26367[26367] {pull}27236[27236]
 - Agent now adapts the beats queue size based on output settings. {issue}26638[26638] {pull}27429[27429]
-- Support ephemeral containers in Kubernetes dynamic provider. {issue}#27020[#27020] {pull}27707[27707]
+- Support ephemeral containers in Kubernetes dynamic provider. {issue}27020[#27020] {pull}27707[27707]
+- Add complete k8s metadata through composable provider. {pull}27691[27691]
