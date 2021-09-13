@@ -93,10 +93,8 @@ func init() {
 	switch runtime.GOARCH {
 	case "amd64", "386":
 		// We require a number of syscalls to run. This list was generated with
-		// mage build && env ELASTIC_SYNTHETICS_CAPABLE=true strace --output=syscalls  ./heartbeat --path.config sample-synthetics-config/ -e
-		// then filtered through:  cat syscalls | cut -d '(' -f 1 | egrep '\w+' -o | sort | uniq | xargs -n1 -IFF echo \"FF\"
-		// We should tighten this up before GA. While it is true that there are probably duplicate
-		// syscalls here vs. the base, this is probably OK for now.
+		// mage build && env ELASTIC_SYNTHETICS_CAPABLE=true strace -f --output=syscalls  ./heartbeat --path.config sample-synthetics-config/ -e
+		// then grepping for 'EPERM' in the 'syscalls' file.
 		syscalls := []string{
 			"access",
 			"arch_prctl",
@@ -159,6 +157,7 @@ func init() {
 			"name_to_handle_at",
 			"newfstatat",
 			"openat",
+			"pipe",
 			"pipe2",
 			"poll",
 			"prctl",
