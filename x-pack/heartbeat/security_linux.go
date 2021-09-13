@@ -44,40 +44,40 @@ func init() {
 func changeUser(localUserName string) error {
 	localUser, err := user.Lookup(localUserName)
 	if err != nil {
-		return fmt.Errorf("could not lookup '%s': %s", localUser, err)
+		return fmt.Errorf("could not lookup '%s': %w", localUser, err)
 	}
 	localUserUid, err := strconv.Atoi(localUser.Uid)
 	if err != nil {
-		return fmt.Errorf("could not parse UID '%s' as int: %s", localUser.Uid, err)
+		return fmt.Errorf("could not parse UID '%s' as int: %w", localUser.Uid, err)
 	}
 	localUserGid, err := strconv.Atoi(localUser.Gid)
 	if err != nil {
-		return fmt.Errorf("could not parse GID '%s' as int: %s", localUser.Uid, err)
+		return fmt.Errorf("could not parse GID '%s' as int: %w", localUser.Uid, err)
 	}
 	// We include the root group because the docker image contains many directories (data,logs)
 	// that are owned by root:root with 0775 perms. The heartbeat user is in both groups
 	// in the container, but we need to repeat that here.
-	err = syscall.Setgroups([]int{localUserUid, 0})
+	err = syscall.Setgroups([]int{localUserGid, 0})
 	if err != nil {
-		return fmt.Errorf("could not prsetgroups: %s", err)
+		return fmt.Errorf("could not prsetgroups: %w", err)
 	}
 
-	// Set the main group as 1000 so new files created are owned by the user's group
-	err = syscall.Setgid(1000)
+	// Set the main group as localUserUid so new files created are owned by the user's group
+	err = syscall.Setgid(localUserGid)
 	if err != nil {
-		return fmt.Errorf("could not set gid to %d: %s", localUserGid, err)
+		return fmt.Errorf("could not set gid to %d: %w", localUserGid, err)
 	}
 
 	// Note this is not the regular SetUID! Look at the 'cap' package docs for it, it preserves
 	// capabilities post-SetUID, which we use to lock things down immediately
 	err = cap.SetUID(localUserUid)
 	if err != nil {
-		return fmt.Errorf("could not setuid to %d: %s", localUserUid, err)
+		return fmt.Errorf("could not setuid to %d: %w", localUserUid, err)
 	}
 
 	u, err := user.Lookup(localUserName)
 	if err != nil {
-		return fmt.Errorf("could not lookup local username: %s", err)
+		return fmt.Errorf("could not lookup local username: %w", err)
 	}
 
 	// This may not be necessary, but is good hygeine, we do some shelling out to node/npm etc.
@@ -92,23 +92,23 @@ func setCapabilities() error {
 	// possible to get, effective makes it 'active'
 	err := newcaps.SetFlag(cap.Permitted, true, cap.NET_RAW)
 	if err != nil {
-		return fmt.Errorf("error setting permitted setcap: %s", err)
+		return fmt.Errorf("error setting permitted setcap: %w", err)
 	}
 	err = newcaps.SetFlag(cap.Effective, true, cap.NET_RAW)
 	if err != nil {
-		return fmt.Errorf("error setting effective setcap: %s", err)
+		return fmt.Errorf("error setting effective setcap: %w", err)
 	}
 
 	// We do not want these capabilities to be inherited by subprocesses
 	err = newcaps.SetFlag(cap.Inheritable, false, cap.NET_RAW)
 	if err != nil {
-		return fmt.Errorf("error setting inheritable setcap: %s", err)
+		return fmt.Errorf("error setting inheritable setcap: %w", err)
 	}
 
 	// Apply the new capabilities to the current process (incl. all threads)
 	err = newcaps.SetProc()
 	if err != nil {
-		return fmt.Errorf("error setting new process capabilities via setcap: %s", err)
+		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
 	}
 
 	return nil
