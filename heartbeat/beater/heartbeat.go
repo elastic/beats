@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"syscall"
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
@@ -33,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	"kernel.org/pub/linux/libs/security/libcap/cap"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
@@ -80,6 +82,8 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
+	groups, _ := syscall.Getgroups()
+	logp.Info("Effective user/group ids: %d/%d, with groups: %v, and with capabilities: %s", syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
 
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
