@@ -194,6 +194,10 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		attributes["visState"] = ReplaceIndexInVisState(logger, index, visState)
 	}
 
+	if mapStateJSON, ok := attributes["mapStateJSON"].(string); ok {
+		attributes["visState"] = replaceIndexInMapStateJSON(logger, index, mapStateJSON)
+	}
+
 	if references, ok := objectMap["references"].([]interface{}); ok {
 		objectMap["references"] = replaceIndexInReferences(index, references)
 	}
@@ -209,6 +213,43 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	}
 
 	return b
+}
+
+func replaceIndexInMapStateJSON(logger *logp.Logger, index string, mapStateJSON string) string {
+	var mapState map[string]interface{}
+
+	err := json.Unmarshal([]byte(mapStateJSON), &mapState)
+	if err != nil {
+		logger.Errorf("Failed to convert bytes to map[string]interface: %+v", err)
+		return mapStateJSON
+	}
+	if filters, ok := mapState["filters"].([]interface{}); ok {
+		for i, f := range filters {
+			if filter, ok := f.(map[string]interface{}); ok {
+				if meta, ok := filter["meta"].(map[string]interface{}); ok {
+					if _, ok := meta["index"]; !ok {
+						continue
+					}
+					meta["index"] = index
+					filter["meta"] = meta
+				}
+				filters[i] = filter
+			}
+		}
+		mapState["filters"] = filters
+	}
+
+	b, err := json.Marshal(mapState)
+	if err != nil {
+		logger.Error("Error marshaling modified dashboard: %+v", err)
+		return mapStateJSON
+	}
+	fmt.Println(mapState)
+
+	return string(b)
+
+	return mapStateJSON
+
 }
 
 func replaceIndexInPanelsJSON(logger *logp.Logger, index string, panelsJSON []interface{}) []interface{} {
