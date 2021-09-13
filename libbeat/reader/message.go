@@ -80,14 +80,12 @@ func (m *Message) AddFlagsWithKey(key string, flags ...string) error {
 // ToEvent converts a Message to an Event that can be published
 // to the output.
 func (m *Message) ToEvent() beat.Event {
-	if m.Fields == nil {
-		m.Fields = common.MapStr{}
-	}
 
 	if len(m.Content) > 0 {
-		if _, ok := m.Fields["message"]; !ok {
-			m.Fields["message"] = string(m.Content)
+		if m.Fields == nil {
+			m.Fields = common.MapStr{}
 		}
+		m.Fields["message"] = string(m.Content)
 	}
 
 	return beat.Event{
