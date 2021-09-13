@@ -48,6 +48,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
 - Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
+- Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
+- Rename `log.path` to `log.file.path` in filestream to be consistent with `log` input and ECS. {pull}27761[27761]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -199,6 +201,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
 - Fix `httpjson` input rate limit processing and documentation. {pull}[]
+- Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
+- Make filestream events ECS compliant. {issue}27776[27776]
 
 *Heartbeat*
 
