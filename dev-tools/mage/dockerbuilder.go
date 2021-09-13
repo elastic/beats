@@ -73,13 +73,13 @@ func (b *dockerBuilder) Build() error {
 			return errors.Wrap(err, "failed to prepare build")
 		}
 
-		tag, err := b.dockerBuild(variant)
+		tag, err := b.dockerBuild()
 		tries := 3
 		for err != nil && tries != 0 {
 			fmt.Println(">> Building docker images again (after 10 s)")
 			// This sleep is to avoid hitting the docker build issues when resources are not available.
 			time.Sleep(time.Second * 10)
-			tag, err = b.dockerBuild(variant)
+			tag, err = b.dockerBuild()
 			tries -= 1
 		}
 		if err != nil {
@@ -194,7 +194,7 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 	return nil
 }
 
-func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
+func (b *dockerBuilder) dockerBuild() (string, error) {
 	imageName := b.imageName
 
 	taggedImageName := fmt.Sprintf("%s:%s", imageName, b.Version)
