@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ZipURLSource struct {
@@ -45,6 +46,7 @@ func (z *ZipURLSource) Validate() (err error) {
 }
 
 func (z *ZipURLSource) Fetch() error {
+	logp.Info("fetch1")
 	changed, err := checkIfChanged(z)
 	if err != nil {
 		return fmt.Errorf("could not check if zip source changed for %s: %w", z.URL, err)
@@ -53,17 +55,20 @@ func (z *ZipURLSource) Fetch() error {
 		return nil
 	}
 
+	logp.Info("fetch2")
 	// remove target directory if etag changed
 	if z.TargetDirectory != "" {
 		os.RemoveAll(z.TargetDirectory)
 	}
 
+	logp.Info("fetch3")
 	tf, err := ioutil.TempFile("/tmp", "elastic-synthetics-zip-")
 	if err != nil {
 		return fmt.Errorf("could not create tmpfile for zip source: %w", err)
 	}
 	defer os.Remove(tf.Name())
 
+	logp.Info("fetch4")
 	newEtag, err := download(z, tf)
 	if err != nil {
 		return fmt.Errorf("could not download %s: %w", z.URL, err)
@@ -71,6 +76,7 @@ func (z *ZipURLSource) Fetch() error {
 	// We are guaranteed an etag
 	z.etag = newEtag
 
+	logp.Info("fetch5")
 	if z.TargetDirectory != "" {
 		os.MkdirAll(z.TargetDirectory, 0755)
 	} else {
@@ -80,12 +86,14 @@ func (z *ZipURLSource) Fetch() error {
 		}
 	}
 
+	logp.Info("fetch6")
 	err = unzip(tf, z.TargetDirectory, z.Folder)
 	if err != nil {
 		z.Close()
 		return err
 	}
 
+	logp.Info("fetch7")
 	// run as the local job after extracting the files
 	if !Offline() {
 		err = setupOnlineDir(z.TargetDirectory)
@@ -112,8 +120,10 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	for _, f := range rdr.File {
 		err = unzipFile(targetDir, folder, f)
 		if err != nil {
-			// TODO: err handlers
-			os.RemoveAll(targetDir)
+			rmErr := os.RemoveAll(targetDir)
+			if rmErr != nil {
+				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, (original unzip error: %s)", rmErr, err)
+			}
 			return err
 		}
 	}
@@ -186,6 +196,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 		if err == nil {
 			resp.Body.Close()
 		}
+		logp.Info("attempt to download zip at %s failed: %s, will retry in 1s", z.URL, err)
 		time.Sleep(time.Second)
 	}
 	if resp != nil && resp.StatusCode > 300 {

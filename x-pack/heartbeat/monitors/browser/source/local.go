@@ -152,10 +152,5 @@ func runSimpleCommand(cmd *exec.Cmd, dir string) error {
 	logp.Info("Running %s in %s", cmd, dir)
 	output, err := cmd.CombinedOutput()
 	logp.Info("Ran %s (%d) got '%s': (%s) as (%d/%d)", cmd, cmd.ProcessState.ExitCode(), string(output), err, syscall.Getuid(), syscall.Geteuid())
-	if cmd.ProcessState.ExitCode() != 0 {
-
-		syscall.Exec("/bin/bash", nil, nil)
-		os.Exit(123)
-	}
 	return err
 }

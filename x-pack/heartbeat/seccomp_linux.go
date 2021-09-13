@@ -33,17 +33,21 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("could not parse GID '%s' as int: %s", localUser.Uid, err))
 			}
+			// We include the root group because the docker image contains many directories (data,logs)
+			// that are owned by root:root with 0775 perms. The heartbeat user is in both groups
+			// in the container, but we need to repeat that here.
 			err = syscall.Setgroups([]int{localUserUid, 0})
 			if err != nil {
 				panic(fmt.Sprintf("could not prsetgroups: %s", err))
 			}
 
+			// Set the main group as 1000 so new files created are owned by the user's group
 			err = syscall.Setgid(1000)
 			if err != nil {
 				panic(fmt.Sprintf("could not set gid to %d: %s", localUserGid, err))
 			}
 
-			// Note this is not the regular SetUID! Look at the package docs for it, it preserves
+			// Note this is not the regular SetUID! Look at the 'cap' package docs for it, it preserves
 			// capabilities post-SetUID, which we use to lock things down immediately
 			err = cap.SetUID(localUserUid)
 			if err != nil {
@@ -54,6 +58,9 @@ func init() {
 			if err != nil {
 				panic(fmt.Sprintf("could not lookup local username: %s", err))
 			}
+
+			// This may not be necessary, but is good hygeine, we do some shelling out to node/npm etc.
+			// and $HOME should reflect the user's preferences
 			os.Setenv("HOME", u.HomeDir)
 
 			// Start with an empty capability set
@@ -75,12 +82,14 @@ func init() {
 				panic(fmt.Sprintf("error setting inheritable setcap: %s", err))
 			}
 
+			// Apply the new capabilities to the current process (incl. all threads)
 			newcaps.SetProc()
 			if err != nil {
 				panic(fmt.Sprintf("error setting new process capabilities via setcap: %s", err))
 			}
+
 			groups, _ := syscall.Getgroups()
-			logp.Info("Now running as uid: %d, gid: %d, with groups: %v, and with capabilities: %s\n", syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
+			logp.Info("Now running as '%s' with effect user/group ids %d/%d, with groups: %v, and with capabilities: %s\n", localUser, syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
 		}
 
 		// We require a number of syscalls to run. This list was generated with
@@ -122,7 +131,10 @@ func init() {
 			"openat",
 			"eventfd2",
 			"prctl",
-			"mkdtemp",
+			"mkdir",
+			"rmdir",
+			"link",
+			"unlink",
 			"pread64",
 			"prlimit64",
 			"read",
@@ -139,13 +151,15 @@ func init() {
 			"socket",
 			"umask",
 			"uname",
+			"utimensat",
+			"futimens",
 			"write",
-			"eouueouoe",
 		}
 
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
 			panic(err)
+			//os.Exit(29)
 		}
-		fmt.Printf("Installed seccomp policy")
+		logp.Info("Installed seccomp policy")
 	}
 }
