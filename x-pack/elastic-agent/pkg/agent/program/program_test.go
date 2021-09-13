@@ -546,7 +546,7 @@ func TestUseCases(t *testing.T) {
 					d, err := yaml.Marshal(&compareMap.Content)
 					require.NoError(t, err)
 
-					err := os.MkdirAll(generatedFilesDir, 0755)
+					err = os.MkdirAll(generatedFilesDir, 0755)
 					require.NoError(t, err)
 					err = ioutil.WriteFile(generatedPath, d, 0644)
 					require.NoError(t, err)
