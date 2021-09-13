@@ -71,15 +71,25 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 		pattern   string
 		expected  []byte
 	}{
+		//{
+		//	[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"metricbeat-*\"}"}}}`),
+		//	"otherindex-*",
+		//	[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}`),
+		//},
+		//{
+		//	[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}`),
+		//	"otherindex-*",
+		//	[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}`),
+		//},
+		//{
+		//	[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"filebeat-*"}}]}]}}`),
+		//	"otherindex-*",
+		//	[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"otherindex-*"}}]}]}}`),
+		//},
 		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"metricbeat-*\"}"}}}`),
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"filebeat-*","type":"index-pattern"}]}}}]}}`),
 			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}`),
-		},
-		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}`),
-			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}`),
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"otherindex-*","type":"index-pattern"}]}}}]}}`),
 		},
 	}
 
