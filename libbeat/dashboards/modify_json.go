@@ -264,6 +264,13 @@ func replaceIndexInLayerListJSON(logger *logp.Logger, index string, layerListJSO
 			}
 			elem["joins"] = joins
 		}
+		if descriptor, ok := elem["sourceDescriptor"].(map[string]interface{}); ok {
+			if _, ok := descriptor["indexPatternId"]; ok {
+				descriptor["indexPatternId"] = index
+			}
+			elem["sourceDescriptor"] = descriptor
+		}
+
 		layerListJSON[i] = elem
 	}
 	return layerListJSON
@@ -300,8 +307,8 @@ func replaceIndexInPanelsJSON(logger *logp.Logger, index string, panelsJSON []in
 				if references, ok := configAttr["references"].([]interface{}); ok {
 					configAttr["references"] = replaceIndexInReferences(index, references)
 				}
-				if layerListJSON, ok := configAttr["layerListJSON"].(string); ok {
-					configAttr["layerListJSON"] = replaceIndexInLaterListStr(logger, index, layerListJSON)
+				if layerListJSON, ok := configAttr["layerListJSON"].([]interface{}); ok {
+					configAttr["layerListJSON"] = replaceIndexInLayerListJSON(logger, index, layerListJSON)
 				}
 				config["attributes"] = configAttr
 			}
@@ -321,44 +328,18 @@ func replaceIndexInPanelsJSON(logger *logp.Logger, index string, panelsJSON []in
 }
 
 func replaceIndexInParamControls(logger *logp.Logger, index string, params map[string]interface{}) map[string]interface{} {
-	if contolsList, ok := params["controls"].([]interface{}); ok {
-		for i, ctrl := range contolsList {
+	if controlsList, ok := params["controls"].([]interface{}); ok {
+		for i, ctrl := range controlsList {
 			if control, ok := ctrl.(map[string]interface{}); ok {
 				if _, ok := control["indexPattern"]; ok {
 					control["indexPattern"] = index
-					contolsList[i] = control
+					controlsList[i] = control
 				}
 			}
 		}
-		params["controls"] = contolsList
+		params["controls"] = controlsList
 	}
 	return params
-}
-
-func replaceIndexInLaterListStr(logger *logp.Logger, index string, layerListJSON string) string {
-	var layerList []map[string]interface{}
-	err := json.Unmarshal([]byte(layerListJSON), &layerList)
-	if err != nil {
-		logger.Error("Failed to unmarshal json: %+v", err)
-		return layerListJSON
-	}
-	for i, elem := range layerList {
-		if descriptor, ok := elem["sourceDescriptor"].(map[string]interface{}); ok {
-			if _, ok := descriptor["indexPatternId"]; ok {
-				descriptor["indexPatternId"] = index
-			}
-			elem["sourceDescriptor"] = descriptor
-			layerList[i] = elem
-		}
-	}
-
-	b, err := json.Marshal(layerList)
-	if err != nil {
-		logger.Error("Failed to marshal to json: %+v", err)
-		return layerListJSON
-	}
-	return string(b)
-
 }
 
 func replaceIndexInReferences(index string, references []interface{}) []interface{} {
