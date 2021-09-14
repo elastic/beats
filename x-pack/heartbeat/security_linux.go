@@ -12,8 +12,9 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
+
+	"github.com/elastic/beats/v7/libbeat/common/seccomp"
 )
 
 func init() {
