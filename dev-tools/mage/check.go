@@ -265,6 +265,7 @@ func checkDashboardForErrors(file string, d []byte) bool {
 	if bytes.Contains(replaced, []byte(BeatName+"-*")) {
 		hasErrors = true
 		fmt.Printf(">> Cannot modify all index pattern references in dashboard - %s\n", file)
+		fmt.Println("Please edit the dashboard override function named ReplaceIndexInDashboardObject in libbeat.")
 		fmt.Println(string(replaced))
 	}
 
