@@ -75,14 +75,9 @@ func changeUser(localUserName string) error {
 		return fmt.Errorf("could not setuid to %d: %w", localUserUid, err)
 	}
 
-	u, err := user.Lookup(localUserName)
-	if err != nil {
-		return fmt.Errorf("could not lookup local username: %w", err)
-	}
-
 	// This may not be necessary, but is good hygeine, we do some shelling out to node/npm etc.
 	// and $HOME should reflect the user's preferences
-	return os.Setenv("HOME", u.HomeDir)
+	return os.Setenv("HOME", localUser.HomeDir)
 }
 
 func setCapabilities() error {
