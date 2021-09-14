@@ -567,9 +567,9 @@ Required if using split type of `string`.  This is the sub string used to split 
 Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
-==== `response.split[].ignore_error`
+==== `response.split[].ignore_empty_value`
 
-If set to true, failure to find a non-empty target will pass operation on to the next nested split operation instead of failing with an error. Default: `false`.
+If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
 
 [float]
 ==== `response.split[].split`

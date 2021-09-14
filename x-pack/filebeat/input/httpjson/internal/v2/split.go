@@ -25,19 +25,19 @@ var (
 // by applying elements of the chain's linked list to an input until completed
 // or an error state is encountered.
 type split struct {
-	log                   *logp.Logger
-	targetInfo            targetInfo
-	kind                  string
-	transforms            []basicTransform
-	child                 *split
-	keepParent            bool
-	ignoreEmptyFieldError bool
-	keyField              string
-	isRoot                bool
-	delimiter             string
+	log              *logp.Logger
+	targetInfo       targetInfo
+	kind             string
+	transforms       []basicTransform
+	child            *split
+	keepParent       bool
+	ignoreEmptyValue bool
+	keyField         string
+	isRoot           bool
+	delimiter        string
 }
 
-// newSplitSplit returns a new split based on the provided config and
+// newSplitResponse returns a new split based on the provided config and
 // logging to the provided logger, tagging the split as the root of the chain.
 func newSplitResponse(cfg *splitConfig, log *logp.Logger) (*split, error) {
 	if cfg == nil {
@@ -79,15 +79,15 @@ func newSplit(c *splitConfig, log *logp.Logger) (*split, error) {
 	}
 
 	return &split{
-		log:                   log,
-		targetInfo:            ti,
-		kind:                  c.Type,
-		keepParent:            c.KeepParent,
-		ignoreEmptyFieldError: c.IgnoreError,
-		keyField:              c.KeyField,
-		delimiter:             c.DelimiterString,
-		transforms:            ts,
-		child:                 s,
+		log:              log,
+		targetInfo:       ti,
+		kind:             c.Type,
+		keepParent:       c.KeepParent,
+		ignoreEmptyValue: c.IgnoreEmptyValue,
+		keyField:         c.KeyField,
+		delimiter:        c.DelimiterString,
+		transforms:       ts,
+		child:            s,
 	}, nil
 }
 
@@ -107,7 +107,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 	}
 
 	if v == nil {
-		if s.ignoreEmptyFieldError {
+		if s.ignoreEmptyValue {
 			if s.child != nil {
 				return s.child.split(ctx, root, ch)
 			}
@@ -128,7 +128,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(varr) == 0 {
-			if s.ignoreEmptyFieldError {
+			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
 				}
@@ -155,7 +155,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(vmap) == 0 {
-			if s.ignoreEmptyFieldError {
+			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
 				}
@@ -182,7 +182,7 @@ func (s *split) split(ctx *transformContext, root common.MapStr, ch chan<- maybe
 		}
 
 		if len(vstr) == 0 {
-			if s.ignoreEmptyFieldError {
+			if s.ignoreEmptyValue {
 				if s.child != nil {
 					return s.child.split(ctx, root, ch)
 				}

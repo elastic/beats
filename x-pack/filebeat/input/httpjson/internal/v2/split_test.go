@@ -355,14 +355,14 @@ func TestSplit(t *testing.T) {
 			},
 		},
 		{
-			name: "A missing array in an object",
+			name: "An empty array in an object",
 			config: &splitConfig{
 				Target: "body.response",
 				Type:   "array",
 				Split: &splitConfig{
-					Target:      "body.Event.Attributes",
-					IgnoreError: true,
-					KeepParent:  true,
+					Target:           "body.Event.Attributes",
+					IgnoreEmptyValue: true,
+					KeepParent:       true,
 					Split: &splitConfig{
 						Target:     "body.Event.OtherAttributes",
 						KeepParent: true,
@@ -413,15 +413,70 @@ func TestSplit(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "A missing map in an object",
+			name: "A missing array in an object",
 			config: &splitConfig{
 				Target: "body.response",
 				Type:   "array",
 				Split: &splitConfig{
-					Target:      "body.Event.Attributes",
-					Type:        "map",
-					IgnoreError: true,
-					KeepParent:  true,
+					Target:           "body.Event.Attributes",
+					IgnoreEmptyValue: true,
+					KeepParent:       true,
+					Split: &splitConfig{
+						Target:     "body.Event.OtherAttributes",
+						KeepParent: true,
+					},
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"response": []interface{}{
+						map[string]interface{}{
+							"Event": map[string]interface{}{
+								"timestamp": "1606324417",
+								"OtherAttributes": []interface{}{
+									map[string]interface{}{
+										"key": "value",
+									},
+									map[string]interface{}{
+										"key2": "value2",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"Event": common.MapStr{
+						"timestamp": "1606324417",
+						"OtherAttributes": common.MapStr{
+							"key": "value",
+						},
+					},
+				},
+				{
+					"Event": common.MapStr{
+						"timestamp": "1606324417",
+						"OtherAttributes": common.MapStr{
+							"key2": "value2",
+						},
+					},
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "An empty map in an object",
+			config: &splitConfig{
+				Target: "body.response",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:           "body.Event.Attributes",
+					Type:             "map",
+					IgnoreEmptyValue: true,
+					KeepParent:       true,
 					Split: &splitConfig{
 						Type:       "map",
 						Target:     "body.Event.OtherAttributes",
@@ -463,12 +518,60 @@ func TestSplit(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			name: "A missing string",
+			name: "A missing map in an object",
 			config: &splitConfig{
-				Target:          "body.items",
-				Type:            "string",
-				DelimiterString: "\n",
-				IgnoreError:     true,
+				Target: "body.response",
+				Type:   "array",
+				Split: &splitConfig{
+					Target:           "body.Event.Attributes",
+					Type:             "map",
+					IgnoreEmptyValue: true,
+					KeepParent:       true,
+					Split: &splitConfig{
+						Type:       "map",
+						Target:     "body.Event.OtherAttributes",
+						KeepParent: true,
+					},
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"response": []interface{}{
+						map[string]interface{}{
+							"Event": map[string]interface{}{
+								"timestamp": "1606324417",
+								"OtherAttributes": map[string]interface{}{
+									// Only include a single item here to avoid
+									// map iteration order flakes.
+									"1": map[string]interface{}{
+										"key": "value",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{
+					"Event": common.MapStr{
+						"timestamp": "1606324417",
+						"OtherAttributes": common.MapStr{
+							"key": "value",
+						},
+					},
+				},
+			},
+			expectedErr: nil,
+		},
+		{
+			name: "An empty string",
+			config: &splitConfig{
+				Target:           "body.items",
+				Type:             "string",
+				DelimiterString:  "\n",
+				IgnoreEmptyValue: true,
 				Split: &splitConfig{
 					Target:          "body.other_items",
 					Type:            "string",
@@ -487,6 +590,32 @@ func TestSplit(t *testing.T) {
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 1"},
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 2"},
 				{"@timestamp": "1234567890", "items": "", "other_items": "Line 3"},
+			},
+		},
+		{
+			name: "A missing string",
+			config: &splitConfig{
+				Target:           "body.items",
+				Type:             "string",
+				DelimiterString:  "\n",
+				IgnoreEmptyValue: true,
+				Split: &splitConfig{
+					Target:          "body.other_items",
+					Type:            "string",
+					DelimiterString: "\n",
+				},
+			},
+			ctx: emptyTransformContext(),
+			resp: transformable{
+				"body": common.MapStr{
+					"@timestamp":  "1234567890",
+					"other_items": "Line 1\nLine 2\nLine 3",
+				},
+			},
+			expectedMessages: []common.MapStr{
+				{"@timestamp": "1234567890", "other_items": "Line 1"},
+				{"@timestamp": "1234567890", "other_items": "Line 2"},
+				{"@timestamp": "1234567890", "other_items": "Line 3"},
 			},
 		},
 	}
