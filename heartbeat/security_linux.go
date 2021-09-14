@@ -35,9 +35,11 @@ func init() {
 	// rather than relying on errors from `setcap`
 	setCapabilities()
 
+	fmt.Printf("GOARCH %s\n", runtime.GOARCH)
 	switch runtime.GOARCH {
 	case "amd64", "386":
 		err := setSeccompRules()
+		fmt.Printf("SETSECCOMP %s\n\n\n", err)
 		if err != nil {
 			panic(err)
 		}
@@ -144,6 +146,7 @@ func setSeccompRules() error {
 		"fstat",
 		"fsync",
 		"futex",
+		"capget",
 		"getcwd",
 		"getdents64",
 		"getegid",

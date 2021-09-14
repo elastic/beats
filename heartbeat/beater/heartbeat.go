@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -84,7 +85,9 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 	groups, _ := syscall.Getgroups()
-	logp.Info("Effective user/group ids: %d/%d, with groups: %v, and with capabilities: %s", syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
+	if runtime.GOOS == "linux" {
+		logp.Info("Effective user/group ids: %d/%d, with groups: %v, and with capabilities: %s", syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
+	}
 
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
