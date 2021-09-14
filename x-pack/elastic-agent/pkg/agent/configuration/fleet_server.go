@@ -47,7 +47,7 @@ type Elasticsearch struct {
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.
-func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, error) {
+func ElasticsearchFromConnStr(conn string, serviceToken string, insecure bool) (Elasticsearch, error) {
 	u, err := url.Parse(conn)
 	if err != nil {
 		return Elasticsearch{}, err
@@ -63,6 +63,11 @@ func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, 
 		Hosts:    []string{u.Host},
 		Path:     u.Path,
 		TLS:      nil,
+	}
+	if insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
+		}
 	}
 	if serviceToken != "" {
 		cfg.ServiceToken = serviceToken

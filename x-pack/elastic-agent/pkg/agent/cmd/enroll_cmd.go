@@ -304,6 +304,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.ProxyURL,
 		c.options.ProxyDisabled,
 		c.options.ProxyHeaders,
+		c.options.Insecure,
 	)
 	if err != nil {
 		return "", err
@@ -497,7 +498,9 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
-			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders)
+			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
+			c.options.Insecure,
+		)
 		if err != nil {
 			return err
 		}
@@ -806,16 +809,21 @@ func createFleetServerBootstrapConfig(
 	proxyURL string,
 	proxyDisabled bool,
 	proxyHeaders map[string]string,
+	insecure bool,
 ) (*configuration.FleetAgentConfig, error) {
 	localFleetServer := connStr != ""
 
-	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken)
+	es, err := configuration.ElasticsearchFromConnStr(connStr, serviceToken, insecure)
 	if err != nil {
 		return nil, err
 	}
 	if esCA != "" {
-		es.TLS = &tlscommon.Config{
-			CAs: []string{esCA},
+		if es.TLS == nil {
+			es.TLS = &tlscommon.Config{
+				CAs: []string{esCA},
+			}
+		} else {
+			es.TLS.CAs = []string{esCA}
 		}
 	}
 	if host == "" {
@@ -856,6 +864,9 @@ func createFleetServerBootstrapConfig(
 				Certificate: cert,
 				Key:         key,
 			},
+		}
+		if insecure {
+			cfg.Server.TLS.VerificationMode = tlscommon.VerifyNone
 		}
 	}
 
