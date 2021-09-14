@@ -20,9 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
-	"os/user"
 	"runtime"
-	"strconv"
 	"syscall"
 	"time"
 
@@ -88,12 +86,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
 	if runtime.GOOS == "linux" {
-		u, _ := user.LookupId(strconv.Itoa(syscall.Geteuid()))
-		groups, err := u.GroupIds()
-		if err != nil {
-			logp.Warn("Could not lookup groups for user")
-		}
-		logp.Info("Effective user/group ids: %d/%d, with groups: %v, and with capabilities: %s", u.Uid, u.Gid, groups, cap.GetProc())
+		groups, _ := syscall.Getgroups()
+		logp.Info("Effective user/group ids: %d/%d, with groups: %v, and with capabilities: %s", syscall.Geteuid(), syscall.Getegid(), groups, cap.GetProc())
 	}
 
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
