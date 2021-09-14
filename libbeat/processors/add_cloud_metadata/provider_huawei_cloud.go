@@ -45,7 +45,7 @@ var huaweiMetadataFetcher = provider{
 	Local: true,
 
 	Create: func(_ string, c *common.Config) (metadataFetcher, error) {
-		huaweiCloudMetadataHost := "169.254.169.254"
+		metadataHost := "169.254.169.254"
 		huaweiCloudMetadataJSONURI := "/openstack/latest/meta_data.json"
 
 		huaweiCloudSchema := func(m map[string]interface{}) common.MapStr {
@@ -55,7 +55,7 @@ var huaweiMetadataFetcher = provider{
 			return common.MapStr{"cloud": m}
 		}
 
-		urls, err := getMetadataURLs(c, huaweiCloudMetadataHost, []string{
+		urls, err := getMetadataURLs(c, metadataHost, []string{
 			huaweiCloudMetadataJSONURI,
 		})
 		if err != nil {
