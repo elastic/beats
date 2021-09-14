@@ -30,7 +30,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/f5"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/fortinet"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/gcp"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/google_workspace"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/gsuite"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/ibmmq"

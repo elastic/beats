@@ -23,7 +23,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
-  * <<filebeat-module-gcp>>
   * <<filebeat-module-google_workspace>>
   * <<filebeat-module-gsuite>>
   * <<filebeat-module-haproxy>>
@@ -98,7 +97,6 @@ include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
-include::modules/gcp.asciidoc[]
 include::modules/google_workspace.asciidoc[]
 include::modules/gsuite.asciidoc[]
 include::modules/haproxy.asciidoc[]
