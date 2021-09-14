@@ -27,11 +27,13 @@ func init() {
 		if err != nil {
 			panic(err)
 		}
-		err = setCapabilities()
-		if err != nil {
-			panic(err)
-		}
 	}
+
+	// Attempt to set capabilities before we setup seccomp rules
+	// Note that we discard any errors because they are not actionable.
+	// The beat should use `getcap` at a later point to examine available capabilities
+	// rather than relying on errors from `setcap`
+	setCapabilities()
 
 	switch runtime.GOARCH {
 	case "amd64", "386":
