@@ -23,6 +23,8 @@ import (
 	"syscall"
 	"time"
 
+	"kernel.org/pub/linux/libs/security/libcap/cap"
+
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/hbregistry"
 	"github.com/elastic/beats/v7/heartbeat/monitors"
@@ -34,7 +36,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"kernel.org/pub/linux/libs/security/libcap/cap"
 
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
