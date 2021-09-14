@@ -55,7 +55,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"add":                 add,
 			"mul":                 mul,
 			"div":                 div,
-			"hmac":                hmacString,
+			"hmac":                hmacStringHex,
+			"hmacBase64":          hmacStringBase64,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
 			"join":                strings.Join,
@@ -267,10 +268,9 @@ func base64EncodeNoPad(values ...string) string {
 	return base64.RawStdEncoding.EncodeToString([]byte(data))
 }
 
-func hmacString(hmacType string, hmacKey string, values ...string) string {
-	data := strings.Join(values[:], "")
+func hmacString(hmacType string, hmacKey string, data string) []byte {
 	if data == "" {
-		return ""
+		return nil
 	}
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	var mac hash.Hash
@@ -281,11 +281,32 @@ func hmacString(hmacType string, hmacKey string, values ...string) string {
 		mac = hmac.New(sha1.New, []byte(hmacKey))
 	default:
 		// Upstream config validation prevents this from happening.
-		return ""
+		return nil
 	}
 	// Write Data to it
 	mac.Write([]byte(data))
 
+	// Get result and encode as bytes
+	return mac.Sum(nil)
+}
+
+func hmacStringHex(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
 	// Get result and encode as hexadecimal string
-	return hex.EncodeToString(mac.Sum(nil))
+	return hex.EncodeToString(bytes)
+}
+
+func hmacStringBase64(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
+
+	// Get result and encode as hexadecimal string
+	return base64.StdEncoding.EncodeToString(bytes)
 }
