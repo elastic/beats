@@ -23,12 +23,6 @@
       description: >
         Partition data.
       fields:
-        - name: id
-          type: long
-          deprecated: 6.5
-          description: >
-            Partition id.
-
         - name: leader
           type: long
           description: >
@@ -52,27 +46,3 @@
           type: long
           description: >
             Error code from fetching partition.
-
-    - name: topic.error.code
-      type: long
-      deprecated: 6.5
-      description: >
-        topic error code.
-    - name: topic.name
-      type: keyword
-      deprecated: 6.5
-      description: >
-        Topic name
-
-    - name: broker.id
-      type: long
-      deprecated: 6.5
-      description: >
-        Broker id
-    - name: broker.address
-      type: keyword
-      deprecated: 6.5
-      description: >
-        Broker address
-
-
