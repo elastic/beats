@@ -8,8 +8,11 @@
         "log.offset": 0,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"[gc worker] starts the whole job\"] [uuid=5ec149b2c34000a] [safePoint=427440234486300672] [concurrency=1]",
-        "tidb.source_line": "gc_worker.go:262"
+        "tidb.message": "[gc worker] starts the whole job",
+        "tidb.source_line": "gc_worker.go:262",
+        "tidb.tidb.concurrency": "1",
+        "tidb.tidb.safePoint": "427440234486300672",
+        "tidb.tidb.uuid": "5ec149b2c34000a"
     },
     {
         "@timestamp": "2021-09-02T04:08:13.775Z",
@@ -20,8 +23,11 @@
         "log.offset": 166,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"[gc worker] start resolve locks\"] [uuid=5ec149b2c34000a] [safePoint=427440234486300672] [concurrency=1]",
-        "tidb.source_line": "gc_worker.go:942"
+        "tidb.message": "[gc worker] start resolve locks",
+        "tidb.source_line": "gc_worker.go:942",
+        "tidb.tidb.concurrency": "1",
+        "tidb.tidb.safePoint": "427440234486300672",
+        "tidb.tidb.uuid": "5ec149b2c34000a"
     },
     {
         "@timestamp": "2021-09-02T04:08:13.775Z",
@@ -31,9 +37,11 @@
         "input.type": "log",
         "log.offset": 331,
         "service.type": "tidb",
+        "tidb.body": "[\"range task started\"] [name=resolve-locks-runner] [startKey=] [endKey=] [concurrency=1]",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"range task started\"] [name=resolve-locks-runner] [startKey=] [endKey=] [concurrency=1]",
-        "tidb.source_line": "range_task.go:113"
+        "tidb.message": "range task started",
+        "tidb.source_line": "range_task.go:113",
+        "tidb.tidb.name": "resolve-locks-runner"
     },
     {
         "@timestamp": "2021-09-02T04:08:13.811Z",
@@ -43,9 +51,11 @@
         "input.type": "log",
         "log.offset": 480,
         "service.type": "tidb",
+        "tidb.body": "[\"range task finished\"] [name=resolve-locks-runner] [startKey=] [endKey=] [\"cost time\"=36.326497ms] [\"completed regions\"=75]",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"range task finished\"] [name=resolve-locks-runner] [startKey=] [endKey=] [\"cost time\"=36.326497ms] [\"completed regions\"=75]",
-        "tidb.source_line": "range_task.go:219"
+        "tidb.message": "range task finished",
+        "tidb.source_line": "range_task.go:219",
+        "tidb.tidb.name": "resolve-locks-runner"
     },
     {
         "@timestamp": "2021-09-02T04:08:13.812Z",
@@ -56,8 +66,11 @@
         "log.offset": 665,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"[gc worker] finish resolve locks\"] [uuid=5ec149b2c34000a] [safePoint=427440234486300672] [regions=75]",
-        "tidb.source_line": "gc_worker.go:963"
+        "tidb.message": "[gc worker] finish resolve locks",
+        "tidb.source_line": "gc_worker.go:963",
+        "tidb.tidb.regions": "75",
+        "tidb.tidb.safePoint": "427440234486300672",
+        "tidb.tidb.uuid": "5ec149b2c34000a"
     },
     {
         "@timestamp": "2021-09-02T04:08:26.020Z",
@@ -68,8 +81,10 @@
         "log.offset": 828,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"new connection\"] [conn=426830] [remoteAddr=10.0.162.87:55860]",
-        "tidb.source_line": "server.go:388"
+        "tidb.message": "new connection",
+        "tidb.source_line": "server.go:388",
+        "tidb.tidb.conn": "426830",
+        "tidb.tidb.remoteAddr": "10.0.162.87:55860"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.536Z",
@@ -80,8 +95,10 @@
         "log.offset": 948,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"new connection\"] [conn=426832] [remoteAddr=10.0.170.58:45258]",
-        "tidb.source_line": "server.go:388"
+        "tidb.message": "new connection",
+        "tidb.source_line": "server.go:388",
+        "tidb.tidb.conn": "426832",
+        "tidb.tidb.remoteAddr": "10.0.170.58:45258"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.536Z",
@@ -92,8 +109,10 @@
         "log.offset": 1068,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"new connection\"] [conn=426831] [remoteAddr=10.0.170.58:45260]",
-        "tidb.source_line": "server.go:388"
+        "tidb.message": "new connection",
+        "tidb.source_line": "server.go:388",
+        "tidb.tidb.conn": "426831",
+        "tidb.tidb.remoteAddr": "10.0.170.58:45260"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.541Z",
@@ -104,8 +123,9 @@
         "log.offset": 1188,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"connection closed\"] [conn=426801]",
-        "tidb.source_line": "server.go:391"
+        "tidb.message": "connection closed",
+        "tidb.source_line": "server.go:391",
+        "tidb.tidb.conn": "426801"
     },
     {
         "@timestamp": "2021-09-02T04:08:53.826Z",
@@ -116,8 +136,9 @@
         "log.offset": 1280,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"connection closed\"] [conn=426805]",
-        "tidb.source_line": "server.go:391"
+        "tidb.message": "connection closed",
+        "tidb.source_line": "server.go:391",
+        "tidb.tidb.conn": "426805"
     },
     {
         "@timestamp": "2021-09-02T04:09:13.733Z",
@@ -128,7 +149,8 @@
         "log.offset": 1372,
         "service.type": "tidb",
         "tidb.level": "INFO",
-        "tidb.log_message": "[\"[gc worker] there's already a gc job running, skipped\"] [\"leaderTick on\"=5ec149b2c34000a]",
-        "tidb.source_line": "gc_worker.go:233"
+        "tidb.message": "[gc worker] there's already a gc job running, skipped",
+        "tidb.source_line": "gc_worker.go:233",
+        "tidb.tidb.leaderTick on": "5ec149b2c34000a"
     }
 ]

@@ -158369,13 +158369,23 @@ type: keyword
 
 --
 
-*`tidb.log_message`*::
+*`tidb.message`*::
 +
 --
 The Log Message Section contains a customized message describing the log line.
 
 
-type: keyword
+type: text
+
+--
+
+*`tidb.body`*::
++
+--
+A failover field. Contains unparsed messages and fields. Should exist only when parsing failed.
+
+
+type: text
 
 --
 
@@ -158385,11 +158395,33 @@ type: keyword
 Contains fields from the binlog(pump and drainer) instance logs.
 
 
+
+*`tidb.binlog.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
 [float]
 === pd
 
 Contains fields from the PD instance logs.
 
+
+
+*`tidb.pd.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
 
 [float]
 === slowlog
@@ -159096,11 +159128,33 @@ type: double
 Contains fields from the TiCDC instance logs.
 
 
+
+*`tidb.ticdc.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
 [float]
 === tidb
 
 Contains fields from the TiDB instance logs.
 
+
+
+*`tidb.tidb.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
 
 [float]
 === tiflash
@@ -159108,11 +159162,33 @@ Contains fields from the TiDB instance logs.
 Contains fields from the TiFlash instance logs.
 
 
+
+*`tidb.tiflash.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
 [float]
 === tikv
 
 Contains fields from the TiKV instance logs.
 
+
+
+*`tidb.tikv.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
 
 [float]
 === tispark

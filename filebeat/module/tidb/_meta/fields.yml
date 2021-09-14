@@ -20,7 +20,12 @@
             Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted
             and other characters should be removed.
             The source file line number that generates the log line. Only digits are permitted.
-        - name: log_message
-          type: keyword
+        - name: message
+          type: text
           description: >
             The Log Message Section contains a customized message describing the log line.
+        - name: body
+          type: text
+          description: >
+            A failover field.
+            Contains unparsed messages and fields. Should exist only when parsing failed.

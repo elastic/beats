@@ -11,7 +11,6 @@ function register(scriptParams) {
 function process(event) {
     // get the message
     var m0 = event.Get("message")
-    event.Delete("message")
     if (m0 === null) {
         event.Cancel();
         return;
@@ -65,6 +64,7 @@ function process(event) {
     // put the final query
     safePut("Query", query)
 
+    event.Delete("message")
     return event
 }
 

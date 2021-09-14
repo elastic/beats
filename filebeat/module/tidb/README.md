@@ -89,10 +89,9 @@ networks:
 make clean
 make python-env
 source ./build/python-env/bin/activate
-
-# Run after each code change
-make update
 make filebeat.test
+# Run after each time module changing
+make update
 GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb TESTING_FILEBEAT_FILESETS=tiflash pytest tests/system/test_modules.py
 ```
 
