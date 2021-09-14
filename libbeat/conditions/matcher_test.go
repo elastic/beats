@@ -78,19 +78,19 @@ func TestRegexpCondition(t *testing.T) {
 	configs := []Config{
 		{
 			Regexp: &Fields{fields: map[string]interface{}{
-				"source": "apache2/error.*",
+				"source": "apache/error.*",
 			}},
 		},
 
 		{
 			Regexp: &Fields{fields: map[string]interface{}{
-				"source": "apache2/access.*",
+				"source": "apache/access.*",
 			}},
 		},
 
 		{
 			Regexp: &Fields{fields: map[string]interface{}{
-				"source":  "apache2/error.*",
+				"source":  "apache/error.*",
 				"message": "[client 1.2.3.4]",
 			}},
 		},
