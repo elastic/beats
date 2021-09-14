@@ -21693,6 +21693,26 @@ type: keyword
 
 --
 
+*`cisco.asa.termination_initiator`*::
++
+--
+Interface name of the side that initiated the teardown
+
+
+type: keyword
+
+--
+
+*`cisco.asa.tunnel_type`*::
++
+--
+SA type (remote access or L2L)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -21925,6 +21945,16 @@ type: keyword
 +
 --
 The WebVPN group name the user belongs to
+
+
+type: keyword
+
+--
+
+*`cisco.ftd.termination_initiator`*::
++
+--
+Interface name of the side that initiated the teardown
 
 
 type: keyword
