@@ -709,7 +709,7 @@ processors:
   - dissect:
       if: '["602303", "602304"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
-      pattern: "%{network.type}: An %{network.direction} %{network.inner} SA (SPI= %{}) between %{source.address} and %{destination.address} (user= %{user.name}) has been %{event.action}."
+      pattern: "%{network.type}: An %{network.direction} %{_temp_.cisco.tunnel_type} SA (SPI= %{}) between %{source.address} and %{destination.address} (user= %{user.name}) has been %{event.action}."
   - dissect:
       if: "ctx._temp_.cisco.message_id == '750002'"
       field: "message"

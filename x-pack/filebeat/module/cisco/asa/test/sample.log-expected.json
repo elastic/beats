@@ -4761,5 +4761,68 @@
             "cisco-asa",
             "forwarded"
         ]
+    },
+    {
+        "@timestamp": "2021-07-29T08:35:29.000-02:00",
+        "cisco.asa.message_id": "602304",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "12.12.12.12",
+        "destination.as.number": 32328,
+        "destination.as.organization.name": "Alascom, Inc.",
+        "destination.geo.continent_name": "North America",
+        "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
+        "destination.geo.location.lat": 37.751,
+        "destination.geo.location.lon": -97.822,
+        "destination.ip": "12.12.12.12",
+        "event.action": "deleted",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 602304,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 12.12.12.12 and 12.12.12.12 (user= 12.12.12.12) has been deleted.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "deletion",
+            "info",
+            "user"
+        ],
+        "fileset.name": "asa",
+        "input.type": "log",
+        "log.file.path": "sample.log",
+        "log.level": "informational",
+        "log.offset": 13641,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.ip": [
+            "12.12.12.12"
+        ],
+        "related.user": [
+            "12.12.12.12"
+        ],
+        "service.type": "cisco",
+        "source.address": "12.12.12.12",
+        "source.as.number": 32328,
+        "source.as.organization.name": "Alascom, Inc.",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "12.12.12.12",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "12.12.12.12"
     }
 ]

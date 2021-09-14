@@ -3739,6 +3739,122 @@
         ]
     },
     {
+        "cisco.asa.message_id": "602303",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "event.action": "created",
+        "event.code": 602303,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602303: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been created.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 10775,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
+        "cisco.asa.message_id": "602304",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "event.action": "deleted",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 602304,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been deleted.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "deletion",
+            "info",
+            "user"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 10937,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
         "cisco.asa.message_id": "750002",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",

@@ -21823,6 +21823,16 @@ type: keyword
 
 --
 
+*`cisco.asa.tunnel_type`*::
++
+--
+SA type (remote access or L2L)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
