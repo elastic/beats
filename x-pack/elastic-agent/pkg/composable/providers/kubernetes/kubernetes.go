@@ -127,7 +127,6 @@ func (p *dynamicProvider) newWatcher(
 	resourceType string,
 	comm composable.DynamicProviderComm,
 	client k8s.Interface) (kubernetes.Watcher, error) {
-	//rawConfig, err := common.NewConfigFrom(c)
 	switch resourceType {
 	case "pod":
 		watcher, err := NewPodWatcher(comm, p.config, p.logger, client, p.config.Scope)
