@@ -7,15 +7,14 @@ package kubernetes
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	k8s "k8s.io/client-go/kubernetes"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
+	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -42,8 +41,7 @@ func NewNodeWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string,
-	rawConfig *common.Config) (kubernetes.Watcher, error) {
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -54,6 +52,10 @@ func NewNodeWatcher(
 		return nil, errors.New(err, "couldn't create kubernetes watcher")
 	}
 
+	rawConfig, err := common.NewConfigFrom(cfg)
+	if err != nil {
+		return nil, errors.New(err, "failed to unpack configuration")
+	}
 	metaGen := metadata.NewNodeMetadataGenerator(rawConfig, watcher.Store(), client)
 	watcher.AddEventHandler(&node{
 		logger,

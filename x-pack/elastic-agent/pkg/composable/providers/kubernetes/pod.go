@@ -71,8 +71,7 @@ func NewPodWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string,
-	rawConfig *common.Config) (kubernetes.Watcher, error) {
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -102,6 +101,10 @@ func NewPodWatcher(
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
 
+	rawConfig, err := common.NewConfigFrom(cfg)
+	if err != nil {
+		return nil, errors.New(err, "failed to unpack configuration")
+	}
 	metaGen := metadata.GetPodMetaGen(rawConfig, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
 	p := pod{
@@ -136,22 +139,12 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 	p.comm.AddOrUpdate(data.uid, PodPriority, data.mapping, data.processors)
 
 	// Emit all containers in the pod
-	p.emitContainers(pod, pod.Spec.Containers, pod.Status.ContainerStatuses)
-
 	// TODO: deal with init containers stopping after initialization
-	p.emitContainers(pod, pod.Spec.InitContainers, pod.Status.InitContainerStatuses)
-
-	// Get ephemeral containers and their status
-	ephContainers, ephContainersStatuses := getEphemeralContainers(pod)
-	p.emitContainers(pod, ephContainers, ephContainersStatuses)
-
+	p.emitContainers(pod)
 }
 
-func (p *pod) emitContainers(
-	pod *kubernetes.Pod,
-	containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus) {
-	generateContainerData(p.comm, pod, containers, containerstatuses, p.config, p.metagen)
+func (p *pod) emitContainers(pod *kubernetes.Pod) {
+	generateContainerData(p.comm, pod, p.config, p.metagen)
 }
 
 func (p *pod) emitStopped(pod *kubernetes.Pod) {
@@ -264,18 +257,10 @@ func generatePodData(
 func generateContainerData(
 	comm composable.DynamicProviderComm,
 	pod *kubernetes.Pod,
-	containers []kubernetes.Container,
-	containerstatuses []kubernetes.PodContainerStatus,
 	cfg *Config,
 	kubeMetaGen metadata.MetaGen) {
 
-	containerIDs := map[string]string{}
-	runtimes := map[string]string{}
-	for _, c := range containerstatuses {
-		cid, runtime := kubernetes.ContainerIDWithRuntime(c)
-		containerIDs[c.Name] = cid
-		runtimes[c.Name] = runtime
-	}
+	containers := getContainersInPod(pod)
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
@@ -287,15 +272,14 @@ func generateContainerData(
 		// If it doesn't have an ID, container doesn't exist in
 		// the runtime, emit only an event if we are stopping, so
 		// we are sure of cleaning up configurations.
-		cid := containerIDs[c.Name]
-		if cid == "" {
+		if c.id == "" {
 			continue
 		}
 
 		// ID is the combination of pod UID + container name
-		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.Name)
+		eventID := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), c.spec.Name)
 
-		meta := kubeMetaGen.Generate(pod, metadata.WithFields("container.name", c.Name))
+		meta := kubeMetaGen.Generate(pod, metadata.WithFields("container.name", c.spec.Name))
 		kubemetaMap, err := meta.GetValue("kubernetes")
 		if err != nil {
 			continue
@@ -310,10 +294,10 @@ func generateContainerData(
 
 		//container ECS fields
 		cmeta := common.MapStr{
-			"id":      cid,
-			"runtime": runtimes[c.Name],
+			"id":      c.id,
+			"runtime": c.runtime,
 			"image": common.MapStr{
-				"name": c.Image,
+				"name": c.spec.Image,
 			},
 		}
 
@@ -340,13 +324,13 @@ func generateContainerData(
 		// add container metadata under kubernetes.container.* to
 		// make them available to dynamic var resolution
 		containerMeta := common.MapStr{
-			"id":      cid,
-			"name":    c.Name,
-			"image":   c.Image,
-			"runtime": runtimes[c.Name],
+			"id":      c.id,
+			"name":    c.spec.Name,
+			"image":   c.spec.Image,
+			"runtime": c.runtime,
 		}
-		if len(c.Ports) > 0 {
-			for _, port := range c.Ports {
+		if len(c.spec.Ports) > 0 {
+			for _, port := range c.spec.Ports {
 				containerMeta.Put("port", fmt.Sprintf("%v", port.ContainerPort))
 				containerMeta.Put("port_name", port.Name)
 				k8sMapping["container"] = containerMeta
@@ -357,19 +341,6 @@ func generateContainerData(
 			comm.AddOrUpdate(eventID, ContainerPriority, k8sMapping, processors)
 		}
 	}
-}
-
-func getEphemeralContainers(pod *kubernetes.Pod) ([]kubernetes.Container, []kubernetes.PodContainerStatus) {
-	var ephContainers []kubernetes.Container
-	var ephContainersStatuses []kubernetes.PodContainerStatus
-	for _, c := range pod.Spec.EphemeralContainers {
-		c := kubernetes.Container(c.EphemeralContainerCommon)
-		ephContainers = append(ephContainers, c)
-	}
-	for _, s := range pod.Status.EphemeralContainerStatuses {
-		ephContainersStatuses = append(ephContainersStatuses, s)
-	}
-	return ephContainers, ephContainersStatuses
 }
 
 // podNamespaceAnnotations returns the annotations of the namespace of the pod

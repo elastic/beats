@@ -41,8 +41,7 @@ func NewServiceWatcher(
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string,
-	rawConfig *common.Config) (kubernetes.Watcher, error) {
+	scope string) (kubernetes.Watcher, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -61,6 +60,12 @@ func NewServiceWatcher(
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
 	}
 	namespaceMeta := metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+
+	rawConfig, err := common.NewConfigFrom(cfg)
+	if err != nil {
+		return nil, errors.New(err, "failed to unpack configuration")
+	}
+
 	metaGen := metadata.NewServiceMetadataGenerator(rawConfig, watcher.Store(), namespaceMeta, client)
 	watcher.AddEventHandler(&service{
 		logger,

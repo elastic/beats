@@ -9,8 +9,6 @@ import (
 
 	k8s "k8s.io/client-go/kubernetes"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/composable"
@@ -34,9 +32,8 @@ func init() {
 }
 
 type dynamicProvider struct {
-	logger    *logger.Logger
-	config    *Config
-	rawConfig *common.Config
+	logger *logger.Logger
+	config *Config
 }
 
 // DynamicProviderBuilder builds the dynamic provider.
@@ -49,29 +46,26 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
-	rawConfig, err := common.NewConfigFrom(c)
-	if err != nil {
-		return nil, errors.New(err, "failed to unpack configuration")
-	}
-	return &dynamicProvider{logger, &cfg, rawConfig}, nil
+
+	return &dynamicProvider{logger, &cfg}, nil
 }
 
 // Run runs the kubernetes context provider.
 func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	if p.config.Resources.Pod.Enabled {
-		err := p.watchResource(comm, "pod", p.config)
+		err := p.watchResource(comm, "pod")
 		if err != nil {
 			return err
 		}
 	}
 	if p.config.Resources.Node.Enabled {
-		err := p.watchResource(comm, "node", p.config)
+		err := p.watchResource(comm, "node")
 		if err != nil {
 			return err
 		}
 	}
 	if p.config.Resources.Service.Enabled {
-		err := p.watchResource(comm, "service", p.config)
+		err := p.watchResource(comm, "service")
 		if err != nil {
 			return err
 		}
@@ -83,9 +77,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 // and starts watching for such resource's events.
 func (p *dynamicProvider) watchResource(
 	comm composable.DynamicProviderComm,
-	resourceType string,
-	config *Config) error {
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	resourceType string) error {
+	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes provider for resource %s skipped, unable to connect: %s", resourceType, err)
@@ -100,24 +93,24 @@ func (p *dynamicProvider) watchResource(
 		p.logger.Debugf(
 			"Initializing Kubernetes watcher for resource %s using node: %v",
 			resourceType,
-			config.Node)
+			p.config.Node)
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Node,
+			ConfigHost:  p.config.Node,
 			Client:      client,
-			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			IsInCluster: kubernetes.IsInCluster(p.config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
-		config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
+		p.config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
 		if err != nil {
 			p.logger.Debugf("Kubernetes provider skipped, unable to discover node: %w", err)
 			return nil
 		}
 
 	} else {
-		config.Node = ""
+		p.config.Node = ""
 	}
 
-	watcher, err := p.newWatcher(resourceType, comm, client, config)
+	watcher, err := p.newWatcher(resourceType, comm, client)
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher for resource %s", resourceType)
 	}
@@ -133,23 +126,23 @@ func (p *dynamicProvider) watchResource(
 func (p *dynamicProvider) newWatcher(
 	resourceType string,
 	comm composable.DynamicProviderComm,
-	client k8s.Interface,
-	config *Config) (kubernetes.Watcher, error) {
+	client k8s.Interface) (kubernetes.Watcher, error) {
+	//rawConfig, err := common.NewConfigFrom(c)
 	switch resourceType {
 	case "pod":
-		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
+		watcher, err := NewPodWatcher(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
 		return watcher, nil
 	case "node":
-		watcher, err := NewNodeWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
+		watcher, err := NewNodeWatcher(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
 		return watcher, nil
 	case "service":
-		watcher, err := NewServiceWatcher(comm, config, p.logger, client, p.config.Scope, p.rawConfig)
+		watcher, err := NewServiceWatcher(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}

@@ -99,30 +99,6 @@ func TestGeneratePodData(t *testing.T) {
 
 func TestGenerateContainerPodData(t *testing.T) {
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
-	pod := &kubernetes.Pod{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      "testpod",
-			UID:       types.UID(uid),
-			Namespace: "testns",
-			Labels: map[string]string{
-				"foo": "bar",
-			},
-			Annotations: map[string]string{
-				"app": "production",
-			},
-		},
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Pod",
-			APIVersion: "v1",
-		},
-		Spec: kubernetes.PodSpec{
-			NodeName: "testnode",
-		},
-		Status: kubernetes.PodStatus{PodIP: "127.0.0.5"},
-	}
-
-	providerDataChan := make(chan providerData, 1)
-
 	containers := []kubernetes.Container{
 		{
 			Name:  "nginx",
@@ -143,6 +119,34 @@ func TestGenerateContainerPodData(t *testing.T) {
 			ContainerID: "crio://asdfghdeadbeef",
 		},
 	}
+	pod := &kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testpod",
+			UID:       types.UID(uid),
+			Namespace: "testns",
+			Labels: map[string]string{
+				"foo": "bar",
+			},
+			Annotations: map[string]string{
+				"app": "production",
+			},
+		},
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Pod",
+			APIVersion: "v1",
+		},
+		Spec: kubernetes.PodSpec{
+			NodeName:   "testnode",
+			Containers: containers,
+		},
+		Status: kubernetes.PodStatus{
+			PodIP:             "127.0.0.5",
+			ContainerStatuses: containerStatuses,
+		},
+	}
+
+	providerDataChan := make(chan providerData, 1)
+
 	comm := MockDynamicComm{
 		context.TODO(),
 		providerDataChan,
@@ -150,8 +154,6 @@ func TestGenerateContainerPodData(t *testing.T) {
 	generateContainerData(
 		&comm,
 		pod,
-		containers,
-		containerStatuses,
 		&Config{},
 		&podMeta{})
 
