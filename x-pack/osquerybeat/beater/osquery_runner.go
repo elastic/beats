@@ -41,12 +41,18 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 		inputCh chan []config.InputConfig
 	)
 
-	// Cleanup on exit
-	defer func() {
+	var mx sync.Mutex
+	cancel := func() {
+		mx.Lock()
 		if cn != nil {
 			cn()
+			cn = nil
 		}
-	}()
+		defer mx.Unlock()
+	}
+
+	// Cleanup on exit
+	defer cancel()
 
 	errCh := make(chan error, 1)
 
@@ -58,11 +64,13 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			r.log.Info("Osquery is running and options changed, stop osqueryd")
 
 			// Cancel context
-			cn()
-			cn = nil
+			cancel()
 
 			// Wait until osquery runner exists
 			wg.Wait()
+
+			// Set the flags to use
+			flags = newFlags
 		}
 
 		// Start osqueryd if not running
@@ -74,7 +82,16 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			wg.Add(1)
 			go func() {
 				defer wg.Done()
-				errCh <- runfn(ctx, newFlags, inputCh)
+				err := runfn(ctx, flags, inputCh)
+
+				// Reset cancellable
+				cancel()
+
+				// Forward error to main loop
+				select {
+				case errCh <- err:
+				case <-ctx.Done():
+				}
 			}()
 		}
 
@@ -91,9 +108,7 @@ func (r *osqueryRunner) Run(parentCtx context.Context, runfn osqueryRunFunc) err
 			process(inputs)
 		case err := <-errCh:
 			if err == nil || errors.Is(err, context.Canceled) {
-				r.log.Info("Osquery exited:", err)
-				// Set cancellable func to nil so the runner restarts osquery on the next input update
-				cn = nil
+				r.log.Info("Osquery exited: ", err)
 			} else {
 				r.log.Error("Failed to run osquery:", err)
 				return err
