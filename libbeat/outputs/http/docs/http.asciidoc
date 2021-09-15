@@ -1,0 +1,185 @@
+[[http-output]]
+=== Configure the Http output
+
+++++
+<titleabbrev>Http</titleabbrev>
+++++
+
+The Http output sends events directly to a Http endpoint.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+output.http:
+  hosts: ["https://myhost:443"]
+----
+
+*Basic authentication:*
+
+["source","yaml",subs="attributes,callouts"]
+----
+output.http:
+  hosts: ["https://myhost:443"]
+  username: "{user}"
+  password: "{pwd}"
+----
+
+==== Configuration options
+
+You can specify the following options in the `http` section of the +{beatname_lc}.yml+ config file:
+
+===== `protocol`
+
+The enabled config is a string to set the protocol.
+
+The default value is ``.
+
+
+===== `path`
+The path of the http endpoint to connect to (it can be also specified in hosts)
+
+The default value is ``
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  path: /api
+------------------------------------------------------------------------------
+
+
+
+===== `proxy_url`
+The http proxy to use
+
+The default value is ``
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  proxy_url: "http://myproxy:8080"
+------------------------------------------------------------------------------
+
+
+
+===== `loadbalance`
+To load balance across several hosts
+
+The default value is false
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost1:443", "https://myhost2:443"]
+  loadbalance: true
+------------------------------------------------------------------------------
+
+===== `batch_publish`
+
+The default value is false
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  batch_publish: true
+------------------------------------------------------------------------------
+
+===== `batch_size`
+
+The default value is 2048
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  batch_publish: true
+------------------------------------------------------------------------------
+
+
+===== `compression_level`
+Between 0 and 9.
+The default value is 0
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  compression_level: 1
+------------------------------------------------------------------------------
+
+===== `tls`
+to use client certificates
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  tls: 1
+------------------------------------------------------------------------------
+
+===== `max_retries`
+The default value is 3
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  max_retries: 3
+------------------------------------------------------------------------------
+
+===== `timeout`
+The default value is 90s
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  timeout: 180s
+------------------------------------------------------------------------------
+
+
+===== `headers`
+To set http headers
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  headers:
+    h1: v1
+    h2: v2
+------------------------------------------------------------------------------
+
+
+===== `content_type`
+To set contenty type of the http request
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  content_type: "text/json"
+------------------------------------------------------------------------------
+
+
+===== `backoff`
+Backoff init and max values, in time.Duration type
+The default value is
+  backoff.init: 1s
+  backoff.max: 60s
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  backoff.init: 10s
+  backoff.max: 180s
+------------------------------------------------------------------------------
+
+
+
+===== `format`
+The default value is json
+[source,yaml]
+------------------------------------------------------------------------------
+output.http:
+  hosts: ["https://myhost:443"]
+  format: "text"
+------------------------------------------------------------------------------

@@ -24,6 +24,9 @@ endif::[]
 ifndef::no_console_output[]
 * <<console-output>>
 endif::[]
+ifndef::no_http_output[]
+* <<http-output>>
+endif::[]
 
 //# end::outputs-list[]
 
@@ -82,6 +85,13 @@ ifdef::requires_xpack[]
 [role="xpack"]
 endif::[]
 include::{libbeat-outputs-dir}/codec/docs/codec.asciidoc[]
+endif::[]
+
+ifndef::no_http_output[]
+ifdef::requires_xpack[]
+[role="xpack"]
+endif::[]
+include::{libbeat-outputs-dir}/http/docs/http.asciidoc[]
 endif::[]
 
 //# end::outputs-include[]
