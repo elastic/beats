@@ -65,21 +65,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return errors.Wrap(err, "failed to fetch redis info")
 	}
 
-	// In 5.0 some fields are renamed, maintain both names, old ones will be deprecated
-	renamings := []struct {
-		old, new string
-	}{
-		{"client_longest_output_list", "client_recent_max_output_buffer"},
-		{"client_biggest_input_buf", "client_recent_max_input_buffer"},
-	}
-	for _, r := range renamings {
-		if v, ok := info[r.new]; ok {
-			info[r.old] = v
-		} else {
-			info[r.new] = info[r.old]
-		}
-	}
-
 	slowLogLength, err := redis.FetchSlowLogLength(conn)
 	if err != nil {
 		return errors.Wrap(err, "failed to fetch slow log length")

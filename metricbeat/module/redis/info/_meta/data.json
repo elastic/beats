@@ -21,10 +21,8 @@
     "redis": {
         "info": {
             "clients": {
-                "biggest_input_buf": 0,
                 "blocked": 0,
                 "connected": 5,
-                "longest_output_list": 0,
                 "max_input_buffer": 0,
                 "max_output_buffer": 0
             },
@@ -116,7 +114,6 @@
                     "offset": 0,
                     "sync": {}
                 },
-                "master_offset": 0,
                 "role": "master",
                 "slave": {}
             },
