@@ -78,6 +78,7 @@ func NewNodeEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pu
 		Node:         config.Node,
 		IsUpdated:    isUpdated,
 		HonorReSyncs: true,
+		Workers:      config.Workers,
 	}, nil)
 
 	if err != nil {

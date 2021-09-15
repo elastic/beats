@@ -56,6 +56,9 @@ type Config struct {
 	Templates template.MapperSettings `config:"templates"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+
+	// Workers is the number of workers to run to process incoming kuberentes watch events
+	Workers int `config:"workers"`
 }
 
 // Public variable, so specific beats (as Filebeat) can set a different cleanup timeout if they need it.
@@ -68,6 +71,7 @@ func defaultConfig() *Config {
 		CleanupTimeout: DefaultCleanupTimeout,
 		Prefix:         "co.elastic",
 		Unique:         false,
+		Workers:        1,
 	}
 }
 

@@ -40,6 +40,9 @@ type kubeAnnotatorConfig struct {
 	DefaultIndexers Enabled       `config:"default_indexers"`
 
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+
+	// Workers is the number of workers to run to process incoming kuberentes watch events
+	Workers int `config:"workers"`
 }
 
 type Enabled struct {
@@ -55,6 +58,7 @@ func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
 		Scope:           "node",
+		Workers:         1,
 	}
 }
 

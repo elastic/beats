@@ -74,6 +74,8 @@ type WatchOptions struct {
 	IsUpdated func(old, new interface{}) bool
 	// HonorReSyncs allows resync events to be requeued on the worker
 	HonorReSyncs bool
+	// Workers is the number of workers that need to be run to process the watch events
+	Workers int
 }
 
 type item struct {
@@ -91,6 +93,7 @@ type watcher struct {
 	stop     context.CancelFunc
 	handler  ResourceEventHandler
 	logger   *logp.Logger
+	workers  int
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
@@ -130,6 +133,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 		stop:     cancel,
 		logger:   logp.NewLogger("kubernetes"),
 		handler:  NoOpEventHandlerFuncs{},
+		workers:  opts.Workers,
 	}
 
 	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -185,11 +189,13 @@ func (w *watcher) Start() error {
 
 	//TODO: Do we run parallel workers for this? It is useful when we run metricbeat as one instance per cluster?
 
-	// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
-	go wait.Until(func() {
-		for w.process(w.ctx) {
-		}
-	}, time.Second*1, w.ctx.Done())
+	for i := 0; i < w.workers; i++ {
+		// Wrap the process function with wait.Until so that if the controller crashes, it starts up again after a second.
+		go wait.Until(func() {
+			for w.process(w.ctx) {
+			}
+		}, time.Second*1, w.ctx.Done())
+	}
 
 	return nil
 }

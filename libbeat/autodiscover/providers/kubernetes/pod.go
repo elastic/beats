@@ -84,6 +84,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 		Node:         config.Node,
 		Namespace:    config.Namespace,
 		HonorReSyncs: true,
+		Workers:      config.Workers,
 	}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Pod{}, err)
@@ -92,6 +93,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 		Node:        config.Node,
+		Workers:     config.Workers,
 	}
 	if config.Namespace != "" {
 		options.Namespace = config.Namespace
@@ -106,6 +108,7 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	}
 	namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
+		Workers:     config.Workers,
 	}, nil)
 	if err != nil {
 		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)

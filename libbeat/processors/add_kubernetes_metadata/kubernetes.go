@@ -184,6 +184,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 			SyncTimeout: config.SyncPeriod,
 			Node:        config.Host,
 			Namespace:   config.Namespace,
+			Workers:     config.Workers,
 		}, nil)
 		if err != nil {
 			k.log.Errorf("Couldn't create kubernetes watcher for %T", &kubernetes.Pod{})
