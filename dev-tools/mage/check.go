@@ -36,6 +36,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
+	"github.com/elastic/beats/v7/libbeat/dashboards"
 	"github.com/elastic/beats/v7/libbeat/processors/dissect"
 )
 
@@ -258,6 +259,14 @@ func checkDashboardForErrors(file string, d []byte) bool {
 		hasErrors = true
 		fmt.Printf(">> Dashboard format - %s:\n", file)
 		fmt.Println("  ", err)
+	}
+
+	replaced := dashboards.ReplaceIndexInDashboardObject("my-test-index-*", d)
+	if bytes.Contains(replaced, []byte(BeatName+"-*")) {
+		hasErrors = true
+		fmt.Printf(">> Cannot modify all index pattern references in dashboard - %s\n", file)
+		fmt.Println("Please edit the dashboard override function named ReplaceIndexInDashboardObject in libbeat.")
+		fmt.Println(string(replaced))
 	}
 
 	return hasErrors

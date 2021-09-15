@@ -1,8 +1,148 @@
 {
     "attributes": {
         "description": "",
-        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"866b5ce1-6ca0-47db-a6f2-54c5e0dcd2f0\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"79ec6461-7561-45e4-a6a2-9d6fbd4cf986\",\"geoField\":\"source.geo.location\",\"filterByMapBounds\":true,\"scalingType\":\"LIMIT\",\"topHitsSize\":1,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"marker\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"279da950-e9a7-4287-ab37-25906e448455\",\"label\":\"Source Locations\",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"joins\":[],\"query\":{\"query\":\"event.dataset:gcp.audit\",\"language\":\"kuery\"}}]",
-        "mapStateJSON": "{\"zoom\":1.97,\"center\":{\"lon\":0,\"lat\":19.94277},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false}}",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "866b5ce1-6ca0-47db-a6f2-54c5e0dcd2f0",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "279da950-e9a7-4287-ab37-25906e448455",
+                "joins": [],
+                "label": "Source Locations",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:gcp.audit"
+                },
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "filterByMapBounds": true,
+                    "geoField": "source.geo.location",
+                    "id": "79ec6461-7561-45e4-a6a2-9d6fbd4cf986",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "scalingType": "LIMIT",
+                    "sortField": "",
+                    "sortOrder": "desc",
+                    "tooltipProperties": [],
+                    "topHitsSize": 1,
+                    "type": "ES_SEARCH"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "#54B399"
+                            },
+                            "type": "STATIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "marker"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "size": 6
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "value": ""
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#41937c"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 19.94277,
+                "lon": 0
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-7d",
+                "to": "now"
+            },
+            "zoom": 1.97
+        },
         "title": "Audit Source Locations [Filebeat GCP]",
         "uiStateJSON": {
             "isLayerTOCOpen": true,
