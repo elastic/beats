@@ -84,6 +84,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
 - Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 - Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
+- Rename `log.path` to `log.file.path` in filestream to be consistent with `log` input and ECS. {pull}27761[27761]
+- Only filesets that are explicitly configured will be enabled. {issue}17256[17256] {pull}27526[27526]
 - All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
 
 *Heartbeat*
@@ -108,6 +110,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
 - Add Linux pressure metricset {pull}27355[27355]
 - Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
+- Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
+- Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 
 *Packetbeat*
 
@@ -208,6 +212,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix bug with cgroups hierarchy override path in cgroups {pull}27620[27620]
 - Beat `setup kibana` command may use the elasticsearch API key defined in `output.elasticsearch.api_key`. {issue}24015[24015] {pull}27540[27540]
 - Seperate namespaces for V1 and V2 controller paths {pull}27676[27676]
+- Beats dashboards use custom index when `setup.dashboards.index` is set. {issue}21232[21232] {pull}27901[27901]
 
 *Auditbeat*
 
@@ -217,6 +222,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
+- file_integrity: honor include_files when doing initial scan. {issue}27273[27273] {pull}27722[27722]
 
 *Filebeat*
 
@@ -311,6 +317,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
 - Fix `httpjson` input rate limit processing and documentation. {pull}[]
+- Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
+- Make filestream events ECS compliant. {issue}27776[27776]
 
 *Heartbeat*
 
@@ -738,12 +746,17 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
 - Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
+- Add `timezone` config option to the `decode_cef` processor. {issue}27232[27232] {pull}27727[27727]
+- Add `timezone` config option to the `syslog` input. {pull}27727[27727]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
+- Added support for parsing syslog dates containing a leading 0 (e.g. `Sep 01`) rather than a space. {pull}27775[27775]
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
-
+- Improve memory usage of line reader of `log` and `filestream` input. {pull}27782[27782]
+- Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
+- Update Cisco ASA/FTD ingest pipeline grok/dissect patterns for multiple message IDs. {issue}26869[26869] {pull}26879[26879]
 
 *Heartbeat*
 
@@ -871,6 +884,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Apache: convert status.total_kbytes to status.total_bytes in fleet mode. {pull}23022[23022]
 - Release MSSQL as GA {pull}23146[23146]
 - Add AWS Kinesis metricset. {pull}25989[25989]
+- Enable `journald` input type in Filebeat. {issue}7955[7955] {pull}27351[27351]
 - Move openmetrics module to oss. {pull}26561[26561]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 

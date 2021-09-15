@@ -82,6 +82,11 @@
 - Fix issue with install directory in state path in K8s {pull}27396[27396]
 - Disable monitoring during fleet-server bootstrapping. {pull}27222[27222]
 - Change output.elasticsearch.proxy_disabled flag to output.elasticsearch.proxy_disable so fleet uses it. {issue}27670[27670] {pull}27671[27671]
+- Add validation for certificate flags to ensure they are absolute paths. {pull}27779[27779]
+- Migrate state on upgrade {pull}27825[27825]
+- Add "_monitoring" suffix to monitoring instance names to remove ambiguity with the status command. {issue}25449[25449]
+- Ignore ErrNotExists when fixing permissions. {issue}27836[27836] {pull}27846[27846]
+- Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
 
 ==== New features
 
@@ -135,3 +140,4 @@
 - Add new --enroll-delay option for install and enroll commands. {pull}27118[27118]
 - Add link to troubleshooting guide on fatal exits. {issue}26367[26367] {pull}27236[27236]
 - Agent now adapts the beats queue size based on output settings. {issue}26638[26638] {pull}27429[27429]
+- Support ephemeral containers in Kubernetes dynamic provider. {issue}#27020[#27020] {pull}27707[27707]
