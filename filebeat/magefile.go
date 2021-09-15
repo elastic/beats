@@ -105,6 +105,7 @@ func Update() {
 // modules.d directory.
 func Config() {
 	mg.Deps(devtools.GenerateDirModulesD, configYML)
+	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {

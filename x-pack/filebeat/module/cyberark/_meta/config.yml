@@ -2,7 +2,7 @@
 # Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
 - module: cyberark
   corepas:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

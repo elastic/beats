@@ -1,7 +1,7 @@
 # googlecloud module is deprecated, please use gcp instead
 - module: gcp
   vpcflow:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -19,7 +19,7 @@
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
   firewall:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -37,7 +37,7 @@
     var.credentials_file: ${path.config}/gcp-service-account-xyz.json
 
   audit:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
