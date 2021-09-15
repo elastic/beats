@@ -112,6 +112,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
+- Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
 
 *Packetbeat*
 
