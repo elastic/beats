@@ -12029,19 +12029,6 @@ type: long
 
 --
 
-*`docker.diskio.reads`*::
-+
---
-
-deprecated:[6.4]
-
-Number of current reads per second
-
-
-type: scaled_float
-
---
-
 [float]
 === write
 
@@ -12111,19 +12098,6 @@ type: long
 
 --
 
-*`docker.diskio.writes`*::
-+
---
-
-deprecated:[6.4]
-
-Number of current writes per second
-
-
-type: scaled_float
-
---
-
 [float]
 === summary
 
@@ -12190,19 +12164,6 @@ Total number of queued requests
 
 
 type: long
-
---
-
-*`docker.diskio.total`*::
-+
---
-
-deprecated:[6.4]
-
-Number of reads and writes per second
-
-
-type: scaled_float
 
 --
 
@@ -12700,104 +12661,6 @@ Network interface name.
 
 
 type: keyword
-
---
-
-[float]
-=== in
-
-Incoming network stats per second.
-
-
-
-*`docker.network.in.bytes`*::
-+
---
-Total number of incoming bytes.
-
-
-type: long
-
-format: bytes
-
---
-
-*`docker.network.in.dropped`*::
-+
---
-Total number of dropped incoming packets.
-
-
-type: scaled_float
-
---
-
-*`docker.network.in.errors`*::
-+
---
-Total errors on incoming packets.
-
-
-type: long
-
---
-
-*`docker.network.in.packets`*::
-+
---
-Total number of incoming packets.
-
-
-type: long
-
---
-
-[float]
-=== out
-
-Outgoing network stats per second.
-
-
-
-*`docker.network.out.bytes`*::
-+
---
-Total number of outgoing bytes.
-
-
-type: long
-
-format: bytes
-
---
-
-*`docker.network.out.dropped`*::
-+
---
-Total number of dropped outgoing packets.
-
-
-type: scaled_float
-
---
-
-*`docker.network.out.errors`*::
-+
---
-Total errors on outgoing packets.
-
-
-type: long
-
---
-
-*`docker.network.out.packets`*::
-+
---
-Total number of outgoing packets.
-
-
-type: long
 
 --
 
