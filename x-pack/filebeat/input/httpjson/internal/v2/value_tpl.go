@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/google/uuid"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
@@ -56,11 +57,12 @@ func (t *valueTpl) Unpack(in string) error {
 			"mul":                 mul,
 			"div":                 div,
 			"hmac":                hmacStringHex,
-			"hmacBase64":          hmacStringBase64,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
 			"join":                strings.Join,
 			"sprintf":             fmt.Sprintf,
+			"hmacBase64":          hmacStringBase64,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -309,4 +311,12 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 
 	// Get result and encode as hexadecimal string
 	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func uuidString() string {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return ""
+	}
+	return uuid.String()
 }
