@@ -218,77 +218,118 @@ func TestGenerateContainerPodData(t *testing.T) {
 
 }
 
-func TestGetEphemeralContainers(t *testing.T) {
-	name := "filebeat"
-	namespace := "default"
-	podIP := "127.0.0.1"
-	containerID := "docker://foobar"
+func TestEphemeralContainers(t *testing.T) {
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
-	containerImage := "elastic/filebeat:6.3.0"
-	node := "node"
+	containers := []v1.EphemeralContainer{
+		{
+			EphemeralContainerCommon: v1.EphemeralContainerCommon{
+				Image: "nginx:1.120",
+				Name:  "nginx",
+			},
+		},
+	}
+	containerStatuses := []kubernetes.PodContainerStatus{
+		{
+			Name:        "nginx",
+			Ready:       true,
+			ContainerID: "crio://asdfghdeadbeef",
+		},
+	}
+	pod := &kubernetes.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      "testpod",
+			UID:       types.UID(uid),
+			Namespace: "testns",
+			Labels: map[string]string{
+				"foo": "bar",
+			},
+			Annotations: map[string]string{
+				"app": "production",
+			},
+		},
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Pod",
+			APIVersion: "v1",
+		},
+		Spec: kubernetes.PodSpec{
+			NodeName:            "testnode",
+			EphemeralContainers: containers,
+		},
+		Status: kubernetes.PodStatus{
+			PodIP:                      "127.0.0.5",
+			EphemeralContainerStatuses: containerStatuses,
+		},
+	}
 
-	expectedEphemeralContainers :=
-		[]kubernetes.Container{
-			{
-				Name:  "filebeat",
-				Image: "elastic/filebeat:6.3.0",
-			},
-		}
-	expectedephemeralContainersStatuses :=
-		[]kubernetes.PodContainerStatus{
-			{
-				Name: "filebeat",
-				State: v1.ContainerState{
-					Running: &v1.ContainerStateRunning{
-						StartedAt: metav1.Time{},
-					},
-				},
-				Ready:       false,
-				ContainerID: "docker://foobar",
-			},
-		}
+	providerDataChan := make(chan providerData, 1)
 
-	pod :=
-		&kubernetes.Pod{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:        name,
-				UID:         types.UID(uid),
-				Namespace:   namespace,
-				Labels:      map[string]string{},
-				Annotations: map[string]string{},
+	comm := MockDynamicComm{
+		context.TODO(),
+		providerDataChan,
+	}
+	generateContainerData(
+		&comm,
+		pod,
+		&Config{},
+		&podMeta{})
+
+	mapping := map[string]interface{}{
+		"namespace": pod.GetNamespace(),
+		"pod": common.MapStr{
+			"uid":  string(pod.GetUID()),
+			"name": pod.GetName(),
+			"labels": common.MapStr{
+				"foo": "bar",
 			},
-			TypeMeta: metav1.TypeMeta{
-				Kind:       "Pod",
-				APIVersion: "v1",
+			"annotations": common.MapStr{
+				"app": "production",
 			},
-			Status: v1.PodStatus{
-				PodIP: podIP,
-				Phase: kubernetes.PodRunning,
-				EphemeralContainerStatuses: []kubernetes.PodContainerStatus{
-					{
-						Name:        name,
-						ContainerID: containerID,
-						State: v1.ContainerState{
-							Running: &v1.ContainerStateRunning{},
-						},
-					},
-				},
-			},
-			Spec: v1.PodSpec{
-				NodeName: node,
-				EphemeralContainers: []v1.EphemeralContainer{
-					{
-						EphemeralContainerCommon: v1.EphemeralContainerCommon{
-							Image: containerImage,
-							Name:  name,
-						},
-					},
-				},
-			},
-		}
-	ephContainers, ephContainersStatuses := getEphemeralContainers(pod)
-	assert.Equal(t, expectedEphemeralContainers, ephContainers)
-	assert.Equal(t, expectedephemeralContainersStatuses, ephContainersStatuses)
+			"ip": pod.Status.PodIP,
+		},
+		"container": common.MapStr{
+			"id":      "asdfghdeadbeef",
+			"name":    "nginx",
+			"image":   "nginx:1.120",
+			"runtime": "crio",
+		},
+		"namespace_annotations": common.MapStr{
+			"nsa": "nsb",
+		},
+		"annotations": common.MapStr{
+			"app": "production",
+		},
+	}
+
+	processors := map[string]interface{}{
+		"container": common.MapStr{
+			"id":      "asdfghdeadbeef",
+			"image":   common.MapStr{"name": "nginx:1.120"},
+			"runtime": "crio",
+		}, "orchestrator": common.MapStr{
+			"cluster": common.MapStr{
+				"name": "devcluster",
+				"url":  "8.8.8.8:9090"},
+		}, "kubernetes": common.MapStr{
+			"namespace":             "testns",
+			"namespace_annotations": common.MapStr{"nsa": "nsb"},
+			"pod": common.MapStr{
+				"annotations": common.MapStr{"app": "production"},
+				"ip":          "127.0.0.5",
+				"labels":      common.MapStr{"foo": "bar"},
+				"name":        "testpod",
+				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
+	}
+	cuid := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), "nginx")
+	data := <-providerDataChan
+	assert.Equal(t, cuid, data.uid)
+	assert.Equal(t, mapping, data.mapping)
+	for _, v := range data.processors {
+		k := v["add_fields"].(map[string]interface{})
+		target := k["target"].(string)
+		fields := k["fields"]
+		assert.Equal(t, processors[target], fields)
+	}
+
 }
 
 // MockDynamicComm is used in tests.
