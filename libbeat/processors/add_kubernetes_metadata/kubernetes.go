@@ -177,7 +177,7 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		}
 		k.log.Debugf("Initializing a new Kubernetes watcher using host: %s", config.Host)
 
-		watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
+		watcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_pod", client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 			Node:        config.Host,
 			Namespace:   config.Namespace,
@@ -199,11 +199,11 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *common.Confi
 		if config.Namespace != "" {
 			options.Namespace = config.Namespace
 		}
-		nodeWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Node{}, options, nil)
+		nodeWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_node", client, &kubernetes.Node{}, options, nil)
 		if err != nil {
 			k.log.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
 		}
-		namespaceWatcher, err := kubernetes.NewWatcher(client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+		namespaceWatcher, err := kubernetes.NewNamedWatcher("add_kubernetes_metadata_namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
 			SyncTimeout: config.SyncPeriod,
 		}, nil)
 		if err != nil {

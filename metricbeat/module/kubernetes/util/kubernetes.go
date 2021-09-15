@@ -70,6 +70,10 @@ const selector = "kubernetes"
 // GetWatcher initializes a kubernetes watcher with the given
 // scope (node or cluster), and resource type
 func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
+	return GetNamedWatcher("", base, resource, nodeScope)
+}
+
+func GetNamedWatcher(name string, base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope bool) (kubernetes.Watcher, error) {
 	config := kubernetesConfig{
 		AddMetadata: true,
 		SyncPeriod:  time.Minute * 10,
@@ -110,7 +114,7 @@ func GetWatcher(base mb.BaseMetricSet, resource kubernetes.Resource, nodeScope b
 
 	log.Debugf("Initializing a new Kubernetes watcher using host: %v", config.Host)
 
-	return kubernetes.NewWatcher(client, resource, options, nil)
+	return kubernetes.NewNamedWatcher(name, client, resource, options, nil)
 }
 
 // NewResourceMetadataEnricher returns an Enricher configured for kubernetes resource events
@@ -119,7 +123,7 @@ func NewResourceMetadataEnricher(
 	res kubernetes.Resource,
 	nodeScope bool) Enricher {
 
-	watcher, err := GetWatcher(base, res, nodeScope)
+	watcher, err := GetNamedWatcher("resource_metadata_enricher", base, res, nodeScope)
 	if err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}
@@ -209,7 +213,7 @@ func NewContainerMetadataEnricher(
 	base mb.BaseMetricSet,
 	nodeScope bool) Enricher {
 
-	watcher, err := GetWatcher(base, &kubernetes.Pod{}, nodeScope)
+	watcher, err := GetNamedWatcher("container_metadata_enricher", base, &kubernetes.Pod{}, nodeScope)
 	if err != nil {
 		logp.Err("Error initializing Kubernetes metadata enricher: %s", err)
 		return &nilEnricher{}

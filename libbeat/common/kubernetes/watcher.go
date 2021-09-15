@@ -96,6 +96,10 @@ type watcher struct {
 // NewWatcher initializes the watcher client to provide a events handler for
 // resource from the cluster (filtered to the given node)
 func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
+	return NewNamedWatcher("", client, resource, opts, indexers)
+}
+
+func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
 	var queue workqueue.Interface
 
@@ -105,7 +109,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 	}
 
 	store = informer.GetStore()
-	queue = workqueue.New()
+	queue = workqueue.NewNamed(name)
 
 	if opts.IsUpdated == nil {
 		opts.IsUpdated = func(o, n interface{}) bool {
