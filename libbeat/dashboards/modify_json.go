@@ -21,6 +21,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"regexp"
 
 	"github.com/pkg/errors"
 
@@ -45,10 +46,7 @@ type JSONObject struct {
 	Attributes JSONObjectAttribute `json:"attributes"`
 }
 
-type JSONFormat struct {
-	Objects []JSONObject `json:"objects"`
-}
-
+// ReplaceIndexInIndexPattern replaces an index in a dashboard content body
 func ReplaceIndexInIndexPattern(index string, content common.MapStr) (err error) {
 	if index == "" {
 		return nil
@@ -124,43 +122,62 @@ func ReplaceIndexInSavedObject(index string, kibanaSavedObject map[string]interf
 		}
 		kibanaSavedObject["searchSourceJSON"] = searchSourceJSON
 	}
-	if visStateJSON, ok := kibanaSavedObject["visState"].(string); ok {
-		visStateJSON = ReplaceIndexInVisState(index, visStateJSON)
-		kibanaSavedObject["visState"] = visStateJSON
+	if visState, ok := kibanaSavedObject["visState"].(map[string]interface{}); ok {
+		kibanaSavedObject["visState"] = ReplaceIndexInVisState(index, visState)
 	}
 
 	return kibanaSavedObject
 }
 
+var timeLionIdxRegexp = regexp.MustCompile(`index=\".*beat-\*\"`)
+
 // ReplaceIndexInVisState replaces index appearing in visState params objects
-func ReplaceIndexInVisState(index string, visStateJSON string) string {
-
-	var visState map[string]interface{}
-	err := json.Unmarshal([]byte(visStateJSON), &visState)
-	if err != nil {
-		logp.Err("Fail to unmarshal visState: %v", err)
-		return visStateJSON
-	}
-
+func ReplaceIndexInVisState(index string, visState map[string]interface{}) map[string]interface{} {
 	params, ok := visState["params"].(map[string]interface{})
 	if !ok {
-		return visStateJSON
+		return visState
 	}
 
 	// Don't set it if it was not set before
-	if pattern, ok := params["index_pattern"].(string); !ok || len(pattern) == 0 {
-		return visStateJSON
+	if pattern, ok := params["index_pattern"].(string); ok && len(pattern) != 0 {
+		params["index_pattern"] = index
 	}
 
-	params["index_pattern"] = index
-
-	d, err := json.Marshal(visState)
-	if err != nil {
-		logp.Err("Fail to marshal visState: %v", err)
-		return visStateJSON
+	if s, ok := params["series"].([]interface{}); ok {
+		for i, ser := range s {
+			if series, ok := ser.(map[string]interface{}); ok {
+				if _, ok := series["series_index_pattern"]; !ok {
+					continue
+				}
+				series["series_index_pattern"] = index
+				s[i] = series
+			}
+		}
+		params["series"] = s
 	}
 
-	return string(d)
+	if annotations, ok := params["annotations"].([]interface{}); ok {
+		for i, ann := range annotations {
+			annotation, ok := ann.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if _, ok = annotation["index_pattern"]; !ok {
+				continue
+			}
+			annotation["index_pattern"] = index
+			annotations[i] = annotation
+		}
+		params["annotations"] = annotations
+	}
+
+	if expr, ok := params["expression"].(string); ok {
+		params["expression"] = timeLionIdxRegexp.ReplaceAllString(expr, `index="`+index+`"`)
+	}
+
+	visState["params"] = replaceIndexInParamControls(index, params)
+
+	return visState
 }
 
 // ReplaceIndexInDashboardObject replaces references to the index pattern in dashboard objects
@@ -190,8 +207,26 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 		attributes["kibanaSavedObjectMeta"] = ReplaceIndexInSavedObject(index, kibanaSavedObject)
 	}
 
-	if visState, ok := attributes["visState"].(string); ok {
+	if visState, ok := attributes["visState"].(map[string]interface{}); ok {
 		attributes["visState"] = ReplaceIndexInVisState(index, visState)
+	}
+
+	if layerListJSON, ok := attributes["layerListJSON"].([]interface{}); ok {
+		attributes["layerListJSON"] = replaceIndexInLayerListJSON(index, layerListJSON)
+	}
+
+	if mapStateJSON, ok := attributes["mapStateJSON"].(map[string]interface{}); ok {
+		attributes["mapStateJSON"] = replaceIndexInMapStateJSON(index, mapStateJSON)
+	}
+
+	if panelsJSON, ok := attributes["panelsJSON"].([]interface{}); ok {
+		attributes["panelsJSON"] = replaceIndexInPanelsJSON(index, panelsJSON)
+	}
+
+	objectMap["attributes"] = attributes
+
+	if references, ok := objectMap["references"].([]interface{}); ok {
+		objectMap["references"] = replaceIndexInReferences(index, references)
 	}
 
 	b, err := json.Marshal(objectMap)
@@ -201,6 +236,121 @@ func ReplaceIndexInDashboardObject(index string, content []byte) []byte {
 	}
 
 	return b
+}
+
+func replaceIndexInLayerListJSON(index string, layerListJSON []interface{}) []interface{} {
+	for i, layerListElem := range layerListJSON {
+		elem, ok := layerListElem.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		if joins, ok := elem["joins"].([]interface{}); ok {
+			for j, join := range joins {
+				if pos, ok := join.(map[string]interface{}); ok {
+					for key, val := range pos {
+						if joinElems, ok := val.(map[string]interface{}); ok {
+							if _, ok := joinElems["indexPatternTitle"]; ok {
+								joinElems["indexPatternTitle"] = index
+								pos[key] = joinElems
+							}
+						}
+					}
+					joins[j] = pos
+				}
+			}
+			elem["joins"] = joins
+		}
+		if descriptor, ok := elem["sourceDescriptor"].(map[string]interface{}); ok {
+			if _, ok := descriptor["indexPatternId"]; ok {
+				descriptor["indexPatternId"] = index
+			}
+			elem["sourceDescriptor"] = descriptor
+		}
+
+		layerListJSON[i] = elem
+	}
+	return layerListJSON
+}
+
+func replaceIndexInMapStateJSON(index string, mapState map[string]interface{}) map[string]interface{} {
+	if filters, ok := mapState["filters"].([]interface{}); ok {
+		for i, f := range filters {
+			if filter, ok := f.(map[string]interface{}); ok {
+				if meta, ok := filter["meta"].(map[string]interface{}); ok {
+					if _, ok := meta["index"]; !ok {
+						continue
+					}
+					meta["index"] = index
+					filter["meta"] = meta
+				}
+				filters[i] = filter
+			}
+		}
+		mapState["filters"] = filters
+	}
+
+	return mapState
+}
+
+func replaceIndexInPanelsJSON(index string, panelsJSON []interface{}) []interface{} {
+	for i, p := range panelsJSON {
+		if panel, ok := p.(map[string]interface{}); ok {
+			config, ok := panel["embeddableConfig"].(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if configAttr, ok := config["attributes"].(map[string]interface{}); ok {
+				if references, ok := configAttr["references"].([]interface{}); ok {
+					configAttr["references"] = replaceIndexInReferences(index, references)
+				}
+				if layerListJSON, ok := configAttr["layerListJSON"].([]interface{}); ok {
+					configAttr["layerListJSON"] = replaceIndexInLayerListJSON(index, layerListJSON)
+				}
+				config["attributes"] = configAttr
+			}
+
+			if savedVis, ok := config["savedVis"].(map[string]interface{}); ok {
+				if params, ok := savedVis["params"].(map[string]interface{}); ok {
+					savedVis["params"] = replaceIndexInParamControls(index, params)
+				}
+				config["savedVis"] = savedVis
+			}
+
+			panel["embeddableConfig"] = config
+			panelsJSON[i] = panel
+		}
+	}
+	return panelsJSON
+}
+
+func replaceIndexInParamControls(index string, params map[string]interface{}) map[string]interface{} {
+	if controlsList, ok := params["controls"].([]interface{}); ok {
+		for i, ctrl := range controlsList {
+			if control, ok := ctrl.(map[string]interface{}); ok {
+				if _, ok := control["indexPattern"]; ok {
+					control["indexPattern"] = index
+					controlsList[i] = control
+				}
+			}
+		}
+		params["controls"] = controlsList
+	}
+	return params
+}
+
+func replaceIndexInReferences(index string, references []interface{}) []interface{} {
+	for i, ref := range references {
+		if reference, ok := ref.(map[string]interface{}); ok {
+			if refType, ok := reference["type"].(string); ok {
+				if refType == "index-pattern" {
+					reference["id"] = index
+				}
+			}
+			references[i] = reference
+		}
+	}
+	return references
 }
 
 func EncodeJSONObjects(content []byte) []byte {
