@@ -185,15 +185,6 @@ func (p *pod) OnUpdate(obj interface{}) {
 func (p *pod) unlockedUpdate(obj interface{}) {
 	p.logger.Debugf("Watcher Pod update: %+v", obj)
 	pod := obj.(*kubernetes.Pod)
-
-	p.logger.Debugf("pod update for pod: %+v, status: %+v", pod.Name, pod.Status.Phase)
-
-	if podTerminated(pod, getContainersInPod(pod)) {
-		time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
-		return
-	}
-
-	p.logger.Debugf("pod update: %+v", obj)
 	p.emitRunning(pod)
 }
 
@@ -204,7 +195,13 @@ func (p *pod) OnDelete(obj interface{}) {
 
 	p.logger.Debugf("pod delete: %+v", obj)
 	pod := obj.(*kubernetes.Pod)
-	time.AfterFunc(p.cleanupTimeout, func() { p.emitStopped(pod) })
+	// TODO: verify if we need this check here
+	if podTerminated(pod, getContainersInPod(pod)) {
+		time.AfterFunc(p.cleanupTimeout, func() {
+			p.emitStopped(pod)
+		})
+		return
+	}
 }
 
 func generatePodData(
