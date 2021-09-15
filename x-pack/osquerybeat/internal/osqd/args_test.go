@@ -10,7 +10,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func TestFlagsAreTheSame(t *testing.T) {
+func TestFlagsAreSame(t *testing.T) {
 	tests := []struct {
 		Name           string
 		Flags1, Flags2 Flags
@@ -42,7 +42,7 @@ func TestFlagsAreTheSame(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.Name, func(t *testing.T) {
-			res := FlagsAreTheSame(tc.Flags1, tc.Flags2)
+			res := FlagsAreSame(tc.Flags1, tc.Flags2)
 			diff := cmp.Diff(tc.Expected, res)
 			if diff != "" {
 				t.Error(diff)

@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/runner"
 )
 
 var (
@@ -153,49 +152,21 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	g, ctx := errgroup.WithContext(ctx)
 
-	var osqrunner *runner.Runner
-	var flags osqd.Flags
-
-	inputCh := make(chan []config.InputConfig, 1)
-
-	process := func(inputs []config.InputConfig) {
-		newFlags := config.GetOsqueryOptions(inputs)
-
-		// If Osqueryd is running and flags are different: stop osquery
-		if osqrunner != nil && !osqd.FlagsAreTheSame(flags, newFlags) {
-			// Stop the runner and wait until osqueryd exits
-			bt.log.Info("Stop osqueryd due to flags change, new flags:", newFlags)
-			osqrunner.Stop()
-			osqrunner = nil
-			bt.log.Info("Osqueryd stopped")
-		}
-
-		// Start osqueryd if not running with the new flags
-		if osqrunner == nil {
-			osqrunner = runner.New()
-			g.Go(func() error {
-				return osqrunner.Run(ctx, func(ctx context.Context) error {
-					err := bt.runOsquery(ctx, b, osq, newFlags, inputCh)
-					if err != nil {
-						if errors.Is(err, context.Canceled) {
-							bt.log.Info("Osquery exited:", err)
-							return nil
-						}
-						bt.log.Error("Failed to run osquery:", err)
-					}
-					return err
-				})
-			})
-		}
-
-		inputCh <- inputs
-	}
+	// Start osquery runner.
+	// It restarts osquery on configuration options change
+	// It exits if osqueryd fails to run for any reason, like a bad configuration for example
+	runner := newOsqueryRunner(bt.log)
+	g.Go(func() error {
+		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
+			return bt.runOsquery(ctx, b, osq, flags, inputCh)
+		})
+	})
 
 	// Start osquery only if config has inputs, otherwise it will be started on the first configuration sent from the agent
 	// This way we don't need to persist the configuration for configuration plugin, because osquery is not running until
 	// we have the first valid configuration
 	if len(bt.config.Inputs) > 0 {
-		process(bt.config.Inputs)
+		runner.Update(ctx, bt.config.Inputs)
 	}
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
@@ -203,7 +174,6 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 
 	// Run main loop
 	g.Go(func() error {
-
 		// Configure publisher from initial input
 		err := bt.pub.Configure(bt.config.Inputs)
 		if err != nil {
@@ -221,7 +191,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
 					return err
 				}
-				process(inputConfigs)
+				runner.Update(ctx, inputConfigs)
 			}
 		}
 	})
@@ -333,12 +303,8 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 
 	// Run extension server shutdown goroutine, otherwise it waits for ping failure
 	g.Go(func() error {
-		for {
-			select {
-			case <-ctx.Done():
-				return extserver.Shutdown(context.Background())
-			}
-		}
+		<-ctx.Done()
+		return extserver.Shutdown(context.Background())
 	})
 
 	return g.Wait()

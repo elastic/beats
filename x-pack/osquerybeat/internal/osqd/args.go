@@ -35,7 +35,7 @@ func (f Flags) GetString(key string) string {
 	return ""
 }
 
-func FlagsAreTheSame(flags1, flags2 Flags) bool {
+func FlagsAreSame(flags1, flags2 Flags) bool {
 	return reflect.DeepEqual(flags1, flags2)
 }
 
