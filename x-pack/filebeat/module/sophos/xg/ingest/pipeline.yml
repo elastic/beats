@@ -33,10 +33,10 @@ processors:
 - set:
     field: _temp_.time
     value: "{{sophos.xg.timestamp}}"
-    if: "ctx?.sophos?.xg?.timestamp != null"
+    ignore_empty_value: true
 
 - date:
-    if: "ctx?.event?.timezone == null"
+    if: "ctx?.event?.timezone == null && ctx._temp_?.time != null"
     field: _temp_.time
     target_field: "@timestamp"
     formats:
@@ -44,8 +44,9 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
+    - UNIX
 - date:
-    if: "ctx?.event?.timezone != null"
+    if: "ctx?.event?.timezone != null && ctx._temp_?.time != null"
     timezone: "{{ event.timezone }}"
     field: _temp_.time
     target_field: "@timestamp"
@@ -54,6 +55,7 @@ processors:
     - yyyy-MM-dd HH:mm:ss Z
     - yyyy-MM-dd HH:mm:ss z
     - ISO8601
+    - UNIX
 
 - date:
     if: "ctx?.event.timezone == null && ctx?.sophos?.xg?.eventtime != null"
