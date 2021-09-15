@@ -12,8 +12,6 @@ import (
 	"net/http"
 	"net/url"
 
-	egclient "github.com/akamai/AkamaiOPEN-edgegrid-golang/client-v1"
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -32,14 +30,9 @@ type httpClient struct {
 	limiter *rateLimiter
 }
 
-func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *http.Request, rf *requestFactory) (*http.Response, error) {
+func (c *httpClient) do(stdCtx context.Context, trCtx *transformContext, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(stdCtx, func() (*http.Response, error) {
-
-		if rf.EdgeGridConfig.Host != "" {
-			return egclient.Do(rf.EdgeGridConfig, req)
-		} else {
-			return c.client.Do(req)
-		}
+		return c.client.Do(req)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute http client.Do: %w", err)
@@ -87,15 +80,14 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 }
 
 type requestFactory struct {
-	url            url.URL
-	method         string
-	body           *common.MapStr
-	transforms     []basicTransform
-	user           string
-	password       string
-	log            *logp.Logger
-	encoder        encoderFunc
-	EdgeGridConfig edgegrid.Config
+	url        url.URL
+	method     string
+	body       *common.MapStr
+	transforms []basicTransform
+	user       string
+	password   string
+	log        *logp.Logger
+	encoder    encoderFunc
 }
 
 func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.Logger) *requestFactory {
@@ -112,9 +104,6 @@ func newRequestFactory(config *requestConfig, authConfig *authConfig, log *logp.
 	if authConfig != nil && authConfig.Basic.isEnabled() {
 		rf.user = authConfig.Basic.User
 		rf.password = authConfig.Basic.Password
-	}
-	if authConfig != nil && authConfig.EdgeGrid.isEnabled() {
-		rf.EdgeGridConfig = authConfig.EdgeGrid.config()
 	}
 	return rf
 }
@@ -139,9 +128,6 @@ func (rf *requestFactory) newHTTPRequest(stdCtx context.Context, trCtx *transfor
 
 	url := trReq.url()
 	req, err := http.NewRequest(rf.method, url.String(), bytes.NewBuffer(body))
-	if rf.EdgeGridConfig.Host != "" {
-		req, err = egclient.NewRequest(rf.EdgeGridConfig, rf.method, url.String(), nil)
-	}
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +169,7 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 		return fmt.Errorf("failed to create http request: %w", err)
 	}
 
-	httpResp, err := r.client.do(stdCtx, trCtx, req, r.requestFactory)
+	httpResp, err := r.client.do(stdCtx, trCtx, req)
 	if err != nil {
 		return fmt.Errorf("failed to execute http client.Do: %w", err)
 	}

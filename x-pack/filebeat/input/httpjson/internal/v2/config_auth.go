@@ -19,27 +19,16 @@ import (
 	"golang.org/x/oauth2/endpoints"
 	"golang.org/x/oauth2/google"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 type authConfig struct {
-	Basic    *basicAuthConfig `config:"basic"`
-	OAuth2   *oAuth2Config    `config:"oauth2"`
-	EdgeGrid *edgeGridConfig  `config:"edgegrid"`
+	Basic  *basicAuthConfig `config:"basic"`
+	OAuth2 *oAuth2Config    `config:"oauth2"`
 }
 
 func (c authConfig) Validate() error {
-	list := []bool{c.Basic.isEnabled(), c.OAuth2.isEnabled(), c.EdgeGrid.isEnabled()}
-	filtered := []bool{}
-
-	for i := range list {
-		if list[i] {
-			filtered = append(filtered, list[i])
-		}
-	}
-
-	if len(filtered) > 1 {
+	if c.Basic.isEnabled() && c.OAuth2.isEnabled() {
 		return errors.New("only one kind of auth can be enabled")
 	}
 	return nil
@@ -273,43 +262,4 @@ func (o *oAuth2Config) validateAzureProvider() error {
 	}
 
 	return nil
-}
-
-type edgeGridConfig struct {
-	Enabled      *bool  `config:"enabled"`
-	Host         string `config:"host"`
-	ClientToken  string `config:"client_token"`
-	ClientSecret string `config:"client_secret"`
-	AccessToken  string `config:"access_token"`
-}
-
-// IsEnabled returns true if the `enable` field is set to true in the yaml.
-func (e *edgeGridConfig) isEnabled() bool {
-	return e != nil && (e.Enabled == nil || *e.Enabled)
-}
-
-// Validate checks if oauth2 config is valid.
-func (e *edgeGridConfig) Validate() error {
-	if !e.isEnabled() {
-		return nil
-	}
-
-	if e.Host == "" || e.ClientToken == "" || e.ClientSecret == "" || e.AccessToken == "" {
-		return errors.New("All parameters must be set; Host, Client Token, Client Secret, Access Token.")
-	}
-
-	return nil
-}
-
-func (e *edgeGridConfig) config() edgegrid.Config {
-	config := edgegrid.Config{
-		Host:         e.Host,
-		ClientToken:  e.ClientToken,
-		ClientSecret: e.ClientSecret,
-		AccessToken:  e.AccessToken,
-		MaxBody:      1024,
-		HeaderToSign: []string{},
-		Debug:        false,
-	}
-	return config
 }
