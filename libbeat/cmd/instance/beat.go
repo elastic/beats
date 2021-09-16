@@ -29,6 +29,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"os/user"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -162,7 +163,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
-	version := settings.Version
+	setVersion := settings.Version
 	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
@@ -172,7 +173,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
+		b, err := NewBeat(name, idxPrefix, setVersion, elasticLicensed)
 		if err != nil {
 			return err
 		}
@@ -183,6 +184,20 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
+		// Add more beat metadata
+		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
+		monitoring.NewString(registry, "build_commit").Set(version.Commit())
+		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
+		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+
+		u, err := user.Current()
+		if err != nil {
+			return err
+		}
+		monitoring.NewString(registry, "username").Set(u.Username)
+		monitoring.NewString(registry, "uid").Set(u.Uid)
+		monitoring.NewString(registry, "gid").Set(u.Gid)
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
@@ -414,6 +429,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
