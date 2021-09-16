@@ -19,7 +19,7 @@ const paginationNamespace = "pagination"
 func registerPaginationTransforms() {
 	registerTransform(paginationNamespace, appendName, newAppendPagination)
 	registerTransform(paginationNamespace, deleteName, newDeletePagination)
-	registerTransform(paginationNamespace, setName, newSetPagination)
+	registerTransform(paginationNamespace, setName, newSetRequestPagination)
 }
 
 type pagination struct {
