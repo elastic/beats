@@ -8,7 +8,11 @@ This section summarizes the changes in each release. Also read
 <<breaking-changes>> for more detail about changes that affect
 upgrade.
 
+<<<<<<< HEAD
 * <<release-notes-8.0.0-alpha1>>
+=======
+* <<release-notes-7.14.2>>
+>>>>>>> 8afdddc333 (Forward port 7.14.2 changelog to 7.x (#27972))
 * <<release-notes-7.14.1>>
 * <<release-notes-7.14.0>>
 * <<release-notes-7.13.4>>
