@@ -1,7 +1,7 @@
 # Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
 - module: gsuite
   saml:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -9,7 +9,7 @@
     # var.user_key: all
     # var.interval: 2h
   user_accounts:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -17,7 +17,7 @@
     # var.user_key: all
     # var.interval: 2h
   login:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -25,7 +25,7 @@
     # var.user_key: all
     # var.interval: 2h
   admin:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -33,7 +33,7 @@
     # var.user_key: all
     # var.interval: 2h
   drive:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -41,7 +41,7 @@
     # var.user_key: all
     # var.interval: 2h
   groups:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h

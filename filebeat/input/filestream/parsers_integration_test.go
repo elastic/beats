@@ -247,6 +247,8 @@ The total should be 4 lines covered
 
 // test_rabbitmq_multiline_log from test_multiline.py
 func TestParsersRabbitMQMultilineLog(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27893")
+
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -291,6 +293,8 @@ connection <0.23893.109>, channel 3 - soft error:
 
 // test_max_lines from test_multiline.py
 func TestParsersMultilineMaxLines(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27894")
+
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -501,6 +505,8 @@ func TestParsersCloseTimeoutWithMultiline(t *testing.T) {
 
 // test_consecutive_newline from test_multiline.py
 func TestParsersConsecutiveNewline(t *testing.T) {
+	t.Skip("Flaky test: https://github.com/elastic/beats/issues/27085")
+
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"

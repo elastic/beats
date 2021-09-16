@@ -1,6 +1,6 @@
 - module: snyk
   audit:
-    enabled: true
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
     #
@@ -29,7 +29,7 @@
     #var.email_address: ""
 
   vulnerabilities:
-    enabled: true
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
     # How often the API should be polled. Data from the Snyk API is automatically updated
