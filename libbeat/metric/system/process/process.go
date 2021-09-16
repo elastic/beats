@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
+	"github.com/elastic/beats/v7/libbeat/metric/system/numcpu"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sigar "github.com/elastic/gosigar"
 )
@@ -403,7 +404,7 @@ func GetProcCPUPercentage(s0, s1 *Process) (normalizedPct, pct, totalPct float64
 		totalCPUDeltaMillis := int64(s1.CPU.Total - s0.CPU.Total)
 
 		pct := float64(totalCPUDeltaMillis) / float64(timeDeltaMillis)
-		normalizedPct := pct / float64(runtime.NumCPU())
+		normalizedPct := pct / float64(numcpu.NumCPU())
 		return common.Round(normalizedPct, common.DefaultDecimalPlacesCount),
 			common.Round(pct, common.DefaultDecimalPlacesCount),
 			common.Round(float64(s1.CPU.Total), common.DefaultDecimalPlacesCount)
@@ -538,7 +539,7 @@ func (procStats *Stats) getSingleProcess(pid int, newProcs ProcsMap) *Process {
 	}
 
 	if !procStats.matchProcess(process.Name) {
-		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s; err=", pid, process.Name, err)
+		logger.Debugf("Process name does not matches the provided regex; pid=%d; name=%s", pid, process.Name)
 		return nil
 	}
 

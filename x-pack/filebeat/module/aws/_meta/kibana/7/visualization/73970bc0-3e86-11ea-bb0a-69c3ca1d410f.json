@@ -1,0 +1,101 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "ELB Top User Agents [Filebeat AWS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "29527130-3e86-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "cc6d5070-3e85-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "2b29c940-3e86-11ea-9067-cf383a4ea3b3"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "pivot_id": "user_agent.original",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "color_rules": [
+                            {
+                                "id": "42e14220-3e86-11ea-9067-cf383a4ea3b3"
+                            }
+                        ],
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "kuery",
+                            "query": "fileset.name : \"elb\" "
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "User Agent",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "2010cb20-3e87-11ea-9067-cf383a4ea3b3",
+                                "type": "cumulative_sum"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "user_agent.original",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "ELB Top User Agents [Filebeat AWS] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "73970bc0-3e86-11ea-bb0a-69c3ca1d410f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:58.419Z",
+    "version": "WzQzNjIsMV0="
+}

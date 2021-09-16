@@ -18,7 +18,7 @@ func TestEventACKTracker(t *testing.T) {
 	t.Cleanup(cancel)
 
 	acker := newEventACKTracker(ctx)
-	acker.Add(1)
+	acker.Add()
 	acker.ACK()
 
 	assert.EqualValues(t, 0, acker.pendingACKs)
@@ -42,7 +42,7 @@ func TestEventACKHandler(t *testing.T) {
 
 	// Create acker. Add one pending ACK.
 	acker := newEventACKTracker(ctx)
-	acker.Add(1)
+	acker.Add()
 
 	// Create an ACK handler and simulate one ACKed event.
 	ackHandler := newEventACKHandler()
@@ -50,5 +50,20 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler.ACKEvents(1)
 
 	assert.EqualValues(t, 0, acker.pendingACKs)
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+}
+
+func TestEventACKHandlerWait(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	// Create acker. Add one pending ACK.
+	acker := newEventACKTracker(ctx)
+	acker.Add()
+	acker.ACK()
+	acker.Wait()
+	acker.Add()
+
+	assert.EqualValues(t, 1, acker.pendingACKs)
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }

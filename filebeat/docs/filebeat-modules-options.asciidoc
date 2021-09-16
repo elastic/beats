@@ -75,12 +75,13 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 ----
 {beatname_lc}.modules:
 - module: nginx
+  access:
+  error:
 - module: mysql
+  slowlog:
 - module: system
+  auth:
 ----
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]
 
 [[advanced-settings]]
 === Override input settings
