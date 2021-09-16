@@ -7,21 +7,13 @@
 package health
 
 import (
-	"os"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
 )
-
-func init() {
-	// To be moved to some kind of helper
-	os.Setenv("BEAT_STRICT_PERMS", "false")
-	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
-}
 
 func TestEventMapping(t *testing.T) {
 	logp.TestingSetup()
