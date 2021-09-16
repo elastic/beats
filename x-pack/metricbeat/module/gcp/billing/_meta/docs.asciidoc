@@ -27,7 +27,7 @@ tax, adjustment, or rounding error. Default to `regular`.
 === Configuration example
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - billing
   period: 24h
