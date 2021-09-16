@@ -67,7 +67,7 @@ output.http:
 ===== `loadbalance`
 To load balance across several hosts
 
-The default value is false
+The default value is `false`
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ output.http:
 
 ===== `batch_publish`
 
-The default value is false
+The default value is `false`
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ output.http:
 
 ===== `batch_size`
 
-The default value is 2048
+The default value is `2048`
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ output.http:
 
 ===== `compression_level`
 Between 0 and 9.
-The default value is 0
+The default value is `0`
 
 [source,yaml]
 ------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ output.http:
 ------------------------------------------------------------------------------
 
 ===== `max_retries`
-The default value is 3
+The default value is `3`
 [source,yaml]
 ------------------------------------------------------------------------------
 output.http:
@@ -129,7 +129,7 @@ output.http:
 ------------------------------------------------------------------------------
 
 ===== `timeout`
-The default value is 90s
+The default value is `90s`
 [source,yaml]
 ------------------------------------------------------------------------------
 output.http:
@@ -163,8 +163,8 @@ output.http:
 ===== `backoff`
 Backoff init and max values, in time.Duration type
 The default value is
-  backoff.init: 1s
-  backoff.max: 60s
+  `backoff.init: 1s`
+  `backoff.max: 60s`
 [source,yaml]
 ------------------------------------------------------------------------------
 output.http:
@@ -176,7 +176,8 @@ output.http:
 
 
 ===== `format`
-The default value is json
+It can be `json` or `json_lines`.
+The default value is `json`
 [source,yaml]
 ------------------------------------------------------------------------------
 output.http:
