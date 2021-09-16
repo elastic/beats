@@ -1,0 +1,46 @@
+[
+    {
+        "enterprisesearch": {
+            "health": {
+                "cluster_uuid": "Bkz2QJZuSxuZrbQRJ8xhuA",
+                "jvm": {
+                    "memory_usage": {
+                        "heap_committed.bytes": 1784152064,
+                        "heap_init.bytes": 268435456,
+                        "heap_max.bytes": 3817865216,
+                        "heap_used.bytes": 1551901480,
+                        "non_heap_committed.bytes": 266469376,
+                        "non_heap_init.bytes": 2555904,
+                        "object_pending_finalization_count": 123
+                    },
+                    "threads": {
+                        "thread_count": 24,
+                        "peak_thread_count": 27,
+                        "total_started_thread_count": 119,
+                        "daemon_thread_count": 23
+                    }
+                },
+                "crawler": {
+                    "workers": {
+                        "pool_size": 32,
+                        "active": 0,
+                        "available": 32
+                    }
+                }
+            }
+        },
+        "event": {
+            "dataset": "enterprisesearch.health",
+            "duration": 115000,
+            "module": "enterprisesearch"
+        },
+        "metricset": {
+            "name": "health",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "enterprisesearch"
+        }
+    }
+]

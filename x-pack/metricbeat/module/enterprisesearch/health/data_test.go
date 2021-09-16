@@ -7,22 +7,23 @@
 package health
 
 import (
-	"io/ioutil"
-	"path/filepath"
+	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+
+	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
 )
 
+func init() {
+	// To be moved to some kind of helper
+	os.Setenv("BEAT_STRICT_PERMS", "false")
+	mb.Registry.SetSecondarySource(mb.NewLightModulesSource("../../../module"))
+}
+
 func TestEventMapping(t *testing.T) {
-	files, err := filepath.Glob("./_meta/test/*.json")
-	assert.NoError(t, err)
-
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
-		assert.NoError(t, err)
-
-		_, err = eventMapping(input)
-		assert.NoError(t, err, f)
-	}
+	logp.TestingSetup()
+	mbtest.TestDataFiles(t, "enterprisesearch", "health")
 }

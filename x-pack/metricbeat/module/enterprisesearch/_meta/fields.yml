@@ -8,4 +8,5 @@
     - name: enterprisesearch
       type: group
       description: >
+        `enterprisesearch` contains statistics that were read from Enterprise Search
       fields:

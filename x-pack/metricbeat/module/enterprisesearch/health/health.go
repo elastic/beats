@@ -49,7 +49,7 @@ type MetricSet struct {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The enterprisesearch health metricset is beta.")
+	cfgwarn.Beta("The Enterprise Search health metricset is currently in beta.")
 
 	http, err := helper.NewHTTP(base)
 	if err != nil {

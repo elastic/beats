@@ -27,7 +27,7 @@
             "heap_used": 1551901480,
             "heap_committed": 1784152064,
             "heap_max": 3817865216,
-            "object_pending_finalization_count": 0,
+            "object_pending_finalization_count": 123,
             "non_heap_init": 2555904,
             "non_heap_committed": 266469376
         },
