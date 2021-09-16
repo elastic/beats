@@ -124,7 +124,7 @@ func runCmd(
 
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
-		cmd.Args = append(cmd.Args, "--suite-params", string(paramsBytes))
+		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
 	}
 
 	if len(filterJourneys.Tags) > 0 {
