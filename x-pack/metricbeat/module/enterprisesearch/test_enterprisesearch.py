@@ -14,6 +14,8 @@ class Test(XPackTest):
             "name": "enterprisesearch",
             "metricsets": ["health"],
             "hosts": [self.compose_host(service="enterprise_search")],
+            "username": self.get_username(),
+            "password": self.get_password(),
             "period": "5s"
         }])
         proc = self.start_beat(home=self.beat_path)
@@ -31,3 +33,9 @@ class Test(XPackTest):
 
         enterprisesearch_health = evt["enterprisesearch"]["health"]
         self.assertIn("jvm", enterprisesearch_health)
+
+    def get_username(self):
+        return os.getenv('ENT_SEARCH_USER', 'elastic')
+
+    def get_password(self):
+        return os.getenv('ENT_SEARCH_PASSWORD', 'changeme')
