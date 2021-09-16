@@ -1,6 +1,6 @@
 # Dev Guide
 
-### Debug scripts processors
+### Debug the scripts processor
 
 - Configure the filebeat to accept stdin input and output results to stdout
 - Add your script processor
@@ -33,7 +33,7 @@ logging.metrics.enabled: false
 
 Use this configuration to start filebeat process.
 
-### Prepare an elasticsearch instance
+### Prepare a minimal elasticsearch cluster
 
 Use docker-compose to start an elasticsearch instance and a kibana instance.
 
@@ -82,7 +82,7 @@ networks:
     driver: bridge
 ```
 
-### Running Tests
+### Run Tests
 
 ```shell
 # Just run once
@@ -92,15 +92,16 @@ source ./build/python-env/bin/activate
 make filebeat.test
 # Run after each time module changing
 make update
+# Start tests
 GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb TESTING_FILEBEAT_FILESETS=tiflash pytest tests/system/test_modules.py
 ```
 
-### Getting records in elasticsearch
+### Get records from the elasticsearch instance
 
 ```shell
 curl -X GET --location "http://localhost:9200/test-filebeat-modules/_search"
 ```
 
-### View test configs and runtime logs
+### View test configs and logs
 
-`filebeat/build/system-tests/run/test_modules.Test.test_fileset_file_0_tidb/`
+Test results locate at `filebeat/build/system-tests/run/test_modules.Test.test_fileset_file_0_tidb/`
