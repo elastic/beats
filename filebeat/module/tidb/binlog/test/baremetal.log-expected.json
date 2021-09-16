@@ -5,12 +5,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "WARN",
+        "log.logger": "config.go",
         "log.offset": 0,
+        "log.origin.file.line": "544",
+        "message": "pump may not be able to access drainer using this addr",
         "service.type": "tidb",
-        "tidb.binlog.listen addr": "http://127.0.0.1:8250",
-        "tidb.level": "WARN",
-        "tidb.message": "pump may not be able to access drainer using this addr",
-        "tidb.source_line": "config.go:544"
+        "tidb.binlog.listen addr": "http://127.0.0.1:8250"
     },
     {
         "@timestamp": "2021-09-07T03:24:58.439Z",
@@ -18,12 +19,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "WARN",
+        "log.logger": "config.go",
         "log.offset": 153,
+        "log.origin.file.line": "544",
+        "message": "pump may not be able to access drainer using this addr",
         "service.type": "tidb",
-        "tidb.binlog.listen addr": "http://127.0.0.1:8250",
-        "tidb.level": "WARN",
-        "tidb.message": "pump may not be able to access drainer using this addr",
-        "tidb.source_line": "config.go:544"
+        "tidb.binlog.listen addr": "http://127.0.0.1:8250"
     },
     {
         "@timestamp": "2021-09-07T03:21:26.381Z",
@@ -31,16 +33,17 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "version.go",
         "log.offset": 306,
+        "log.origin.file.line": "50",
+        "message": "Welcome to Drainer",
         "service.type": "tidb",
         "tidb.binlog.Build TS": "2021-08-23 02:22:04",
         "tidb.binlog.Git Commit Hash": "8d1aa3c53a9c783d39b7b9618d9dee2f5450c76e",
         "tidb.binlog.Go OS/Arch": "darwin/amd64",
         "tidb.binlog.Go Version": "go1.16.5",
-        "tidb.binlog.Release Version": "v5.2.0",
-        "tidb.level": "INFO",
-        "tidb.message": "Welcome to Drainer",
-        "tidb.source_line": "version.go:50"
+        "tidb.binlog.Release Version": "v5.2.0"
     },
     {
         "@timestamp": "2021-09-07T03:21:26.381Z",
@@ -48,12 +51,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "main.go",
         "log.offset": 560,
+        "log.origin.file.line": "46",
+        "message": "start drainer...",
         "service.type": "tidb",
-        "tidb.binlog.config": "{\\\"log-level\\\":\\\"info\\\",\\\"node-id\\\":\\\"drainer_0\\\",\\\"addr\\\":\\\"http://127.0.0.1:8250\\\",\\\"advertise-addr\\\":\\\"http://127.0.0.1:8250\\\",\\\"data-dir\\\":\\\"data.drainer\\\",\\\"detect-interval\\\":5,\\\"pd-urls\\\":\\\"http://127.0.0.1:2379\\\",\\\"log-file\\\":\\\"/Users/yifan/.tiup/data/test/drainer-0/drainer.log\\\",\\\"initial-commit-ts\\\":-1,\\\"sycner\\\":{\\\"sql-mode\\\":null,\\\"ignore-txn-commit-ts\\\":null,\\\"ignore-schemas\\\":\\\"INFORMATION_SCHEMA,PERFORMANCE_SCHEMA,mysql\\\",\\\"ignore-table\\\":null,\\\"txn-batch\\\":20,\\\"loopback-control\\\":false,\\\"sync-ddl\\\":true,\\\"channel-id\\\":0,\\\"worker-count\\\":16,\\\"to\\\":{\\\"host\\\":\\\"localhost\\\",\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"\\\",\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null},\\\"encrypted_password\\\":\\\"\\\",\\\"sync-mode\\\":0,\\\"port\\\":3306,\\\"checkpoint\\\":{\\\"type\\\":\\\"\\\",\\\"schema\\\":\\\"\\\",\\\"host\\\":\\\"\\\",\\\"user\\\":\\\"\\\",\\\"password\\\":\\\"\\\",\\\"encrypted_password\\\":\\\"\\\",\\\"port\\\":0,\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null}},\\\"dir\\\":\\\"\\\",\\\"retention-time\\\":0,\\\"params\\\":null,\\\"merge\\\":false,\\\"zookeeper-addrs\\\":\\\"\\\",\\\"kafka-addrs\\\":\\\"\\\",\\\"kafka-version\\\":\\\"\\\",\\\"kafka-max-messages\\\":0,\\\"kafka-client-id\\\":\\\"\\\",\\\"topic-name\\\":\\\"\\\"},\\\"replicate-do-table\\\":null,\\\"replicate-do-db\\\":null,\\\"db-type\\\":\\\"mysql\\\",\\\"relay\\\":{\\\"log-dir\\\":\\\"\\\",\\\"max-file-size\\\":10485760},\\\"disable-dispatch-flag\\\":null,\\\"enable-dispatch-flag\\\":null,\\\"disable-dispatch\\\":null,\\\"enable-dispatch\\\":null,\\\"safe-mode\\\":false,\\\"disable-detect-flag\\\":null,\\\"enable-detect-flag\\\":null,\\\"disable-detect\\\":null,\\\"enable-detect\\\":null},\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null},\\\"synced-check-time\\\":5,\\\"compressor\\\":\\\"\\\",\\\"EtcdTimeout\\\":5000000000,\\\"MetricsAddr\\\":\\\"\\\",\\\"MetricsInterval\\\":15}",
-        "tidb.level": "INFO",
-        "tidb.message": "start drainer...",
-        "tidb.source_line": "main.go:46"
+        "tidb.binlog.config": "{\\\"log-level\\\":\\\"info\\\",\\\"node-id\\\":\\\"drainer_0\\\",\\\"addr\\\":\\\"http://127.0.0.1:8250\\\",\\\"advertise-addr\\\":\\\"http://127.0.0.1:8250\\\",\\\"data-dir\\\":\\\"data.drainer\\\",\\\"detect-interval\\\":5,\\\"pd-urls\\\":\\\"http://127.0.0.1:2379\\\",\\\"log-file\\\":\\\"/Users/yifan/.tiup/data/test/drainer-0/drainer.log\\\",\\\"initial-commit-ts\\\":-1,\\\"sycner\\\":{\\\"sql-mode\\\":null,\\\"ignore-txn-commit-ts\\\":null,\\\"ignore-schemas\\\":\\\"INFORMATION_SCHEMA,PERFORMANCE_SCHEMA,mysql\\\",\\\"ignore-table\\\":null,\\\"txn-batch\\\":20,\\\"loopback-control\\\":false,\\\"sync-ddl\\\":true,\\\"channel-id\\\":0,\\\"worker-count\\\":16,\\\"to\\\":{\\\"host\\\":\\\"localhost\\\",\\\"user\\\":\\\"root\\\",\\\"password\\\":\\\"\\\",\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null},\\\"encrypted_password\\\":\\\"\\\",\\\"sync-mode\\\":0,\\\"port\\\":3306,\\\"checkpoint\\\":{\\\"type\\\":\\\"\\\",\\\"schema\\\":\\\"\\\",\\\"host\\\":\\\"\\\",\\\"user\\\":\\\"\\\",\\\"password\\\":\\\"\\\",\\\"encrypted_password\\\":\\\"\\\",\\\"port\\\":0,\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null}},\\\"dir\\\":\\\"\\\",\\\"retention-time\\\":0,\\\"params\\\":null,\\\"merge\\\":false,\\\"zookeeper-addrs\\\":\\\"\\\",\\\"kafka-addrs\\\":\\\"\\\",\\\"kafka-version\\\":\\\"\\\",\\\"kafka-max-messages\\\":0,\\\"kafka-client-id\\\":\\\"\\\",\\\"topic-name\\\":\\\"\\\"},\\\"replicate-do-table\\\":null,\\\"replicate-do-db\\\":null,\\\"db-type\\\":\\\"mysql\\\",\\\"relay\\\":{\\\"log-dir\\\":\\\"\\\",\\\"max-file-size\\\":10485760},\\\"disable-dispatch-flag\\\":null,\\\"enable-dispatch-flag\\\":null,\\\"disable-dispatch\\\":null,\\\"enable-dispatch\\\":null,\\\"safe-mode\\\":false,\\\"disable-detect-flag\\\":null,\\\"enable-detect-flag\\\":null,\\\"disable-detect\\\":null,\\\"enable-detect\\\":null},\\\"security\\\":{\\\"ssl-ca\\\":\\\"\\\",\\\"ssl-cert\\\":\\\"\\\",\\\"ssl-key\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null},\\\"synced-check-time\\\":5,\\\"compressor\\\":\\\"\\\",\\\"EtcdTimeout\\\":5000000000,\\\"MetricsAddr\\\":\\\"\\\",\\\"MetricsInterval\\\":15}"
     },
     {
         "@timestamp": "2021-09-07T03:21:26.382Z",
@@ -61,12 +65,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "client.go",
         "log.offset": 2426,
+        "log.origin.file.line": "214",
+        "message": "[pd] create pd client with endpoints",
         "service.type": "tidb",
-        "tidb.binlog.pd-address": "[http://127.0.0.1:2379]",
-        "tidb.level": "INFO",
-        "tidb.message": "[pd] create pd client with endpoints",
-        "tidb.source_line": "client.go:214"
+        "tidb.binlog.pd-address": "[http://127.0.0.1:2379]"
     },
     {
         "@timestamp": "2021-09-07T03:21:26.383Z",
@@ -74,13 +79,17 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.logger": "base_client.go",
         "log.offset": 2562,
+        "log.origin.file.line": "346",
+        "message": "[pd] switch leader",
         "service.type": "tidb",
         "tidb.binlog.new-leader": "http://127.0.0.1:2379",
-        "tidb.body": "[\"[pd] switch leader\"] [new-leader=http://127.0.0.1:2379] [old-leader=]",
-        "tidb.level": "INFO",
-        "tidb.message": "[pd] switch leader",
-        "tidb.source_line": "base_client.go:346"
+        "tidb.body": "[\"[pd] switch leader\"] [new-leader=http://127.0.0.1:2379] [old-leader=]\n\n"
     },
     {
         "@timestamp": "2021-09-07T03:21:10.262Z",
@@ -88,12 +97,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "storage.go",
         "log.offset": 2697,
+        "log.origin.file.line": "384",
+        "message": null,
         "service.type": "tidb",
-        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":461,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}",
-        "tidb.level": "INFO",
-        "tidb.message": null,
-        "tidb.source_line": "storage.go:384"
+        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":461,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}"
     },
     {
         "@timestamp": "2021-09-07T03:21:20.262Z",
@@ -101,14 +111,15 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "server.go",
         "log.offset": 3073,
+        "log.origin.file.line": "568",
+        "message": "server info tick",
         "service.type": "tidb",
         "tidb.binlog.MaxCommitTS": "427552899955425283",
         "tidb.binlog.alivePullerCount": "0",
-        "tidb.binlog.writeBinlogCount": "0",
-        "tidb.level": "INFO",
-        "tidb.message": "server info tick",
-        "tidb.source_line": "server.go:568"
+        "tidb.binlog.writeBinlogCount": "0"
     },
     {
         "@timestamp": "2021-09-07T03:21:20.263Z",
@@ -116,12 +127,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "storage.go",
         "log.offset": 3225,
+        "log.origin.file.line": "384",
+        "message": null,
         "service.type": "tidb",
-        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":1038,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}",
-        "tidb.level": "INFO",
-        "tidb.message": null,
-        "tidb.source_line": "storage.go:384"
+        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":1038,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}"
     },
     {
         "@timestamp": "2021-09-07T03:21:30.262Z",
@@ -129,12 +141,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "storage.go",
         "log.offset": 3602,
+        "log.origin.file.line": "384",
+        "message": null,
         "service.type": "tidb",
-        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":1530,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}",
-        "tidb.level": "INFO",
-        "tidb.message": null,
-        "tidb.source_line": "storage.go:384"
+        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":1530,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}"
     },
     {
         "@timestamp": "2021-09-07T03:21:30.262Z",
@@ -142,14 +155,15 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "server.go",
         "log.offset": 3979,
+        "log.origin.file.line": "568",
+        "message": "server info tick",
         "service.type": "tidb",
         "tidb.binlog.MaxCommitTS": "427552902340935681",
         "tidb.binlog.alivePullerCount": "0",
-        "tidb.binlog.writeBinlogCount": "0",
-        "tidb.level": "INFO",
-        "tidb.message": "server info tick",
-        "tidb.source_line": "server.go:568"
+        "tidb.binlog.writeBinlogCount": "0"
     },
     {
         "@timestamp": "2021-09-07T03:21:40.263Z",
@@ -157,14 +171,15 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "server.go",
         "log.offset": 4131,
+        "log.origin.file.line": "568",
+        "message": "server info tick",
         "service.type": "tidb",
         "tidb.binlog.MaxCommitTS": "427552905526247425",
         "tidb.binlog.alivePullerCount": "0",
-        "tidb.binlog.writeBinlogCount": "0",
-        "tidb.level": "INFO",
-        "tidb.message": "server info tick",
-        "tidb.source_line": "server.go:568"
+        "tidb.binlog.writeBinlogCount": "0"
     },
     {
         "@timestamp": "2021-09-07T03:21:40.263Z",
@@ -172,12 +187,13 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "storage.go",
         "log.offset": 4283,
+        "log.origin.file.line": "384",
+        "message": null,
         "service.type": "tidb",
-        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":2101,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}",
-        "tidb.level": "INFO",
-        "tidb.message": null,
-        "tidb.source_line": "storage.go:384"
+        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":2101,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}"
     },
     {
         "@timestamp": "2021-09-07T03:21:50.263Z",
@@ -185,14 +201,15 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "server.go",
         "log.offset": 4660,
+        "log.origin.file.line": "568",
+        "message": "server info tick",
         "service.type": "tidb",
         "tidb.binlog.MaxCommitTS": "427552907898650625",
         "tidb.binlog.alivePullerCount": "0",
-        "tidb.binlog.writeBinlogCount": "0",
-        "tidb.level": "INFO",
-        "tidb.message": "server info tick",
-        "tidb.source_line": "server.go:568"
+        "tidb.binlog.writeBinlogCount": "0"
     },
     {
         "@timestamp": "2021-09-07T03:21:50.263Z",
@@ -200,11 +217,12 @@
         "event.module": "tidb",
         "fileset.name": "binlog",
         "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "storage.go",
         "log.offset": 4812,
+        "log.origin.file.line": "384",
+        "message": null,
         "service.type": "tidb",
-        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":2678,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}",
-        "tidb.level": "INFO",
-        "tidb.message": null,
-        "tidb.source_line": "storage.go:384"
+        "tidb.binlog.DBStats": "{\\\"WriteDelayCount\\\":0,\\\"WriteDelayDuration\\\":0,\\\"WritePaused\\\":false,\\\"AliveSnapshots\\\":0,\\\"AliveIterators\\\":0,\\\"IOWrite\\\":2678,\\\"IORead\\\":0,\\\"BlockCacheSize\\\":0,\\\"OpenedTablesCount\\\":0,\\\"LevelSizes\\\":null,\\\"LevelTablesCounts\\\":null,\\\"LevelRead\\\":null,\\\"LevelWrite\\\":null,\\\"LevelDurations\\\":null}"
     }
 ]

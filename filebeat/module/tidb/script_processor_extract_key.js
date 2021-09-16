@@ -20,7 +20,7 @@ function process(event) {
         return event
     }
     var message = messageMatch[1]
-    event.Put("tidb.message", message)
+    event.Put("message", message)
 
     // get k-vs
     var kvString = raw.substring(messageMatch[0].length).trim()

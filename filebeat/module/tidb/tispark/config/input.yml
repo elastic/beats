@@ -5,11 +5,6 @@ paths:
  - {{$path}}
 {{ end }}
 
-exclude_files:
-{{ range $i, $files := .exclude_files }}
- - {{$files}}
-{{ end }}
-
 multiline:
   type: pattern
   pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'

@@ -158349,36 +158349,6 @@ Common fields in the TiDB Module.
 
 
 
-*`tidb.level`*::
-+
---
-The log level in upper case. Available levels are FATAL, ERROR, WARN, INFO and DEBUG.
-
-
-type: keyword
-
---
-
-*`tidb.source_line`*::
-+
---
-The source file name that generates the log line. Only UTF-8 characters matching the regular expression [a-zA-Z0-9\.-_] are permitted and other characters should be removed. The source file line number that generates the log line. Only digits are permitted.
-
-
-type: keyword
-
---
-
-*`tidb.message`*::
-+
---
-The Log Message Section contains a customized message describing the log line.
-
-
-type: text
-
---
-
 *`tidb.body`*::
 +
 --

@@ -5,17 +5,11 @@ paths:
  - {{$path}}
 {{ end }}
 
-exclude_files:
-{{ range $i, $files := .exclude_files }}
- - {{$files}}
-{{ end }}
-
 multiline:
   type: pattern
   pattern: '^# Time: '
   negate: true
   match: after
-  timeout: 3s
 
 processors:
 {{ if eq .deployment "container" }}

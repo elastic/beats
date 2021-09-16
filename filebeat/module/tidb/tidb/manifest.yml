@@ -10,10 +10,6 @@ var:
       - /tidb-deploy/tidb-4000/log/*.log
       # the default path of tidb operator
       - /var/log/containers/*tidb*.log
-  - name: exclude_files
-    default:
-      - '.gz$'
-      - '.*slowlog.*\.log$'
 
 ingest_pipeline: ingest/pipeline.json
 input: config/input.yml

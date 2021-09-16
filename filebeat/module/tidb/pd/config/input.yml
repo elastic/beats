@@ -5,10 +5,11 @@ paths:
  - {{$path}}
 {{ end }}
 
-exclude_files:
-{{ range $i, $files := .exclude_files }}
- - {{$files}}
-{{ end }}
+multiline:
+  type: pattern
+  pattern: '^\[[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}|^[0-9]{4}/[0-9]{2}/[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}'
+  negate: true
+  match: after
 
 processors:
 {{ if eq .deployment "container" }}
@@ -20,7 +21,7 @@ processors:
 {{ end }}
   - add_cloud_metadata: ~
   - dissect:
-      tokenizer: '[%{time}] [%{tidb.level}] [%{tidb.source_line}] %{tidb.body}'
+      tokenizer: '[%{time}] [%{log.level}] [%{log.logger}:%{log.origin.file.line}] %{tidb.body}'
       field: "message"
       target_prefix: ""
       ignore_failure: true
@@ -61,7 +62,7 @@ processors:
                 return event
             }
             var message = messageMatch[1]
-            event.Put("tidb.message", message)
+            event.Put("message", message)
 
             // get k-vs
             var kvString = raw.substring(messageMatch[0].length).trim()

@@ -10,9 +10,6 @@ var:
       - /tidb-deploy/cdc-8300/log/*.log
       # the default path of tidb operator
       - /var/log/containers/*cdc*.log
-  - name: exclude_files
-    default:
-      - '.gz$'
 
 ingest_pipeline: ingest/pipeline.json
 input: config/input.yml

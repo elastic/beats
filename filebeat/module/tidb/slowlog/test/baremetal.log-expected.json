@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-09-15T08:37:23.610Z",
+        "@timestamp": "2021-09-16T02:11:04.548Z",
         "event.dataset": "tidb.slowlog",
         "event.module": "tidb",
         "fileset.name": "slowlog",
@@ -41,7 +41,7 @@
         "tidb.slowlog.Write_sql_response_total": 0
     },
     {
-        "@timestamp": "2021-09-15T08:37:23.611Z",
+        "@timestamp": "2021-09-16T02:11:04.548Z",
         "event.dataset": "tidb.slowlog",
         "event.module": "tidb",
         "fileset.name": "slowlog",

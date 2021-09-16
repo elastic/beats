@@ -12,9 +12,6 @@ var:
       # the default path of tidb operator
       - /var/log/containers/*pump*.log
       - /var/log/containers/*drainer*.log
-  - name: exclude_files
-    default:
-      - '.gz$'
 
 ingest_pipeline: ingest/pipeline.json
 input: config/input.yml

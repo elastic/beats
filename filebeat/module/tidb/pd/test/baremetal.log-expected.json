@@ -5,124 +5,110 @@
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.logger": "grpc_service.go",
         "log.offset": 0,
+        "log.origin.file.line": "764",
+        "message": "update service GC safe point",
         "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "update service GC safe point",
         "tidb.pd.expire-at": "-9223372035224211918",
         "tidb.pd.safepoint": "427442383531016192",
-        "tidb.pd.service-id": "gc_worker",
-        "tidb.source_line": "grpc_service.go:764"
+        "tidb.pd.service-id": "gc_worker"
     },
     {
-        "@timestamp": "2021-09-02T06:26:31.792Z",
+        "@timestamp": "2021-09-16T02:10:34.341Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 182,
-        "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "updated gc safe point",
-        "tidb.pd.safe-point": "427442383531016192",
-        "tidb.source_line": "grpc_service.go:716"
+        "log.flags": [
+            "dissect_parsing_error",
+            "multiline"
+        ],
+        "log.offset": 183,
+        "message": "2021/09/07 11:31:08 \u001b[32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 \u001b[33mSLOW SQL >= 200ms\n\u001b[0m\u001b[31;1m[1537.544ms] \u001b[33m[rows:12]\u001b[35m\nSELECT\n\t*,\n\tFIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER\nFROM (\n\tSELECT\n\t\tTYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE\n\tFROM\n\t\tINFORMATION_SCHEMA.CLUSTER_LOAD\n\tWHERE\n\t\tDEVICE_TYPE IN ('memory','cpu')\n\tGROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n) AS A\nORDER BY\n\t_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n\u001b[0m\n",
+        "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-02T06:34:48.286Z",
+        "@timestamp": "2021-09-16T02:10:34.342Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 302,
-        "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "starting auto periodic compaction",
-        "tidb.pd.compact-period": "1h0m0s",
-        "tidb.pd.revision": "3670862",
-        "tidb.source_line": "periodic.go:135"
+        "log.flags": [
+            "dissect_parsing_error",
+            "multiline"
+        ],
+        "log.offset": 807,
+        "message": "2021/09/07 11:31:09 \u001b[32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 \u001b[33mSLOW SQL >= 200ms\n\u001b[0m\u001b[31;1m[1524.674ms] \u001b[33m[rows:12]\u001b[35m\nSELECT\n\t*,\n\tFIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER\nFROM (\n\tSELECT\n\t\tTYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE\n\tFROM\n\t\tINFORMATION_SCHEMA.CLUSTER_LOAD\n\tWHERE\n\t\tDEVICE_TYPE IN ('memory','cpu')\n\tGROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n) AS A\nORDER BY\n\t_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n\u001b[0m\n",
+        "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-02T06:34:48.288Z",
+        "@timestamp": "2021-09-16T02:10:34.342Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 441,
-        "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "compact tree index",
-        "tidb.pd.revision": "3670862",
-        "tidb.source_line": "index.go:189"
+        "log.flags": [
+            "dissect_parsing_error",
+            "multiline"
+        ],
+        "log.offset": 1431,
+        "message": "2021/09/07 11:31:11 \u001b[32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 \u001b[33mSLOW SQL >= 200ms\n\u001b[0m\u001b[31;1m[1525.476ms] \u001b[33m[rows:12]\u001b[35m\nSELECT\n\t*,\n\tFIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER\nFROM (\n\tSELECT\n\t\tTYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE\n\tFROM\n\t\tINFORMATION_SCHEMA.CLUSTER_LOAD\n\tWHERE\n\t\tDEVICE_TYPE IN ('memory','cpu')\n\tGROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n) AS A\nORDER BY\n\t_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME\n\u001b[0m",
+        "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-02T06:34:48.288Z",
+        "@timestamp": "2021-09-07T08:56:26.786Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 538,
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "WARN",
+        "log.logger": "retry_interceptor.go",
+        "log.offset": 2054,
+        "log.origin.file.line": "61",
+        "message": "retrying of unary invoker failed",
         "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "completed auto periodic compaction",
-        "tidb.pd.compact-period": "1h0m0s",
-        "tidb.pd.revision": "3670862",
-        "tidb.pd.took": "1h0m0.003057499s",
-        "tidb.source_line": "periodic.go:146"
+        "tidb.body": "[\"retrying of unary invoker failed\"] [target=endpoint://client-d87ffc6e-42b8-4b17-8ee1-712cfbc4b073/127.0.0.1:2379] [attempt=0] [error=\"rpc error: code = NotFound desc = etcdserver: requested lease not found\"]\ne-limit\\\":4,\\\"hot-region-cache-hits-threshold\\\":3,\\\"store-limit\\\":{},\\\"tolerant-size-ratio\\\":0,\\\"low-space-ratio\\\":0.8,\\\"high-space-ratio\\\":0.7,\\\"region-score-formula-version\\\":\\\"v2\\\",\\\"scheduler-max-waiting-operator\\\":5,\\\"enable-remove-down-replica\\\":\\\"true\\\",\\\"enable-replace-offline-replica\\\":\\\"true\\\",\\\"enable-make-up-replica\\\":\\\"true\\\",\\\"enable-remove-extra-replica\\\":\\\"true\\\",\\\"enable-location-replacement\\\":\\\"true\\\",\\\"enable-debug-metrics\\\":\\\"false\\\",\\\"enable-joint-consensus\\\":\\\"true\\\",\\\"schedulers-v2\\\":[{\\\"type\\\":\\\"balance-region\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"},{\\\"type\\\":\\\"balance-leader\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"},{\\\"type\\\":\\\"hot-region\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"}],\\\"schedulers-payload\\\":null,\\\"store-limit-mode\\\":\\\"manual\\\"},\\\"replication\\\":{\\\"max-replicas\\\":3,\\\"location-labels\\\":\\\"\\\",\\\"strictly-match-label\\\":\\\"false\\\",\\\"enable-placement-rules\\\":\\\"true\\\",\\\"isolation-level\\\":\\\"\\\"},\\\"pd-server\\\":{\\\"use-region-storage\\\":\\\"true\\\",\\\"max-gap-reset-ts\\\":\\\"24h0m0s\\\",\\\"key-type\\\":\\\"table\\\",\\\"runtime-services\\\":\\\"\\\",\\\"metric-storage\\\":\\\"\\\",\\\"dashboard-address\\\":\\\"auto\\\",\\\"trace-region-flow\\\":\\\"true\\\",\\\"flow-round-by-digit\\\":3},\\\"cluster-version\\\":\\\"0.0.0\\\",\\\"labels\\\":{},\\\"quota-backend-bytes\\\":\\\"8GiB\\\",\\\"auto-compaction-mode\\\":\\\"periodic\\\",\\\"auto-compaction-retention-v2\\\":\\\"1h\\\",\\\"TickInterval\\\":\\\"500ms\\\",\\\"ElectionInterval\\\":\\\"3s\\\",\\\"PreVote\\\":true,\\\"security\\\":{\\\"cacert-path\\\":\\\"\\\",\\\"cert-path\\\":\\\"\\\",\\\"key-path\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null,\\\"redact-info-log\\\":false,\\\"encryption\\\":{\\\"data-encryption-method\\\":\\\"plaintext\\\",\\\"data-key-rotation-period\\\":\\\"168h0m0s\\\",\\\"master-key\\\":{\\\"type\\\":\\\"plaintext\\\",\\\"key-id\\\":\\\"\\\",\\\"region\\\":\\\"\\\",\\\"endpoint\\\":\\\"\\\",\\\"path\\\":\\\"\\\"}}},\\\"label-property\\\":null,\\\"WarningMsgs\\\":null,\\\"DisableStrictReconfigCheck\\\":false,\\\"HeartbeatStreamBindInterval\\\":\\\"1m0s\\\",\\\"LeaderPriorityCheckInterval\\\":\\\"1m0s\\\",\\\"dashboard\\\":{\\\"tidb-cacert-path\\\":\\\"\\\",\\\"tidb-cert-path\\\":\\\"\\\",\\\"tidb-key-path\\\":\\\"\\\",\\\"public-path-prefix\\\":\\\"\\\",\\\"internal-proxy\\\":false,\\\"enable-telemetry\\\":true,\\\"enable-experimental\\\":false},\\\"replication-mode\\\":{\\\"replication-mode\\\":\\\"majority\\\",\\\"dr-auto-sync\\\":{\\\"label-key\\\":\\\"\\\",\\\"primary\\\":\\\"\\\",\\\"dr\\\":\\\"\\\",\\\"primary-replicas\\\":0,\\\"dr-replicas\\\":0,\\\"wait-store-timeout\\\":\\\"1m0s\\\",\\\"wait-sync-timeout\\\":\\\"1m0s\\\",\\\"wait-async-timeout\\\":\\\"2m0s\\\"}}}\"]",
+        "tidb.pd.attempt": "0",
+        "tidb.pd.target": "endpoint://client-d87ffc6e-42b8-4b17-8ee1-712cfbc4b073/127.0.0.1:2379"
     },
     {
-        "@timestamp": "2021-09-02T06:34:48.301Z",
+        "@timestamp": "2021-09-06T08:54:43.715Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 702,
+        "log.level": "INFO",
+        "log.logger": "server.go",
+        "log.offset": 4733,
+        "log.origin.file.line": "194",
+        "message": "register REST path",
         "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "finished scheduled compaction",
-        "tidb.pd.compact-revision": "3670862",
-        "tidb.pd.took": "13.098004ms",
-        "tidb.source_line": "kvstore_compaction.go:55"
+        "tidb.pd.path": "/pd/api/v1"
     },
     {
-        "@timestamp": "2021-09-02T06:36:31.791Z",
+        "@timestamp": "2021-09-06T08:54:43.715Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 849,
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "INFO",
+        "log.logger": "server.go",
+        "log.offset": 4830,
+        "log.origin.file.line": "194",
+        "message": "register REST path",
         "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "updated gc safe point",
-        "tidb.pd.safe-point": "427442540817416192",
-        "tidb.source_line": "grpc_service.go:716"
-    },
-    {
-        "@timestamp": "2021-09-02T06:44:51.691Z",
-        "event.dataset": "tidb.pd",
-        "event.module": "tidb",
-        "fileset.name": "pd",
-        "input.type": "log",
-        "log.offset": 969,
-        "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "update service GC safe point",
-        "tidb.pd.expire-at": "-9223372035224210718",
-        "tidb.pd.safepoint": "427442698103816192",
-        "tidb.pd.service-id": "gc_worker",
-        "tidb.source_line": "grpc_service.go:764"
-    },
-    {
-        "@timestamp": "2021-09-02T06:46:31.797Z",
-        "event.dataset": "tidb.pd",
-        "event.module": "tidb",
-        "fileset.name": "pd",
-        "input.type": "log",
-        "log.offset": 1151,
-        "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "updated gc safe point",
-        "tidb.pd.safe-point": "427442698103816192",
-        "tidb.source_line": "grpc_service.go:716"
+        "tidb.pd.path": "/swagger/"
     },
     {
         "@timestamp": "2021-09-02T06:56:31.799Z",
@@ -130,11 +116,12 @@
         "event.module": "tidb",
         "fileset.name": "pd",
         "input.type": "log",
-        "log.offset": 1271,
+        "log.level": "INFO",
+        "log.logger": "grpc_service.go",
+        "log.offset": 4927,
+        "log.origin.file.line": "716",
+        "message": "updated gc safe point",
         "service.type": "tidb",
-        "tidb.level": "INFO",
-        "tidb.message": "updated gc safe point",
-        "tidb.pd.safe-point": "427442855390216192",
-        "tidb.source_line": "grpc_service.go:716"
+        "tidb.pd.safe-point": "427442855390216192"
     }
 ]

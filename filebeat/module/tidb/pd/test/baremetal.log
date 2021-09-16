@@ -1,10 +1,61 @@
 [2021/09/02 06:24:51.689 +00:00] [INFO] [grpc_service.go:764] ["update service GC safe point"] [service-id=gc_worker] [expire-at=-9223372035224211918] [safepoint=427442383531016192]
-[2021/09/02 06:26:31.792 +00:00] [INFO] [grpc_service.go:716] ["updated gc safe point"] [safe-point=427442383531016192]
-[2021/09/02 06:34:48.286 +00:00] [INFO] [periodic.go:135] ["starting auto periodic compaction"] [revision=3670862] [compact-period=1h0m0s]
-[2021/09/02 06:34:48.288 +00:00] [INFO] [index.go:189] ["compact tree index"] [revision=3670862]
-[2021/09/02 06:34:48.288 +00:00] [INFO] [periodic.go:146] ["completed auto periodic compaction"] [revision=3670862] [compact-period=1h0m0s] [took=1h0m0.003057499s]
-[2021/09/02 06:34:48.301 +00:00] [INFO] [kvstore_compaction.go:55] ["finished scheduled compaction"] [compact-revision=3670862] [took=13.098004ms]
-[2021/09/02 06:36:31.791 +00:00] [INFO] [grpc_service.go:716] ["updated gc safe point"] [safe-point=427442540817416192]
-[2021/09/02 06:44:51.691 +00:00] [INFO] [grpc_service.go:764] ["update service GC safe point"] [service-id=gc_worker] [expire-at=-9223372035224210718] [safepoint=427442698103816192]
-[2021/09/02 06:46:31.797 +00:00] [INFO] [grpc_service.go:716] ["updated gc safe point"] [safe-point=427442698103816192]
+
+2021/09/07 11:31:08 [32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 [33mSLOW SQL >= 200ms
+[0m[31;1m[1537.544ms] [33m[rows:12][35m
+SELECT
+	*,
+	FIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER
+FROM (
+	SELECT
+		TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE
+	FROM
+		INFORMATION_SCHEMA.CLUSTER_LOAD
+	WHERE
+		DEVICE_TYPE IN ('memory','cpu')
+	GROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+) AS A
+ORDER BY
+	_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+[0m
+
+2021/09/07 11:31:09 [32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 [33mSLOW SQL >= 200ms
+[0m[31;1m[1524.674ms] [33m[rows:12][35m
+SELECT
+	*,
+	FIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER
+FROM (
+	SELECT
+		TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE
+	FROM
+		INFORMATION_SCHEMA.CLUSTER_LOAD
+	WHERE
+		DEVICE_TYPE IN ('memory','cpu')
+	GROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+) AS A
+ORDER BY
+	_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+[0m
+
+2021/09/07 11:31:11 [32m/Users/pingcap/gopkg/pkg/mod/github.com/pingcap/tidb-dashboard@v0.0.0-20210826074103-29034af68525/pkg/apiserver/clusterinfo/hostinfo/cluster_load.go:49 [33mSLOW SQL >= 200ms
+[0m[31;1m[1525.476ms] [33m[rows:12][35m
+SELECT
+	*,
+	FIELD(LOWER(A.TYPE), 'tiflash', 'tikv', 'pd', 'tidb') AS _ORDER
+FROM (
+	SELECT
+		TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME, JSON_OBJECTAGG(NAME, VALUE) AS JSON_VALUE
+	FROM
+		INFORMATION_SCHEMA.CLUSTER_LOAD
+	WHERE
+		DEVICE_TYPE IN ('memory','cpu')
+	GROUP BY TYPE, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+) AS A
+ORDER BY
+	_ORDER DESC, INSTANCE, DEVICE_TYPE, DEVICE_NAME
+[0m
+[2021/09/07 16:56:26.786 +08:00] [WARN] [retry_interceptor.go:61] ["retrying of unary invoker failed"] [target=endpoint://client-d87ffc6e-42b8-4b17-8ee1-712cfbc4b073/127.0.0.1:2379] [attempt=0] [error="rpc error: code = NotFound desc = etcdserver: requested lease not found"]
+e-limit\":4,\"hot-region-cache-hits-threshold\":3,\"store-limit\":{},\"tolerant-size-ratio\":0,\"low-space-ratio\":0.8,\"high-space-ratio\":0.7,\"region-score-formula-version\":\"v2\",\"scheduler-max-waiting-operator\":5,\"enable-remove-down-replica\":\"true\",\"enable-replace-offline-replica\":\"true\",\"enable-make-up-replica\":\"true\",\"enable-remove-extra-replica\":\"true\",\"enable-location-replacement\":\"true\",\"enable-debug-metrics\":\"false\",\"enable-joint-consensus\":\"true\",\"schedulers-v2\":[{\"type\":\"balance-region\",\"args\":null,\"disable\":false,\"args-payload\":\"\"},{\"type\":\"balance-leader\",\"args\":null,\"disable\":false,\"args-payload\":\"\"},{\"type\":\"hot-region\",\"args\":null,\"disable\":false,\"args-payload\":\"\"}],\"schedulers-payload\":null,\"store-limit-mode\":\"manual\"},\"replication\":{\"max-replicas\":3,\"location-labels\":\"\",\"strictly-match-label\":\"false\",\"enable-placement-rules\":\"true\",\"isolation-level\":\"\"},\"pd-server\":{\"use-region-storage\":\"true\",\"max-gap-reset-ts\":\"24h0m0s\",\"key-type\":\"table\",\"runtime-services\":\"\",\"metric-storage\":\"\",\"dashboard-address\":\"auto\",\"trace-region-flow\":\"true\",\"flow-round-by-digit\":3},\"cluster-version\":\"0.0.0\",\"labels\":{},\"quota-backend-bytes\":\"8GiB\",\"auto-compaction-mode\":\"periodic\",\"auto-compaction-retention-v2\":\"1h\",\"TickInterval\":\"500ms\",\"ElectionInterval\":\"3s\",\"PreVote\":true,\"security\":{\"cacert-path\":\"\",\"cert-path\":\"\",\"key-path\":\"\",\"cert-allowed-cn\":null,\"redact-info-log\":false,\"encryption\":{\"data-encryption-method\":\"plaintext\",\"data-key-rotation-period\":\"168h0m0s\",\"master-key\":{\"type\":\"plaintext\",\"key-id\":\"\",\"region\":\"\",\"endpoint\":\"\",\"path\":\"\"}}},\"label-property\":null,\"WarningMsgs\":null,\"DisableStrictReconfigCheck\":false,\"HeartbeatStreamBindInterval\":\"1m0s\",\"LeaderPriorityCheckInterval\":\"1m0s\",\"dashboard\":{\"tidb-cacert-path\":\"\",\"tidb-cert-path\":\"\",\"tidb-key-path\":\"\",\"public-path-prefix\":\"\",\"internal-proxy\":false,\"enable-telemetry\":true,\"enable-experimental\":false},\"replication-mode\":{\"replication-mode\":\"majority\",\"dr-auto-sync\":{\"label-key\":\"\",\"primary\":\"\",\"dr\":\"\",\"primary-replicas\":0,\"dr-replicas\":0,\"wait-store-timeout\":\"1m0s\",\"wait-sync-timeout\":\"1m0s\",\"wait-async-timeout\":\"2m0s\"}}}"]
+[2021/09/06 16:54:43.715 +08:00] [INFO] [server.go:194] ["register REST path"] [path=/pd/api/v1]
+[2021/09/06 16:54:43.715 +08:00] [INFO] [server.go:194] ["register REST path"] [path=/swagger/]
+
 [2021/09/02 06:56:31.799 +00:00] [INFO] [grpc_service.go:716] ["updated gc safe point"] [safe-point=427442855390216192]
