@@ -203,9 +203,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixes the Snyk module to work with the new API changes. {pull}27358[27358]
 - Fixes a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
-- Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
-- Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
-- Fix `httpjson` input rate limit processing and documentation. {pull}[]
 - Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
 - Make filestream events ECS compliant. {issue}27776[27776]
 
