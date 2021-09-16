@@ -81,6 +81,7 @@ type responseParameters struct {
 type jsonpathResponseCheck struct {
 	Description string `config:"description"`
 	Exists      string `config:"exists"`
+	Equals      string `config:"equals"`
 }
 type jsonResponseCheck struct {
 	Description string             `config:"description"`

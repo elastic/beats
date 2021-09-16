@@ -24,15 +24,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 
+	"github.com/PaesslerAG/gval"
 	pjp "github.com/PaesslerAG/jsonpath"
 	pkgerrors "github.com/pkg/errors"
-	"k8s.io/client-go/util/jsonpath"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -231,23 +232,25 @@ func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (
 
 	var compiledChecks []compiledCheck
 
-	/*
-		for _, check := range checks {
-			cond, err := conditions.NewCondition(check.Condition)
-			if err != nil {
-				return nil, err
-			}
-
-			checkFn := func(ms map[string]interface{}) bool { return cond.Check(ms) }
-			compiledChecks = append(compiledChecks, compiledCheck{check.Description, checkFn})
+	for _, check := range checks {
+		cond, err := conditions.NewCondition(check.Condition)
+		if err != nil {
+			return nil, err
 		}
-	*/
+
+		checkFn := func(ms map[string]interface{}) bool { return cond.Check(common.MapStr(ms)) }
+		compiledChecks = append(compiledChecks, compiledCheck{check.Description, checkFn})
+	}
 
 	for _, check := range jpChecks {
 		compiled := compiledCheck{}
 		compiled.description = check.Description
 
-		jp, err := pjp.New(check.Exists)
+		var jp gval.Evaluable
+		var err error
+		if check.Exists != "" {
+			jp, err = pjp.New(check.Exists)
+		}
 
 		if err != nil {
 			return nil, fmt.Errorf("could not compile JSON Path expression '%s': %w", check.Exists, err)
@@ -266,37 +269,6 @@ func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (
 			return true
 		}
 		compiledChecks = append(compiledChecks, compiled)
-	}
-
-	if false {
-
-		for _, check := range jpChecks {
-			compiled := compiledCheck{}
-			compiled.description = check.Description
-
-			jpp := jsonpath.New(check.Exists)
-			err := jpp.Parse(check.Exists)
-
-			if err != nil {
-				return nil, fmt.Errorf("could not compile JSON Path expression '%s': %w", check.Exists, err)
-			}
-			compiled.check = func(m map[string]interface{}) bool {
-				matches, err := jpp.FindResults(m)
-				if err != nil {
-					logp.Warn("error matching JSON Path '%v', %v: %v", check.Exists, matches, err)
-					return false
-				}
-				logp.Warn("GOT RES %#v AND", matches)
-				jpp.PrintResults(os.Stdout, matches[0])
-				if matches == nil {
-					return false
-				} else if len(matches) == 0 || len(matches[0]) == 0 {
-					return false
-				}
-				return true
-			}
-			compiledChecks = append(compiledChecks, compiled)
-		}
 	}
 
 	return func(r *http.Response, body string) error {
