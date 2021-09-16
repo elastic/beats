@@ -49,7 +49,7 @@ func TestGenerateNodeData(t *testing.T) {
 		"node": common.MapStr{
 			"uid":  string(node.GetUID()),
 			"name": node.GetName(),
-			"ip": "node1",
+			"ip":   "node1",
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",
@@ -68,9 +68,9 @@ func TestGenerateNodeData(t *testing.T) {
 			"labels":      common.MapStr{"foo": "bar"},
 			"annotations": common.MapStr{"baz": "ban"},
 			"node": common.MapStr{
-				"ip":          "node1",
-				"name":        "testnode",
-				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"},
+				"ip":   "node1",
+				"name": "testnode",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133"},
 		},
 	}
 	assert.Equal(t, node, data.node)
@@ -121,7 +121,7 @@ func (n *nodeMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOp
 		"node": common.MapStr{
 			"uid":  string(k8sNode.GetUID()),
 			"name": k8sNode.GetName(),
-			"ip": "node1",
+			"ip":   "node1",
 		},
 		"labels": common.MapStr{
 			"foo": "bar",

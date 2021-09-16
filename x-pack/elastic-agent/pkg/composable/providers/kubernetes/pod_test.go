@@ -9,17 +9,15 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 )
 
 func TestGeneratePodData(t *testing.T) {
@@ -56,7 +54,7 @@ func TestGeneratePodData(t *testing.T) {
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"ip": pod.Status.PodIP,
+			"ip":   pod.Status.PodIP,
 		},
 		"namespace_annotations": common.MapStr{
 			"nsa": "nsb",
@@ -75,15 +73,15 @@ func TestGeneratePodData(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace":             "testns",
+			"namespace": "testns",
 			"labels": common.MapStr{
 				"foo": "bar",
 			},
 			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
-				"ip":          "127.0.0.5",
-				"name":        "testpod",
-				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
+				"ip":   "127.0.0.5",
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
 	assert.Equal(t, string(pod.GetUID()), data.uid)
 	assert.Equal(t, mapping, data.mapping)
@@ -156,14 +154,14 @@ func TestGenerateContainerPodData(t *testing.T) {
 		&podMeta{},
 		common.MapStr{
 			"nsa": "nsb",
-		},)
+		})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"ip": pod.Status.PodIP,
+			"ip":   pod.Status.PodIP,
 		},
 		"container": common.MapStr{
 			"id":        "asdfghdeadbeef",
@@ -194,13 +192,13 @@ func TestGenerateContainerPodData(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace":             "testns",
+			"namespace":   "testns",
 			"annotations": common.MapStr{"app": "production"},
 			"labels":      common.MapStr{"foo": "bar"},
 			"pod": common.MapStr{
-				"ip":          "127.0.0.5",
-				"name":        "testpod",
-				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
+				"ip":   "127.0.0.5",
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
 	cuid := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), "nginx")
 	data := <-providerDataChan
@@ -271,14 +269,14 @@ func TestEphemeralContainers(t *testing.T) {
 		&podMeta{},
 		common.MapStr{
 			"nsa": "nsb",
-		},)
+		})
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"ip": pod.Status.PodIP,
+			"ip":   pod.Status.PodIP,
 		},
 		"labels": common.MapStr{
 			"foo": "bar",
@@ -307,13 +305,13 @@ func TestEphemeralContainers(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
-			"namespace":             "testns",
+			"namespace":   "testns",
 			"labels":      common.MapStr{"foo": "bar"},
 			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
-				"ip":          "127.0.0.5",
-				"name":        "testpod",
-				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
+				"ip":   "127.0.0.5",
+				"name": "testpod",
+				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
 	cuid := fmt.Sprintf("%s.%s", pod.GetObjectMeta().GetUID(), "nginx")
 	data := <-providerDataChan
@@ -387,7 +385,7 @@ func (p *podMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOpt
 		"pod": common.MapStr{
 			"uid":  string(k8sPod.GetUID()),
 			"name": k8sPod.GetName(),
-			"ip": k8sPod.Status.PodIP,
+			"ip":   k8sPod.Status.PodIP,
 		},
 		"labels": common.MapStr{
 			"foo": "bar",
