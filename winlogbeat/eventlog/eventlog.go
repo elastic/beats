@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
 // Debug selectors used in this package.
@@ -50,6 +51,13 @@ var (
 	// readErrors contains counters for the read error types that occur.
 	readErrors = expvar.NewMap("read_errors")
 )
+
+// IsRecoverable returns a boolean indicating whether the error represents
+// a condition where the Windows Event Log session can be recovered through a
+// reopening of the handle (Close, Open).
+func IsRecoverable(err error) bool {
+	return err == win.ERROR_INVALID_HANDLE || err == win.RPC_S_SERVER_UNAVAILABLE || err == win.RPC_S_CALL_CANCELLED
+}
 
 // EventLog is an interface to a Windows Event Log.
 type EventLog interface {
