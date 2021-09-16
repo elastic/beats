@@ -1,7 +1,7 @@
 - module: tidb
 
   tidb:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty, filebeat will choose the default TiUP cluster path.
     # A list of glob-based paths that will be crawled and fetched.
@@ -47,22 +47,22 @@
     # The configuration items are exactly the same for each fileset listed below.
 
   slowlog:
-    enabled: true
+    enabled: false
 
   pd:
-    enabled: true
+    enabled: false
 
   tikv:
-    enabled: true
+    enabled: false
 
   tiflash:
-    enabled: true
+    enabled: false
 
   binlog:
-    enabled: true
+    enabled: false
 
   ticdc:
-    enabled: true
+    enabled: false
 
   tispark:
-    enabled: true
+    enabled: false
