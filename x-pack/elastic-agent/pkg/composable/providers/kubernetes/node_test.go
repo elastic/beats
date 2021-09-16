@@ -49,16 +49,13 @@ func TestGenerateNodeData(t *testing.T) {
 		"node": common.MapStr{
 			"uid":  string(node.GetUID()),
 			"name": node.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"baz": "ban",
-			},
 			"ip": "node1",
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",
+		},
+		"labels": common.MapStr{
+			"foo": "bar",
 		},
 	}
 
@@ -68,10 +65,10 @@ func TestGenerateNodeData(t *testing.T) {
 				"name": "devcluster",
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
+			"labels":      common.MapStr{"foo": "bar"},
+			"annotations": common.MapStr{"baz": "ban"},
 			"node": common.MapStr{
-				"annotations": common.MapStr{"baz": "ban"},
 				"ip":          "node1",
-				"labels":      common.MapStr{"foo": "bar"},
 				"name":        "testnode",
 				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"},
 		},
@@ -124,13 +121,13 @@ func (n *nodeMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOp
 		"node": common.MapStr{
 			"uid":  string(k8sNode.GetUID()),
 			"name": k8sNode.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"baz": "ban",
-			},
 			"ip": "node1",
+		},
+		"labels": common.MapStr{
+			"foo": "bar",
+		},
+		"annotations": common.MapStr{
+			"baz": "ban",
 		},
 	}
 }

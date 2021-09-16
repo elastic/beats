@@ -56,16 +56,13 @@ func TestGeneratePodData(t *testing.T) {
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"app": "production",
-			},
 			"ip": pod.Status.PodIP,
 		},
 		"namespace_annotations": common.MapStr{
 			"nsa": "nsb",
+		},
+		"labels": common.MapStr{
+			"foo": "bar",
 		},
 		"annotations": common.MapStr{
 			"app": "production",
@@ -79,11 +76,12 @@ func TestGeneratePodData(t *testing.T) {
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
 			"namespace":             "testns",
-			"namespace_annotations": common.MapStr{"nsa": "nsb"},
+			"labels": common.MapStr{
+				"foo": "bar",
+			},
+			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
-				"annotations": common.MapStr{"app": "production"},
 				"ip":          "127.0.0.5",
-				"labels":      common.MapStr{"foo": "bar"},
 				"name":        "testpod",
 				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
@@ -155,19 +153,16 @@ func TestGenerateContainerPodData(t *testing.T) {
 		&comm,
 		pod,
 		&Config{},
-		&podMeta{})
+		&podMeta{},
+		common.MapStr{
+			"nsa": "nsb",
+		},)
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"app": "production",
-			},
 			"ip": pod.Status.PodIP,
 		},
 		"container": common.MapStr{
@@ -184,6 +179,9 @@ func TestGenerateContainerPodData(t *testing.T) {
 		"annotations": common.MapStr{
 			"app": "production",
 		},
+		"labels": common.MapStr{
+			"foo": "bar",
+		},
 	}
 
 	processors := map[string]interface{}{
@@ -197,11 +195,10 @@ func TestGenerateContainerPodData(t *testing.T) {
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
 			"namespace":             "testns",
-			"namespace_annotations": common.MapStr{"nsa": "nsb"},
+			"annotations": common.MapStr{"app": "production"},
+			"labels":      common.MapStr{"foo": "bar"},
 			"pod": common.MapStr{
-				"annotations": common.MapStr{"app": "production"},
 				"ip":          "127.0.0.5",
-				"labels":      common.MapStr{"foo": "bar"},
 				"name":        "testpod",
 				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
@@ -271,20 +268,20 @@ func TestEphemeralContainers(t *testing.T) {
 		&comm,
 		pod,
 		&Config{},
-		&podMeta{})
+		&podMeta{},
+		common.MapStr{
+			"nsa": "nsb",
+		},)
 
 	mapping := map[string]interface{}{
 		"namespace": pod.GetNamespace(),
 		"pod": common.MapStr{
 			"uid":  string(pod.GetUID()),
 			"name": pod.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"app": "production",
-			},
 			"ip": pod.Status.PodIP,
+		},
+		"labels": common.MapStr{
+			"foo": "bar",
 		},
 		"container": common.MapStr{
 			"id":      "asdfghdeadbeef",
@@ -311,11 +308,10 @@ func TestEphemeralContainers(t *testing.T) {
 				"url":  "8.8.8.8:9090"},
 		}, "kubernetes": common.MapStr{
 			"namespace":             "testns",
-			"namespace_annotations": common.MapStr{"nsa": "nsb"},
+			"labels":      common.MapStr{"foo": "bar"},
+			"annotations": common.MapStr{"app": "production"},
 			"pod": common.MapStr{
-				"annotations": common.MapStr{"app": "production"},
 				"ip":          "127.0.0.5",
-				"labels":      common.MapStr{"foo": "bar"},
 				"name":        "testpod",
 				"uid":         "005f3b90-4b9d-12f8-acf0-31020a840133"}},
 	}
@@ -391,16 +387,13 @@ func (p *podMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOpt
 		"pod": common.MapStr{
 			"uid":  string(k8sPod.GetUID()),
 			"name": k8sPod.GetName(),
-			"labels": common.MapStr{
-				"foo": "bar",
-			},
-			"annotations": common.MapStr{
-				"app": "production",
-			},
 			"ip": k8sPod.Status.PodIP,
 		},
-		"namespace_annotations": common.MapStr{
-			"nsa": "nsb",
+		"labels": common.MapStr{
+			"foo": "bar",
+		},
+		"annotations": common.MapStr{
+			"app": "production",
 		},
 	}
 }

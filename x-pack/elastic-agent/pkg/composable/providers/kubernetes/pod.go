@@ -140,11 +140,11 @@ func (p *pod) emitRunning(pod *kubernetes.Pod) {
 
 	// Emit all containers in the pod
 	// TODO: deal with init containers stopping after initialization
-	p.emitContainers(pod)
+	p.emitContainers(pod, namespaceAnnotations)
 }
 
-func (p *pod) emitContainers(pod *kubernetes.Pod) {
-	generateContainerData(p.comm, pod, p.config, p.metagen)
+func (p *pod) emitContainers(pod *kubernetes.Pod, namespaceAnnotations common.MapStr) {
+	generateContainerData(p.comm, pod, p.config, p.metagen, namespaceAnnotations)
 }
 
 func (p *pod) emitStopped(pod *kubernetes.Pod) {
@@ -221,6 +221,7 @@ func generatePodData(
 	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
 	if len(namespaceAnnotations) != 0 {
+		// TODO: convert it to namespace.annotations for 8.0
 		k8sMapping["namespace_annotations"] = namespaceAnnotations
 	}
 
@@ -255,7 +256,8 @@ func generateContainerData(
 	comm composable.DynamicProviderComm,
 	pod *kubernetes.Pod,
 	cfg *Config,
-	kubeMetaGen metadata.MetaGen) {
+	kubeMetaGen metadata.MetaGen,
+	namespaceAnnotations common.MapStr) {
 
 	containers := getContainersInPod(pod)
 
@@ -285,6 +287,11 @@ func generateContainerData(
 		// k8sMapping includes only the metadata that fall under kubernetes.*
 		// and these are available as dynamic vars through the provider
 		k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
+
+		if len(namespaceAnnotations) != 0 {
+			// TODO: convert it to namespace.annotations for 8.0
+			k8sMapping["namespace_annotations"] = namespaceAnnotations
+		}
 
 		// add annotations to be discoverable by templates
 		k8sMapping["annotations"] = annotations

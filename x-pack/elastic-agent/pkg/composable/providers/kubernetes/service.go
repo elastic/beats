@@ -21,12 +21,13 @@ import (
 )
 
 type service struct {
-	logger         *logp.Logger
-	cleanupTimeout time.Duration
-	comm           composable.DynamicProviderComm
-	scope          string
-	config         *Config
-	metagen        metadata.MetaGen
+	logger           *logp.Logger
+	cleanupTimeout   time.Duration
+	comm             composable.DynamicProviderComm
+	scope            string
+	config           *Config
+	metagen          metadata.MetaGen
+	namespaceWatcher kubernetes.Watcher
 }
 
 type serviceData struct {
@@ -74,13 +75,15 @@ func NewServiceWatcher(
 		scope,
 		cfg,
 		metaGen,
+		namespaceWatcher,
 	})
 
 	return watcher, nil
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
-	data := generateServiceData(service, s.config, s.metagen)
+	namespaceAnnotations := svcNamespaceAnnotations(service, s.namespaceWatcher)
+	data := generateServiceData(service, s.config, s.metagen, namespaceAnnotations)
 	if data == nil {
 		return
 	}
@@ -88,6 +91,29 @@ func (s *service) emitRunning(service *kubernetes.Service) {
 
 	// Emit the service
 	s.comm.AddOrUpdate(string(service.GetUID()), ServicePriority, data.mapping, data.processors)
+}
+
+// svcNamespaceAnnotations returns the annotations of the namespace of the service
+func svcNamespaceAnnotations(svc *kubernetes.Service, watcher kubernetes.Watcher) common.MapStr {
+	if watcher == nil {
+		return nil
+	}
+
+	rawNs, ok, err := watcher.Store().GetByKey(svc.Namespace)
+	if !ok || err != nil {
+		return nil
+	}
+
+	namespace, ok := rawNs.(*kubernetes.Namespace)
+	if !ok {
+		return nil
+	}
+
+	annotations := common.MapStr{}
+	for k, v := range namespace.GetAnnotations() {
+		safemapstr.Put(annotations, k, v)
+	}
+	return annotations
 }
 
 func (s *service) emitStopped(service *kubernetes.Service) {
@@ -120,7 +146,11 @@ func (s *service) OnDelete(obj interface{}) {
 	time.AfterFunc(s.cleanupTimeout, func() { s.emitStopped(service) })
 }
 
-func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen metadata.MetaGen) *serviceData {
+func generateServiceData(
+	service *kubernetes.Service,
+	cfg *Config,
+	kubeMetaGen metadata.MetaGen,
+	namespaceAnnotations common.MapStr) *serviceData {
 	host := service.Spec.ClusterIP
 
 	// If a service doesn't have an IP then dont monitor it
@@ -134,15 +164,20 @@ func generateServiceData(service *kubernetes.Service, cfg *Config, kubeMetaGen m
 		return &serviceData{}
 	}
 
+	// k8sMapping includes only the metadata that fall under kubernetes.*
+	// and these are available as dynamic vars through the provider
+	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
+
+	if len(namespaceAnnotations) != 0 {
+		// TODO: convert it to namespace.annotations for 8.0
+		k8sMapping["namespace_annotations"] = namespaceAnnotations
+	}
+
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
 	annotations := common.MapStr{}
 	for k, v := range service.GetObjectMeta().GetAnnotations() {
 		safemapstr.Put(annotations, k, v)
 	}
-
-	// k8sMapping includes only the metadata that fall under kubernetes.*
-	// and these are available as dynamic vars through the provider
-	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
 	// add annotations to be discoverable by templates
 	k8sMapping["annotations"] = annotations
