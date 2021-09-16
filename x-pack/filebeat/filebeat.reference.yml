@@ -763,29 +763,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------ Cyber-Ark Module ------------------------------
-# The cyberark module is deprecated and will be removed in future releases.
-# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
-- module: cyberark
-  corepas:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9527
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #----------------------------- CyberArk PAS Module -----------------------------
 - module: cyberarkpas
   audit:
@@ -1125,58 +1102,6 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
 
-
-#-------------------------------- Gsuite Module --------------------------------
-# Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
-- module: gsuite
-  saml:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  user_accounts:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  login:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  admin:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  drive:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  groups:
-    enabled: false
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
 
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
