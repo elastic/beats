@@ -11,7 +11,7 @@ https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
 
 *Filebeat*
 
-- Auditd: Fix Top Exec Commands dashboard visualization. {pull}27638[27638]
+- Auditd module: Fix the top exec commands dashboard visualization. {pull}27638[27638]
 - Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
 - Fix `httpjson` input rate limit processing and documentation. {pull}27739[27739]
 
