@@ -22,7 +22,6 @@ import (
 
 	"github.com/elastic/beats/v7/filebeat/cmd"
 	inputs "github.com/elastic/beats/v7/filebeat/input/default-inputs"
-    _ "github.com/elastic/beats/v7/libbeat/outputs/http"
 )
 
 // The basic model of execution:
