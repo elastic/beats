@@ -18,20 +18,22 @@
 package http
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
+	pjp "github.com/PaesslerAG/jsonpath"
 	pkgerrors "github.com/pkg/errors"
+	"k8s.io/client-go/util/jsonpath"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // multiValidator combines multiple validations of each type into a single easy to use object.
@@ -101,10 +103,10 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 		bodyValidators = append(bodyValidators, checkBody(pm, nm))
 	}
 
-	if len(config.RecvJSON) > 0 {
-		jsonChecks, err := checkJSON(config.RecvJSON)
+	if len(config.RecvJSON)+len(config.RecvJSONPath) > 0 {
+		jsonChecks, err := checkJSON(config.RecvJSON, config.RecvJSONPath)
 		if err != nil {
-			return multiValidator{}, err
+			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}
 		bodyValidators = append(bodyValidators, jsonChecks)
 	}
@@ -220,24 +222,85 @@ func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 	}
 }
 
-func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
+func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (bodyValidator, error) {
+	type checker func(map[string]interface{}) bool
 	type compiledCheck struct {
 		description string
-		condition   conditions.Condition
+		check       checker
 	}
 
 	var compiledChecks []compiledCheck
 
-	for _, check := range checks {
-		cond, err := conditions.NewCondition(check.Condition)
-		if err != nil {
-			return nil, err
+	/*
+		for _, check := range checks {
+			cond, err := conditions.NewCondition(check.Condition)
+			if err != nil {
+				return nil, err
+			}
+
+			checkFn := func(ms map[string]interface{}) bool { return cond.Check(ms) }
+			compiledChecks = append(compiledChecks, compiledCheck{check.Description, checkFn})
 		}
-		compiledChecks = append(compiledChecks, compiledCheck{check.Description, cond})
+	*/
+
+	for _, check := range jpChecks {
+		compiled := compiledCheck{}
+		compiled.description = check.Description
+
+		jp, err := pjp.New(check.Exists)
+
+		if err != nil {
+			return nil, fmt.Errorf("could not compile JSON Path expression '%s': %w", check.Exists, err)
+		}
+		compiled.check = func(m map[string]interface{}) bool {
+			matches, err := jp(context.TODO(), m)
+			if err != nil {
+				logp.Warn("error matching JSON Path '%v', %v: %v", check.Exists, matches, err)
+				return false
+			}
+			if matches == nil {
+				return false
+			} else if mlist := matches.([]interface{}); len(mlist) == 0 {
+				return false
+			}
+			return true
+		}
+		compiledChecks = append(compiledChecks, compiled)
+	}
+
+	if false {
+
+		for _, check := range jpChecks {
+			compiled := compiledCheck{}
+			compiled.description = check.Description
+
+			jpp := jsonpath.New(check.Exists)
+			err := jpp.Parse(check.Exists)
+
+			if err != nil {
+				return nil, fmt.Errorf("could not compile JSON Path expression '%s': %w", check.Exists, err)
+			}
+			compiled.check = func(m map[string]interface{}) bool {
+				matches, err := jpp.FindResults(m)
+				if err != nil {
+					logp.Warn("error matching JSON Path '%v', %v: %v", check.Exists, matches, err)
+					return false
+				}
+				logp.Warn("GOT RES %#v AND", matches)
+				jpp.PrintResults(os.Stdout, matches[0])
+				if matches == nil {
+					return false
+				} else if len(matches) == 0 || len(matches[0]) == 0 {
+					return false
+				}
+				return true
+			}
+			compiledChecks = append(compiledChecks, compiled)
+		}
 	}
 
 	return func(r *http.Response, body string) error {
-		decoded := &common.MapStr{}
+		decoded := &map[string]interface{}{}
 		decoder := json.NewDecoder(strings.NewReader(body))
 		decoder.UseNumber()
 		err := decoder.Decode(decoded)
@@ -247,11 +310,11 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 			return pkgerrors.Wrapf(err, "could not parse JSON for body check with condition. Source: %s", body)
 		}
 
-		jsontransform.TransformNumbers(*decoded)
+		//jsontransform.TransformNumbers(*decoded)
 
 		var errorDescs []string
 		for _, compiledCheck := range compiledChecks {
-			ok := compiledCheck.condition.Check(decoded)
+			ok := compiledCheck.check(*decoded)
 			if !ok {
 				errorDescs = append(errorDescs, compiledCheck.description)
 			}
