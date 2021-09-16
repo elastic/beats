@@ -19,7 +19,7 @@
         "tidb.pd.service-id": "gc_worker"
     },
     {
-        "@timestamp": "2021-09-16T02:10:34.341Z",
+        "@timestamp": "2021-09-16T04:12:14.284Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
@@ -33,7 +33,7 @@
         "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-16T02:10:34.342Z",
+        "@timestamp": "2021-09-16T04:12:14.285Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
@@ -47,7 +47,7 @@
         "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-16T02:10:34.342Z",
+        "@timestamp": "2021-09-16T04:12:14.285Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",

@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2021-09-16T02:10:55.382Z",
+        "@timestamp": "2021-09-16T04:12:31.236Z",
         "event.dataset": "tidb.ticdc",
         "event.module": "tidb",
         "fileset.name": "ticdc",
