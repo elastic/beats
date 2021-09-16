@@ -65,7 +65,6 @@ Under `zip_url`, specify these options:
 located in the repository.
 *`username`*:: The username for authenticating with the zip endpoint. This setting is optional.
 *`password`*:: The password for authenticating with the zip endpoint. This setting is optional.
-*`ssl`*:: SSL options applied to downloading the zip, not the browser. See <<configuration-ssl>> for more details.
 
 If `username` and `password` are provided, they will be sent as HTTP Basic Authentication
 headers to the remote zip endpoint.
@@ -84,10 +83,8 @@ Example configuration:
       folder: "examples/todos"
       username: ""
       password: ""
-      # ssl options apply to downloading the zip, not the browser
-      #ssl:
-      #  certificate_authorities: ['/etc/ca.crt']
 -------------------------------------------------------------------------------
+
 
 [float]
 [[monitor-source-local]]
@@ -200,6 +197,7 @@ Example configuration:
 
 *`tags`*:: run only journeys with the given tag(s), or globs
 *`match`*:: run only journeys with a name or tags that matches the configured glob
+
 
 [float]
 [[monitor-browser-synthetics-args]]

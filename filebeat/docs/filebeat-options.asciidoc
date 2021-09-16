@@ -72,7 +72,6 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-gcp-pubsub>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
-* <<{beatname_lc}-input-journald>>
 * <<{beatname_lc}-input-kafka>>
 * <<{beatname_lc}-input-log>>
 * <<{beatname_lc}-input-mqtt>>
@@ -106,8 +105,6 @@ include::../../x-pack/filebeat/docs/inputs/input-gcp-pubsub.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-httpjson.asciidoc[]
-
-include::inputs/input-journald.asciidoc[]
 
 include::inputs/input-kafka.asciidoc[]
 

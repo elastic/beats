@@ -3,7 +3,7 @@
 
 - module: zoom
   webhook:
-    enabled: false
+    enabled: true
 
     # The type of input to use
     #var.input: http_endpoint

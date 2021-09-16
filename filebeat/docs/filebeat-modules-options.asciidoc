@@ -75,12 +75,8 @@ The following example shows a configuration that runs the `nginx`,`mysql`, and
 ----
 {beatname_lc}.modules:
 - module: nginx
-  access:
-  error:
 - module: mysql
-  slowlog:
 - module: system
-  auth:
 ----
 
 [[advanced-settings]]

@@ -294,7 +294,10 @@ ifeval::["{beatname_lc}"!="auditbeat"]
 ["source", "dockerfile", subs="attributes"]
 --------------------------------------------
 FROM {dockerimage}
-COPY --chown=root:{beatname_lc} {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+COPY {beatname_lc}.yml /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER root
+RUN chown root:{beatname_lc} /usr/share/{beatname_lc}/{beatname_lc}.yml
+USER {beatname_lc}
 --------------------------------------------
 
 endif::[]

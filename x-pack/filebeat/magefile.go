@@ -45,12 +45,12 @@ func Build() error {
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return filebeat.GolangCrossBuild()
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return filebeat.CrossBuild()
+	return devtools.CrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -130,7 +130,6 @@ func ExportDashboard() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, devtools.GenerateDirModulesD)
-	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {

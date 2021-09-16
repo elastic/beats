@@ -26,7 +26,6 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/sha512"
-	"debug/elf"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -39,7 +38,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -914,49 +912,4 @@ func IntegrationTestEnvVars() []string {
 		vars = append(vars, ListMatchingEnvVars(prefix)...)
 	}
 	return vars
-}
-
-// ReadGLIBCRequirement returns the required glibc version for a dynamically
-// linked ELF binary. The target machine must have a version equal to or
-// greater than (newer) the returned value.
-func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
-	e, err := elf.Open(elfFile)
-	if err != nil {
-		return nil, err
-	}
-
-	symbols, err := e.DynamicSymbols()
-	if err != nil {
-		return nil, err
-	}
-
-	versionSet := map[SemanticVersion]struct{}{}
-	for _, sym := range symbols {
-		if strings.HasPrefix(sym.Version, "GLIBC_") {
-			semver, err := NewSemanticVersion(strings.TrimPrefix(sym.Version, "GLIBC_"))
-			if err != nil {
-				continue
-			}
-
-			versionSet[*semver] = struct{}{}
-		}
-	}
-
-	if len(versionSet) == 0 {
-		return nil, errors.New("no GLIBC symbols found in binary (is this a static binary?)")
-	}
-
-	var versions []SemanticVersion
-	for ver := range versionSet {
-		versions = append(versions, ver)
-	}
-
-	sort.Slice(versions, func(i, j int) bool {
-		a := versions[i]
-		b := versions[j]
-		return a.LessThan(&b)
-	})
-
-	max := versions[len(versions)-1]
-	return &max, nil
 }

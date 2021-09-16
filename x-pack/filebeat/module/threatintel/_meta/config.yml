@@ -1,6 +1,6 @@
 - module: threatintel
   abuseurl:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -12,7 +12,7 @@
     var.interval: 10m
 
   abusemalware:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -24,7 +24,7 @@
     var.interval: 10m
 
   malwarebazaar:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -36,7 +36,7 @@
     var.interval: 10m
 
   misp:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data, defaults to JSON.
     var.input: httpjson
@@ -65,7 +65,7 @@
     var.interval: 5m
 
   otx:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data
     var.input: httpjson
@@ -92,7 +92,7 @@
     var.interval: 5m
 
   anomali:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data
     var.input: httpjson
@@ -114,7 +114,7 @@
     var.interval: 5m
 
   anomalithreatstream:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data
     var.input: http_endpoint
@@ -139,7 +139,7 @@
     # var.ssl_key: path/to/ssl_key.pem
 
   recordedfuture:
-    enabled: false
+    enabled: true
 
     # Input used for ingesting threat intel data
     var.input: httpjson

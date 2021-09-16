@@ -38,8 +38,7 @@ func (h *Upgrade) Handle(ctx context.Context, a fleetapi.Action, acker store.Fle
 		return fmt.Errorf("invalid type, expected ActionUpgrade and received %T", a)
 	}
 
-	_, err := h.upgrader.Upgrade(ctx, &upgradeAction{action}, true)
-	return err
+	return h.upgrader.Upgrade(ctx, &upgradeAction{action}, true)
 }
 
 type upgradeAction struct {

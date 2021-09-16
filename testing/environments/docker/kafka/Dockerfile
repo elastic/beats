@@ -22,11 +22,7 @@ ADD healthcheck.sh /healthcheck.sh
 EXPOSE 9092
 EXPOSE 2181
 
-# healthcheck.sh tries to create and delete an empty kafka topic (the topic
-# string is  based on the timestamp), and reports healthy if topic creation
-# was successful.
-# With these parameters, Docker will consider the container unhealthy if the
-# Kafka server is unresponsive for 3 minutes.
-HEALTHCHECK --start-period=10s --interval=5s --timeout=5s --retries=36 CMD /healthcheck.sh
+# Healthcheck creates an empty topic foo. As soon as a topic is created, it assumes broke is available
+HEALTHCHECK --interval=1s --retries=600 CMD /healthcheck.sh
 
 ENTRYPOINT ["/run.sh"]

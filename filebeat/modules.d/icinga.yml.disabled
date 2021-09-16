@@ -4,7 +4,7 @@
 - module: icinga
   # Main logs
   main:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -12,7 +12,7 @@
 
   # Debug logs
   debug:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -20,7 +20,7 @@
 
   # Startup logs
   startup:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

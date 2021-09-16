@@ -7,7 +7,6 @@
 package install
 
 import (
-	"errors"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -30,8 +29,6 @@ func recursiveRootPermissions(path string) error {
 			}
 			// remove any world permissions from the file
 			err = os.Chmod(name, info.Mode().Perm()&0770)
-		} else if errors.Is(err, fs.ErrNotExist) {
-			return nil
 		}
 		return err
 	})

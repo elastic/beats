@@ -19,9 +19,6 @@ data:
         - type: kubernetes
           scope: cluster
           node: ${NODE_NAME}
-          # In large Kubernetes clusters consider setting unique to false
-          # to avoid using the leader election strategy and
-          # instead run a dedicated Metricbeat instance using a Deployment in addition to the DaemonSet
           unique: true
           templates:
             - config:

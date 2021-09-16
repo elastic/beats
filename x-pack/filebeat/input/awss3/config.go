@@ -12,7 +12,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -51,8 +50,7 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if c.QueueURL == "" && c.BucketARN == "" {
-		logp.NewLogger(inputName).Warnf("neither queue_url nor bucket_arn were provided, input %s will stop", inputName)
-		return nil
+		return fmt.Errorf("queue_url or bucket_arn must provided")
 	}
 
 	if c.QueueURL != "" && c.BucketARN != "" {

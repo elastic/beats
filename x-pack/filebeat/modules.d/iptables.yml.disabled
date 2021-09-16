@@ -3,7 +3,7 @@
 
 - module: iptables
   log:
-    enabled: false
+    enabled: true
 
     # Set which input to use between syslog (default) or file.
     #var.input:

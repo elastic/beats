@@ -305,11 +305,9 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	var err error
 
 	monitor := o.monitor
-	appName := p.BinaryName()
 	if app.IsSidecar(p) {
 		// make watchers unmonitorable
 		monitor = noop.NewMonitor()
-		appName += "_monitoring"
 	}
 
 	if p.ServicePort() == 0 {
@@ -317,7 +315,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
-			appName,
+			p.BinaryName(),
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			desc,
@@ -333,7 +331,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
-			appName,
+			p.BinaryName(),
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),

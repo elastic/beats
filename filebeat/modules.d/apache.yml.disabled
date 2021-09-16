@@ -4,7 +4,7 @@
 - module: apache
   # Access logs
   access:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -12,7 +12,7 @@
 
   # Error logs
   error:
-    enabled: false
+    enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.

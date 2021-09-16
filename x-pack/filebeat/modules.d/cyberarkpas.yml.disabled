@@ -3,7 +3,7 @@
 
 - module: cyberarkpas
   audit:
-    enabled: false
+    enabled: true
 
     # Set which input to use between tcp (default), udp, or file.
     #

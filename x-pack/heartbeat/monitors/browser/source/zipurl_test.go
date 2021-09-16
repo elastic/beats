@@ -5,9 +5,9 @@
 package source
 
 import (
+	"context"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"os"
 	"path"
 	"path/filepath"
@@ -15,121 +15,59 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
 )
 
-func TestSimpleCases(t *testing.T) {
-	type testCase struct {
-		name         string
-		cfg          common.MapStr
-		tlsServer    bool
-		wantFetchErr bool
+func TestZipUrlFetchNoAuth(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := &ZipURLSource{
+		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:  "/",
+		Retries: 3,
 	}
-	testCases := []testCase{
-		{
-			"basics",
-			common.MapStr{
-				"folder":  "/",
-				"retries": 3,
-			},
-			false,
-			false,
-		},
-		{
-			"targetdir",
-			common.MapStr{
-				"folder":           "/",
-				"retries":          3,
-				"target_directory": "/tmp/synthetics/blah",
-			},
-			false,
-			false,
-		},
-		{
-			"auth success",
-			common.MapStr{
-				"folder":   "/",
-				"retries":  3,
-				"username": "testuser",
-				"password": "testpass",
-			},
-			false,
-			false,
-		},
-		{
-			"auth failure",
-			common.MapStr{
-				"folder":   "/",
-				"retries":  3,
-				"username": "testuser",
-				"password": "badpass",
-			},
-			false,
-			true,
-		},
-		{
-			"ssl ignore cert errors",
-			common.MapStr{
-				"folder":  "/",
-				"retries": 3,
-				"ssl": common.MapStr{
-					"enabled":           "true",
-					"verification_mode": "none",
-				},
-			},
-			true,
-			false,
-		},
-		{
-			"bad ssl",
-			common.MapStr{
-				"folder":  "/",
-				"retries": 3,
-				"ssl": common.MapStr{
-					"enabled":                 "true",
-					"certificate_authorities": []string{},
-				},
-			},
-			true,
-			true,
-		},
+	fetchAndCheckDir(t, zus)
+}
+
+func TestZipUrlFetchWithAuth(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
+
+	zus := &ZipURLSource{
+		URL:      fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:   "/",
+		Retries:  3,
+		Username: "testuser",
+		Password: "testpass",
 	}
+	fetchAndCheckDir(t, zus)
+}
 
-	for _, tc := range testCases {
-		url, teardown := setupTests(tc.tlsServer)
-		defer teardown()
-		t.Run(tc.name, func(t *testing.T) {
-			tc.cfg["url"] = fmt.Sprintf("%s/fixtures/todos.zip", url)
-			zus, err := dummyZus(tc.cfg)
-			require.NoError(t, err)
+func TestZipUrlTargetDirectory(t *testing.T) {
+	address, teardown := setupTests()
+	defer teardown()
 
-			require.NotNil(t, zus.httpClient)
-
-			if tc.wantFetchErr == true {
-				err := zus.Fetch()
-				require.Error(t, err)
-				return
-			}
-
-			fetchAndCheckDir(t, zus)
-		})
+	zus := &ZipURLSource{
+		URL:             fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:          "/",
+		Retries:         3,
+		TargetDirectory: "/tmp/synthetics/blah",
 	}
+	fetchAndCheckDir(t, zus)
 }
 
 func TestZipUrlWithSameEtag(t *testing.T) {
-	address, teardown := setupTests(false)
+	address, teardown := setupTests()
 	defer teardown()
 
-	zus, err := dummyZus(common.MapStr{
-		"url":     fmt.Sprintf("%s/fixtures/todos.zip", address),
-		"folder":  "/",
-		"retries": 3,
-	})
-	require.NoError(t, err)
-	err = zus.Fetch()
+	zus := ZipURLSource{
+		URL:     fmt.Sprintf("http://%s/fixtures/todos.zip", address),
+		Folder:  "/",
+		Retries: 3,
+	}
+	err := zus.Fetch()
 	defer zus.Close()
 	require.NoError(t, err)
 
@@ -142,33 +80,32 @@ func TestZipUrlWithSameEtag(t *testing.T) {
 }
 
 func TestZipUrlWithBadUrl(t *testing.T) {
-	_, teardown := setupTests(false)
+	_, teardown := setupTests()
 	defer teardown()
 
-	zus, err := dummyZus(common.MapStr{
-		"url":     "http://notahost.notadomaintoehutoeuhn",
-		"folder":  "/",
-		"retries": 2,
-	})
-	require.NoError(t, err)
-	err = zus.Fetch()
+	zus := ZipURLSource{
+		URL:     "http://notahost.notadomaintoehutoeuhn",
+		Folder:  "/",
+		Retries: 2,
+	}
+	err := zus.Fetch()
 	defer zus.Close()
 	require.Error(t, err)
 }
 
-func setupTests(tls bool) (addr string, teardown func()) {
+func setupTests() (addr string, teardown func()) {
 	// go offline, so we dont invoke npm install for unit tests
 	GoOffline()
 
-	srv := createServer(tls)
-	address := srv.URL
+	srv := createServer()
+	address := srv.Addr
 	return address, func() {
 		GoOnline()
-		srv.Close()
+		srv.Shutdown(context.Background())
 	}
 }
 
-func createServer(tls bool) (addr *httptest.Server) {
+func createServer() (addr *http.Server) {
 	_, filename, _, _ := runtime.Caller(0)
 	fixturesPath := path.Join(filepath.Dir(filename), "fixtures")
 	fileServer := http.FileServer(http.Dir(fixturesPath))
@@ -184,12 +121,10 @@ func createServer(tls bool) (addr *httptest.Server) {
 		http.StripPrefix("/fixtures", fileServer).ServeHTTP(resp, req)
 	})
 
-	var srv *httptest.Server
-	if tls {
-		srv = httptest.NewTLSServer(mux)
-	} else {
-		srv = httptest.NewServer(mux)
-	}
+	srv := &http.Server{Addr: "localhost:1234", Handler: mux}
+	go func() {
+		srv.ListenAndServe()
+	}()
 
 	return srv
 }
@@ -204,15 +139,4 @@ func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
 	require.NoError(t, zip.Close())
 	_, err = os.Stat(zip.TargetDirectory)
 	require.True(t, os.IsNotExist(err), "TargetDirectory %s should have been deleted", zip.TargetDirectory)
-}
-
-func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
-	zus := &ZipURLSource{}
-	y, _ := yaml.Marshal(conf)
-	c, err := common.NewConfigWithYAML(y, string(y))
-	if err != nil {
-		return nil, err
-	}
-	err = c.Unpack(zus)
-	return zus, err
 }

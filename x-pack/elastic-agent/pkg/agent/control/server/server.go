@@ -110,7 +110,7 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 
 // Restart performs re-exec.
 func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
-	s.rex.ReExec(nil)
+	s.rex.ReExec()
 	return &proto.RestartResponse{
 		Status: proto.ActionStatus_SUCCESS,
 	}, nil
@@ -128,7 +128,7 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 			Error:  "cannot be upgraded; perform upgrading using Fleet",
 		}, nil
 	}
-	cb, err := u.Upgrade(ctx, &upgradeRequest{request}, false)
+	err := u.Upgrade(ctx, &upgradeRequest{request}, false)
 	if err != nil {
 		return &proto.UpgradeResponse{
 			Status: proto.ActionStatus_FAILURE,
@@ -139,7 +139,7 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 	// this ensures that the upgrade response over GRPC is returned
 	go func() {
 		<-time.After(time.Second)
-		s.rex.ReExec(cb)
+		s.rex.ReExec()
 	}()
 	return &proto.UpgradeResponse{
 		Status:  proto.ActionStatus_SUCCESS,

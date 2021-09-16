@@ -5,7 +5,7 @@
         "cisco.ftd.destination_interface": "Inside",
         "cisco.ftd.message_id": "302016",
         "cisco.ftd.source_interface": "Outside",
-        "cisco.ftd.source_username": "LOCAL\\Elastic",
+        "cisco.ftd.source_username": "(LOCAL\\Elastic)",
         "cisco.ftd.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
@@ -34,7 +34,6 @@
         "log.level": "informational",
         "log.offset": 0,
         "network.bytes": 148,
-        "network.community_id": "1:9aBQ+NznvYals1agEGRVJm37dvQ=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Inside",
@@ -50,14 +49,10 @@
             "10.123.123.123",
             "10.233.123.123"
         ],
-        "related.user": [
-            "Elastic"
-        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 53723,
-        "source.user.name": "Elastic",
         "tags": [
             "cisco-ftd",
             "forwarded"
@@ -92,7 +87,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 200,
-        "network.community_id": "1:kV/6Jt4iMhVyUT1AW+UO0itOhqU=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "Outside",
@@ -144,7 +138,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 381,
-        "network.community_id": "1:7nrIUULEgk5A+nhbh4kNmEkwL3o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -170,7 +163,7 @@
         "cisco.ftd.message_id": "106023",
         "cisco.ftd.rule_name": "Inside_access_in",
         "cisco.ftd.source_interface": "Inside",
-        "cisco.ftd.source_username": "LOCAL\\Elastic",
+        "cisco.ftd.source_username": "(LOCAL\\Elastic)",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",
         "destination.port": 57621,
@@ -195,7 +188,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 545,
-        "network.community_id": "1:LM0R4Wi8tEf+1pe2ukofXQKxfMc=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Outside",
@@ -210,14 +202,10 @@
         "related.ip": [
             "10.123.123.123"
         ],
-        "related.user": [
-            "Elastic"
-        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 57621,
-        "source.user.name": "Elastic",
         "tags": [
             "cisco-ftd",
             "forwarded"

@@ -60,9 +60,7 @@ func TestMetaFieldsOffset(t *testing.T) {
 		if len(msg.Content) != 0 {
 			expectedFields = common.MapStr{
 				"log": common.MapStr{
-					"file": common.MapStr{
-						"path": path,
-					},
+					"path":   path,
 					"offset": offset,
 				},
 			}

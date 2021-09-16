@@ -46,7 +46,7 @@ func TestTransformableClone(t *testing.T) {
 }
 
 func TestNewTransformsFromConfig(t *testing.T) {
-	registerTransform("test", setName, newSetRequestPagination)
+	registerTransform("test", setName, newSetRequest)
 	t.Cleanup(func() { registeredTransforms = newRegistry() })
 
 	cases := []struct {
@@ -126,7 +126,7 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 		return fakeTransform{}, nil
 	}
 
-	registerTransform("test", setName, newSetRequestPagination)
+	registerTransform("test", setName, newSetRequest)
 	registerTransform("test", "fake", fakeConstr)
 	t.Cleanup(func() { registeredTransforms = newRegistry() })
 

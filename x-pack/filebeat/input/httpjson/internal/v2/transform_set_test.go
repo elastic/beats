@@ -41,40 +41,72 @@ func TestNewSet(t *testing.T) {
 			expectedErr: "invalid target: cursor.foo",
 		},
 		{
-			name:        "newSetRequestPagination targets body",
-			constructor: newSetRequestPagination,
+			name:        "newSetRequest targets body",
+			constructor: newSetRequest,
 			config: map[string]interface{}{
 				"target": "body.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "body"},
 		},
 		{
-			name:        "newSetRequestPagination targets header",
-			constructor: newSetRequestPagination,
+			name:        "newSetRequest targets header",
+			constructor: newSetRequest,
 			config: map[string]interface{}{
 				"target": "header.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "header"},
 		},
 		{
-			name:        "newSetRequestPagination targets url param",
-			constructor: newSetRequestPagination,
+			name:        "newSetRequest targets url param",
+			constructor: newSetRequest,
 			config: map[string]interface{}{
 				"target": "url.params.foo",
 			},
 			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
 		},
 		{
-			name:        "newSetRequestPagination targets url value",
-			constructor: newSetRequestPagination,
+			name:        "newSetRequest targets something else",
+			constructor: newSetRequest,
+			config: map[string]interface{}{
+				"target": "cursor.foo",
+			},
+			expectedErr: "invalid target: cursor.foo",
+		},
+		{
+			name:        "newSetPagination targets body",
+			constructor: newSetPagination,
+			config: map[string]interface{}{
+				"target": "body.foo",
+			},
+			expectedTarget: targetInfo{Name: "foo", Type: "body"},
+		},
+		{
+			name:        "newSetPagination targets header",
+			constructor: newSetPagination,
+			config: map[string]interface{}{
+				"target": "header.foo",
+			},
+			expectedTarget: targetInfo{Name: "foo", Type: "header"},
+		},
+		{
+			name:        "newSetPagination targets url param",
+			constructor: newSetPagination,
+			config: map[string]interface{}{
+				"target": "url.params.foo",
+			},
+			expectedTarget: targetInfo{Name: "foo", Type: "url.params"},
+		},
+		{
+			name:        "newSetPagination targets url value",
+			constructor: newSetPagination,
 			config: map[string]interface{}{
 				"target": "url.value",
 			},
 			expectedTarget: targetInfo{Type: "url.value"},
 		},
 		{
-			name:        "newSetRequestPagination targets something else",
-			constructor: newSetRequestPagination,
+			name:        "newSetPagination targets something else",
+			constructor: newSetPagination,
 			config: map[string]interface{}{
 				"target": "cursor.foo",
 			},

@@ -7,9 +7,9 @@ package snapshot
 import (
 	"encoding/json"
 	"fmt"
+	gohttp "net/http"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact/download/http"
@@ -27,7 +27,7 @@ func NewDownloader(config *artifact.Config, versionOverride string) (download.Do
 }
 
 func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.Config, error) {
-	snapshotURI, err := snapshotURI(versionOverride, config)
+	snapshotURI, err := snapshotURI(versionOverride)
 	if err != nil {
 		return nil, fmt.Errorf("failed to detect remote snapshot repo, proceeding with configured: %v", err)
 	}
@@ -43,7 +43,7 @@ func snapshotConfig(config *artifact.Config, versionOverride string) (*artifact.
 	}, nil
 }
 
-func snapshotURI(versionOverride string, config *artifact.Config) (string, error) {
+func snapshotURI(versionOverride string) (string, error) {
 	version := release.Version()
 	if versionOverride != "" {
 		if strings.HasSuffix(versionOverride, "-SNAPSHOT") {
@@ -52,13 +52,8 @@ func snapshotURI(versionOverride string, config *artifact.Config) (string, error
 		version = versionOverride
 	}
 
-	client, err := config.HTTPTransportSettings.Client(httpcommon.WithAPMHTTPInstrumentation())
-	if err != nil {
-		return "", err
-	}
-
 	artifactsURI := fmt.Sprintf("https://artifacts-api.elastic.co/v1/search/%s-SNAPSHOT/elastic-agent", version)
-	resp, err := client.Get(artifactsURI)
+	resp, err := gohttp.Get(artifactsURI)
 	if err != nil {
 		return "", err
 	}

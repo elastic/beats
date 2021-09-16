@@ -86,8 +86,8 @@ configs:
 include::{libbeat-dir}/tab-widgets/enable-modules-widget.asciidoc[]
 --
 
-. In the module configs under `modules.d`, enable the desired datasets and
-change the module settings to match your environment.
+. In the module configs under `modules.d`, change the module settings to match
+your environment.
 +
 For example, log locations are set based on the OS. If your logs aren't in
 default locations, set the `paths` variable:
@@ -97,7 +97,6 @@ default locations, set the `paths` variable:
 ----
 - module: nginx
   access:
-    enabled: true
     var.paths: ["/var/log/nginx/access.log*"] <1>
 ----
 --

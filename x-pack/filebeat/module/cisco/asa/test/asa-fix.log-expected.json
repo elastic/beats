@@ -4,7 +4,7 @@
         "cisco.asa.destination_interface": "Inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "Outside",
-        "cisco.asa.source_username": "LOCAL\\Elastic",
+        "cisco.asa.source_username": "(LOCAL\\Elastic)",
         "cisco.asa.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
@@ -33,7 +33,6 @@
         "log.level": "informational",
         "log.offset": 0,
         "network.bytes": 148,
-        "network.community_id": "1:9aBQ+NznvYals1agEGRVJm37dvQ=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Inside",
@@ -49,14 +48,10 @@
             "10.123.123.123",
             "10.233.123.123"
         ],
-        "related.user": [
-            "Elastic"
-        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 53723,
-        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -90,7 +85,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 200,
-        "network.community_id": "1:kV/6Jt4iMhVyUT1AW+UO0itOhqU=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "Outside",
@@ -141,7 +135,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 381,
-        "network.community_id": "1:7nrIUULEgk5A+nhbh4kNmEkwL3o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -166,7 +159,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "Inside_access_in",
         "cisco.asa.source_interface": "Inside",
-        "cisco.asa.source_username": "LOCAL\\Elastic",
+        "cisco.asa.source_username": "(LOCAL\\Elastic)",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",
         "destination.port": 57621,
@@ -191,7 +184,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 545,
-        "network.community_id": "1:LM0R4Wi8tEf+1pe2ukofXQKxfMc=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "Outside",
@@ -206,14 +198,10 @@
         "related.ip": [
             "10.123.123.123"
         ],
-        "related.user": [
-            "Elastic"
-        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 57621,
-        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -341,7 +329,6 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 989,
-        "network.community_id": "1:/zjqku0IM1BTHL37aH0DvJSecYY=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "identity",
@@ -390,7 +377,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1171,
-        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -439,7 +425,6 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1334,
-        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -489,7 +474,6 @@
         "input.type": "log",
         "log.level": "error",
         "log.offset": 1514,
-        "network.community_id": "1:kRCfRJ9T/IeRNAhAhzOsF6EjIV4=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "inside",
@@ -549,7 +533,6 @@
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 1723,
-        "network.community_id": "1:cJpy7sqGDQbchRUXDtR8k10HinM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.egress.interface.name": "outside",

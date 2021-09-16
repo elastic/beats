@@ -5,7 +5,6 @@
 package reexec
 
 import (
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
 
@@ -13,7 +12,7 @@ import (
 type ExecManager interface {
 	// ReExec asynchronously re-executes command in the same PID and memory address
 	// as the currently running application.
-	ReExec(callback ShutdownCallbackFn, argOverrides ...string)
+	ReExec(argOverrides ...string)
 
 	// ShutdownChan returns the shutdown channel the main function should use to
 	// handle shutdown of the current running application.
@@ -32,9 +31,6 @@ type manager struct {
 	complete chan bool
 }
 
-// ShutdownCallbackFn is called once everything is shutdown and allows cleanup during reexec process.
-type ShutdownCallbackFn func() error
-
 // NewManager returns the reexec manager.
 func NewManager(log *logger.Logger, exec string) ExecManager {
 	return &manager{
@@ -46,17 +42,10 @@ func NewManager(log *logger.Logger, exec string) ExecManager {
 	}
 }
 
-func (m *manager) ReExec(shutdownCallback ShutdownCallbackFn, argOverrides ...string) {
+func (m *manager) ReExec(argOverrides ...string) {
 	go func() {
 		close(m.trigger)
 		<-m.shutdown
-
-		if shutdownCallback != nil {
-			if err := shutdownCallback(); err != nil {
-				// panic; because there is no going back, everything is shutdown
-				panic(errors.New(errors.TypeUnexpected, err, "failure occured during shutdown cleanup"))
-			}
-		}
 
 		if err := reexec(m.logger, m.exec, argOverrides...); err != nil {
 			// panic; because there is no going back, everything is shutdown

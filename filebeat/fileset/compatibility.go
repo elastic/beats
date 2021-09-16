@@ -106,13 +106,6 @@ var processorCompatibilityChecks = []processorCompatibility{
 		},
 		adaptConfig: deleteProcessor,
 	},
-	{
-		procType: "*",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.9.0"))
-		},
-		adaptConfig: removeDescription,
-	},
 }
 
 // Processor represents and Ingest Node processor definition.
@@ -280,7 +273,7 @@ nextProcessor:
 
 		// Run compatibility checks on the processor.
 		for _, proc := range processorCompatibilityChecks {
-			if processor.Name() != proc.procType && proc.procType != "*" {
+			if processor.Name() != proc.procType {
 				continue
 			}
 
@@ -288,9 +281,9 @@ nextProcessor:
 				continue
 			}
 
-			processor, err = proc.adaptConfig(processor, log.With("processor_type", processor.Name(), "processor_index", i))
+			processor, err = proc.adaptConfig(processor, log.With("processor_type", proc.procType, "processor_index", i))
 			if err != nil {
-				return fmt.Errorf("failed to adapt %q processor at index %d: %w", processor.Name(), i, err)
+				return fmt.Errorf("failed to adapt %q processor at index %d: %w", proc.procType, i, err)
 			}
 			if processor.IsNil() {
 				continue nextProcessor
@@ -413,18 +406,5 @@ func replaceConvertIP(processor Processor, log *logp.Logger) (Processor, error) 
 	})
 	processor.name = "grok"
 	log.Debug("processor output=", processor.String())
-	return processor, nil
-}
-
-// removeDescription removes the description config option so ES less than 7.9 will work.
-func removeDescription(processor Processor, log *logp.Logger) (Processor, error) {
-	_, ok := processor.GetString("description")
-	if !ok {
-		return processor, nil
-	}
-
-	log.Debug("Removing unsupported 'description' from processor.")
-	processor.Delete("description")
-
 	return processor, nil
 }

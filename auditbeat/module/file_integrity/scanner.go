@@ -140,11 +140,6 @@ func (s *scanner) walkDir(dir string, action Action) error {
 			}
 			return nil
 		}
-
-		if !info.IsDir() && !s.config.IsIncludedPath(path) {
-			return nil
-		}
-
 		defer func() { startTime = time.Now() }()
 
 		event := s.newScanEvent(path, info, err, action)

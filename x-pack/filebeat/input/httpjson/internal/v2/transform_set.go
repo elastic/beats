@@ -39,7 +39,7 @@ type set struct {
 
 func (set) transformName() string { return setName }
 
-func newSetRequestPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newSetRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
 	set, err := newSet(cfg, log)
 	if err != nil {
 		return nil, err
@@ -52,8 +52,6 @@ func newSetRequestPagination(cfg *common.Config, log *logp.Logger) (transform, e
 		set.runFunc = setHeader
 	case targetURLParams:
 		set.runFunc = setURLParams
-	case targetURLValue:
-		set.runFunc = setURLValue
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
 	}
@@ -70,6 +68,28 @@ func newSetResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
 	switch set.targetInfo.Type {
 	case targetBody:
 		set.runFunc = setBody
+	default:
+		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
+	}
+
+	return &set, nil
+}
+
+func newSetPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+	set, err := newSet(cfg, log)
+	if err != nil {
+		return nil, err
+	}
+
+	switch set.targetInfo.Type {
+	case targetBody:
+		set.runFunc = setBody
+	case targetHeader:
+		set.runFunc = setHeader
+	case targetURLParams:
+		set.runFunc = setURLParams
+	case targetURLValue:
+		set.runFunc = setURLValue
 	default:
 		return nil, fmt.Errorf("invalid target type: %s", set.targetInfo.Type)
 	}

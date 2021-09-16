@@ -201,7 +201,7 @@ func (l *logHints) getFilesets(hints common.MapStr, module string) map[string]*f
 	var configured bool
 	filesets := make(map[string]*filesetConfig)
 
-	moduleFilesets, err := l.registry.ModuleAvailableFilesets(module)
+	moduleFilesets, err := l.registry.ModuleFilesets(module)
 	if err != nil {
 		logp.Err("Error retrieving module filesets: %+v", err)
 		return nil

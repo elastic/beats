@@ -366,16 +366,10 @@ func ExampleDecoder_Decode() {
 	//   "event": {
 	//     "eventdata": {
 	//       "binary": "770069006E006C006F00670062006500610074002F0034000000",
-	//       "data": [
-	//         {
-	//           "#text": "winlogbeat",
-	//           "name": "param1"
-	//         },
-	//         {
-	//           "#text": "running",
-	//           "name": "param2"
-	//         }
-	//       ]
+	//       "data": {
+	//         "#text": "running",
+	//         "name": "param2"
+	//       }
 	//     },
 	//     "processingerrordata": {
 	//       "dataitemname": "shellId",
