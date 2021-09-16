@@ -135,7 +135,7 @@ func unifyResourceMetadata(in common.MapStr) common.MapStr {
 		}
 		values, ok := rawValues.(common.MapStr)
 		if ok {
-			resourceValues[key] = values
+			resourceValues.Put(key, values)
 			in.Delete(key)
 		}
 	}
