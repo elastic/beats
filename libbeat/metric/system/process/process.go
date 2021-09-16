@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/go-sysinfo/types"
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -60,7 +61,7 @@ type Process struct {
 	FD         sigar.ProcFDUsage
 	Env        common.MapStr
 
-	//cpu stats
+	// cpu stats
 	cpuSinceStart   float64
 	cpuTotalPct     float64
 	cpuTotalPctNorm float64
@@ -291,12 +292,20 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 	return uTime, sTime, nil
 }
 
+var (
+	host types.Host
+	err  error
+)
+
+func init() {
+	host, err = sysinfo.Host()
+}
+
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
 
 	// This is a holdover until we migrate this library to metricbeat/internal
 	// At which point we'll use the memory code there.
 	var totalPhyMem uint64
-	host, err := sysinfo.Host()
 	if err != nil {
 		procStats.logger.Warnf("Getting host details: %v", err)
 	} else {
