@@ -48,7 +48,7 @@ func (e *incomingFieldExtractor) extractTimeSeriesMetricValues(resp *monitoring.
 		}
 
 		p := KeyValuePoint{
-			Key:       cleanMetricNameString(resp.Metric.Type, aligner, e.mc),
+			Key:       remap(e.logger, cleanMetricNameString(resp.Metric.Type, aligner, e.mc)),
 			Value:     getValueFromPoint(point),
 			Timestamp: ts,
 		}
@@ -81,6 +81,20 @@ func cleanMetricNameString(s string, aligner string, mc metricsConfig) string {
 
 	metricName := replacedChars + gcp.AlignersMapToSuffix[aligner]
 	return metricName
+}
+
+var reMapping = map[string]string{}
+
+func remap(l *logp.Logger, s string) string {
+	var newS string
+
+	if v, found := reMapping[s]; found {
+		l.Debugf("remapping %s to %s", s, newS)
+		return v
+	}
+
+	l.Debugf("no remap found for %s", s)
+	return s
 }
 
 func getValueFromPoint(p *monitoring.Point) (out interface{}) {
