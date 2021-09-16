@@ -94,6 +94,24 @@ message ApplicationStatus {
   string payload = 5;
 }
 
+// Current metadata for a running beat.
+message BeatMeta {
+  string beat = 1;
+  string name = 2;
+  string hostname = 3;
+  string id = 4;
+  string ephemeral_id = 5;
+  string version = 6;
+  string build_commit = 7;
+  string build_time = 8;
+  string username = 9;
+  string user_id = 10;
+  string user_gid = 11;
+  string architecture = 12;
+  bool elastic_licensed = 13;
+  string error = 14;
+}
+
 // Status is the current status of Elastic Agent.
 message StatusResponse {
   // Overall status of Elastic Agent.
@@ -102,6 +120,11 @@ message StatusResponse {
   string message = 2;
   // Status of each application in Elastic Agent.
   repeated ApplicationStatus applications = 3;
+}
+
+// BeatMetaResponse is the current running version infomation for all Beats.
+message BeatMetaResponse {
+  repeated BeatMeta beats = 1;
 }
 
 service ElasticAgentControl {
@@ -116,4 +139,7 @@ service ElasticAgentControl {
 
   // Upgrade starts the upgrade process of Elastic Agent.
   rpc Upgrade(UpgradeRequest) returns (UpgradeResponse);
+
+  // Gather all running beat metadata.
+  rpc BeatMeta(Empty) returns (BeatMetaResponse);
 }
