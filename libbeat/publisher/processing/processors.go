@@ -182,7 +182,7 @@ func makeAddDynMetaProcessor(
 	})
 }
 
-func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
+func debugPrintProcessor(info beat.Info, log *logp.Logger, debug bool) *processorFn {
 	// ensure only one go-routine is using the encoder (in case
 	// beat.Client is shared between multiple go-routines by accident)
 	var mux sync.Mutex
@@ -200,6 +200,9 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 			return event, nil
 		}
 
+		if debug {
+			log.Infof("Publish event: %s", b)
+		}
 		log.Debugf("Publish event: %s", b)
 		return event, nil
 	})

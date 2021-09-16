@@ -349,8 +349,11 @@ func (b *builder) Create(cfg beat.ProcessingConfig, drop bool) (beat.Processor, 
 	}
 
 	// setup 10: debug print final event (P)
-	if b.log.IsDebug() {
-		processors.add(debugPrintProcessor(b.info, b.log))
+	debug := false
+	debugSwitch, _ := cfg.EventMetadata.Fields.Flatten().GetValue("metadata.debugOn")
+	debug, _ = debugSwitch.(bool)
+	if b.log.IsDebug() || debug {
+		processors.add(debugPrintProcessor(b.info, b.log, debug))
 	}
 
 	// setup 11: drop all events if outputs are disabled (P)
