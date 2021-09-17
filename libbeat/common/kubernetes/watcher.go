@@ -215,9 +215,11 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	}
 	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
 		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
-		obj = deleted.Obj
+		w.queue.Add(&item{key, obj, state})
+	} else {
+		w.queue.Add(&item{key, nil, state})
 	}
-	w.queue.Add(&item{key, obj, state})
+
 }
 
 // process gets the top of the work queue and processes the object that is received.
@@ -243,7 +245,7 @@ func (w *watcher) process(ctx context.Context) bool {
 		return true
 	}
 	if !exists {
-		if entry.state == delete {
+		if entry.state == delete && entry.objectRaw != nil {
 			w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
 			// delete anyway in order to clean states
 			w.handler.OnDelete(entry.objectRaw)
