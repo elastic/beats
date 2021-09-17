@@ -30,16 +30,18 @@
         "threatintel.anomalithreatstream.value_type": "domain",
         "threatintel.indicator.as.organization.name": "OVH Hosting",
         "threatintel.indicator.confidence": 2,
-        "threatintel.indicator.domain": "d4xgfj.example.net",
         "threatintel.indicator.first_seen": "2020-10-08T12:21:50.000Z",
         "threatintel.indicator.geo.country_iso_code": "FR",
         "threatintel.indicator.geo.location.lat": -49.1,
         "threatintel.indicator.geo.location.lon": 94.4,
         "threatintel.indicator.ip": "203.0.113.35",
         "threatintel.indicator.last_seen": "2020-10-08T12:24:42.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "d4xgfj.example.net"
     },
     {
         "event.category": "threat",
@@ -80,7 +82,9 @@
         "threatintel.indicator.geo.location.lon": -64.7,
         "threatintel.indicator.ip": "2001:db8:fc77:2510:5ab8:7bc8:65a3:4894",
         "threatintel.indicator.last_seen": "2020-10-08T12:24:42.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv6-addr"
     },
@@ -123,7 +127,9 @@
         "threatintel.indicator.geo.location.lon": 0.0,
         "threatintel.indicator.ip": "192.0.2.8",
         "threatintel.indicator.last_seen": "2020-10-08T12:24:42.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -162,7 +168,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-08T12:22:16.000Z",
         "threatintel.indicator.last_seen": "2020-10-08T12:24:42.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -206,7 +214,9 @@
         "threatintel.indicator.geo.location.lon": -129.3,
         "threatintel.indicator.ip": "192.0.2.235",
         "threatintel.indicator.last_seen": "2020-10-09T18:49:37.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -249,7 +259,9 @@
         "threatintel.indicator.geo.location.lon": -52.2,
         "threatintel.indicator.ip": "2001:db8:df14:f43b:a986:5e2a:8ce9:4523",
         "threatintel.indicator.last_seen": "2020-10-09T18:49:37.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv6-addr"
     },
@@ -294,13 +306,15 @@
         "threatintel.anomalithreatstream.update_id": 1356750652,
         "threatintel.anomalithreatstream.value_type": "domain",
         "threatintel.indicator.confidence": 7,
-        "threatintel.indicator.domain": "ei1im6skd.example.com",
         "threatintel.indicator.first_seen": "2020-10-09T18:14:43.000Z",
         "threatintel.indicator.ip": "203.0.113.130",
         "threatintel.indicator.last_seen": "2020-10-09T18:14:43.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "ei1im6skd.example.com"
     },
     {
         "event.category": "threat",
@@ -336,7 +350,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:10.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:10.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -376,7 +392,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.236",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:13.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ax1a6o38z.example.org",
@@ -423,7 +441,9 @@
         "threatintel.indicator.geo.country_iso_code": "CN",
         "threatintel.indicator.ip": "2001:db8:62cc:2fd2:f406:9c03:e2e8:617d",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:13.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "beko3.example.com",
@@ -468,7 +488,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:22.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:22.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -508,7 +530,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:23.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:23.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -548,7 +572,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.162",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:30.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "sevs82.example.com",
@@ -594,7 +620,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:37.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:37.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -632,7 +660,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:40.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:40.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -671,7 +701,9 @@
         "threatintel.indicator.confidence": 8,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:45.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:45.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -712,7 +744,9 @@
         "threatintel.indicator.confidence": 0,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:54.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:54.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -752,7 +786,9 @@
         "threatintel.indicator.confidence": 3,
         "threatintel.indicator.first_seen": "2020-10-09T18:30:59.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:30:59.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -790,7 +826,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:10.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:10.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -830,7 +868,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:16.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:16.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -869,7 +909,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:22.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:22.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -912,7 +954,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:27.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:27.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -949,7 +993,9 @@
         "threatintel.anomalithreatstream.value_type": "md5",
         "threatintel.indicator.first_seen": "2020-10-09T18:31:29.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:29.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -988,7 +1034,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.229",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:34.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "faahk3drf.example.net",
@@ -1033,7 +1081,9 @@
         "threatintel.indicator.confidence": 7,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:36.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:36.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1073,7 +1123,9 @@
         "threatintel.indicator.confidence": 7,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:39.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:39.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1112,7 +1164,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:31:43.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:43.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1152,7 +1206,9 @@
         "threatintel.indicator.geo.country_iso_code": "DE",
         "threatintel.indicator.ip": "192.0.2.219",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:49.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -1191,7 +1247,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.208",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:49.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "p9okf0.example.org",
@@ -1237,7 +1295,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.105",
         "threatintel.indicator.last_seen": "2020-10-09T18:31:58.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "fxkeo24m.example.com",
@@ -1283,7 +1343,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:02.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:02.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1322,7 +1384,9 @@
         "threatintel.indicator.confidence": 9,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:03.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:03.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1362,7 +1426,9 @@
         "threatintel.indicator.confidence": 3,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:04.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:04.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1401,7 +1467,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:08.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:08.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1441,7 +1509,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:11.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:11.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1480,7 +1550,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:19.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:19.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1519,7 +1591,9 @@
         "threatintel.indicator.geo.country_iso_code": "CN",
         "threatintel.indicator.ip": "2001:db8:b94f:43d3:f1ef:8964:c8e3:48d4",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:30.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv6-addr"
     },
@@ -1558,7 +1632,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:32:35.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:32:35.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1598,7 +1674,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.16",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:10.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "ke4ffyj5.example.com",
@@ -1643,7 +1721,9 @@
         "threatintel.indicator.confidence": 4,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:13.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:13.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1682,7 +1762,9 @@
         "threatintel.indicator.confidence": 3,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:14.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:14.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1720,7 +1802,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:14.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:14.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1760,7 +1844,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.154",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:22.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "rl27d.example.net",
@@ -1805,7 +1891,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:24.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:24.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1845,7 +1933,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.228",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:26.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "6ygk0y.example.com",
@@ -1890,7 +1980,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.38",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:27.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "rcsr9o.example.net",
@@ -1936,7 +2028,9 @@
         "threatintel.anomalithreatstream.value_type": "md5",
         "threatintel.indicator.first_seen": "2020-10-09T18:33:29.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:29.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -1976,7 +2070,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:43.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:43.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2017,7 +2113,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:45.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:45.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2055,7 +2153,9 @@
         "threatintel.indicator.confidence": 8,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:45.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:45.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2095,7 +2195,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.115",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:48.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "cc7d.example.com",
@@ -2141,7 +2243,9 @@
         "threatintel.indicator.confidence": 4,
         "threatintel.indicator.first_seen": "2020-10-09T18:33:51.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:51.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2181,7 +2285,9 @@
         "threatintel.indicator.geo.country_iso_code": "VN",
         "threatintel.indicator.ip": "192.0.2.61",
         "threatintel.indicator.last_seen": "2020-10-09T18:33:57.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -2220,7 +2326,9 @@
         "threatintel.indicator.geo.country_iso_code": "DE",
         "threatintel.indicator.ip": "192.0.2.233",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:00.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -2259,7 +2367,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "2001:db8:9850:9607:e204:423b:cade:837e",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:00.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "v9aqrp81q.example.net",
@@ -2303,7 +2413,9 @@
         "threatintel.indicator.geo.country_iso_code": "IN",
         "threatintel.indicator.ip": "192.0.2.234",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:00.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -2343,7 +2455,9 @@
         "threatintel.indicator.confidence": 10,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:02.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:02.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2384,7 +2498,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:05.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:05.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2422,7 +2538,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:11.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:11.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2461,7 +2579,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:12.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:12.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2499,7 +2619,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.83",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:17.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "o4kqv8b8.example.net",
@@ -2546,7 +2668,9 @@
         "threatintel.indicator.confidence": 9,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:20.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:20.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2586,7 +2710,9 @@
         "threatintel.indicator.confidence": 3,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:20.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:20.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2627,7 +2753,9 @@
         "threatintel.indicator.confidence": 0,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:32.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:32.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2665,7 +2793,9 @@
         "threatintel.indicator.confidence": 1,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:32.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:32.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2702,7 +2832,9 @@
         "threatintel.anomalithreatstream.value_type": "md5",
         "threatintel.indicator.first_seen": "2020-10-09T18:34:39.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:39.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2741,7 +2873,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:40.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:40.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2780,7 +2914,9 @@
         "threatintel.indicator.geo.country_iso_code": "VN",
         "threatintel.indicator.ip": "192.0.2.88",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:41.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -2820,7 +2956,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.111",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:43.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "91p0p.example.com",
@@ -2864,7 +3002,9 @@
         "threatintel.indicator.confidence": 7,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:48.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:48.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2902,7 +3042,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:53.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:53.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2941,7 +3083,9 @@
         "threatintel.indicator.confidence": 2,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:53.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:53.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -2980,7 +3124,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.133",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:54.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "lzr6.example.org",
@@ -3024,7 +3170,9 @@
         "threatintel.indicator.confidence": 8,
         "threatintel.indicator.first_seen": "2020-10-09T18:34:55.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:34:55.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -3062,7 +3210,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:35:01.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:35:01.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -3102,7 +3252,9 @@
         "threatintel.indicator.confidence": 6,
         "threatintel.indicator.first_seen": "2020-10-09T18:35:01.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:35:01.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -3141,7 +3293,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.177",
         "threatintel.indicator.last_seen": "2020-10-09T18:35:04.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "932.example.com",
@@ -3186,7 +3340,9 @@
         "threatintel.indicator.confidence": 3,
         "threatintel.indicator.first_seen": "2020-10-09T18:35:06.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:35:06.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -3225,7 +3381,9 @@
         "threatintel.indicator.confidence": 5,
         "threatintel.indicator.first_seen": "2020-10-09T18:35:22.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:35:22.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "file"
     },
@@ -3270,7 +3428,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.71",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:01.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "0te9x75e.example.net",
@@ -3317,7 +3477,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.180",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:04.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "b7qdtnl8f.example.org",
@@ -3360,12 +3522,14 @@
         "threatintel.anomalithreatstream.update_id": 1826833096,
         "threatintel.anomalithreatstream.value_type": "domain",
         "threatintel.indicator.confidence": 2,
-        "threatintel.indicator.domain": "4gtq1n.example.net",
         "threatintel.indicator.first_seen": "2020-10-09T18:44:19.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:19.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "4gtq1n.example.net"
     },
     {
         "event.category": "threat",
@@ -3408,7 +3572,9 @@
         "threatintel.indicator.geo.country_iso_code": "RU",
         "threatintel.indicator.ip": "192.0.2.17",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:27.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -3448,7 +3614,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.183",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:35.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "tfva.example.org",
@@ -3495,7 +3663,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "203.0.113.149",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:36.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "erg2.example.com",
@@ -3547,7 +3717,9 @@
         "threatintel.indicator.geo.country_iso_code": "IN",
         "threatintel.indicator.ip": "203.0.113.27",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:37.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "0elz6c.example.com",
@@ -3594,7 +3766,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "2001:db8:129e:7520:8797:95ca:a4d1:3011",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:45.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "6i0-utr.example.com",
@@ -3645,7 +3819,9 @@
         "threatintel.indicator.geo.country_iso_code": "CN",
         "threatintel.indicator.ip": "203.0.113.128",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:47.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -3684,14 +3860,16 @@
         "threatintel.anomalithreatstream.update_id": 3315952704,
         "threatintel.anomalithreatstream.value_type": "domain",
         "threatintel.indicator.confidence": 7,
-        "threatintel.indicator.domain": "ztpyt.example.org",
         "threatintel.indicator.first_seen": "2020-10-09T18:44:50.000Z",
         "threatintel.indicator.geo.country_iso_code": "HK",
         "threatintel.indicator.ip": "203.0.113.16",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:50.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
-        "threatintel.indicator.type": "domain-name"
+        "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "ztpyt.example.org"
     },
     {
         "event.category": "threat",
@@ -3732,7 +3910,9 @@
         "threatintel.indicator.confidence": 9,
         "threatintel.indicator.first_seen": "2020-10-09T18:44:50.000Z",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:50.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "e5el.example.net",
@@ -3777,7 +3957,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.226",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:54.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "eryz36i.example.net",
@@ -3824,7 +4006,9 @@
         "threatintel.indicator.geo.country_iso_code": "US",
         "threatintel.indicator.ip": "192.0.2.25",
         "threatintel.indicator.last_seen": "2020-10-09T18:44:58.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "i-pb.example.com",
@@ -3875,7 +4059,9 @@
         "threatintel.indicator.geo.country_iso_code": "IN",
         "threatintel.indicator.ip": "2001:db8:79d3:9083:95f2:a6fd:e475:4956",
         "threatintel.indicator.last_seen": "2020-10-09T18:45:05.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv6-addr"
     },
@@ -3919,7 +4105,9 @@
         "threatintel.indicator.geo.location.lon": 112.8,
         "threatintel.indicator.ip": "192.0.2.12",
         "threatintel.indicator.last_seen": "2021-04-19T08:57:46.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -3956,7 +4144,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:17.000Z",
         "threatintel.indicator.ip": "203.0.113.5",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:17.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -3992,7 +4182,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:23.000Z",
         "threatintel.indicator.ip": "192.0.2.68",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:23.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -4029,7 +4221,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:24.000Z",
         "threatintel.indicator.ip": "203.0.113.54",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:24.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -4066,7 +4260,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:25.000Z",
         "threatintel.indicator.ip": "203.0.113.195",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:25.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -4104,7 +4300,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:25.000Z",
         "threatintel.indicator.ip": "192.0.2.239",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:25.000Z",
-        "threatintel.indicator.marking.tlp": "Amber",
+        "threatintel.indicator.marking.tlp": [
+            "Amber"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     },
@@ -4143,7 +4341,9 @@
         "threatintel.indicator.first_seen": "2021-04-29T16:02:26.000Z",
         "threatintel.indicator.ip": "192.0.2.169",
         "threatintel.indicator.last_seen": "2021-04-29T16:02:26.000Z",
-        "threatintel.indicator.marking.tlp": "White",
+        "threatintel.indicator.marking.tlp": [
+            "White"
+        ],
         "threatintel.indicator.provider": "Default Organization",
         "threatintel.indicator.type": "ipv4-addr"
     }

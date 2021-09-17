@@ -276,6 +276,61 @@ func TestValueTpl(t *testing.T) {
 			expectedVal:   "",
 			expectedError: errEmptyTemplateResult.Error(),
 		},
+		{
+			name:        "func base64Encode 2 strings",
+			value:       `[[base64Encode "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "c3RyaW5nMXN0cmluZzI=",
+		},
+		{
+			name:          "func base64Encode no value",
+			value:         `[[base64Encode ""]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
+		},
+		{
+			name:  "func join",
+			value: `[[join .last_response.body.arr ","]]`,
+			paramCtx: &transformContext{
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
+				lastResponse: newTestResponse(
+					common.MapStr{
+						"arr": []string{
+							"foo",
+							"bar",
+						},
+					},
+					http.Header{},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: "foo,bar",
+		},
+		{
+			name:  "func sprintf",
+			value: `[[sprintf "%q:%d" (join .last_response.body.arr ",") 1]]`,
+			paramCtx: &transformContext{
+				firstEvent: &common.MapStr{},
+				lastEvent:  &common.MapStr{},
+				lastResponse: newTestResponse(
+					common.MapStr{
+						"arr": []string{
+							"foo",
+							"bar",
+						},
+					},
+					http.Header{},
+					"",
+				),
+			},
+			paramTr:     transformable{},
+			expectedVal: `"foo,bar":1`,
+		},
 	}
 
 	for _, tc := range cases {
