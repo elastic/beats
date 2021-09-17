@@ -124,10 +124,10 @@
         "title": "RDS Write Latency in Milliseconds [Metricbeat AWS]",
         "visualizationType": "lnsXY"
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.14.0",
     "id": "8560b400-f096-11eb-b61f-a53cb4913361",
     "migrationVersion": {
-        "lens": "7.13.1"
+        "lens": "7.14.0"
     },
     "references": [
         {
@@ -142,6 +142,6 @@
         }
     ],
     "type": "lens",
-    "updated_at": "2021-08-04T16:30:34.757Z",
-    "version": "WzM0MTYsMV0="
+    "updated_at": "2021-08-04T21:05:50.194Z",
+    "version": "WzU1MTQsMl0="
 }

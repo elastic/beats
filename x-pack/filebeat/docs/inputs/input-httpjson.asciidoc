@@ -103,10 +103,9 @@ The state has the following elements:
 - `last_response.page`: A number indicating the page number of the last response.
 - `first_event`: A map representing the first event sent to the output (result from applying transforms to `last_response.body`).
 - `last_event`: A map representing the last event sent to the output (result from applying transforms to `last_response.body`).
-- `url.value`: The full URL with params and fragments.
-- `url.params`: A map containing the URL params.
-- `header`: A map containing the headers. References request headers when used in <<request-transforms>> or <<request-rate-limit>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
-- `body`: A map containing the body. References request body when used in <<request-transforms>> configuration section, and to the last response body when used in <<response-transforms>>, <<response-split>> or <<response-pagination>> configuration sections.
+- `url`: The last requested URL as a raw https://pkg.go.dev/net/url#URL[`url.URL`] Go type.
+- `header`: A map containing the headers. References the next request headers when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response headers when used in <<response-transforms>>, <<response-split>>, or <<request-rate-limit>> configuration sections.
+- `body`: A map containing the body. References the next request body when used in <<request-transforms>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
 All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
@@ -204,6 +203,10 @@ Some built-in helper functions are provided to work with the input state inside 
 - `mul`: multiplies two integers.
 - `div`: does the integer division of two integer values.
 - `hmac`: calculates the hmac signature of a list of strings concatenated together. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
+- `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
+- `join`: joins a list of strings using the specified separator. Example: `[[join .body.arr ","]]`
+- `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -461,9 +464,9 @@ List of transforms to apply to the request before each execution.
 
 Available transforms for request: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
-Can write state to: [`header.*`, `url.params.*`, `body.*`].
+Can write state to: [`body.*`, `header.*`, `url.*`].
 
 ["source","yaml",subs="attributes"]
 ----
@@ -564,6 +567,11 @@ Required if using split type of `string`.  This is the sub string used to split 
 Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
 
 [float]
+==== `response.split[].ignore_empty_value`
+
+If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
+
+[float]
 ==== `response.split[].split`
 
 Nested split operation. Split operations can be nested at will. An event won't be created until the deepest split operation is applied.
@@ -581,7 +589,7 @@ List of transforms that will be applied to the response to every new page reques
 
 Available transforms for pagination: [`append`, `delete`, `set`].
 
-Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`].
+Can read state from: [`.last_response.*`, `.first_event.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
 Can write state to: [`body.*`, `header.*`, `url.*`].
 

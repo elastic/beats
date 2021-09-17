@@ -3,10 +3,56 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.0.0-alpha2]]
+=== Beats version 8.0.0-alpha2
+
+Changes will be described in a later alpha / beta.
+
 [[release-notes-8.0.0-alpha1]]
 === Beats version 8.0.0-alpha1
 
 Changes will be described in a later alpha / beta.
+[[release-notes-7.14.2]]
+=== Beats version 7.14.2
+https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Auditd module: Fix the top exec commands dashboard visualization. {pull}27638[27638]
+- Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
+- Fix `httpjson` input rate limit processing and documentation. {pull}27739[27739]
+
+[[release-notes-7.14.1]]
+=== Beats version 7.14.1
+https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+- Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
+
+*Filebeat*
+
+- Convert the o365 module's `client.port` and `source.port` to numbers (from strings) in events. {pull}22939[22939]
+- Fix the Snyk module to work with the new API changes. {pull}27358[27358]
+- Fix a bug in `http_endpoint` that caused numbers encoded as strings. {issue}27382[27382] {pull}27480[27480]
+
+*Metricbeat*
+
+- Change `server_status_path` default setting to `nginx_status` for the `nginx` module. {pull}26642[26642]
+- Change `startTime` and `endTime` of `GetMetricData` API in cloudwatch metricset to be only one collection period apart. {pull}27327[27327]
+- Fix cloudwatch metricset collecting duplicate data points. {pull}27248[27248]
+- Add percent formatters to system/process. {pull}27374[27374]
+- Fix instance machineType reporting in compute metricset of GCP module. {pull}27363[27363]
+
+==== Added
+
+*Filebeat*
+
+- Update Elasticsearch module's ingest pipeline for parsing new deprecation logs. {issue}26857[26857] {pull}26880[26880]
 
 [[release-notes-7.14.0]]
 === Beats version 7.14.0

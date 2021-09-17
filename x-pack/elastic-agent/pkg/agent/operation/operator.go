@@ -151,8 +151,13 @@ func (o *Operator) HandleConfig(cfg configrequest.Request) (err error) {
 
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		o.statusReporter.Update(state.Failed, err.Error(), nil)
-		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
+		if err == filterContextCancelled(err) {
+			// error is not filtered and should be reported
+			o.statusReporter.Update(state.Failed, err.Error(), nil)
+			err = errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
+		}
+
+		return err
 	}
 	o.statusController.UpdateStateID(stateID)
 
@@ -300,9 +305,11 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	var err error
 
 	monitor := o.monitor
+	appName := p.BinaryName()
 	if app.IsSidecar(p) {
 		// make watchers unmonitorable
 		monitor = noop.NewMonitor()
+		appName += "_monitoring"
 	}
 
 	if p.ServicePort() == 0 {
@@ -310,7 +317,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			desc,
@@ -326,7 +333,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),

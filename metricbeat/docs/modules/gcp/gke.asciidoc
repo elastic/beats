@@ -1,0 +1,19 @@
+////
+This file is generated! See scripts/mage/docs_collector.go
+////
+
+[[metricbeat-metricset-gcp-gke]]
+[role="xpack"]
+=== Google Cloud Platform gke metricset
+
+beta[]
+
+include::../../../../x-pack/metricbeat/module/gcp/gke/_meta/docs.asciidoc[]
+
+This is a default metricset. If the host module is unconfigured, this metricset is enabled by default.
+
+==== Fields
+
+For a description of each field in the metricset, see the
+<<exported-fields-gcp,exported fields>> section.
+

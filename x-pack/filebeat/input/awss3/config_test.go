@@ -92,7 +92,7 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			"",
-			func(queueURL, s3Bucketr string) config {
+			func(queueURL, s3Bucket string) config {
 				c := makeConfig(queueURL, "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
@@ -112,8 +112,10 @@ func TestConfig(t *testing.T) {
 				"queue_url":  "",
 				"bucket_arn": "",
 			},
-			"queue_url or bucket_arn must provided",
-			nil,
+			"",
+			func(queueURL, s3Bucket string) config {
+				return makeConfig("", "")
+			},
 		},
 		{
 			"error on both queueURL and s3Bucket",

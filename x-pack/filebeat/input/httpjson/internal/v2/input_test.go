@@ -58,9 +58,9 @@ func TestInput(t *testing.T) {
 			baseConfig: map[string]interface{}{
 				"interval":                     1,
 				"http_method":                  "GET",
-				"request.rate_limit.limit":     `[[.last_request.header.Get "X-Rate-Limit-Limit"]]`,
-				"request.rate_limit.remaining": `[[.last_request.header.Get "X-Rate-Limit-Remaining"]]`,
-				"request.rate_limit.reset":     `[[.last_request.header.Get "X-Rate-Limit-Reset"]]`,
+				"request.rate_limit.limit":     `[[.last_response.header.Get "X-Rate-Limit-Limit"]]`,
+				"request.rate_limit.remaining": `[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`,
+				"request.rate_limit.reset":     `[[.last_response.header.Get "X-Rate-Limit-Reset"]]`,
 			},
 			handler:  rateLimitHandler(),
 			expected: []string{`{"hello":"world"}`},
@@ -319,6 +319,75 @@ func TestInput(t *testing.T) {
 			},
 			handler:  oauth2Handler,
 			expected: []string{`{"hello": "world"}`},
+		},
+		{
+			name: "Test request transforms can access state from previous transforms",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL + "/test-path"
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       1,
+				"request.method": "POST",
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "header.X-Foo",
+							"value":  "foo",
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.bar",
+							"value":  `[[.header.Get "X-Foo"]]`,
+						},
+					},
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.url.path",
+							"value":  `[[.url.Path]]`,
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("POST", `{"bar":"foo","url":{"path":"/test-path"}}`),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+		},
+		{
+			name: "Test response transforms can't access request state from previous transforms",
+			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+				registerRequestTransforms()
+				registerResponseTransforms()
+				t.Cleanup(func() { registeredTransforms = newRegistry() })
+				server := httptest.NewServer(h)
+				config["request.url"] = server.URL
+				t.Cleanup(server.Close)
+			},
+			baseConfig: map[string]interface{}{
+				"interval":       10,
+				"request.method": "GET",
+				"request.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "header.X-Foo",
+							"value":  "foo",
+						},
+					},
+				},
+				"response.transforms": []interface{}{
+					map[string]interface{}{
+						"set": map[string]interface{}{
+							"target": "body.bar",
+							"value":  `[[.header.Get "X-Foo"]]`,
+						},
+					},
+				},
+			},
+			handler:  defaultHandler("GET", ""),
+			expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 		},
 	}
 
