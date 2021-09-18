@@ -206,20 +206,17 @@ func (m *FileReaderManager) getFileReaderHash(reuseReader *ReuseHarvester) strin
 // cleanup: 清理已关闭的reader
 func (m *FileReaderManager) cleanup() {
 	for id, fileReaders := range m.fileReaders {
+		leftFileReader := make([]*FileHarvester, 0)
 		length := len(fileReaders)
-		for i := 0; i < length; {
+		for i := 0; i < length; i++ {
 			select {
 			case <-fileReaders[i].done:
-				if length != i {
-					fileReaders[i] = fileReaders[length-1]
-					length--
-					continue
-				}
+				continue
 			default:
+				leftFileReader = append(leftFileReader, fileReaders[i])
 			}
-			i++
 		}
-		fileReaders = fileReaders[:length]
+		fileReaders = leftFileReader
 		if len(fileReaders) == 0 {
 			delete(m.fileReaders, id)
 			logp.Info("ReuseHarvester has release the FileHarvester, id: %s", id)
@@ -292,7 +289,7 @@ func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 	})
 
 	//add forwarder
-	h.forwarder <- reuseReader
+	go func() {h.forwarder <- reuseReader}()
 	return nil
 }
 
@@ -312,6 +309,15 @@ func (h *FileHarvester) Run() {
 	var err error
 
 	defer func() {
+	L:
+		for {
+			select {
+			case  _ = <-h.forwarder:
+				continue
+			default:
+				break L
+			}
+		}
 		h.Close()
 		close(h.done)
 	}()
