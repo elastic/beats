@@ -283,13 +283,14 @@ func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 		h.state.TTL = h.config.CleanInactive
 	}
 
+	//add forwarder
+	go func() {h.forwarder <- reuseReader}()
+
 	// start to read file
 	h.runOnce.Do(func() {
 		go h.Run()
 	})
 
-	//add forwarder
-	go func() {h.forwarder <- reuseReader}()
 	return nil
 }
 
