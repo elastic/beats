@@ -151,6 +151,13 @@ var reMapping = map[string]string{
 	"tcp_ssl_proxy.egress_bytes_count.value":   "tcp_ssl_proxy.egress.bytes",
 	"tcp_ssl_proxy.ingress_bytes_count.value":  "tcp_ssl_proxy.ingress.bytes",
 
+	// gcp.metrics metricset
+	// NOTE: nothing here; if the user directly uses this metricset the mapping to ECS is
+	// unpredictable.
+	// Following the least surprise principle, instead of trying to convert it, leave it as it is.
+	// To prevent users from using this metricset directly, proper metricset should be implemented
+	// to adhere to ECS and Beats naming conventions.
+
 	// gcp.pubsub metricset
 	"snapshot.backlog_bytes.value":                                               "snapshot.backlog.bytes",
 	"snapshot.backlog_bytes_by_region.value":                                     "snapshot.backlog_bytes_by_region.bytes",
