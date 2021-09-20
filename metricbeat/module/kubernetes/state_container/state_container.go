@@ -173,7 +173,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
 			containerFields.Put("image.name", cImage)
-			// remove ECS container fields from kubernetes.container.* since they will be set through alias
+			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
 			event.Delete("image")
 		}
 
