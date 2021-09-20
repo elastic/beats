@@ -173,7 +173,7 @@ func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, w
 
 			// Renew visibility.
 			if err := p.sqs.ChangeMessageVisibility(ctx, msg, p.sqsVisibilityTimeout); err != nil {
-				log.Warn("Failed to extend message visibility timeout.", "error", err)
+				log.Warnw("Failed to extend message visibility timeout.", "error", err)
 			}
 		}
 	}

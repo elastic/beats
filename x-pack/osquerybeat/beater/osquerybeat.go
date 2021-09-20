@@ -194,7 +194,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		for {
 			select {
 			case <-ctx.Done():
-				bt.log.Info("context cancelled, exiting")
+				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
 				bt.pub.Configure(inputConfigs)
@@ -258,11 +258,6 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		bt.handleSnapshotResult(ctx, cli, configPlugin, res)
 	})
 
-	// Run extensions
-	g.Go(func() error {
-		return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
-	})
-
 	// Run main loop
 	g.Go(func() error {
 		// Connect to osqueryd
@@ -272,6 +267,11 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		}
 		defer cli.Close()
 
+		// Run extensions only after succesful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
+		g.Go(func() error {
+			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
+		})
+
 		// Register action handler
 		ah := bt.registerActionHandler(b, cli)
 		defer bt.unregisterActionHandler(b, ah)
@@ -280,7 +280,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		for {
 			select {
 			case <-ctx.Done():
-				bt.log.Info("context cancelled, exiting")
+				bt.log.Info("runOsquery context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputCh:
 				err = configPlugin.Set(inputConfigs)
