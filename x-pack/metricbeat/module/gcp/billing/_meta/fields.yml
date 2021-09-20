@@ -3,15 +3,15 @@
   release: beta
   type: group
   fields:
-    - name: cost_type
-      type: keyword
-      description: Cost types include regular, tax, adjustment, and rounding_error.
-    - name: invoice_month
-      type: keyword
-      description: Billing report month.
-    - name: project_id
-      type: keyword
-      description: Project ID of the billing report belongs to.
-    - name: total
-      type: float
-      description: Total billing amount.
+  - name: cost_type
+    type: keyword
+    description: Cost types include regular, tax, adjustment, and rounding_error.
+  - name: invoice_month
+    type: keyword
+    description: Billing report month.
+  - name: project_id
+    type: keyword
+    description: Project ID of the billing report belongs to.
+  - name: total
+    type: float
+    description: Total billing amount.
