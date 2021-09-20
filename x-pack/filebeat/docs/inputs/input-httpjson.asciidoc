@@ -466,7 +466,7 @@ Available transforms for request: [`append`, `delete`, `set`].
 
 Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
-Can write state to: [`header.*`, `url.params.*`, `body.*`].
+Can write state to: [`body.*`, `header.*`, `url.*`].
 
 ["source","yaml",subs="attributes"]
 ----
@@ -565,6 +565,11 @@ Required if using split type of `string`.  This is the sub string used to split 
 ==== `response.split[].key_field`
 
 Valid when used with `type: map`. When not empty, defines a new field where the original key value will be stored.
+
+[float]
+==== `response.split[].ignore_empty_value`
+
+If set to true, empty or missing value will be ignored and processing will pass on to the next nested split operation instead of failing with an error. Default: `false`.
 
 [float]
 ==== `response.split[].split`
