@@ -38022,63 +38022,12 @@ consumergroup
 
 
 
-[float]
-=== broker
-
-Broker Consumer Group Information have been read from (Broker handling the consumer group).
-
-
-
-*`kafka.consumergroup.broker.id`*::
-+
---
-Broker id
-
-
-type: long
-
---
-
-*`kafka.consumergroup.broker.address`*::
-+
---
-Broker address
-
-
-type: keyword
-
---
-
 *`kafka.consumergroup.id`*::
 +
 --
 Consumer Group ID
 
 type: keyword
-
---
-
-*`kafka.consumergroup.topic`*::
-+
---
-
-deprecated:[6.5]
-
-Topic name
-
-type: keyword
-
---
-
-*`kafka.consumergroup.partition`*::
-+
---
-
-deprecated:[6.5]
-
-Partition ID
-
-type: long
 
 --
 
@@ -38194,19 +38143,6 @@ Partition data.
 
 
 
-*`kafka.partition.partition.id`*::
-+
---
-
-deprecated:[6.5]
-
-Partition id.
-
-
-type: long
-
---
-
 *`kafka.partition.partition.leader`*::
 +
 --
@@ -38254,58 +38190,6 @@ Error code from fetching partition.
 
 
 type: long
-
---
-
-*`kafka.partition.topic.error.code`*::
-+
---
-
-deprecated:[6.5]
-
-topic error code.
-
-
-type: long
-
---
-
-*`kafka.partition.topic.name`*::
-+
---
-
-deprecated:[6.5]
-
-Topic name
-
-
-type: keyword
-
---
-
-*`kafka.partition.broker.id`*::
-+
---
-
-deprecated:[6.5]
-
-Broker id
-
-
-type: long
-
---
-
-*`kafka.partition.broker.address`*::
-+
---
-
-deprecated:[6.5]
-
-Broker address
-
-
-type: keyword
 
 --
 
