@@ -21,8 +21,9 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/google/uuid"
+
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // we define custom delimiters to prevent issues when using template values as part of other Go templates.
