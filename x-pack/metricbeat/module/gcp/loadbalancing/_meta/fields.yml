@@ -3,55 +3,55 @@
   release: beta
   type: group
   fields:
-  - name: https.backend_request_bytes_count.value
+  - name: https.backend_request.bytes
     type: long
     description: The number of bytes sent as requests from HTTP/S load balancer to backends.
-  - name: https.backend_request_count.value
+  - name: https.backend_request.count
     type: long
     description: The number of requests served by backends of HTTP/S load balancer.
-  - name: https.backend_response_bytes_count.value
+  - name: https.backend_response.bytes
     type: long
     description: The number of bytes sent as responses from backends (or cache) to external HTTP(S) load balancer.
-  - name: https.request_bytes_count.value
+  - name: https.request.bytes
     type: long
     description: The number of bytes sent as requests from clients to HTTP/S load balancer.
-  - name: https.request_count.value
+  - name: https.request.count
     type: long
     description: The number of requests served by HTTP/S load balancer.
-  - name: https.response_bytes_count.value
+  - name: https.response.bytes
     type: long
     description: The number of bytes sent as responses from HTTP/S load balancer to clients.
-  - name: l3.external.egress_bytes_count.value
+  - name: l3.external.egress.bytes
     type: long
     description: The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it's counting bytes on application stream only.
-  - name: l3.external.egress_packets_count.value
+  - name: l3.external.egress_packets.count
     type: long
     description: The number of packets sent from external TCP/UDP network load balancer backend to client of the flow.
-  - name: l3.external.ingress_bytes_count.value
+  - name: l3.external.ingress.bytes
     type: long
     description: The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it's counting bytes on application stream only.
-  - name: l3.external.ingress_packets_count.value
+  - name: l3.external.ingress_packets.count
     type: long
     description: The number of packets sent from client to external TCP/UDP network load balancer backend.
-  - name: l3.internal.egress_bytes_count.value
+  - name: l3.internal.egress.bytes
     type: long
     description: The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
-  - name: l3.internal.egress_packets_count.value
+  - name: l3.internal.egress_packets.count
     type: long
     description: The number of packets sent from ILB backend to client of the flow.
-  - name: l3.internal.ingress_bytes_count.value
+  - name: l3.internal.ingress.bytes
     type: long
     description: The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
-  - name: l3.internal.ingress_packets_count.value
+  - name: l3.internal.ingress_packets.count
     type: long
     description: The number of packets sent from client to ILB backend.
   - name: tcp_ssl_proxy.closed_connections.value
     type: long
     description: Number of connections that were terminated over TCP/SSL proxy.
-  - name: tcp_ssl_proxy.egress_bytes_count.value
+  - name: tcp_ssl_proxy.egress.bytes
     type: long
     description: Number of bytes sent from VM to client using proxy.
-  - name: tcp_ssl_proxy.ingress_bytes_count.value
+  - name: tcp_ssl_proxy.ingress.bytes
     type: long
     description: Number of bytes sent from client to VM using proxy.
   - name: tcp_ssl_proxy.new_connections.value

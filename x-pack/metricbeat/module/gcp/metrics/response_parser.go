@@ -132,6 +132,24 @@ var reMapping = map[string]string{
 	"pod.volume.total_bytes.value":                    "pod.volume.total.bytes",
 	"pod.volume.used_bytes.value":                     "pod.volume.used.bytes",
 	"pod.volume.utilization.value":                    "pod.volume.utilization.pct",
+
+	// gcp.loadbalancing metricset
+	"https.backend_request_bytes_count.value":  "https.backend_request.bytes",
+	"https.backend_request_count.value":        "https.backend_request.count",
+	"https.backend_response_bytes_count.value": "https.backend_response.bytes",
+	"https.request_bytes_count.value":          "https.request.bytes",
+	"https.request_count.value":                "https.request.count",
+	"https.response_bytes_count.value":         "https.response.bytes",
+	"l3.external.egress_bytes_count.value":     "l3.external.egress.bytes",
+	"l3.external.egress_packets_count.value":   "l3.external.egress_packets.count",
+	"l3.external.ingress_bytes_count.value":    "l3.external.ingress.bytes",
+	"l3.external.ingress_packets_count.value":  "l3.external.ingress_packets.count",
+	"l3.internal.egress_bytes_count.value":     "l3.internal.egress.bytes",
+	"l3.internal.egress_packets_count.value":   "l3.internal.egress_packets.count",
+	"l3.internal.ingress_bytes_count.value":    "l3.internal.ingress.bytes",
+	"l3.internal.ingress_packets_count.value":  "l3.internal.ingress_packets.count",
+	"tcp_ssl_proxy.egress_bytes_count.value":   "tcp_ssl_proxy.egress.bytes",
+	"tcp_ssl_proxy.ingress_bytes_count.value":  "tcp_ssl_proxy.ingress.bytes",
 }
 
 func remap(l *logp.Logger, s string) string {
