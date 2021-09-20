@@ -757,6 +757,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
 - Update Cisco ASA/FTD ingest pipeline grok/dissect patterns for multiple message IDs. {issue}26869[26869] {pull}26879[26879]
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
+- Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 
 *Heartbeat*
 
