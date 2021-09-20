@@ -22,9 +22,8 @@ func InjectInsecureOutput(fleetConfig *configuration.FleetAgentConfig) func(*log
 	return func(_ *logger.Logger, rootAst *transpiler.AST) error {
 		// if verification mode is not set abort
 		if fleetConfig == nil ||
-			fleetConfig.Server == nil ||
-			fleetConfig.Server.TLS == nil ||
-			fleetConfig.Server.TLS.VerificationMode == tlscommon.VerifyFull {
+			fleetConfig.Client.Transport.TLS == nil ||
+			fleetConfig.Client.Transport.TLS.VerificationMode == tlscommon.VerifyFull {
 			// no change
 			return nil
 		}
@@ -47,7 +46,7 @@ func InjectInsecureOutput(fleetConfig *configuration.FleetAgentConfig) func(*log
 			return nil
 		}
 
-		modeString := fleetConfig.Server.TLS.VerificationMode.String()
+		modeString := fleetConfig.Client.Transport.TLS.VerificationMode.String()
 
 		for _, outputNode := range outputsNodeCollection {
 			outputKV, ok := outputNode.(*transpiler.Key)
@@ -76,7 +75,6 @@ func InjectInsecureOutput(fleetConfig *configuration.FleetAgentConfig) func(*log
 			output.Insert(
 				transpiler.NewKey(sslVerificationKey, transpiler.NewStrVal(modeString)),
 			)
-
 		}
 
 		return nil

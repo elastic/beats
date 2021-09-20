@@ -11,9 +11,11 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/remote"
 )
 
 func TestInjectInsecure(t *testing.T) {
@@ -60,14 +62,37 @@ func TestInjectInsecure(t *testing.T) {
 			},
 			VerificationMode: tlscommon.VerifyNone,
 		},
+
+		{
+			Name: "do not override provided value none",
+			Config: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"elasticsearch": map[string]interface{}{
+						"key":                   "value",
+						"ssl.verification_mode": "strict",
+					},
+				},
+			},
+			Expected: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"elasticsearch": map[string]interface{}{
+						"key":                   "value",
+						"ssl.verification_mode": "strict",
+					},
+				},
+			},
+			VerificationMode: tlscommon.VerifyNone,
+		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			fn := InjectInsecureOutput(&configuration.FleetAgentConfig{
-				Server: &configuration.FleetServerConfig{
-					TLS: &tlscommon.Config{
-						VerificationMode: tc.VerificationMode,
+				Client: remote.Config{
+					Transport: httpcommon.HTTPTransportSettings{
+						TLS: &tlscommon.Config{
+							VerificationMode: tc.VerificationMode,
+						},
 					},
 				},
 			})
