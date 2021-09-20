@@ -195,6 +195,17 @@ var reMapping = map[string]string{
 	"topic.send_request_count.value":                                             "topic.send_request.count",
 	"topic.streaming_pull_response_count.value":                                  "topic.streaming_pull_response.count",
 	"topic.unacked_bytes_by_region.value":                                        "topic.unacked_bytes_by_region.bytes",
+
+	// gcp.storage metricset
+	"api.request_count.value":                        "api.request.count",
+	"authz.acl_based_object_access_count.value":      "authz.acl_based_object_access.count",
+	"authz.acl_operations_count.value":               "authz.acl_operations.count",
+	"authz.object_specific_acl_mutation_count.value": "authz.object_specific_acl_mutation.count",
+	"network.received_bytes_count.value":             "network.received.bytes",
+	"network.sent_bytes_count.value":                 "network.sent.bytes",
+	"storage.object_count.value":                     "storage.object.count",
+	"storage.total_byte_seconds.value":               "storage.total_byte_seconds.bytes",
+	"storage.total_bytes.value":                      "storage.total.bytes",
 }
 
 func remap(l *logp.Logger, s string) string {
