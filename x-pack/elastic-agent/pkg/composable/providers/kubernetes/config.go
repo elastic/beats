@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
-
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 

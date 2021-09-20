@@ -195,13 +195,9 @@ func (p *pod) OnDelete(obj interface{}) {
 
 	p.logger.Debugf("pod delete: %+v", obj)
 	pod := obj.(*kubernetes.Pod)
-	// TODO: verify if we need this check here
-	if podTerminated(pod, getContainersInPod(pod)) {
-		time.AfterFunc(p.cleanupTimeout, func() {
-			p.emitStopped(pod)
-		})
-		return
-	}
+	time.AfterFunc(p.cleanupTimeout, func() {
+		p.emitStopped(pod)
+	})
 }
 
 func generatePodData(
@@ -410,39 +406,6 @@ func (*namespacePodUpdater) OnAdd(interface{}) {}
 // OnDelete handles delete events on namespaces. Nothing to do, if pods are deleted from this
 // namespace they will generate their own delete events.
 func (*namespacePodUpdater) OnDelete(interface{}) {}
-
-// podTerminating returns true if a pod is marked for deletion or is in a phase beyond running.
-func podTerminating(pod *kubernetes.Pod) bool {
-	if pod.GetObjectMeta().GetDeletionTimestamp() != nil {
-		return true
-	}
-
-	switch pod.Status.Phase {
-	case kubernetes.PodRunning, kubernetes.PodPending:
-	default:
-		return true
-	}
-
-	return false
-}
-
-// podTerminated returns true if a pod is terminated, this method considers a
-// pod as terminated if none of its containers are running (or going to be running).
-func podTerminated(pod *kubernetes.Pod, containers []*containerInPod) bool {
-	// Pod is not marked for termination, so it is not terminated.
-	if !podTerminating(pod) {
-		return false
-	}
-
-	// If any container is running, the pod is not terminated yet.
-	for _, container := range containers {
-		if container.status.State.Running != nil {
-			return false
-		}
-	}
-
-	return true
-}
 
 // getContainersInPod returns all the containers defined in a pod and their statuses.
 // It includes init and ephemeral containers.
