@@ -85190,24 +85190,6 @@ Kafka log lines.
 
 
 
-*`kafka.log.level`*::
-+
---
-type: alias
-
-alias to: log.level
-
---
-
-*`kafka.log.message`*::
-+
---
-type: alias
-
-alias to: message
-
---
-
 *`kafka.log.component`*::
 +
 --
