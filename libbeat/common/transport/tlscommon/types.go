@@ -35,44 +35,44 @@ var (
 	ErrCertificateUnspecified = errors.New("certificate file not configured")
 )
 
-var tlsCipherSuites = map[string]tlsCipherSuite{
+var tlsCipherSuites = map[string]CipherSuite{
 	// ECDHE-ECDSA
-	"ECDHE-ECDSA-AES-128-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA),
-	"ECDHE-ECDSA-AES-128-CBC-SHA256": tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256),
-	"ECDHE-ECDSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256),
-	"ECDHE-ECDSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA),
-	"ECDHE-ECDSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384),
-	"ECDHE-ECDSA-CHACHA20-POLY1305":  tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305),
-	"ECDHE-ECDSA-RC4-128-SHA":        tlsCipherSuite(tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA),
+	"ECDHE-ECDSA-AES-128-CBC-SHA":    CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA),
+	"ECDHE-ECDSA-AES-128-CBC-SHA256": CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256),
+	"ECDHE-ECDSA-AES-128-GCM-SHA256": CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256),
+	"ECDHE-ECDSA-AES-256-CBC-SHA":    CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA),
+	"ECDHE-ECDSA-AES-256-GCM-SHA384": CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384),
+	"ECDHE-ECDSA-CHACHA20-POLY1305":  CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305),
+	"ECDHE-ECDSA-RC4-128-SHA":        CipherSuite(tls.TLS_ECDHE_ECDSA_WITH_RC4_128_SHA),
 
 	// ECDHE-RSA
-	"ECDHE-RSA-3DES-CBC3-SHA":      tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA),
-	"ECDHE-RSA-AES-128-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA),
-	"ECDHE-RSA-AES-128-CBC-SHA256": tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256),
-	"ECDHE-RSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256),
-	"ECDHE-RSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA),
-	"ECDHE-RSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384),
-	"ECDHE-RSA-CHACHA20-POLY1205":  tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305),
-	"ECDHE-RSA-RC4-128-SHA":        tlsCipherSuite(tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA),
+	"ECDHE-RSA-3DES-CBC3-SHA":      CipherSuite(tls.TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA),
+	"ECDHE-RSA-AES-128-CBC-SHA":    CipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA),
+	"ECDHE-RSA-AES-128-CBC-SHA256": CipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256),
+	"ECDHE-RSA-AES-128-GCM-SHA256": CipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256),
+	"ECDHE-RSA-AES-256-CBC-SHA":    CipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA),
+	"ECDHE-RSA-AES-256-GCM-SHA384": CipherSuite(tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384),
+	"ECDHE-RSA-CHACHA20-POLY1205":  CipherSuite(tls.TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305),
+	"ECDHE-RSA-RC4-128-SHA":        CipherSuite(tls.TLS_ECDHE_RSA_WITH_RC4_128_SHA),
 
 	// RSA-X
-	"RSA-RC4-128-SHA":   tlsCipherSuite(tls.TLS_RSA_WITH_RC4_128_SHA),
-	"RSA-3DES-CBC3-SHA": tlsCipherSuite(tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA),
+	"RSA-RC4-128-SHA":   CipherSuite(tls.TLS_RSA_WITH_RC4_128_SHA),
+	"RSA-3DES-CBC3-SHA": CipherSuite(tls.TLS_RSA_WITH_3DES_EDE_CBC_SHA),
 
 	// RSA-AES
-	"RSA-AES-128-CBC-SHA":    tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA),
-	"RSA-AES-128-CBC-SHA256": tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA256),
-	"RSA-AES-128-GCM-SHA256": tlsCipherSuite(tls.TLS_RSA_WITH_AES_128_GCM_SHA256),
-	"RSA-AES-256-CBC-SHA":    tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_CBC_SHA),
-	"RSA-AES-256-GCM-SHA384": tlsCipherSuite(tls.TLS_RSA_WITH_AES_256_GCM_SHA384),
+	"RSA-AES-128-CBC-SHA":    CipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA),
+	"RSA-AES-128-CBC-SHA256": CipherSuite(tls.TLS_RSA_WITH_AES_128_CBC_SHA256),
+	"RSA-AES-128-GCM-SHA256": CipherSuite(tls.TLS_RSA_WITH_AES_128_GCM_SHA256),
+	"RSA-AES-256-CBC-SHA":    CipherSuite(tls.TLS_RSA_WITH_AES_256_CBC_SHA),
+	"RSA-AES-256-GCM-SHA384": CipherSuite(tls.TLS_RSA_WITH_AES_256_GCM_SHA384),
 
-	"TLS-AES-128-GCM-SHA256":       tlsCipherSuite(tls.TLS_AES_128_GCM_SHA256),
-	"TLS-AES-256-GCM-SHA384":       tlsCipherSuite(tls.TLS_AES_256_GCM_SHA384),
-	"TLS-CHACHA20-POLY1305-SHA256": tlsCipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
+	"TLS-AES-128-GCM-SHA256":       CipherSuite(tls.TLS_AES_128_GCM_SHA256),
+	"TLS-AES-256-GCM-SHA384":       CipherSuite(tls.TLS_AES_256_GCM_SHA384),
+	"TLS-CHACHA20-POLY1305-SHA256": CipherSuite(tls.TLS_CHACHA20_POLY1305_SHA256),
 }
 
-var tlsCipherSuitesInverse = make(map[tlsCipherSuite]string, len(tlsCipherSuites))
-var tlsRenegotiationSupportTypesInverse = make(map[tlsRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
+var tlsCipherSuitesInverse = make(map[CipherSuite]string, len(tlsCipherSuites))
+var tlsRenegotiationSupportTypesInverse = make(map[TlsRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
 var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
 
 // Init creates a inverse representation of the values mapping.
@@ -97,10 +97,10 @@ var tlsCurveTypes = map[string]tlsCurveType{
 	"X25519": tlsCurveType(tls.X25519),
 }
 
-var tlsRenegotiationSupportTypes = map[string]tlsRenegotiationSupport{
-	"never":  tlsRenegotiationSupport(tls.RenegotiateNever),
-	"once":   tlsRenegotiationSupport(tls.RenegotiateOnceAsClient),
-	"freely": tlsRenegotiationSupport(tls.RenegotiateFreelyAsClient),
+var tlsRenegotiationSupportTypes = map[string]TlsRenegotiationSupport{
+	"never":  TlsRenegotiationSupport(tls.RenegotiateNever),
+	"once":   TlsRenegotiationSupport(tls.RenegotiateOnceAsClient),
+	"freely": TlsRenegotiationSupport(tls.RenegotiateFreelyAsClient),
 }
 
 type tlsClientAuth int
@@ -194,9 +194,9 @@ func (m *tlsClientAuth) Unpack(in interface{}) error {
 	return nil
 }
 
-type tlsCipherSuite uint16
+type CipherSuite uint16
 
-func (cs *tlsCipherSuite) Unpack(s string) error {
+func (cs *CipherSuite) Unpack(s string) error {
 	suite, found := tlsCipherSuites[s]
 	if !found {
 		return fmt.Errorf("invalid tls cipher suite '%v'", s)
@@ -206,7 +206,7 @@ func (cs *tlsCipherSuite) Unpack(s string) error {
 	return nil
 }
 
-func (cs tlsCipherSuite) String() string {
+func (cs CipherSuite) String() string {
 	if s, found := tlsCipherSuitesInverse[cs]; found {
 		return s
 	}
@@ -225,9 +225,16 @@ func (ct *tlsCurveType) Unpack(s string) error {
 	return nil
 }
 
-type tlsRenegotiationSupport tls.RenegotiationSupport
+type TlsRenegotiationSupport tls.RenegotiationSupport
 
-func (r *tlsRenegotiationSupport) Unpack(s string) error {
+func (r TlsRenegotiationSupport) String() string {
+	if t, found := tlsRenegotiationSupportTypesInverse[r]; found {
+		return t
+	}
+	return "<unknown>"
+}
+
+func (r *TlsRenegotiationSupport) Unpack(s string) error {
 	t, found := tlsRenegotiationSupportTypes[s]
 	if !found {
 		return fmt.Errorf("invalid tls renegotiation type '%v'", s)
@@ -237,9 +244,17 @@ func (r *tlsRenegotiationSupport) Unpack(s string) error {
 	return nil
 }
 
-func (r tlsRenegotiationSupport) MarshalText() ([]byte, error) {
+func (r TlsRenegotiationSupport) MarshalText() ([]byte, error) {
 	if t, found := tlsRenegotiationSupportTypesInverse[r]; found {
 		return []byte(t), nil
+	}
+
+	return nil, fmt.Errorf("could not marshal '%+v' to text", r)
+}
+
+func (r TlsRenegotiationSupport) MarshalYAML() (interface{}, error) {
+	if t, found := tlsRenegotiationSupportTypesInverse[r]; found {
+		return t, nil
 	}
 
 	return nil, fmt.Errorf("could not marshal '%+v' to text", r)
@@ -264,4 +279,15 @@ func (c *CertificateConfig) Validate() error {
 		return ErrCertificateUnspecified
 	}
 	return nil
+}
+
+func convCipherSuites(suites []CipherSuite) []uint16 {
+	if len(suites) == 0 {
+		return nil
+	}
+	cipherSuites := make([]uint16, len(suites))
+	for i, s := range suites {
+		cipherSuites[i] = uint16(s)
+	}
+	return cipherSuites
 }

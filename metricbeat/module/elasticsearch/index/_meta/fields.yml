@@ -4,10 +4,99 @@
     index
   release: ga
   fields:
+    - name: created
+      type: long
+    - name: hidden
+      type: boolean
+    - name: shards
+      type: group
+      fields:
+        - name: total
+          type: long
+    - name: uuid
+      type: keyword
+    - name: status
+      type: keyword
     - name: name
       type: keyword
       description: >
         Index name.
+    - name: primaries
+      type: group
+      fields:
+        - name: search
+          type: group
+          fields:
+            - name: query_total
+              type: long
+            - name: query_time_in_millis
+              type: long
+        - name: request_cache
+          type: group
+          fields:
+            - name: memory_size_in_bytes
+              type: long
+            - name: evictions
+              type: long
+            - name: hit_count
+              type: long
+            - name: miss_count
+              type: long
+        - name: query_cache
+          type: group
+          fields:
+            - name: memory_size_in_bytes
+              type: long
+            - name: hit_count
+              type: long
+            - name: miss_count
+              type: long
+        - name: store.size_in_bytes
+          type: long
+        - name: docs.count
+          type: long
+        - name: docs.deleted
+          type: long
+        - name: segments
+          type: group
+          fields:
+            - name: count
+              type: long
+            - name: memory_in_bytes
+              type: long
+            - name: terms_memory_in_bytes
+              type: long
+            - name: stored_fields_memory_in_bytes
+              type: long
+            - name: term_vectors_memory_in_bytes
+              type: long
+            - name: norms_memory_in_bytes
+              type: long
+            - name: points_memory_in_bytes
+              type: long
+            - name: doc_values_memory_in_bytes
+              type: long
+            - name: index_writer_memory_in_bytes
+              type: long
+            - name: version_map_memory_in_bytes
+              type: long
+            - name: fixed_bit_set_memory_in_bytes
+              type: long
+        - name: refresh.total_time_in_millis
+          type: long
+        - name: refresh.external_total_time_in_millis
+          type: long
+        - name: merges.total_size_in_bytes
+          type: long
+        - name: indexing
+          type: group
+          fields:
+            - name: index_total
+              type: long
+            - name: index_time_in_millis
+              type: long
+            - name: throttle_time_in_millis
+              type: long
     - name: total
       type: group
       fields:
@@ -19,18 +108,87 @@
           type: long
           description: >
             Total number of deleted documents in the index.
-        - name: store.size.bytes
-          type: long
+        - name: store.size_in_bytes
           format: bytes
-          description: >
-            Total size of the index in bytes.
-        - name: segments.count
           type: long
           description: >
-            Total number of index segments.
-        - name: segments.memory.bytes
+              Total size of the index in bytes.
+        - name: query_cache
+          type: group
+          fields:
+          - name: memory_size_in_bytes
+            type: long
+          - name: evictions
+            type: long
+          - name: hit_count
+            type: long
+          - name: miss_count
+            type: long
+        - name: fielddata.memory_size_in_bytes
           type: long
-          format: bytes
-          description: >
-            Total number of memory used by the segments in bytes.
+        - name: fielddata.evictions
+          type: long
+        - name: request_cache
+          type: group
+          fields:
+            - name: memory_size_in_bytes
+              type: long
+            - name: evictions
+              type: long
+            - name: hit_count
+              type: long
+            - name: miss_count
+              type: long
+        - name: merges.total_size_in_bytes
+          type: long
+        - name: refresh.total_time_in_millis
+          type: long
+        - name: refresh.external_total_time_in_millis
+          type: long
+        - name: segments
+          type: group
+          fields:
+            - name: memory_in_bytes
+              type: long
+              format: bytes
+              description: >
+                Total number of memory used by the segments in bytes.
+            - name: terms_memory_in_bytes
+              type: long
+            - name: points_memory_in_bytes
+              type: long
+            - name: count
+              type: long
+              description: >
+                Total number of index segments.
+            - name: doc_values_memory_in_bytes
+              type: long
+            - name: norms_memory_in_bytes
+              type: long
+            - name: stored_fields_memory_in_bytes
+              type: long
+            - name: fixed_bit_set_memory_in_bytes
+              type: long
+            - name: term_vectors_memory_in_bytes
+              type: long
+            - name: version_map_memory_in_bytes
+              type: long
+            - name: index_writer_memory_in_bytes
+              type: long
+        - name: search
+          type: group
+          fields:
+            - name: query_total
+              type: long
+            - name: query_time_in_millis
+              type: long
+        - name: indexing
+          type: group
+          fields:
+            - name: index_total
+              type: long
+            - name: index_time_in_millis
+              type: long
+            - name: throttle_time_in_millis
+              type: long
 

@@ -1,0 +1,78 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Access map [Filebeat IIS] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "autoPrecision": true,
+                        "field": "source.geo.location",
+                        "isFilteredByCollar": true,
+                        "precision": 2,
+                        "useGeocentroid": true
+                    },
+                    "schema": "segment",
+                    "type": "geohash_grid"
+                }
+            ],
+            "params": {
+                "addTooltip": true,
+                "heatClusterSize": 1.5,
+                "isDesaturated": true,
+                "legendPosition": "bottomright",
+                "mapCenter": [
+                    0,
+                    0
+                ],
+                "mapType": "Scaled Circle Markers",
+                "mapZoom": 2,
+                "wms": {
+                    "enabled": false,
+                    "options": {
+                        "format": "image/png",
+                        "transparent": true
+                    }
+                }
+            },
+            "title": "Access map [Filebeat IIS] ECS",
+            "type": "tile_map"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "eb2db5b0-fe11-11e7-a3b0-d13028918f9f-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:09.583Z",
+    "version": "WzQ0MjksMV0="
+}

@@ -19,7 +19,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "http://18.194.223.56:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -41,7 +40,18 @@
         "tags": [
             "forwarded"
         ],
-        "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
+        "url.domain": "18.194.223.56",
+        "url.original": "http://18.194.223.56:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
+        "user_agent.version": "41.0.2228.0"
     },
     {
         "@timestamp": "2019-10-14T12:01:41.918Z",
@@ -63,7 +73,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "http://18.194.223.56:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -85,7 +94,18 @@
         "tags": [
             "forwarded"
         ],
-        "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
+        "url.domain": "18.194.223.56",
+        "url.original": "http://18.194.223.56:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36",
+        "user_agent.os.full": "Windows 7",
+        "user_agent.os.name": "Windows",
+        "user_agent.os.version": "7",
+        "user_agent.version": "41.0.2228.0"
     },
     {
         "@timestamp": "2019-10-14T12:01:49.543Z",
@@ -107,7 +127,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -129,7 +148,15 @@
         "tags": [
             "forwarded"
         ],
-        "user_agent.original": "curl/7.58.0"
+        "url.domain": "filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-14T12:01:50.199Z",
@@ -151,7 +178,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -173,7 +199,15 @@
         "tags": [
             "forwarded"
         ],
-        "user_agent.original": "curl/7.58.0"
+        "url.domain": "filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-14T12:01:50.831Z",
@@ -195,7 +229,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 0,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 612,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -217,6 +250,14 @@
         "tags": [
             "forwarded"
         ],
-        "user_agent.original": "curl/7.58.0"
+        "url.domain": "filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-1703142762.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     }
 ]

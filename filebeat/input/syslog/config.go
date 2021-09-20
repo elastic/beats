@@ -30,7 +30,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -38,6 +38,7 @@ type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	Format                    syslogFormat           `config:"format"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
+	Timezone                  *cfgtype.Timezone      `config:"timezone"`
 }
 
 type syslogFormat int
@@ -60,7 +61,8 @@ var defaultConfig = config{
 	ForwarderConfig: harvester.ForwarderConfig{
 		Type: "syslog",
 	},
-	Format: syslogFormatRFC3164,
+	Format:   syslogFormatRFC3164,
+	Timezone: cfgtype.MustNewTimezone("Local"),
 }
 
 type syslogTCP struct {
@@ -119,8 +121,6 @@ func factory(
 
 		return tcp.New(&config.Config, factory)
 	case unix.Name:
-		cfgwarn.Beta("Syslog Unix socket support is beta.")
-
 		config := defaultUnix()
 		if err := cfg.Unpack(&config); err != nil {
 			return nil, err

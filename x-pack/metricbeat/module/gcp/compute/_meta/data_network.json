@@ -6,15 +6,12 @@
             "name": "elastic-observability"
         },
         "instance": {
-            "id": "8174466357339614075",
-            "name": "ron-loadtest-kibana"
-        },
-        "machine": {
-            "type": "n1-standard-8"
+            "id": "1113015278728017638",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx"
         },
         "provider": "gcp"
     },
-    "cloud.availability_zone": "us-central1-a",
+    "cloud.availability_zone": "us-central1-c",
     "cloud.region": "us-central1",
     "event": {
         "dataset": "gcp.compute",
@@ -26,37 +23,37 @@
             "instance": {
                 "network": {
                     "received_bytes_count": {
-                        "value": 43502
+                        "value": 9519
                     },
                     "received_packets_count": {
-                        "value": 94
+                        "value": 134
                     },
                     "sent_bytes_count": {
-                        "value": 202
+                        "value": 0
                     },
                     "sent_packets_count": {
-                        "value": 4
+                        "value": 0
                     }
                 }
             }
         },
         "labels": {
             "metrics": {
-                "loadbalanced": "false"
+                "loadbalanced": "true"
             }
         }
     },
     "host": {
-        "id": "8174466357339614075",
-        "name": "ron-loadtest-kibana",
+        "id": "1113015278728017638",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-58mx",
         "network": {
-            "in": {
-                "bytes": 202,
-                "packets": 4
+            "egress": {
+                "bytes": 9519,
+                "packets": 134
             },
-            "out": {
-                "bytes": 43502,
-                "packets": 94
+            "ingress": {
+                "bytes": 0,
+                "packets": 0
             }
         }
     },

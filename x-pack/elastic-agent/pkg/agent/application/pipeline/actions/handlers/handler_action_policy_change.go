@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"sort"
 	"time"
 
@@ -84,7 +85,7 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	}
 
 	h.log.Debugf("handlerPolicyChange: emit configuration for action %+v", a)
-	err = h.handleKibanaHosts(ctx, c)
+	err = h.handleFleetServerHosts(ctx, c)
 	if err != nil {
 		return err
 	}
@@ -95,9 +96,17 @@ func (h *PolicyChange) Handle(ctx context.Context, a fleetapi.Action, acker stor
 	return acker.Ack(ctx, action)
 }
 
-func (h *PolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) (err error) {
-	// do not update kibana host from policy; no setters provided with local Fleet Server
+func (h *PolicyChange) handleFleetServerHosts(ctx context.Context, c *config.Config) (err error) {
+	// do not update fleet-server host from policy; no setters provided with local Fleet Server
 	if len(h.setters) == 0 {
+		return nil
+	}
+	data, err := c.ToMapStr()
+	if err != nil {
+		return errors.New(err, "could not convert the configuration from the policy", errors.TypeConfig)
+	}
+	if _, ok := data["fleet"]; !ok {
+		// no fleet information in the configuration (skip checking client)
 		return nil
 	}
 
@@ -135,12 +144,16 @@ func (h *PolicyChange) handleKibanaHosts(ctx context.Context, c *config.Config) 
 	}
 	ctx, cancel := context.WithTimeout(ctx, apiStatusTimeout)
 	defer cancel()
-	_, err = client.Send(ctx, "GET", "/api/status", nil, nil, nil)
+	resp, err := client.Send(ctx, "GET", "/api/status", nil, nil, nil)
 	if err != nil {
 		return errors.New(
 			err, "fail to communicate with updated API client hosts",
 			errors.TypeNetwork, errors.M("hosts", h.config.Fleet.Client.Hosts))
 	}
+	// discard body for proper cancellation and connection reuse
+	io.Copy(ioutil.Discard, resp.Body)
+	resp.Body.Close()
+
 	reader, err := fleetToReader(h.agentInfo, h.config)
 	if err != nil {
 		return errors.New(

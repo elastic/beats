@@ -45,6 +45,8 @@ function dockerPullImages() {
   docker.elastic.co/kibana/kibana:${SNAPSHOT}
   docker.elastic.co/logstash/logstash:${SNAPSHOT}
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-arm
+  docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-armhf
+  docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-armel
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-base-arm-debian9
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-darwin
   docker.elastic.co/beats-dev/golang-crossbuild:${GO_VERSION}-main

@@ -33,8 +33,8 @@
         "sophos.xg.priority": "Information",
         "sophos.xg.ssid": "SPIDIGO2015",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -71,8 +71,8 @@
         "sophos.xg.priority": "Information",
         "sophos.xg.ssid": "SPIDIGO2015",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

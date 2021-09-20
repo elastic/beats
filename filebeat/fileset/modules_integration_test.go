@@ -105,7 +105,13 @@ func TestSetupNginx(t *testing.T) {
 	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		{Module: "nginx"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"error":  {},
+				"access": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))
@@ -251,8 +257,7 @@ func TestLoadMultiplePipelinesWithRollback(t *testing.T) {
 
 func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:     eslegtest.GetURL(),
-		Timeout: 0,
+		URL: eslegtest.GetURL(),
 	})
 	if err != nil {
 		t.Fatal(err)

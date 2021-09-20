@@ -19,8 +19,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -36,8 +36,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "89.40.182.58",
-            "172.16.68.20"
+            "172.16.68.20",
+            "89.40.182.58"
         ],
         "rule.category": "access to a potentially vulnerable web application",
         "rule.id": "1881",
@@ -70,8 +70,8 @@
         "source.ip": "89.40.182.58",
         "source.port": 41528,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -94,8 +94,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -147,8 +147,8 @@
         "source.ip": "117.50.11.192",
         "source.port": 58914,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -171,8 +171,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -188,8 +188,8 @@
             "some_other_host.local"
         ],
         "related.ip": [
-            "77.61.185.101",
-            "172.16.68.20"
+            "172.16.68.20",
+            "77.61.185.101"
         ],
         "rule.category": "Web Application Attack",
         "rule.id": "53589",
@@ -222,8 +222,8 @@
         "source.ip": "77.61.185.101",
         "source.port": 59476,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -246,8 +246,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -290,8 +290,8 @@
         "source.ip": "10.0.0.168",
         "source.port": 28938,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -314,8 +314,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -358,8 +358,8 @@
         "source.ip": "10.0.1.31",
         "source.port": 40140,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

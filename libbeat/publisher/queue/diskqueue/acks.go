@@ -24,17 +24,58 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-// queuePosition represents a logical position within the queue buffer.
+// queuePosition represents the position of a data frame within the queue: the
+// containing segment, and a byte index into that segment on disk.
+// It also stores the 0-based index of the current frame within its segment
+// file. (Note that this depends only on the segment file itself, and is
+// unrelated to the frameID type used to identify frames in memory.)
+// The frame index is logically redundant with the byte index, but
+// calculating it requires a linear scan of the segment file, so we store
+// both values so we can track frame counts without reading the whole segment.
+// When referencing a data frame, a byteIndex of 0 / uninitialized is
+// understood to mean the first frame on disk (the header offset is
+// added during handling); thus, `queuePosition{segmentID: 5}` always points
+// to the first frame of segment 5, even though the logical position on
+// disk depends on the header size, which can vary across schema versions.
+// However, a nonzero byteIndex is always interpreted as an exact
+// file position.
 type queuePosition struct {
-	segmentID segmentID
-	offset    segmentOffset
+	segmentID  segmentID
+	byteIndex  uint64
+	frameIndex uint64
 }
 
+// diskQueueACKS stores the position of the oldest unacknowledged frame,
+// synchronizing it to disk using the file handle in positionFile.
+// sent to a consumer, and accepts later frames in any order, advancing
+// the position as the oldest one is received. When the position changes,
+// positionFile is overwritten with the new value.
+//
+// This is a simple way to track forward progress in the queue:
+// if the application terminates before all frames have been acknowledged,
+// the next session will restart at the first missing frame. This means
+// some later frames may be transmitted twice in this case, but it
+// guarantees that we don't drop any data.
+//
+// When all frames in a segment file have been acknowledged, the
+// segment id is sent to diskQueueACKs.segmentACKChan (which is read
+// and handled in core_loop.go) indicating that it is safe to dispose
+// of that segment.
+//
+// diskQueueACKS detects that a segment has been completely acknowledged
+// using the first frame ID of each segment as a boundary: if s is a
+// queueSegment, and every frame before s.firstFrameID has been
+// acknowledged, then every segment before s.id has been acknowledged.
+// This means it can't detect the end of the final segment, so that case
+// is handled diskQueue.handleShutdown.
 type diskQueueACKs struct {
 	logger *logp.Logger
 
 	// This lock must be held to access diskQueueACKs fields (except for
 	// diskQueueACKs.done, which is always safe).
+	// This is needed because ACK handling happens in the same goroutine
+	// as the caller (which may vary), unlike most queue logic which
+	// happens in the core loop.
 	lock sync.Mutex
 
 	// The id and position of the first unacknowledged frame.
@@ -46,15 +87,20 @@ type diskQueueACKs struct {
 	// remaining frame, which is written to disk as ACKs are received. (We do
 	// this to avoid duplicating events if the beat terminates without a clean
 	// shutdown.)
+	// Frames with id older than the oldest unacknowledged frame (nextFrameID)
+	// are removed from the table.
 	frameSize map[frameID]uint64
 
 	// segmentBoundaries maps the first frameID of each segment to its
-	// corresponding segment ID.
-	segmentBoundaries map[frameID]segmentID
+	// corresponding segment. We only need *queueSegment so we can
+	// call queueSegment.headerSize to calculate our position on
+	// disk; otherwise this could be a map from frameID to segmentID.
+	segmentBoundaries map[frameID]*queueSegment
 
-	// When a segment has been completely acknowledged by a consumer, it sends
-	// the segment ID to this channel, where it is read by the core loop and
-	// scheduled for deletion.
+	// When a call to addFrames results in a segment being completely
+	// acknowledged by a consumer, the highest segment ID that has been
+	// completely acknowledged is sent to this channel, where the core loop
+	// reads it and scheduled all segments up to that point for deletion.
 	segmentACKChan chan segmentID
 
 	// An open writable file handle to the file that stores the queue position.
@@ -77,8 +123,8 @@ func newDiskQueueACKs(
 		nextFrameID:       0,
 		nextPosition:      position,
 		frameSize:         make(map[frameID]uint64),
-		segmentBoundaries: make(map[frameID]segmentID),
-		segmentACKChan:    make(chan segmentID),
+		segmentBoundaries: make(map[frameID]*queueSegment),
+		segmentACKChan:    make(chan segmentID, 1),
 		positionFile:      positionFile,
 		done:              make(chan struct{}),
 	}
@@ -95,16 +141,10 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 	}
 	for _, frame := range frames {
 		segment := frame.segment
-		if frame.id != 0 && frame.id == segment.firstFrameID {
+		if frame.id == segment.firstFrameID {
 			// This is the first frame in its segment, mark it so we know when
 			// we're starting a new segment.
-			//
-			// Subtlety: we don't count the very first frame as a "boundary" even
-			// though it is the first frame we read from its segment. This prevents
-			// us from resetting our segment offset to zero, in case the initial
-			// offset was restored from a previous session instead of starting at
-			// the beginning of the first file.
-			dqa.segmentBoundaries[frame.id] = segment.id
+			dqa.segmentBoundaries[frame.id] = segment
 		}
 		dqa.frameSize[frame.id] = frame.bytesOnDisk
 	}
@@ -114,15 +154,23 @@ func (dqa *diskQueueACKs) addFrames(frames []*readFrame) {
 			newSegment, ok := dqa.segmentBoundaries[dqa.nextFrameID]
 			if ok {
 				// This is the start of a new segment. Remove this frame from the
-				// segment boundary list and set the position to the start of the
-				// new segment.
+				// segment boundary list and reset the byte index to immediately
+				// after the segment header.
 				delete(dqa.segmentBoundaries, dqa.nextFrameID)
-				dqa.nextPosition = queuePosition{
-					segmentID: newSegment,
-					offset:    0,
+				if dqa.nextFrameID != 0 {
+					// Special case if this is the first frame of a new session:
+					// don't overwrite nextPosition, since it may contain the saved
+					// position of the previous session.
+					dqa.nextPosition = queuePosition{segmentID: newSegment.id}
+				}
+				if dqa.nextPosition.byteIndex == 0 {
+					// Frame positions with byteIndex 0 are interpreted as pointing
+					// to the first frame (see the definition of queuePosition).
+					dqa.nextPosition.byteIndex = newSegment.headerSize()
 				}
 			}
-			dqa.nextPosition.offset += segmentOffset(dqa.frameSize[dqa.nextFrameID])
+			dqa.nextPosition.byteIndex += dqa.frameSize[dqa.nextFrameID]
+			dqa.nextPosition.frameIndex++
 			delete(dqa.frameSize, dqa.nextFrameID)
 		}
 		// We advanced the ACK position at least somewhat, so write its

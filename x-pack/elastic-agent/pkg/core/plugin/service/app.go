@@ -166,13 +166,16 @@ func (a *Application) Start(ctx context.Context, _ app.Taggable, cfg map[string]
 	if a.srvState != nil {
 		a.setState(state.Starting, "Starting", nil)
 		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
-		a.srvState.UpdateConfig(string(cfgStr))
+		a.srvState.UpdateConfig(a.srvState.Config())
 	} else {
 		a.setState(state.Starting, "Starting", nil)
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
+
+		// Set input types from the spec
+		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
 	defer func() {
@@ -305,6 +308,10 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 
 func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
 	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		if state.IsStateFiltered(msg, payload) {
+			return
+		}
+
 		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload

@@ -1,0 +1,6 @@
+- name: log
+  type: group
+  description: >
+    ZooKeeper logs.
+  release: beta
+  fields:

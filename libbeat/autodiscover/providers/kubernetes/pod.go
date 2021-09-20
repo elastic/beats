@@ -63,7 +63,16 @@ func NewPodEventer(uuid uuid.UUID, cfg *common.Config, client k8s.Interface, pub
 	// Ensure that node is set correctly whenever the scope is set to "node". Make sure that node is empty
 	// when cluster scope is enforced.
 	if config.Scope == "node" {
-		config.Node = kubernetes.DiscoverKubernetesNode(logger, config.Node, kubernetes.IsInCluster(config.KubeConfig), client)
+		nd := &kubernetes.DiscoverKubernetesNodeParams{
+			ConfigHost:  config.Node,
+			Client:      client,
+			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
+		}
+		config.Node, err = kubernetes.DiscoverKubernetesNode(logger, nd)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't discover kubernetes node due to error %w", err)
+		}
 	} else {
 		config.Node = ""
 	}
@@ -339,7 +348,7 @@ func (p *pod) emit(pod *kubernetes.Pod, flag string) {
 // configured port, a single event is created, with the port set to 0.
 // Host and port information is only included if the container is
 // running.
-// If the container ID is unkown, only "stop" events are generated.
+// If the container ID is unknown, only "stop" events are generated.
 // It also returns a map with the named ports.
 func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerInPod, annotations, namespaceAnnotations common.MapStr) ([]bus.Event, common.MapStr) {
 	if c.id == "" && flag != "stop" {
@@ -361,7 +370,9 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 	}
 
 	// Information that can be used in discovering a workload
-	kubemeta := meta.Clone()
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
 	kubemeta["container"] = common.MapStr{
 		"id":      c.id,
@@ -383,6 +394,9 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 
 	var events []bus.Event
 	portsMap := common.MapStr{}
+
+	meta.Put("container", cmeta)
+
 	for _, port := range ports {
 		event := bus.Event{
 			"provider":   p.uuid,
@@ -390,10 +404,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 			flag:         true,
 			"kubernetes": kubemeta,
 			// Actual metadata that will enrich the event.
-			"meta": common.MapStr{
-				"kubernetes": meta,
-				"container":  cmeta,
-			},
+			"meta": meta,
 		}
 		// Include network information only if the container is running,
 		// so templates that need network don't generate a config.
@@ -417,7 +428,9 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 	meta := p.metagen.Generate(pod)
 
 	// Information that can be used in discovering a workload
-	kubemeta := meta.Clone()
+	kubemetaMap, _ := meta.GetValue("kubernetes")
+	kubemeta, _ := kubemetaMap.(common.MapStr)
+	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
 	if len(namespaceAnnotations) != 0 {
 		kubemeta["namespace_annotations"] = namespaceAnnotations
@@ -429,9 +442,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 		"id":         fmt.Sprint(pod.GetObjectMeta().GetUID()),
 		flag:         true,
 		"kubernetes": kubemeta,
-		"meta": common.MapStr{
-			"kubernetes": meta,
-		},
+		"meta":       meta,
 	}
 
 	// Include network information only if the pod has an IP and there is any

@@ -4,6 +4,53 @@
     Beat state
   release: ga
   fields:
+    - name: service
+      type: group
+      fields:
+        - name: id
+          type: keyword
+        - name: name
+          type: keyword
+        - name: version
+          type: keyword
+    - name: input
+      type: group
+      fields:
+        - name: count
+          type: long
+        - name: names
+          type: keyword
+    - name: beat
+      type: group
+      fields:
+        - name: host
+          type: keyword
+        - name: name
+          type: keyword
+        - name: type
+          type: keyword
+        - name: uuid
+          type: keyword
+        - name: version
+          type: keyword
+    - name: cluster.uuid
+      type: keyword
+    - name: host
+      type: group
+      fields:
+        - name: containerized
+          type: keyword
+        - name: os
+          type: group
+          fields:
+            - name: kernel
+              type: keyword
+            - name: name
+              type: keyword
+            - name: platform
+              type: keyword
+            - name: version
+              type: keyword
     - name: management.enabled
       type: boolean
       description: >
@@ -12,6 +59,8 @@
       type: integer
       description: >
         Number of modules enabled
+    - name: module.names
+      type: keyword
     - name: output.name
       type: keyword
       description: >

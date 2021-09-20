@@ -33,7 +33,7 @@ import (
 func init() {
 	mb.Registry.MustAddMetricSet(elasticsearch.ModuleName, "index", New,
 		mb.WithHostParser(elasticsearch.HostParser),
-		mb.WithNamespace("elasticsearch.index"),
+		mb.DefaultMetricSet(),
 	)
 }
 
@@ -77,10 +77,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	if err := m.updateServicePath(*info.Version.Number); err != nil {
-		if m.XPack {
-			m.Logger().Error(err)
-			return nil
-		}
 		return err
 	}
 
@@ -89,20 +85,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	if m.XPack {
-		err = eventsMappingXPack(r, m, *info, content)
-		if err != nil {
-			// Since this is an x-pack code path, we log the error but don't
-			// return it. Otherwise it would get reported into `metricbeat-*`
-			// indices.
-			m.Logger().Error(err)
-			return nil
-		}
-	} else {
-		return eventsMapping(r, *info, content)
-	}
-
-	return nil
+	return eventsMapping(r, m.HTTP, *info, content)
 }
 
 func (m *MetricSet) updateServicePath(esVersion common.Version) error {

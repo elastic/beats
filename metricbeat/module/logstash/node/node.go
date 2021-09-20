@@ -65,32 +65,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	if !m.MetricSet.XPack {
-		content, err := m.HTTP.FetchContent()
-		if err != nil {
-			return err
-		}
+	if err := m.CheckPipelineGraphAPIsAvailable(); err != nil {
+		return err
+	}
 
-		return eventMapping(r, content)
+	content, err := m.HTTP.FetchContent()
+	if err != nil {
+		return err
 	}
 
 	pipelinesContent, overrideClusterUUID, err := logstash.GetPipelines(m.MetricSet)
 	if err != nil {
-		m.Logger().Error(err)
-		return nil
+		return err
 	}
 
-	err = eventMappingXPack(r, m, pipelinesContent, overrideClusterUUID)
-	if err != nil {
-		m.Logger().Error(err)
-	}
-
-	return nil
-}
-
-func (m *MetricSet) init() error {
-	if m.XPack {
-		return m.CheckPipelineGraphAPIsAvailable()
+	if err = eventMapping(r, content, pipelinesContent, overrideClusterUUID); err != nil {
+		return err
 	}
 
 	return nil

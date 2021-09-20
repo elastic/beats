@@ -12,31 +12,38 @@ processors:
     value: success
     if: "ctx.fortinet?.firewall?.action != null"
 - append:
+    field: event.type
+    value: denied
+    allow_duplicates: false
+    if: "['block', 'blocked', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action) || ['block'].contains(ctx.fortinet?.firewall?.utmaction)"
+- append:
+    field: event.type
+    value: allowed
+    allow_duplicates: false
+    if: "(ctx.fortinet?.firewall?.utmaction == null || ['allow'].contains(ctx.fortinet?.firewall?.action)) && !['block', 'blocked', 'deny', 'close', 'server-rst'].contains(ctx.fortinet?.firewall?.action)"
+- append:
     field: event.category
     value: network
+    allow_duplicates: false
 - append:
     field: event.type
     value: connection
+    allow_duplicates: false
 - append:
     field: event.type
     value: start
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.action == 'start'"
 - append:
     field: event.type
     value: end
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.action != null && ctx.fortinet?.firewall?.action !='start'"
 - append:
     field: event.type
     value: protocol
+    allow_duplicates: false
     if: "ctx.fortinet?.firewall?.app != null && ctx.fortinet?.firewall?.action != 'deny'"
-- append:
-    field: event.type
-    value: allowed
-    if: "ctx.fortinet?.firewall?.utmaction == null && ctx.fortinet?.firewall?.action != 'deny'"
-- append:
-    field: event.type
-    value: denied
-    if: "ctx.fortinet?.firewall?.utmaction == 'block'"
 - rename:
     field: fortinet.firewall.dstip
     target_field: destination.ip
@@ -80,10 +87,6 @@ processors:
 - rename:
     field: fortinet.firewall.dstunauthuser
     target_field: destination.user.name
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.group
-    target_field: source.user.group.name
     ignore_missing: true
 - convert:
     field: fortinet.firewall.sentbyte
@@ -152,10 +155,6 @@ processors:
     ignore_missing: true
     if: "ctx.event?.code == null"
 - rename:
-    field: fortinet.firewall.msg
-    target_field: message
-    ignore_missing: true
-- rename:
     field: fortinet.firewall.comment
     target_field: rule.description
     ignore_missing: true
@@ -184,21 +183,6 @@ processors:
     field: rule.category
     pattern: "\\."
     replacement: "-"
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.proto
-    target_field: network.iana_number
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.service
-    target_field: network.protocol
-    ignore_missing: true
-- lowercase:
-    field: network.protocol
-    ignore_missing: true
-- rename:
-    field: fortinet.firewall.url
-    target_field: url.path
     ignore_missing: true
 - remove:
     field:

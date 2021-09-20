@@ -231,6 +231,7 @@ func TestRfc5424ParseStructuredData(t *testing.T) {
 
 	runTests(tests, t)
 }
+
 func createVersionTestRule(v int, success bool) testRule {
 	var rule = testRule{
 		title: fmt.Sprintf("versionTest v:%d", v),
@@ -308,6 +309,34 @@ func TestRfc5424SyslogParserValueBoundary(t *testing.T) {
 	tests = append(tests, createVersionTestRule(1000, false))
 
 	runTests(tests, t)
+}
+
+func TestRfc5424SyslogParserDate(t *testing.T) {
+	test := []testRule{
+		{
+			title: "Test two-digit mdays",
+			log:   []byte(`<165>1 2003-08-07T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - %% It's time to make the do-nuts.`),
+			syslog: event{
+				priority:   165,
+				version:    1,
+				hostname:   "192.0.2.1",
+				appName:    "myproc",
+				processID:  "8710",
+				msgID:      "-",
+				year:       2003,
+				month:      8,
+				day:        7,
+				hour:       5,
+				minute:     14,
+				second:     15,
+				nanosecond: 3000,
+				message:    `%% It's time to make the do-nuts.`,
+				loc:        time.FixedZone("", -7*3600),
+			},
+		},
+	}
+
+	runTests(test, t)
 }
 
 func AssertEvent(t *testing.T, except event, actual *event) {

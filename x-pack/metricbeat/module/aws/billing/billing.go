@@ -18,6 +18,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer/costexploreriface"
+	"github.com/aws/aws-sdk-go-v2/service/organizations"
+	"github.com/aws/aws-sdk-go-v2/service/organizations/organizationsiface"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -208,6 +210,15 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, groupByDimKeys []string, groupByTags []string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
+	// get linked account IDs and names
+	accounts := map[string]string{}
+	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
+		awsConfig := m.MetricSet.AwsConfig.Copy()
+		svcOrg := organizations.New(awscommon.EnrichAWSConfigWithEndpoint(
+			m.Endpoint, "organizations", regionName, awsConfig))
+		accounts = m.getAccountName(svcOrg)
+	}
+
 	groupBys := getGroupBys(groupByTags, groupByDimKeys)
 	for _, groupBy := range groupBys {
 		var groupDefs []costexplorer.GroupDefinition
@@ -256,6 +267,12 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
 						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
+						if groupBy.dimension == "LINKED_ACCOUNT" {
+							if name, ok := accounts[key]; ok {
+								event.RootFields.Put("aws.linked_account.id", key)
+								event.RootFields.Put("aws.linked_account.name", name)
+							}
+						}
 						continue
 					}
 
@@ -406,4 +423,24 @@ func generateEventID(eventID string) string {
 	h.Write([]byte(eventID))
 	prefix := hex.EncodeToString(h.Sum(nil))
 	return prefix[:20]
+}
+
+func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]string {
+	// construct ListAccountsInput
+	ListAccountsInput := &organizations.ListAccountsInput{}
+	req := svc.ListAccountsRequest(ListAccountsInput)
+	p := organizations.NewListAccountsPaginator(req)
+
+	accounts := map[string]string{}
+	for p.Next(context.TODO()) {
+		page := p.CurrentPage()
+		for _, a := range page.Accounts {
+			accounts[*a.Id] = *a.Name
+		}
+	}
+
+	if err := p.Err(); err != nil {
+		m.logger.Warnf("failed ListAccountsRequest", err)
+	}
+	return accounts
 }

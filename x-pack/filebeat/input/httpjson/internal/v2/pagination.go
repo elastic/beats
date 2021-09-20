@@ -19,7 +19,7 @@ const paginationNamespace = "pagination"
 func registerPaginationTransforms() {
 	registerTransform(paginationNamespace, appendName, newAppendPagination)
 	registerTransform(paginationNamespace, deleteName, newDeletePagination)
-	registerTransform(paginationNamespace, setName, newSetPagination)
+	registerTransform(paginationNamespace, setName, newSetRequestPagination)
 }
 
 type pagination struct {
@@ -92,7 +92,7 @@ type pageIterator struct {
 	isFirst bool
 	done    bool
 
-	n int
+	n int64
 }
 
 func (p *pagination) newPageIterator(stdCtx context.Context, trCtx *transformContext, resp *http.Response) *pageIterator {

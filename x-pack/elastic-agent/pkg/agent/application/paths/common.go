@@ -28,6 +28,8 @@ var (
 	configPath      string
 	configFilePath  string
 	logsPath        string
+	downloadsPath   string
+	installPath     string
 	unversionedHome bool
 	tmpCreator      sync.Once
 )
@@ -44,6 +46,8 @@ func init() {
 	fs.StringVar(&configPath, "path.config", configPath, "Config path is the directory Agent looks for its config file")
 	fs.StringVar(&configFilePath, "c", DefaultConfigName, "Configuration file, relative to path.config")
 	fs.StringVar(&logsPath, "path.logs", logsPath, "Logs path contains Agent log output")
+	fs.StringVar(&downloadsPath, "path.downloads", downloadsPath, "Downloads path contains binaries Agent downloads")
+	fs.StringVar(&installPath, "path.install", installPath, "Install path contains binaries Agent extracts")
 }
 
 // Top returns the top directory for Elastic Agent, all the versioned
@@ -75,7 +79,7 @@ func Home() string {
 	if unversionedHome {
 		return topPath
 	}
-	return versionedHome(topPath)
+	return VersionedHome(topPath)
 }
 
 // IsVersionHome returns true if the Home path is versioned based on build.
@@ -134,6 +138,37 @@ func SetLogs(path string) {
 	logsPath = path
 }
 
+// VersionedHome returns a versioned path based on a TopPath and used commit.
+func VersionedHome(base string) string {
+	return filepath.Join(base, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
+}
+
+// Downloads returns the downloads directory for Agent
+func Downloads() string {
+	if downloadsPath == "" {
+		return filepath.Join(Home(), "downloads")
+	}
+	return downloadsPath
+}
+
+// SetDownloads updates the path for the downloads.
+func SetDownloads(path string) {
+	downloadsPath = path
+}
+
+// Install returns the install directory for Agent
+func Install() string {
+	if installPath == "" {
+		return filepath.Join(Home(), "install")
+	}
+	return installPath
+}
+
+// SetInstall updates the path for the install.
+func SetInstall(path string) {
+	installPath = path
+}
+
 // initialTop returns the initial top-level path for the binary
 //
 // When nested in top-level/data/elastic-agent-${hash}/ the result is top-level/.
@@ -162,8 +197,4 @@ func retrieveExecutablePath() string {
 func insideData(exePath string) bool {
 	expectedPath := filepath.Join("data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
 	return strings.HasSuffix(exePath, expectedPath)
-}
-
-func versionedHome(base string) string {
-	return filepath.Join(base, "data", fmt.Sprintf("elastic-agent-%s", release.ShortCommit()))
 }

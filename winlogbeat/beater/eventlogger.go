@@ -39,6 +39,7 @@ type eventLogger struct {
 	eventMeta  common.EventMetadata
 	processors beat.ProcessorList
 	keepNull   bool
+	log        *logp.Logger
 }
 
 type eventLoggerConfig struct {
@@ -55,6 +56,7 @@ func newEventLogger(
 	beatInfo beat.Info,
 	source eventlog.EventLog,
 	options *common.Config,
+	log *logp.Logger,
 ) (*eventLogger, error) {
 	config := eventLoggerConfig{}
 	if err := options.Unpack(&config); err != nil {
@@ -70,11 +72,11 @@ func newEventLogger(
 		source:     source,
 		eventMeta:  config.EventMetadata,
 		processors: processors,
+		log:        log.With("id", source.Name()),
 	}, nil
 }
 
 func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
-	api := e.source.Name()
 	return pipeline.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.GuaranteedSend,
 		Processing: beat.ProcessingConfig{
@@ -84,8 +86,8 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			KeepNull:      e.keepNull,
 		},
 		ACKHandler: acker.Counting(func(n int) {
-			addPublished(api, n)
-			logp.Info("EventLog[%s] successfully published %d events", api, n)
+			addPublished(e.source.Name(), n)
+			e.log.Debugw("Successfully published events.", "event.count", n)
 		}),
 	})
 }
@@ -107,8 +109,7 @@ func (e *eventLogger) run(
 
 	client, err := e.connect(pipeline)
 	if err != nil {
-		logp.Warn("EventLog[%s] Pipeline error. Failed to connect to publisher pipeline",
-			api.Name())
+		e.log.Warnw("Pipeline error. Failed to connect to publisher pipeline", "error", err)
 		return
 	}
 
@@ -121,20 +122,19 @@ func (e *eventLogger) run(
 
 	err = api.Open(state)
 	if err != nil {
-		logp.Warn("EventLog[%s] Open() error. No events will be read from "+
-			"this source. %v", api.Name(), err)
+		e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
 		return
 	}
 	defer func() {
-		logp.Info("EventLog[%s] Stop processing.", api.Name())
+		e.log.Info("Stop processing.")
 
 		if err := api.Close(); err != nil {
-			logp.Warn("EventLog[%s] Close() error. %v", api.Name(), err)
+			e.log.Warnw("Close() error.", "error", err)
 			return
 		}
 	}()
 
-	debugf("EventLog[%s] opened successfully", api.Name())
+	e.log.Debug("Opened successfully.")
 
 	for stop := false; !stop; {
 		select {
@@ -151,11 +151,11 @@ func (e *eventLogger) run(
 			// Graceful stop.
 			stop = true
 		default:
-			logp.Warn("EventLog[%s] Read() error: %v", api.Name(), err)
+			e.log.Warnw("Read() error.", "error", err)
 			return
 		}
 
-		debugf("EventLog[%s] Read() returned %d records", api.Name(), len(records))
+		e.log.Debugf("Read() returned %d records.", len(records))
 		if len(records) == 0 {
 			time.Sleep(time.Second)
 			continue

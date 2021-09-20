@@ -45,8 +45,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -105,8 +105,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -168,8 +168,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -227,16 +227,16 @@
         "input.type": "log",
         "log.offset": 3738,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -294,16 +294,16 @@
         "input.type": "log",
         "log.offset": 5108,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -358,8 +358,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -413,8 +413,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -466,8 +466,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -522,16 +522,16 @@
         "input.type": "log",
         "log.offset": 9881,
         "related.hash": [
-            "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91",
+            "75a94b8aa3b9a7c4de4f866b508111ac5a6f2b12",
             "a97fb86da4e010974860e5024137b56b",
-            "75a94b8aa3b9a7c4de4f866b508111ac5a6f2b12"
+            "dd6d4fedd34a4d0e5c62b0e6d8c734d157ee921e07cddc82251755bed0de3f91"
         ],
         "related.hosts": [
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -592,8 +592,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -651,8 +651,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -710,8 +710,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -764,8 +764,8 @@
             "Demo_Low_Prev_Retro"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -808,8 +808,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -861,16 +861,16 @@
         "input.type": "log",
         "log.offset": 17570,
         "related.hash": [
-            "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b",
             "48a0bf05b9706a00d2a0ff6260412f11",
-            "5058b16a86beee96927371210b9a9f682976a50a"
+            "5058b16a86beee96927371210b9a9f682976a50a",
+            "d5221f6847978682234cb8ebfa951cb56b1323658679a820b168bbc1f5261a3b"
         ],
         "related.hosts": [
             "Demo_Low_Prev_Retro"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -939,8 +939,8 @@
             "Demo_Qakbot_2"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -995,8 +995,8 @@
             "Demo_Qakbot_2"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1050,8 +1050,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1116,8 +1116,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1181,16 +1181,16 @@
         "process.name": "mssecsvc.exe",
         "process.pid": 2980,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1245,8 +1245,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1289,8 +1289,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1345,8 +1345,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1401,8 +1401,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1454,8 +1454,8 @@
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1509,16 +1509,16 @@
         "input.type": "log",
         "log.offset": 31671,
         "related.hash": [
-            "fce5b6784dc9f44cdc1d6214bb7b68d3029db049dcaf734edc9660bb3373bc79",
             "5df0c4ebca109779dc8afc745d612637",
-            "bdb11107a33eaeded6a838eb2a0e6167637dbe9c"
+            "bdb11107a33eaeded6a838eb2a0e6167637dbe9c",
+            "fce5b6784dc9f44cdc1d6214bb7b68d3029db049dcaf734edc9660bb3373bc79"
         ],
         "related.hosts": [
             "Demo_AMP_Exploit_Prevention_Audit"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1572,8 +1572,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1632,8 +1632,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1690,8 +1690,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1745,8 +1745,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1800,8 +1800,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1860,8 +1860,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -1916,8 +1916,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -1969,8 +1969,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2029,8 +2029,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2088,16 +2088,16 @@
         "input.type": "log",
         "log.offset": 43815,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2152,8 +2152,8 @@
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2208,16 +2208,16 @@
         "input.type": "log",
         "log.offset": 46299,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2275,16 +2275,16 @@
         "input.type": "log",
         "log.offset": 47663,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2342,16 +2342,16 @@
         "input.type": "log",
         "log.offset": 49034,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2415,16 +2415,16 @@
         "process.name": "mssecsvc.exe",
         "process.pid": 3020,
         "related.hash": [
-            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa",
+            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467",
             "84c82835a5d21bbcf75a61706d8ab549",
-            "5ff465afaabcbf0150d1a3ab2c2e74f3a4426467"
+            "ed01ebfbc9eb5bbea545af4d01bf5f1071661840480439c6e5babe8e080e41aa"
         ],
         "related.hosts": [
             "Demo_WannaCry_Ransomware"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2486,16 +2486,16 @@
         "process.name": "services.exe",
         "process.pid": 480,
         "related.hash": [
-            "90b63fbdde1b1aa7295e6cbe9ab7726792f8829eb53f2327f8a9cf109054f2a0",
             "75a758a0c5cea48c9922d64a113d0f9d",
+            "90b63fbdde1b1aa7295e6cbe9ab7726792f8829eb53f2327f8a9cf109054f2a0",
             "c78f4c22dd195a1791472a2c271a0c85b53900d9"
         ],
         "related.hosts": [
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "related.user": [
             "user@testdomain.com"
@@ -2556,8 +2556,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2615,8 +2615,8 @@
             "Demo_AMP_MAP_FriedEx"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2674,8 +2674,8 @@
             "Demo_Command_Line_Arguments_Kovter"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2733,8 +2733,8 @@
             "Demo_Command_Line_Arguments_Kovter"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2788,8 +2788,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [
@@ -2841,8 +2841,8 @@
             "Demo_Qakbot_1"
         ],
         "related.ip": [
-            "8.8.8.8",
-            "10.10.10.10"
+            "10.10.10.10",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "tags": [

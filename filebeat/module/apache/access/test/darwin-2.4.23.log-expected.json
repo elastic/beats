@@ -5,6 +5,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "::1 - - [26/Dec/2016:16:16:28 +0200] \"GET / HTTP/1.1\" 200 45",
         "event.outcome": "success",
         "fileset.name": "access",
         "http.request.method": "GET",
@@ -17,6 +18,7 @@
         "source.address": "::1",
         "source.ip": "::1",
         "url.original": "/",
+        "url.path": "/",
         "user.name": "-"
     },
     {
@@ -25,6 +27,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "::1 - - [26/Dec/2016:16:16:29 +0200] \"GET /favicon.ico HTTP/1.1\" 404 209",
         "event.outcome": "failure",
         "fileset.name": "access",
         "http.request.method": "GET",
@@ -36,7 +39,9 @@
         "service.type": "apache",
         "source.address": "::1",
         "source.ip": "::1",
+        "url.extension": "ico",
         "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
         "user.name": "-"
     },
     {
@@ -45,6 +50,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "::1 - - [26/Dec/2016:16:16:48 +0200] \"-\" 408 -",
         "event.outcome": "failure",
         "fileset.name": "access",
         "http.response.status_code": 408,
@@ -61,6 +67,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "77.179.66.156 - - [26/Dec/2016:18:23:35 +0200] \"GET / HTTP/1.1\" 200 45",
         "event.outcome": "success",
         "fileset.name": "access",
         "http.request.method": "GET",
@@ -83,6 +90,7 @@
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/",
+        "url.path": "/",
         "user.name": "-"
     },
     {
@@ -91,6 +99,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "77.179.66.156 - - [26/Dec/2016:18:23:41 +0200] \"GET /notfound HTTP/1.1\" 404 206",
         "event.outcome": "failure",
         "fileset.name": "access",
         "http.request.method": "GET",
@@ -113,6 +122,7 @@
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/notfound",
+        "url.path": "/notfound",
         "user.name": "-"
     },
     {
@@ -121,6 +131,7 @@
         "event.dataset": "apache.access",
         "event.kind": "event",
         "event.module": "apache",
+        "event.original": "77.179.66.156 - - [26/Dec/2016:18:23:45 +0200] \"GET /hmm HTTP/1.1\" 404 201",
         "event.outcome": "failure",
         "fileset.name": "access",
         "http.request.method": "GET",
@@ -143,6 +154,7 @@
         "source.geo.region_name": "Rheinland-Pfalz",
         "source.ip": "77.179.66.156",
         "url.original": "/hmm",
+        "url.path": "/hmm",
         "user.name": "-"
     }
 ]

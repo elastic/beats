@@ -173,7 +173,7 @@ endif::serverless[]
 By default, {beatname_uc} periodically logs its internal metrics that have
 changed in the last period. For each metric that changed, the delta from the
 value at the beginning of the period is logged. Also, the total values for all
-non-zero internal metrics are logged on shutdown. Set this to false to disable 
+non-zero internal metrics are logged on shutdown. Set this to false to disable
 this behavior. The default is true.
 
 Here is an example log line:
@@ -190,6 +190,13 @@ metrics and for this reason they are also not documented.
 ==== `logging.metrics.period`
 
 The period after which to log the internal metrics. The default is 30s.
+
+[float]
+==== `logging.metrics.namespaces`
+
+A list of metrics namespaces to report in the logs. Defaults to `[stats]`.
+`stats` contains general Beat metrics. `dataset` may be present in some
+Beats and contains module or input metrics.
 
 ifndef::serverless[]
 [float]
@@ -239,6 +246,15 @@ Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
 are boundary-aligned with minutes, hours, days, weeks, months, and years as
 reported by the local system clock. All other intervals are calculated from the
 unix epoch. Defaults to disabled.
+
+[float]
+==== `logging.files.suffix`
+
+When a log rotation happens it can either rename older files with
+an incresing index if `count` is configured. The other option is `date`
+that appends the current date and time to the end of the filename.
+When the log is rotated a new file is created and older files
+remain untouched.
 endif::serverless[]
 
 [float]

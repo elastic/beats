@@ -8,13 +8,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
 	"github.com/gofrs/uuid"
 	lru "github.com/hashicorp/golang-lru"
+	"github.com/osquery/osquery-go"
+	kconfig "github.com/osquery/osquery-go/plugin/config"
+	klogger "github.com/osquery/osquery-go/plugin/logger"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -22,7 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqueryd"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
 )
 
 var (
@@ -30,19 +34,33 @@ var (
 	ErrAlreadyRunning     = errors.New("already running")
 	ErrQueryExecution     = errors.New("failed query execution")
 	ErrActionRequest      = errors.New("invalid action request")
+	ErrOsquerydExited     = errors.New("osqueryd exited")
 )
 
 const (
 	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
 	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+
+	// The interval in second for configuration refresh;
+	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
+	configurationRefreshIntervalSecs = 60
+
+	osqueryTimeout = 60 * time.Second
+)
+
+const (
+	osqueryInputType     = "osquery"
+	extManagerServerName = "osqextman"
+	configPluginName     = "osq_config"
+	loggerPluginName     = "osq_logger"
 )
 
 // osquerybeat configuration.
 type osquerybeat struct {
 	b      *beat.Beat
 	config config.Config
-	client beat.Client
-	osqCli *osqueryd.Client
+
+	pub *pub.Publisher
 
 	log *logp.Logger
 
@@ -57,13 +75,14 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
 	bt := &osquerybeat{
 		b:      b,
 		config: c,
 		log:    log,
+		pub:    pub.New(b, log),
 	}
 
 	return bt, nil
@@ -83,28 +102,13 @@ func (bt *osquerybeat) initContext() (context.Context, error) {
 func (bt *osquerybeat) close() {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
-	if bt.client != nil {
-		bt.client.Close()
-		bt.client = nil
+	if bt.pub != nil {
+		bt.pub.Close()
 	}
 	if bt.cancel != nil {
 		bt.cancel()
 		bt.cancel = nil
 	}
-}
-
-func (bt *osquerybeat) inputTypes() []string {
-	m := make(map[string]struct{})
-	for _, input := range bt.config.Inputs {
-		m[input.Type] = struct{}{}
-	}
-
-	res := make([]string, 0, len(m))
-	for k := range m {
-		res = append(res, k)
-	}
-
-	return res
 }
 
 // Run starts osquerybeat.
@@ -116,167 +120,243 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer bt.close()
 
 	// Watch input configuration updates
-	inputConfigCh := config.WatchInputs(ctx)
-
-	var wg sync.WaitGroup
-
-	exefp, err := os.Executable()
-	if err != nil {
-		return err
-	}
-	exedir := filepath.Dir(exefp)
-
-	// Create temp directory for socket and possibly other things
-	// The unix domain socker path is limited to 108 chars and would
-	// not always be able to create in subdirectory
-	tmpdir, removeTmpDir, err := createSockDir(bt.log)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if removeTmpDir != nil {
-			removeTmpDir()
-		}
-	}()
+	inputConfigCh := config.WatchInputs(ctx, bt.log)
 
 	// Install osqueryd if needed
-	err = installOsquery(ctx, exedir)
+	err = installOsquery(ctx)
 	if err != nil {
 		return err
 	}
 
-	// Start osqueryd child process
-	osd := osqueryd.OsqueryD{
-		RootDir:    exedir,
-		SocketPath: osqueryd.SocketPath(tmpdir),
+	// Create socket path
+	socketPath, cleanupFn, err := osqd.CreateSocketPath()
+	if err != nil {
+		return err
 	}
+	defer cleanupFn()
 
-	// Connect publisher
-	bt.client, err = b.Publisher.Connect()
+	// Create osqueryd runner
+	osq := osqd.New(
+		socketPath,
+		osqd.WithLogger(bt.log),
+		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
+		osqd.WithConfigPlugin(configPluginName),
+		osqd.WithLoggerPlugin(loggerPluginName),
+	)
+
+	// Check that osqueryd exists and runnable
+	err = osq.Check(ctx)
 	if err != nil {
 		return err
 	}
 
-	// Start osqueryd child process
-	osdCtx, osdCn := context.WithCancel(ctx)
-	defer osdCn()
-	osqDone, err := osd.Start(osdCtx)
-	if err != nil {
-		bt.log.Errorf("Failed to start osqueryd process: %v", err)
-		return err
+	g, ctx := errgroup.WithContext(ctx)
+	var inputCh chan []config.InputConfig
+
+	startOsqueryIfNotStarted := func() {
+		// Start only once
+		if inputCh == nil {
+			inputCh = make(chan []config.InputConfig, 1)
+			g.Go(func() error {
+				err := bt.runOsquery(ctx, b, osq, inputCh)
+				if err != nil {
+					if errors.Is(err, context.Canceled) {
+						bt.log.Errorf("Osquery exited: %v", err)
+					} else {
+						bt.log.Errorf("Failed to run osquery: %v", err)
+					}
+				}
+				return err
+			})
+		}
 	}
 
-	// Create a cache for queries
-	cache, err := lru.New(scheduledOsqueriesTypesCacheSize + adhocOsqueriesTypesCacheSize)
+	// Start osquery only if config has inputs, otherwise it will be started on the first configuration sent from the agent
+	// This way we don't need to persist the configuration for configuration plugin, because osquery is not running until
+	// we have the first valid configuration
+	if len(bt.config.Inputs) > 0 {
+		startOsqueryIfNotStarted()
+		inputCh <- bt.config.Inputs
+	}
+
+	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
+	bt.setManagerPayload(b)
+
+	// Run main loop
+	g.Go(func() error {
+
+		// Configure publisher from initial input
+		err := bt.pub.Configure(bt.config.Inputs)
+		if err != nil {
+			return err
+		}
+
+		for {
+			select {
+			case <-ctx.Done():
+				bt.log.Info("osquerybeat context cancelled, exiting")
+				return ctx.Err()
+			case inputConfigs := <-inputConfigCh:
+				bt.pub.Configure(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
+					return err
+				}
+				startOsqueryIfNotStarted()
+				inputCh <- inputConfigs
+			}
+		}
+	})
+
+	// Wait for clean exit
+	return g.Wait()
+}
+
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, inputCh <-chan []config.InputConfig) error {
+	socketPath := osq.SocketPath()
+
+	// Create a cache for queries types resolution
+	cache, err := lru.New(adhocOsqueriesTypesCacheSize)
 	if err != nil {
 		bt.log.Errorf("Failed to create osquery query results types cache: %v", err)
 		return err
 	}
 
-	// Connect to osqueryd socket. Replying on the client library retry logic that checks for the socket availability
-	bt.osqCli, err = osqueryd.NewClient(ctx, osd.SocketPath, osqueryd.DefaultTimeout, bt.log, osqueryd.WithCache(cache))
-	if err != nil {
-		bt.log.Errorf("Failed to create osqueryd client: %v", err)
-		return err
-	}
-
-	cacheResize := func(size int) {
-		if size <= 0 {
-			size = scheduledOsqueriesTypesCacheSize
-		}
-		cache.Resize(size + adhocOsqueriesTypesCacheSize)
-	}
-
-	// Unlink socket path early
-	if removeTmpDir != nil {
-		removeTmpDir()
-		removeTmpDir = nil
-	}
-
-	// Start queries execution scheduler
-	scheduler := NewScheduler(ctx, bt.query)
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		scheduler.Run()
-	}()
-
-	// Load initial queries
-	loadSchedulerStreams := func(streams []config.StreamConfig) {
-		cacheResize(len(streams))
-		scheduler.Load(streams)
-	}
-	streams, inputTypes := config.StreamsFromInputs(bt.config.Inputs)
-	sz := len(streams)
-	if sz > 0 {
-		loadSchedulerStreams(streams)
-	}
-
-	// Agent actions handlers
-	var actionHandlers []*actionHandler
-	unregisterActionHandlers := func() {
-		bt.log.Debug("unregisterActionHandlers")
-		// Unregister action handlers
-		if b.Manager != nil {
-			for _, ah := range actionHandlers {
-				b.Manager.UnregisterAction(ah)
-				ah.bt = nil
-			}
-		}
-		actionHandlers = nil
-	}
-
-	registerActionHandlers := func(itypes []string) {
-		unregisterActionHandlers()
-		// Register action handler
-		if b.Manager != nil {
-			bt.log.Debugf("registerActionHandlers register actions: %v", itypes)
-			for _, inType := range itypes {
-				ah := &actionHandler{
-					inputType: inType,
-					bt:        bt,
-				}
-				b.Manager.RegisterAction(ah)
-				actionHandlers = append(actionHandlers, ah)
+	// Start osqueryd
+	g, ctx := errgroup.WithContext(ctx)
+	g.Go(func() error {
+		err := osq.Run(ctx)
+		if err != nil {
+			if errors.Is(err, context.Canceled) {
+				bt.log.Errorf("Osqueryd exited: %v", err)
+			} else {
+				bt.log.Errorf("Failed to run osqueryd: %v", err)
 			}
 		} else {
-			bt.log.Debug("registerActionHandlers b.Manager is nil, not registering actions")
+			// When osqueryd is killed for example there is no error returned
+			// but we can't continue running. Exiting.
+			bt.log.Info("osqueryd process exited")
+			err = ErrOsquerydExited
 		}
+		return err
+	})
+
+	// Create osqueryd client
+	cli := osqdcli.New(socketPath,
+		osqdcli.WithLogger(bt.log),
+		osqdcli.WithTimeout(osqueryTimeout),
+		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
+	)
+
+	// Create osquery configuration plugin that loads a persisted configuration from the disk
+	configPlugin := NewConfigPlugin(bt.log)
+	// Resize cache
+	cache.Resize(configPlugin.Count())
+
+	// Create osquery logger plugin
+	loggerPlugin := NewLoggerPlugin(bt.log, func(res SnapshotResult) {
+		bt.handleSnapshotResult(ctx, cli, configPlugin, res)
+	})
+
+	// Run main loop
+	g.Go(func() error {
+		// Connect to osqueryd
+		err = cli.Connect(ctx)
+		if err != nil {
+			return err
+		}
+		defer cli.Close()
+
+		// Run extensions only after succesful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
+		g.Go(func() error {
+			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
+		})
+
+		// Register action handler
+		ah := bt.registerActionHandler(b, cli)
+		defer bt.unregisterActionHandler(b, ah)
+
+		// Process input
+		for {
+			select {
+			case <-ctx.Done():
+				bt.log.Info("runOsquery context cancelled, exiting")
+				return ctx.Err()
+			case inputConfigs := <-inputCh:
+				err = configPlugin.Set(inputConfigs)
+				if err != nil {
+					bt.log.Errorf("failed to set configuration from inputs: %v", err)
+					return err
+				}
+				cache.Resize(configPlugin.Count())
+			}
+		}
+	})
+	return g.Wait()
+}
+
+func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
+	// Register config and logger extensions
+	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
+	if err != nil {
+		return
 	}
 
-	setManagerPayload := func(itypes []string) {
-		if b.Manager != nil {
-			b.Manager.SetPayload(map[string]interface{}{
-				"osquery_version": distro.OsquerydVersion(),
-			})
+	// Register osquery configuration plugin
+	extserver.RegisterPlugin(kconfig.NewPlugin(configPluginName, configPlugin.GenerateConfig))
+	// Register osquery logger plugin
+	extserver.RegisterPlugin(klogger.NewPlugin(loggerPluginName, loggerPlugin.Log))
+
+	g, ctx := errgroup.WithContext(ctx)
+	// Run extension server
+	g.Go(func() error {
+		return extserver.Run()
+	})
+
+	// Run extension server shutdown goroutine, otherwise it waits for ping failure
+	g.Go(func() error {
+		for {
+			select {
+			case <-ctx.Done():
+				return extserver.Shutdown(context.Background())
+			}
 		}
+	})
+
+	return g.Wait()
+}
+
+func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
+	ns, ok := configPlugin.LookupNamespace(res.Name)
+	if !ok {
+		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
+		// Drop the scheduled query results since at this point we don't have the namespace for the datastream where to send the results to
+		// and the API key would not have permissions for that namespaces datastream to create the index
+		return
 	}
 
-LOOP:
-	for {
-		select {
-		case err = <-osqDone:
-			break LOOP // Exiting if osquery child process exited with error
-		case <-ctx.Done():
-			bt.log.Info("Wait osqueryd exit")
-			exitErr := <-osqDone
-			bt.log.Infof("Exited osqueryd process, error: %v", exitErr)
-			break LOOP
-		case inputConfigs := <-inputConfigCh:
-			streams, inputTypes = config.StreamsFromInputs(inputConfigs)
-			registerActionHandlers(inputTypes)
-			setManagerPayload(inputTypes)
-			loadSchedulerStreams(streams)
-		}
+	qi, ok := configPlugin.LookupQueryInfo(res.Name)
+	if !ok {
+		bt.log.Errorf("failed to lookup query info: %s", res.Name)
+		return
 	}
 
-	// Unregister action handlers
-	unregisterActionHandlers()
+	hits, err := cli.ResolveResult(ctx, qi.QueryConfig.Query, res.Hits)
+	if err != nil {
+		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
+		return
+	}
 
-	// Wait for clean scheduler exit
-	wg.Wait()
+	responseID := uuid.Must(uuid.NewV4()).String()
+	bt.pub.Publish(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
+}
 
-	return err
+func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
+	if b.Manager != nil {
+		b.Manager.SetPayload(map[string]interface{}{
+			"osquery_version": distro.OsquerydVersion(),
+		})
+	}
 }
 
 // Stop stops osquerybeat.
@@ -284,128 +364,23 @@ func (bt *osquerybeat) Stop() {
 	bt.close()
 }
 
-func (bt *osquerybeat) query(ctx context.Context, q interface{}) error {
-	cfg, ok := q.(config.StreamConfig)
-	if !ok {
-		bt.log.Error("Unexpected query configuration")
-		return ErrInvalidQueryConfig
+func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client) *actionHandler {
+	if b.Manager == nil {
+		return nil
 	}
 
-	// Response ID could be useful in order to differentiate between different runs for the interval queries
-	responseID := uuid.Must(uuid.NewV4()).String()
-
-	log := bt.log.With("id", cfg.ID).With("query", cfg.Query).With("interval", cfg.Interval)
-
-	reqData := map[string]interface{}{
-		"id":    cfg.ID,
-		"query": cfg.Query,
+	ah := &actionHandler{
+		log:       bt.log,
+		inputType: osqueryInputType,
+		publisher: bt.pub,
+		queryExec: cli,
 	}
-
-	err := bt.executeQuery(ctx, log, cfg.Index, cfg.ID, cfg.Query, responseID, reqData)
-	if err != nil {
-		// Preserving the error as is, it will be attached to the result document
-		return err
-	}
-	return nil
+	b.Manager.RegisterAction(ah)
+	return ah
 }
 
-func (bt *osquerybeat) executeQuery(ctx context.Context, log *logp.Logger, index, id, query, responseID string, req map[string]interface{}) error {
-	log.Debugf("Execute query: %s", query)
-
-	start := time.Now()
-
-	hits, err := bt.osqCli.Query(ctx, query)
-
-	if err != nil {
-		log.Errorf("Failed to execute query, err: %v", err)
-		return err
+func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) {
+	if b.Manager != nil && ah != nil {
+		b.Manager.UnregisterAction(ah)
 	}
-
-	log.Infof("Completed query in: %v", time.Since(start))
-
-	for _, hit := range hits {
-		reqData := req["data"]
-		event := beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"type":      bt.b.Info.Name,
-				"action_id": id,
-				"osquery":   hit,
-			},
-		}
-		if reqData != nil {
-			event.Fields["action_data"] = reqData
-		}
-		if responseID != "" {
-			event.Fields["response_id"] = responseID
-		}
-		if index != "" {
-			event.Meta = common.MapStr{"index": index}
-		}
-
-		bt.client.Publish(event)
-	}
-	log.Infof("The %d events sent to index %s", len(hits), index)
-	return nil
-}
-
-type actionHandler struct {
-	inputType string
-	bt        *osquerybeat
-}
-
-func (a *actionHandler) Name() string {
-	return a.inputType
-}
-
-type actionData struct {
-	Query string
-	ID    string
-}
-
-func actionDataFromRequest(req map[string]interface{}) (ad actionData, err error) {
-	if req == nil {
-		return ad, ErrActionRequest
-	}
-	if v, ok := req["id"]; ok {
-		if id, ok := v.(string); ok {
-			ad.ID = id
-		}
-	}
-	if v, ok := req["data"]; ok {
-		if m, ok := v.(map[string]interface{}); ok {
-			if v, ok := m["query"]; ok {
-				if query, ok := v.(string); ok {
-					ad.Query = query
-				}
-			}
-		}
-	}
-	return ad, nil
-}
-
-// Execute handles the action request.
-func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{}) (map[string]interface{}, error) {
-
-	start := time.Now().UTC()
-	err := a.execute(ctx, req)
-	end := time.Now().UTC()
-
-	res := map[string]interface{}{
-		"started_at":   start.Format(time.RFC3339Nano),
-		"completed_at": end.Format(time.RFC3339Nano),
-	}
-
-	if err != nil {
-		res["error"] = err.Error()
-	}
-	return res, nil
-}
-
-func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) error {
-	ad, err := actionDataFromRequest(req)
-	if err != nil {
-		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
-	}
-	return a.bt.executeQuery(ctx, a.bt.log, config.DefaultStreamIndex, ad.ID, ad.Query, "", req)
 }

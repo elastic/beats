@@ -189,6 +189,10 @@ inputs:
             id: agent-id
             snapshot: false
             version: 8.0.0
+      - add_fields:
+          target: agent
+          fields:
+            id: agent-id
   - name: With processors
     type: file
     processors:
@@ -202,6 +206,10 @@ inputs:
             id: agent-id
             snapshot: false
             version: 8.0.0
+      - add_fields:
+          target: agent
+          fields:
+            id: agent-id
 `,
 			rule: &RuleList{
 				Rules: []Rule{
@@ -653,6 +661,182 @@ logs:
 				},
 			},
 		},
+		"insert defaults into existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key3: val3
+      d_key4: val4
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
+
+		"insert defaults into not existing": {
+			givenYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+rest: of
+`,
+			expectedYAML: `
+level_one:
+  key1: val1
+  key2:
+    d_key1: val2
+    d_key2: val3
+  level_two:
+    key1: val1
+    key2:
+      d_key1: val2
+      d_key2: val3
+rest: of
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InsertDefaults("level_one.level_two", "level_one.key1", "level_one.key2"),
+				},
+			},
+		},
+
+		"inject auth headers: no headers": {
+			givenYAML: `
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+      - "127.0.0.1:9202"
+  logstash:
+    port: 5
+`,
+			expectedYAML: `
+output:
+  elasticsearch:
+    headers:
+      h1: test-header
+    hosts:
+      - "127.0.0.1:9201"
+      - "127.0.0.1:9202"
+  logstash:
+    port: 5
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectHeaders(),
+				},
+			},
+		},
+
+		"inject auth headers: existing headers": {
+			givenYAML: `
+output:
+  elasticsearch:
+    headers:
+      sample-header: existing
+    hosts:
+      - "127.0.0.1:9201"
+      - "127.0.0.1:9202"
+  logstash:
+    port: 5
+`,
+			expectedYAML: `
+output:
+  elasticsearch:
+    headers:
+      sample-header: existing
+      h1: test-header
+    hosts:
+      - "127.0.0.1:9201"
+      - "127.0.0.1:9202"
+  logstash:
+    port: 5
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectHeaders(),
+				},
+			},
+		},
+		"inject queue settings": {
+			givenYAML: `
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+    bulk_max_size: 46
+    worker: 5
+`,
+			expectedYAML: `
+queue:
+  mem:
+    events: 690
+    flush:
+      min_events: 46
+      timeout: 1s
+
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+    bulk_max_size: 46
+    worker: 5
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectQueue(),
+				},
+			},
+		},
+		"inject queue settings falls back on default values": {
+			givenYAML: `
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+`,
+			expectedYAML: `
+queue:
+  mem:
+    events: 350
+    flush:
+      min_events: 50
+      timeout: 1s
+
+output:
+  elasticsearch:
+    hosts:
+      - "127.0.0.1:9201"
+`,
+			rule: &RuleList{
+				Rules: []Rule{
+					InjectQueue(),
+				},
+			},
+		},
 	}
 
 	for name, test := range testcases {
@@ -716,6 +900,8 @@ func TestSerialization(t *testing.T) {
 		CopyAllToList("t2", "insert_before", "a", "b"),
 		FixStream(),
 		SelectInto("target", "s1", "s2"),
+		InsertDefaults("target", "s1", "s2"),
+		InjectHeaders(),
 	)
 
 	y := `- rename:
@@ -781,6 +967,12 @@ func TestSerialization(t *testing.T) {
     - s1
     - s2
     path: target
+- insert_defaults:
+    selectors:
+    - s1
+    - s2
+    path: target
+- inject_headers: {}
 `
 
 	t.Run("serialize_rules", func(t *testing.T) {
@@ -809,6 +1001,12 @@ func (*fakeAgentInfo) Version() string {
 
 func (*fakeAgentInfo) Snapshot() bool {
 	return false
+}
+
+func (*fakeAgentInfo) Headers() map[string]string {
+	return map[string]string{
+		"h1": "test-header",
+	}
 }
 
 func FakeAgentInfo() AgentInfo {

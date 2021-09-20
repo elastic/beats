@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -16,8 +17,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 )
@@ -27,6 +27,8 @@ const (
 
 	retryOnBadConnTimeout = 5 * time.Minute
 )
+
+var hasScheme = regexp.MustCompile(`^([a-z][a-z0-9+\-.]*)://`)
 
 type requestFunc func(string, string, url.Values, io.Reader) (*http.Request, error)
 type wrapperFunc func(rt http.RoundTripper) (http.RoundTripper, error)
@@ -107,13 +109,18 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 		p = p + "/"
 	}
 
-	usedDefaultPort := defaultPort
-
 	hosts := cfg.GetHosts()
 	clients := make([]*requestClient, len(hosts))
 	for i, host := range cfg.GetHosts() {
-		var transport http.RoundTripper
-		transport, err := makeTransport(cfg.Timeout, cfg.TLS)
+		connStr, err := common.MakeURL(string(cfg.Protocol), p, host, 0)
+		if err != nil {
+			return nil, errors.Wrap(err, "invalid fleet-server endpoint")
+		}
+
+		transport, err := cfg.Transport.RoundTripper(
+			httpcommon.WithAPMHTTPInstrumentation(),
+			httpcommon.WithForceAttemptHTTP2(true),
+		)
 		if err != nil {
 			return nil, err
 		}
@@ -132,15 +139,11 @@ func NewWithConfig(log *logger.Logger, cfg Config, wrapper wrapperFunc) (*Client
 
 		httpClient := http.Client{
 			Transport: transport,
-			Timeout:   cfg.Timeout,
+			Timeout:   cfg.Transport.Timeout,
 		}
 
-		url, err := common.MakeURL(string(cfg.Protocol), p, host, usedDefaultPort)
-		if err != nil {
-			return nil, errors.Wrap(err, "invalid Kibana endpoint")
-		}
 		clients[i] = &requestClient{
-			request: prefixRequestFactory(url),
+			request: prefixRequestFactory(connStr),
 			client:  httpClient,
 		}
 	}
@@ -177,6 +180,7 @@ func (c *Client) Send(
 	// Content-Type / Accepted type can be override from the called.
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Add("Accept", "application/json")
+	// TODO: Make this header specific to fleet-server or remove it
 	req.Header.Set("kbn-xsrf", "1") // Without this Kibana will refuse to answer the request.
 
 	// copy headers.
@@ -187,6 +191,7 @@ func (c *Client) Send(
 	}
 
 	requester.lastUsed = time.Now().UTC()
+
 	resp, err := requester.client.Do(req.WithContext(ctx))
 	if err != nil {
 		requester.lastErr = err
@@ -267,20 +272,4 @@ func prefixRequestFactory(URL string) requestFunc {
 		newPath := strings.Join([]string{URL, path, "?", params.Encode()}, "")
 		return http.NewRequest(method, newPath, body)
 	}
-}
-
-// makeTransport create a transport object based on the TLS configuration.
-func makeTransport(timeout time.Duration, tls *tlscommon.Config) (*http.Transport, error) {
-	tlsConfig, err := tlscommon.LoadTLSConfig(tls)
-	if err != nil {
-		return nil, errors.Wrap(err, "invalid TLS configuration")
-	}
-	dialer := transport.NetDialer(timeout)
-	tlsDialer, err := transport.TLSDialer(dialer, tlsConfig, timeout)
-	if err != nil {
-		return nil, errors.Wrap(err, "fail to create TLS dialer")
-	}
-
-	// TODO: Dial is deprecated we need to move to DialContext.
-	return &http.Transport{Dial: dialer.Dial, DialTLS: tlsDialer.Dial}, nil
 }

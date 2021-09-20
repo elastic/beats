@@ -28,7 +28,7 @@ rules:
       selectors: [ fleet.server.policy.id ]
       path: inputs.0.policy
 
-  - select_into:
+  - insert_defaults:
       selectors:
         - fleet.server.host
         - fleet.server.port
@@ -62,5 +62,7 @@ rules:
         - fleet
         - inputs
         - output
+
+  - inject_headers: {}
 
 when: length(${fleet}) > 0 and length(${inputs}) > 0 and hasKey(${output}, 'elasticsearch')

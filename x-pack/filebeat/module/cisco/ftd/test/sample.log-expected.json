@@ -21,17 +21,18 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 0,
+        "network.community_id": "1:3NxcSu9jwJUYIYwJ2TO4TSNnPX8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "dmz",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -70,17 +71,18 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 139,
+        "network.community_id": "1:3NxcSu9jwJUYIYwJ2TO4TSNnPX8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "dmz",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -120,17 +122,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 294,
+        "network.community_id": "1:/AVpSqNe7QhujyFPgKMbMS9Ct44=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -169,19 +172,20 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 465,
+        "network.community_id": "1:462QRxMFThXYxhSyvR50cIDJegg=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "INT-FW01",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -223,19 +227,20 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "INT-FW01",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 632,
+        "network.community_id": "1:c8hH08+kxqP8+dYZZFCsPYYf0oo=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "INT-FW01",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -281,6 +286,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 812,
+        "network.community_id": "1:oGT+RQ2PYVsSEX/LuKvEW6O6Jiw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -333,6 +339,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 938,
+        "network.community_id": "1:4NJbCZhuyrAJcj7S647C7IIhAM8=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -342,8 +349,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.43",
-            "10.123.3.42"
+            "10.123.3.42",
+            "192.0.2.43"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.43",
@@ -380,6 +387,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1106,
+        "network.community_id": "1:ay9S7HyVcpV47ArwMPDsxLg6wBU=",
         "network.iana_number": 17,
         "network.transport": "udp",
         "observer.egress.interface.name": "outside",
@@ -432,6 +440,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1233,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
@@ -441,9 +450,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "10.123.1.35",
             "192.0.2.222",
-            "192.0.2.43",
-            "10.123.1.35"
+            "192.0.2.43"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -481,6 +490,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1401,
+        "network.community_id": "1:fZibb4nXPyoJv3pk+hIlafmMMMY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "outside",
@@ -534,6 +544,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1527,
+        "network.community_id": "1:KAOD4KM9MUK44UkzQPDM20+aGPI=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
@@ -543,9 +554,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.1",
+            "10.123.3.130",
             "10.123.3.42",
-            "10.123.3.130"
+            "192.0.2.1"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.1",
@@ -588,16 +599,17 @@
         "log.level": "informational",
         "log.offset": 1692,
         "network.bytes": 140,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.222",
-            "10.123.1.35"
+            "10.123.1.35",
+            "192.0.2.222"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -619,6 +631,7 @@
         "destination.address": "10.123.1.35",
         "destination.ip": "10.123.1.35",
         "destination.port": 52925,
+        "destination.user.name": "user2",
         "event.action": "flow-expiration",
         "event.category": [
             "network"
@@ -642,25 +655,32 @@
         "log.level": "informational",
         "log.offset": 1844,
         "network.bytes": 9999999,
+        "network.community_id": "1:JpGltiZUmRdP7Yj0gpMkjYQzWJY=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.222",
-            "10.123.1.35"
+            "10.123.1.35",
+            "192.0.2.222"
+        ],
+        "related.user": [
+            "user1",
+            "user2"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
         "source.ip": "192.0.2.222",
         "source.port": 53,
+        "source.user.name": "user1",
         "tags": [
             "cisco-ftd",
             "forwarded"
-        ]
+        ],
+        "user.name": "user2"
     },
     {
         "@timestamp": "2011-06-04T21:59:52.000-02:00",
@@ -688,6 +708,7 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2008,
+        "network.community_id": "1:tTzSWYTCd+HV5W2Q/cSW6AszABM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "FJSG2NRFW01",
@@ -698,8 +719,8 @@
             "FJSG2NRFW01"
         ],
         "related.ip": [
-            "192.168.132.46",
-            "172.24.177.29"
+            "172.24.177.29",
+            "192.168.132.46"
         ],
         "service.type": "cisco",
         "source.address": "192.168.132.46",
@@ -735,16 +756,17 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2163,
+        "network.community_id": "1:EsAlPGwbpvnOIWG+1RbOLtWOWaI=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.168.3.42",
-            "192.0.0.130"
+            "192.0.0.130",
+            "192.168.3.42"
         ],
         "service.type": "cisco",
         "source.address": "192.168.3.42",
@@ -788,18 +810,19 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2289,
+        "network.community_id": "1:m/dSB7tetihSecuyjm6x4Rl/8I8=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
+            "10.0.0.130",
             "192.0.0.17",
-            "192.168.3.42",
-            "10.0.0.130"
+            "192.168.3.42"
         ],
         "service.type": "cisco",
         "source.address": "192.0.0.17",
@@ -829,13 +852,14 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 2454,
+        "network.community_id": "1:cjsjwTI1K/FNwJ9mwZX971rPjfo=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -844,8 +868,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.0.66",
-            "10.1.2.60"
+            "10.1.2.60",
+            "192.0.0.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.0.66",
@@ -878,17 +902,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2563,
+        "network.community_id": "1:Zboag8BrI6OW/Oo2vWMZ2CJe4tM=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -927,17 +952,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2722,
+        "network.community_id": "1:Ne/QE55iCFiCg5J75DhSp3KZzQI=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -976,17 +1002,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 2883,
+        "network.community_id": "1:nVqNkC3HBTw1Le7RJD28aYfCDTg=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1025,17 +1052,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3044,
+        "network.community_id": "1:c82bgYlFS2zsrs3He7w3jq7x6jY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1074,17 +1102,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3205,
+        "network.community_id": "1:iQJvtLpa8CzCZimwacqAWJp9sZg=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1123,17 +1152,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3366,
+        "network.community_id": "1:CHFAR3iwADiL0sMiLhocbg8YF4o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1172,17 +1202,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3527,
+        "network.community_id": "1:fW9fDNL4osH5ogPXIzh5huGyJLU=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1221,17 +1252,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3688,
+        "network.community_id": "1:VqbI7AJvRLmCOZAb2tHFFBTeRZ8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1270,17 +1302,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 3847,
+        "network.community_id": "1:TUJhCk7pGNvVhgiAnf4YJJaoCpo=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "dmz",
+        "observer.egress.interface.name": "dmz",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1319,17 +1352,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4004,
+        "network.community_id": "1:EItD1g2bG+b/iorMXbZ/3Bvjam8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1366,23 +1400,24 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 4163,
+        "network.community_id": "1:a6VFmKsjwlqdlhQIeSm95/lkWlY=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.66",
-            "10.1.2.42"
+            "10.1.2.42",
+            "192.0.2.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
@@ -1412,13 +1447,14 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 4274,
+        "network.community_id": "1:96NZ3spb6QBXPZwoL7NadaqTMac=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.protocol": "dns",
@@ -1427,8 +1463,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.66",
-            "10.1.5.60"
+            "10.1.5.60",
+            "192.0.2.66"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.66",
@@ -1461,17 +1497,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4383,
+        "network.community_id": "1:DbXtTF7Tt+LJ0/omdap4K0RmodY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1510,17 +1547,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4542,
+        "network.community_id": "1:8enMIE4IqhVXWyyRuJRvdyDxiBA=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1559,17 +1597,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4703,
+        "network.community_id": "1:3vGj3wfvZB2f5kZmDflH/qfkWYE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1608,17 +1647,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 4862,
+        "network.community_id": "1:Wjdn68t3gwpMPxbO1bBTBvMkQKE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1657,17 +1697,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5018,
+        "network.community_id": "1:OHPCPPOkvDP3KMLJodW8pdmntUw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1706,23 +1747,24 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 5174,
+        "network.community_id": "1:7ujfPje/XmaZUbijXhcBn7jzz8Y=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.126",
-            "10.0.0.132"
+            "10.0.0.132",
+            "192.0.2.126"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
@@ -1755,23 +1797,24 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 5321,
+        "network.community_id": "1:7ujfPje/XmaZUbijXhcBn7jzz8Y=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "192.0.2.126",
-            "10.0.0.132"
+            "10.0.0.132",
+            "192.0.2.126"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.126",
@@ -1804,17 +1847,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5468,
+        "network.community_id": "1:IOafOGWxFLefP+hvoAc06Z1pBj8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1853,17 +1897,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5631,
+        "network.community_id": "1:89qba0kw6T/uGNWcSzTTYvNoLeY=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1903,17 +1948,18 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 5792,
+        "network.community_id": "1:3EQcjAJCGY7yJRip464V5VZ2h00=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1962,12 +2008,13 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5963,
+        "network.community_id": "1:xQpx+K3UkeF1wQfNjT+9cuVvkHo=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "identity",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "identity",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -1975,8 +2022,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.77.12",
-            "10.0.13.13"
+            "10.0.13.13",
+            "192.168.77.12"
         ],
         "service.type": "cisco",
         "source.address": "192.168.77.12",
@@ -2009,19 +2056,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6143,
+        "network.community_id": "1:/lWsjFt8GNAqxtRiPYxbyU20/N8=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "dmz",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2029,8 +2077,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.33",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.33"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
@@ -2063,19 +2111,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 6298,
+        "network.community_id": "1:/lWsjFt8GNAqxtRiPYxbyU20/N8=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "dmz",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2083,8 +2132,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.33",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.33"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.33",
@@ -2130,9 +2179,9 @@
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2187,9 +2236,9 @@
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2243,11 +2292,12 @@
         "log.level": "informational",
         "log.offset": 6803,
         "network.bytes": 14804,
+        "network.community_id": "1:tVS/eeyng4tH7pSAcq77I2cbedw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2301,11 +2351,12 @@
         "log.level": "informational",
         "log.offset": 6973,
         "network.bytes": 134781,
+        "network.community_id": "1:Tc+oC6fll4kTgOTp2hiirhpXAuQ=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2359,11 +2410,12 @@
         "log.level": "informational",
         "log.offset": 7144,
         "network.bytes": 134781,
+        "network.community_id": "1:Tc+oC6fll4kTgOTp2hiirhpXAuQ=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2403,18 +2455,19 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7315,
+        "network.community_id": "1:BX8uzuuLWZ5TLiZXPqdka12ZHOc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2454,18 +2507,19 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7462,
+        "network.community_id": "1:BX8uzuuLWZ5TLiZXPqdka12ZHOc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2507,19 +2561,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "127.0.0.1",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 7609,
+        "network.community_id": "1:BouUIZD+TqJZdYklL1aMrJfnbQ0=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "dmz",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2527,8 +2582,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.168.1.34",
-            "192.0.0.12"
+            "192.0.0.12",
+            "192.168.1.34"
         ],
         "service.type": "cisco",
         "source.address": "192.168.1.34",
@@ -2571,12 +2626,13 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7765,
+        "network.community_id": "1:mUqH1e0FnddfDertRLbskQ9rX5Q=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2628,12 +2684,13 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 7944,
+        "network.community_id": "1:mUqH1e0FnddfDertRLbskQ9rX5Q=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2687,11 +2744,12 @@
         "log.level": "informational",
         "log.offset": 8123,
         "network.bytes": 11420,
+        "network.community_id": "1:kugTIYv6tVeitQAN8XRNgUPvZiw=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "dmz",
         "observer.hostname": "127.0.0.1",
-        "observer.ingress.interface.name": "dmz",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2699,8 +2757,8 @@
             "127.0.0.1"
         ],
         "related.ip": [
-            "192.0.2.222",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.0.2.222"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.222",
@@ -2743,16 +2801,17 @@
         "log.level": "informational",
         "log.offset": 8293,
         "network.bytes": 1416,
+        "network.community_id": "1:n1IQHcbrWLb1u8dflqz8hfEElA0=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.44.4.4",
-            "10.44.2.2"
+            "10.44.2.2",
+            "10.44.4.4"
         ],
         "service.type": "cisco",
         "source.address": "10.44.4.4",
@@ -2782,16 +2841,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8435,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2829,16 +2888,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8556,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2876,16 +2935,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8677,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2923,16 +2982,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8798,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -2970,16 +3029,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 8919,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3017,16 +3076,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9040,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3064,16 +3123,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9161,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3111,16 +3170,16 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 9283,
-        "observer.egress.interface.name": "Mobile_Traffic",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Mobile_Traffic",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3161,19 +3220,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 9405,
+        "network.community_id": "1:buRYH8vRkdq5apZqKHNDfmztnUo=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "inside",
         "observer.hostname": "GIFRCHN01",
-        "observer.ingress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3181,8 +3241,8 @@
             "GIFRCHN01"
         ],
         "related.ip": [
-            "192.0.2.95",
-            "10.32.112.125"
+            "10.32.112.125",
+            "192.0.2.95"
         ],
         "service.type": "cisco",
         "source.address": "192.0.2.95",
@@ -3212,8 +3272,8 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "host.hostname": "GIFRCHN01",
@@ -3222,8 +3282,8 @@
         "log.offset": 9559,
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "Outside",
         "observer.hostname": "GIFRCHN01",
+        "observer.ingress.interface.name": "Outside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3261,22 +3321,23 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 9669,
+        "network.community_id": "1:XKWgpeop6LmXORBjS+D+pjammJ4=",
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "172.16.30.2",
-            "172.16.1.10"
+            "172.16.1.10",
+            "172.16.30.2"
         ],
         "service.type": "cisco",
         "source.address": "172.16.30.2",
@@ -3313,17 +3374,18 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 9805,
+        "network.community_id": "1:ZWjuP5bJeA+f0NH342ubXOWI+Lc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3382,10 +3444,11 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 10056,
+        "network.community_id": "1:iQUXct+pq5A5+rR869ELbDtnuek=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outsidet",
+        "observer.egress.interface.name": "outsidet",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3434,17 +3497,18 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 10355,
+        "network.community_id": "1:iQUXct+pq5A5+rR869ELbDtnuek=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outsidet",
+        "observer.egress.interface.name": "outsidet",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3481,8 +3545,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3502,7 +3566,8 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "/app"
+        "url.original": "/app",
+        "url.path": "/app"
     },
     {
         "@timestamp": "2009-11-16T14:12:36.000-02:00",
@@ -3522,8 +3587,8 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
@@ -3543,7 +3608,10 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "http://example.com"
+        "url.domain": "example.com",
+        "url.original": "http://example.com",
+        "url.path": "",
+        "url.scheme": "http"
     },
     {
         "@timestamp": "2009-11-16T14:12:37.000-02:00",
@@ -3564,14 +3632,14 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "ftd",
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 10823,
-        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "ftd",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -3586,6 +3654,10 @@
             "cisco-ftd",
             "forwarded"
         ],
-        "url.original": "http://www.example.net/images/favicon.ico"
+        "url.domain": "www.example.net",
+        "url.extension": "ico",
+        "url.original": "http://www.example.net/images/favicon.ico",
+        "url.path": "/images/favicon.ico",
+        "url.scheme": "http"
     }
 ]

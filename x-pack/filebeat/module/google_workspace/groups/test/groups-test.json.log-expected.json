@@ -11,8 +11,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"acl_change\",\"name\":\"change_acl_permission\",\"parameters\":[{\"name\":\"acl_permission\",\"value\":\"can_add_members\"},{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"new_value_repeated\",\"multiValue\":[\"managers\",\"members\"]},{\"name\":\"old_value_repeated\",\"multiValue\":[\"managers\"]}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -130,9 +130,9 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"approve_join_request\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"user_email\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "groups",
         "event.type": [
+            "change",
             "group",
-            "user",
-            "change"
+            "user"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -193,9 +193,9 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"join\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"}]}}",
         "event.provider": "groups",
         "event.type": [
+            "change",
             "group",
-            "user",
-            "change"
+            "user"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -297,8 +297,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_basic_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -306,8 +306,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_basic_setting\",\"parameters\":[{\"name\":\"basic_setting\",\"value\":\"allow_external_members\"},{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"new_value\",\"value\":\"true\"},{\"name\":\"old_value\",\"value\":\"false\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -364,8 +364,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"create_group\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -419,8 +419,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"delete_group\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "deletion"
+            "deletion",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -466,8 +466,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_identity_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -475,8 +475,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_identity_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"identity_setting\",\"value\":\"required_forms_of_identity\"},{\"name\":\"new_value\",\"value\":\"display_name_only\"},{\"name\":\"old_value\",\"value\":\"display_name_or_google_profile\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -525,8 +525,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "add_info_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -534,8 +534,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"add_info_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"info_setting\",\"value\":\"custom_footer\"},{\"name\":\"value\",\"value\":\"footer\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "creation"
+            "creation",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -583,8 +583,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_info_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -592,8 +592,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_info_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"info_setting\",\"value\":\"custom_footer\"},{\"name\":\"new_value\",\"value\":\"footer\"},{\"name\":\"old_value\",\"value\":\"old footer\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -642,8 +642,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "remove_info_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -651,8 +651,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"remove_info_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"info_setting\",\"value\":\"custom_footer\"},{\"name\":\"value\",\"value\":\"footer\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "deletion"
+            "deletion",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -700,8 +700,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_new_members_restrictions_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -709,8 +709,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_new_members_restrictions_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"new_members_restrictions_setting\",\"value\":\"new_members_can_post\"},{\"name\":\"new_value\",\"value\":\"inherit\"},{\"name\":\"old_value\",\"value\":\"overriden_to_false\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -759,8 +759,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_post_replies_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -768,8 +768,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_post_replies_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"post_replies_setting\",\"value\":\"where_should_replies_be_sent\"},{\"name\":\"new_value\",\"value\":\"reply_to_custom_address\"},{\"name\":\"old_value\",\"value\":\"reply_to_author_only\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -818,8 +818,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_spam_moderation_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -827,8 +827,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_spam_moderation_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"spam_moderation_setting\",\"value\":\"how_to_handle_suspected_spam_messages\"},{\"name\":\"new_value\",\"value\":\"moderate_and_do_not_send_notifications\"},{\"name\":\"old_value\",\"value\":\"moderate_and_send_notifications\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -877,8 +877,8 @@
         "@timestamp": "2020-10-02T15:00:00.000Z",
         "event.action": "change_topic_setting",
         "event.category": [
-            "iam",
-            "configuration"
+            "configuration",
+            "iam"
         ],
         "event.dataset": "google_workspace.groups",
         "event.id": "1",
@@ -886,8 +886,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"change_topic_setting\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"topic_setting\",\"value\":\"allowed_topic_types\"},{\"name\":\"new_value\",\"value\":\"discussions_questions\"},{\"name\":\"old_value\",\"value\":\"discussions\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
-            "change"
+            "change",
+            "group"
         ],
         "fileset.name": "groups",
         "google_workspace.actor.type": "USER",
@@ -1067,8 +1067,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"add_user\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"user_email\",\"value\":\"user@example.com\"},{\"name\":\"member_role\",\"value\":\"manager\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
             "creation",
+            "group",
             "user"
         ],
         "fileset.name": "groups",
@@ -1447,8 +1447,8 @@
         "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"groups\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"98.235.162.24\",\"events\":{\"type\":\"moderator_action\",\"name\":\"remove_user\",\"parameters\":[{\"name\":\"group_email\",\"value\":\"group@example.com\"},{\"name\":\"user_email\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "groups",
         "event.type": [
-            "group",
             "deletion",
+            "group",
             "user"
         ],
         "fileset.name": "groups",

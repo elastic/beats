@@ -7,7 +7,8 @@ package cmd
 import (
 	heartbeatCmd "github.com/elastic/beats/v7/heartbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
-	xpackcmd "github.com/elastic/beats/v7/x-pack/libbeat/cmd"
+
+	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
 // RootCmd to handle beats cli
@@ -17,5 +18,4 @@ func init() {
 	settings := heartbeatCmd.HeartbeatSettings()
 	settings.ElasticLicensed = true
 	RootCmd = heartbeatCmd.Initialize(settings)
-	xpackcmd.AddXPack(RootCmd, heartbeatCmd.Name)
 }

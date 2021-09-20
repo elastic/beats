@@ -128,7 +128,8 @@ class Test(BaseTest):
         # Based on the convention that if a name contains -json the json format is needed. Currently used for LS.
         if "-json" in test_file:
             cmd.append("-M")
-            cmd.append("{module}.{fileset}.var.format=json".format(module=module, fileset=fileset))
+            cmd.append("{module}.{fileset}.var.format=json".format(
+                module=module, fileset=fileset))
 
         output_path = os.path.join(self.working_dir)
         # Runs inside a with block to ensure file is closed afterwards
@@ -152,8 +153,10 @@ class Test(BaseTest):
         # List of errors to check in filebeat output logs
         errors = ["error loading pipeline for fileset"]
         # Checks if the output of filebeat includes errors
-        contains_error, error_line = file_contains(os.path.join(output_path, "output.log"), errors)
-        assert contains_error is False, "Error found in log:{}".format(error_line)
+        contains_error, error_line = file_contains(
+            os.path.join(output_path, "output.log"), errors)
+        assert contains_error is False, "Error found in log:{}".format(
+            error_line)
 
         # Make sure index exists
         self.wait_until(lambda: self.es.indices.exists(self.index_name))
@@ -194,14 +197,27 @@ class Test(BaseTest):
                 for k, obj in enumerate(objects):
                     objects[k] = self.flatten_object(obj, {}, "")
                     clean_keys(objects[k])
+                    for key in objects[k].keys():
+                        if isinstance(objects[k][key], list):
+                            objects[k][key].sort(key=str)
 
-                json.dump(objects, f, indent=4, separators=(',', ': '), sort_keys=True)
+                json.dump(objects, f, indent=4, separators=(
+                    ',', ': '), sort_keys=True)
 
         with open(test_file + "-expected.json", "r") as f:
             expected = json.load(f)
 
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
+
+        # Do not perform a comparison between the resulting and expected documents
+        # if the TESTING_FILEBEAT_SKIP_DIFF flag is set.
+        #
+        # This allows to run a basic check with older versions of ES that can lead
+        # to slightly different documents without maintaining multiple sets of
+        # golden files.
+        if os.getenv("TESTING_FILEBEAT_SKIP_DIFF"):
+            return
 
         for idx in range(len(expected)):
             ev = expected[idx]
@@ -214,7 +230,8 @@ class Test(BaseTest):
 
             d = DeepDiff(ev, obj, ignore_order=True)
 
-            assert len(d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
+            assert len(
+                d) == 0, "The following expected object doesn't match:\n Diff:\n{}, full object: \n{}".format(d, obj)
 
 
 def clean_keys(obj):
@@ -240,7 +257,6 @@ def clean_keys(obj):
         "cisco.asa",
         "cisco.ios",
         "citrix.netscaler",
-        "cyberark.corepas",
         "cylance.protect",
         "f5.bigipafm",
         "fortinet.clientendpoint",
@@ -261,20 +277,14 @@ def clean_keys(obj):
         "microsoft.defender_atp",
         "crowdstrike.falcon_endpoint",
         "crowdstrike.falcon_audit",
-        "gsuite.admin",
-        "gsuite.config",
-        "gsuite.drive",
-        "gsuite.groups",
-        "gsuite.ingest",
-        "gsuite.login",
-        "gsuite.saml",
-        "gsuite.user_accounts",
         "zoom.webhook",
         "threatintel.otx",
         "threatintel.abuseurl",
         "threatintel.abusemalware",
         "threatintel.anomali",
+        "threatintel.anomalithreatstream",
         "threatintel.malwarebazaar",
+        "threatintel.recordedfuture",
         "snyk.vulnerabilities",
         "snyk.audit",
         "awsfargate.log",

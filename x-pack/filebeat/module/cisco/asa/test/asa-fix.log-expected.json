@@ -4,7 +4,7 @@
         "cisco.asa.destination_interface": "Inside",
         "cisco.asa.message_id": "302016",
         "cisco.asa.source_interface": "Outside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "cisco.asa.termination_user": "zzzzzz",
         "destination.address": "10.233.123.123",
         "destination.ip": "10.233.123.123",
@@ -33,11 +33,12 @@
         "log.level": "informational",
         "log.offset": 0,
         "network.bytes": 148,
+        "network.community_id": "1:9aBQ+NznvYals1agEGRVJm37dvQ=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "Outside",
+        "observer.egress.interface.name": "Inside",
         "observer.hostname": "SNL-ASA-VPN-A01",
-        "observer.ingress.interface.name": "Inside",
+        "observer.ingress.interface.name": "Outside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -48,10 +49,14 @@
             "10.123.123.123",
             "10.233.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 53723,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -77,19 +82,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 200,
+        "network.community_id": "1:kV/6Jt4iMhVyUT1AW+UO0itOhqU=",
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "Inside",
+        "observer.egress.interface.name": "Outside",
         "observer.hostname": "SNL-ASA-VPN-A01",
-        "observer.ingress.interface.name": "Outside",
+        "observer.ingress.interface.name": "Inside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -128,17 +134,18 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 381,
+        "network.community_id": "1:7nrIUULEgk5A+nhbh4kNmEkwL3o=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "dmz",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "dmz",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -159,7 +166,7 @@
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "Inside_access_in",
         "cisco.asa.source_interface": "Inside",
-        "cisco.asa.source_username": "(LOCAL\\Elastic)",
+        "cisco.asa.source_username": "LOCAL\\Elastic",
         "destination.address": "10.123.123.123",
         "destination.ip": "10.123.123.123",
         "destination.port": 57621,
@@ -176,19 +183,20 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 545,
+        "network.community_id": "1:LM0R4Wi8tEf+1pe2ukofXQKxfMc=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "Inside",
+        "observer.egress.interface.name": "Outside",
         "observer.hostname": "SNL-ASA-VPN-A01",
-        "observer.ingress.interface.name": "Outside",
+        "observer.ingress.interface.name": "Inside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -198,10 +206,14 @@
         "related.ip": [
             "10.123.123.123"
         ],
+        "related.user": [
+            "Elastic"
+        ],
         "service.type": "cisco",
         "source.address": "10.123.123.123",
         "source.ip": "10.123.123.123",
         "source.port": 57621,
+        "source.user.name": "Elastic",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -224,8 +236,8 @@
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -268,8 +280,8 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "SNL-ASA-VPN-A01",
@@ -278,8 +290,8 @@
         "log.offset": 853,
         "network.iana_number": 58,
         "network.transport": "ipv6-icmp",
-        "observer.egress.interface.name": "ISP1",
         "observer.hostname": "SNL-ASA-VPN-A01",
+        "observer.ingress.interface.name": "ISP1",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -322,23 +334,24 @@
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 989,
+        "network.community_id": "1:/zjqku0IM1BTHL37aH0DvJSecYY=",
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "Inside",
-        "observer.ingress.interface.name": "identity",
+        "observer.egress.interface.name": "identity",
+        "observer.ingress.interface.name": "Inside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.255.0.206",
-            "10.12.31.51"
+            "10.12.31.51",
+            "10.255.0.206"
         ],
         "service.type": "cisco",
         "source.address": "10.255.0.206",
@@ -370,17 +383,18 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1171,
+        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "dmz2",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "dmz2",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -418,17 +432,18 @@
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1334,
+        "network.community_id": "1:F0lY+M777B6QL2SDSKa9RfuUJ7s=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "dmz2",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "dmz2",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -467,17 +482,18 @@
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 1514,
+        "network.community_id": "1:kRCfRJ9T/IeRNAhAhzOsF6EjIV4=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "outside",
-        "observer.ingress.interface.name": "inside",
+        "observer.egress.interface.name": "inside",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
@@ -526,23 +542,24 @@
         "event.severity": 1,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "input.type": "log",
         "log.level": "alert",
         "log.offset": 1723,
+        "network.community_id": "1:cJpy7sqGDQbchRUXDtR8k10HinM=",
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "inside",
-        "observer.ingress.interface.name": "outside",
+        "observer.egress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "10.1.2.3",
-            "1.2.33.40"
+            "1.2.33.40",
+            "10.1.2.3"
         ],
         "related.user": [
             "joe"

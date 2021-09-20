@@ -14,8 +14,8 @@
         "destination.port": 123,
         "event.action": "security_threat",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.duration": 0,
@@ -28,9 +28,9 @@
         "event.start": "2020-03-02T21:13:03.193-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -62,9 +62,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "0.0.0.0",
             "10.11.11.1",
             "187.188.188.10",
-            "0.0.0.0",
             "3.3.10.11"
         ],
         "related.user": [
@@ -86,8 +86,8 @@
         "source.port": 12345,
         "source.user.name": "unknown-user",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -105,8 +105,8 @@
         "destination.port": 123,
         "event.action": "security_threat",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.duration": 0,
@@ -119,9 +119,9 @@
         "event.start": "2020-03-02T21:13:03.197-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -153,9 +153,9 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
+            "0.0.0.0",
             "10.11.11.1",
             "187.188.188.10",
-            "0.0.0.0",
             "3.3.10.11"
         ],
         "related.user": [
@@ -177,8 +177,8 @@
         "source.port": 12345,
         "source.user.name": "unknown-user",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -196,8 +196,8 @@
         "destination.port": 80,
         "event.action": "security_threat",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.duration": 0,
@@ -210,9 +210,9 @@
         "event.start": "2007-02-15T07:17:15.719-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -242,10 +242,10 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "183.78.180.27",
-            "118.127.111.1",
             "0.0.0.0",
-            "172.19.13.11"
+            "118.127.111.1",
+            "172.19.13.11",
+            "183.78.180.27"
         ],
         "rule.id": "9",
         "rule.name": "IPS",
@@ -262,8 +262,8 @@
         "source.packets": 0,
         "source.port": 45610,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -281,8 +281,8 @@
         "destination.port": 80,
         "event.action": "security_threat",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.duration": 0,
@@ -295,9 +295,9 @@
         "event.start": "2017-10-12T19:55:55.792-02:00",
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -327,10 +327,10 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "183.78.180.27",
-            "118.127.30.11",
             "0.0.0.0",
-            "172.16.1.10"
+            "118.127.30.11",
+            "172.16.1.10",
+            "183.78.180.27"
         ],
         "rule.id": "9",
         "rule.name": "IPS",
@@ -347,8 +347,8 @@
         "source.packets": 0,
         "source.port": 45610,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -357,8 +357,8 @@
         "destination.port": 80,
         "event.action": "application_ddos",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -368,9 +368,9 @@
         "event.severity": 165,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -400,8 +400,8 @@
         "server.port": 80,
         "service.type": "juniper",
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -412,8 +412,8 @@
         "destination.port": 80,
         "event.action": "application_ddos",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -423,9 +423,9 @@
         "event.severity": 165,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -458,8 +458,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "192.168.14.214",
-            "172.27.14.203"
+            "172.27.14.203",
+            "192.168.14.214"
         ],
         "rule.id": "1",
         "server.ip": "172.27.14.203",
@@ -468,8 +468,8 @@
         "source.ip": "192.168.14.214",
         "source.port": 50825,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     },
     {
@@ -480,8 +480,8 @@
         "destination.port": 80,
         "event.action": "application_ddos",
         "event.category": [
-            "network",
-            "intrusion_detection"
+            "intrusion_detection",
+            "network"
         ],
         "event.dataset": "juniper.srx",
         "event.kind": "alert",
@@ -491,9 +491,9 @@
         "event.severity": 165,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
+            "connection",
             "denied",
-            "connection"
+            "info"
         ],
         "fileset.name": "srx",
         "input.type": "log",
@@ -526,8 +526,8 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "193.168.14.214",
-            "172.30.20.201"
+            "172.30.20.201",
+            "193.168.14.214"
         ],
         "rule.id": "1",
         "server.ip": "172.30.20.201",
@@ -536,8 +536,8 @@
         "source.ip": "193.168.14.214",
         "source.port": 50825,
         "tags": [
-            "juniper.srx",
-            "forwarded"
+            "forwarded",
+            "juniper.srx"
         ]
     }
 ]

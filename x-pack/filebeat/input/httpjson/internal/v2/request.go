@@ -22,7 +22,7 @@ const requestNamespace = "request"
 func registerRequestTransforms() {
 	registerTransform(requestNamespace, appendName, newAppendRequest)
 	registerTransform(requestNamespace, deleteName, newDeleteRequest)
-	registerTransform(requestNamespace, setName, newSetRequest)
+	registerTransform(requestNamespace, setName, newSetRequestPagination)
 }
 
 type httpClient struct {
@@ -179,6 +179,8 @@ func (r *requester) doRequest(stdCtx context.Context, trCtx *transformContext, p
 	if err != nil {
 		return err
 	}
+
+	trCtx.clearIntervalData()
 
 	var n int
 	for maybeMsg := range eventsCh {

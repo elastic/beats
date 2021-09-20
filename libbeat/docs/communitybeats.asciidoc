@@ -117,6 +117,7 @@ https://github.com/sentient/statsdbeat[statsdbeat]:: Receives UDP https://github
 https://github.com/Corwind/supervisorctlbeat.git[supervisorctlbeat]:: This beat aims to parse the supervisorctl status command output and send it to elasticsearch for indexation
 https://github.com/live-wire/terminalbeat[terminalbeat]:: Runs an external command and forwards the https://www.computerhope.com/jargon/s/stdout.htm[stdout] for the same to Elasticsearch/Logstash.
 https://github.com/berfinsari/tracebeat[tracebeat]:: Reads traceroute output and indexes them into Elasticsearch.
+https://github.com/DmitryZ-outten/trivybeat[trivybeat]:: Fetches Docker containers which are running on the same machine, scan CVEs of those containers using Trivy server and index them into Elasticsearch.
 https://github.com/buehler/go-elastic-twitterbeat[twitterbeat]:: Reads tweets for specified screen names.
 https://github.com/gravitational/udpbeat[udpbeat]:: Ships structured logs via UDP.
 https://github.com/hartfordfive/udplogbeat[udplogbeat]:: Accept events via local UDP socket (in plain-text or JSON with ability to enforce schemas).  Can also be used for applications only supporting syslog logging.

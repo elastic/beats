@@ -6,12 +6,22 @@ package v2
 
 import (
 	"bytes"
+	"crypto/hmac"
+	"crypto/sha1"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"hash"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"text/template"
 	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -45,6 +55,15 @@ func (t *valueTpl) Unpack(in string) error {
 			"getRFC5988Link":      getRFC5988Link,
 			"toInt":               toInt,
 			"add":                 add,
+			"mul":                 mul,
+			"div":                 div,
+			"hmac":                hmacStringHex,
+			"base64Encode":        base64Encode,
+			"base64EncodeNoPad":   base64EncodeNoPad,
+			"join":                join,
+			"sprintf":             fmt.Sprintf,
+			"hmacBase64":          hmacStringBase64,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -201,15 +220,131 @@ func getRFC5988Link(rel string, links []string) string {
 	return ""
 }
 
-func toInt(s string) int {
-	i, _ := strconv.ParseInt(s, 10, 64)
-	return int(i)
+func toInt(v interface{}) int64 {
+	vv := reflect.ValueOf(v)
+	switch vv.Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return int64(vv.Int())
+	case reflect.Float32, reflect.Float64:
+		return int64(vv.Float())
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return int64(vv.Uint())
+	case reflect.String:
+		f, _ := strconv.ParseFloat(vv.String(), 64)
+		return int64(f)
+	default:
+		return 0
+	}
 }
 
-func add(vs ...int) int {
-	var sum int
+func add(vs ...int64) int64 {
+	var sum int64
 	for _, v := range vs {
 		sum += v
 	}
 	return sum
+}
+
+func mul(a, b int64) int64 {
+	return a * b
+}
+
+func div(a, b int64) int64 {
+	return a / b
+}
+
+func base64Encode(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.StdEncoding.EncodeToString([]byte(data))
+}
+
+func base64EncodeNoPad(values ...string) string {
+	data := strings.Join(values, "")
+	if data == "" {
+		return ""
+	}
+
+	return base64.RawStdEncoding.EncodeToString([]byte(data))
+}
+
+func hmacString(hmacType string, hmacKey string, data string) []byte {
+	if data == "" {
+		return nil
+	}
+	// Create a new HMAC by defining the hash type and the key (as byte array)
+	var mac hash.Hash
+	switch hmacType {
+	case "sha256":
+		mac = hmac.New(sha256.New, []byte(hmacKey))
+	case "sha1":
+		mac = hmac.New(sha1.New, []byte(hmacKey))
+	default:
+		// Upstream config validation prevents this from happening.
+		return nil
+	}
+	// Write Data to it
+	mac.Write([]byte(data))
+
+	// Get result and encode as bytes
+	return mac.Sum(nil)
+}
+
+func hmacStringHex(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
+	// Get result and encode as hexadecimal string
+	return hex.EncodeToString(bytes)
+}
+
+func hmacStringBase64(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
+
+	// Get result and encode as hexadecimal string
+	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func uuidString() string {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return ""
+	}
+	return uuid.String()
+}
+
+// join concatenates the elements of its first argument to create a single string. The separator
+// string sep is placed between elements in the resulting string. If the first argument is not of
+// type string or []string, its elements will be stringified.
+func join(v interface{}, sep string) string {
+	// check for []string or string to avoid using reflect
+	switch t := v.(type) {
+	case []string:
+		return strings.Join(t, sep)
+	case string:
+		return t
+	}
+
+	// if we have a slice of a different type, convert it to []string
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Slice, reflect.Array:
+		s := reflect.ValueOf(v)
+		vs := make([]string, s.Len())
+		for i := 0; i < s.Len(); i++ {
+			vs[i] = fmt.Sprint(s.Index(i))
+		}
+		return strings.Join(vs, sep)
+	}
+
+	// return the stringified single value
+	return fmt.Sprint(v)
 }

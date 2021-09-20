@@ -14,8 +14,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -51,8 +51,8 @@
         "source.user.group.name": "Open Group",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "user.name": "elastic.user@elastic.test.com"
     },
@@ -88,8 +88,8 @@
             "my_fancy_host"
         ],
         "related.ip": [
-            "83.20.132.250",
-            "214.167.51.66"
+            "214.167.51.66",
+            "83.20.132.250"
         ],
         "related.user": [
             "elastic.user@elastic.test.com"
@@ -121,8 +121,8 @@
         "source.ip": "83.20.132.250",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -158,8 +158,8 @@
         "sophos.xg.priority": "Error",
         "sophos.xg.status": "Expire",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -177,8 +177,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -222,8 +222,8 @@
         "source.ip": "83.9.140.96",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "user.name": "elastic.user@elastic.test.com"
     },
@@ -268,8 +268,8 @@
         "sophos.xg.priority": "Notice",
         "sophos.xg.status": "Successful",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -306,8 +306,8 @@
         "sophos.xg.raw_data": "192.168.110.10",
         "sophos.xg.status": "Expire",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -325,8 +325,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
-            "start"
+            "start",
+            "user"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -370,8 +370,8 @@
         "source.ip": "217.250.157.135",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "user.name": "elastic.user@elastic.test.com"
     },
@@ -420,8 +420,8 @@
         "source.bytes": 0,
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -481,8 +481,8 @@
         "source.ip": "91.67.201.4",
         "source.user.name": "hendrikl",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "user.name": "hendrikl"
     },
@@ -520,8 +520,8 @@
         "sophos.xg.priority": "Notice",
         "sophos.xg.status": "Successful",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -566,8 +566,8 @@
         "source.ip": "10.83.234.5",
         "source.user.name": "admin",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -617,8 +617,8 @@
         "source.ip": "172.66.35.15",
         "source.user.name": "root",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -655,8 +655,8 @@
         "sophos.xg.priority": "Notice",
         "sophos.xg.status": "Successful",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -691,8 +691,8 @@
         "sophos.xg.message_id": "17923",
         "sophos.xg.priority": "Information",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -701,8 +701,8 @@
         "client.ip": "10.84.234.38",
         "destination.bytes": 0,
         "event.category": [
-            "network",
-            "authentication"
+            "authentication",
+            "network"
         ],
         "event.code": "062910617703",
         "event.dataset": "sophos.xg",
@@ -713,9 +713,9 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "user",
+            "connection",
             "end",
-            "connection"
+            "user"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -754,8 +754,8 @@
         "source.user.group.name": "VPN.SSL.Users.elastic",
         "source.user.name": "elastic.user@elastic.test.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ],
         "user.name": "elastic.user@elastic.test.com"
     },
@@ -801,8 +801,8 @@
         "sophos.xg.status": "Connected",
         "source.bytes": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -847,8 +847,8 @@
         "sophos.xg.status": "Disconnected",
         "source.bytes": 22368,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -893,8 +893,8 @@
         "sophos.xg.status": "Interim",
         "source.bytes": 0,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -931,8 +931,8 @@
         "sophos.xg.status": "Success",
         "sophos.xg.updatedip": "10.198.232.86",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

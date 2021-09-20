@@ -22,6 +22,8 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
+  # Set enabled to true (or delete the following line) to enable this example monitor
+  enabled: false
   # ID used to uniquely identify this monitor in elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere

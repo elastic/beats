@@ -129,7 +129,7 @@ type crossBuildParams struct {
 
 // CrossBuild executes a given build target once for each target platform.
 func CrossBuild(options ...CrossBuildOption) error {
-	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: crossBuildImage}
+	params := crossBuildParams{Platforms: Platforms, Target: defaultCrossBuildTarget, ImageSelector: CrossBuildImage}
 	for _, opt := range options {
 		opt(&params)
 	}
@@ -193,17 +193,26 @@ func buildMage() error {
 		"-compile", CreateDir(filepath.Join("build", "mage-linux-"+arch)))
 }
 
-func crossBuildImage(platform string) (string, error) {
+func CrossBuildImage(platform string) (string, error) {
 	tagSuffix := "main"
 
 	switch {
-	case strings.HasPrefix(platform, "darwin"):
-		tagSuffix = "darwin"
-	case strings.HasPrefix(platform, "linux/arm"):
+	case platform == "darwin/amd64":
+		tagSuffix = "darwin-debian10"
+	case platform == "darwin/arm64":
+		tagSuffix = "darwin-arm64-debian10"
+	case platform == "linux/arm64":
 		tagSuffix = "arm"
+		// when it runs on a ARM64 host/worker.
 		if runtime.GOARCH == "arm64" {
 			tagSuffix = "base-arm-debian9"
 		}
+	case platform == "linux/armv5":
+		tagSuffix = "armel"
+	case platform == "linux/armv6":
+		tagSuffix = "armel"
+	case platform == "linux/armv7":
+		tagSuffix = "armhf"
 	case strings.HasPrefix(platform, "linux/mips"):
 		tagSuffix = "mips"
 	case strings.HasPrefix(platform, "linux/ppc"):

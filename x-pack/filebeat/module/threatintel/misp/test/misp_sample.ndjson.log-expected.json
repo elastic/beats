@@ -11,11 +11,11 @@
         "log.offset": 0,
         "service.type": "threatintel",
         "tags": [
-            "misp-galaxy:ransomware=Dharma Ransomware",
-            "type:OSINT",
-            "tlp:white",
             "malware_classification:malware-category=Ransomware",
-            "osint:source-type=blog - post"
+            "misp-galaxy:ransomware=Dharma Ransomware",
+            "osint:source-type=blog - post",
+            "tlp:white",
+            "type:OSINT"
         ],
         "threatintel.indicator.file.hash.md5": "f2679bdabe46e10edc6352fff3c829bc",
         "threatintel.indicator.marking.tlp": [
@@ -69,13 +69,12 @@
         "log.offset": 8248,
         "service.type": "threatintel",
         "tags": [
-            "misp-galaxy:ransomware=Dharma Ransomware",
-            "type:OSINT",
-            "tlp:white",
             "malware_classification:malware-category=Ransomware",
-            "osint:source-type=blog - post"
+            "misp-galaxy:ransomware=Dharma Ransomware",
+            "osint:source-type=blog - post",
+            "tlp:white",
+            "type:OSINT"
         ],
-        "threatintel.indicator.domain": "your-ip.getmyip.com",
         "threatintel.indicator.ip": "178.128.103.74",
         "threatintel.indicator.marking.tlp": [
             "white"
@@ -83,6 +82,7 @@
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "your-ip.getmyip.com",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "1st stage",
         "threatintel.misp.attribute.deleted": false,
@@ -138,6 +138,7 @@
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "www.virustotal.com",
+        "threatintel.indicator.url.full": "https://www.virustotal.com/file/7fa4482bfbca550ce296d8e791b1091d60d733ea8042167fd0eb853530584452/analysis/1486030116/",
         "threatintel.indicator.url.original": "https://www.virustotal.com/file/7fa4482bfbca550ce296d8e791b1091d60d733ea8042167fd0eb853530584452/analysis/1486030116/",
         "threatintel.indicator.url.path": "/file/7fa4482bfbca550ce296d8e791b1091d60d733ea8042167fd0eb853530584452/analysis/1486030116/",
         "threatintel.indicator.url.scheme": "https",
@@ -186,8 +187,8 @@
         "log.offset": 20139,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
         "threatintel.indicator.file.hash.sha256": "0a1103bc90725d4665b932f88e81d39eafa5823b0de3ab146e2d4548b7da79a0",
         "threatintel.indicator.marking.tlp": [
@@ -241,8 +242,8 @@
         "log.offset": 21711,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
         "threatintel.indicator.ip": "223.25.233.248",
         "threatintel.indicator.marking.tlp": [
@@ -296,16 +297,16 @@
         "log.offset": 23232,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
-        "threatintel.indicator.domain": "xenserver.ddns.net",
         "threatintel.indicator.marking.tlp": [
             "green"
         ],
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "xenserver.ddns.net",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -351,8 +352,8 @@
         "log.offset": 24759,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
         "threatintel.indicator.marking.tlp": [
             "green"
@@ -406,8 +407,8 @@
         "log.offset": 26271,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
         "threatintel.indicator.file.hash.sha1": "0ea76f1586c008932d90c991dfdd5042f3aac8ea",
         "threatintel.indicator.marking.tlp": [
@@ -461,16 +462,16 @@
         "log.offset": 27875,
         "service.type": "threatintel",
         "tags": [
-            "type:OSINT",
-            "tlp:green"
+            "tlp:green",
+            "type:OSINT"
         ],
-        "threatintel.indicator.domain": "whatsapp.com",
         "threatintel.indicator.marking.tlp": [
             "green"
         ],
         "threatintel.indicator.provider": "misp",
         "threatintel.indicator.scanner_stats": 2,
         "threatintel.indicator.type": "domain-name",
+        "threatintel.indicator.url.domain": "whatsapp.com",
         "threatintel.misp.attribute.category": "Network activity",
         "threatintel.misp.attribute.comment": "",
         "threatintel.misp.attribute.deleted": false,
@@ -516,8 +517,8 @@
         "log.offset": 29397,
         "service.type": "threatintel",
         "tags": [
-            "misp-galaxy:threat-actor=Turla Group",
             "Turla",
+            "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
         "threatintel.indicator.marking.tlp": [
@@ -527,6 +528,7 @@
         "threatintel.indicator.scanner_stats": 0,
         "threatintel.indicator.type": "url",
         "threatintel.indicator.url.domain": "get.adobe.com",
+        "threatintel.indicator.url.full": "http://get.adobe.com/stats/AbfFcBebD/?q=",
         "threatintel.indicator.url.original": "http://get.adobe.com/stats/AbfFcBebD/?q=",
         "threatintel.indicator.url.path": "/stats/AbfFcBebD/",
         "threatintel.indicator.url.query": "q=",
@@ -576,8 +578,8 @@
         "log.offset": 31486,
         "service.type": "threatintel",
         "tags": [
-            "misp-galaxy:threat-actor=Turla Group",
             "Turla",
+            "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
         "threatintel.indicator.marking.tlp": [
@@ -631,8 +633,8 @@
         "log.offset": 33567,
         "service.type": "threatintel",
         "tags": [
-            "misp-galaxy:threat-actor=Turla Group",
             "Turla",
+            "misp-galaxy:threat-actor=Turla Group",
             "tlp:white"
         ],
         "threatintel.indicator.file.hash.sha1": "c51d288469df9f25e2fb7ac491918b3e579282ea",

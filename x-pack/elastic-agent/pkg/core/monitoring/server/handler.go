@@ -27,8 +27,6 @@ type apiHandler struct {
 func (h *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err := h.innerFn(w, r)
 	if err != nil {
-		writeResponse(w, unexpectedErrorWithReason(err.Error()))
-
 		switch e := err.(type) {
 		case apiError:
 			w.WriteHeader(e.Status())
@@ -36,6 +34,8 @@ func (h *apiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusInternalServerError)
 
 		}
+
+		writeResponse(w, unexpectedErrorWithReason(err.Error()))
 	}
 }
 

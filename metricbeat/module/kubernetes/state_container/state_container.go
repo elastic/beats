@@ -18,6 +18,7 @@
 package state_container
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -26,6 +27,7 @@ import (
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
@@ -45,8 +47,20 @@ var (
 	// Mapping of state metrics
 	mapping = &p.MetricsMapping{
 		Metrics: map[string]p.MetricMap{
-			"kube_pod_info":                                     p.InfoMetric(),
-			"kube_pod_container_info":                           p.InfoMetric(),
+			"kube_pod_info":           p.InfoMetric(),
+			"kube_pod_container_info": p.InfoMetric(),
+			"kube_pod_container_resource_requests": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.request.cores",
+					"memory": "memory.request.bytes",
+				},
+			)),
+			"kube_pod_container_resource_limits": p.Metric("", p.OpFilterMap(
+				"resource", map[string]string{
+					"cpu":    "cpu.limit.cores",
+					"memory": "memory.limit.bytes",
+				},
+			)),
 			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
 			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
 			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
@@ -76,9 +90,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_container", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_container", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet
@@ -89,6 +103,7 @@ type MetricSet struct {
 	mb.BaseMetricSet
 	prometheus p.Prometheus
 	enricher   util.Enricher
+	mod        k8smod.Module
 }
 
 // New create a new instance of the MetricSet
@@ -99,10 +114,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err != nil {
 		return nil, err
 	}
+	mod, ok := base.Module().(k8smod.Module)
+	if !ok {
+		return nil, fmt.Errorf("must be child of kubernetes module")
+	}
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		enricher:      util.NewContainerMetadataEnricher(base, false),
+		mod:           mod,
 	}, nil
 }
 
@@ -112,7 +132,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	m.enricher.Start()
 
-	events, err := m.prometheus.GetProcessedMetrics(mapping)
+	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
+	if err != nil {
+		return errors.Wrap(err, "error getting families")
+	}
+	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
 		return errors.Wrap(err, "error getting event")
 	}
@@ -121,21 +145,20 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	// Calculate deprecated nanocores values
 	for _, event := range events {
-		if request, ok := event["cpu.request.cores"]; ok {
+		if request, err := event.GetValue("cpu.request.cores"); err == nil {
 			if requestCores, ok := request.(float64); ok {
-				event["cpu.request.nanocores"] = requestCores * nanocores
+				event.Put("cpu.request.nanocores", requestCores*nanocores)
 			}
 		}
 
-		if limit, ok := event["cpu.limit.cores"]; ok {
+		if limit, err := event.GetValue("cpu.limit.cores"); err == nil {
 			if limitCores, ok := limit.(float64); ok {
-				event["cpu.limit.nanocores"] = limitCores * nanocores
+				event.Put("cpu.limit.nanocores", limitCores*nanocores)
 			}
 		}
 
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		var rootFields common.MapStr
 		containerFields := common.MapStr{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
@@ -150,32 +173,28 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerImage, ok := event["image"]; ok {
 			cImage := (containerImage).(string)
 			containerFields.Put("image.name", cImage)
-			// remove ECS container fields from kubernetes.container.* since they will be set through alias
+			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
 			event.Delete("image")
 		}
 
+		e, err := util.CreateEvent(event, "kubernetes.container")
+		if err != nil {
+			m.Logger().Error(err)
+		}
+
 		if len(containerFields) > 0 {
-			rootFields = common.MapStr{
-				"container": containerFields,
+			if e.RootFields != nil {
+				e.RootFields.DeepUpdate(common.MapStr{
+					"container": containerFields,
+				})
+			} else {
+				e.RootFields = common.MapStr{
+					"container": containerFields,
+				}
 			}
 		}
 
-		var moduleFieldsMapStr common.MapStr
-		moduleFields, ok := event[mb.ModuleDataKey]
-		if ok {
-			moduleFieldsMapStr, ok = moduleFields.(common.MapStr)
-			if !ok {
-				m.Logger().Errorf("error trying to convert '%s' from event to common.MapStr", mb.ModuleDataKey)
-			}
-		}
-		delete(event, mb.ModuleDataKey)
-
-		if reported := reporter.Event(mb.Event{
-			RootFields:      rootFields,
-			MetricSetFields: event,
-			ModuleFields:    moduleFieldsMapStr,
-			Namespace:       "kubernetes.container",
-		}); !reported {
+		if reported := reporter.Event(e); !reported {
 			return nil
 		}
 	}

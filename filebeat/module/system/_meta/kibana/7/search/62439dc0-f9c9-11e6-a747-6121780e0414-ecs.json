@@ -1,0 +1,47 @@
+{
+    "attributes": {
+        "columns": [
+            "system.auth.ssh.event",
+            "system.auth.ssh.method",
+            "user.name",
+            "source.ip",
+            "source.geo.country_iso_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:system.auth AND system.auth.ssh.event:*"
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "SSH login attempts [Filebeat System] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "62439dc0-f9c9-11e6-a747-6121780e0414-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:34:23.956Z",
+    "version": "WzQ1NDEsMV0="
+}

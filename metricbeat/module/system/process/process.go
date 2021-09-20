@@ -21,18 +21,19 @@ package process
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 var debugf = logp.MakeDebug("system.process")
@@ -90,11 +91,19 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		perCPU:  config.IncludePerCPU,
 		IsAgent: systemModule.IsAgent,
 	}
+
+	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
+	if len(paths.Paths.Hostfs) < 2 {
+		override, isset := os.LookupEnv("LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE")
+		if isset {
+			m.stats.CgroupOpts.CgroupsHierarchyOverride = override
+		}
+	}
+
 	err := m.stats.Init()
 	if err != nil {
 		return nil, err
 	}
-
 	return m, nil
 }
 

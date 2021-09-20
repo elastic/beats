@@ -33,8 +33,11 @@ stages:
             branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
         stage: mandatory
     macos:
         mage: "mage build unitTest"

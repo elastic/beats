@@ -1,0 +1,160 @@
+{
+    "cluster_name": "docker-cluster",
+    "cluster_uuid": "tMjf3CQ_TyCXNfcoR9eTWw",
+    "version": 137,
+    "state_uuid": "n-UoXaqYRoOe9qAC76IG6A",
+    "master_node": "hx-oJ1-aT_-5pRG22JMI1Q",
+    "nodes": {
+        "hx-oJ1-aT_-5pRG22JMI1Q": {
+            "name": "1fb2aa83efac",
+            "ephemeral_id": "7oBOrfgNSQqlcnWZHb3kZw",
+            "transport_address": "127.0.0.1:9300",
+            "attributes": {
+                "ml.machine_memory": "33300463616",
+                "xpack.installed": "true",
+                "transform.node": "true",
+                "ml.max_open_jobs": "20"
+            }
+        }
+    },
+    "routing_table": {
+        "indices": {
+            ".apm-custom-link": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".apm-custom-link",
+                            "allocation_id": {
+                                "id": "UBnwq-49RVie17H7rNxZ5g"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana-event-log-8.0.0-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana-event-log-8.0.0-000001",
+                            "allocation_id": {
+                                "id": "yMoiDQJFTBSsUs8jXU365g"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana_1": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana_1",
+                            "allocation_id": {
+                                "id": "Hjpxq1XrRb-oHdC98LjVKA"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".kibana_task_manager_1": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".kibana_task_manager_1",
+                            "allocation_id": {
+                                "id": "t4fldJzLS_mnOUAyEL-NmQ"
+                            }
+                        }
+                    ]
+                }
+            },
+            "metricbeat-8.0.0-2020.11.18-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-8.0.0-2020.11.18-000001",
+                            "allocation_id": {
+                                "id": "n7p13nerRFutSjZvfxd5pQ"
+                            }
+                        },
+                        {
+                            "state": "UNASSIGNED",
+                            "primary": false,
+                            "node": null,
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "metricbeat-8.0.0-2020.11.18-000001",
+                            "recovery_source": {
+                                "type": "PEER"
+                            },
+                            "unassigned_info": {
+                                "reason": "CLUSTER_RECOVERED",
+                                "at": "2020-12-09T19:01:54.545Z",
+                                "delayed": false,
+                                "allocation_status": "no_attempt"
+                            }
+                        }
+                    ]
+                }
+            },
+            "ilm-history-3-000001": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": "ilm-history-3-000001",
+                            "allocation_id": {
+                                "id": "DqiX-m2JS2Kobo6_49MdBA"
+                            }
+                        }
+                    ]
+                }
+            },
+            ".apm-agent-configuration": {
+                "shards": {
+                    "0": [
+                        {
+                            "state": "STARTED",
+                            "primary": true,
+                            "node": "hx-oJ1-aT_-5pRG22JMI1Q",
+                            "relocating_node": null,
+                            "shard": 0,
+                            "index": ".apm-agent-configuration",
+                            "allocation_id": {
+                                "id": "Ba_BCJuiR2qA5Tdcu9IzrA"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}

@@ -1,36 +1,48 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "container": {
-        "id": "cc78e58acfda4501105dc4de8e3ae218f2da616213e6e3af168c40103829302a",
+        "id": "b1c3118fb2087e499c421aa20e28847ad4c185be6c1864166b1a03cc2affaf80",
         "image": {
-            "name": "metricbeat_elasticsearch"
+            "name": "docker.elastic.co/beats/elastic-agent:7.13.0-SNAPSHOT"
         },
-        "name": "metricbeat_elasticsearch_1_df866b3a7b3d",
+        "name": "elastic-package-stack_elastic-agent_1",
         "runtime": "docker"
     },
     "docker": {
         "container": {
             "labels": {
-                "com_docker_compose_config-hash": "e3e0a2c6e5d1afb741bc8b1ecb09cda0395886b7a3e5084a9fd110be46d70f78",
+                "com_docker_compose_config-hash": "fdad7f67fafe5a242b9b9d27bff78bef4b96c683a2bb1412d91c32fb5981f2b3",
                 "com_docker_compose_container-number": "1",
                 "com_docker_compose_oneoff": "False",
-                "com_docker_compose_project": "metricbeat",
-                "com_docker_compose_service": "elasticsearch",
-                "com_docker_compose_slug": "df866b3a7b3d50c0802350cbe58ee5b34fa32b7f6ba7fe9e48cde2c12dd0201d",
-                "com_docker_compose_version": "1.23.1",
+                "com_docker_compose_project": "elastic-package-stack",
+                "com_docker_compose_project_config_files": "/home/alexk/.elastic-package/stack/openport/snapshot.yml",
+                "com_docker_compose_project_working_dir": "/home/alexk/.elastic-package/stack/openport",
+                "com_docker_compose_service": "elastic-agent",
+                "com_docker_compose_version": "1.27.4",
+                "description": "Agent manages other beats based on configuration provided.",
+                "io_k8s_description": "Agent manages other beats based on configuration provided.",
+                "io_k8s_display-name": "Elastic-Agent image",
                 "license": "Elastic License",
-                "org_label-schema_build-date": "20181006",
-                "org_label-schema_license": "GPLv2",
-                "org_label-schema_name": "elasticsearch",
+                "maintainer": "infra@elastic.co",
+                "name": "elastic-agent",
+                "org_label-schema_build-date": "2021-04-21T06:45:43Z",
+                "org_label-schema_license": "Elastic License",
+                "org_label-schema_name": "elastic-agent",
                 "org_label-schema_schema-version": "1.0",
-                "org_label-schema_url": "https://www.elastic.co/products/elasticsearch",
-                "org_label-schema_vcs-url": "https://github.com/elastic/elasticsearch-docker",
+                "org_label-schema_url": "https://www.elastic.co/beats/elastic-agent",
+                "org_label-schema_vcs-ref": "c52c43963ca8416dc92c7d3dbf6cb6e89dd00acf",
+                "org_label-schema_vcs-url": "github.com/elastic/beats/v7",
                 "org_label-schema_vendor": "Elastic",
-                "org_label-schema_version": "6.5.1"
+                "org_label-schema_version": "7.13.0-SNAPSHOT",
+                "org_opencontainers_image_created": "2021-04-21T06:45:43Z",
+                "org_opencontainers_image_licenses": "Elastic License",
+                "org_opencontainers_image_title": "Elastic-Agent",
+                "org_opencontainers_image_vendor": "Elastic",
+                "release": "1",
+                "summary": "elastic-agent",
+                "url": "https://www.elastic.co/beats/elastic-agent",
+                "vendor": "Elastic",
+                "version": "7.13.0-SNAPSHOT"
             }
         },
         "network": {
@@ -41,10 +53,10 @@
                 "packets": 0
             },
             "inbound": {
-                "bytes": 23047,
+                "bytes": 156469392,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 241
+                "packets": 710866
             },
             "interface": "eth0",
             "out": {
@@ -54,10 +66,10 @@
                 "packets": 0
             },
             "outbound": {
-                "bytes": 0,
+                "bytes": 3150916813,
                 "dropped": 0,
                 "errors": 0,
-                "packets": 0
+                "packets": 1059447
             }
         }
     },
@@ -67,7 +79,8 @@
         "module": "docker"
     },
     "metricset": {
-        "name": "network"
+        "name": "network",
+        "period": 10000
     },
     "service": {
         "address": "/var/run/docker.sock",

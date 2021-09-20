@@ -4,8 +4,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -64,9 +64,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -74,13 +74,14 @@
         "log.level": "alert",
         "log.offset": 0,
         "network.application": "dns client",
+        "network.community_id": "1:yuD3M7UhwRSNitDpAnWcqzEC85c=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -113,8 +114,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -175,9 +176,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -185,13 +186,14 @@
         "log.level": "alert",
         "log.offset": 658,
         "network.application": "dns client",
+        "network.community_id": "1:eDcIGG/W1UcwGWzaTgv5mgr2RDw=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -224,8 +226,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -284,9 +286,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -294,13 +296,14 @@
         "log.level": "alert",
         "log.offset": 1371,
         "network.application": "dns client",
+        "network.community_id": "1:nTPeg7DUgB3rjeFwl+cm5VHEdXQ=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -333,8 +336,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -395,9 +398,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -405,13 +408,14 @@
         "log.level": "alert",
         "log.offset": 2047,
         "network.application": "dns client",
+        "network.community_id": "1:F3IHQYMd3DO1p+rWBITDU1/XCgA=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -444,8 +448,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -505,9 +509,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -515,13 +519,14 @@
         "log.level": "alert",
         "log.offset": 2766,
         "network.application": "dns client",
+        "network.community_id": "1:1SqTqSDG5492OiLhDUMOi+wnDYs=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -554,8 +559,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -614,9 +619,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -624,13 +629,14 @@
         "log.level": "alert",
         "log.offset": 3449,
         "network.application": "dns client",
+        "network.community_id": "1:eXdHUOdHk5dGXusvMEGcWj9ywPM=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -663,8 +669,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -726,9 +732,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -736,13 +742,14 @@
         "log.level": "alert",
         "log.offset": 4125,
         "network.application": "dns client",
+        "network.community_id": "1:rjxS8IH4jqdHiflcG+1txqEFP1M=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -775,8 +782,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -835,9 +842,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -845,13 +852,14 @@
         "log.level": "alert",
         "log.offset": 4878,
         "network.application": "dns client",
+        "network.community_id": "1:R1FcZHFFvO0mHFfeVXH/CwTGCmU=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -884,8 +892,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -945,9 +953,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -955,13 +963,14 @@
         "log.level": "alert",
         "log.offset": 5553,
         "network.application": "dns client",
+        "network.community_id": "1:0YJqKZXX7VN9W1Gx6txd8TFELHM=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -994,8 +1003,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1056,9 +1065,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1066,13 +1075,14 @@
         "log.level": "alert",
         "log.offset": 6269,
         "network.application": "dns client",
+        "network.community_id": "1:jVTdIEwjG0Eb77jGrcDygrNq9jg=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1105,8 +1115,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1168,9 +1178,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1178,13 +1188,14 @@
         "log.level": "alert",
         "log.offset": 6983,
         "network.application": "dns client",
+        "network.community_id": "1:ZllIE5YNb+12oKtX/tP/gysnSuE=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1217,8 +1228,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1273,9 +1284,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1283,13 +1294,14 @@
         "log.level": "alert",
         "log.offset": 7672,
         "network.application": "dns client",
+        "network.community_id": "1:oGBN4YWsAncmtqDJ1onnQNRAEnw=",
         "network.iana_number": 6,
         "network.protocol": "dns",
         "network.transport": "tcp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1322,8 +1334,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1383,9 +1395,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1393,13 +1405,14 @@
         "log.level": "alert",
         "log.offset": 8298,
         "network.application": "dns client",
+        "network.community_id": "1:+1CCqUYePM8bXFUXWVeSSjL3g58=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1432,8 +1445,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1492,9 +1505,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1502,13 +1515,14 @@
         "log.level": "alert",
         "log.offset": 9010,
         "network.application": "dns client",
+        "network.community_id": "1:f5P/ntfU9KchCtCfWHT0mYDOHOw=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1541,8 +1555,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1602,9 +1616,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1612,13 +1626,14 @@
         "log.level": "alert",
         "log.offset": 9683,
         "network.application": "dns client",
+        "network.community_id": "1:wrAm7MmrJHlBQ+ikcQmSwf2JnJM=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1651,8 +1666,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1713,9 +1728,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1723,13 +1738,14 @@
         "log.level": "alert",
         "log.offset": 10403,
         "network.application": "dns client",
+        "network.community_id": "1:rjxS8IH4jqdHiflcG+1txqEFP1M=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1762,8 +1778,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1822,9 +1838,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1832,13 +1848,14 @@
         "log.level": "alert",
         "log.offset": 11118,
         "network.application": "dns client",
+        "network.community_id": "1:0YJqKZXX7VN9W1Gx6txd8TFELHM=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1871,8 +1888,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -1931,9 +1948,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -1941,13 +1958,14 @@
         "log.level": "alert",
         "log.offset": 11801,
         "network.application": "dns client",
+        "network.community_id": "1:nTPeg7DUgB3rjeFwl+cm5VHEdXQ=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -1980,8 +1998,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2040,9 +2058,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -2050,13 +2068,14 @@
         "log.level": "alert",
         "log.offset": 12477,
         "network.application": "dns client",
+        "network.community_id": "1:R1FcZHFFvO0mHFfeVXH/CwTGCmU=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -2089,8 +2108,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2147,9 +2166,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -2157,13 +2176,14 @@
         "log.level": "alert",
         "log.offset": 13152,
         "network.application": "dns client",
+        "network.community_id": "1:k5kQaEfpetJ7SxFkG7Ytzzz5ik0=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",
@@ -2196,8 +2216,8 @@
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "430003",
         "cisco.ftd.rule_name": [
-            "default",
-            "Intrusion-Rule"
+            "Intrusion-Rule",
+            "default"
         ],
         "cisco.ftd.security.ac_policy": "default",
         "cisco.ftd.security.access_control_rule_action": "Allow",
@@ -2258,9 +2278,9 @@
         "event.start": "2019-08-26T23:11:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "connection",
-            "end",
-            "allowed"
+            "end"
         ],
         "fileset.name": "ftd",
         "host.hostname": "siem-ftd",
@@ -2268,13 +2288,14 @@
         "log.level": "alert",
         "log.offset": 13795,
         "network.application": "dns client",
+        "network.community_id": "1:jVTdIEwjG0Eb77jGrcDygrNq9jg=",
         "network.iana_number": 17,
         "network.protocol": "dns",
         "network.transport": "udp",
-        "observer.egress.interface.name": "inside",
+        "observer.egress.interface.name": "outside",
         "observer.egress.zone": "output-zone",
         "observer.hostname": "siem-ftd",
-        "observer.ingress.interface.name": "outside",
+        "observer.ingress.interface.name": "inside",
         "observer.ingress.zone": "input-zone",
         "observer.product": "ftd",
         "observer.type": "firewall",

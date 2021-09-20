@@ -196,6 +196,12 @@ func makeOptions(cfg Config) []zap.Option {
 	if cfg.development {
 		options = append(options, zap.Development())
 	}
+	if cfg.ECSEnabled {
+		fields := []zap.Field{
+			zap.String("service.name", cfg.Beat),
+		}
+		options = append(options, zap.Fields(fields...))
+	}
 	return options
 }
 
@@ -226,11 +232,7 @@ func makeEventLogOutput(cfg Config) (zapcore.Core, error) {
 }
 
 func makeFileOutput(cfg Config) (zapcore.Core, error) {
-	name := cfg.Beat
-	if cfg.Files.Name != "" {
-		name = cfg.Files.Name
-	}
-	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, name))
+	filename := paths.Resolve(paths.Logs, filepath.Join(cfg.Files.Path, cfg.LogFilename()))
 
 	rotator, err := file.NewFileRotator(filename,
 		file.MaxSizeBytes(cfg.Files.MaxSize),
@@ -239,6 +241,7 @@ func makeFileOutput(cfg Config) (zapcore.Core, error) {
 		file.Interval(cfg.Files.Interval),
 		file.RotateOnStartup(cfg.Files.RotateOnStartup),
 		file.RedirectStderr(cfg.Files.RedirectStderr),
+		file.Suffix(cfg.Files.Suffix),
 	)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to create file rotator")

@@ -15,8 +15,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "file.size": 0,
         "fileset.name": "xg",
@@ -41,8 +41,8 @@
         "sophos.xg.priority": "Information",
         "sophos.xg.reason": "eligible",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -62,8 +62,8 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "file.hash.sha1": "83cd339302bf5e8ed5240ca6383418089c337a81",
         "file.mime_type": "application/octet-stream",
@@ -103,8 +103,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith@iview.com",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -123,8 +123,8 @@
         "event.timezone": "-02:00",
         "event.type": [
             "allowed",
-            "end",
-            "connection"
+            "connection",
+            "end"
         ],
         "file.size": 0,
         "fileset.name": "xg",
@@ -149,8 +149,8 @@
         "sophos.xg.priority": "Information",
         "sophos.xg.reason": "eligible",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -169,8 +169,8 @@
         "event.severity": "6",
         "event.timezone": "-02:00",
         "event.type": [
-            "start",
-            "connection"
+            "connection",
+            "start"
         ],
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
         "file.mime_type": "application/octet-stream",
@@ -210,8 +210,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -231,8 +231,8 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "file.hash.sha1": "3ce799580908df9ca0dc649aa8c2d06ab267e8c8",
         "file.mime_type": "application/octet-stream",
@@ -272,8 +272,8 @@
         "source.ip": "10.198.47.112",
         "source.user.name": "jsmith",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -293,8 +293,8 @@
         "event.severity": "2",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "file.hash.sha1": "d910c4a81122c360fe57f67a04999425a65249db",
         "file.mime_type": "application/pdf",
@@ -330,8 +330,8 @@
         "sophos.xg.source": "sophostest.com",
         "source.ip": "172.16.34.24",
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

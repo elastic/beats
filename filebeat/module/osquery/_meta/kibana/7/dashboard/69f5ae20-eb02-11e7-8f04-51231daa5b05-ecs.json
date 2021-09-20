@@ -1,0 +1,163 @@
+{
+    "attributes": {
+        "description": "Dashboard for visualizing the data collected by the Osquery compliance pack.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "1",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "2",
+                    "w": 28,
+                    "x": 20,
+                    "y": 4
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_1",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "3",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_2",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "4",
+                    "w": 20,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_3",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 20,
+                    "x": 0,
+                    "y": 16
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_4",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 1,
+                    "i": "6",
+                    "w": 12,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_5",
+                "version": "6.1.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Osquery] Compliance pack ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "69f5ae20-eb02-11e7-8f04-51231daa5b05-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "7a9482d0-eb00-11e7-8f04-51231daa5b05-ecs",
+            "name": "panel_0",
+            "type": "search"
+        },
+        {
+            "id": "a9fd8bb0-eb01-11e7-8f04-51231daa5b05-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "3824b080-eb02-11e7-8f04-51231daa5b05-ecs",
+            "name": "panel_2",
+            "type": "search"
+        },
+        {
+            "id": "1da1ed30-eb03-11e7-8f04-51231daa5b05-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "240f3630-eb05-11e7-8f04-51231daa5b05-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "2d6e0760-f4ab-11e7-8647-534bb4c21040-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:54.660Z",
+    "version": "WzQ5MzIsMV0="
+}

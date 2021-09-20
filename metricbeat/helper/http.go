@@ -28,11 +28,13 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
+
+var userAgent = useragent.UserAgent("Metricbeat")
 
 // HTTP is a custom HTTP Client that handle the complexity of connection and retrieving information
 // from HTTP endpoint.
@@ -74,11 +76,6 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		headers.Set("Authorization", header)
 	}
 
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
 	// Ensure backward compatibility
 	builder := hostData.Transport
 	if builder == nil {
@@ -90,27 +87,22 @@ func NewHTTPFromConfig(config Config, hostData mb.HostData) (*HTTP, error) {
 		return nil, err
 	}
 
-	var tlsDialer transport.Dialer
-	tlsDialer, err = transport.TLSDialer(dialer, tlsConfig, config.ConnectTimeout)
+	client, err := config.Transport.Client(
+		httpcommon.WithBaseDialer(dialer),
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
+	)
 	if err != nil {
 		return nil, err
 	}
 
 	return &HTTP{
 		hostData: hostData,
-		client: &http.Client{
-			Transport: &http.Transport{
-				Dial:            dialer.Dial,
-				DialTLS:         tlsDialer.Dial,
-				TLSClientConfig: tlsConfig.ToConfig(),
-				Proxy:           http.ProxyFromEnvironment,
-			},
-			Timeout: config.Timeout,
-		},
-		headers: headers,
-		method:  "GET",
-		uri:     hostData.SanitizedURI,
-		body:    nil,
+		client:   client,
+		headers:  headers,
+		method:   "GET",
+		uri:      hostData.SanitizedURI,
+		body:     nil,
 	}, nil
 }
 

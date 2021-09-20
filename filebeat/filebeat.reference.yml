@@ -80,32 +80,32 @@ filebeat.modules:
 - module: elasticsearch
   # Server log
   server:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   gc:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   audit:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   slowlog:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   deprecation:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -114,7 +114,7 @@ filebeat.modules:
 - module: haproxy
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input:
@@ -191,7 +191,7 @@ filebeat.modules:
 - module: kafka
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for Kafka. If left empty,
     # Filebeat will look under /opt.
@@ -205,7 +205,7 @@ filebeat.modules:
 - module: kibana
   # Server logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -213,7 +213,7 @@ filebeat.modules:
 
   # Audit logs
   audit:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -281,7 +281,7 @@ filebeat.modules:
 - module: nats
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -322,9 +322,9 @@ filebeat.modules:
   #  #var.paths:
 
 #------------------------------- Osquery Module -------------------------------
-- module: osquery
-  result:
-    enabled: true
+#- module: osquery
+  #result:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -339,7 +339,7 @@ filebeat.modules:
 - module: pensando
 # Firewall logs
   dfw:
-    enabled: true
+    enabled: false
     var.syslog_host: 0.0.0.0
     var.syslog_port: 9001
 
@@ -384,7 +384,7 @@ filebeat.modules:
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the the default path.
     #var.paths:
@@ -418,7 +418,7 @@ filebeat.inputs:
 #
 # Possible options are:
 # * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input. Experimental.
+# * filestream: Improved version of log input
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
@@ -699,6 +699,16 @@ filebeat.inputs:
   # original for harvesting but will report the symlink name as source.
   #prospector.scanner.symlinks: false
 
+  ### Log rotation
+
+  # When an external tool rotates the input files with copytruncate strategy
+  # use this section to help the input find the rotated files.
+  #rotation.external.strategy.copytruncate:
+  # Regex that matches the rotated files.
+  #  suffix_regex: \.\d$
+  # If the rotated filename suffix is a datetime, set it here. 
+  #  dateformat: -20060102
+
   ### State options
 
   # Files for the modification data is older then clean_inactive the state from the registry is removed
@@ -895,7 +905,6 @@ filebeat.inputs:
     #max_message_size: 10KiB
 
 # Accept RFC5424 formatted syslog event via TCP.
-# RFC5424 support is in beta.
 #- type: syslog
   #enabled: false
   #format: rfc5424
@@ -1064,14 +1073,14 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-  
+
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-    
+
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -1102,8 +1111,8 @@ filebeat.inputs:
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
@@ -1497,6 +1506,7 @@ output.elasticsearch:
   # Kerberos realm.
   #kerberos.realm: ELASTIC
 
+
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
   # Boolean flag to enable or disable the output module.
@@ -1755,10 +1765,6 @@ output.elasticsearch:
   # purposes.  The default is "beats".
   #client_id: beats
 
-  # Enables Kerberos FAST authentication in the Kafka output. This may
-  # conflict with certain Active Directory configurations.
-  #enable_krb5_fast: false
-
   # Use SSL settings for HTTPS.
   #ssl.enabled: true
 
@@ -1836,6 +1842,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -2307,6 +2317,11 @@ setup.kibana:
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
 
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
+
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
 logging.to_files: true
@@ -2339,6 +2354,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. filebeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false

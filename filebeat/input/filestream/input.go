@@ -27,7 +27,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -35,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
@@ -57,15 +57,14 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
-	parserConfig    []common.ConfigNamespace
-	msgPostProc     []postProcesser
+	parsers         parser.Config
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store loginp.StateStore) input.Plugin {
 	return input.Plugin{
 		Name:       pluginName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Stable,
 		Deprecated: false,
 		Info:       "filestream input",
 		Doc:        "The filestream input collects logs from the local filestream service",
@@ -84,14 +83,9 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, err
 	}
 
-	filewatcher, err := newFileWatcher(config.Paths, config.FileWatcher)
+	prospector, err := newProspector(config)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error while creating filewatcher %v", err)
-	}
-
-	identifier, err := newFileIdentifier(config.FileIdentity)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error while creating file identifier: %v", err)
+		return nil, nil, fmt.Errorf("cannot create prospector: %w", err)
 	}
 
 	encodingFactory, ok := encoding.FindEncoding(config.Reader.Encoding)
@@ -99,18 +93,11 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		return nil, nil, fmt.Errorf("unknown encoding('%v')", config.Reader.Encoding)
 	}
 
-	prospector := &fileProspector{
-		filewatcher:       filewatcher,
-		identifier:        identifier,
-		ignoreOlder:       config.IgnoreOlder,
-		cleanRemoved:      config.CleanRemoved,
-		stateChangeCloser: config.Close.OnStateChange,
-	}
-
 	filestream := &filestream{
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
+		parsers:         config.Reader.Parsers,
 	}
 
 	return prospector, filestream, nil
@@ -124,7 +111,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 		return fmt.Errorf("not file source")
 	}
 
-	reader, err := inp.open(ctx.Logger, ctx.Cancelation, fs.newPath, 0)
+	reader, err := inp.open(ctx.Logger, ctx.Cancelation, fs, 0)
 	if err != nil {
 		return err
 	}
@@ -145,7 +132,7 @@ func (inp *filestream) Run(
 	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
 	state := initState(log, cursor, fs)
 
-	r, err := inp.open(log, ctx.Cancelation, fs.newPath, state.Offset)
+	r, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
@@ -177,18 +164,30 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 	return state
 }
 
-func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path string, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(log, path, offset)
+func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSource, offset int64) (reader.Reader, error) {
+	f, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
 		return nil, err
 	}
 
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
+	// if the file is archived, it means that it is not going to be updated in the future
+	// thus, when EOF is reached, it can be closed
+	closerCfg := inp.closerConfig
+	if fs.archived && !inp.closerConfig.Reader.OnEOF {
+		closerCfg = closerConfig{
+			Reader: readerCloserConfig{
+				OnEOF:         true,
+				AfterInterval: inp.closerConfig.Reader.AfterInterval,
+			},
+			OnStateChange: inp.closerConfig.OnStateChange,
+		}
+	}
 	// TODO: NewLineReader uses additional buffering to deal with encoding and testing
 	//       for new lines in input stream. Simple 8-bit based encodings, or plain
 	//       don't require 'complicated' logic.
-	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, inp.closerConfig)
+	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
 	if err != nil {
 		return nil, err
 	}
@@ -219,14 +218,11 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, path stri
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
-	if err != nil {
-		return nil, err
-	}
+	r = readfile.NewFilemeta(r, fs.newPath, offset)
+
+	r = inp.parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
-
-	inp.msgPostProc = newPostProcessors(inp.readerConfig.Parsers)
 
 	return r, nil
 }
@@ -333,8 +329,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
-		if err := p.Publish(event, s); err != nil {
+		if err := p.Publish(message.ToEvent(), s); err != nil {
 			return err
 		}
 	}
@@ -367,36 +362,4 @@ func matchAny(matchers []match.Matcher, text string) bool {
 		}
 	}
 	return false
-}
-
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
-	fields := common.MapStr{
-		"log": common.MapStr{
-			"offset": m.Bytes, // Offset here is the offset before the starting char.
-			"file": common.MapStr{
-				"path": path,
-			},
-		},
-	}
-	fields.DeepUpdate(m.Fields)
-	m.Fields = fields
-
-	for _, proc := range inp.msgPostProc {
-		proc.PostProcess(&m)
-	}
-
-	if len(m.Content) > 0 {
-		if m.Fields == nil {
-			m.Fields = common.MapStr{}
-		}
-		if _, ok := m.Fields["message"]; !ok {
-			m.Fields["message"] = string(m.Content)
-		}
-	}
-
-	return beat.Event{
-		Timestamp: m.Ts,
-		Meta:      m.Meta,
-		Fields:    m.Fields,
-	}
 }
