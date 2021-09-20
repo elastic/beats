@@ -253,14 +253,14 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "4",
 		},
 		{
-			name:        "func sha1 hmac",
+			name:        "func sha1 hmac Hex",
 			value:       `[[hmac "sha1" "secret" "string1" "string2"]]`,
 			paramCtx:    emptyTransformContext(),
 			paramTr:     transformable{},
 			expectedVal: "87eca1e7cba012b2dd4a907c2ad4345a252a38f4",
 		},
 		{
-			name:        "func sha256 hmac",
+			name:        "func sha256 hmac Hex",
 			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
 			value:       `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`,
@@ -269,7 +269,7 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "adc61cd206e146f2d1337504e760ea70f3d2e34bedf28d07802e0e776568a06b",
 		},
 		{
-			name:          "func invalid hmac",
+			name:          "func invalid hmac Hex",
 			value:         `[[hmac "md5" "secret" "string1" "string2"]]`,
 			paramCtx:      emptyTransformContext(),
 			paramTr:       transformable{},
@@ -330,6 +330,30 @@ func TestValueTpl(t *testing.T) {
 			},
 			paramTr:     transformable{},
 			expectedVal: `"foo,bar":1`,
+		},
+		{
+			name:        "func sha1 hmac Base64",
+			value:       `[[hmacBase64 "sha1" "secret" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "h+yh58ugErLdSpB8KtQ0WiUqOPQ=",
+		},
+		{
+			name:        "func sha256 hmac Base64",
+			setup:       func() { timeNow = func() time.Time { return time.Unix(1627697597, 0).UTC() } },
+			teardown:    func() { timeNow = time.Now },
+			value:       `[[hmacBase64 "sha256" "secret" "string1" "string2"]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "HlglO6yRZs0Ts3MjmgnRKtTJk3fr9nt8LmeliVKZyAA=",
+		},
+		{
+			name:          "func invalid hmac Base64",
+			value:         `[[hmacBase64 "md5" "secret" "string1" "string2"]]`,
+			paramCtx:      emptyTransformContext(),
+			paramTr:       transformable{},
+			expectedVal:   "",
+			expectedError: errEmptyTemplateResult.Error(),
 		},
 	}
 
