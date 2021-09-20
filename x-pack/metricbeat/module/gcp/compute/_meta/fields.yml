@@ -3,10 +3,10 @@
   release: beta
   type: group
   fields:
-  - name: instance.firewall.dropped_bytes_count.value
+  - name: firewall.dropped_bytes_count.value
     type: long
     description: Incoming bytes dropped by the firewall
-  - name: instance.firewall.dropped_packets_count.value
+  - name: firewall.dropped_packets_count.value
     type: long
     description: Incoming packets dropped by the firewall
   - name: instance.cpu.reserved_cores.value
