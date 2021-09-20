@@ -2,15 +2,105 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "e9560bbace13ca19de4b3771023198e8568f6b5ed6af3a949f10a5b8137b5be9",
+				"id": "eadcbd54ba914dff6475ae64805887967cfb973aeb9b07364c94372658a71d11",
 				"image": {
-					"name": "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
+					"name": "gcr.io/google_containers/kube-scheduler-amd64:v1.9.7"
 				},
 				"runtime": "docker"
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-scheduler-minikube"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.1,
+					"nanocores": 100000000
+				}
+			},
+			"id": "docker://eadcbd54ba914dff6475ae64805887967cfb973aeb9b07364c94372658a71d11",
+			"name": "kube-scheduler",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
+				"image": {
+					"name": "gcr.io/google_containers/kube-proxy-amd64:v1.9.7"
+				},
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": {
+				"name": "kube-system"
+			},
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-proxy-znhg6"
+			}
+		},
+		"MetricSetFields": {
+			"id": "docker://76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
+			"name": "kube-proxy",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "1958e71d048065d38ce83dafda567c5fa9d0c1278cd7292d55b9f1d80b0a67f9",
+				"image": {
+					"name": "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.7"
+				},
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -21,20 +111,76 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.15,
-					"nanocores": 150000000
+					"cores": 0.1,
+					"nanocores": 100000000
 				}
 			},
-			"id": "docker://e9560bbace13ca19de4b3771023198e8568f6b5ed6af3a949f10a5b8137b5be9",
+			"id": "docker://1958e71d048065d38ce83dafda567c5fa9d0c1278cd7292d55b9f1d80b0a67f9",
+			"memory": {
+				"limit": {
+					"bytes": 178257920
+				},
+				"request": {
+					"bytes": 73400320
+				}
+			},
+			"name": "kubedns",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
+				"id": "aad0addd205dc72dc7abc8f9d02a1b429a2f2e1df3acc60431ca6b79746c093b",
+				"image": {
+					"name": "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.7"
+				},
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": {
+				"name": "kube-system"
+			},
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-dns-6f4fd4bdf-wlmht"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.01,
+					"nanocores": 10000000
+				}
+			},
+			"id": "docker://aad0addd205dc72dc7abc8f9d02a1b429a2f2e1df3acc60431ca6b79746c093b",
 			"memory": {
 				"request": {
 					"bytes": 20971520
 				}
 			},
-			"name": "dnsmasq",
+			"name": "sidecar",
 			"status": {
 				"phase": "running",
 				"ready": true,
+				"reason": "OOMKilled",
 				"restarts": 0
 			}
 		},
@@ -60,7 +206,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -97,45 +245,6 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
-				"image": {
-					"name": "gcr.io/google_containers/kube-proxy-amd64:v1.9.7"
-				},
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "minikube"
-			},
-			"pod": {
-				"name": "kube-proxy-znhg6"
-			}
-		},
-		"MetricSetFields": {
-			"id": "docker://76c260259ddfd0267b5acb4e514465215ef1ebfa93a4057d592828772e6b39f5",
-			"name": "kube-proxy",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
 				"id": "4beb9aab887ca162c9cb3534c4826156636241052cd548153eaa2a170b6d102f",
 				"image": {
 					"name": "gcr.io/google_containers/kube-controller-manager-amd64:v1.9.7"
@@ -144,7 +253,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -181,6 +292,58 @@
 	{
 		"RootFields": {
 			"container": {
+				"id": "ab382dbe8f8265f88ee9fec7de142f778da4a5fd9fe0334e3bdb6fe851124c08",
+				"image": {
+					"name": "k8s.gcr.io/kube-addon-manager:v8.6"
+				},
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": {
+				"name": "kube-system"
+			},
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-addon-manager-minikube"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.005,
+					"nanocores": 5000000
+				}
+			},
+			"id": "docker://ab382dbe8f8265f88ee9fec7de142f778da4a5fd9fe0334e3bdb6fe851124c08",
+			"memory": {
+				"request": {
+					"bytes": 52428800
+				}
+			},
+			"name": "kube-addon-manager",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
 				"id": "948c4ebd8ca4fdf352e7fbf7f5c5d381af7e615ced435dc42fde0c1d25851320",
 				"image": {
 					"name": "k8s.gcr.io/addon-resizer:1.7"
@@ -189,7 +352,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -238,193 +403,6 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "eadcbd54ba914dff6475ae64805887967cfb973aeb9b07364c94372658a71d11",
-				"image": {
-					"name": "gcr.io/google_containers/kube-scheduler-amd64:v1.9.7"
-				},
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "minikube"
-			},
-			"pod": {
-				"name": "kube-scheduler-minikube"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1,
-					"nanocores": 100000000
-				}
-			},
-			"id": "docker://eadcbd54ba914dff6475ae64805887967cfb973aeb9b07364c94372658a71d11",
-			"name": "kube-scheduler",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "1958e71d048065d38ce83dafda567c5fa9d0c1278cd7292d55b9f1d80b0a67f9",
-				"image": {
-					"name": "gcr.io/google_containers/k8s-dns-kube-dns-amd64:1.14.7"
-				},
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "minikube"
-			},
-			"pod": {
-				"name": "kube-dns-6f4fd4bdf-wlmht"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.1,
-					"nanocores": 100000000
-				}
-			},
-			"id": "docker://1958e71d048065d38ce83dafda567c5fa9d0c1278cd7292d55b9f1d80b0a67f9",
-			"memory": {
-				"limit": {
-					"bytes": 178257920
-				},
-				"request": {
-					"bytes": 73400320
-				}
-			},
-			"name": "kubedns",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "6e96fd8a687409b2314dcc01f209bb0c813c2fb08b8f75ad1695e120d41e1a2a",
-				"image": {
-					"name": "gcr.io/google_containers/etcd-amd64:3.1.11"
-				},
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "minikube"
-			},
-			"pod": {
-				"name": "etcd-minikube"
-			}
-		},
-		"MetricSetFields": {
-			"id": "docker://6e96fd8a687409b2314dcc01f209bb0c813c2fb08b8f75ad1695e120d41e1a2a",
-			"name": "etcd",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
-				"id": "ab382dbe8f8265f88ee9fec7de142f778da4a5fd9fe0334e3bdb6fe851124c08",
-				"image": {
-					"name": "k8s.gcr.io/kube-addon-manager:v8.6"
-				},
-				"runtime": "docker"
-			}
-		},
-		"ModuleFields": {
-			"namespace": "kube-system",
-			"node": {
-				"name": "minikube"
-			},
-			"pod": {
-				"name": "kube-addon-manager-minikube"
-			}
-		},
-		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.005,
-					"nanocores": 5000000
-				}
-			},
-			"id": "docker://ab382dbe8f8265f88ee9fec7de142f778da4a5fd9fe0334e3bdb6fe851124c08",
-			"memory": {
-				"request": {
-					"bytes": 52428800
-				}
-			},
-			"name": "kube-addon-manager",
-			"status": {
-				"phase": "running",
-				"ready": true,
-				"restarts": 0
-			}
-		},
-		"Index": "",
-		"ID": "",
-		"Namespace": "kubernetes.container",
-		"Timestamp": "0001-01-01T00:00:00Z",
-		"Error": null,
-		"Host": "",
-		"Service": "",
-		"Took": 0,
-		"Period": 0,
-		"DisableTimeSeries": false
-	},
-	{
-		"RootFields": {
-			"container": {
 				"id": "88951e0178ea5131fa3e2d7cafacb3a7e63700795dd6fa0d40ed2e4ac1f52f9c",
 				"image": {
 					"name": "quay.io/coreos/kube-state-metrics:v1.3.0"
@@ -433,7 +411,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -482,6 +462,58 @@
 	{
 		"RootFields": {
 			"container": {
+				"id": "e9560bbace13ca19de4b3771023198e8568f6b5ed6af3a949f10a5b8137b5be9",
+				"image": {
+					"name": "gcr.io/google_containers/k8s-dns-dnsmasq-nanny-amd64:1.14.7"
+				},
+				"runtime": "docker"
+			}
+		},
+		"ModuleFields": {
+			"namespace": {
+				"name": "kube-system"
+			},
+			"node": {
+				"name": "minikube"
+			},
+			"pod": {
+				"name": "kube-dns-6f4fd4bdf-wlmht"
+			}
+		},
+		"MetricSetFields": {
+			"cpu": {
+				"request": {
+					"cores": 0.15,
+					"nanocores": 150000000
+				}
+			},
+			"id": "docker://e9560bbace13ca19de4b3771023198e8568f6b5ed6af3a949f10a5b8137b5be9",
+			"memory": {
+				"request": {
+					"bytes": 20971520
+				}
+			},
+			"name": "dnsmasq",
+			"status": {
+				"phase": "running",
+				"ready": true,
+				"restarts": 0
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.container",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": {
+			"container": {
 				"id": "c46bc2164edcb5972be6fc9174155e61179cb04314c4f6da5d25d3a76acadee6",
 				"image": {
 					"name": "k8s.gcr.io/kubernetes-dashboard-amd64:v1.8.1"
@@ -490,7 +522,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
@@ -521,40 +555,30 @@
 	{
 		"RootFields": {
 			"container": {
-				"id": "aad0addd205dc72dc7abc8f9d02a1b429a2f2e1df3acc60431ca6b79746c093b",
+				"id": "6e96fd8a687409b2314dcc01f209bb0c813c2fb08b8f75ad1695e120d41e1a2a",
 				"image": {
-					"name": "gcr.io/google_containers/k8s-dns-sidecar-amd64:1.14.7"
+					"name": "gcr.io/google_containers/etcd-amd64:3.1.11"
 				},
 				"runtime": "docker"
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},
 			"pod": {
-				"name": "kube-dns-6f4fd4bdf-wlmht"
+				"name": "etcd-minikube"
 			}
 		},
 		"MetricSetFields": {
-			"cpu": {
-				"request": {
-					"cores": 0.01,
-					"nanocores": 10000000
-				}
-			},
-			"id": "docker://aad0addd205dc72dc7abc8f9d02a1b429a2f2e1df3acc60431ca6b79746c093b",
-			"memory": {
-				"request": {
-					"bytes": 20971520
-				}
-			},
-			"name": "sidecar",
+			"id": "docker://6e96fd8a687409b2314dcc01f209bb0c813c2fb08b8f75ad1695e120d41e1a2a",
+			"name": "etcd",
 			"status": {
 				"phase": "running",
 				"ready": true,
-				"reason": "OOMKilled",
 				"restarts": 0
 			}
 		},
@@ -580,7 +604,9 @@
 			}
 		},
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": {
+				"name": "kube-system"
+			},
 			"node": {
 				"name": "minikube"
 			},

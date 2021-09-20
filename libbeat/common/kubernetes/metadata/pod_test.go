@@ -133,7 +133,9 @@ func TestPod_Generate(t *testing.T) {
 					"annotations": common.MapStr{
 						"app": "production",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"node": common.MapStr{
 						"name": "testnode",
 					},
@@ -179,7 +181,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "owner",
 					},
@@ -234,7 +238,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"daemonset": common.MapStr{
 						"name": "owner",
 					},
@@ -289,7 +295,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "nginx-deployment",
 					},
@@ -347,7 +355,9 @@ func TestPod_Generate(t *testing.T) {
 						"uid":  uid,
 						"ip":   "127.0.0.5",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "nginx-deployment",
 					},
@@ -422,7 +432,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
-				"namespace": "default",
+				"namespace": common.MapStr{
+					"name": "default",
+				},
 				"node": common.MapStr{
 					"name": "testnode",
 				},
@@ -472,7 +484,9 @@ func TestPod_GenerateFromName(t *testing.T) {
 					"uid":  uid,
 					"ip":   "127.0.0.5",
 				},
-				"namespace": "default",
+				"namespace": common.MapStr{
+					"name": "default",
+				},
 				"deployment": common.MapStr{
 					"name": "owner",
 				},

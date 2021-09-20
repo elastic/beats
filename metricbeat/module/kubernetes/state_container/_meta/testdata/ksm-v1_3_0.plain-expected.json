@@ -1,9 +1,9 @@
 [
     {
         "container": {
-            "id": "469f5d2b7854eb52e5d13dc0cd3e664c1b682b157aabaf596ffe4984f1516902",
+            "id": "fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
             "image": {
-                "name": "gcr.io/kubernetes-helm/tiller:v2.3.1"
+                "name": "gcr.io/google_containers/kubedns-amd64:1.9-test"
             },
             "runtime": "docker"
         },
@@ -14,20 +14,36 @@
         },
         "kubernetes": {
             "container": {
-                "id": "docker://469f5d2b7854eb52e5d13dc0cd3e664c1b682b157aabaf596ffe4984f1516902",
-                "name": "tiller",
+                "cpu": {
+                    "request": {
+                        "cores": 0.2,
+                        "nanocores": 200000000
+                    }
+                },
+                "id": "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
+                "memory": {
+                    "limit": {
+                        "bytes": 278257920
+                    },
+                    "request": {
+                        "bytes": 83400320
+                    }
+                },
+                "name": "kubedns",
                 "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 1
+                    "phase": "terminated",
+                    "ready": false,
+                    "restarts": 3
                 }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "test"
+            },
             "node": {
-                "name": "minikube"
+                "name": "minikube-test"
             },
             "pod": {
-                "name": "tiller-deploy-3067024529-9lpmb"
+                "name": "kube-dns-v20-5g5cb-test"
             }
         },
         "metricset": {
@@ -62,7 +78,9 @@
                     "restarts": 2
                 }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "kube-system"
+            },
             "node": {
                 "name": "minikube"
             },
@@ -80,6 +98,13 @@
         }
     },
     {
+        "container": {
+            "id": "52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",
+            "image": {
+                "name": "gcr.io/google_containers/exechealthz-amd64:1.2"
+            },
+            "runtime": "docker"
+        },
         "event": {
             "dataset": "kubernetes.container",
             "duration": 115000,
@@ -88,28 +113,88 @@
         "kubernetes": {
             "container": {
                 "cpu": {
-                    "limit": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
-                    },
                     "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
+                        "cores": 0.01,
+                        "nanocores": 10000000
                     }
                 },
+                "id": "docker://52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",
                 "memory": {
                     "limit": {
                         "bytes": 52428800
                     },
                     "request": {
-                        "bytes": 31457280
+                        "bytes": 52428800
                     }
                 },
-                "name": "kube-state-metrics"
+                "name": "healthz",
+                "status": {
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 2
+                }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "kube-system"
+            },
+            "node": {
+                "name": "minikube"
+            },
             "pod": {
-                "name": "kube-state-metrics-1303537707-mnzbp"
+                "name": "kube-dns-v20-5g5cb"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "91fdd43f6b1b4c3dd133cfca53e0b1210bc557c2ae56006026b5ccdb5f52826f",
+            "image": {
+                "name": "gcr.io/google-containers/kube-addon-manager:v6.3"
+            },
+            "runtime": "docker"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.005,
+                        "nanocores": 5000000
+                    }
+                },
+                "id": "docker://91fdd43f6b1b4c3dd133cfca53e0b1210bc557c2ae56006026b5ccdb5f52826f",
+                "memory": {
+                    "request": {
+                        "bytes": 52428800
+                    }
+                },
+                "name": "kube-addon-manager",
+                "status": {
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 2
+                }
+            },
+            "namespace": {
+                "name": "kube-system"
+            },
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "name": "kube-addon-manager-minikube"
             }
         },
         "metricset": {
@@ -162,12 +247,111 @@
                     "restarts": 1
                 }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "kube-system"
+            },
             "node": {
                 "name": "minikube"
             },
             "pod": {
                 "name": "kube-state-metrics-1303537707-7ncd1"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "limit": {
+                        "cores": 0.2,
+                        "nanocores": 200000000
+                    },
+                    "request": {
+                        "cores": 0.1,
+                        "nanocores": 100000000
+                    }
+                },
+                "memory": {
+                    "limit": {
+                        "bytes": 52428800
+                    },
+                    "request": {
+                        "bytes": 31457280
+                    }
+                },
+                "name": "kube-state-metrics"
+            },
+            "namespace": {
+                "name": "kube-system"
+            },
+            "pod": {
+                "name": "kube-state-metrics-1303537707-mnzbp"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "4fa227874ee68536bf902394fb662f07b99099798ca9cd5c1506b79075acc065",
+            "image": {
+                "name": "bitnami/redis:3.2.8-r2"
+            },
+            "runtime": "docker"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.1,
+                        "nanocores": 100000000
+                    }
+                },
+                "id": "docker://4fa227874ee68536bf902394fb662f07b99099798ca9cd5c1506b79075acc065",
+                "memory": {
+                    "request": {
+                        "bytes": 268435456
+                    }
+                },
+                "name": "jumpy-owl-redis",
+                "status": {
+                    "phase": "waiting",
+                    "ready": false,
+                    "restarts": 270
+                }
+            },
+            "namespace": {
+                "name": "default"
+            },
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "name": "jumpy-owl-redis-3481028193-s78x9"
             }
         },
         "metricset": {
@@ -213,12 +397,56 @@
                     "restarts": 1
                 }
             },
-            "namespace": "jenkins",
+            "namespace": {
+                "name": "jenkins"
+            },
             "node": {
                 "name": "minikube"
             },
             "pod": {
                 "name": "wise-lynx-jenkins-1616735317-svn6k"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
+            "id": "9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
+            "image": {
+                "name": "gcr.io/google_containers/kube-dnsmasq-amd64:1.4"
+            },
+            "runtime": "docker"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "id": "docker://9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
+                "name": "dnsmasq",
+                "status": {
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 2
+                }
+            },
+            "namespace": {
+                "name": "kube-system"
+            },
+            "node": {
+                "name": "minikube"
+            },
+            "pod": {
+                "name": "kube-dns-v20-5g5cb"
             }
         },
         "metricset": {
@@ -267,7 +495,9 @@
                     "restarts": 2
                 }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "kube-system"
+            },
             "node": {
                 "name": "minikube"
             },
@@ -286,9 +516,9 @@
     },
     {
         "container": {
-            "id": "4fa227874ee68536bf902394fb662f07b99099798ca9cd5c1506b79075acc065",
+            "id": "469f5d2b7854eb52e5d13dc0cd3e664c1b682b157aabaf596ffe4984f1516902",
             "image": {
-                "name": "bitnami/redis:3.2.8-r2"
+                "name": "gcr.io/kubernetes-helm/tiller:v2.3.1"
             },
             "runtime": "docker"
         },
@@ -299,230 +529,22 @@
         },
         "kubernetes": {
             "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.1,
-                        "nanocores": 100000000
-                    }
-                },
-                "id": "docker://4fa227874ee68536bf902394fb662f07b99099798ca9cd5c1506b79075acc065",
-                "memory": {
-                    "request": {
-                        "bytes": 268435456
-                    }
-                },
-                "name": "jumpy-owl-redis",
-                "status": {
-                    "phase": "waiting",
-                    "ready": false,
-                    "restarts": 270
-                }
-            },
-            "namespace": "default",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "name": "jumpy-owl-redis-3481028193-s78x9"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
-            "image": {
-                "name": "gcr.io/google_containers/kubedns-amd64:1.9-test"
-            },
-            "runtime": "docker"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.2,
-                        "nanocores": 200000000
-                    }
-                },
-                "id": "docker://fa3d83f648de42492b38fa3e8501d109376f391c50f2bd210c895c8477ae4b62-test",
-                "memory": {
-                    "limit": {
-                        "bytes": 278257920
-                    },
-                    "request": {
-                        "bytes": 83400320
-                    }
-                },
-                "name": "kubedns",
-                "status": {
-                    "phase": "terminated",
-                    "ready": false,
-                    "restarts": 3
-                }
-            },
-            "namespace": "test",
-            "node": {
-                "name": "minikube-test"
-            },
-            "pod": {
-                "name": "kube-dns-v20-5g5cb-test"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "91fdd43f6b1b4c3dd133cfca53e0b1210bc557c2ae56006026b5ccdb5f52826f",
-            "image": {
-                "name": "gcr.io/google-containers/kube-addon-manager:v6.3"
-            },
-            "runtime": "docker"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.005,
-                        "nanocores": 5000000
-                    }
-                },
-                "id": "docker://91fdd43f6b1b4c3dd133cfca53e0b1210bc557c2ae56006026b5ccdb5f52826f",
-                "memory": {
-                    "request": {
-                        "bytes": 52428800
-                    }
-                },
-                "name": "kube-addon-manager",
+                "id": "docker://469f5d2b7854eb52e5d13dc0cd3e664c1b682b157aabaf596ffe4984f1516902",
+                "name": "tiller",
                 "status": {
                     "phase": "running",
                     "ready": true,
-                    "restarts": 2
+                    "restarts": 1
                 }
             },
-            "namespace": "kube-system",
+            "namespace": {
+                "name": "kube-system"
+            },
             "node": {
                 "name": "minikube"
             },
             "pod": {
-                "name": "kube-addon-manager-minikube"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",
-            "image": {
-                "name": "gcr.io/google_containers/exechealthz-amd64:1.2"
-            },
-            "runtime": "docker"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.01,
-                        "nanocores": 10000000
-                    }
-                },
-                "id": "docker://52fa55e051dc5b68e44c027588685b7edd85aaa03b07f7216d399249ff4fc821",
-                "memory": {
-                    "limit": {
-                        "bytes": 52428800
-                    },
-                    "request": {
-                        "bytes": 52428800
-                    }
-                },
-                "name": "healthz",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 2
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "name": "kube-dns-v20-5g5cb"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
-            "image": {
-                "name": "gcr.io/google_containers/kube-dnsmasq-amd64:1.4"
-            },
-            "runtime": "docker"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "id": "docker://9a4c9462cd078d7be4f0a9b94bcfeb69d5fdd76bff67142df3f58367ac7e8d61",
-                "name": "dnsmasq",
-                "status": {
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 2
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "minikube"
-            },
-            "pod": {
-                "name": "kube-dns-v20-5g5cb"
+                "name": "tiller-deploy-3067024529-9lpmb"
             }
         },
         "metricset": {
