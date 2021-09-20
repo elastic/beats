@@ -148,6 +148,27 @@ processors:
     ignore_failure: true
     ignore_missing: true
     if: "ctx.sophos?.xg?.firewall?.receivedkbits != null"
+- convert:
+    field: sophos.xg.free
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.free
+- convert:
+    field: sophos.xg.used
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.used
+- convert:
+    field: sophos.xg.total_memory
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.total_memory
 
 #############
 ## Cleanup ##

@@ -23,15 +23,15 @@
         "service.type": "sophos",
         "sophos.xg.device": "SFW",
         "sophos.xg.device_name": "SF01V",
-        "sophos.xg.free": "578650112",
+        "sophos.xg.free": 578650112,
         "sophos.xg.log_component": "Memory",
         "sophos.xg.log_subtype": "Usage",
         "sophos.xg.log_type": "System Health",
         "sophos.xg.message_id": "18031",
         "sophos.xg.priority": "Information",
-        "sophos.xg.total_memory": "2100191232",
+        "sophos.xg.total_memory": 2100191232,
         "sophos.xg.unit": "byte",
-        "sophos.xg.used": "1521541120",
+        "sophos.xg.used": 1521541120,
         "tags": [
             "forwarded",
             "sophos-xg"
