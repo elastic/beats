@@ -9,6 +9,9 @@
   - name: https.backend_request_count.value
     type: long
     description: The number of requests served by backends of HTTP/S load balancer.
+  - name: https.backend_response_bytes_count.value
+    type: long
+    description: The number of bytes sent as responses from backends (or cache) to external HTTP(S) load balancer.
   - name: https.request_bytes_count.value
     type: long
     description: The number of bytes sent as requests from clients to HTTP/S load balancer.
