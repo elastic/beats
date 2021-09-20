@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removes old module name aliases (gsuite) and removing old cyberark module in favor of the new cyberarkpas{pull}27915[27915]
 - Only filesets that are explicitly configured will be enabled. {issue}17256[17256] {pull}27526[27526]
 - All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
+- Remove deprecated fields in Kafka module. {pull}27938[27938]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -115,6 +116,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
+- Remove deprecated fields in Kafka module. {pull}27938[27938]
 
 *Packetbeat*
 
@@ -528,6 +530,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Allow non-padded base64 data to be decoded by decode_base64_field {pull}27311[27311], {issue}27021[27021]
 - The Kafka support library Sarama has been updated to 1.29.1. {pull}27717[27717]
 - Kafka is now supported up to version 2.8.0. {pull}27720[27720]
+- Add default seccomp policy for linux arm64. {pull}27955[27955]
 
 *Auditbeat*
 
@@ -756,6 +759,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add `ignore_empty_value` flag to `httpjson` `split` processor. {pull}27880[27880]
 - Update Cisco ASA/FTD ingest pipeline grok/dissect patterns for multiple message IDs. {issue}26869[26869] {pull}26879[26879]
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
+- Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 
 *Heartbeat*
 
