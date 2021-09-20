@@ -123,7 +123,7 @@ func newLocal(
 		router,
 		&pipeline.ConfigModifiers{
 			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
-			Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectInsecureOutput(cfg.Fleet)},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 		},
 		caps,
 		monitor,
