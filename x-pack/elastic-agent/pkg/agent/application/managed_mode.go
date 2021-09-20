@@ -147,7 +147,7 @@ func newManaged(
 		router,
 		&pipeline.ConfigModifiers{
 			Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
-			Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+			Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectInsecureOutput(cfg.Fleet), modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 		caps,
 		monitor,

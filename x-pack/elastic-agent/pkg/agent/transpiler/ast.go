@@ -104,6 +104,11 @@ func (d *Dict) Find(key string) (Node, bool) {
 	return nil, false
 }
 
+// Insert inserts a value into a collection.
+func (d *Dict) Insert(node Node) {
+	d.value = append(d.value, node)
+}
+
 func (d *Dict) String() string {
 	var sb strings.Builder
 	for i := 0; i < len(d.value); i++ {
