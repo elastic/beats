@@ -1,8 +1,162 @@
 {
     "attributes": {
         "description": "",
-        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"0b910b6c-77c8-4223-892a-1ebf69b0ccb4\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"type\":\"ES_GEO_GRID\",\"id\":\"3ba31ffc-7051-44bf-96a0-a684020cd2a3\",\"geoField\":\"source.geo.location\",\"requestType\":\"point\",\"resolution\":\"FINE\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"fillColor\":{\"type\":\"DYNAMIC\",\"options\":{\"color\":\"Yellow to Red\",\"colorCategory\":\"palette_0\",\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3},\"type\":\"ORDINAL\",\"useCustomColorRamp\":false}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":0}},\"iconSize\":{\"type\":\"DYNAMIC\",\"options\":{\"minSize\":8,\"maxSize\":32,\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3}}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"DYNAMIC\",\"options\":{\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"}}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"airfield\"}}},\"isTimeAware\":true},\"id\":\"acc53b7b-3411-406b-9371-6fa62b6b9365\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\"}]",
-        "mapStateJSON": "{\"zoom\":2.88,\"center\":{\"lon\":16.67387,\"lat\":30.87292},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"event.dataset:\\\"o365.audit\\\" \",\"language\":\"kuery\"},\"filters\":[],\"settings\":{\"autoFitToDataBounds\":false}}",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "0b910b6c-77c8-4223-892a-1ebf69b0ccb4",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "acc53b7b-3411-406b-9371-6fa62b6b9365",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "geoField": "source.geo.location",
+                    "id": "3ba31ffc-7051-44bf-96a0-a684020cd2a3",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "requestType": "point",
+                    "resolution": "FINE",
+                    "type": "ES_GEO_GRID"
+                },
+                "style": {
+                    "isTimeAware": true,
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "Yellow to Red",
+                                "colorCategory": "palette_0",
+                                "field": {
+                                    "name": "doc_count",
+                                    "origin": "source"
+                                },
+                                "fieldMetaOptions": {
+                                    "isEnabled": true,
+                                    "sigma": 3
+                                },
+                                "type": "ORDINAL",
+                                "useCustomColorRamp": false
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "airfield"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "field": {
+                                    "name": "doc_count",
+                                    "origin": "source"
+                                },
+                                "fieldMetaOptions": {
+                                    "isEnabled": true,
+                                    "sigma": 3
+                                },
+                                "maxSize": 32,
+                                "minSize": 8
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "labelBorderColor": {
+                            "options": {
+                                "color": "#FFFFFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelBorderSize": {
+                            "options": {
+                                "size": "SMALL"
+                            }
+                        },
+                        "labelColor": {
+                            "options": {
+                                "color": "#000000"
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelSize": {
+                            "options": {
+                                "size": 14
+                            },
+                            "type": "STATIC"
+                        },
+                        "labelText": {
+                            "options": {
+                                "field": {
+                                    "name": "doc_count",
+                                    "origin": "source"
+                                }
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#FFF"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 30.87292,
+                "lon": 16.67387
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": "event.dataset:\"o365.audit\" "
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-7d",
+                "to": "now"
+            },
+            "zoom": 2.88
+        },
         "title": "Client Geo Map [Filebeat o365 audit]",
         "uiStateJSON": {
             "isLayerTOCOpen": true,
