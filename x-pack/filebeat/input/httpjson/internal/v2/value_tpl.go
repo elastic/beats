@@ -58,7 +58,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmac":                hmacString,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
-			"join":                strings.Join,
+			"join":                join,
 			"sprintf":             fmt.Sprintf,
 		}).
 		Delims(leftDelim, rightDelim).
@@ -288,4 +288,31 @@ func hmacString(hmacType string, hmacKey string, values ...string) string {
 
 	// Get result and encode as hexadecimal string
 	return hex.EncodeToString(mac.Sum(nil))
+}
+
+// join concatenates the elements of its first argument to create a single string. The separator
+// string sep is placed between elements in the resulting string. If the first argument is not of
+// type string or []string, its elements will be stringified.
+func join(v interface{}, sep string) string {
+	// check for []string or string to avoid using reflect
+	switch t := v.(type) {
+	case []string:
+		return strings.Join(t, sep)
+	case string:
+		return t
+	}
+
+	// if we have a slice of a different type, convert it to []string
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Slice, reflect.Array:
+		s := reflect.ValueOf(v)
+		vs := make([]string, s.Len())
+		for i := 0; i < s.Len(); i++ {
+			vs[i] = fmt.Sprint(s.Index(i))
+		}
+		return strings.Join(vs, sep)
+	}
+
+	// return the stringified single value
+	return fmt.Sprint(v)
 }
