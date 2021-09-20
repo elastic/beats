@@ -1,7 +1,7 @@
 - name: billing
+  description: Google Cloud Billing metrics
   release: beta
   type: group
-  description: Google Cloud Billing metrics
   fields:
     - name: cost_type
       type: keyword
