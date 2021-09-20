@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Removes old module name aliases (gsuite) and removing old cyberark module in favor of the new cyberarkpas{pull}27915[27915]
 - Only filesets that are explicitly configured will be enabled. {issue}17256[17256] {pull}27526[27526]
 - All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
+- Remove deprecated fields in Kafka module. {pull}27938[27938]
 
 *Heartbeat*
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
@@ -115,6 +116,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
+- Remove deprecated fields in Kafka module. {pull}27938[27938]
 
 *Packetbeat*
 

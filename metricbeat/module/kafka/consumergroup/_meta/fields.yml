@@ -4,36 +4,9 @@
     consumergroup
   release: ga
   fields:
-    - name: broker
-      type: group
-      deprecated: 6.5
-      description: >
-        Broker Consumer Group Information have been read from (Broker handling
-        the consumer group).
-      fields:
-        - name: id
-          type: long
-          description: >
-            Broker id
-
-        - name: address
-          type: keyword
-          description: >
-            Broker address
-
     - name: id
       type: keyword
       description: Consumer Group ID
-
-    - name: topic
-      type: keyword
-      deprecated: 6.5
-      description: Topic name
-
-    - name: partition
-      type: long
-      deprecated: 6.5
-      description: Partition ID
 
     - name: offset
       type: long
