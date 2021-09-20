@@ -3,7 +3,7 @@ module github.com/elastic/beats/v7
 go 1.16
 
 require (
-	cloud.google.com/go v0.51.0
+	cloud.google.com/go v0.83.0
 	cloud.google.com/go/bigquery v1.0.1
 	cloud.google.com/go/pubsub v1.0.1
 	cloud.google.com/go/storage v1.0.0
