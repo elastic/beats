@@ -292,24 +292,36 @@ func TestValueTpl(t *testing.T) {
 			expectedError: errEmptyTemplateResult.Error(),
 		},
 		{
-			name:  "func join",
-			value: `[[join .last_response.body.arr ","]]`,
+			name: "func join",
+			value: `[[join .last_response.body.strarr ","]] [[join .last_response.body.iarr ","]] ` +
+				`[[join .last_response.body.narr ","]] [[join .last_response.body.singlevalstr ","]] ` +
+				`[[join .last_response.body.singlevalint ","]]`,
 			paramCtx: &transformContext{
 				firstEvent: &common.MapStr{},
 				lastEvent:  &common.MapStr{},
 				lastResponse: newTestResponse(
 					common.MapStr{
-						"arr": []string{
+						"strarr": []string{
 							"foo",
 							"bar",
 						},
+						"iarr": []interface{}{
+							"foo",
+							2,
+						},
+						"narr": []int{
+							1,
+							2,
+						},
+						"singlevalstr": "foo",
+						"singlevalint": 2,
 					},
 					http.Header{},
 					"",
 				),
 			},
 			paramTr:     transformable{},
-			expectedVal: "foo,bar",
+			expectedVal: "foo,bar foo,2 1,2 foo 2",
 		},
 		{
 			name:  "func sprintf",
