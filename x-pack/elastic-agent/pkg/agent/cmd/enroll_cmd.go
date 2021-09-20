@@ -263,7 +263,6 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
-		c.options.Insecure,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
 		c.options.FleetServer.ProxyURL,
@@ -461,7 +460,6 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 			c.options.FleetServer.PolicyID,
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
-			c.options.Insecure,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
 			c.options.FleetServer.ProxyURL, c.options.FleetServer.ProxyDisabled, c.options.FleetServer.ProxyHeaders)
@@ -761,7 +759,7 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 
 func createFleetServerBootstrapConfig(
 	connStr, serviceToken, policyID, host string,
-	port uint16, insecure bool,
+	port uint16,
 	cert, key, esCA string,
 	headers map[string]string,
 	proxyURL string,
@@ -818,12 +816,6 @@ func createFleetServerBootstrapConfig(
 				Key:         key,
 			},
 		}
-	}
-	if insecure {
-		if cfg.Server.TLS == nil {
-			cfg.Server.TLS = &tlscommon.Config{}
-		}
-		cfg.Server.TLS.VerificationMode = tlscommon.VerifyNone
 	}
 
 	if localFleetServer {
