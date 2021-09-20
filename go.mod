@@ -92,7 +92,7 @@ require (
 	github.com/golang/snappy v0.0.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.12.0
-	github.com/google/go-cmp v0.5.4
+	github.com/google/go-cmp v0.5.6
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
