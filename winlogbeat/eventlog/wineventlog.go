@@ -97,7 +97,6 @@ func (a NoMoreEventsAction) String() string { return noMoreEventsActionNames[a] 
 // defaultWinEventLogConfig is the default configuration for new wineventlog readers.
 var defaultWinEventLogConfig = winEventLogConfig{
 	BatchReadSize: 100,
-	EventLanguage: 0,
 }
 
 // query contains parameters used to customize the event log data that is
