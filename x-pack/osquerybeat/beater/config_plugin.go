@@ -65,6 +65,10 @@ type ConfigPlugin struct {
 
 	// Raw config bytes cached
 	configString string
+
+	// One common namespace from the first input as of 7.16
+	// This is used to ad-hoc queries results over GetNamespace API
+	namespace string
 }
 
 func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
@@ -84,6 +88,9 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 }
 
 func (p *ConfigPlugin) Count() int {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+
 	return p.queriesCount
 }
 
@@ -99,6 +106,12 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	defer p.mx.RUnlock()
 	ns, ok = p.namespaces[name]
 	return ns, ok
+}
+
+func (p *ConfigPlugin) GetNamespace() string {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.namespace
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -154,6 +167,7 @@ func (p *ConfigPlugin) render() (string, error) {
 func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	p.configString = ""
+	p.namespace = ""
 
 	queriesCount := 0
 	osqueryConfig := &config.OsqueryConfig{}
@@ -176,15 +190,16 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 		return nil
 	}
 
+	// Read namespace from the first input as of 7.16
+	p.namespace = inputs[0].Datastream.Namespace
+	if p.namespace == "" {
+		p.namespace = config.DefaultNamespace
+	}
+
 	// Since 7.16 version only one integration/input is expected
 	// The inputs[0].Osquery can be nil if this is pre 7.16 integration configuration
 	if inputs[0].Osquery != nil {
 		osqueryConfig = inputs[0].Osquery
-	}
-
-	namespace := inputs[0].Datastream.Namespace
-	if namespace == "" {
-		namespace = config.DefaultNamespace
 	}
 
 	// Common code to register query with lookup maps, enforce snapshot and increment queries count
@@ -199,7 +214,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			Query:      qi.Query,
 			ECSMapping: ecsm,
 		}
-		namespaces[name] = namespace
+		namespaces[name] = p.namespace
 		queriesCount++
 
 		qi.Snapshot = true
@@ -208,7 +223,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
 	for name, qi := range osqueryConfig.Schedule {
-		qi, err = registerQuery(name, namespace, qi)
+		qi, err = registerQuery(name, p.namespace, qi)
 		if err != nil {
 			return err
 		}
@@ -218,7 +233,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
 	for packName, pack := range osqueryConfig.Packs {
 		for name, qi := range pack.Queries {
-			qi, err = registerQuery(getPackQueryName(packName, name), namespace, qi)
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi)
 			if err != nil {
 				return err
 			}
@@ -243,7 +258,7 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 				ECSMapping: stream.ECSMapping,
 			}
 
-			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), namespace, qi)
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
 			if err != nil {
 				return err
 			}

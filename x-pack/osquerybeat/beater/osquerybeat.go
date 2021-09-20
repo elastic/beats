@@ -261,7 +261,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		})
 
 		// Register action handler
-		ah := bt.registerActionHandler(b, cli)
+		ah := bt.registerActionHandler(b, cli, configPlugin)
 		defer bt.unregisterActionHandler(b, ah)
 
 		// Process input
@@ -348,7 +348,7 @@ func (bt *osquerybeat) Stop() {
 	bt.close()
 }
 
-func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client) *actionHandler {
+func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin) *actionHandler {
 	if b.Manager == nil {
 		return nil
 	}
@@ -358,6 +358,7 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client) 
 		inputType: osqueryInputType,
 		publisher: bt.pub,
 		queryExec: cli,
+		np:        configPlugin,
 	}
 	b.Manager.RegisterAction(ah)
 	return ah
