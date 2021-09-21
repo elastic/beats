@@ -11,152 +11,59 @@ processors:
     field: sophos.xg.idle
     target_field: sophos.xg.idle_cpu
     ignore_missing: true
-    #if: "ctx.sophos?.xg?.firewall?.idle !=null"
 - gsub:
     field: sophos.xg.idle_cpu
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.log_component == "CPU"'
 - convert:
     field: sophos.xg.idle_cpu
     target_field: sophos.xg.idle_cpu
     type: float
-    ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.idle_cpu != null"
+    on_failure:
+      - remove:
+          field: sophos.xg.idle_cpu
 - rename:
     field: sophos.xg.system
     target_field: sophos.xg.system_cpu
     ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.system !=null"
 - gsub:
     field: sophos.xg.system_cpu
+    # TODO: Better expr "%$"
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.log_component == "CPU"'
 - convert:
     field: sophos.xg.system_cpu
     target_field: sophos.xg.system_cpu
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.system_cpu != null"
+    on_failure:
+      - remove:
+          field: sophos.xg.system_cpu
 - rename:
     field: sophos.xg.user
     target_field: sophos.xg.user_cpu
     ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.user !=null"
 - gsub:
     field: sophos.xg.user_cpu
     pattern: "(.{1}$)"
     replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "CPU"'
+    if: 'ctx.sophos?.xg?.log_component == "CPU"'
 - convert:
     field: sophos.xg.user_cpu
     target_field: sophos.xg.user_cpu
     type: float
     ignore_failure: true
     ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.user_cpu != null"
+    on_failure:
+      - remove:
+          field: sophos.xg.user_cpu
 - convert:
     field: sophos.xg.used
     target_field: sophos.xg.used
-    type: integer
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.used != null"
-- convert:
-    field: sophos.xg.total_memory
-    target_field: sophos.xg.total_memory
-    type: integer
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.total_memory != null"
-- convert:
-    field: sophos.xg.free
-    target_field: sophos.xg.free
-    type: integer
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.free != null"
-- gsub:
-    field: sophos.xg.Configuration
-    pattern: "(.{1}$)"
-    replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
-- convert:
-    field: sophos.xg.Configuration
-    target_field: sophos.xg.configuration
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.Configuration != null"
-- gsub:
-    field: sophos.xg.Reports
-    pattern: "(.{1}$)"
-    replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
-- convert:
-    field: sophos.xg.Reports
-    target_field: sophos.xg.Reports
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.Reports != null"
-- gsub:
-    field: sophos.xg.Temp
-    pattern: "(.{1}$)"
-    replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
-- convert:
-    field: sophos.xg.Temp
-    target_field: sophos.xg.Temp
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.Temp != null"
-- gsub:
-    field: sophos.xg.Signature
-    pattern: "(.{1}$)"
-    replacement: ""
-    if: 'ctx.sophos?.xg?.firewall?.log_component == "Disk"'
-- convert:
-    field: sophos.xg.Signature
-    target_field: sophos.xg.Signature
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.Signature != null"
-- convert:
-    field: sophos.xg.users
-    target_field: sophos.xg.users
-    type: integer
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.users != null"
-- convert:
-    field: sophos.xg.transmittedkbits
-    target_field: sophos.xg.transmittedkbits
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.transmittedkbits != null"
-- convert:
-    field: sophos.xg.receivedkbits
-    target_field: sophos.xg.receivedkbits
-    type: float
-    ignore_failure: true
-    ignore_missing: true
-    if: "ctx.sophos?.xg?.firewall?.receivedkbits != null"
-- convert:
-    field: sophos.xg.free
-    type: integer
-    ignore_missing: true
-    on_failure:
-      - remove:
-          field: sophos.xg.free
-- convert:
-    field: sophos.xg.used
     type: integer
     ignore_missing: true
     on_failure:
@@ -164,15 +71,106 @@ processors:
           field: sophos.xg.used
 - convert:
     field: sophos.xg.total_memory
+    target_field: sophos.xg.total_memory
     type: integer
     ignore_missing: true
     on_failure:
       - remove:
           field: sophos.xg.total_memory
+- convert:
+    field: sophos.xg.free
+    target_field: sophos.xg.free
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.free
+- gsub:
+    field: sophos.xg.Configuration
+    pattern: "(.{1}$)"
+    replacement: ""
+    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+- convert:
+    field: sophos.xg.Configuration
+    target_field: sophos.xg.configuration
+    type: float
+    ignore_missing: true
+    ignore_failure: true
+
+- gsub:
+    field: sophos.xg.Reports
+    pattern: "(.{1}$)"
+    replacement: ""
+    # TODO: Ignore missing
+    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+- convert:
+    field: sophos.xg.Reports
+    target_field: sophos.xg.Reports
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Reports
+- gsub:
+    field: sophos.xg.Temp
+    pattern: "(.{1}$)"
+    replacement: ""
+    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+- convert:
+    field: sophos.xg.Temp
+    target_field: sophos.xg.Temp
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Temp
+- gsub:
+    field: sophos.xg.Signature
+    pattern: "(.{1}$)"
+    replacement: ""
+    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+- convert:
+    field: sophos.xg.Signature
+    target_field: sophos.xg.Signature
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Signature
+- convert:
+    field: sophos.xg.users
+    target_field: sophos.xg.users
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.users
+- convert:
+    field: sophos.xg.transmittedkbits
+    target_field: sophos.xg.transmittedkbits
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.transmittedkbits
+- convert:
+    field: sophos.xg.receivedkbits
+    target_field: sophos.xg.receivedkbits
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.receivedkbits
 
 #############
 ## Cleanup ##
 #############
+- remove:
+    field:
+      - sophos.xg.system
+      - sophos.xg.Configuration
+    ignore_missing: true
+
 on_failure:
 - set:
     field: error.message
