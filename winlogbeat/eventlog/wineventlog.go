@@ -60,6 +60,7 @@ type winEventLogConfig struct {
 	Forwarded     *bool              `config:"forwarded"`
 	SimpleQuery   query              `config:",inline"`
 	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage uint32             `config:"language"`
 }
 
 // NoMoreEventsAction defines what action for the reader to take when
@@ -390,7 +391,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 
 	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
 		mf := sys.MessageFiles{SourceName: sourceName}
-		h, err := win.OpenPublisherMetadata(0, sourceName, 0)
+		h, err := win.OpenPublisherMetadata(0, sourceName, c.EventLanguage)
 		if err != nil {
 			mf.Err = err
 			return mf
@@ -431,7 +432,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		}
 	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
+			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
 	}
 
