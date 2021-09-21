@@ -11,18 +11,11 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 
 *Affecting all Beats*
 
-- Remove the deprecated `xpack.monitoring.*` settings. Going forward only `monitoring.*` settings may be used. {issue}9424[9424] {pull}18608[18608]
-- Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
-- Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 - Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dashboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
-- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 - Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
 - Rename `log.path` to `log.file.path` in filestream to be consistent with `log` input and ECS. {pull}27761[27761]
 
@@ -30,26 +23,9 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 - Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
 - Fix inconsistency in `event.dataset` values between heartbeat and fleet by always setting this value to the monitor type / fleet dataset. {pull}27535[27535]
 
-*Journalbeat*
-
-
-
 *Metricbeat*
 
 - Fix Elasticsearch jvm.gc.collectors.old being exposed as young {issue}19636[19636] {pull}26616[26616]
-- Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
-- Added Airflow lightweight module {pull}26220[26220]
-- Add state_job metricset to Kubernetes module{pull}26479[26479]
-- Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
 
 ==== Bugfixes
 
@@ -65,6 +41,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 - Seperate namespaces for V1 and V2 controller paths {pull}27676[27676]
 - Fix build constraint that caused issues with doc builds. {pull}27381[27381]
 - Do not try to load ILM policy if `check_exists` is `false`. {pull}27508[27508] {issue}26322[26322]
+- Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 
 *Auditbeat*
 
@@ -75,29 +52,14 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 - Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
 - Make filestream events ECS compliant. {issue}27776[27776]
 
-*Heartbeat*
-
-
-*Journalbeat*
-
-
 *Metricbeat*
 
 - Allow metric prefix override per service in gcp module. {pull}26960[26960]
 - Update metrics configuration and dashboards after changes in the Azure Monitor {pull}27520[27520]
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 - Fix an issue with message template caching in the `wineventlog-experimental` API implementation. {pull}26826[26826]
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -111,9 +73,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 - Add cgroups V2 support {pull}27242[27242]
 - update ECS field definitions to ECS 1.11.0. {pull}27107[27107]
 - The disk queue is now GA. {pull}27515[27515]
-
-*Auditbeat*
-
+- Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 
 *Filebeat*
 
@@ -124,56 +84,17 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 - Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
 - Move AWS module and filesets to GA. {pull}27428[27428]
 - update ecs.version to ECS 1.11.0. {pull}27107[27107]
-
-
-*Heartbeat*
-
-
-*Journalbeat*
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
 
 *Metricbeat*
 
 - Move openmetrics module to oss. {pull}26561[26561]
 - Fix release state of kubernetes metricsets. {pull}26864[26864]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Journalbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-*Journalbeat*
-
+- Added `statsd.mappings` configuration for Statsd module {pull}26220[26220]
+- Added Airflow lightweight module {pull}26220[26220]
+- Add state_job metricset to Kubernetes module{pull}26479[26479]
+- Bump AWS SDK version to v0.24.0 for WebIdentity authentication flow {issue}19393[19393] {pull}27126[27126]
 
 
 [[release-notes-7.14.2]]
