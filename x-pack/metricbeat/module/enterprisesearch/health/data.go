@@ -16,14 +16,18 @@ var (
 	schema = s.Schema{
 		"cluster_uuid": c.Str("cluster_uuid"), // This is going to be included in 7.16+
 		"name": c.Str("name"),
-		"version": c.Str("version"),
+
+		"version": c.Dict("version", s.Schema{
+			"number": c.Str("number"),
+			"build_hash": c.Str("build_hash"),
+		}),
 
 		"jvm": c.Dict("jvm", s.Schema{
 			"version": c.Str("version"),
 
 			"gc": c.Dict("gc", s.Schema{
 				"collection_count": c.Int("collection_count"),
-				"collection_time":  c.Int("collection_time"),
+				"collection_time.msec":  c.Int("collection_time"),
 				// TODO: Add separate metrics for old and young generation collectors
 			}),
 
@@ -47,12 +51,12 @@ var (
 
 		"process": c.Dict("process", s.Schema{
 			"pid": c.Int("pid"),
-			"uptime": c.Int("uptime"),
+			"uptime.sec": c.Int("uptime"),
 
 			"filebeat": c.Dict("filebeat", s.Schema{
 				"pid": c.Int("pid"),
 				"restart_count": c.Int("restart_count"),
-				"seconds_since_last_restart": c.Int("seconds_since_last_restart"),
+				"time_since_last_restart.sec": c.Int("seconds_since_last_restart"),
 			}),
 		}),
 
@@ -72,6 +76,18 @@ func eventMapping(input []byte) (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	// Add version info
+	system := data["system"].(map[string]interface{})
+	jvm := data["jvm"].(map[string]interface{})
+	jvm["version"] = system["java_version"]
+
+	// Collect process info in a form ready for mapping
+	process := make(map[string]interface{})
+	process["pid"] = jvm["pid"]
+	process["uptime"] = jvm["uptime"]
+	process["filebeat"] = data["filebeat"]
+	data["process"] = process
 
 	dataFields, err := schema.Apply(data)
 	return dataFields, err

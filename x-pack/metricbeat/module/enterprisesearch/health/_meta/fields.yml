@@ -7,10 +7,70 @@
       type: keyword
       description: Elasticsearch Cluster UUID used by Enterprise Search
 
+    - name: name
+      type: keyword
+      description: Host name for the Enterprise Search node
+
+    - name: version
+      type: group
+      description: Enterprise Search version information
+      fields:
+        - name: number
+          type: keyword
+          description: Enterprise Search version number using the semantic versioning format
+
+        - name: build_hash
+          type: keyword
+          description: A unique build hash for the Enterprise Search package
+
+    - name: process
+      type: group
+      description: Enterprise Search process information
+      fields:
+        - name: pid
+          type: long
+          description: Process ID for the Enterprise Search instance
+
+        - name: uptime.sec
+          type: long
+          description: Process uptime for the Enterprise Search instance
+
+        - name: filebeat
+          type: group
+          description: Health information for the embedded Filebeat instance
+          fields:
+            - name: pid
+              type: long
+              description: Process ID for the embedded Filebeat instance
+
+            - name: restart_count
+              type: long
+              description: Number of times embedded Filebeat instance had to be restarted due to some issues
+
+            - name: time_since_last_restart.sec
+              type: long
+              description: Time since the last embedded Filebeat instance restart (-1 if never restarted)
+
     - name: jvm
       type: group
       description: JVM health
       fields:
+        - name: version
+          type: keyword
+          description: JVM version used to run Enterprise Search
+
+        - name: gc
+          type: group
+          description: Java garbage collection metrics
+          fields:
+            - name: collection_count
+              type: long
+              description: Total number of Java garbage collector invocations since the start of the process
+
+            - name: collection_time.msec
+              type: long
+              description: Total time spent running Java garbage collector since the start of the process
+
         - name: memory_usage
           type: group
           description: Memory usage

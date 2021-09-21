@@ -1,46 +1,65 @@
 [
-    {
-        "enterprisesearch": {
-            "health": {
-                "cluster_uuid": "Bkz2QJZuSxuZrbQRJ8xhuA",
-                "jvm": {
-                    "memory_usage": {
-                        "heap_committed.bytes": 1784152064,
-                        "heap_init.bytes": 268435456,
-                        "heap_max.bytes": 3817865216,
-                        "heap_used.bytes": 1551901480,
-                        "non_heap_committed.bytes": 266469376,
-                        "non_heap_init.bytes": 2555904,
-                        "object_pending_finalization_count": 123
-                    },
-                    "threads": {
-                        "thread_count": 24,
-                        "peak_thread_count": 27,
-                        "total_started_thread_count": 119,
-                        "daemon_thread_count": 23
-                    }
-                },
-                "crawler": {
-                    "workers": {
-                        "pool_size": 32,
-                        "active": 0,
-                        "available": 32
-                    }
-                }
-            }
+  {
+    "enterprisesearch":{
+      "health":{
+        "cluster_uuid":"MTD6fXYGTZylTMoW5AG5JA",
+        "crawler":{
+          "workers":{
+            "active":0,
+            "available":16,
+            "pool_size":16
+          }
         },
-        "event": {
-            "dataset": "enterprisesearch.health",
-            "duration": 115000,
-            "module": "enterprisesearch"
+        "jvm":{
+          "gc":{
+            "collection_count":20,
+            "collection_time.msec":2303
+          },
+          "memory_usage":{
+            "heap_committed.bytes":1279262720,
+            "heap_init.bytes":268435456,
+            "heap_max.bytes":1908932608,
+            "heap_used.bytes":736601248,
+            "non_heap_committed.bytes":99745792,
+            "non_heap_init.bytes":2555904,
+            "object_pending_finalization_count":0
+          },
+          "threads":{
+            "daemon_thread_count":17,
+            "peak_thread_count":32,
+            "thread_count":27,
+            "total_started_thread_count":35
+          },
+          "version":"1.8.0_292"
         },
-        "metricset": {
-            "name": "health",
-            "period": 10000
+        "name":"elastic-m1.local",
+        "process":{
+          "filebeat":{
+            "pid":60067,
+            "restart_count":0,
+            "time_since_last_restart.sec":-1
+          },
+          "pid":59623,
+          "uptime.sec":170377
         },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "enterprisesearch"
+        "version":{
+          "build_hash":"unknown",
+          "number":"8.0.0"
         }
+      }
+    },
+    "event":{
+      "dataset":"enterprisesearch.health",
+      "duration":115000,
+      "module":"enterprisesearch"
+    },
+    "metricset":{
+      "name":"health",
+      "period":10000
+    },
+    "service":{
+      "address":"127.0.0.1:55555",
+      "type":"enterprisesearch"
     }
+  }
 ]
