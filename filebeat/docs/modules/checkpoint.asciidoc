@@ -10,7 +10,6 @@ This file is generated! See scripts/docs_collector.py
 
 
 == Check Point module
-beta[]
 
 This is a module for Check Point firewall logs. It supports logs from the Log
 Exporter in the Syslog RFC 5424 format. If you need to ingest Check Point logs
