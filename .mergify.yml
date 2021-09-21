@@ -99,6 +99,22 @@ pull_request_rules:
         - files~=^\.mergify\.yml$
     actions:
       delete_head_branch:
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=master
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label. Could you fix it @{{author}}? 🙏
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-v./d./d./d` is the label to automatically backport to the `7./d` branch. `/d` is the digit
+
+          **NOTE**: `backport-skip` has been added to this pull request.
+      label:
+        add:
+          - backport-skip
   - name: backport patches to 7.x branch
     conditions:
       - merged
