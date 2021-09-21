@@ -29,11 +29,16 @@ type queryExecutor interface {
 	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
 }
 
+type namespaceProvider interface {
+	GetNamespace() string
+}
+
 type actionHandler struct {
 	log       *logp.Logger
 	inputType string
 	publisher publisher
 	queryExec queryExecutor
+	np        namespaceProvider
 }
 
 func (a *actionHandler) Name() string {
@@ -63,7 +68,16 @@ func (a *actionHandler) execute(ctx context.Context, req map[string]interface{})
 	if err != nil {
 		return fmt.Errorf("%v: %w", err, ErrQueryExecution)
 	}
-	return a.executeQuery(ctx, config.Datastream(config.DefaultNamespace), ac, "", req)
+
+	var namespace string
+	if a.np != nil {
+		namespace = a.np.GetNamespace()
+	}
+	if namespace == "" {
+		namespace = config.DefaultNamespace
+	}
+
+	return a.executeQuery(ctx, config.Datastream(namespace), ac, "", req)
 }
 
 func (a *actionHandler) executeQuery(ctx context.Context, index string, ac action.Action, responseID string, req map[string]interface{}) error {

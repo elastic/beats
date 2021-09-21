@@ -21,16 +21,16 @@ import (
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
-	packs := make(map[string]pack)
+	packs := make(map[string]config.Pack)
 	for _, input := range inputs {
-		pack := pack{
+		pack := config.Pack{
 			Platform:  input.Platform,
 			Version:   input.Version,
 			Discovery: input.Discovery,
-			Queries:   make(map[string]query),
+			Queries:   make(map[string]config.Query),
 		}
 		for _, stream := range input.Streams {
-			query := query{
+			query := config.Query{
 				Query:    stream.Query,
 				Interval: stream.Interval,
 				Platform: stream.Platform,
@@ -41,7 +41,9 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 		}
 		packs[input.Name] = pack
 	}
-	raw, err := newOsqueryConfig(packs).render()
+	raw, err := newOsqueryConfig(&config.OsqueryConfig{
+		Packs: packs,
+	}).Render()
 	if err != nil {
 		return "", err
 	}
@@ -391,7 +393,7 @@ func TestSet(t *testing.T) {
 					if !ok {
 						t.Fatalf("failed to resolve name %v", name)
 					}
-					diff = cmp.Diff(qi.QueryConfig.Query, stream.Query)
+					diff = cmp.Diff(qi.Query, stream.Query)
 					if diff != "" {
 						t.Error(diff)
 					}
