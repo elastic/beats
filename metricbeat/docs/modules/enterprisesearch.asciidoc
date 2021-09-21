@@ -8,8 +8,15 @@ This file is generated! See scripts/mage/docs_collector.go
 
 beta[]
 
-This is the enterprisesearch module.
+This module periodically fetches metrics and health information from Elastic Enterprise Search instances using HTTP APIs.
 
+[float]
+=== Compatibility
+The module has been tested with Enterprise Search versions 7.16.0 and higher. Versions below 7.16.0 are not expected to work due to a number of API-level incompatibilities.
+
+[float]
+=== Usage
+The Enterprise Search module requires a set of credentials (a username and a password) for an Elasticserch user for a user that has a `monitor` https://www.elastic.co/guide/en/elasticsearch/reference/current/security-privileges.html#privileges-list-cluster[cluster privilege].
 
 
 [float]
