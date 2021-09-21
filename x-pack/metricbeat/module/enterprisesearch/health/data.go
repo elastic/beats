@@ -18,6 +18,7 @@ var (
 		"avg.ms": c.Float("mean"),
 	}
 	schema = s.Schema{
+		"cluster_uuid": c.Str("cluster_uuid"), // This is going to be included in 7.16+
 		"jvm": c.Dict("jvm", s.Schema{
 			"memory_usage": c.Dict("memory_usage", s.Schema{
 				"heap_init.bytes":                   c.Int("heap_init"),
@@ -42,8 +43,6 @@ var (
 				"available": c.Int("available"),
 			}),
 		}),
-		// TODO: Must not be optional once it is added to a released version of Enterprise Search health endpoint
-		"cluster_uuid": c.Str("cluster_uuid", s.Optional),
 	}
 )
 
