@@ -33,9 +33,6 @@ type Config struct {
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`
-
-	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
 // Resources config section for resources' config blocks
@@ -55,7 +52,6 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
-	c.IncludeCreatorMetadata = true
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
 }
