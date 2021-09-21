@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Okta module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The Okta module collects events from the
 https://developer.okta.com/docs/reference/[Okta API]. Specifically this supports
 reading from the https://developer.okta.com/docs/reference/api/system-log/[Okta
