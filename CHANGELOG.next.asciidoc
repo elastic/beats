@@ -205,6 +205,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
 - Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
 - Make filestream events ECS compliant. {issue}27776[27776]
+- Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
 
 *Heartbeat*
 
