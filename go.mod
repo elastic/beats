@@ -4,8 +4,8 @@ go 1.16
 
 require (
 	cloud.google.com/go v0.83.0
-	cloud.google.com/go/bigquery v1.0.1
-	cloud.google.com/go/pubsub v1.0.1
+	cloud.google.com/go/bigquery v1.8.0
+	cloud.google.com/go/pubsub v1.3.1
 	cloud.google.com/go/storage v1.10.0
 	code.cloudfoundry.org/go-diodes v0.0.0-20190809170250-f77fb823c7ee // indirect
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
@@ -19,7 +19,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.4.2
-	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
+	github.com/Microsoft/go-winio v0.4.16
 	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
@@ -85,14 +85,14 @@ require (
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.10.4
 	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
-	github.com/gofrs/uuid v3.3.0+incompatible
+	github.com/gofrs/uuid v4.0.0+incompatible
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.3
 	github.com/gomodule/redigo v1.8.3
 	github.com/google/flatbuffers v1.12.0
-	github.com/google/go-cmp v0.5.4
+	github.com/google/go-cmp v0.5.6
 	github.com/google/gopacket v1.1.18-0.20191009163724-0ad7f2610e34
 	github.com/google/uuid v1.1.2
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
@@ -129,7 +129,6 @@ require (
 	github.com/pierrre/gotestcover v0.0.0-20160517101806-924dca7d15f0
 	github.com/pkg/errors v0.9.1
 	github.com/pmezard/go-difflib v1.0.0
-	github.com/prometheus/client_golang v1.1.1-0.20190913103102-20428fa0bffc // indirect
 	github.com/prometheus/client_model v0.2.0
 	github.com/prometheus/common v0.29.0
 	github.com/prometheus/procfs v0.6.0
