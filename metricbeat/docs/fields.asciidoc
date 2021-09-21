@@ -36,6 +36,7 @@ grouped in the following categories:
 * <<exported-fields-dropwizard>>
 * <<exported-fields-ecs>>
 * <<exported-fields-elasticsearch>>
+* <<exported-fields-enterprisesearch>>
 * <<exported-fields-envoyproxy>>
 * <<exported-fields-etcd>>
 * <<exported-fields-gcp>>
@@ -30804,6 +30805,327 @@ type: keyword
 +
 --
 type: keyword
+
+--
+
+[[exported-fields-enterprisesearch]]
+== enterprisesearch fields
+
+Enterprise Search module
+
+
+
+[float]
+=== enterprisesearch
+
+`enterprisesearch` contains statistics that were read from Enterprise Search
+
+
+
+[float]
+=== health
+
+Enterprise Search health
+
+
+*`enterprisesearch.health.cluster_uuid`*::
++
+--
+Elasticsearch Cluster UUID used by Enterprise Search
+
+type: keyword
+
+--
+
+*`enterprisesearch.health.name`*::
++
+--
+Host name for the Enterprise Search node
+
+type: keyword
+
+--
+
+[float]
+=== version
+
+Enterprise Search version information
+
+
+*`enterprisesearch.health.version.number`*::
++
+--
+Enterprise Search version number using the semantic versioning format
+
+type: keyword
+
+--
+
+*`enterprisesearch.health.version.build_hash`*::
++
+--
+A unique build hash for the Enterprise Search package
+
+type: keyword
+
+--
+
+[float]
+=== process
+
+Enterprise Search process information
+
+
+*`enterprisesearch.health.process.pid`*::
++
+--
+Process ID for the Enterprise Search instance
+
+type: long
+
+--
+
+*`enterprisesearch.health.process.uptime.sec`*::
++
+--
+Process uptime for the Enterprise Search instance
+
+type: long
+
+--
+
+[float]
+=== filebeat
+
+Health information for the embedded Filebeat instance
+
+
+*`enterprisesearch.health.process.filebeat.pid`*::
++
+--
+Process ID for the embedded Filebeat instance
+
+type: long
+
+--
+
+*`enterprisesearch.health.process.filebeat.restart_count`*::
++
+--
+Number of times embedded Filebeat instance had to be restarted due to some issues
+
+type: long
+
+--
+
+*`enterprisesearch.health.process.filebeat.time_since_last_restart.sec`*::
++
+--
+Time since the last embedded Filebeat instance restart (-1 if never restarted)
+
+type: long
+
+--
+
+[float]
+=== jvm
+
+JVM health
+
+
+*`enterprisesearch.health.jvm.version`*::
++
+--
+JVM version used to run Enterprise Search
+
+type: keyword
+
+--
+
+[float]
+=== gc
+
+Java garbage collection metrics
+
+
+*`enterprisesearch.health.jvm.gc.collection_count`*::
++
+--
+Total number of Java garbage collector invocations since the start of the process
+
+type: long
+
+--
+
+*`enterprisesearch.health.jvm.gc.collection_time.msec`*::
++
+--
+Total time spent running Java garbage collector since the start of the process
+
+type: long
+
+--
+
+[float]
+=== memory_usage
+
+Memory usage
+
+
+*`enterprisesearch.health.jvm.memory_usage.heap_init.bytes`*::
++
+--
+Heap init used by the JVM in bytes.
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.heap_used.bytes`*::
++
+--
+Heap used by the JVM in bytes.
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.heap_committed.bytes`*::
++
+--
+Committed heap to the JVM in bytes.
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.heap_max.bytes`*::
++
+--
+Max heap used by the JVM in bytes
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.non_heap_init.bytes`*::
++
+--
+Non-Heap initial memory used by the JVM in bytes.
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.non_heap_committed.bytes`*::
++
+--
+Non-Heap committed memory used by the JVM in bytes.
+
+type: long
+
+format: bytes
+
+--
+
+*`enterprisesearch.health.jvm.memory_usage.object_pending_finalization_count`*::
++
+--
+Displays the approximate number of objects for which finalization is pending.
+
+
+type: long
+
+--
+
+[float]
+=== threads
+
+Threads information
+
+
+*`enterprisesearch.health.jvm.threads.thread_count`*::
++
+--
+The number of live threads.
+
+type: long
+
+--
+
+*`enterprisesearch.health.jvm.threads.peak_thread_count`*::
++
+--
+Peak live thread count since the JVM started or the peak was reset.
+
+type: long
+
+--
+
+*`enterprisesearch.health.jvm.threads.total_started_thread_count`*::
++
+--
+Total number of threads created and/or started since the JVM started.
+
+type: long
+
+--
+
+*`enterprisesearch.health.jvm.threads.daemon_thread_count`*::
++
+--
+Current number of live daemon threads.
+
+type: long
+
+--
+
+[float]
+=== crawler
+
+Crawler health
+
+
+[float]
+=== workers
+
+Crawler workers
+
+
+*`enterprisesearch.health.crawler.workers.pool_size`*::
++
+--
+Workers pool size.
+
+type: long
+
+--
+
+*`enterprisesearch.health.crawler.workers.active`*::
++
+--
+Number of active workers.
+
+type: long
+
+--
+
+*`enterprisesearch.health.crawler.workers.available`*::
++
+--
+Number of available workers.
+
+type: long
 
 --
 
