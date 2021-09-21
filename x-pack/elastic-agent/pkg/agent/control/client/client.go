@@ -53,6 +53,25 @@ type ApplicationStatus struct {
 	Payload map[string]interface{}
 }
 
+// BeatMeta is the running version and ID inforation for a running beat.
+type BeatMeta struct {
+	Beat               string
+	Name               string
+	Hostname           string
+	ID                 string
+	EphemeralID        string
+	Version            string
+	BuildCommit        string
+	BuildTime          time.Time
+	Username           string
+	UserID             string
+	UserGID            string
+	BinaryArchitecture string
+	RouteKey           string
+	ElasticLicensed    bool
+	Error              string
+}
+
 // AgentStatus is the current status of the Elastic Agent.
 type AgentStatus struct {
 	Status       Status
@@ -74,6 +93,8 @@ type Client interface {
 	Restart(ctx context.Context) error
 	// Upgrade triggers upgrade of the current running daemon.
 	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
+	// BeatMeta gathers running beat meta-data.
+	BeatMeta(ctx context.Context) ([]BeatMeta, error)
 }
 
 // client manages the state and communication to the Elastic Agent.
@@ -183,4 +204,46 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string) 
 		return "", fmt.Errorf(res.Error)
 	}
 	return res.Version, nil
+}
+
+// BeatMeta gathers running beat metadata.
+func (c *client) BeatMeta(ctx context.Context) ([]BeatMeta, error) {
+	bv, err := c.client.BeatMeta(ctx, &proto.Empty{})
+	if err != nil {
+		return nil, err
+	}
+	beatMeta := []BeatMeta{}
+
+	for _, bm := range bv.Beats {
+		meta := BeatMeta{
+			Beat:               bm.Beat,
+			Name:               bm.Name,
+			Hostname:           bm.Hostname,
+			ID:                 bm.Id,
+			EphemeralID:        bm.EphemeralId,
+			Version:            bm.Version,
+			BuildCommit:        bm.BuildCommit,
+			Username:           bm.Username,
+			UserID:             bm.UserId,
+			UserGID:            bm.UserGid,
+			BinaryArchitecture: bm.Architecture,
+			RouteKey:           bm.RouteKey,
+			ElasticLicensed:    bm.ElasticLicensed,
+			Error:              bm.Error,
+		}
+		if bm.BuildTime != "" {
+			ts, err := time.Parse(time.RFC3339, bm.BuildTime)
+			if err != nil {
+				if meta.Error != "" {
+					meta.Error += ", " + err.Error()
+				} else {
+					meta.Error = err.Error()
+				}
+			} else {
+				meta.BuildTime = ts
+			}
+		}
+		beatMeta = append(beatMeta, meta)
+	}
+	return beatMeta, nil
 }

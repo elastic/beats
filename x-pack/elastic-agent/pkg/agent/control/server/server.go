@@ -8,6 +8,9 @@ import (
 	"context"
 	"encoding/json"
 	"net"
+	"net/http"
+	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -17,10 +20,15 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	monitoring "github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/beats"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/socket"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/sorted"
 )
 
 // Server is the daemon side of the control protocol.
@@ -29,9 +37,14 @@ type Server struct {
 	rex        reexec.ExecManager
 	statusCtrl status.Controller
 	up         *upgrade.Upgrader
+	routeFn    func() *sorted.Set
 	listener   net.Listener
 	server     *grpc.Server
 	lock       sync.RWMutex
+}
+
+type specer interface {
+	Specs() map[string]program.Spec
 }
 
 // New creates a new control protocol server.
@@ -49,6 +62,13 @@ func (s *Server) SetUpgrader(up *upgrade.Upgrader) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 	s.up = up
+}
+
+// SetRouteFn changes the route retrieval function.
+func (s *Server) SetRouteFn(routesFetchFn func() *sorted.Set) {
+	s.lock.Lock()
+	defer s.lock.Unlock()
+	s.routeFn = routesFetchFn
 }
 
 // Start starts the GRPC endpoint and accepts new connections.
@@ -145,6 +165,113 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 		Status:  proto.ActionStatus_SUCCESS,
 		Version: request.Version,
 	}, nil
+}
+
+// BeatInfo is the metadata response a beat will provide when the root ("/") is queried.
+type BeatInfo struct {
+	Beat            string `json:"beat"`
+	Name            string `json:"name"`
+	Hostname        string `json:"hostname"`
+	ID              string `json:"uuid"`
+	EphemeralID     string `json:"ephemeral_id"`
+	Version         string `json:"version"`
+	Commit          string `json:"build_commit"`
+	Time            string `json:"build_time"`
+	Username        string `json:"username"`
+	UserID          string `json:"uid"`
+	GroupID         string `json:"gid"`
+	BinaryArch      string `json:"binary_arch"`
+	ElasticLicensed bool   `json:"elastic_licensed"`
+}
+
+// BeatMeta returns version and beat inforation for all running beats.
+func (s *Server) BeatMeta(ctx context.Context, _ *proto.Empty) (*proto.BeatMetaResponse, error) {
+	if s.routeFn == nil {
+		return nil, errors.New("route function is nil")
+	}
+
+	resp := &proto.BeatMetaResponse{
+		Beats: []*proto.BeatMeta{},
+	}
+
+	routes := s.routeFn()
+	for _, rk := range routes.Keys() {
+		programs, ok := routes.Get(rk)
+		if !ok {
+			s.logger.With("route_key", rk).Warn("Unable to retrieve route.")
+			continue
+		}
+
+		sp, ok := programs.(specer)
+		if !ok {
+			s.logger.With("route_key", rk, "route", programs).Warn("Unable to cast route as specer.")
+			continue
+		}
+		specs := sp.Specs()
+
+		for n, spec := range specs {
+			beatMeta := &proto.BeatMeta{
+				Name:     n,
+				RouteKey: rk,
+			}
+
+			client := http.Client{
+				Timeout: time.Second * 5,
+			}
+			endpoint := monitoring.MonitoringEndpoint(spec, runtime.GOOS, rk)
+			if strings.HasPrefix(endpoint, "unix://") {
+				client.Transport = &http.Transport{
+					Proxy:       nil,
+					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "unix://")),
+				}
+				endpoint = "unix"
+			} else if strings.HasPrefix(endpoint, "npipe://") {
+				client.Transport = &http.Transport{
+					Proxy:       nil,
+					DialContext: socket.DialContext(strings.TrimPrefix(endpoint, "npipe:///")),
+				}
+				endpoint = "npipe"
+			}
+
+			res, err := client.Get("http://" + endpoint + "/")
+			if err != nil {
+				beatMeta.Error = err.Error()
+				resp.Beats = append(resp.Beats, beatMeta)
+				continue
+			}
+			if res.StatusCode != 200 {
+				beatMeta.Error = "response status is: " + res.Status
+				resp.Beats = append(resp.Beats, beatMeta)
+				continue
+			}
+
+			bi := &BeatInfo{}
+			dec := json.NewDecoder(res.Body)
+			if err := dec.Decode(bi); err != nil {
+				res.Body.Close()
+				beatMeta.Error = err.Error()
+				resp.Beats = append(resp.Beats, beatMeta)
+				continue
+			}
+			res.Body.Close()
+
+			beatMeta.Beat = bi.Beat
+			beatMeta.Hostname = bi.Hostname
+			beatMeta.Id = bi.ID
+			beatMeta.EphemeralId = bi.EphemeralID
+			beatMeta.Version = bi.Version
+			beatMeta.BuildCommit = bi.Commit
+			beatMeta.BuildTime = bi.Time
+			beatMeta.Username = bi.Username
+			beatMeta.UserId = bi.UserID
+			beatMeta.UserGid = bi.GroupID
+			beatMeta.Architecture = bi.BinaryArch
+			beatMeta.ElasticLicensed = bi.ElasticLicensed
+
+			resp.Beats = append(resp.Beats, beatMeta)
+		}
+	}
+	return resp, nil
 }
 
 type upgradeRequest struct {

@@ -135,6 +135,21 @@ func (o *Operator) State() map[string]state.State {
 	return result
 }
 
+// Specs returns all program specifications
+func (o *Operator) Specs() map[string]program.Spec {
+	r := make(map[string]program.Spec)
+
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	for _, app := range o.apps {
+		// use app.Name() instead of the (map) key so we can easy find the "_monitoring" processes
+		r[app.Name()] = app.Spec()
+	}
+
+	return r
+}
+
 // Close stops all programs handled by operator and clears state
 func (o *Operator) Close() error {
 	o.monitor.Close()

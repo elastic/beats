@@ -7,6 +7,7 @@ package stream
 import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/pipeline"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 )
@@ -20,6 +21,10 @@ type stater interface {
 	State() map[string]state.State
 }
 
+type specer interface {
+	Specs() map[string]program.Spec
+}
+
 func (b *operatorStream) Close() error {
 	return b.configHandler.Close()
 }
@@ -29,6 +34,13 @@ func (b *operatorStream) State() map[string]state.State {
 		return s.State()
 	}
 
+	return nil
+}
+
+func (b *operatorStream) Specs() map[string]program.Spec {
+	if s, ok := b.configHandler.(specer); ok {
+		return s.Specs()
+	}
 	return nil
 }
 
