@@ -232,6 +232,21 @@ winlogbeat.event_logs:
 
 =======================================
 
+[float]
+==== `event_logs.language`
+
+The language ID the events will be rendered in. The language will be forced regardless
+of the system language. A complete list of language IDs can be found
+https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-lcid/a9eac961-e77d-41a6-90a5-ce1a8b0cdb9c[here].
+It defaults to `0`, which indicates to use the system language.
+
+[source,yaml]
+--------------------------------------------------------------------------------
+winlogbeat.event_logs:
+  - name: Security
+    event_id: 4624, 4625, 4700-4800, -4735
+    language: 0x0409 # en-US
+--------------------------------------------------------------------------------
 
 [float]
 ==== `event_logs.level`
