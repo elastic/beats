@@ -16525,18 +16525,6 @@ type: keyword
 
 --
 
-*`kubernetes.container.image`*::
-+
---
-Kubernetes container image
-
-
-type: alias
-
-alias to: container.image.name
-
---
-
 [[exported-fields-memcache]]
 == Memcache fields
 
