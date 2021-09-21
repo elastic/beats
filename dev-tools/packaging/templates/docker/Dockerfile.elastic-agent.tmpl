@@ -17,13 +17,14 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     rm {{ $beatBinary }} && \
     ln -s {{ $beatHome }}/data/elastic-agent-{{ commit_short }}/elastic-agent {{ $beatBinary }} && \
     chmod 0755 {{ $beatHome }}/data/elastic-agent-*/elastic-agent && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
     true
+
+{{- if .linux_capabilities }}
+RUN setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
+{{- end }}
 
 FROM {{ .from }}
 
