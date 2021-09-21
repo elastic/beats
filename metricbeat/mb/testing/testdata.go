@@ -344,7 +344,15 @@ func checkDocumented(data []common.MapStr, omitFields []string) error {
 }
 
 func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
-	for foundKey := range foundKeys {
+	// Sort all found keys to guarantee consistent validation messages
+	sortedFoundKeys := make([]string, 0, len(foundKeys))
+	for k := range foundKeys {
+    sortedFoundKeys = append(sortedFoundKeys, k)
+	}
+	sort.Strings(sortedFoundKeys)
+
+	for k := range sortedFoundKeys {
+		foundKey := sortedFoundKeys[k]
 		if _, ok := knownKeys[foundKey]; !ok {
 			for _, omitField := range omitFields {
 				if omitDocumentedField(foundKey, omitField) {
