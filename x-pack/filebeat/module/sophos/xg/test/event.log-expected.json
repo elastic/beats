@@ -376,7 +376,7 @@
         "user.name": "elastic.user@elastic.test.com"
     },
     {
-        "@timestamp": "2020-05-18T14:39:04.000-02:00",
+        "@timestamp": "2020-05-20T05:47:46.000-02:00",
         "client.bytes": 0,
         "destination.bytes": 0,
         "event.code": "062811617824",
@@ -696,7 +696,7 @@
         ]
     },
     {
-        "@timestamp": "2020-05-18T14:39:20.000-02:00",
+        "@timestamp": "2020-06-02T06:29:36.000-02:00",
         "client.bytes": 0,
         "client.ip": "10.84.234.38",
         "destination.bytes": 0,
