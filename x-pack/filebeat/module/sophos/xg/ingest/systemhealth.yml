@@ -3,7 +3,6 @@ processors:
 #######################
 ## ECS Event Mapping ##
 #######################
-#TODO: Need to setup a different field naming convention, maybe "cpu.idle, cpu.system etc"
 - set:
     field: event.kind
     value: event
@@ -13,9 +12,10 @@ processors:
     ignore_missing: true
 - gsub:
     field: sophos.xg.idle_cpu
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "CPU"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.idle_cpu
     target_field: sophos.xg.idle_cpu
@@ -30,10 +30,10 @@ processors:
     ignore_missing: true
 - gsub:
     field: sophos.xg.system_cpu
-    # TODO: Better expr "%$"
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "CPU"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.system_cpu
     target_field: sophos.xg.system_cpu
@@ -49,9 +49,10 @@ processors:
     ignore_missing: true
 - gsub:
     field: sophos.xg.user_cpu
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "CPU"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.user_cpu
     target_field: sophos.xg.user_cpu
@@ -87,9 +88,10 @@ processors:
           field: sophos.xg.free
 - gsub:
     field: sophos.xg.Configuration
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.Configuration
     target_field: sophos.xg.configuration
@@ -99,10 +101,10 @@ processors:
 
 - gsub:
     field: sophos.xg.Reports
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    # TODO: Ignore missing
-    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.Reports
     target_field: sophos.xg.Reports
@@ -113,9 +115,10 @@ processors:
           field: sophos.xg.Reports
 - gsub:
     field: sophos.xg.Temp
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.Temp
     target_field: sophos.xg.Temp
@@ -126,9 +129,10 @@ processors:
           field: sophos.xg.Temp
 - gsub:
     field: sophos.xg.Signature
-    pattern: "(.{1}$)"
+    pattern: "%$"
     replacement: ""
-    if: 'ctx.sophos?.xg?.log_component == "Disk"'
+    ignore_missing: true
+    ignore_failure: true
 - convert:
     field: sophos.xg.Signature
     target_field: sophos.xg.Signature
