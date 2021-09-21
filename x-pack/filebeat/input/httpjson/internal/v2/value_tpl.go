@@ -21,6 +21,8 @@ import (
 	"text/template"
 	"time"
 
+	"github.com/google/uuid"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -55,11 +57,13 @@ func (t *valueTpl) Unpack(in string) error {
 			"add":                 add,
 			"mul":                 mul,
 			"div":                 div,
-			"hmac":                hmacString,
+			"hmac":                hmacStringHex,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
-			"join":                strings.Join,
+			"join":                join,
 			"sprintf":             fmt.Sprintf,
+			"hmacBase64":          hmacStringBase64,
+			"uuid":                uuidString,
 		}).
 		Delims(leftDelim, rightDelim).
 		Parse(in)
@@ -267,10 +271,9 @@ func base64EncodeNoPad(values ...string) string {
 	return base64.RawStdEncoding.EncodeToString([]byte(data))
 }
 
-func hmacString(hmacType string, hmacKey string, values ...string) string {
-	data := strings.Join(values[:], "")
+func hmacString(hmacType string, hmacKey string, data string) []byte {
 	if data == "" {
-		return ""
+		return nil
 	}
 	// Create a new HMAC by defining the hash type and the key (as byte array)
 	var mac hash.Hash
@@ -281,11 +284,67 @@ func hmacString(hmacType string, hmacKey string, values ...string) string {
 		mac = hmac.New(sha1.New, []byte(hmacKey))
 	default:
 		// Upstream config validation prevents this from happening.
-		return ""
+		return nil
 	}
 	// Write Data to it
 	mac.Write([]byte(data))
 
+	// Get result and encode as bytes
+	return mac.Sum(nil)
+}
+
+func hmacStringHex(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
 	// Get result and encode as hexadecimal string
-	return hex.EncodeToString(mac.Sum(nil))
+	return hex.EncodeToString(bytes)
+}
+
+func hmacStringBase64(hmacType string, hmacKey string, values ...string) string {
+	data := strings.Join(values[:], "")
+	if data == "" {
+		return ""
+	}
+	bytes := hmacString(hmacType, hmacKey, data)
+
+	// Get result and encode as hexadecimal string
+	return base64.StdEncoding.EncodeToString(bytes)
+}
+
+func uuidString() string {
+	uuid, err := uuid.NewRandom()
+	if err != nil {
+		return ""
+	}
+	return uuid.String()
+}
+
+// join concatenates the elements of its first argument to create a single string. The separator
+// string sep is placed between elements in the resulting string. If the first argument is not of
+// type string or []string, its elements will be stringified.
+func join(v interface{}, sep string) string {
+	// check for []string or string to avoid using reflect
+	switch t := v.(type) {
+	case []string:
+		return strings.Join(t, sep)
+	case string:
+		return t
+	}
+
+	// if we have a slice of a different type, convert it to []string
+	switch reflect.TypeOf(v).Kind() {
+	case reflect.Slice, reflect.Array:
+		s := reflect.ValueOf(v)
+		vs := make([]string, s.Len())
+		for i := 0; i < s.Len(); i++ {
+			vs[i] = fmt.Sprint(s.Index(i))
+		}
+		return strings.Join(vs, sep)
+	}
+
+	// return the stringified single value
+	return fmt.Sprint(v)
 }

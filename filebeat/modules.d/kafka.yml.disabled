@@ -4,7 +4,7 @@
 - module: kafka
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for Kafka. If left empty,
     # Filebeat will look under /opt.
