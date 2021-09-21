@@ -347,7 +347,7 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 	// Sort all found keys to guarantee consistent validation messages
 	sortedFoundKeys := make([]string, 0, len(foundKeys))
 	for k := range foundKeys {
-    sortedFoundKeys = append(sortedFoundKeys, k)
+		sortedFoundKeys = append(sortedFoundKeys, k)
 	}
 	sort.Strings(sortedFoundKeys)
 
