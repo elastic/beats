@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
-	"github.com/Azure/go-autorest/autorest/date"
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
+	//"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +17,7 @@ import (
 func TestEventMapping(t *testing.T) {
 	usageDate := "2020-08-08"
 	name := "test"
-	startDate := date.Time{}
+	//startDate := date.Time{}
 
 	var charge decimal.Decimal = decimal.NewFromFloat(8.123456)
 	var prop = consumption.ForecastProperties{
@@ -36,26 +36,26 @@ func TestEventMapping(t *testing.T) {
 		ChargeType:       "Actual",
 		ConfidenceLevels: nil,
 	}
-	var prop1 = consumption.UsageDetailProperties{
-		InstanceName:     &name,
-		SubscriptionName: &name,
-		AccountName:      &name,
-		DepartmentName:   &name,
-		Product:          &name,
-		InstanceID:       &name,
-		UsageStart:       &startDate,
-		UsageEnd:         &startDate,
-	}
+	//	var prop1 = consumption.UsageDetailProperties{
+	//		InstanceName:     &name,
+	//		SubscriptionName: &name,
+	//		AccountName:      &name,
+	//		DepartmentName:   &name,
+	//		Product:          &name,
+	//		InstanceID:       &name,
+	//		UsageStart:       &startDate,
+	//		UsageEnd:         &startDate,
+	//	}
 	usage := Usage{
-		UsageDetails: []consumption.UsageDetail{
-			{
-				UsageDetailProperties: &prop1,
-				ID:                    nil,
-				Name:                  nil,
-				Type:                  nil,
-				Tags:                  nil,
-			},
-		},
+		//UsageDetails: []consumption.UsageDetail{
+		//	{
+		//		UsageDetailProperties: &prop1,
+		//		ID:                    nil,
+		//		Name:                  nil,
+		//		Type:                  nil,
+		//		Tags:                  nil,
+		//	},
+		//},
 		ActualCosts: []consumption.Forecast{
 			{
 				ForecastProperties: &prop2,

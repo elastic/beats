@@ -11,7 +11,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
 
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
@@ -19,7 +19,7 @@ import (
 const missingNamespace = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case."
 
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
-func mapMetrics(client *azure.Client, resources []resources.GenericResource, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
+func mapMetrics(client *azure.Client, resources []resources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
 	for _, resource := range resources {
 		for _, metric := range resourceConfig.Metrics {

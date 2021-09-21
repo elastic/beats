@@ -6,6 +6,7 @@ package billing
 
 import (
 	"github.com/pkg/errors"
+	"time"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
@@ -58,11 +59,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	results, err := m.client.GetMetrics()
+	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
+	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	results, err := m.client.GetMetrics(startTime, endTime)
 	if err != nil {
 		return errors.Wrap(err, "error retrieving usage information")
 	}
-	events := EventsMapping(results)
+	events := EventsMapping(results, startTime, endTime)
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {

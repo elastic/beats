@@ -28,17 +28,30 @@ var (
 
 // Config options
 type Config struct {
-	ClientId                string           `config:"client_id"  validate:"required"`
-	ClientSecret            string           `config:"client_secret"  validate:"required"`
-	TenantId                string           `config:"tenant_id"  validate:"required"`
-	SubscriptionId          string           `config:"subscription_id"  validate:"required"`
-	Period                  time.Duration    `config:"period" validate:"nonzero,required"`
-	Resources               []ResourceConfig `config:"resources"`
-	RefreshListInterval     time.Duration    `config:"refresh_list_interval"`
-	DefaultResourceType     string           `config:"default_resource_type"`
-	AddCloudMetadata        bool             `config:"add_cloud_metadata"`
-	ResourceManagerEndpoint string           `config:"resource_manager_endpoint"`
-	ActiveDirectoryEndpoint string           `config:"active_directory_endpoint"`
+	// shared config options
+	ClientId                string        `config:"client_id"  validate:"required"`
+	ClientSecret            string        `config:"client_secret"  validate:"required"`
+	TenantId                string        `config:"tenant_id"  validate:"required"`
+	SubscriptionId          string        `config:"subscription_id"  validate:"required"`
+	Period                  time.Duration `config:"period" validate:"nonzero,required"`
+	ResourceManagerEndpoint string        `config:"resource_manager_endpoint"`
+	ActiveDirectoryEndpoint string        `config:"active_directory_endpoint"`
+	// specific to resource metrics
+	Resources           []ResourceConfig `config:"resources"`
+	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
+	DefaultResourceType string           `config:"default_resource_type"`
+	AddCloudMetadata    bool             `config:"add_cloud_metadata"`
+	// specific to billing
+	Scope BillingScope `config:"scope"` // options are subscription
+}
+
+// BillingScope contains billing options to retrieve usage details.
+type BillingScope struct {
+	SubscriptionId      string `config:"subscription_id"`
+	DepartmentId        string `config:"department_id"`
+	BillingAccountId    string `config:"billing_accountId"`
+	EnrollmentAccountId string `config:"enrollment_account_id"`
+	ManagementGroupId   string `config:"management_group_id"`
 }
 
 // ResourceConfig contains resource and metric list specific configuration.
