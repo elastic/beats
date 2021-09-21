@@ -94,10 +94,13 @@ processors:
     ignore_failure: true
 - convert:
     field: sophos.xg.Configuration
-    target_field: sophos.xg.configuration
+    target_field: sophos.xg.Configuration
     type: float
     ignore_missing: true
-    ignore_failure: true
+    on_failure:
+      - remove:
+          field:
+            - sophos.xg.Configuration
 
 - gsub:
     field: sophos.xg.Reports
@@ -165,15 +168,6 @@ processors:
     on_failure:
       - remove:
           field: sophos.xg.receivedkbits
-
-#############
-## Cleanup ##
-#############
-- remove:
-    field:
-      - sophos.xg.system
-      - sophos.xg.Configuration
-    ignore_missing: true
 
 on_failure:
 - set:
