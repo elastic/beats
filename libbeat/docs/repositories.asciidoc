@@ -178,6 +178,7 @@ gpgcheck=1
 gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
 enabled=1
 autorefresh=1
+skip_if_unavailable=1
 type=rpm-md
 --------------------------------------------------
 endif::[]
