@@ -334,6 +334,7 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 
 func TestJsonExpression(t *testing.T) {
 	simpleJson := "{\"foo\": \"hi\", \"bar\": 3, \"baz\": {\"bot\": \"blah\"}}"
+	arrayJson := fmt.Sprintf("[%s, %s]", simpleJson, simpleJson)
 	var tests = []struct {
 		description   string
 		body          string
@@ -376,9 +377,21 @@ func TestJsonExpression(t *testing.T) {
 			"$.baz.bot == \"nope\"",
 			false,
 		},
+		{
+			"good array json matches jsonpath",
+			arrayJson,
+			"$[0].baz.bot == \"blah\"",
+			true,
+		},
+		{
+			"bad array json matches jsonpath",
+			arrayJson,
+			"$[0].baz.bot == \"nope\"",
+			false,
+		},
 	}
 
-	for _, test := range tests {
+	for _, test := range tests[6:] {
 		t.Run(test.description, func(t *testing.T) {
 			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 				fmt.Fprintln(w, test.body)

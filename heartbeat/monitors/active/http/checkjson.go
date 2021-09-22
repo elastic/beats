@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type jsonChecker func(map[string]interface{}) bool
+type jsonChecker func(interface{}) bool
 type compiledJSONCheck struct {
 	description string
 	check       jsonChecker
@@ -36,8 +36,8 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return nil, fmt.Errorf("could not compile gval expression '%s': %w", check.Expression, err)
 			}
 
-			checkFn := func(m map[string]interface{}) bool {
-				matches, err := eval.EvalBool(context.TODO(), m)
+			checkFn := func(d interface{}) bool {
+				matches, err := eval.EvalBool(context.Background(), d)
 				if err != nil {
 					logp.Warn("error matching JSON against boolean expression: '%v', %v: %v", check.Expression, matches, err)
 					return false
@@ -53,7 +53,14 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return nil, fmt.Errorf("could not load JSON condition '%s': %w", check.Description, err)
 			}
 
-			checkFn := func(ms map[string]interface{}) bool { return cond.Check(common.MapStr(ms)) }
+			checkFn := func(d interface{}) bool {
+				ms, ok := d.(common.MapStr)
+				if ok {
+					return cond.Check(common.MapStr(ms))
+				} else {
+					return false
+				}
+			}
 			conditionChecks = append(conditionChecks, compiledJSONCheck{check.Description, checkFn})
 		}
 	}
@@ -96,30 +103,35 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 	}, nil
 }
 
-func decodeJSON(body string, transformNumber bool) (map[string]interface{}, error) {
-	decoded := &map[string]interface{}{}
+func decodeJSON(body string, forCondition bool) (result interface{}, err error) {
 	decoder := json.NewDecoder(strings.NewReader(body))
-
-	// Condition checks require useNumber to be true to convert the parsed numeric
+	// Condition checks need to convert the parsed numeric
 	// values in a way appropriate for the condition evaluator. GVal only works if
 	// this is not enabled, so expression checks have a separate codepath.
-	if transformNumber {
+	if forCondition {
 		decoder.UseNumber()
 	}
-	err := decoder.Decode(decoded)
 
-	if transformNumber {
-		jsontransform.TransformNumbers(*decoded)
-	}
-
+	err = decoder.Decode(&result)
 	if err != nil {
-		return nil, fmt.Errorf("could not parse JSON for body check with condition. Err: %w Source: %s", err, body)
+		return result, err
 	}
 
-	return *decoded, nil
+	if forCondition {
+		if resMap, ok := result.(map[string]interface{}); ok {
+			if forCondition {
+				jsontransform.TransformNumbers(resMap)
+			}
+			return interface{}(resMap), nil
+		} else {
+			return nil, fmt.Errorf("received non-object JSON for condition, use expression syntax for arrays of JSON instead")
+		}
+	}
+
+	return result, nil
 }
 
-func runCompiledJSONChecks(decodedBody map[string]interface{}, compiledChecks []compiledJSONCheck) []string {
+func runCompiledJSONChecks(decodedBody interface{}, compiledChecks []compiledJSONCheck) []string {
 	var errorDescs []string
 	for _, compiledCheck := range compiledChecks {
 		ok := compiledCheck.check(decodedBody)
