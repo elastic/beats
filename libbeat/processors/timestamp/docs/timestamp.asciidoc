@@ -41,7 +41,7 @@ If a layout does not contain a year then the current year in the specified
 | `field`          | yes      |            | Source field containing the time to be parsed.                                                                        |
 | `target_field`   | no       | @timestamp | Target field for the parsed time value. The target value is always written as UTC.                                    |
 | `layouts`        | yes      |            | Timestamp layouts that define the expected time value format. In addition layouts, `UNIX` and `UNIX_MS` are accepted. |
-| `timezone`       | no       | UTC        | Time zone (e.g. America/New_York) to use when parsing a timestamp not containing a time zone.                           |
+| `timezone`       | no       | UTC        | IANA time zone name (e.g. `America/New_York`) or fixed time offset (e.g. `+0200`) to use when parsing times that do not contain a time zone. `Local` may be specified to use the machine's local time zone.|
 | `ignore_missing` | no       | false      | Ignore errors when the source field is missing.                                                                       |
 | `ignore_failure` | no       | false      | Ignore all errors produced by the processor.                                                                          |
 | `test`           | no       |            | A list of timestamps that must parse successfully when loading the processor.                                         |

@@ -1,0 +1,42 @@
+{
+    "attributes": {
+        "description": "Navigation pane for the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Threat Intel Module Navigation [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "**Filebeat Threat Intel Module Navigation**\n\n[Abuse Malware Overview](#/dashboard/5ba16340-72e6-11eb-a3e3-b3cc7c78a70f)  \n[Abuse URL Overview](#/dashboard/65fa6bc0-72f0-11eb-a3e3-b3cc7c78a70f)  \n[AlienVault Overview](#/dashboard/53e4e630-76cf-11eb-a3e3-b3cc7c78a70f)  \n[Anomali Overview](#/dashboard/68c48a30-739e-11eb-a3e3-b3cc7c78a70f)  \n[Malware Bazaar Overview](#/dashboard/dee7be00-82ab-11eb-ac13-d5ca87cb8fa2)  \n[MISP Overview](#/dashboard/47e6fdc0-76b9-11eb-a3e3-b3cc7c78a70f)  \n[Recorded Future Overview](#/dashboard/894dd3e0-df57-11eb-8f2b-753caedf727d)  ",
+                "openLinksInNewTab": false
+            },
+            "title": "Threat Intel Module Navigation [Filebeat Threat Intel]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f13f5650-df5b-11eb-8f2b-753caedf727d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:32.145Z",
+    "version": "WzQ2NDgsMV0="
+}

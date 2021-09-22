@@ -1,0 +1,179 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "host",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "host"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "host",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Host List [Auditbeat System] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": 1,
+                        "direction": "asc"
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Hostname",
+                        "field": "system.audit.host.hostname",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "_key",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "aggregate": "max",
+                        "customLabel": "Uptime (days)",
+                        "field": "system.audit.host.uptime",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "OS",
+                        "field": "system.audit.host.os.name",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Version",
+                        "field": "system.audit.host.os.version",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Host ID",
+                        "field": "system.audit.host.id",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "aggregate": "concat",
+                        "customLabel": "Status",
+                        "field": "message",
+                        "size": 1,
+                        "sortField": "@timestamp",
+                        "sortOrder": "desc"
+                    },
+                    "schema": "metric",
+                    "type": "top_hits"
+                }
+            ],
+            "params": {
+                "perPage": 10,
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Host List [Auditbeat System] ECS",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:36:02.960Z",
+    "version": "WzUwMTYsMV0="
+}

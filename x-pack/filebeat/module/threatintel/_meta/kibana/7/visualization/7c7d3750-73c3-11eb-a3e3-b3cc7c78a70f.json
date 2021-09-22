@@ -1,0 +1,134 @@
+{
+    "attributes": {
+        "description": "Types of MISP indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "threatintel.misp"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "threatintel.misp"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "exists": {
+                            "field": "threatintel.indicator.type"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "threatintel.indicator.type",
+                            "negate": false,
+                            "type": "exists",
+                            "value": "exists"
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "MISP Indicator Type [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "threatintel.indicator.type",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "labels": {
+                    "last_level": true,
+                    "show": true,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "MISP Indicator Type [Filebeat Threat Intel]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7c7d3750-73c3-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+            "name": "search_0",
+            "type": "search"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:31.083Z",
+    "version": "WzQ2MzQsMV0="
+}

@@ -1,0 +1,81 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Top Domains [Filebeat CoreDNS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "coredns.query.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "maxFontSize": 72,
+                "metric": {
+                    "accessor": 0,
+                    "aggType": "count",
+                    "format": {
+                        "id": "number"
+                    },
+                    "params": {}
+                },
+                "minFontSize": 18,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear",
+                "showLabel": true
+            },
+            "title": "Top Domains [Filebeat CoreDNS]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3ad75810-4429-11e9-8548-ab7fbe04f038",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:40.046Z",
+    "version": "WzQyNDEsMV0="
+}

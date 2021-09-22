@@ -140,9 +140,9 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 	if in.config.BucketARN != "" {
 		// Create S3 receiver and S3 notification processor.
-		poller, err := in.createS3Lister(inputContext, client, persistentStore, states)
+		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
 		if err != nil {
-			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+			return fmt.Errorf("failed to initialize s3 poller: %w", err)
 		}
 		defer poller.metrics.Close()
 
@@ -193,14 +193,23 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, client beat.Client) (*sqsRe
 	return sqsReader, nil
 }
 
-func (in *s3Input) createS3Lister(ctx v2.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
+func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
 	s3ServiceName := "s3"
 	if in.config.FIPSEnabled {
 		s3ServiceName = "s3-fips"
 	}
 
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+	regionName, err := getRegionForBucketARN(cancelCtx, s3Client, in.config.BucketARN)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get AWS region for bucket_arn: %w", err)
+	}
+
+	in.awsConfig.Region = regionName
+	s3Client = s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
+
 	s3API := &awsS3API{
-		client: s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig)),
+		client: s3Client,
 	}
 
 	log := ctx.Logger.With("bucket_arn", in.config.BucketARN)
@@ -245,4 +254,20 @@ func getRegionFromQueueURL(queueURL string, endpoint string) (string, error) {
 		}
 	}
 	return "", fmt.Errorf("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+}
+
+func getRegionForBucketARN(ctx context.Context, s3Client *s3.Client, bucketARN string) (string, error) {
+	bucketMetadata := strings.Split(bucketARN, ":")
+	bucketName := bucketMetadata[len(bucketMetadata)-1]
+
+	req := s3Client.GetBucketLocationRequest(&s3.GetBucketLocationInput{
+		Bucket: awssdk.String(bucketName),
+	})
+
+	resp, err := req.Send(ctx)
+	if err != nil {
+		return "", err
+	}
+
+	return string(resp.LocationConstraint), nil
 }

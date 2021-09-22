@@ -62,6 +62,7 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 174,
+        "network.community_id": "1:bEmZObpc4rxeHLkGwSyEBNS+Sxg=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",

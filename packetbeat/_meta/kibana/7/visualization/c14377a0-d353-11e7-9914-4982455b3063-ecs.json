@@ -1,0 +1,32 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"query\",\"negate\":false,\"type\":\"custom\",\"value\":\"{\\\"exists\\\":{\\\"field\\\":\\\"tls\\\"}}\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"exists\":{\"field\":\"tls\"}}}],\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "TLS Alerts [Packetbeat] ECS",
+        "uiStateJSON": "{\"vis\": {\"colors\": {\"None\": \"#7EB26D\", \"handshake_failure\": \"#E24D42\"}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"field\":\"tls.detailed.alert_types\",\"include\":\".*\",\"json\":\"{\\\"missing\\\": \\\"None\\\"}\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\",\"type\":\"pie\",\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"distinctColors\":true},\"title\":\"TLS Alerts ECS\",\"type\":\"pie\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c14377a0-d353-11e7-9914-4982455b3063-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyMzQsMV0="
+}

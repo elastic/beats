@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"network.protocol\",\"negate\":false,\"params\":{\"query\":\"http\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"http\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"network.protocol\":{\"query\":\"http\",\"type\":\"phrase\"}}}},{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"http.response.status_code\",\"negate\":true,\"params\":{\"gte\":200,\"lt\":299},\"type\":\"range\",\"value\":\"200 to 299\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index\"},\"range\":{\"http.response.status_code\":{\"gte\":200,\"lte\":299}}}],\"highlight\":{\"fields\":{\"*\":{}},\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"]},\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "HTTP error codes evolution [Packetbeat] ECS",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"drop_partials\":false,\"extended_bounds\":{},\"field\":\"@timestamp\",\"interval\":\"auto\",\"min_doc_count\":1,\"useNormalizedEsInterval\":true},\"schema\":\"segment\",\"type\":\"date_histogram\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"HTTP Status Code\",\"field\":\"http.response.status_code\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"1\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":5},\"schema\":\"group\",\"type\":\"terms\"}],\"params\":{\"addLegend\":true,\"addTimeMarker\":false,\"addTooltip\":true,\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"labels\":{\"show\":true,\"truncate\":100,\"filter\":true},\"position\":\"bottom\",\"scale\":{\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{},\"type\":\"category\"}],\"defaultYExtents\":false,\"drawLinesBetweenPoints\":true,\"grid\":{\"categoryLines\":false,\"style\":{\"color\":\"#eee\"}},\"interpolate\":\"linear\",\"legendPosition\":\"right\",\"radiusRatio\":9,\"scale\":\"linear\",\"seriesParams\":[{\"data\":{\"id\":\"1\",\"label\":\"Count\"},\"drawLinesBetweenPoints\":true,\"interpolate\":\"linear\",\"mode\":\"normal\",\"radiusRatio\":9,\"show\":\"true\",\"showCircles\":true,\"type\":\"line\",\"valueAxis\":\"ValueAxis-1\"}],\"setYExtents\":false,\"shareYAxis\":true,\"showCircles\":true,\"smoothLines\":false,\"times\":[],\"type\":\"line\",\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"labels\":{\"filter\":false,\"rotate\":0,\"show\":true,\"truncate\":100},\"name\":\"LeftAxis-1\",\"position\":\"left\",\"scale\":{\"defaultYExtents\":false,\"mode\":\"normal\",\"setYExtents\":false,\"type\":\"linear\"},\"show\":true,\"style\":{},\"title\":{\"text\":\"Count\"},\"type\":\"value\"}],\"yAxis\":{},\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"isVislibVis\":true,\"detailedTooltip\":true,\"fittingFunction\":\"zero\"},\"title\":\"HTTP error codes evolution [Packetbeat] ECS\",\"type\":\"line\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "HTTP-error-codes-evolution-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:41.048Z",
+    "version": "WzMxNTIsMV0="
+}

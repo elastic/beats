@@ -37,6 +37,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+// ErrMonitorDisabled is returned when the monitor plugin is marked as disabled.
+var ErrMonitorDisabled = errors.New("monitor not loaded, plugin is disabled")
+
 // Monitor represents a configured recurring monitoring configuredJob loaded from a config file. Starting it
 // will cause it to run with the given scheduler until Stop() is called.
 type Monitor struct {
@@ -124,6 +127,10 @@ func newMonitorUnsafe(
 	standardFields, err := stdfields.ConfigToStdMonitorFields(config)
 	if err != nil {
 		return nil, err
+	}
+
+	if !config.Enabled() {
+		return nil, fmt.Errorf("monitor '%s' with id '%s' skipped: %w", standardFields.Name, standardFields.ID, ErrMonitorDisabled)
 	}
 
 	pluginFactory, found := registrar.Get(standardFields.Type)

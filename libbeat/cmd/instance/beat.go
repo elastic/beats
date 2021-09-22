@@ -532,7 +532,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config())
+			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}
@@ -822,7 +822,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
 		}
 
-		client, err := kibana.NewKibanaClient(kibanaConfig)
+		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %v", err)
 		}
@@ -1103,12 +1103,16 @@ func initKibanaConfig(beatConfig beatConfig) (*common.Config, error) {
 	if esConfig.Enabled() {
 		username, _ := esConfig.String("username", -1)
 		password, _ := esConfig.String("password", -1)
+		api_key, _ := esConfig.String("api_key", -1)
 
 		if !kibanaConfig.HasField("username") && username != "" {
 			kibanaConfig.SetString("username", -1, username)
 		}
 		if !kibanaConfig.HasField("password") && password != "" {
 			kibanaConfig.SetString("password", -1, password)
+		}
+		if !kibanaConfig.HasField("api_key") && api_key != "" {
+			kibanaConfig.SetString("api_key", -1, api_key)
 		}
 	}
 	return kibanaConfig, nil

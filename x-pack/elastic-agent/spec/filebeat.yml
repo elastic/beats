@@ -75,6 +75,7 @@ rules:
     - gcp-pubsub
     - http_endpoint
     - httpjson
+    - journald
     - kafka
     - log
     - mqtt
@@ -108,8 +109,6 @@ rules:
     - keystore
 
 - inject_headers: {}
-
-- inject_queue: {}
 
 when: length(${filebeat.inputs}) > 0 and hasKey(${output}, 'elasticsearch', 'redis',
   'kafka', 'logstash')
