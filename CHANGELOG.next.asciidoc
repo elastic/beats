@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add daemonset.name in pods controlled by DaemonSets {pull}26808[26808], {issue}25816[25816]
 - Kubernetes autodiscover fails in node scope if node name cannot be discovered {pull}26947[26947]
 - Loading Kibana assets (dashboards, index templates) rely on Saved Object API. So to provide a reliable service, Beats can only import and export dasbhboards using at least Kibana 7.15. {issue}20672[20672] {pull}27220[27220]
+- Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 
@@ -93,8 +94,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 
 *Heartbeat*
-- Remove long deprecated `watch_poll` functionality. {pull}27166[27166]
-- Fix inconsistency in `event.dataset` values between heartbeat and fleet by always setting this value to the monitor type / fleet dataset. {pull}27535[27535]
 
 *Journalbeat*
 
@@ -219,6 +218,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Beat `setup kibana` command may use the elasticsearch API key defined in `output.elasticsearch.api_key`. {issue}24015[24015] {pull}27540[27540]
 - Fix `decode_xml` handling of array merging when using `to_lower: true`. {pull}27922[27922]
 - Seperate namespaces for V1 and V2 controller paths {pull}27676[27676]
+- The `o365input` and `o365` module now recover from an authentication problem or other fatal errors, instead of terminating. {pull}21258[21258]
 - Beats dashboards use custom index when `setup.dashboards.index` is set. {issue}21232[21232] {pull}27901[27901]
 
 *Auditbeat*
@@ -229,7 +229,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - system/package: Fix an error that can occur while trying to persist package metadata. {issue}18536[18536] {pull}18887[18887]
 - system/socket: Fix dataset using 100% CPU and becoming unresponsive in some scenarios. {pull}19033[19033] {pull}19764[19764]
 - system/socket: Fixed tracking of long-running connections. {pull}19033[19033]
-- file_integrity: honor include_files when doing initial scan. {issue}27273[27273] {pull}27722[27722]
 
 *Filebeat*
 
@@ -321,6 +320,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Filebeat compatibility function to remove processor description field on ES < 7.9.0 {pull}27774[27774]
 - Make filestream events ECS compliant. {issue}27776[27776]
 - Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
+- Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
+- Update indentation for azure filebeat configuration. {pull}26604[26604]
 
 *Heartbeat*
 
@@ -425,8 +426,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
-- Allow metric prefix override per service in gcp module. {pull}26960[26960]
-- Update metrics configuration and dashboards after changes in the Azure Monitor {pull}27520[27520]
 
 *Packetbeat*
 
@@ -750,11 +749,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add support to merge registry updates in the filestream input across multiple ACKed batches in case of backpressure in the registry or disk. {pull}25976[25976]
 - Add support to `decode_cef` for MAC addresses that do not contain separator characters. {issue}27050[27050] {pull}27109[27109]
 - Add new `hmac` template function for httpjson input {pull}27168[27168]
+- Added support for first_event context in filebeat httpjson input {pull}23437[23437]
+- Added feature to modules to adapt Ingest Node pipelines for compatibility with older Elasticsearch versions by
+- Upgrade panw module to ecs 1.8 {issue}23118[23118] {pull}23931[23931]
+- Upgrade juniper/srx to ecs 1.8.0. {issue}23118[23118] {pull}23936[23936]
+- Upgrade okta to ecs 1.8.0 and move js processor to ingest pipeline {issue}23118[23118] {pull}23929[23929]
 - Add `timezone` config option to the `decode_cef` processor. {issue}27232[27232] {pull}27727[27727]
 - Add `timezone` config option to the `syslog` input. {pull}27727[27727]
-- Update `tags` and `threatintel.indicator.provider` fields in `threatintel.anomali` ingest pipeline {issue}24746[24746] {pull}27141[27141]
-- Move AWS module and filesets to GA. {pull}27428[27428]
-- update ecs.version to ECS 1.11.0. {pull}27107[27107]
 - Added support for parsing syslog dates containing a leading 0 (e.g. `Sep 01`) rather than a space. {pull}27775[27775]
 - Add base64 Encode functionality to httpjson input. {pull}27681[27681]
 - Add `join` and `sprintf` functions to `httpjson` input. {pull}27735[27735]
@@ -764,6 +765,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
 - Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 - Release checkpoint module as GA. {pull}27814[27814]
+
 
 *Heartbeat*
 
