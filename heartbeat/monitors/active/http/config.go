@@ -71,18 +71,12 @@ type requestParameters struct {
 
 type responseParameters struct {
 	// expected HTTP response configuration
-	Status       []uint16                 `config:"status"`
-	RecvHeaders  map[string]string        `config:"headers"`
-	RecvBody     interface{}              `config:"body"`
-	RecvJSONPath []*jsonpathResponseCheck `config:"jsonpath"`
-	RecvJSON     []*jsonResponseCheck     `config:"json"`
+	Status      []uint16             `config:"status"`
+	RecvHeaders map[string]string    `config:"headers"`
+	RecvBody    interface{}          `config:"body"`
+	RecvJSON    []*jsonResponseCheck `config:"json"`
 }
 
-type jsonpathResponseCheck struct {
-	Description string `config:"description"`
-	Matches     string `config:"matches"`
-	Negate      bool   `config:"negate"`
-}
 type jsonResponseCheck struct {
 	Description string             `config:"description"`
 	Expression  string             `config:"expression"`

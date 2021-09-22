@@ -246,7 +246,7 @@ func TestCheckJson(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}}, nil)
+			checker, err := checkJSON([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
@@ -314,7 +314,7 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}}, nil)
+			checker, err := checkJSON([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
@@ -332,20 +332,49 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 
 }
 
-func TestJsonPath(t *testing.T) {
+func TestJsonExpression(t *testing.T) {
+	simpleJson := "{\"foo\": \"hi\", \"bar\": 3, \"baz\": {\"bot\": \"blah\"}}"
 	var tests = []struct {
-		description string
-		body        string
-		path        string
-		negate      bool
-		result      bool
+		description   string
+		body          string
+		expression    string
+		expectSuccess bool
 	}{
 		{
-			"positive match",
-			"{\"foo\": \"hi\", \"bar\": 3}",
+			"good match succeeds",
+			simpleJson,
 			"foo == \"hi\" && bar == 3",
-			false,
 			true,
+		},
+		{
+			"bad match fails",
+			simpleJson,
+			"foo == \"hi\" && bar == 1000",
+			false,
+		},
+		{
+			"deep match succeeds",
+			simpleJson,
+			"baz == {\"bot\": \"blah\"}",
+			true,
+		},
+		{
+			"bad deep match fails",
+			simpleJson,
+			"baz == {\"bot\": \"nope\"}",
+			false,
+		},
+		{
+			"good match succeeds with jsonpath",
+			simpleJson,
+			"$.baz.bot == \"blah\"",
+			true,
+		},
+		{
+			"bad match fails with jsonpath",
+			simpleJson,
+			"$.baz.bot == \"nope\"",
+			false,
 		},
 	}
 
@@ -361,25 +390,25 @@ func TestJsonPath(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON(nil,
-				[]*jsonpathResponseCheck{
+			checker, err := checkJSON(
+				[]*jsonResponseCheck{
 					{
 						Description: test.description,
-						Matches:     test.path,
-						Negate:      test.negate,
+						Expression:  test.expression,
 					},
 				},
 			)
+
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
 			checkRes := checker(res, string(body))
 
-			if result := checkRes == nil; result != test.result {
-				if test.result {
-					t.Fatalf("Expected condition: '%s' (negate: %t) to match body: %s. got: %s", test.path, test.negate, test.body, checkRes)
+			if result := checkRes == nil; result != test.expectSuccess {
+				if test.expectSuccess {
+					t.Fatalf("Expected expression: '%s' to match body: %s. got: %s", test.expression, test.body, checkRes)
 				} else {
-					t.Fatalf("Did not expect condition: '%s' (negate: %t) to match body: %s. got: %s", test.path, test.negate, test.body, checkRes)
+					t.Fatalf("Did not expect expression: '%s' to match body: %s. got: %s", test.expression, test.body, checkRes)
 				}
 			}
 		})

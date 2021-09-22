@@ -18,23 +18,12 @@
 package http
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"strings"
-
-	"github.com/PaesslerAG/gval"
-	"github.com/PaesslerAG/jsonpath"
-	pkgerrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // multiValidator combines multiple validations of each type into a single easy to use object.
@@ -104,8 +93,8 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 		bodyValidators = append(bodyValidators, checkBody(pm, nm))
 	}
 
-	if len(config.RecvJSON)+len(config.RecvJSONPath) > 0 {
-		jsonChecks, err := checkJSON(config.RecvJSON, config.RecvJSONPath)
+	if len(config.RecvJSON) > 0 {
+		jsonChecks, err := checkJSON(config.RecvJSON)
 		if err != nil {
 			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}
@@ -221,110 +210,4 @@ func checkBody(positiveMatch, negativeMatch []match.Matcher) bodyValidator {
 		}
 		return nil
 	}
-}
-
-func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (bodyValidator, error) {
-	type checker func(map[string]interface{}) bool
-	type compiledCheck struct {
-		description string
-		check       checker
-	}
-
-	var compiledChecks []compiledCheck
-
-	for _, check := range checks {
-		cond, err := conditions.NewCondition(check.Condition)
-		if err != nil {
-			return nil, fmt.Errorf("could not load JSON condition '%s': %w", check.Description, err)
-		}
-
-		checkFn := func(ms map[string]interface{}) bool { return cond.Check(common.MapStr(ms)) }
-		compiledChecks = append(compiledChecks, compiledCheck{check.Description, checkFn})
-	}
-
-	for _, check := range jpChecks {
-		compiled := compiledCheck{}
-		compiled.description = check.Description
-
-		/*
-				var jp gval.Evaluable
-				var err error
-				if check.Path != "" {
-					jp, err = pjp.New(check.Path)
-				}
-
-			if err != nil {
-				return nil, fmt.Errorf("could not compile JSON Path expression %s (%s): %w", check.Description, check.Path, err)
-			}
-		*/
-		var err error
-
-		var eval gval.Evaluable
-		if check.Matches != "" {
-			eval, err = gval.Full(jsonpath.PlaceholderExtension()).NewEvaluable(check.Matches)
-			if err != nil {
-				return nil, fmt.Errorf("could not compile gval expression '%s': %w", check.Matches, err)
-			}
-		}
-		compiled.check = func(m map[string]interface{}) bool {
-			matches, err := eval.EvalBool(context.TODO(), m)
-			if err != nil {
-				logp.Warn("error matching JSON Path '%v', %v: %v", check.Matches, matches, err)
-				return false
-			}
-
-			matchReturnValue := true
-			if check.Negate {
-				return !matches
-			} else {
-				return matches
-			}
-
-			/*
-				if mlist, ok := matches.([]interface{}); ok && len(mlist) == 0 {
-					return !matchReturnValue
-				}
-			*/
-
-			if eval != nil {
-				//eval(context.Background(), matches)
-			}
-
-			return matchReturnValue
-		}
-		compiledChecks = append(compiledChecks, compiled)
-	}
-
-	return func(r *http.Response, body string) error {
-		decoded := &map[string]interface{}{}
-		decoder := json.NewDecoder(strings.NewReader(body))
-		//decoder.UseNumber()
-		err := decoder.Decode(decoded)
-
-		if err != nil {
-			body, _ := ioutil.ReadAll(r.Body)
-			return pkgerrors.Wrapf(err, "could not parse JSON for body check with condition. Source: %s", body)
-		}
-
-		//jsontransform.TransformNumbers(*decoded)
-
-		var errorDescs []string
-		for _, compiledCheck := range compiledChecks {
-			ok := compiledCheck.check(*decoded)
-			if !ok {
-				errorDescs = append(errorDescs, compiledCheck.description)
-			}
-		}
-
-		if len(errorDescs) > 0 {
-			return fmt.Errorf(
-				"JSON body did not match %d conditions '%s' for monitor. Received JSON %+v",
-				len(errorDescs),
-				strings.Join(errorDescs, ","),
-				decoded,
-			)
-		}
-
-		return nil
-	}, nil
 }
