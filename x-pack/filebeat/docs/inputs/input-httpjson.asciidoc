@@ -202,11 +202,13 @@ Some built-in helper functions are provided to work with the input state inside 
 - `add`: adds a list of integers and returns their sum.
 - `mul`: multiplies two integers.
 - `div`: does the integer division of two integer values.
-- `hmac`: calculates the hmac signature of a list of strings concatenated together. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `hmac`: calculates the hmac signature of a list of strings concatenated together. Returns a hex encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
 - `base64Encode`: Joins and base64 encodes all supplied strings. Example `[[base64Encode "string1" "string2"]]`
 - `base64EncodeNoPad`: Joins and base64 encodes all supplied strings without padding. Example `[[base64EncodeNoPad "string1" "string2"]]`
-- `join`: joins a list of strings using the specified separator. Example: `[[join .body.arr ","]]`
+- `join`: joins a list using the specified separator. Example: `[[join .body.arr ","]]`
 - `sprintf`: formats according to a format specifier and returns the resulting string. Refer to https://pkg.go.dev/fmt#Sprintf[the Go docs] for usage. Example: `[[sprintf "%d:%q" 34 "quote this"]]`
+- `hmacBase64`: calculates the hmac signature of a list of strings concatenated together. Returns a base64 encoded signature. Supports sha1 or sha256. Example `[[hmac "sha256" "secret" "string1" "string2" (formatDate (now) "RFC1123")]]`
+- `uuid`: returns a random UUID such as `a11e8780-e3e7-46d0-8e76-f66e75acf019` Example: `[[ uuid ]]`
 
 In addition to the provided functions, any of the native functions for https://golang.org/pkg/time/#Time[`time.Time`], https://golang.org/pkg/net/http/#Header[`http.Header`], and https://golang.org/pkg/net/url/#Values[`url.Values`] types can be used on the corresponding objects. Examples: `[[(now).Day]]`, `[[.last_response.header.Get "key"]]`
 
@@ -466,7 +468,7 @@ Available transforms for request: [`append`, `delete`, `set`].
 
 Can read state from: [`.last_response.*`, `.last_event.*`, `.cursor.*`, `.header.*`, `.url.*`, `.body.*`].
 
-Can write state to: [`header.*`, `url.params.*`, `body.*`].
+Can write state to: [`body.*`, `header.*`, `url.*`].
 
 ["source","yaml",subs="attributes"]
 ----

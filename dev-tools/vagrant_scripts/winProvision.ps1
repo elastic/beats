@@ -7,7 +7,7 @@ if (-Not (Test-Path $gopath_beats)) {
     echo 'Creating github.com\\elastic in the GOPATH'
     New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
     echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
-    cmd /c mklink /d $gopath_beats \\\\vboxsvr\\vagrant
+    cmd /c mklink /d $gopath_beats \\vboxsvr\vagrant
 }
 
 if (-Not (Get-Command "gvm" -ErrorAction SilentlyContinue)) {
