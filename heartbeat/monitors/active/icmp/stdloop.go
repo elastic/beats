@@ -392,7 +392,7 @@ func createListener(name, network string) *icmp.PacketConn {
 	// XXX: need to check for conn == nil, as 'err != nil' seems always to be
 	//      true, even if error value itself is `nil`. Checking for conn suppresses
 	//      misleading log message.
-	if conn == nil && err != nil {
+	ia conn == nil && err != nil {
 		return nil
 	}
 	return conn

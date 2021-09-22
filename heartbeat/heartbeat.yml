@@ -31,19 +31,11 @@ heartbeat.monitors:
   schedule: '@every 1m'
   check.response:
     status: [200]
-    json:
-      - description: thing
-        equals:
-          something: somethingelse
-    json:
-      - description: thing
-        jsonpath:
-          #...
     jsonpath:
-      - description: "Has matching node"
-        #path: '$.nodes[?(@.name=="LAPTOP-80O11FM2")]'
-        path: '$.my.status'
-        equals: 'myvalue'
+      - description: "Fancy filter"
+        path: '$.nodes[?(@.name=="LAPTOP-80O11FM2")]'
+        negate: true
+      
 
 # ======================= Elasticsearch template setting =======================
 

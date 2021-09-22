@@ -80,11 +80,12 @@ type responseParameters struct {
 
 type jsonpathResponseCheck struct {
 	Description string `config:"description"`
-	Exists      string `config:"exists"`
-	Equals      string `config:"equals"`
+	Matches     string `config:"matches"`
+	Negate      bool   `config:"negate"`
 }
 type jsonResponseCheck struct {
 	Description string             `config:"description"`
+	Expression  string             `config:"expression"`
 	Condition   *conditions.Config `config:"condition"`
 }
 

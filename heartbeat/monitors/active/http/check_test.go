@@ -246,7 +246,7 @@ func TestCheckJson(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
+			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}}, nil)
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
@@ -314,7 +314,7 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}})
+			checker, err := checkJSON([]*jsonResponseCheck{{test.condDesc, test.condConf}}, nil)
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)
@@ -332,6 +332,60 @@ func TestCheckJsonWithIntegerComparison(t *testing.T) {
 
 }
 
+func TestJsonPath(t *testing.T) {
+	var tests = []struct {
+		description string
+		body        string
+		path        string
+		negate      bool
+		result      bool
+	}{
+		{
+			"positive match",
+			"{\"foo\": \"hi\", \"bar\": 3}",
+			"foo == \"hi\" && bar == 3",
+			false,
+			true,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprintln(w, test.body)
+			}))
+			defer ts.Close()
+
+			res, err := http.Get(ts.URL)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			checker, err := checkJSON(nil,
+				[]*jsonpathResponseCheck{
+					{
+						Description: test.description,
+						Matches:     test.path,
+						Negate:      test.negate,
+					},
+				},
+			)
+			require.NoError(t, err)
+			body, err := ioutil.ReadAll(res.Body)
+			require.NoError(t, err)
+			checkRes := checker(res, string(body))
+
+			if result := checkRes == nil; result != test.result {
+				if test.result {
+					t.Fatalf("Expected condition: '%s' (negate: %t) to match body: %s. got: %s", test.path, test.negate, test.body, checkRes)
+				} else {
+					t.Fatalf("Did not expect condition: '%s' (negate: %t) to match body: %s. got: %s", test.path, test.negate, test.body, checkRes)
+				}
+			}
+		})
+	}
+
+}
 func TestCheckStatus(t *testing.T) {
 
 	var matchTests = []struct {

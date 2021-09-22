@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"github.com/PaesslerAG/gval"
-	pjp "github.com/PaesslerAG/jsonpath"
+	"github.com/PaesslerAG/jsonpath"
 	pkgerrors "github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
@@ -235,7 +235,7 @@ func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (
 	for _, check := range checks {
 		cond, err := conditions.NewCondition(check.Condition)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("could not load JSON condition '%s': %w", check.Description, err)
 		}
 
 		checkFn := func(ms map[string]interface{}) bool { return cond.Check(common.MapStr(ms)) }
@@ -246,27 +246,51 @@ func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (
 		compiled := compiledCheck{}
 		compiled.description = check.Description
 
-		var jp gval.Evaluable
-		var err error
-		if check.Exists != "" {
-			jp, err = pjp.New(check.Exists)
-		}
+		/*
+				var jp gval.Evaluable
+				var err error
+				if check.Path != "" {
+					jp, err = pjp.New(check.Path)
+				}
 
-		if err != nil {
-			return nil, fmt.Errorf("could not compile JSON Path expression '%s': %w", check.Exists, err)
+			if err != nil {
+				return nil, fmt.Errorf("could not compile JSON Path expression %s (%s): %w", check.Description, check.Path, err)
+			}
+		*/
+		var err error
+
+		var eval gval.Evaluable
+		if check.Matches != "" {
+			eval, err = gval.Full(jsonpath.PlaceholderExtension()).NewEvaluable(check.Matches)
+			if err != nil {
+				return nil, fmt.Errorf("could not compile gval expression '%s': %w", check.Matches, err)
+			}
 		}
 		compiled.check = func(m map[string]interface{}) bool {
-			matches, err := jp(context.TODO(), m)
+			matches, err := eval.EvalBool(context.TODO(), m)
 			if err != nil {
-				logp.Warn("error matching JSON Path '%v', %v: %v", check.Exists, matches, err)
+				logp.Warn("error matching JSON Path '%v', %v: %v", check.Matches, matches, err)
 				return false
 			}
-			if matches == nil {
-				return false
-			} else if mlist := matches.([]interface{}); len(mlist) == 0 {
-				return false
+
+			matchReturnValue := true
+			if check.Negate {
+				return !matches
+			} else {
+				return matches
 			}
-			return true
+
+			/*
+				if mlist, ok := matches.([]interface{}); ok && len(mlist) == 0 {
+					return !matchReturnValue
+				}
+			*/
+
+			if eval != nil {
+				//eval(context.Background(), matches)
+			}
+
+			return matchReturnValue
 		}
 		compiledChecks = append(compiledChecks, compiled)
 	}
@@ -274,7 +298,7 @@ func checkJSON(checks []*jsonResponseCheck, jpChecks []*jsonpathResponseCheck) (
 	return func(r *http.Response, body string) error {
 		decoded := &map[string]interface{}{}
 		decoder := json.NewDecoder(strings.NewReader(body))
-		decoder.UseNumber()
+		//decoder.UseNumber()
 		err := decoder.Decode(decoded)
 
 		if err != nil {
