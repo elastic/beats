@@ -47,20 +47,15 @@ func NewClient(config azure.Config) (*Client, error) {
 // GetMetrics returns the usage detail and forecast values.
 func (client *Client) GetMetrics(startTime time.Time, endTime time.Time) (Usage, error) {
 	var usage Usage
-	subScope := fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId)
-	filter := fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano))
-	marketplaceDetails, err := client.BillingService.GetMarketplaceUsage(subScope, filter, "", nil)
-	if err != nil {
-		//return usage, errors.Wrap(err, "Retrieving marketplace usage details failed in client")
+	scope := fmt.Sprintf("subscriptions/%s", client.Config.SubscriptionId)
+	if client.Config.BillingScopeDepartment != "" {
+		scope = fmt.Sprintf("/providers/Microsoft.Billing/departments/%s", client.Config.BillingScopeDepartment)
+	} else if client.Config.BillingScopeAccountId != "" {
+		scope = fmt.Sprintf("/providers/Microsoft.Billing/billingAccounts/%s", client.Config.BillingScopeAccountId)
 	}
-	_ = marketplaceDetails
 
-	charges, err := client.BillingService.GetCharges(subScope, startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano), "", "")
-	if err != nil {
-		//return usage, errors.Wrap(err, "Retrieving marketplace usage details failed in client")
-	}
-	_ = charges
-	usageDetails, err := client.BillingService.GetUsageDetails(subScope, "properties/meterDetails", filter, "", nil, consumption.MetrictypeActualCostMetricType)
+	filter := fmt.Sprintf("properties/usageStart eq '%s' and properties/usageEnd eq '%s'", startTime.Format(time.RFC3339Nano), endTime.Format(time.RFC3339Nano))
+	usageDetails, err := client.BillingService.GetUsageDetails(scope, "properties/meterDetails", filter, "", nil, consumption.MetrictypeActualCostMetricType)
 	if err != nil {
 		return usage, errors.Wrap(err, "Retrieving usage details failed in client")
 	}

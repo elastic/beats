@@ -42,16 +42,8 @@ type Config struct {
 	DefaultResourceType string           `config:"default_resource_type"`
 	AddCloudMetadata    bool             `config:"add_cloud_metadata"`
 	// specific to billing
-	Scope BillingScope `config:"scope"` // options are subscription
-}
-
-// BillingScope contains billing options to retrieve usage details.
-type BillingScope struct {
-	SubscriptionId      string `config:"subscription_id"`
-	DepartmentId        string `config:"department_id"`
-	BillingAccountId    string `config:"billing_accountId"`
-	EnrollmentAccountId string `config:"enrollment_account_id"`
-	ManagementGroupId   string `config:"management_group_id"`
+	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
+	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope
 }
 
 // ResourceConfig contains resource and metric list specific configuration.

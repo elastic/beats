@@ -5,8 +5,9 @@
 package billing
 
 import (
-	"github.com/pkg/errors"
 	"time"
+
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 
@@ -65,7 +66,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if err != nil {
 		return errors.Wrap(err, "error retrieving usage information")
 	}
-	events := EventsMapping(results, startTime, endTime)
+	events := EventsMapping(results, startTime, endTime, m.client.Config.SubscriptionId)
 	for _, event := range events {
 		isOpen := report.Event(event)
 		if !isOpen {

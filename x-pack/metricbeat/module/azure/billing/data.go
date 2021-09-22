@@ -5,8 +5,6 @@
 package billing
 
 import (
-	"fmt"
-	"strings"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
@@ -17,8 +15,9 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func EventsMapping(results Usage, startTime time.Time, endTime time.Time) []mb.Event {
+func EventsMapping(results Usage, startTime time.Time, endTime time.Time, subscriptionId string) []mb.Event {
 	var events []mb.Event
+	// usage details come in different forms, most common for this api call is LegacyUsageDetail
 	if len(results.UsageDetails) > 0 {
 		for _, ud := range results.UsageDetails {
 			event := mb.Event{Timestamp: time.Now().UTC()}
@@ -32,21 +31,20 @@ func EventsMapping(results Usage, startTime time.Time, endTime time.Time) []mb.E
 					"subscription_id": legacyUsageDetail.SubscriptionID,
 				}
 				event.MetricSetFields = common.MapStr{
-					"pretax_cost": legacyUsageDetail.Cost,
-					//"department_name":   legacyUsageDetail.,
+					"pretax_cost":          legacyUsageDetail.Cost,
+					"department_name":      legacyUsageDetail.InvoiceSection,
 					"product":              legacyUsageDetail.Product,
 					"usage_start":          startTime,
 					"usage_end":            endTime,
 					"billing_period_start": legacyUsageDetail.BillingPeriodStartDate.ToTime(),
 					"billing_period_end":   legacyUsageDetail.BillingPeriodEndDate.ToTime(),
 					"currency":             legacyUsageDetail.BillingCurrency,
-					//"billing_period_id": legacyUsageDetail.per,
 					"effective_price":      legacyUsageDetail.EffectivePrice,
-					"account_name":         legacyUsageDetail.AccountName,
+					"account_name":         legacyUsageDetail.BillingAccountName,
 					"account_id":           legacyUsageDetail.BillingAccountID,
-					"billing_account_name": legacyUsageDetail.BillingAccountName,
 					"subscription_name":    legacyUsageDetail.SubscriptionName,
 					"unit_price":           legacyUsageDetail.UnitPrice,
+					"quantity":             legacyUsageDetail.Quantity,
 				}
 				event.RootFields = common.MapStr{}
 				event.RootFields.Put("cloud.provider", "azure")
@@ -111,6 +109,9 @@ func EventsMapping(results Usage, startTime time.Time, endTime time.Time) []mb.E
 			RootFields: common.MapStr{
 				"cloud.provider": "azure",
 			},
+			ModuleFields: common.MapStr{
+				"subscription_id": subscriptionId,
+			},
 			MetricSetFields: common.MapStr{
 				"actual_cost":   actualCost,
 				"forecast_cost": forecastCost,
@@ -123,15 +124,4 @@ func EventsMapping(results Usage, startTime time.Time, endTime time.Time) []mb.E
 		events = append(events, event)
 	}
 	return events
-}
-
-// getResourceGroupFromId maps resource group from resource ID
-func getResourceGroupFromId(path string) string {
-	params := strings.Split(path, "/")
-	for i, param := range params {
-		if param == "resourceGroups" {
-			return fmt.Sprintf("%s", params[i+1])
-		}
-	}
-	return ""
 }

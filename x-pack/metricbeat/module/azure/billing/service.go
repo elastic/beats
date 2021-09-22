@@ -44,6 +44,7 @@ func NewService(config azure.Config) (*UsageService, error) {
 	}
 	forcastsClient := consumption.NewForecastsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	usageDetailsClient := consumption.NewUsageDetailsClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
+	// no data available for marketplace and charges apis but could be in the future
 	marketplaceClient := consumption.NewMarketplacesClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	chargesClient := consumption.NewChargesClientWithBaseURI(config.ResourceManagerEndpoint, config.SubscriptionId)
 	forcastsClient.Authorizer = authorizer
