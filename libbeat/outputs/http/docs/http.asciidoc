@@ -2,7 +2,7 @@
 === Configure the Http output
 
 ++++
-<titleabbrev>Http</titleabbrev>
+<titleabbrev>Http output</titleabbrev>
 ++++
 
 The Http output sends events directly to a Http endpoint.
