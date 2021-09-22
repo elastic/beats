@@ -1,0 +1,160 @@
+description: Pipeline for parsing sophos firewall logs (systemhealth pipeline)
+processors:
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: event
+- rename:
+    field: sophos.xg.idle
+    target_field: sophos.xg.idle_cpu
+    ignore_missing: true
+- gsub:
+    field: sophos.xg.idle_cpu
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.idle_cpu
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.idle_cpu
+- rename:
+    field: sophos.xg.system
+    target_field: sophos.xg.system_cpu
+    ignore_missing: true
+- gsub:
+    field: sophos.xg.system_cpu
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.system_cpu
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.system_cpu
+- rename:
+    field: sophos.xg.user
+    target_field: sophos.xg.user_cpu
+    ignore_missing: true
+- gsub:
+    field: sophos.xg.user_cpu
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.user_cpu
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.user_cpu
+- convert:
+    field: sophos.xg.used
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.used
+- convert:
+    field: sophos.xg.total_memory
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.total_memory
+- convert:
+    field: sophos.xg.free
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.free
+- gsub:
+    field: sophos.xg.Configuration
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.Configuration
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field:
+            - sophos.xg.Configuration
+
+- gsub:
+    field: sophos.xg.Reports
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.Reports
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Reports
+- gsub:
+    field: sophos.xg.Temp
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.Temp
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Temp
+- gsub:
+    field: sophos.xg.Signature
+    pattern: "%$"
+    replacement: ""
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: sophos.xg.Signature
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.Signature
+- convert:
+    field: sophos.xg.users
+    type: integer
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.users
+- convert:
+    field: sophos.xg.transmittedkbits
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.transmittedkbits
+- convert:
+    field: sophos.xg.receivedkbits
+    type: float
+    ignore_missing: true
+    on_failure:
+      - remove:
+          field: sophos.xg.receivedkbits
+
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'
