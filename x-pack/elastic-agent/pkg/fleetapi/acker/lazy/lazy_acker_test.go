@@ -82,7 +82,16 @@ func TestLazyAcker(t *testing.T) {
 	if err := lacker.Ack(c, testAction1); err != nil {
 		t.Fatal(err)
 	}
+	if err := lacker.Ack(c, testAction1); err != nil {
+		t.Fatal(err)
+	}
 	if err := lacker.Ack(c, testAction2); err != nil {
+		t.Fatal(err)
+	}
+	if err := lacker.Ack(c, testAction2); err != nil {
+		t.Fatal(err)
+	}
+	if err := lacker.Ack(c, testAction3); err != nil {
 		t.Fatal(err)
 	}
 	if err := lacker.Ack(c, testAction3); err != nil {
