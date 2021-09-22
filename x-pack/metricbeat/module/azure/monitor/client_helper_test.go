@@ -17,19 +17,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/azure"
 )
 
-func MockResource() resources.GenericResource {
-	id := "123"
-	name := "resourceName"
-	location := "resourceLocation"
-	rType := "resourceType"
-	return resources.GenericResource{
-		ID:       &id,
-		Name:     &name,
-		Location: &location,
-		Type:     &rType,
-	}
-}
-
 func MockResourceExpanded() resources.GenericResourceExpanded {
 	id := "123"
 	name := "resourceName"
