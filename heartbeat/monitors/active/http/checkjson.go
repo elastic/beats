@@ -54,7 +54,7 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 			}
 
 			checkFn := func(d interface{}) bool {
-				ms, ok := d.(common.MapStr)
+				ms, ok := d.(map[string]interface{})
 				if ok {
 					return cond.Check(common.MapStr(ms))
 				} else {
@@ -114,7 +114,7 @@ func decodeJSON(body string, forCondition bool) (result interface{}, err error) 
 
 	err = decoder.Decode(&result)
 	if err != nil {
-		return result, err
+		return result, fmt.Errorf("could not parse JSON: %w", err)
 	}
 
 	if forCondition {
