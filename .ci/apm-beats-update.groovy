@@ -26,7 +26,7 @@ pipeline {
     quietPeriod(10)
   }
   triggers {
-    issueCommentTrigger('(?i)^/run\\s+(?:apm-beats-update\\W+)?.*')
+    issueCommentTrigger('(?i).*/run\\s+(?:apm-beats-update\\W+)?.*')
     upstream("Beats/beats/${ env.JOB_BASE_NAME.startsWith('PR-') ? 'none' : env.JOB_BASE_NAME }")
   }
   stages {
