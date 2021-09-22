@@ -40,11 +40,16 @@ type InputConfig struct {
 	Name       string                  `config:"name"`
 	Type       string                  `config:"type"`
 	Datastream DatastreamConfig        `config:"data_stream"` // Datastream configuration
-	Streams    []StreamConfig          `config:"streams"`
 	Processors processors.PluginConfig `config:"processors"`
-	Platform   string                  `config:"iplatform"` // restrict all queries to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
-	Version    string                  `config:"iversion"`  // only run the queries with osquery versions greater than or equal-to this version string
-	Discovery  []string                `config:"discovery"` // a list of discovery queries https://osquery.readthedocs.io/en/stable/deployment/configuration/#discovery-queries
+
+	// Full Osquery configuration
+	Osquery *OsqueryConfig `config:"osquery"`
+
+	// Deprecated
+	Streams   []StreamConfig `config:"streams"`
+	Platform  string         `config:"iplatform"` // restrict all queries to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
+	Version   string         `config:"iversion"`  // only run the queries with osquery versions greater than or equal-to this version string
+	Discovery []string       `config:"discovery"` // a list of discovery queries https://osquery.readthedocs.io/en/stable/deployment/configuration/#discovery-queries
 }
 
 type Config struct {
@@ -58,4 +63,15 @@ func Datastream(namespace string) string {
 		namespace = DefaultNamespace
 	}
 	return datastreamPrefix + namespace
+}
+
+// GetOsqueryOptions Returns options from the first input if available
+func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
+	if len(inputs) == 0 {
+		return nil
+	}
+	if inputs[0].Osquery == nil {
+		return nil
+	}
+	return inputs[0].Osquery.Options
 }

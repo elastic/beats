@@ -111,17 +111,15 @@ func (r *Resource) GenerateK8s(kind string, obj kubernetes.Resource, options ...
 	}
 
 	// Add controller metadata if present
-	if r.config.IncludeCreatorMetadata {
-		for _, ref := range accessor.GetOwnerReferences() {
-			if ref.Controller != nil && *ref.Controller {
-				switch ref.Kind {
-				// TODO grow this list as we keep adding more `state_*` metricsets
-				case "Deployment",
-					"ReplicaSet",
-					"StatefulSet",
-					"DaemonSet":
-					safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
-				}
+	for _, ref := range accessor.GetOwnerReferences() {
+		if ref.Controller != nil && *ref.Controller {
+			switch ref.Kind {
+			// TODO grow this list as we keep adding more `state_*` metricsets
+			case "Deployment",
+				"ReplicaSet",
+				"StatefulSet",
+				"DaemonSet":
+				safemapstr.Put(meta, strings.ToLower(ref.Kind)+".name", ref.Name)
 			}
 		}
 	}
