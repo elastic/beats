@@ -28,7 +28,7 @@ import (
 	"github.com/magefile/mage/sh"
 )
 
-// KubectlApply applys the manifest file to the kubernetes cluster.
+// KubectlApply applies the manifest file to the kubernetes cluster.
 //
 // KUBECONFIG must be in `env` to target a specific cluster.
 func KubectlApply(env map[string]string, stdout, stderr io.Writer, filepath string) error {
@@ -60,7 +60,7 @@ func KubectlDelete(env map[string]string, stdout, stderr io.Writer, filepath str
 	return err
 }
 
-// KubectlApplyInput applys the manifest string to the kubernetes cluster.
+// KubectlApplyInput applies the manifest string to the kubernetes cluster.
 //
 // KUBECONFIG must be in `env` to target a specific cluster.
 func KubectlApplyInput(env map[string]string, stdout, stderr io.Writer, manifest string) error {
