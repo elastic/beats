@@ -3,12 +3,15 @@
 
 == Apache module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses access and error logs created by the
 https://httpd.apache.org/[Apache HTTP] server.
 
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
+
 
 [float]
 === Compatibility
