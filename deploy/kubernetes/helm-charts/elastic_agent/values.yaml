@@ -1,0 +1,67 @@
+# Default values for elastic-agent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  name: docker.elastic.co/beats/elastic-agent
+  tag: 7.12.0-SNAPSHOT
+  pullPolicy: IfNotPresent
+  args: [ "-e", "-d", "*" ]
+
+daemonset:
+  enabled: true
+  labels:
+    type: daemonset
+
+deployment:
+  enabled: true
+  labels:
+      type: deployment
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+# podSecurityContext:
+#   fsGroup: 1000
+#   runAsUser: 1000
+
+securityContext:
+  runAsUser: 0
+
+labels:
+  app.kubernetes.io/app: agent-ingest-management-nodescope
+  app.kubernetes.io/group: ingest-management
+
+extraEnvs:
+  - name: FLEET_ENROLL
+    value: "1"
+  # Use enrollment key of node scope configuration to distinguish node scope datasets
+  - name: FLEET_ENROLLMENT_TOKEN
+    value:
+  - name: KIBANA_HOST
+    value: "http://kibana:5601"
+
+resources:
+  limits:
+    memory: 1Gi
+  requests:
+    cpu: 300m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
