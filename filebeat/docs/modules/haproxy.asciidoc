@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == haproxy module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses logs from a (`haproxy`) process.
 
 include::../include/what-happens.asciidoc[]

@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Traefik module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module parses access logs created by
 https://traefik.io/[Træfik].
 

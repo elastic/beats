@@ -3,6 +3,8 @@
 
 == MongoDB module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses logs created by
 https://www.mongodb.com/[MongoDB].
 

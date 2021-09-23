@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Sophos module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Sophos Products, currently it accepts
 logs in syslog format or from a file for the following devices:
 
