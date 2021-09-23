@@ -87,7 +87,7 @@
 - Add "_monitoring" suffix to monitoring instance names to remove ambiguity with the status command. {issue}25449[25449]
 - Ignore ErrNotExists when fixing permissions. {issue}27836[27836] {pull}27846[27846]
 - Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
-- Fix issue where --insecure didn't propogate to Fleet Server ES connection. {pull}27969[27969]
+- Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
 
 ==== New features
 
