@@ -54,7 +54,7 @@
   alias6: true
   alias: true
 
-- from: docker.container.labels # TODO: How to map these?
+- from: docker.container.labels  # TODO: How to map these?
   to: container.labels
   alias6: false
   alias: true
@@ -115,8 +115,8 @@
 
 - from: source
   to:
-    - log.file.path
-    - log.source.address
+  - log.file.path
+  - log.source.address
   alias: false
   beat: filebeat
 
@@ -428,7 +428,7 @@
   beat: filebeat
 
 - from: suricata.eve.timestamp
-  to: "@timestamp"
+  to: '@timestamp'
   alias: true
   beat: filebeat
 
@@ -476,7 +476,7 @@
   beat: filebeat
 
 - from: system.auth.timestamp
-  to: "@timestamp"
+  to: '@timestamp'
   alias: true
   beat: filebeat
 
@@ -557,6 +557,155 @@
 
 - from: system.auth.ssh.geoip.region_iso_code
   to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+## Apache module
+
+- from: apache2.access.remote_ip
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_name
+  to: user.name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.method
+  to: http.request.method
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.url
+  to: url.original
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.http_version
+  to: http.version
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.response_code
+  to: http.response.status_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.referrer
+  to: http.request.referrer
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.agent
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.body_sent.bytes
+  to: http.response.body.bytes
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.continent_name
+  to: source.geo.continent_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.country_iso_code
+  to: source.geo.country_iso_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.location
+  to: source.geo.location
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.region_name
+  to: source.geo.region_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.city_name
+  to: source.geo.city_name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.geoip.region_iso_code
+  to: source.geo.region_iso_code
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_agent.original
+  to: user_agent.original
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.device
+  to: user_agent.device.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.name
+  to: user_agent.name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.os
+  to: user_agent.os.full_name
+  alias: true
+  beat: filebeat
+- from: apache2.access.user_agent.os_name
+  to: user_agent.os.name
+  alias: true
+  beat: filebeat
+
+- from: apache2.access.user_agent.major
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.minor
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.patch
+  to: user_agent.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_major
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_minor
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+- from: apache2.access.user_agent.os_patch
+  to: user_agent.os.version
+  alias: false
+  beat: filebeat
+
+### Error fileset
+- from: apache2.error.message
+  to: message
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.level
+  to: log.level
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.client
+  to: source.address
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.pid
+  to: process.pid
+  alias: true
+  beat: filebeat
+
+- from: apache2.error.tid
+  to: process.thread.id
   alias: true
   beat: filebeat
 
@@ -1599,6 +1748,7 @@
   alias: true
   beat: metricbeat
 
+
 ### Redis
 
 - from: php_fpm.status.pid
@@ -1872,7 +2022,7 @@
 - from: method
   to: http.request.method
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 - from: path
@@ -1883,7 +2033,7 @@
 - from: real_ip
   to: network.forwarded_ip
   alias: false
-  comment: Field is used by serveral protocols.
+  comment: Field is used by several protocols.
   beat: packetbeat
 
 ## MySQL
@@ -1891,7 +2041,7 @@
   to: status
   alias: false
   comment: >
-    Status reflects whether or not an error occured. Its values are either
+    Status reflects whether or not an error occurred. Its values are either
     OK or Error.
   beat: packetbeat
 
