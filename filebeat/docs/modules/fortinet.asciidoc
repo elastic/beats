@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Fortinet module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Fortinet logs sent in the syslog format. It supports the
 following devices:
 
