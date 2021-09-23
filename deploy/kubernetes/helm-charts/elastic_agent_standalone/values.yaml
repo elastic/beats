@@ -1,0 +1,67 @@
+# Default values for elastic-agent.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  name: docker.elastic.co/beats/elastic-agent
+  tag: 7.13.0-SNAPSHOT
+  pullPolicy: Always
+  args: [
+    "-c", "/etc/agent.yml",
+    "-e"
+    ]
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+# podSecurityContext:
+#   fsGroup: 1000
+#   runAsUser: 1000
+
+securityContext:
+  runAsUser: 0
+
+labels:
+  app.kubernetes.io/name: elastic-agent
+
+extraEnvs:
+  - name: ELASTICSEARCH_USERNAME
+    value: "elastic"
+  - name: ELASTICSEARCH_PASSWORD
+    value: "changeme"
+  - name: ELASTICSEARCH_HOST
+    value: "http://elasticsearch:9200"
+
+resources:
+  limits:
+    memory: 1Gi
+  requests:
+    cpu: 300m
+    memory: 500Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+packages:
+  kubernetes: 0.5.2
+  log: 0.4.6
+  system: 0.12.7
+
+fields:
+  ecs:
+    version: 1.9.0

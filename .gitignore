@@ -1,9 +1,11 @@
 # Directories
+.venv
 /.vagrant
 /.idea
 /.vscode
 /build
 /*/*.template*.json
+__pycache__
 **/html_docs
 *beat/fields.yml
 *beat/_meta/kibana.generated

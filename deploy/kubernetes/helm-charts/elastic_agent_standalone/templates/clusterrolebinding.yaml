@@ -1,0 +1,48 @@
+---
+{{- if .Values.serviceAccount.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: {{ template "elastic-agent.serviceAccountName" . }}-cluster-role-binding
+  labels:
+    app: "{{ template "elastic-agent.fullname" . }}"
+    chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+    heritage: {{ .Release.Service | quote }}
+    release: {{ .Release.Name | quote }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "elastic-agent.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ template "elastic-agent.serviceAccountName" . }}-cluster-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: {{ template "elastic-agent.serviceAccountName" . }}-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "elastic-agent.serviceAccountName" . }}
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: {{ template "elastic-agent.serviceAccountName" . }}-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "elastic-agent.serviceAccountName" . }}-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "elastic-agent.serviceAccountName" . }}
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: {{ template "elastic-agent.serviceAccountName" . }}-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
+{{- end -}}

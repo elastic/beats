@@ -1,0 +1,11 @@
+atomicwrites==1.4.0
+attrs==21.2.0
+importlib-metadata==4.8.1
+more-itertools==8.10.0
+pluggy==1.0.0
+py==1.10.0
+pytest==6.2.5
+PyYAML==5.4.1
+setuptools==58.1.0
+six==1.16.0
+zipp==3.5.0
