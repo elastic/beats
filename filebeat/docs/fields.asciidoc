@@ -85190,24 +85190,6 @@ Kafka log lines.
 
 
 
-*`kafka.log.level`*::
-+
---
-type: alias
-
-alias to: log.level
-
---
-
-*`kafka.log.message`*::
-+
---
-type: alias
-
-alias to: message
-
---
-
 *`kafka.log.component`*::
 +
 --
@@ -85621,18 +85603,6 @@ Kubernetes container name (different than the name from the runtime)
 
 
 type: keyword
-
---
-
-*`kubernetes.container.image`*::
-+
---
-Kubernetes container image
-
-
-type: alias
-
-alias to: container.image.name
 
 --
 

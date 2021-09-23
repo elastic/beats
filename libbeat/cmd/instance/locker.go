@@ -44,7 +44,7 @@ func newLocker(b *Beat) *locker {
 	}
 }
 
-// lock attemps to acquire a lock on the data path for the currently-running
+// lock attempts to acquire a lock on the data path for the currently-running
 // Beat instance. If another Beats instance already has a lock on the same data path
 // an ErrAlreadyLocked error is returned.
 func (l *locker) lock() error {
