@@ -70,6 +70,7 @@ type kafkaConfig struct {
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
+	EnableIdempotent         bool                      `config:"enable_idempotent"`
 }
 
 type metaConfig struct {
@@ -250,6 +251,12 @@ func newSaramaConfig(log *logp.Logger, config *kafkaConfig) (*sarama.Config, err
 
 	k.Producer.Return.Successes = true // enable return channel for signaling
 	k.Producer.Return.Errors = true
+
+	if config.EnableIdempotent {
+		k.Producer.Idempotent = true
+		k.Net.MaxOpenRequests = 1
+		k.Producer.RequiredAcks = sarama.WaitForAll
+	}
 
 	// have retries being handled by libbeat, disable retries in sarama library
 	retryMax := config.MaxRetries
