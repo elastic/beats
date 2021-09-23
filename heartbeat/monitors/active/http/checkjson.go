@@ -19,6 +19,7 @@ type jsonChecker func(interface{}) bool
 type compiledJSONCheck struct {
 	description string
 	check       jsonChecker
+	source      string
 }
 
 func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
@@ -46,7 +47,12 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return matches
 			}
 
-			expressionChecks = append(expressionChecks, compiledJSONCheck{check.Description, checkFn})
+			logp.Warn("Add expression: %s\n", check.Expression)
+			expressionChecks = append(expressionChecks, compiledJSONCheck{
+				description: check.Description,
+				check:       checkFn,
+				source:      check.Expression,
+			})
 		} else if check.Condition != nil {
 			cond, err := conditions.NewCondition(check.Condition)
 			if err != nil {
@@ -61,7 +67,11 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 					return false
 				}
 			}
-			conditionChecks = append(conditionChecks, compiledJSONCheck{check.Description, checkFn})
+			conditionChecks = append(conditionChecks, compiledJSONCheck{
+				description: check.Description,
+				check:       checkFn,
+				source:      fmt.Sprintf("%v", check.Condition),
+			})
 		}
 	}
 
@@ -73,7 +83,6 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 				return err
 			}
 			validationFailures = append(validationFailures, runCompiledJSONChecks(decoded, expressionChecks)...)
-
 		}
 
 		if len(conditionChecks) > 0 {
@@ -136,7 +145,7 @@ func runCompiledJSONChecks(decodedBody interface{}, compiledChecks []compiledJSO
 	for _, compiledCheck := range compiledChecks {
 		ok := compiledCheck.check(decodedBody)
 		if !ok {
-			errorDescs = append(errorDescs, fmt.Sprintf("rule '%s' not matched", compiledCheck.description))
+			errorDescs = append(errorDescs, fmt.Sprintf("rule '%s'(%s) not matched.", compiledCheck.description, compiledCheck.source))
 		}
 	}
 
