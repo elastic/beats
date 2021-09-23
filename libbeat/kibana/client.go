@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
@@ -38,7 +39,9 @@ import (
 )
 
 var (
-	MinimumRequiredVersionSavedObjects = common.MustNewVersion("7.15.0")
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	MinimumRequiredVersionSavedObjects = common.MustNewVersion("7.14.0")
 )
 
 type Connection struct {
@@ -214,6 +217,7 @@ func (conn *Connection) SendWithContext(ctx context.Context, method, extraPath s
 	addHeaders(req.Header, headers)
 
 	contentType := req.Header.Get("Content-Type")
+	contentType, _, _ = mime.ParseMediaType(contentType)
 	if contentType != "multipart/form-data" && contentType != "application/ndjson" {
 		req.Header.Set("Content-Type", "application/json")
 	}

@@ -29,7 +29,7 @@ func TestConfig(t *testing.T) {
 		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
 			QueueURL:            quequeURL,
-			Bucket:              s3Bucket,
+			BucketARN:           s3Bucket,
 			APITimeout:          120 * time.Second,
 			VisibilityTimeout:   300 * time.Second,
 			SQSMaxReceiveCount:  5,
@@ -69,7 +69,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":            s3Bucket,
+				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 			},
 			"",
@@ -109,10 +109,10 @@ func TestConfig(t *testing.T) {
 			"",
 			"",
 			common.MapStr{
-				"queue_url": "",
-				"bucket":    "",
+				"queue_url":  "",
+				"bucket_arn": "",
 			},
-			"queue_url or bucket must provided",
+			"queue_url or bucket_arn must provided",
 			nil,
 		},
 		{
@@ -120,10 +120,10 @@ func TestConfig(t *testing.T) {
 			queueURL,
 			s3Bucket,
 			common.MapStr{
-				"queue_url": queueURL,
-				"bucket":    s3Bucket,
+				"queue_url":  queueURL,
+				"bucket_arn": s3Bucket,
 			},
-			"queue_url <https://example.com> and bucket <arn:aws:s3:::aBucket> cannot be set at the same time",
+			"queue_url <https://example.com> and bucket_arn <arn:aws:s3:::aBucket> cannot be set at the same time",
 			nil,
 		},
 		{
@@ -164,7 +164,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":               s3Bucket,
+				"bucket_arn":           s3Bucket,
 				"bucket_list_interval": "0",
 			},
 			"bucket_list_interval <0s> must be greater than 0",
@@ -175,7 +175,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":            s3Bucket,
+				"bucket_arn":        s3Bucket,
 				"number_of_workers": "0",
 			},
 			"number_of_workers <0> must be greater than 0",
@@ -231,7 +231,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":                       s3Bucket,
+				"bucket_arn":                   s3Bucket,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
 			},
