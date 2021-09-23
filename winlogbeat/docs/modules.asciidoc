@@ -22,6 +22,9 @@ a `script` processor to your configuration file and point it at the included
 script file for the module. The documentation for each module includes an
 example.
 
+NOTE: The provided modules only support events in English. For more information
+about how to configure the language in `winlogbeat`, refer to <<configuration-winlogbeat-options>>.
+
 [float]
 === Usage with Forwarded Events
 
@@ -34,6 +37,7 @@ script processors that are guarded by a conditional `when` statement.
 winlogbeat.event_logs:
 - name: ForwardedEvents
   tags: [forwarded]
+  language: 0x0409 # en-US
   processors:
     - script:
         when.equals.winlog.channel: Security
