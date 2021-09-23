@@ -41,7 +41,7 @@ func init() {
 const ErrorSharingViolation syscall.Errno = 32
 
 func TestEventReader(t *testing.T) {
-	t.Skip("Flaky test: about 1/10 of bulds fails https://github.com/elastic/beats/issues/21302")
+	t.Skip("Flaky test: about 1/10 of builds fails https://github.com/elastic/beats/issues/21302")
 	// Make dir to monitor.
 	dir, err := ioutil.TempDir("", "audit")
 	if err != nil {
@@ -241,7 +241,7 @@ func TestEventReader(t *testing.T) {
 }
 
 func TestRaces(t *testing.T) {
-	t.Skip("Flaky test: about 1/20 of bulds fails https://github.com/elastic/beats/issues/21303")
+	t.Skip("Flaky test: about 1/20 of builds fails https://github.com/elastic/beats/issues/21303")
 	const (
 		fileMode os.FileMode = 0640
 		N                    = 100
