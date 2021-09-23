@@ -5,29 +5,29 @@
 			"namespace": "default"
 		},
 		"MetricSetFields": {
-			"name": "hello-1578512100",
 			"completions": {
 				"desired": 1
+			},
+			"name": "hello-1578512100",
+			"owner": {
+				"is_controller": "true",
+				"kind": "CronJob",
+				"name": "hello"
 			},
 			"parallelism": {
 				"desired": 1
 			},
 			"pods": {
-				"succeeded": 1,
+				"active": 0,
 				"failed": 0,
-				"active": 0
-			},
-			"owner": {
-				"kind": "CronJob",
-				"name": "hello",
-				"is_controller": "true"
-			},
-			"time": {
-				"created": "2020-01-08T19:35:00.000Z",
-				"completed": "2020-01-08T19:35:04.000Z"
+				"succeeded": 1
 			},
 			"status": {
 				"complete": "true"
+			},
+			"time": {
+				"completed": "2020-01-08T19:35:04.000Z",
+				"created": "2020-01-08T19:35:00.000Z"
 			}
 		},
 		"Index": "",
