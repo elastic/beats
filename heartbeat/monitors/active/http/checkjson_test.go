@@ -102,7 +102,7 @@ func TestCheckJsonExpression(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON(
+			checker, err := checkJson(
 				[]*jsonResponseCheck{
 					{
 						Description: test.description,
@@ -205,7 +205,7 @@ func TestCheckJsonCondition(t *testing.T) {
 				log.Fatal(err)
 			}
 
-			checker, err := checkJSON([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
+			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)
 			body, err := ioutil.ReadAll(res.Body)
 			require.NoError(t, err)

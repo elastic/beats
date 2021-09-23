@@ -94,7 +94,7 @@ func makeValidateResponse(config *responseParameters) (multiValidator, error) {
 	}
 
 	if len(config.RecvJSON) > 0 {
-		jsonChecks, err := checkJSON(config.RecvJSON)
+		jsonChecks, err := checkJson(config.RecvJSON)
 		if err != nil {
 			return multiValidator{}, fmt.Errorf("could not load JSON check: %w", err)
 		}

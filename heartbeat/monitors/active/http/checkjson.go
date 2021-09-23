@@ -31,19 +31,18 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type jsonChecker func(interface{}) bool
-type compiledJSONCheck struct {
+type compiledJsonCheck struct {
 	description string
 	check       jsonChecker
 	source      string
 }
 
-func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
-	var conditionChecks []compiledJSONCheck
-	var expressionChecks []compiledJSONCheck
+func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
+	var expressionChecks []compiledJsonCheck
+	var conditionChecks []compiledJsonCheck
 
 	for _, check := range checks {
 		if check.Expression != "" && check.Condition != nil {
@@ -59,15 +58,14 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 			checkFn := func(d interface{}) bool {
 				matches, err := eval.EvalBool(context.Background(), d)
 				if err != nil {
-					logp.Warn("error matching JSON against boolean expression: '%v', %v: %v", check.Expression, matches, err)
+					// Conditions cannot match array root JSON responses
 					return false
 				}
 
 				return matches
 			}
 
-			logp.Warn("Add expression: %s\n", check.Expression)
-			expressionChecks = append(expressionChecks, compiledJSONCheck{
+			expressionChecks = append(expressionChecks, compiledJsonCheck{
 				description: check.Description,
 				check:       checkFn,
 				source:      check.Expression,
@@ -87,7 +85,7 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 					return false
 				}
 			}
-			conditionChecks = append(conditionChecks, compiledJSONCheck{
+			conditionChecks = append(conditionChecks, compiledJsonCheck{
 				description: check.Description,
 				check:       checkFn,
 				source:      fmt.Sprintf("%v", check.Condition),
@@ -95,10 +93,14 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 		}
 	}
 
+	return createJsonCheck(expressionChecks, conditionChecks), nil
+}
+
+func createJsonCheck(expressionChecks []compiledJsonCheck, conditionChecks []compiledJsonCheck) bodyValidator {
 	return func(_ *http.Response, body string) error {
 		var validationFailures []string
 		if len(expressionChecks) > 0 {
-			decoded, err := decodeJSON(body, false)
+			decoded, err := decodeJson(body, false)
 			if err != nil {
 				return err
 			}
@@ -106,7 +108,7 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 		}
 
 		if len(conditionChecks) > 0 {
-			decoded, err := decodeJSON(body, true)
+			decoded, err := decodeJson(body, true)
 			if err != nil {
 				// This should only err if the JSON is unparsable,
 				// so no need to handle returning 'errs' if this happens
@@ -129,10 +131,10 @@ func checkJSON(checks []*jsonResponseCheck) (bodyValidator, error) {
 		}
 
 		return nil
-	}, nil
+	}
 }
 
-func decodeJSON(body string, forCondition bool) (result interface{}, err error) {
+func decodeJson(body string, forCondition bool) (result interface{}, err error) {
 	decoder := json.NewDecoder(strings.NewReader(body))
 	// Condition checks need to convert the parsed numeric
 	// values in a way appropriate for the condition evaluator. GVal only works if
@@ -160,7 +162,7 @@ func decodeJSON(body string, forCondition bool) (result interface{}, err error) 
 	return result, nil
 }
 
-func runCompiledJSONChecks(decodedBody interface{}, compiledChecks []compiledJSONCheck) []string {
+func runCompiledJSONChecks(decodedBody interface{}, compiledChecks []compiledJsonCheck) []string {
 	var errorDescs []string
 	for _, compiledCheck := range compiledChecks {
 		ok := compiledCheck.check(decodedBody)

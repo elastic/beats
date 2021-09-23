@@ -290,11 +290,11 @@ The following configuration shows how to check the response using [gval](https:/
         expression: 'foo.bar == "myValue"'
 -------------------------------------------------------------------------------
 
-Expressions can be much more complex than simple equality. They can always use [jsonpath](https://goessner.net/articles/JsonPath/) syntax. Note that strings must be double quoted with `""` rather than single quoted with `''` in our variant of jsonpath. Jsonpath expressions must start with `$.`, for instance `'$.nodes[?(@.name=="myname")] != []'` will check that the `nodes` map has at least one value with the name 'myname'.
+Expressions can be much more complex than simple equality. They can also use [jsonpath](https://goessner.net/articles/JsonPath/) syntax. Note that strings must be double quoted with `"` rather than single quoted with `'` in the `gval` variant of jsonpath. Please note that jsonpath sub-expressions must start with `$.`, for instance `'$.nodes[?(@.name=="myname")] != []'` will check that the `nodes` map has at least one value with the name 'myname'.
 
-When working with responses that are returned in the form of a JSON array rather than an object jsonpath can be used as well. As an example `$.[0].foo == "bar"` tests that the first item in the response has an attribute `foo` that has the value "bar".
+When working with responses that are returned in the form of a JSON array at the root rather than an object jsonpath can be used as well. As an example `$.[0].foo == "bar"` tests that the first item in the response has an attribute `foo` that has the value "bar".
 
-The following configuration shows how to check the response using a legacy `condition` statement when the body contains JSON:
+JSON bodies can also be checked via the now deprecated `condition` option, which is not as powerful as `expression`. The following configuration shows how to check the response using a `condition` statement when the body contains JSON:
 
 [source,yaml]
 -------------------------------------------------------------------------------
