@@ -17,7 +17,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -68,22 +67,8 @@ type Config struct {
 	Namespace          string      `config:"namespace" validate:"nonzero,required"`
 	MetricName         []string    `config:"name"`
 	Dimensions         []Dimension `config:"dimensions"`
-	ResourceTypeFilter string      `config:"tags.resource_type_filter"` // Deprecated.
 	ResourceType       string      `config:"resource_type"`
 	Statistic          []string    `config:"statistic"`
-	Tags               []aws.Tag   `config:"tags"` // Deprecated.
-}
-
-// Validate checks for deprecated config options
-func (c Config) Validate() error {
-	if c.Tags != nil {
-		cfgwarn.Deprecate("8.0.0", "tags is deprecated. Use tags_filter instead")
-	}
-
-	if c.ResourceTypeFilter != "" {
-		cfgwarn.Deprecate("8.0.0", "tags.resource_type_filter is deprecated. Use resource_type instead")
-	}
-	return nil
 }
 
 type metricsWithStatistics struct {
@@ -318,13 +303,6 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 	resourceTypesWithTags := map[string][]aws.Tag{}
 
 	for _, config := range m.CloudwatchConfigs {
-		// If tags_filter on metricset level is given, overwrite tags in
-		// cloudwatch metrics with tags_filter.
-		tagsFilter := config.Tags
-		if m.MetricSet.TagsFilter != nil {
-			tagsFilter = m.MetricSet.TagsFilter
-		}
-
 		// If there is no statistic method specified, then use the default.
 		if config.Statistic == nil {
 			config.Statistic = defaultStatistics
@@ -358,9 +336,9 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 			if config.ResourceType != "" {
 				if _, ok := resourceTypesWithTags[config.ResourceType]; ok {
-					resourceTypesWithTags[config.ResourceType] = tagsFilter
+					resourceTypesWithTags[config.ResourceType] = m.MetricSet.TagsFilter
 				} else {
-					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], tagsFilter...)
+					resourceTypesWithTags[config.ResourceType] = append(resourceTypesWithTags[config.ResourceType], m.MetricSet.TagsFilter...)
 				}
 			}
 			continue
@@ -368,7 +346,7 @@ func (m *MetricSet) readCloudwatchConfig() (listMetricWithDetail, map[string][]n
 
 		configPerNamespace := namespaceDetail{
 			names:              config.MetricName,
-			tags:               tagsFilter,
+			tags:               m.MetricSet.TagsFilter,
 			statistics:         config.Statistic,
 			resourceTypeFilter: config.ResourceType,
 			dimensions:         cloudwatchDimensions,
