@@ -95,6 +95,7 @@ type Stats struct {
 	envRegexps  []match.Matcher // List of regular expressions used to whitelist env vars.
 	cgroups     *cgroup.Reader
 	logger      *logp.Logger
+	host        types.Host
 }
 
 // Ticks of CPU for a process
@@ -292,24 +293,12 @@ func GetOwnResourceUsageTimeInMillis() (int64, int64, error) {
 	return uTime, sTime, nil
 }
 
-var (
-	host types.Host
-	err  error
-)
-
-func init() {
-	host, err = sysinfo.Host()
-}
-
 func (procStats *Stats) getProcessEvent(process *Process) common.MapStr {
-
 	// This is a holdover until we migrate this library to metricbeat/internal
 	// At which point we'll use the memory code there.
 	var totalPhyMem uint64
-	if err != nil {
-		procStats.logger.Warnf("Getting host details: %v", err)
-	} else {
-		memStats, err := host.Memory()
+	if procStats.host != nil {
+		memStats, err := procStats.host.Memory()
 		if err != nil {
 			procStats.logger.Warnf("Getting memory details: %v", err)
 		} else {
@@ -435,6 +424,13 @@ func (procStats *Stats) matchProcess(name string) bool {
 // cannot be compiled.
 func (procStats *Stats) Init() error {
 	procStats.logger = logp.NewLogger("processes")
+
+	var err error
+	procStats.host, err = sysinfo.Host()
+	if err != nil {
+		procStats.logger.Warnf("Getting host details: %v", err)
+	}
+
 	procStats.ProcsMap = make(ProcsMap)
 
 	if len(procStats.Procs) == 0 {
