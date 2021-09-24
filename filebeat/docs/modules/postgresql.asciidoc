@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == PostgreSQL module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module  collects and parses logs created by
 https://www.postgresql.org/[PostgreSQL].
 
