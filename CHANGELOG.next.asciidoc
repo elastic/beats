@@ -731,6 +731,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Release checkpoint module as GA. {pull}27814[27814]
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
+- Add support for secondary object attribute handling {pull}28124[28124]
 
 *Heartbeat*
 

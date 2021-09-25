@@ -41,10 +41,21 @@ processors:
         - threatintel.misp.Galaxy
         - threatintel.misp.Attribute.Galaxy
         - threatintel.misp.Attribute.ShadowAttribute
-        - threatintel.misp.Object
         - threatintel.misp.EventReport
+        - threatintel.misp.Object.Attribute.Galaxy
+        - threatintel.misp.Object.Attribute.ShadowAttribute
         - message
       ignore_missing: true
+  - remove:
+      field:
+        - threatintel.misp.Attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.Attribute.size() == 0
+  - remove:
+      field:
+        - threatintel.misp.Object
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.Object.size() == 0
   - date:
       field: threatintel.misp.timestamp
       formats:
@@ -55,16 +66,20 @@ processors:
       target_field: threatintel.misp.attribute
       ignore_missing: true
   - rename:
+      field: threatintel.misp.Object
+      target_field: threatintel.misp.object
+      ignore_missing: true
+  - rename:
+      field: threatintel.misp.object.Attribute
+      target_field: threatintel.misp.object.attribute
+      ignore_missing: true
+  - rename:
       field: threatintel.misp.Orgc
       target_field: threatintel.misp.orgc
       ignore_missing: true
   - rename:
       field: threatintel.misp.Org
       target_field: threatintel.misp.org
-      ignore_missing: true
-  - rename:
-      field: threatintel.misp.Attribute
-      target_field: threatintel.misp.attribute
       ignore_missing: true
   - rename:
       field: threatintel.misp.Tag
@@ -96,7 +111,7 @@ processors:
   - set:
       field: threatintel.indicator.type
       value: file
-      if: "['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename')"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && (['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.threatintel?.misp?.attribute?.type) || ctx.threatintel?.misp?.attribute?.type.startsWith('filename'))"
   - rename:
       field: threatintel.misp.attribute.value
       target_field: "threatintel.indicator.file.hash.{{threatintel.misp.attribute.type}}"
@@ -112,17 +127,17 @@ processors:
       patterns:
         - "%{WORD}\\|%{WORD:_tmp.hashtype}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - grok:
       field: threatintel.misp.attribute.value
       patterns:
         - "%{DATA:threatintel.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
       ignore_missing: true
-      if: ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
+      if: ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|')
   - set:
       field: threatintel.indicator.file.hash.{{_tmp.hashtype}}
       value: "{{_tmp.hashvalue}}"
-      if: "ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
+      if: "ctx?.threatintel?.misp?.attribute?.type != null && ctx?.threatintel?.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
 
   ## URL/URI indicator operations
   - set:
@@ -288,6 +303,23 @@ processors:
         - threatintel.misp.attribute.value
       ignore_missing: true
       if: ctx?.threatintel?.indicator?.type != 'unknown'
+  - remove:
+      field:
+        - threatintel.misp.object.template_version
+        - threatintel.misp.object.template_uuid
+        - threatintel.misp.object.description
+        - threatintel.misp.object.distribution
+        - threatintel.misp.object.uuid
+        - threatintel.misp.object.deleted
+        - threatintel.misp.object.event_id
+        - threatintel.misp.object.sharing_group_id
+        - threatintel.misp.object.ObjectReference
+        - threatintel.misp.object.name
+        - threatintel.misp.object.meta-category
+        - threatintel.misp.object.comment
+        - threatintel.misp.object.id
+        - threatintel.misp.object.timestamp
+      ignore_missing: true
   - remove:
       field:
         - threatintel.misp.Attribute.timestamp

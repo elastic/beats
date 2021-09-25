@@ -34,7 +34,14 @@ response.split:
   target: body.response
   split:
     target: body.Event.Attribute
+    ignore_empty_value: true
     keep_parent: true
+    split:
+      target: body.Event.Object
+      keep_parent: true
+      split:
+        target: body.Event.Object.Attribute
+        keep_parent: true
 response.request_body_on_pagination: true
 response.pagination:
 - set:

@@ -103,6 +103,10 @@
     type: boolean
     description: >
       If the Organization Community was local or synced from a remote source.
+  - name: event_creator_email
+    type: keyword
+    description: >
+      The email of the creator of the event.
   - name: attribute.id
     type: keyword
     description: >
@@ -160,6 +164,66 @@
     description: >
       The type of relation the attribute has with the event object itself.
   - name: attribute.value
+    type: keyword
+    description: >
+      The value of the attribute, depending on the type like "url, sha1, email-src".
+  - name: object.attribute.id
+    type: keyword
+    description: >
+      The ID of the secondary attribute related to the event object.
+  - name: object.attribute.type
+    type: keyword
+    description: >
+      The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
+  - name: object.attribute.category
+    type: keyword
+    description: >
+      The category of the secondary attribute related to the event object. For example "Network Activity".
+  - name: object.attribute.to_ids
+    type: boolean
+    description: >
+      If the secondary attribute should be automatically synced with an IDS.
+  - name: object.attribute.uuid
+    type: keyword
+    description: >
+      The UUID of the secondary attribute related to the event.
+  - name: object.attribute.event_id
+    type: keyword
+    description: >
+      The local event ID of the secondary attribute related to the event.
+  - name: object.attribute.distribution
+    type: long
+    description: >
+      How the secondary attribute has been distributed, represented by integer numbers.
+  - name: object.attribute.timestamp
+    type: date
+    description: >
+      The timestamp in which the secondary attribute was attached to the event object.
+  - name: object.attribute.comment
+    type: keyword
+    description: >
+      Comments made to the secondary attribute itself.
+  - name: object.attribute.sharing_group_id
+    type: keyword
+    description: >
+      The group ID of the sharing group related to the specific secondary attribute.
+  - name: object.attribute.deleted
+    type: boolean
+    description: >
+      If the secondary attribute has been removed from the event object.
+  - name: object.attribute.disable_correlation
+    type: boolean
+    description: >
+      If correlation has been enabled on the secondary attribute related to the event object.
+  - name: object.attribute.object_id
+    type: keyword
+    description: >
+      The ID of the Object in which the secondary attribute is attached.
+  - name: object.attribute.object_relation
+    type: keyword
+    description: >
+      The type of relation the secondary attribute has with the event object itself.
+  - name: object.attribute.value
     type: keyword
     description: >
       The value of the attribute, depending on the type like "url, sha1, email-src".
