@@ -9,9 +9,8 @@
             "multiline"
         ],
         "log.level": "INFO",
-        "log.logger": "grpc_service.go",
+        "log.logger": "grpc_service.go:764",
         "log.offset": 0,
-        "log.origin.file.line": "764",
         "message": "update service GC safe point",
         "service.type": "tidb",
         "tidb.pd.expire-at": "-9223372035224211918",
@@ -19,7 +18,7 @@
         "tidb.pd.service-id": "gc_worker"
     },
     {
-        "@timestamp": "2021-09-16T04:12:14.284Z",
+        "@timestamp": "2021-09-26T07:47:15.241Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
@@ -33,7 +32,7 @@
         "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-16T04:12:14.285Z",
+        "@timestamp": "2021-09-26T07:47:15.242Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
@@ -47,7 +46,7 @@
         "service.type": "tidb"
     },
     {
-        "@timestamp": "2021-09-16T04:12:14.285Z",
+        "@timestamp": "2021-09-26T07:47:15.242Z",
         "event.dataset": "tidb.pd",
         "event.module": "tidb",
         "fileset.name": "pd",
@@ -70,9 +69,8 @@
             "multiline"
         ],
         "log.level": "WARN",
-        "log.logger": "retry_interceptor.go",
+        "log.logger": "retry_interceptor.go:61",
         "log.offset": 2054,
-        "log.origin.file.line": "61",
         "message": "retrying of unary invoker failed",
         "service.type": "tidb",
         "tidb.body": "[\"retrying of unary invoker failed\"] [target=endpoint://client-d87ffc6e-42b8-4b17-8ee1-712cfbc4b073/127.0.0.1:2379] [attempt=0] [error=\"rpc error: code = NotFound desc = etcdserver: requested lease not found\"]\ne-limit\\\":4,\\\"hot-region-cache-hits-threshold\\\":3,\\\"store-limit\\\":{},\\\"tolerant-size-ratio\\\":0,\\\"low-space-ratio\\\":0.8,\\\"high-space-ratio\\\":0.7,\\\"region-score-formula-version\\\":\\\"v2\\\",\\\"scheduler-max-waiting-operator\\\":5,\\\"enable-remove-down-replica\\\":\\\"true\\\",\\\"enable-replace-offline-replica\\\":\\\"true\\\",\\\"enable-make-up-replica\\\":\\\"true\\\",\\\"enable-remove-extra-replica\\\":\\\"true\\\",\\\"enable-location-replacement\\\":\\\"true\\\",\\\"enable-debug-metrics\\\":\\\"false\\\",\\\"enable-joint-consensus\\\":\\\"true\\\",\\\"schedulers-v2\\\":[{\\\"type\\\":\\\"balance-region\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"},{\\\"type\\\":\\\"balance-leader\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"},{\\\"type\\\":\\\"hot-region\\\",\\\"args\\\":null,\\\"disable\\\":false,\\\"args-payload\\\":\\\"\\\"}],\\\"schedulers-payload\\\":null,\\\"store-limit-mode\\\":\\\"manual\\\"},\\\"replication\\\":{\\\"max-replicas\\\":3,\\\"location-labels\\\":\\\"\\\",\\\"strictly-match-label\\\":\\\"false\\\",\\\"enable-placement-rules\\\":\\\"true\\\",\\\"isolation-level\\\":\\\"\\\"},\\\"pd-server\\\":{\\\"use-region-storage\\\":\\\"true\\\",\\\"max-gap-reset-ts\\\":\\\"24h0m0s\\\",\\\"key-type\\\":\\\"table\\\",\\\"runtime-services\\\":\\\"\\\",\\\"metric-storage\\\":\\\"\\\",\\\"dashboard-address\\\":\\\"auto\\\",\\\"trace-region-flow\\\":\\\"true\\\",\\\"flow-round-by-digit\\\":3},\\\"cluster-version\\\":\\\"0.0.0\\\",\\\"labels\\\":{},\\\"quota-backend-bytes\\\":\\\"8GiB\\\",\\\"auto-compaction-mode\\\":\\\"periodic\\\",\\\"auto-compaction-retention-v2\\\":\\\"1h\\\",\\\"TickInterval\\\":\\\"500ms\\\",\\\"ElectionInterval\\\":\\\"3s\\\",\\\"PreVote\\\":true,\\\"security\\\":{\\\"cacert-path\\\":\\\"\\\",\\\"cert-path\\\":\\\"\\\",\\\"key-path\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null,\\\"redact-info-log\\\":false,\\\"encryption\\\":{\\\"data-encryption-method\\\":\\\"plaintext\\\",\\\"data-key-rotation-period\\\":\\\"168h0m0s\\\",\\\"master-key\\\":{\\\"type\\\":\\\"plaintext\\\",\\\"key-id\\\":\\\"\\\",\\\"region\\\":\\\"\\\",\\\"endpoint\\\":\\\"\\\",\\\"path\\\":\\\"\\\"}}},\\\"label-property\\\":null,\\\"WarningMsgs\\\":null,\\\"DisableStrictReconfigCheck\\\":false,\\\"HeartbeatStreamBindInterval\\\":\\\"1m0s\\\",\\\"LeaderPriorityCheckInterval\\\":\\\"1m0s\\\",\\\"dashboard\\\":{\\\"tidb-cacert-path\\\":\\\"\\\",\\\"tidb-cert-path\\\":\\\"\\\",\\\"tidb-key-path\\\":\\\"\\\",\\\"public-path-prefix\\\":\\\"\\\",\\\"internal-proxy\\\":false,\\\"enable-telemetry\\\":true,\\\"enable-experimental\\\":false},\\\"replication-mode\\\":{\\\"replication-mode\\\":\\\"majority\\\",\\\"dr-auto-sync\\\":{\\\"label-key\\\":\\\"\\\",\\\"primary\\\":\\\"\\\",\\\"dr\\\":\\\"\\\",\\\"primary-replicas\\\":0,\\\"dr-replicas\\\":0,\\\"wait-store-timeout\\\":\\\"1m0s\\\",\\\"wait-sync-timeout\\\":\\\"1m0s\\\",\\\"wait-async-timeout\\\":\\\"2m0s\\\"}}}\"]",
@@ -86,9 +84,8 @@
         "fileset.name": "pd",
         "input.type": "log",
         "log.level": "INFO",
-        "log.logger": "server.go",
+        "log.logger": "server.go:194",
         "log.offset": 4733,
-        "log.origin.file.line": "194",
         "message": "register REST path",
         "service.type": "tidb",
         "tidb.pd.path": "/pd/api/v1"
@@ -103,9 +100,8 @@
             "multiline"
         ],
         "log.level": "INFO",
-        "log.logger": "server.go",
+        "log.logger": "server.go:194",
         "log.offset": 4830,
-        "log.origin.file.line": "194",
         "message": "register REST path",
         "service.type": "tidb",
         "tidb.pd.path": "/swagger/"
@@ -117,9 +113,8 @@
         "fileset.name": "pd",
         "input.type": "log",
         "log.level": "INFO",
-        "log.logger": "grpc_service.go",
+        "log.logger": "grpc_service.go:716",
         "log.offset": 4927,
-        "log.origin.file.line": "716",
         "message": "updated gc safe point",
         "service.type": "tidb",
         "tidb.pd.safe-point": "427442855390216192"

@@ -42,9 +42,9 @@
       # These processors will be appended after default processors:
       #processors:
 
-    ###########################################################
-
-    # The configuration items are exactly the same for each fileset listed below.
+  ###############################################################################
+  # The configuration items are exactly the same for each fileset listed below. #
+  ###############################################################################
 
   slowlog:
     enabled: false

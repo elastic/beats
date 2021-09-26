@@ -80,8 +80,9 @@ processors:
                         continue
                     }
                     // try to parse other fields to numbers
-                    if (isSimpleNumber(v)) {
-                        safePut(k, parseFloat(v))
+                    var asFloat = parseFloat(v);
+                    if (String(asFloat).length === v.length) {
+                        safePut(k, asFloat)
                     } else {
                         safePut(k, v)
                     }
@@ -94,11 +95,15 @@ processors:
             event.Delete("message")
             return event
         }
-
-        function isSimpleNumber(str) {
-            if (typeof str != "string") return false
-            return !isNaN(str) && !isNaN(parseFloat(str))
-        }
+  - timestamp:
+      field: 'tidb.slowlog.Time'
+      ignore_missing: true
+      layouts:
+        - '2006-01-02T15:04:05.999999999-07:00'
+        - '2006-01-02T15:04:05.999999999Z'
+      test:
+        - '2021-09-14T14:51:17.924860038+08:00'
+        - '2021-07-27T08:48:41.65181068Z'
   - add_fields:
       target: ''
       fields:

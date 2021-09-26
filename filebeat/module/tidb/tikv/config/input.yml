@@ -21,7 +21,7 @@ processors:
 {{ end }}
   - add_cloud_metadata: ~
   - dissect:
-      tokenizer: '[%{time}] [%{log.level}] [%{log.logger}:%{log.origin.file.line}] %{tidb.body}'
+      tokenizer: '[%{time}] [%{log.level}] [%{log.logger}] %{tidb.body}'
       field: "message"
       target_prefix: ""
       ignore_failure: true
