@@ -1,0 +1,110 @@
+type: {{.deployment}}
+
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+
+multiline:
+  type: pattern
+  pattern: '^# Time: '
+  negate: true
+  match: after
+
+processors:
+{{ if eq .deployment "container" }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+  - add_cloud_metadata: ~
+  - script:
+      lang: javascript
+      id: tidb_slow_log_parser
+      params: { }
+      source: >
+        var params = {
+            lineRegex: /[^\r\n]+/g,
+            kvRegex: /(\S+): (\S+)/g,
+            keyPrefix: "tidb.slowlog."
+        };
+
+        function register(scriptParams) {
+            params = scriptParams;
+        }
+
+        function process(event) {
+            // get the message
+            var m0 = event.Get("message")
+            if (m0 === null) {
+                event.Cancel();
+                return;
+            }
+
+            // split lines
+            var lines = m0.match(params.lineRegex);
+            if (lines.length < 3) {
+                event.Cancel();
+                return;
+            }
+
+            function safePut(k, v) {
+                event.Put(params.keyPrefix + k, v)
+            }
+
+            // a var handling multiline query
+            var query = ""
+
+            // extract k-v's
+            for (var i = 0; i < lines.length; i++) {
+                // for each line in a slow log
+                // if a line does not start with a "#" char, treat it as a part of query
+                if (lines[i].lastIndexOf("#", 0) !== 0) {
+                    query = query + lines[i]
+                    continue
+                }
+                var match;
+                while (match = params.kvRegex.exec(lines[i])) {
+                    // for each k-v in a line
+                    if (match.length !== 3) {
+                        event.Cancel();
+                        return;
+                    }
+                    var k = match[1]
+                    var v = match[2]
+                    if (k === "Txn_start_ts" || k === "Conn_ID") {
+                        // no need to parse special keys
+                        safePut(k, v)
+                        continue
+                    }
+                    // try to parse other fields to numbers
+                    var asFloat = parseFloat(v);
+                    if (String(asFloat).length === v.length) {
+                        safePut(k, asFloat)
+                    } else {
+                        safePut(k, v)
+                    }
+                }
+            }
+
+            // put the final query
+            safePut("Query", query)
+
+            event.Delete("message")
+            return event
+        }
+  - timestamp:
+      field: 'tidb.slowlog.Time'
+      ignore_missing: true
+      layouts:
+        - '2006-01-02T15:04:05.999999999-07:00'
+        - '2006-01-02T15:04:05.999999999Z'
+      test:
+        - '2021-09-14T14:51:17.924860038+08:00'
+        - '2021-07-27T08:48:41.65181068Z'
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.11.0

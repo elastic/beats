@@ -1,0 +1,10 @@
+- name: tiflash
+  type: group
+  description: >
+    Contains fields from the TiFlash instance logs.
+  fields:
+    - name: '*'
+      type: keyword
+      description: >
+        Log fields defined in the application. The type of values are always string.
+        You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.

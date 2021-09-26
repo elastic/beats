@@ -1,0 +1,285 @@
+- name: slowlog
+  type: group
+  description: >
+    Contains fields from the TiDB slow logs.
+  fields:
+    - name: Time
+      type: date_nanos
+      description: >
+        The print time of log.
+    - name: Query_time
+      type: double
+      description: >
+        The execution time of a statement.
+    - name: Optimize_time
+      type: double
+      description: >
+    - name: Wait_TS
+      type: double
+      description: >
+    - name: Num_cop_tasks
+      type: double
+      description: >
+    - name: Parse_time
+      type: double
+      description: >
+        The parsing time for the statement.
+    - name: Compile_time
+      type: double
+      description: >
+        The duration of the query optimization.
+    - name: Query
+      type: text
+      description: >
+        A SQL statement. This field is not printed as a key in the slow log.
+        It is the last line of the slow log.
+    - name: Prev_stmt
+      type: text
+      description: >
+    - name: Digest
+      type: keyword
+      description: >
+        The fingerprint of the SQL statement.
+    - name: Stats
+      type: keyword
+      description: >
+    - name: Txn_start_ts
+      type: keyword
+      description: >
+        The start timestamp and the unique ID of a transaction.
+        You can use this value to search for the transaction-related logs.
+    - name: Is_internal
+      type: boolean
+      description: >
+        Whether a SQL statement is TiDB internal.
+        True indicates that a SQL statement is executed internally in TiDB
+        and false indicates that a SQL statement is executed by the user.
+    - name: Index_ids
+      type: keyword
+      description: >
+        The IDs of the indexes involved in a statement.
+    - name: Succ
+      type: boolean
+      description: >
+        Whether a statement is executed successfully.
+    - name: Backoff_time
+      type: double
+      description: >
+        The waiting time before retry when a statement encounters errors that require a retry.
+        The common errors as such include: lock occurs, Region split, and TiKV server is busy.
+    - name: LockKeys_time
+      type: double
+      description: >
+    - name: Plan
+      type: keyword
+      description: >
+        The execution plan of the statement.
+        Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
+    - name: Plan_digest
+      type: keyword
+      description: >
+    - name: Prepared
+      type: boolean
+      description: >
+        Whether this statement is a Prepare or Execute request or not.
+    - name: Plan_from_cache
+      type: boolean
+      description: >
+        Whether this statement hits the execution plan cache.
+    - name: Plan_from_binding
+      type: boolean
+      description: >
+    - name: Has_more_results
+      type: boolean
+      description: >
+    - name: Rewrite_time
+      type: double
+      description: >
+        The time consumed for rewriting the query of this statement.
+    - name: Preproc_subqueries
+      type: double
+      description: >
+        The number of subqueries (in the statement) that are executed in advance.
+        For example, the where id in (select if from t) subquery might be executed in advance.
+    - name: Preproc_subqueries_time
+      type: double
+      description: >
+        The time consumed for executing the subquery of this statement in advance.
+    - name: Exec_retry_count
+      type: double
+      description:
+        The retry times of this statement.
+        This field is usually for pessimistic transactions in which the statement is retried when the lock is failed.
+    - name: Exec_retry_time
+      type: double
+      description: >
+        The execution retry duration of this statement.
+        For example, if a statement has been executed three times in total (failed for the first two times),
+        Exec_retry_time means the total duration of the first two executions.
+        The duration of the last execution is Query_time minus Exec_retry_time.
+    - name: Prewrite_time
+      type: double
+      description: >
+        The duration of the first phase (prewrite) of the two-phase transaction commit.
+    - name: Wait_prewrite_binlog_time
+      type: double
+      description: >
+    - name: Commit_time
+      type: double
+      description: >
+        The duration of the second phase (commit) of the two-phase transaction commit.
+    - name: Get_commit_ts_time
+      type: double
+      description: >
+        The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
+    - name: Commit_backoff_time
+      type: double
+      description: >
+    - name: Backoff_types
+      type: keyword
+      description: >
+    - name: Resolve_lock_time
+      type: double
+      description: >
+    - name: Local_latch_wait_time
+      type: double
+      description: >
+        The time that TiDB spends on waiting for the lock before the second phase (commit) of the two-phase transaction commit.
+    - name: Write_keys
+      type: double
+      description: >
+        The count of keys that the transaction writes to the Write CF in TiKV.
+    - name: Write_size
+      type: double
+      description: >
+        The total size of the keys or values to be written when the transaction commits.
+    - name: Prewrite_region
+      type: double
+      description: >
+        The number of TiKV Regions involved in the first phase (prewrite) of the two-phase transaction commit.
+        Each Region triggers a remote procedure call.
+    - name: Txn_retry
+      type: double
+      description: >
+    - name: Cop_time
+      type: double
+      description: >
+    - name: Mem_max
+      type: double
+      description: >
+        The maximum memory space used during the execution period of a SQL statement (the unit is byte).
+    - name: Disk_max
+      type: double
+      description: >
+        The maximum disk space used during the execution period of a SQL statement (the unit is byte).
+    - name: User
+      type: keyword
+      description: >
+        The name of the user who executes this statement.
+    - name: User@Host
+      type: keyword
+      description: >
+        The name of the user who executes this statement.
+    - name: Conn_ID
+      type: keyword
+      description: >
+        The Connection ID (session ID). For example, you can use the keyword con:3 to search for the log whose session ID is 3.
+    - name: Host
+      type: keyword
+      description: >
+    - name: DB
+      type: keyword
+      description: >
+        The current database.
+    - name: Index_names
+      type: keyword
+      description: >
+    - name: Request_count
+      type: double
+      description: >
+        The number of Coprocessor requests that a statement sends.
+    - name: Total_keys
+      type: double
+      description: >
+        The number of keys that Coprocessor has scanned.
+    - name: KV_total
+      type: double
+      description: >
+    - name: PD_total
+      type: double
+      description: >
+    - name: Backoff_total
+      type: double
+      description: >
+    - name: Backoff_Detail
+      type: keyword
+      description: >
+    - name: Write_sql_response_total
+      type: double
+      description: >
+    - name: Process_time
+      type: double
+      description: >
+        The total processing time of a SQL statement in TiKV.
+        Because data is sent to TiKV concurrently, this value might exceed Query_time.
+    - name: Wait_time
+      type: double
+      description: >
+        The total waiting time of a statement in TiKV.
+        Because the Coprocessor of TiKV runs a limited number of threads,
+        requests might queue up when all threads of Coprocessor are working.
+        When a request in the queue takes a long time to process,
+        the waiting time of the subsequent requests increases.
+    - name: Process_keys
+      type: double
+      description: >
+        The number of keys that Coprocessor has processed.
+        Compared with total_keys, processed_keys does not include the old versions of MVCC.
+        A great difference between processed_keys and total_keys indicates that many old versions exist.
+    - name: Cop_proc_avg
+      type: double
+      description: >
+        The average execution time of cop-tasks.
+    - name: Cop_proc_p90
+      type: double
+      description: >
+        The P90 execution time of cop-tasks.
+    - name: Cop_proc_max
+      type: double
+      description: >
+        The maximum execution time of cop-tasks.
+    - name: Cop_proc_addr
+      type: keyword
+      description: >
+        The address of the cop-task with the longest execution time.
+    - name: Cop_wait_avg
+      type: double
+      description: >
+        The average waiting time of cop-tasks.
+    - name: Cop_wait_p90
+      type: double
+      description: >
+        The P90 waiting time of cop-tasks.
+    - name: Cop_wait_max
+      type: double
+      description: >
+        The maximum waiting time of cop-tasks.
+    - name: Cop_wait_addr
+      type: keyword
+      description: >
+        The address of the cop-task whose waiting time is the longest.
+    - name: Rocksdb_delete_skipped_count
+      type: double
+      description: >
+    - name: Rocksdb_key_skipped_count
+      type: double
+      description: >
+    - name: Rocksdb_block_cache_hit_count
+      type: double
+      description: >
+    - name: Rocksdb_block_read_count
+      type: double
+      description: >
+    - name: Rocksdb_block_read_byte
+      type: double
+      description: >

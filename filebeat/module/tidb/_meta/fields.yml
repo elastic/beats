@@ -1,0 +1,16 @@
+- key: tidb
+  title: "TiDB"
+  description: >
+    TiDB Module
+  short_config: true
+  fields:
+    - name: tidb
+      type: group
+      description: >
+        Common fields in the TiDB Module.
+      fields:
+        - name: body
+          type: text
+          description: >
+            A failover field.
+            Contains unparsed messages and fields. Should exist only when parsing failed.

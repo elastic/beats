@@ -1,0 +1,26 @@
+type: {{.deployment}}
+
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+
+multiline:
+  type: pattern
+  pattern: '^[[:space:]]+(at|\.{3})[[:space:]]+\b|^Caused by:'
+  negate: false
+  match: after
+
+processors:
+{{ if eq .deployment "container" }}
+  - add_kubernetes_metadata:
+    host: ${NODE_NAME}
+    matchers:
+      - logs_path:
+          logs_path: "/var/log/containers/"
+{{ end }}
+  - add_cloud_metadata: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.11.0

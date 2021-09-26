@@ -1,0 +1,65 @@
+# Module: tidb
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-tidb.html
+
+- module: tidb
+
+  log:
+    enabled: false
+
+    # Set custom paths for the log files. If left empty, filebeat will choose the default TiUP cluster path.
+    # A list of glob-based paths that will be crawled and fetched.
+    # All patterns supported by Go Glob are also supported here.
+    # For example, to fetch all files from a predefined level of subdirectories,
+    # the following pattern can be used: /var/log/*/*.log. This fetches all .log files from the subfolders of /var/log.
+    # It does not fetch log files from the /var/log folder itself.
+    #var.paths:
+
+    # Set custom deployment environment.
+    # Only two options are valid: "log" (which means bare-metal) and "container".
+    # If left empty, it will be set to "log" by default.
+    #var.deployment:
+
+    input:
+      # TiDB server log file might locate in the same path as slow log file.
+      # Exclude slow log file explicitly here.
+      exclude_files:
+        - '.*slowlog.*\.log$'
+
+      # A list of tags that Filebeat includes in the tags field of each published event.
+      # Tags make it easy to select specific events in Kibana or apply conditional filtering in Logstash.
+      # These tags will be appended to the list of tags specified in the general configuration.
+      #tags:
+      #  - "tag"
+
+      # Optional fields that you can specify to add additional information to the output.
+      # For example, you might add fields that you can use for filtering log data.
+      # Fields can be scalar values, arrays, dictionaries, or any nested combination of these.
+      # By default, the fields that you specify here will be grouped under a fields sub-dictionary in the output document.
+      # To store the custom fields as top-level fields, set the fields_under_root option to true.
+      # If a duplicate field is declared in the general configuration, then its value will be overwritten by the value declared here.
+      #fields:
+      #  key: value
+      #fields_under_root: false
+
+      # A list of processors to apply to the input data.
+      # These processors will be appended after default processors:
+      #processors:
+
+  ###############################################################################
+  # The configuration items are exactly the same for each fileset listed below. #
+  ###############################################################################
+
+  slowlog:
+    enabled: false
+
+  tiflash:
+    enabled: false
+
+  binlog:
+    enabled: false
+
+  ticdc:
+    enabled: false
+
+  tispark:
+    enabled: false

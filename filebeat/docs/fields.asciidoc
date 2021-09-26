@@ -86,6 +86,7 @@ grouped in the following categories:
 * <<exported-fields-suricata>>
 * <<exported-fields-system>>
 * <<exported-fields-threatintel>>
+* <<exported-fields-tidb>>
 * <<exported-fields-tomcat>>
 * <<exported-fields-traefik>>
 * <<exported-fields-zeek>>
@@ -151379,6 +151380,803 @@ Number of rules observed.
 type: long
 
 --
+
+[[exported-fields-tidb]]
+== TiDB fields
+
+TiDB Module
+
+
+
+[float]
+=== tidb
+
+Common fields in the TiDB Module.
+
+
+
+*`tidb.body`*::
++
+--
+A failover field. Contains unparsed messages and fields. Should exist only when parsing failed.
+
+
+type: text
+
+--
+
+[float]
+=== binlog
+
+Contains fields from the binlog(pump and drainer) instance logs.
+
+
+
+*`tidb.binlog.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
+[float]
+=== log
+
+Contains fields from the TiDB instance logs.
+
+
+
+*`tidb.log.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
+[float]
+=== slowlog
+
+Contains fields from the TiDB slow logs.
+
+
+
+*`tidb.slowlog.Time`*::
++
+--
+The print time of log.
+
+
+type: date_nanos
+
+--
+
+*`tidb.slowlog.Query_time`*::
++
+--
+The execution time of a statement.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Optimize_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Wait_TS`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Num_cop_tasks`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Parse_time`*::
++
+--
+The parsing time for the statement.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Compile_time`*::
++
+--
+The duration of the query optimization.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Query`*::
++
+--
+A SQL statement. This field is not printed as a key in the slow log. It is the last line of the slow log.
+
+
+type: text
+
+--
+
+*`tidb.slowlog.Prev_stmt`*::
++
+--
+
+
+type: text
+
+--
+
+*`tidb.slowlog.Digest`*::
++
+--
+The fingerprint of the SQL statement.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Stats`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Txn_start_ts`*::
++
+--
+The start timestamp and the unique ID of a transaction. You can use this value to search for the transaction-related logs.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Is_internal`*::
++
+--
+Whether a SQL statement is TiDB internal. True indicates that a SQL statement is executed internally in TiDB and false indicates that a SQL statement is executed by the user.
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Index_ids`*::
++
+--
+The IDs of the indexes involved in a statement.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Succ`*::
++
+--
+Whether a statement is executed successfully.
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Backoff_time`*::
++
+--
+The waiting time before retry when a statement encounters errors that require a retry. The common errors as such include: lock occurs, Region split, and TiKV server is busy.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.LockKeys_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Plan`*::
++
+--
+The execution plan of the statement. Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Plan_digest`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Prepared`*::
++
+--
+Whether this statement is a Prepare or Execute request or not.
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Plan_from_cache`*::
++
+--
+Whether this statement hits the execution plan cache.
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Plan_from_binding`*::
++
+--
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Has_more_results`*::
++
+--
+
+
+type: boolean
+
+--
+
+*`tidb.slowlog.Rewrite_time`*::
++
+--
+The time consumed for rewriting the query of this statement.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Preproc_subqueries`*::
++
+--
+The number of subqueries (in the statement) that are executed in advance. For example, the where id in (select if from t) subquery might be executed in advance.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Preproc_subqueries_time`*::
++
+--
+The time consumed for executing the subquery of this statement in advance.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Exec_retry_count`*::
++
+--
+The retry times of this statement. This field is usually for pessimistic transactions in which the statement is retried when the lock is failed.
+
+type: double
+
+--
+
+*`tidb.slowlog.Exec_retry_time`*::
++
+--
+The execution retry duration of this statement. For example, if a statement has been executed three times in total (failed for the first two times), Exec_retry_time means the total duration of the first two executions. The duration of the last execution is Query_time minus Exec_retry_time.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Prewrite_time`*::
++
+--
+The duration of the first phase (prewrite) of the two-phase transaction commit.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Wait_prewrite_binlog_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Commit_time`*::
++
+--
+The duration of the second phase (commit) of the two-phase transaction commit.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Get_commit_ts_time`*::
++
+--
+The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Commit_backoff_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_types`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Resolve_lock_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Local_latch_wait_time`*::
++
+--
+The time that TiDB spends on waiting for the lock before the second phase (commit) of the two-phase transaction commit.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Write_keys`*::
++
+--
+The count of keys that the transaction writes to the Write CF in TiKV.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Write_size`*::
++
+--
+The total size of the keys or values to be written when the transaction commits.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Prewrite_region`*::
++
+--
+The number of TiKV Regions involved in the first phase (prewrite) of the two-phase transaction commit. Each Region triggers a remote procedure call.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Txn_retry`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_time`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Mem_max`*::
++
+--
+The maximum memory space used during the execution period of a SQL statement (the unit is byte).
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Disk_max`*::
++
+--
+The maximum disk space used during the execution period of a SQL statement (the unit is byte).
+
+
+type: double
+
+--
+
+*`tidb.slowlog.User`*::
++
+--
+The name of the user who executes this statement.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.User@Host`*::
++
+--
+The name of the user who executes this statement.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Conn_ID`*::
++
+--
+The Connection ID (session ID). For example, you can use the keyword con:3 to search for the log whose session ID is 3.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Host`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.DB`*::
++
+--
+The current database.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Index_names`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Request_count`*::
++
+--
+The number of Coprocessor requests that a statement sends.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Total_keys`*::
++
+--
+The number of keys that Coprocessor has scanned.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.KV_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.PD_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Backoff_Detail`*::
++
+--
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Write_sql_response_total`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Process_time`*::
++
+--
+The total processing time of a SQL statement in TiKV. Because data is sent to TiKV concurrently, this value might exceed Query_time.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Wait_time`*::
++
+--
+The total waiting time of a statement in TiKV. Because the Coprocessor of TiKV runs a limited number of threads, requests might queue up when all threads of Coprocessor are working. When a request in the queue takes a long time to process, the waiting time of the subsequent requests increases.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Process_keys`*::
++
+--
+The number of keys that Coprocessor has processed. Compared with total_keys, processed_keys does not include the old versions of MVCC. A great difference between processed_keys and total_keys indicates that many old versions exist.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_proc_avg`*::
++
+--
+The average execution time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_proc_p90`*::
++
+--
+The P90 execution time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_proc_max`*::
++
+--
+The maximum execution time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_proc_addr`*::
++
+--
+The address of the cop-task with the longest execution time.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Cop_wait_avg`*::
++
+--
+The average waiting time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_wait_p90`*::
++
+--
+The P90 waiting time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_wait_max`*::
++
+--
+The maximum waiting time of cop-tasks.
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Cop_wait_addr`*::
++
+--
+The address of the cop-task whose waiting time is the longest.
+
+
+type: keyword
+
+--
+
+*`tidb.slowlog.Rocksdb_delete_skipped_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_key_skipped_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_cache_hit_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_read_count`*::
++
+--
+
+
+type: double
+
+--
+
+*`tidb.slowlog.Rocksdb_block_read_byte`*::
++
+--
+
+
+type: double
+
+--
+
+[float]
+=== ticdc
+
+Contains fields from the TiCDC instance logs.
+
+
+
+*`tidb.ticdc.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
+[float]
+=== tiflash
+
+Contains fields from the TiFlash instance logs.
+
+
+
+*`tidb.tiflash.*`*::
++
+--
+Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
+
+
+type: keyword
+
+--
+
+[float]
+=== tispark
+
+Contains fields from the TiSpark instance logs.
+
 
 [[exported-fields-tomcat]]
 == Apache Tomcat fields

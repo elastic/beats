@@ -1,0 +1,88 @@
+[
+    {
+        "@timestamp": "2021-09-26T08:46:42.457Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.flags": [
+            "dissect_parsing_error"
+        ],
+        "log.offset": 0,
+        "message": "[WARN] TiCDC server data-dir is not set. Please use `cdc server --data-dir` to start the cdc server if possible.",
+        "service.type": "tidb"
+    },
+    {
+        "@timestamp": "2021-09-07T03:21:14.240Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "helper.go:49",
+        "log.offset": 113,
+        "message": "init log",
+        "service.type": "tidb",
+        "tidb.ticdc.file": "/Users/yifan/.tiup/data/test/cdc-0/ticdc.log",
+        "tidb.ticdc.level": "info"
+    },
+    {
+        "@timestamp": "2021-09-07T03:21:14.241Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "version.go:47",
+        "log.offset": 246,
+        "message": "Welcome to Change Data Capture (CDC)",
+        "service.type": "tidb",
+        "tidb.ticdc.failpoint-build": "false",
+        "tidb.ticdc.git-branch": "heads/refs/tags/v5.2.0",
+        "tidb.ticdc.git-hash": "81c22b1c1b2041e2806160d8c7e1105a70815ff5",
+        "tidb.ticdc.go-version": "go version go1.16.5 darwin/amd64",
+        "tidb.ticdc.release-version": "v5.2.0",
+        "tidb.ticdc.utc-build-time": "2021-08-26 08:36:29"
+    },
+    {
+        "@timestamp": "2021-09-07T03:21:14.241Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "server.go:67",
+        "log.offset": 567,
+        "message": "creating CDC server",
+        "service.type": "tidb",
+        "tidb.ticdc.config": "{\\\"addr\\\":\\\"127.0.0.1:8300\\\",\\\"advertise-addr\\\":\\\"127.0.0.1:8300\\\",\\\"log-file\\\":\\\"/Users/yifan/.tiup/data/test/cdc-0/ticdc.log\\\",\\\"log-level\\\":\\\"info\\\",\\\"log\\\":{\\\"file\\\":{\\\"max-size\\\":300,\\\"max-days\\\":0,\\\"max-backups\\\":0}},\\\"data-dir\\\":\\\"\\\",\\\"gc-ttl\\\":86400,\\\"tz\\\":\\\"System\\\",\\\"capture-session-ttl\\\":10,\\\"owner-flush-interval\\\":200000000,\\\"processor-flush-interval\\\":100000000,\\\"sorter\\\":{\\\"num-concurrent-worker\\\":4,\\\"chunk-size-limit\\\":134217728,\\\"max-memory-percentage\\\":30,\\\"max-memory-consumption\\\":17179869184,\\\"num-workerpool-goroutine\\\":16,\\\"sort-dir\\\":\\\"/tmp/sorter\\\"},\\\"security\\\":{\\\"ca-path\\\":\\\"\\\",\\\"cert-path\\\":\\\"\\\",\\\"key-path\\\":\\\"\\\",\\\"cert-allowed-cn\\\":null},\\\"per-table-memory-quota\\\":20971520,\\\"kv-client\\\":{\\\"worker-concurrent\\\":8,\\\"worker-pool-size\\\":0,\\\"region-scan-limit\\\":40}}",
+        "tidb.ticdc.pd-addrs": "[http://127.0.0.1:2379]"
+    },
+    {
+        "@timestamp": "2021-09-07T03:21:14.241Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "client.go:214",
+        "log.offset": 1491,
+        "message": "[pd] create pd client with endpoints",
+        "service.type": "tidb",
+        "tidb.ticdc.pd-address": "[http://127.0.0.1:2379]"
+    },
+    {
+        "@timestamp": "2021-09-07T03:21:14.243Z",
+        "event.dataset": "tidb.ticdc",
+        "event.module": "tidb",
+        "fileset.name": "ticdc",
+        "input.type": "log",
+        "log.level": "INFO",
+        "log.logger": "base_client.go:346",
+        "log.offset": 1627,
+        "message": "[pd] switch leader",
+        "service.type": "tidb",
+        "tidb.body": "[\"[pd] switch leader\"] [new-leader=http://127.0.0.1:2379] [old-leader=]",
+        "tidb.ticdc.new-leader": "http://127.0.0.1:2379"
+    }
+]
