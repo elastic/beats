@@ -60,7 +60,7 @@ func CustomizePackaging() {
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.yml", configYml)
 				args.Spec.ReplaceFile("/etc/{{.BeatName}}/{{.BeatName}}.reference.yml", referenceConfigYml)
 			case devtools.Docker:
-				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin=eip")
+				args.Spec.ExtraVar("linux_capabilities", "cap_net_raw,cap_net_admin+eip")
 			default:
 				panic(errors.Errorf("unhandled package type: %v", pkgType))
 			}

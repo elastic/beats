@@ -48,7 +48,7 @@ func CustomizePackaging() {
 		pkgType := args.Types[0]
 		switch pkgType {
 		case devtools.Docker:
-			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw=eip")
+			args.Spec.ExtraVar("linux_capabilities", "cap_net_raw+eip")
 			args.Spec.Files[monitorsDTarget] = monitorsD
 		case devtools.TarGz, devtools.Zip:
 			args.Spec.Files[monitorsDTarget] = monitorsD
