@@ -29,7 +29,7 @@ in <<configuration-metricbeat>>. Here is an example configuration:
 ----
 metricbeat.modules:
 - module: enterprisesearch
-  metricsets: ["health"]
+  metricsets: ["health", "stats"]
   enabled: true
   period: 10s
   hosts: ["http://localhost:3002"]
@@ -47,5 +47,9 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-enterprisesearch-health,health>>
 
+* <<metricbeat-metricset-enterprisesearch-stats,stats>>
+
 include::enterprisesearch/health.asciidoc[]
+
+include::enterprisesearch/stats.asciidoc[]
 
