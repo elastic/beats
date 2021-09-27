@@ -21,8 +21,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.005,
-					"nanocores": 5000000
+					"cores": 0.005
 				}
 			},
 			"id": "docker://f13c53a3ed0f3626b33b3c588d6913257320f65714eff28f25ead8f7663dc93b",
@@ -71,8 +70,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.1,
-					"nanocores": 100000000
+					"cores": 0.1
 				}
 			},
 			"id": "docker://0ea0cef8a79c7643474a736e5da14c254d9411d87167028fa07c96d09748c83a",
@@ -155,8 +153,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.2,
-					"nanocores": 200000000
+					"cores": 0.2
 				}
 			},
 			"id": "docker://465ebffafd7fc238a2fa2e764255efcbff88d5513f4c68f57d70932985428d12",
@@ -240,8 +237,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.1,
-					"nanocores": 100000000
+					"cores": 0.1
 				}
 			},
 			"id": "docker://f8fe5be1dbb1931d702c89235c79965730cbcced7b0ced9895f6c54c1ae8e5c3",
@@ -371,8 +367,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.1,
-					"nanocores": 100000000
+					"cores": 0.1
 				}
 			},
 			"id": "docker://15ada7864628d1c8007c01420e5887a501590d3bc9c25628a4770172ad615112",
@@ -463,8 +458,7 @@
 		"MetricSetFields": {
 			"cpu": {
 				"request": {
-					"cores": 0.25,
-					"nanocores": 250000000
+					"cores": 0.25
 				}
 			},
 			"id": "docker://cdaefb4df2f2add498f884fdc717a6ca8d2681c1636934747de600e6427e0c0d",

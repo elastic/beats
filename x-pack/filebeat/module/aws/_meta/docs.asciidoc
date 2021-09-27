@@ -7,6 +7,8 @@
 
 == AWS module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for aws logs. It uses filebeat s3 input to get log files from
 AWS S3 buckets with SQS notification or directly polling list of S3 objects in an S3 bucket.
 The use of SQS notification is preferred: polling list of S3 objects is expensive

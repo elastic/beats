@@ -11,7 +11,7 @@ http.response.headers = {
 }
 ----------------------------------------------------------------------
 
-To fix this you need to {kibana-ref}/index-patterns.html#reload-fields[reload the index pattern] in {kib} under the Management->Index Patterns, and the index pattern will be
+To fix this you need to {kibana-ref}/index-patterns.html[reload the index pattern] in {kib} under the Management->Index Patterns, and the index pattern will be
 updated with a field for each key available in the dictionary:
 
 [source,shell]
