@@ -18,7 +18,7 @@ import (
 func TestFetch(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "enterprise_search")
 
-	config := getConfig("health", service.Host())
+	config := getConfig("stats", service.Host())
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(f)
 	if len(errs) > 0 {
@@ -32,7 +32,7 @@ func TestFetch(t *testing.T) {
 func TestData(t *testing.T) {
 	service := compose.EnsureUpWithTimeout(t, 570, "enterprise_search")
 
-	config := getConfig("health", service.Host())
+	config := getConfig("stats", service.Host())
 
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
 	err := mbtest.WriteEventsReporterV2Error(f, t, "")
