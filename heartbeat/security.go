@@ -15,6 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// TODO: Support other architectures (e.g. arm)
+// +build linux
+// +build 386 amd64
+
 package main
 
 import (
