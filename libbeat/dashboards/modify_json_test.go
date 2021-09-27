@@ -77,9 +77,34 @@ func TestReplaceIndexInDashboardObject(t *testing.T) {
 			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"index\":\"otherindex-*\"}"}}}`),
 		},
 		{
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"metricbeat-*\"}}"}}}`),
+			[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"filebeat-*"}}]}]}}`),
 			"otherindex-*",
-			[]byte(`{"attributes":{"kibanaSavedObjectMeta":{"visState":"{\"params\":{\"index_pattern\":\"otherindex-*\"}}"}}}`),
+			[]byte(`{"attributes":{"layerListJSON":[{"joins":[{"leftField":"iso2","right":{"indexPatternTitle":"otherindex-*"}}]}]}}`),
+		},
+		{
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"filebeat-*","type":"index-pattern"}]}}}]}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"panelsJSON":[{"embeddableConfig":{"attributes":{"references":[{"id":"otherindex-*","type":"index-pattern"}]}}}]}}`),
+		},
+		{
+			[]byte(`{"attributes":{},"references":[{"id":"auditbeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"}]}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{},"references":[{"id":"otherindex-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"}]}`),
+		},
+		{
+			[]byte(`{"attributes":{"visState":{"params":{"index_pattern":"winlogbeat-*"}}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"visState":{"params":{"index_pattern":"otherindex-*"}}}}`),
+		},
+		{
+			[]byte(`{"attributes":{"visState":{"params":{"series":[{"series_index_pattern":"filebeat-*"}]}}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"visState":{"params":{"series":[{"series_index_pattern":"otherindex-*"}]}}}}`),
+		},
+		{
+			[]byte(`{"attributes":{"mapStateJSON":{"filters":[{"meta":{"index":"filebeat-*"}}]}}}`),
+			"otherindex-*",
+			[]byte(`{"attributes":{"mapStateJSON":{"filters":[{"meta":{"index":"otherindex-*"}}]}}}`),
 		},
 	}
 

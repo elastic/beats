@@ -58,7 +58,7 @@ given aggregation aligner applied for each metric type.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -91,7 +91,7 @@ ignored.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -125,7 +125,7 @@ every minute with no aggregation. The metric types in `compute` service with
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -149,7 +149,7 @@ metric prefix, as for GKE metrics the required prefix is `kubernetes.io/`
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"

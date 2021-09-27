@@ -3,6 +3,8 @@
 
 == RabbitMQ module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is the module for parsing https://www.rabbitmq.com/logging.html[RabbitMQ log files]
 
 include::../include/what-happens.asciidoc[]
