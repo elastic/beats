@@ -52,6 +52,3 @@ services:
     - "XPACK_XPACK_MAIN_TELEMETRY_ENABLED=false"
     - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"
 
-
-
-
