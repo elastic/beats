@@ -12,7 +12,7 @@ class Test(XPackTest):
     def test_health(self):
         self.render_config_template(modules=[{
             "name": "enterprisesearch",
-            "metricsets": ["health"],
+            "metricsets": ["health", "stats"],
             "hosts": [self.compose_host(service="enterprise_search")],
             "username": self.get_username(),
             "password": self.get_password(),

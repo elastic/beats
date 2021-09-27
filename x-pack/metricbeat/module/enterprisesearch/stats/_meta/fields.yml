@@ -1,0 +1,232 @@
+- name: stats
+  type: group
+  release: beta
+  description: Enterprise Search stats.
+  fields:
+    - name: connectors
+      type: group
+      description: Workplace Search connectors subsystem stats.
+      fields:
+        - name: job_store
+          type: group
+          description: Workplace Search connectors job store stats.
+          fields:
+            - name: waiting
+              type: long
+              description: Number of connectors jobs waiting to be processed.
+
+            - name: working
+              type: long
+              description: Number of connectors jobs currently being processed.
+            
+            - name: job_types
+              type: group
+              description: Breakdown of connectors jobs by types.
+              fields:
+                - name: delete
+                  type: long
+                  description: Number of delete jobs in the jobs store.
+
+                - name: full
+                  type: long
+                  description: Number of full sync jobs in the jobs store.
+
+                - name: incremental
+                  type: long
+                  description: Number of incremental sync jobs in the jobs store.
+
+                - name: permissions
+                  type: long
+                  description: Number of permissions sync jobs in the jobs store.
+
+        - name: pool
+          type: group
+          description: Workplace Search worker pools stats.
+          fields:
+            - name: extract_worker_pool
+              type: group
+              description: Status information for the extrator workers pool.
+              fields:
+                - name: size
+                  type: long
+                  description: Worker pool size.
+
+                - name: busy
+                  type: long
+                  description: Number of busy workers.
+
+                - name: queue_depth
+                  type: long
+                  description: Number of items waiting to be processed.
+
+                - name: idle
+                  type: long
+                  description: Number of idle workers.
+
+                - name: total_completed
+                  type: long
+                  description: Number of jobs completed since the start.
+
+                - name: total_scheduled
+                  type: long
+                  description: Number of jobs scheduled since the start.
+
+            - name: subextract_worker_pool
+              type: group
+              description: Status information for the sub-extrator workers pool.
+              fields:
+                - name: size
+                  type: long
+                  description: Worker pool size.
+
+                - name: busy
+                  type: long
+                  description: Number of busy workers.
+
+                - name: queue_depth
+                  type: long
+                  description: Number of items waiting to be processed.
+
+                - name: idle
+                  type: long
+                  description: Number of idle workers.
+
+                - name: total_completed
+                  type: long
+                  description: Number of jobs completed since the start.
+
+                - name: total_scheduled
+                  type: long
+                  description: Number of jobs scheduled since the start.
+
+            - name: publish_worker_pool
+              type: group
+              description: Status information for the publish workers pool.
+              fields:
+                - name: size
+                  type: long
+                  description: Worker pool size.
+
+                - name: busy
+                  type: long
+                  description: Number of busy workers.
+
+                - name: queue_depth
+                  type: long
+                  description: Number of items waiting to be processed.
+
+                - name: idle
+                  type: long
+                  description: Number of idle workers.
+
+                - name: total_completed
+                  type: long
+                  description: Number of jobs completed since the start.
+
+                - name: total_scheduled
+                  type: long
+                  description: Number of jobs scheduled since the start.
+
+    - name: http
+      type: group
+      description: Incoming HTTP request metrics.
+      fields:
+        - name: connections
+          type: group
+          description: Incoming HTTP connection statistics.
+          fields:
+            - name: current
+              type: long
+              description: Current number of HTTP connections opened to the Enterprise Search instance.
+
+            - name: max
+              type: long
+              description: Maximum number of concurrent HTTP connections open to the Enterprise Search instance since the start.
+
+            - name: total
+              type: long
+              description: Total number of HTTP connections opened to the Enterprise Search instance since the start.
+
+        - name: network
+          type: group
+          description: Network traffic metrics.
+          fields:
+            - name: received.bytes
+              type: long
+              format: bytes
+              description: Total number of bytes received by the Enterprise Search instance since the start.
+
+            - name: sent.bytes
+              type: long
+              format: bytes
+              description: Total number of bytes sent by the Enterprise Search instance since the start.
+
+            - name: received.bytes_per_sec
+              type: long
+              format: bytes
+              description: Average number of bytes received by the Enterprise Search instance per second since the start.
+
+            - name: sent.bytes_per_sec
+              type: long
+              format: bytes
+              description: Average number of bytes sent by the Enterprise Search instance per second since the start.
+
+        - name: request_duration
+          type: group
+          description: Aggregate HTTP request duration statistics.
+          fields:
+            - name: max.msec
+              type: long
+              description: Longest HTTP connection duration since the start of the instance.
+
+            - name: mean.msec
+              type: long
+              description: Average HTTP connection duration since the start of the instance.
+
+            - name: std_dev.msec
+              type: long
+              description: Standard deviation for HTTP connection duration values since the start of the instance.
+
+        - name: responses
+          type: group
+          description: Aggregate HTTP response counts broken down by HTTP status type.
+          fields:
+            - name: 1xx
+              type: long
+              description: Total number of HTTP requests finished with a 1xx response code since the start of the instance.
+
+            - name: 2xx
+              type: long
+              description: Total number of HTTP requests finished with a 2xx response code since the start of the instance.
+
+            - name: 3xx
+              type: long
+              description: Total number of HTTP requests finished with a 3xx response code since the start of the instance.
+
+            - name: 4xx
+              type: long
+              description: Total number of HTTP requests finished with a 4xx response code since the start of the instance.
+
+            - name: 5xx
+              type: long
+              description: Total number of HTTP requests finished with a 5xx response code since the start of the instance.
+
+    - name: queues
+      type: group
+      description: Aggregate stats on the functioning of the background jobs processing pipeline within Enterprise Search.
+      fields:
+        - name: engine_destroyer.count
+          type: long
+          description: Total number of jobs processed via the engine_destroyer queue since the start of the instance.
+          
+        - name: mailer.count
+          type: long
+          description: Total number of jobs processed via the mailer queue since the start of the instance.
+
+        - name: process_crawl.count
+          type: long
+          description: Total number of jobs processed via the process_crawl queue since the start of the instance.
+          
+        - name: failed.count
+          type: long
+          description: Total number of jobs waiting in the failed queue.
