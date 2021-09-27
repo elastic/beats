@@ -5,7 +5,8 @@
 
 
 == Check Point module
-beta[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is a module for Check Point firewall logs. It supports logs from the Log
 Exporter in the Syslog RFC 5424 format. If you need to ingest Check Point logs
@@ -21,7 +22,6 @@ Example Log Exporter config:
 `cp_log_export add name testdestination target-server 192.168.1.1 target-port 9001 protocol udp format syslog`
 
 include::../include/gs-link.asciidoc[]
-
 
 [float]
 === Compatibility
