@@ -1001,8 +1001,9 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        # packages too big to fit in the main image. In addition, the 'cloud'
+        # variant for the specific cloud requirements.
+        variants: ["complete", "cloud"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1027,8 +1028,9 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image
-        variants: ["complete"]
+        # packages too big to fit in the main image. In addition, the 'cloud'
+        # variant for the specific cloud requirements.
+        variants: ["complete", "cloud"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

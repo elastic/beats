@@ -23,6 +23,10 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
+{{- if (and (eq .Variant "cloud") (not (contains .from "ubi-minimal")))  }}
+    tar -xvf metricbeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*metricbeat" --directory && \
+    tar -xvf filebeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*filebeat" --directory && \
+{{- end }}
     true
 
 FROM {{ .from }}
@@ -41,7 +45,7 @@ RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
         yum install -y epel-release &&  \
         yum update -y $YUM_FLAGS && \
         yum install -y jq && \
-        
+
         yum clean all && \
         exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -133,6 +137,11 @@ RUN chmod 0770 {{ $beatHome }}
 RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
+
+{{- if (and (eq .Variant "cloud") (not (contains .from "ubi-minimal")))  }}
+COPY --from=home /opt/filebeat /opt/filebeat
+COPY --from=home /opt/metricbeat /opt/metricbeat
+{{- end }}
 
 {{- if ne .user "root" }}
 RUN groupadd --gid 1000 {{ .BeatName }}
