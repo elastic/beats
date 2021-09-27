@@ -9,6 +9,8 @@ start:
 stop:
 	${BASE_COMMAND} down -v
 
+status:
+	${BASE_COMMAND} ps
 
 up:
 	${BASE_COMMAND} build
