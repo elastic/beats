@@ -6,6 +6,7 @@ package health
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -77,9 +78,17 @@ func eventMapping(input []byte) (common.MapStr, error) {
 		return nil, err
 	}
 
-	// Add version info
-	system := data["system"].(map[string]interface{})
-	jvm := data["jvm"].(map[string]interface{})
+	system, ok := data["system"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("system is not a map")
+	}
+
+	jvm, ok := data["jvm"].(map[string]interface{})
+	if !ok {
+		return nil, errors.New("jvm is not a map")
+	}
+
+	// Add version info to the JVM section to help the schema mapper find it
 	jvm["version"] = system["java_version"]
 
 	// Collect process info in a form ready for mapping
