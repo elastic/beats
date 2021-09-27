@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-linux-pageinfo]]
-=== linux pageinfo metricset
+=== Linux pageinfo metricset
 
 beta[]
 

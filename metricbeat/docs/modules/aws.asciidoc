@@ -2,11 +2,17 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: aws
+
 [[metricbeat-module-aws]]
 [role="xpack"]
 == AWS module
 
 :libbeat-xpack-dir: ../../../x-pack/libbeat
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches monitoring metrics from AWS CloudWatch using
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_GetMetricData.html[GetMetricData API] for AWS services.
