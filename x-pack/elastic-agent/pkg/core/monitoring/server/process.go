@@ -67,8 +67,9 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 			// proxy stats for elastic agent process
 			return statsHandler(w, r)
 		}
+		beatsEndpoint := vars["beatsEndpoint"]
 
-		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id)
+		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id, beatsEndpoint)
 		if metricsErr != nil {
 			return metricsErr
 		}
@@ -82,7 +83,7 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 	}
 }
 
-func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
+func processMetrics(ctx context.Context, id, path string) ([]byte, int, error) {
 	detail, err := parseID(id)
 	if err != nil {
 		return nil, 0, err
@@ -98,7 +99,7 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 		endpoint += "_monitor"
 	}
 
-	hostData, err := parse.ParseURL(endpoint, "http", "", "", "stats", "")
+	hostData, err := parse.ParseURL(endpoint, "http", "", "", path, "")
 	if err != nil {
 		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
 	}
