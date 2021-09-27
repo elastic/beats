@@ -20,13 +20,9 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
-<<<<<<< HEAD
-	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
-=======
 	github.com/PaesslerAG/gval v1.0.0
 	github.com/PaesslerAG/jsonpath v0.1.1
-	github.com/Shopify/sarama v1.27.0
->>>>>>> 5ae6d63969 ([Heartbeat] Support JSON expressions / validation of JSON arrays (#28073))
+	github.com/Shopify/sarama v0.0.0-00010101000000-000000000000
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
 	github.com/akavel/rsrc v0.8.0 // indirect
