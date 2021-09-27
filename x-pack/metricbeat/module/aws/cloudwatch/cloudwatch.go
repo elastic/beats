@@ -64,11 +64,11 @@ type Dimension struct {
 
 // Config holds a configuration specific for cloudwatch metricset.
 type Config struct {
-	Namespace          string      `config:"namespace" validate:"nonzero,required"`
-	MetricName         []string    `config:"name"`
-	Dimensions         []Dimension `config:"dimensions"`
-	ResourceType       string      `config:"resource_type"`
-	Statistic          []string    `config:"statistic"`
+	Namespace    string      `config:"namespace" validate:"nonzero,required"`
+	MetricName   []string    `config:"name"`
+	Dimensions   []Dimension `config:"dimensions"`
+	ResourceType string      `config:"resource_type"`
+	Statistic    []string    `config:"statistic"`
 }
 
 type metricsWithStatistics struct {
