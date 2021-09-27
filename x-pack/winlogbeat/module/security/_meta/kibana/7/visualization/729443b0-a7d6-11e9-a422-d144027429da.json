@@ -1,0 +1,139 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4625",
+                                "4771"
+                            ],
+                            "type": "phrases",
+                            "value": "4625, 4771"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4625"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4771"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Logon Failed Acconts [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "bucket": {
+                    "accessor": 0,
+                    "format": {
+                        "id": "terms",
+                        "params": {
+                            "id": "string",
+                            "missingBucketLabel": "Missing",
+                            "otherBucketLabel": "Other",
+                            "parsedUrl": {
+                                "basePath": "/s/siem",
+                                "origin": "https://192.168.1.72:5601",
+                                "pathname": "/s/siem/app/kibana"
+                            }
+                        }
+                    },
+                    "type": "vis_dimension"
+                },
+                "maxFontSize": 37,
+                "metric": {
+                    "accessor": 1,
+                    "format": {
+                        "id": "string",
+                        "params": {}
+                    },
+                    "type": "vis_dimension"
+                },
+                "minFontSize": 15,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear",
+                "showLabel": false
+            },
+            "title": "Logon Failed Acconts [Winlogbeat Security]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "729443b0-a7d6-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTcsMl0="
+}

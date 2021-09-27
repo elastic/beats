@@ -18,7 +18,6 @@
 package export
 
 import (
-	"fmt"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -37,7 +36,11 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			dashboard, _ := cmd.Flags().GetString("id")
 			yml, _ := cmd.Flags().GetString("yml")
-			decode, _ := cmd.Flags().GetBool("decode")
+			folder, _ := cmd.Flags().GetString("folder")
+
+			if len(folder) == 0 {
+				fatalf("-folder must be specified")
+			}
 
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
@@ -49,7 +52,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 				b.Config.Kibana = common.NewConfig()
 			}
 
-			client, err := kibana.NewKibanaClient(b.Config.Kibana)
+			client, err := kibana.NewKibanaClient(b.Config.Kibana, b.Info.Beat)
 			if err != nil {
 				fatalf("Error creating Kibana client: %+v.\n", err)
 			}
@@ -61,9 +64,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboards from yml: %+v.\n", err)
 				}
 				for i, r := range results {
-					if decode {
-						r = dashboards.DecodeExported(r)
-					}
+					r = dashboards.DecodeExported(r)
 
 					err = dashboards.SaveToFile(r, info.Dashboards[i].File, filepath.Dir(yml), client.GetVersion())
 					if err != nil {
@@ -81,17 +82,20 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 					fatalf("Error exporting dashboard: %+v.\n", err)
 				}
 
-				if decode {
-					result = dashboards.DecodeExported(result)
+				result = dashboards.DecodeExported(result)
+
+				err = dashboards.SaveToFolder(result, folder, client.GetVersion())
+				if err != nil {
+					fatalf("Error saving assets to folder '%s' : %+v.\n", folder, err)
 				}
-				fmt.Println(string(result))
+
 			}
 		},
 	}
 
 	genTemplateConfigCmd.Flags().String("id", "", "Dashboard id")
 	genTemplateConfigCmd.Flags().String("yml", "", "Yaml file containing list of dashboard ID and filename pairs")
-	genTemplateConfigCmd.Flags().Bool("decode", false, "Decode exported dashboard")
+	genTemplateConfigCmd.Flags().String("folder", "", "Target folder to save exported assets")
 
 	return genTemplateConfigCmd
 }

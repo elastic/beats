@@ -1,0 +1,29 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Event Results [Filebeat Auditd] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "expression": ".es(q=\"event.dataset:auditd.log NOT event.outcome:failure\").label(\"Success\"), .es(q=\"event.outcome:failed\").label(\"Failure\").title(\"Audit Event Results\")",
+                "interval": "auto"
+            },
+            "title": "Event Results [Filebeat Auditd] ECS",
+            "type": "timelion"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2bb0fa70-0a11-11e7-9e84-43da493ad0c7-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:56.442Z",
+    "version": "WzQzNDgsMV0="
+}

@@ -1,0 +1,1569 @@
+# HELP kube_certificatesigningrequest_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_certificatesigningrequest_labels gauge
+# HELP kube_certificatesigningrequest_created Unix creation timestamp
+# TYPE kube_certificatesigningrequest_created gauge
+# HELP kube_certificatesigningrequest_condition The number of each certificatesigningrequest condition
+# TYPE kube_certificatesigningrequest_condition gauge
+# HELP kube_certificatesigningrequest_cert_length Length of the issued cert
+# TYPE kube_certificatesigningrequest_cert_length gauge
+# HELP kube_configmap_info Information about configmap.
+# TYPE kube_configmap_info gauge
+kube_configmap_info{namespace="default",configmap="example-redis-config"} 1
+kube_configmap_info{namespace="kube-system",configmap="kubeadm-config"} 1
+kube_configmap_info{namespace="kube-system",configmap="extension-apiserver-authentication"} 1
+kube_configmap_info{namespace="kube-system",configmap="kube-proxy"} 1
+kube_configmap_info{namespace="kube-system",configmap="metricbeat-daemonset-modules"} 1
+kube_configmap_info{namespace="kube-public",configmap="cluster-info"} 1
+kube_configmap_info{namespace="kube-system",configmap="metricbeat-daemonset-config"} 1
+kube_configmap_info{namespace="local-path-storage",configmap="local-path-config"} 1
+kube_configmap_info{namespace="kube-system",configmap="coredns"} 1
+kube_configmap_info{namespace="kube-system",configmap="kubelet-config-1.16"} 1
+# HELP kube_configmap_created Unix creation timestamp
+# TYPE kube_configmap_created gauge
+kube_configmap_created{namespace="kube-public",configmap="cluster-info"} 1.628778286e+09
+kube_configmap_created{namespace="kube-system",configmap="metricbeat-daemonset-config"} 1.629890082e+09
+kube_configmap_created{namespace="local-path-storage",configmap="local-path-config"} 1.628778292e+09
+kube_configmap_created{namespace="kube-system",configmap="coredns"} 1.628778286e+09
+kube_configmap_created{namespace="kube-system",configmap="kubelet-config-1.16"} 1.628778285e+09
+kube_configmap_created{namespace="default",configmap="example-redis-config"} 1.629794549e+09
+kube_configmap_created{namespace="kube-system",configmap="kubeadm-config"} 1.628778285e+09
+kube_configmap_created{namespace="kube-system",configmap="extension-apiserver-authentication"} 1.628778284e+09
+kube_configmap_created{namespace="kube-system",configmap="kube-proxy"} 1.628778286e+09
+kube_configmap_created{namespace="kube-system",configmap="metricbeat-daemonset-modules"} 1.629890082e+09
+# HELP kube_configmap_metadata_resource_version Resource version representing a specific version of the configmap.
+# TYPE kube_configmap_metadata_resource_version gauge
+kube_configmap_metadata_resource_version{namespace="local-path-storage",configmap="local-path-config"} 251
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="coredns"} 168
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="kubelet-config-1.16"} 154
+kube_configmap_metadata_resource_version{namespace="kube-public",configmap="cluster-info"} 52295
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="metricbeat-daemonset-config"} 427548
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="extension-apiserver-authentication"} 41
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="kube-proxy"} 176
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="metricbeat-daemonset-modules"} 427549
+kube_configmap_metadata_resource_version{namespace="default",configmap="example-redis-config"} 268613
+kube_configmap_metadata_resource_version{namespace="kube-system",configmap="kubeadm-config"} 151
+# HELP kube_cronjob_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_cronjob_labels gauge
+kube_cronjob_labels{namespace="default",cronjob="hello"} 1
+# HELP kube_cronjob_info Info about cronjob.
+# TYPE kube_cronjob_info gauge
+kube_cronjob_info{namespace="default",cronjob="hello",schedule="*/1 * * * *",concurrency_policy="Allow"} 1
+# HELP kube_cronjob_created Unix creation timestamp
+# TYPE kube_cronjob_created gauge
+kube_cronjob_created{namespace="default",cronjob="hello"} 1.629964024e+09
+# HELP kube_cronjob_status_active Active holds pointers to currently running jobs.
+# TYPE kube_cronjob_status_active gauge
+kube_cronjob_status_active{namespace="default",cronjob="hello"} 0
+# HELP kube_cronjob_status_last_schedule_time LastScheduleTime keeps information of when was the last time the job was successfully scheduled.
+# TYPE kube_cronjob_status_last_schedule_time gauge
+# HELP kube_cronjob_spec_suspend Suspend flag tells the controller to suspend subsequent executions.
+# TYPE kube_cronjob_spec_suspend gauge
+kube_cronjob_spec_suspend{namespace="default",cronjob="hello"} 0
+# HELP kube_cronjob_spec_starting_deadline_seconds Deadline in seconds for starting the job if it misses scheduled time for any reason.
+# TYPE kube_cronjob_spec_starting_deadline_seconds gauge
+# HELP kube_cronjob_next_schedule_time Next time the cronjob should be scheduled. The time after lastScheduleTime, or after the cron job's creation time if it's never been scheduled. Use this to determine if the job is delayed.
+# TYPE kube_cronjob_next_schedule_time gauge
+kube_cronjob_next_schedule_time{namespace="default",cronjob="hello"} 1.62996408e+09
+# HELP kube_cronjob_metadata_resource_version Resource version representing a specific version of the cronjob.
+# TYPE kube_cronjob_metadata_resource_version gauge
+kube_cronjob_metadata_resource_version{namespace="default",cronjob="hello"} 489746
+# HELP kube_daemonset_created Unix creation timestamp
+# TYPE kube_daemonset_created gauge
+kube_daemonset_created{namespace="kube-system",daemonset="kindnet"} 1.62877829e+09
+kube_daemonset_created{namespace="kube-system",daemonset="kube-proxy"} 1.628778286e+09
+kube_daemonset_created{namespace="kube-system",daemonset="metricbeat"} 1.629890082e+09
+# HELP kube_daemonset_status_current_number_scheduled The number of nodes running at least one daemon pod and are supposed to.
+# TYPE kube_daemonset_status_current_number_scheduled gauge
+kube_daemonset_status_current_number_scheduled{namespace="kube-system",daemonset="metricbeat"} 2
+kube_daemonset_status_current_number_scheduled{namespace="kube-system",daemonset="kindnet"} 3
+kube_daemonset_status_current_number_scheduled{namespace="kube-system",daemonset="kube-proxy"} 3
+# HELP kube_daemonset_status_desired_number_scheduled The number of nodes that should be running the daemon pod.
+# TYPE kube_daemonset_status_desired_number_scheduled gauge
+kube_daemonset_status_desired_number_scheduled{namespace="kube-system",daemonset="kube-proxy"} 3
+kube_daemonset_status_desired_number_scheduled{namespace="kube-system",daemonset="metricbeat"} 2
+kube_daemonset_status_desired_number_scheduled{namespace="kube-system",daemonset="kindnet"} 3
+# HELP kube_daemonset_status_number_available The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and available
+# TYPE kube_daemonset_status_number_available gauge
+kube_daemonset_status_number_available{namespace="kube-system",daemonset="kindnet"} 3
+kube_daemonset_status_number_available{namespace="kube-system",daemonset="kube-proxy"} 3
+kube_daemonset_status_number_available{namespace="kube-system",daemonset="metricbeat"} 2
+# HELP kube_daemonset_status_number_misscheduled The number of nodes running a daemon pod but are not supposed to.
+# TYPE kube_daemonset_status_number_misscheduled gauge
+kube_daemonset_status_number_misscheduled{namespace="kube-system",daemonset="kindnet"} 0
+kube_daemonset_status_number_misscheduled{namespace="kube-system",daemonset="kube-proxy"} 0
+kube_daemonset_status_number_misscheduled{namespace="kube-system",daemonset="metricbeat"} 0
+# HELP kube_daemonset_status_number_ready The number of nodes that should be running the daemon pod and have one or more of the daemon pod running and ready.
+# TYPE kube_daemonset_status_number_ready gauge
+kube_daemonset_status_number_ready{namespace="kube-system",daemonset="kindnet"} 3
+kube_daemonset_status_number_ready{namespace="kube-system",daemonset="kube-proxy"} 3
+kube_daemonset_status_number_ready{namespace="kube-system",daemonset="metricbeat"} 2
+# HELP kube_daemonset_status_number_unavailable The number of nodes that should be running the daemon pod and have none of the daemon pod running and available
+# TYPE kube_daemonset_status_number_unavailable gauge
+kube_daemonset_status_number_unavailable{namespace="kube-system",daemonset="kindnet"} 0
+kube_daemonset_status_number_unavailable{namespace="kube-system",daemonset="kube-proxy"} 0
+kube_daemonset_status_number_unavailable{namespace="kube-system",daemonset="metricbeat"} 0
+# HELP kube_daemonset_status_observed_generation The most recent generation observed by the daemon set controller.
+# TYPE kube_daemonset_status_observed_generation gauge
+kube_daemonset_status_observed_generation{namespace="kube-system",daemonset="kube-proxy"} 1
+kube_daemonset_status_observed_generation{namespace="kube-system",daemonset="metricbeat"} 1
+kube_daemonset_status_observed_generation{namespace="kube-system",daemonset="kindnet"} 1
+# HELP kube_daemonset_status_updated_number_scheduled The total number of nodes that are running updated daemon pod
+# TYPE kube_daemonset_status_updated_number_scheduled gauge
+kube_daemonset_status_updated_number_scheduled{namespace="kube-system",daemonset="kindnet"} 3
+kube_daemonset_status_updated_number_scheduled{namespace="kube-system",daemonset="kube-proxy"} 3
+kube_daemonset_status_updated_number_scheduled{namespace="kube-system",daemonset="metricbeat"} 2
+# HELP kube_daemonset_metadata_generation Sequence number representing a specific generation of the desired state.
+# TYPE kube_daemonset_metadata_generation gauge
+kube_daemonset_metadata_generation{namespace="kube-system",daemonset="kindnet"} 1
+kube_daemonset_metadata_generation{namespace="kube-system",daemonset="kube-proxy"} 1
+kube_daemonset_metadata_generation{namespace="kube-system",daemonset="metricbeat"} 1
+# HELP kube_daemonset_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_daemonset_labels gauge
+kube_daemonset_labels{namespace="kube-system",daemonset="kindnet"} 1
+kube_daemonset_labels{namespace="kube-system",daemonset="kube-proxy"} 1
+kube_daemonset_labels{namespace="kube-system",daemonset="metricbeat"} 1
+# HELP kube_deployment_created Unix creation timestamp
+# TYPE kube_deployment_created gauge
+kube_deployment_created{namespace="local-path-storage",deployment="local-path-provisioner"} 1.628778292e+09
+kube_deployment_created{namespace="default",deployment="hello-python"} 1.629815782e+09
+kube_deployment_created{namespace="kube-system",deployment="coredns"} 1.628778286e+09
+kube_deployment_created{namespace="kube-system",deployment="kube-state-metrics"} 1.629723843e+09
+# HELP kube_deployment_status_replicas The number of replicas per deployment.
+# TYPE kube_deployment_status_replicas gauge
+kube_deployment_status_replicas{namespace="kube-system",deployment="coredns"} 2
+kube_deployment_status_replicas{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_status_replicas{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+kube_deployment_status_replicas{namespace="default",deployment="hello-python"} 1
+# HELP kube_deployment_status_replicas_available The number of available replicas per deployment.
+# TYPE kube_deployment_status_replicas_available gauge
+kube_deployment_status_replicas_available{namespace="default",deployment="hello-python"} 1
+kube_deployment_status_replicas_available{namespace="kube-system",deployment="coredns"} 2
+kube_deployment_status_replicas_available{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_status_replicas_available{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+# HELP kube_deployment_status_replicas_unavailable The number of unavailable replicas per deployment.
+# TYPE kube_deployment_status_replicas_unavailable gauge
+kube_deployment_status_replicas_unavailable{namespace="default",deployment="hello-python"} 0
+kube_deployment_status_replicas_unavailable{namespace="kube-system",deployment="coredns"} 0
+kube_deployment_status_replicas_unavailable{namespace="kube-system",deployment="kube-state-metrics"} 0
+kube_deployment_status_replicas_unavailable{namespace="local-path-storage",deployment="local-path-provisioner"} 0
+# HELP kube_deployment_status_replicas_updated The number of updated replicas per deployment.
+# TYPE kube_deployment_status_replicas_updated gauge
+kube_deployment_status_replicas_updated{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+kube_deployment_status_replicas_updated{namespace="default",deployment="hello-python"} 1
+kube_deployment_status_replicas_updated{namespace="kube-system",deployment="coredns"} 2
+kube_deployment_status_replicas_updated{namespace="kube-system",deployment="kube-state-metrics"} 1
+# HELP kube_deployment_status_observed_generation The generation observed by the deployment controller.
+# TYPE kube_deployment_status_observed_generation gauge
+kube_deployment_status_observed_generation{namespace="default",deployment="hello-python"} 1
+kube_deployment_status_observed_generation{namespace="kube-system",deployment="coredns"} 1
+kube_deployment_status_observed_generation{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_status_observed_generation{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+# HELP kube_deployment_status_condition The current status conditions of a deployment.
+# TYPE kube_deployment_status_condition gauge
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Progressing",status="true"} 1
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Progressing",status="false"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Progressing",status="unknown"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Available",status="true"} 1
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Available",status="false"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="kube-state-metrics",condition="Available",status="unknown"} 0
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Progressing",status="true"} 1
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Progressing",status="false"} 0
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Progressing",status="unknown"} 0
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Available",status="true"} 1
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Available",status="false"} 0
+kube_deployment_status_condition{namespace="local-path-storage",deployment="local-path-provisioner",condition="Available",status="unknown"} 0
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Progressing",status="true"} 1
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Progressing",status="false"} 0
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Progressing",status="unknown"} 0
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Available",status="true"} 1
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Available",status="false"} 0
+kube_deployment_status_condition{namespace="default",deployment="hello-python",condition="Available",status="unknown"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Progressing",status="true"} 1
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Progressing",status="false"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Progressing",status="unknown"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Available",status="true"} 1
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Available",status="false"} 0
+kube_deployment_status_condition{namespace="kube-system",deployment="coredns",condition="Available",status="unknown"} 0
+# HELP kube_deployment_spec_replicas Number of desired pods for a deployment.
+# TYPE kube_deployment_spec_replicas gauge
+kube_deployment_spec_replicas{namespace="default",deployment="hello-python"} 1
+kube_deployment_spec_replicas{namespace="kube-system",deployment="coredns"} 2
+kube_deployment_spec_replicas{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_spec_replicas{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+# HELP kube_deployment_spec_paused Whether the deployment is paused and will not be processed by the deployment controller.
+# TYPE kube_deployment_spec_paused gauge
+kube_deployment_spec_paused{namespace="default",deployment="hello-python"} 0
+kube_deployment_spec_paused{namespace="kube-system",deployment="coredns"} 0
+kube_deployment_spec_paused{namespace="kube-system",deployment="kube-state-metrics"} 0
+kube_deployment_spec_paused{namespace="local-path-storage",deployment="local-path-provisioner"} 0
+# HELP kube_deployment_spec_strategy_rollingupdate_max_unavailable Maximum number of unavailable replicas during a rolling update of a deployment.
+# TYPE kube_deployment_spec_strategy_rollingupdate_max_unavailable gauge
+kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="kube-system",deployment="kube-state-metrics"} 0
+kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="local-path-storage",deployment="local-path-provisioner"} 0
+kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="default",deployment="hello-python"} 0
+kube_deployment_spec_strategy_rollingupdate_max_unavailable{namespace="kube-system",deployment="coredns"} 1
+# HELP kube_deployment_spec_strategy_rollingupdate_max_surge Maximum number of replicas that can be scheduled above the desired number of replicas during a rolling update of a deployment.
+# TYPE kube_deployment_spec_strategy_rollingupdate_max_surge gauge
+kube_deployment_spec_strategy_rollingupdate_max_surge{namespace="kube-system",deployment="coredns"} 1
+kube_deployment_spec_strategy_rollingupdate_max_surge{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_spec_strategy_rollingupdate_max_surge{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+kube_deployment_spec_strategy_rollingupdate_max_surge{namespace="default",deployment="hello-python"} 1
+# HELP kube_deployment_metadata_generation Sequence number representing a specific generation of the desired state.
+# TYPE kube_deployment_metadata_generation gauge
+kube_deployment_metadata_generation{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_metadata_generation{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+kube_deployment_metadata_generation{namespace="default",deployment="hello-python"} 1
+kube_deployment_metadata_generation{namespace="kube-system",deployment="coredns"} 1
+# HELP kube_deployment_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_deployment_labels gauge
+kube_deployment_labels{namespace="default",deployment="hello-python"} 1
+kube_deployment_labels{namespace="kube-system",deployment="coredns"} 1
+kube_deployment_labels{namespace="kube-system",deployment="kube-state-metrics"} 1
+kube_deployment_labels{namespace="local-path-storage",deployment="local-path-provisioner"} 1
+# HELP kube_endpoint_info Information about endpoint.
+# TYPE kube_endpoint_info gauge
+kube_endpoint_info{namespace="default",endpoint="kubernetes"} 1
+kube_endpoint_info{namespace="kube-system",endpoint="kube-controller-manager"} 1
+kube_endpoint_info{namespace="kube-system",endpoint="kube-dns"} 1
+kube_endpoint_info{namespace="kube-system",endpoint="kube-scheduler"} 1
+kube_endpoint_info{namespace="kube-system",endpoint="kube-state-metrics"} 1
+kube_endpoint_info{namespace="local-path-storage",endpoint="rancher.io-local-path"} 1
+# HELP kube_endpoint_created Unix creation timestamp
+# TYPE kube_endpoint_created gauge
+kube_endpoint_created{namespace="local-path-storage",endpoint="rancher.io-local-path"} 1.628778315e+09
+kube_endpoint_created{namespace="default",endpoint="kubernetes"} 1.628778285e+09
+kube_endpoint_created{namespace="kube-system",endpoint="kube-controller-manager"} 1.628778287e+09
+kube_endpoint_created{namespace="kube-system",endpoint="kube-dns"} 1.628778303e+09
+kube_endpoint_created{namespace="kube-system",endpoint="kube-scheduler"} 1.628778285e+09
+kube_endpoint_created{namespace="kube-system",endpoint="kube-state-metrics"} 1.629723843e+09
+# HELP kube_endpoint_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_endpoint_labels gauge
+kube_endpoint_labels{namespace="kube-system",endpoint="kube-controller-manager"} 1
+kube_endpoint_labels{namespace="kube-system",endpoint="kube-dns"} 1
+kube_endpoint_labels{namespace="kube-system",endpoint="kube-scheduler"} 1
+kube_endpoint_labels{namespace="kube-system",endpoint="kube-state-metrics"} 1
+kube_endpoint_labels{namespace="local-path-storage",endpoint="rancher.io-local-path"} 1
+kube_endpoint_labels{namespace="default",endpoint="kubernetes"} 1
+# HELP kube_endpoint_address_available Number of addresses available in endpoint.
+# TYPE kube_endpoint_address_available gauge
+kube_endpoint_address_available{namespace="kube-system",endpoint="kube-state-metrics"} 2
+kube_endpoint_address_available{namespace="local-path-storage",endpoint="rancher.io-local-path"} 0
+kube_endpoint_address_available{namespace="default",endpoint="kubernetes"} 1
+kube_endpoint_address_available{namespace="kube-system",endpoint="kube-controller-manager"} 0
+kube_endpoint_address_available{namespace="kube-system",endpoint="kube-dns"} 6
+kube_endpoint_address_available{namespace="kube-system",endpoint="kube-scheduler"} 0
+# HELP kube_endpoint_address_not_ready Number of addresses not ready in endpoint
+# TYPE kube_endpoint_address_not_ready gauge
+kube_endpoint_address_not_ready{namespace="default",endpoint="kubernetes"} 0
+kube_endpoint_address_not_ready{namespace="kube-system",endpoint="kube-controller-manager"} 0
+kube_endpoint_address_not_ready{namespace="kube-system",endpoint="kube-dns"} 0
+kube_endpoint_address_not_ready{namespace="kube-system",endpoint="kube-scheduler"} 0
+kube_endpoint_address_not_ready{namespace="kube-system",endpoint="kube-state-metrics"} 0
+kube_endpoint_address_not_ready{namespace="local-path-storage",endpoint="rancher.io-local-path"} 0
+# HELP kube_horizontalpodautoscaler_metadata_generation The generation observed by the HorizontalPodAutoscaler controller.
+# TYPE kube_horizontalpodautoscaler_metadata_generation gauge
+# HELP kube_horizontalpodautoscaler_spec_max_replicas Upper limit for the number of pods that can be set by the autoscaler; cannot be smaller than MinReplicas.
+# TYPE kube_horizontalpodautoscaler_spec_max_replicas gauge
+# HELP kube_horizontalpodautoscaler_spec_min_replicas Lower limit for the number of pods that can be set by the autoscaler, default 1.
+# TYPE kube_horizontalpodautoscaler_spec_min_replicas gauge
+# HELP kube_horizontalpodautoscaler_spec_target_metric The metric specifications used by this autoscaler when calculating the desired replica count.
+# TYPE kube_horizontalpodautoscaler_spec_target_metric gauge
+# HELP kube_horizontalpodautoscaler_status_current_replicas Current number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_current_replicas gauge
+# HELP kube_horizontalpodautoscaler_status_desired_replicas Desired number of replicas of pods managed by this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_desired_replicas gauge
+# HELP kube_horizontalpodautoscaler_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_horizontalpodautoscaler_labels gauge
+# HELP kube_horizontalpodautoscaler_status_condition The condition of this autoscaler.
+# TYPE kube_horizontalpodautoscaler_status_condition gauge
+# HELP kube_ingress_info Information about ingress.
+# TYPE kube_ingress_info gauge
+# HELP kube_ingress_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_ingress_labels gauge
+# HELP kube_ingress_created Unix creation timestamp
+# TYPE kube_ingress_created gauge
+# HELP kube_ingress_metadata_resource_version Resource version representing a specific version of ingress.
+# TYPE kube_ingress_metadata_resource_version gauge
+# HELP kube_ingress_path Ingress host, paths and backend service information.
+# TYPE kube_ingress_path gauge
+# HELP kube_ingress_tls Ingress TLS host and secret information.
+# TYPE kube_ingress_tls gauge
+# HELP kube_job_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_job_labels gauge
+kube_job_labels{namespace="default",job_name="hello"} 1
+# HELP kube_job_info Information about job.
+# TYPE kube_job_info gauge
+kube_job_info{namespace="default",job_name="hello"} 1
+# HELP kube_job_created Unix creation timestamp
+# TYPE kube_job_created gauge
+kube_job_created{namespace="default",job_name="hello"} 1.629448061e+09
+# HELP kube_job_spec_parallelism The maximum desired number of pods the job should run at any given time.
+# TYPE kube_job_spec_parallelism gauge
+kube_job_spec_parallelism{namespace="default",job_name="hello"} 1
+# HELP kube_job_spec_completions The desired number of successfully finished pods the job should be run with.
+# TYPE kube_job_spec_completions gauge
+kube_job_spec_completions{namespace="default",job_name="hello"} 1
+# HELP kube_job_spec_active_deadline_seconds The duration in seconds relative to the startTime that the job may be active before the system tries to terminate it.
+# TYPE kube_job_spec_active_deadline_seconds gauge
+# HELP kube_job_status_succeeded The number of pods which reached Phase Succeeded.
+# TYPE kube_job_status_succeeded gauge
+kube_job_status_succeeded{namespace="default",job_name="hello"} 1
+# HELP kube_job_status_failed The number of pods which reached Phase Failed and the reason for failure.
+# TYPE kube_job_status_failed gauge
+kube_job_status_failed{namespace="default",job_name="hello"} 0
+# HELP kube_job_status_active The number of actively running pods.
+# TYPE kube_job_status_active gauge
+kube_job_status_active{namespace="default",job_name="hello"} 0
+# HELP kube_job_complete The job has completed its execution.
+# TYPE kube_job_complete gauge
+kube_job_complete{namespace="default",job_name="hello",condition="true"} 1
+kube_job_complete{namespace="default",job_name="hello",condition="false"} 0
+kube_job_complete{namespace="default",job_name="hello",condition="unknown"} 0
+# HELP kube_job_failed The job has failed its execution.
+# TYPE kube_job_failed gauge
+# HELP kube_job_status_start_time StartTime represents time when the job was acknowledged by the Job Manager.
+# TYPE kube_job_status_start_time gauge
+kube_job_status_start_time{namespace="default",job_name="hello"} 1.629448061e+09
+# HELP kube_job_status_completion_time CompletionTime represents time when the job was completed.
+# TYPE kube_job_status_completion_time gauge
+kube_job_status_completion_time{namespace="default",job_name="hello"} 1.629448087e+09
+# HELP kube_job_owner Information about the Job's owner.
+# TYPE kube_job_owner gauge
+kube_job_owner{namespace="default",job_name="hello",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+# HELP kube_lease_owner Information about the Lease's owner.
+# TYPE kube_lease_owner gauge
+kube_lease_owner{lease="kind-control-plane",owner_kind="Node",owner_name="kind-control-plane"} 1
+kube_lease_owner{lease="kind-worker",owner_kind="Node",owner_name="kind-worker"} 1
+kube_lease_owner{lease="kind-worker2",owner_kind="Node",owner_name="kind-worker2"} 1
+# HELP kube_lease_renew_time Kube lease renew time.
+# TYPE kube_lease_renew_time gauge
+kube_lease_renew_time{lease="kind-control-plane"} 1.629964059e+09
+kube_lease_renew_time{lease="kind-worker"} 1.629964059e+09
+kube_lease_renew_time{lease="kind-worker2"} 1.629964059e+09
+# HELP kube_limitrange Information about limit range.
+# TYPE kube_limitrange gauge
+# HELP kube_limitrange_created Unix creation timestamp
+# TYPE kube_limitrange_created gauge
+# HELP kube_mutatingwebhookconfiguration_info Information about the MutatingWebhookConfiguration.
+# TYPE kube_mutatingwebhookconfiguration_info gauge
+# HELP kube_mutatingwebhookconfiguration_created Unix creation timestamp.
+# TYPE kube_mutatingwebhookconfiguration_created gauge
+# HELP kube_mutatingwebhookconfiguration_metadata_resource_version Resource version representing a specific version of the MutatingWebhookConfiguration.
+# TYPE kube_mutatingwebhookconfiguration_metadata_resource_version gauge
+# HELP kube_namespace_created Unix creation timestamp
+# TYPE kube_namespace_created gauge
+kube_namespace_created{namespace="kube-public"} 1.628778283e+09
+kube_namespace_created{namespace="kube-system"} 1.628778283e+09
+kube_namespace_created{namespace="local-path-storage"} 1.628778292e+09
+kube_namespace_created{namespace="default"} 1.628778285e+09
+kube_namespace_created{namespace="kube-node-lease"} 1.628778283e+09
+# HELP kube_namespace_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_namespace_labels gauge
+kube_namespace_labels{namespace="kube-public"} 1
+kube_namespace_labels{namespace="kube-system"} 1
+kube_namespace_labels{namespace="local-path-storage"} 1
+kube_namespace_labels{namespace="default"} 1
+kube_namespace_labels{namespace="kube-node-lease"} 1
+# HELP kube_namespace_status_phase kubernetes namespace status phase.
+# TYPE kube_namespace_status_phase gauge
+kube_namespace_status_phase{namespace="kube-public",phase="Active"} 1
+kube_namespace_status_phase{namespace="kube-public",phase="Terminating"} 0
+kube_namespace_status_phase{namespace="kube-system",phase="Active"} 1
+kube_namespace_status_phase{namespace="kube-system",phase="Terminating"} 0
+kube_namespace_status_phase{namespace="local-path-storage",phase="Active"} 1
+kube_namespace_status_phase{namespace="local-path-storage",phase="Terminating"} 0
+kube_namespace_status_phase{namespace="default",phase="Active"} 1
+kube_namespace_status_phase{namespace="default",phase="Terminating"} 0
+kube_namespace_status_phase{namespace="kube-node-lease",phase="Active"} 1
+kube_namespace_status_phase{namespace="kube-node-lease",phase="Terminating"} 0
+# HELP kube_namespace_status_condition The condition of a namespace.
+# TYPE kube_namespace_status_condition gauge
+# HELP kube_networkpolicy_created Unix creation timestamp of network policy
+# TYPE kube_networkpolicy_created gauge
+# HELP kube_networkpolicy_labels Kubernetes labels converted to Prometheus labels
+# TYPE kube_networkpolicy_labels gauge
+# HELP kube_networkpolicy_spec_ingress_rules Number of ingress rules on the networkpolicy
+# TYPE kube_networkpolicy_spec_ingress_rules gauge
+# HELP kube_networkpolicy_spec_egress_rules Number of egress rules on the networkpolicy
+# TYPE kube_networkpolicy_spec_egress_rules gauge
+# HELP kube_node_created Unix creation timestamp
+# TYPE kube_node_created gauge
+kube_node_created{node="kind-control-plane"} 1.628778283e+09
+kube_node_created{node="kind-worker"} 1.628778316e+09
+kube_node_created{node="kind-worker2"} 1.628778316e+09
+# HELP kube_node_info Information about a cluster node.
+# TYPE kube_node_info gauge
+kube_node_info{node="kind-worker2",kernel_version="5.10.25-linuxkit",os_image="Ubuntu 21.04",container_runtime_version="containerd://1.5.2",kubelet_version="v1.16.15",kubeproxy_version="v1.16.15",provider_id="kind://docker/kind/kind-worker2",pod_cidr="10.244.1.0/24",internal_ip="172.20.0.3"} 1
+kube_node_info{node="kind-control-plane",kernel_version="5.10.25-linuxkit",os_image="Ubuntu 21.04",container_runtime_version="containerd://1.5.2",kubelet_version="v1.16.15",kubeproxy_version="v1.16.15",provider_id="kind://docker/kind/kind-control-plane",pod_cidr="10.244.0.0/24",internal_ip="172.20.0.2"} 1
+kube_node_info{node="kind-worker",kernel_version="5.10.25-linuxkit",os_image="Ubuntu 21.04",container_runtime_version="containerd://1.5.2",kubelet_version="v1.16.15",kubeproxy_version="v1.16.15",provider_id="kind://docker/kind/kind-worker",pod_cidr="10.244.2.0/24",internal_ip="172.20.0.4"} 1
+# HELP kube_node_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_node_labels gauge
+kube_node_labels{node="kind-worker2"} 1
+kube_node_labels{node="kind-control-plane"} 1
+kube_node_labels{node="kind-worker"} 1
+# HELP kube_node_role The role of a cluster node.
+# TYPE kube_node_role gauge
+kube_node_role{node="kind-control-plane",role="master"} 1
+# HELP kube_node_spec_taint The taint of a cluster node.
+# TYPE kube_node_spec_taint gauge
+kube_node_spec_taint{node="kind-control-plane",key="node-role.kubernetes.io/master",value="",effect="NoSchedule"} 1
+# HELP kube_node_spec_unschedulable Whether a node can schedule new pods.
+# TYPE kube_node_spec_unschedulable gauge
+kube_node_spec_unschedulable{node="kind-worker"} 0
+kube_node_spec_unschedulable{node="kind-worker2"} 0
+kube_node_spec_unschedulable{node="kind-control-plane"} 0
+# HELP kube_node_status_allocatable The allocatable for different resources of a node that are available for scheduling.
+# TYPE kube_node_status_allocatable gauge
+kube_node_status_allocatable{node="kind-worker2",resource="cpu",unit="core"} 12
+kube_node_status_allocatable{node="kind-worker2",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_allocatable{node="kind-worker2",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-worker2",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-worker2",resource="memory",unit="byte"} 2.9448855552e+10
+kube_node_status_allocatable{node="kind-worker2",resource="pods",unit="integer"} 110
+kube_node_status_allocatable{node="kind-control-plane",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-control-plane",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-control-plane",resource="memory",unit="byte"} 2.9448855552e+10
+kube_node_status_allocatable{node="kind-control-plane",resource="pods",unit="integer"} 110
+kube_node_status_allocatable{node="kind-control-plane",resource="cpu",unit="core"} 12
+kube_node_status_allocatable{node="kind-control-plane",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_allocatable{node="kind-worker",resource="pods",unit="integer"} 110
+kube_node_status_allocatable{node="kind-worker",resource="cpu",unit="core"} 12
+kube_node_status_allocatable{node="kind-worker",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_allocatable{node="kind-worker",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-worker",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_allocatable{node="kind-worker",resource="memory",unit="byte"} 2.9448855552e+10
+# HELP kube_node_status_capacity The capacity for different resources of a node.
+# TYPE kube_node_status_capacity gauge
+kube_node_status_capacity{node="kind-worker2",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_capacity{node="kind-worker2",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_capacity{node="kind-worker2",resource="memory",unit="byte"} 2.9448855552e+10
+kube_node_status_capacity{node="kind-worker2",resource="pods",unit="integer"} 110
+kube_node_status_capacity{node="kind-worker2",resource="cpu",unit="core"} 12
+kube_node_status_capacity{node="kind-worker2",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_capacity{node="kind-control-plane",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_capacity{node="kind-control-plane",resource="memory",unit="byte"} 2.9448855552e+10
+kube_node_status_capacity{node="kind-control-plane",resource="pods",unit="integer"} 110
+kube_node_status_capacity{node="kind-control-plane",resource="cpu",unit="core"} 12
+kube_node_status_capacity{node="kind-control-plane",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_capacity{node="kind-control-plane",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_capacity{node="kind-worker",resource="cpu",unit="core"} 12
+kube_node_status_capacity{node="kind-worker",resource="ephemeral_storage",unit="byte"} 1.35012552704e+11
+kube_node_status_capacity{node="kind-worker",resource="hugepages_1Gi",unit="byte"} 0
+kube_node_status_capacity{node="kind-worker",resource="hugepages_2Mi",unit="byte"} 0
+kube_node_status_capacity{node="kind-worker",resource="memory",unit="byte"} 2.9448855552e+10
+kube_node_status_capacity{node="kind-worker",resource="pods",unit="integer"} 110
+# HELP kube_node_status_condition The condition of a cluster node.
+# TYPE kube_node_status_condition gauge
+kube_node_status_condition{node="kind-control-plane",condition="MemoryPressure",status="true"} 0
+kube_node_status_condition{node="kind-control-plane",condition="MemoryPressure",status="false"} 1
+kube_node_status_condition{node="kind-control-plane",condition="MemoryPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-control-plane",condition="DiskPressure",status="true"} 0
+kube_node_status_condition{node="kind-control-plane",condition="DiskPressure",status="false"} 1
+kube_node_status_condition{node="kind-control-plane",condition="DiskPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-control-plane",condition="PIDPressure",status="true"} 0
+kube_node_status_condition{node="kind-control-plane",condition="PIDPressure",status="false"} 1
+kube_node_status_condition{node="kind-control-plane",condition="PIDPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-control-plane",condition="Ready",status="true"} 1
+kube_node_status_condition{node="kind-control-plane",condition="Ready",status="false"} 0
+kube_node_status_condition{node="kind-control-plane",condition="Ready",status="unknown"} 0
+kube_node_status_condition{node="kind-worker",condition="MemoryPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker",condition="MemoryPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker",condition="MemoryPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker",condition="DiskPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker",condition="DiskPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker",condition="DiskPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker",condition="PIDPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker",condition="PIDPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker",condition="PIDPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker",condition="Ready",status="true"} 1
+kube_node_status_condition{node="kind-worker",condition="Ready",status="false"} 0
+kube_node_status_condition{node="kind-worker",condition="Ready",status="unknown"} 0
+kube_node_status_condition{node="kind-worker2",condition="MemoryPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker2",condition="MemoryPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker2",condition="MemoryPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker2",condition="DiskPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker2",condition="DiskPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker2",condition="DiskPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker2",condition="PIDPressure",status="true"} 0
+kube_node_status_condition{node="kind-worker2",condition="PIDPressure",status="false"} 1
+kube_node_status_condition{node="kind-worker2",condition="PIDPressure",status="unknown"} 0
+kube_node_status_condition{node="kind-worker2",condition="Ready",status="true"} 1
+kube_node_status_condition{node="kind-worker2",condition="Ready",status="false"} 0
+kube_node_status_condition{node="kind-worker2",condition="Ready",status="unknown"} 0
+# HELP kube_persistentvolumeclaim_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_persistentvolumeclaim_labels gauge
+kube_persistentvolumeclaim_labels{namespace="default",persistentvolumeclaim="task-pv-claim"} 1
+# HELP kube_persistentvolumeclaim_info Information about persistent volume claim.
+# TYPE kube_persistentvolumeclaim_info gauge
+kube_persistentvolumeclaim_info{namespace="default",persistentvolumeclaim="task-pv-claim",storageclass="generic",volumename="task-pv-volume"} 1
+# HELP kube_persistentvolumeclaim_status_phase The phase the persistent volume claim is currently in.
+# TYPE kube_persistentvolumeclaim_status_phase gauge
+kube_persistentvolumeclaim_status_phase{namespace="default",persistentvolumeclaim="task-pv-claim",phase="Lost"} 0
+kube_persistentvolumeclaim_status_phase{namespace="default",persistentvolumeclaim="task-pv-claim",phase="Bound"} 1
+kube_persistentvolumeclaim_status_phase{namespace="default",persistentvolumeclaim="task-pv-claim",phase="Pending"} 0
+# HELP kube_persistentvolumeclaim_resource_requests_storage_bytes The capacity of storage requested by the persistent volume claim.
+# TYPE kube_persistentvolumeclaim_resource_requests_storage_bytes gauge
+kube_persistentvolumeclaim_resource_requests_storage_bytes{namespace="default",persistentvolumeclaim="task-pv-claim"} 1024
+# HELP kube_persistentvolumeclaim_access_mode The access mode(s) specified by the persistent volume claim.
+# TYPE kube_persistentvolumeclaim_access_mode gauge
+kube_persistentvolumeclaim_access_mode{namespace="default",persistentvolumeclaim="task-pv-claim",access_mode="ReadWriteOnce"} 1
+# HELP kube_persistentvolumeclaim_status_condition Information about status of different conditions of persistent volume claim.
+# TYPE kube_persistentvolumeclaim_status_condition gauge
+# HELP kube_persistentvolume_claim_ref Information about the Persitant Volume Claim Reference.
+# TYPE kube_persistentvolume_claim_ref gauge
+kube_persistentvolume_claim_ref{persistentvolume="task-pv-volume",name="task-pv-claim",claim_namespace="default"} 1
+# HELP kube_persistentvolume_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_persistentvolume_labels gauge
+kube_persistentvolume_labels{persistentvolume="task-pv-volume"} 1
+# HELP kube_persistentvolume_status_phase The phase indicates if a volume is available, bound to a claim, or released by a claim.
+# TYPE kube_persistentvolume_status_phase gauge
+kube_persistentvolume_status_phase{persistentvolume="task-pv-volume",phase="Pending"} 0
+kube_persistentvolume_status_phase{persistentvolume="task-pv-volume",phase="Available"} 0
+kube_persistentvolume_status_phase{persistentvolume="task-pv-volume",phase="Bound"} 1
+kube_persistentvolume_status_phase{persistentvolume="task-pv-volume",phase="Released"} 0
+kube_persistentvolume_status_phase{persistentvolume="task-pv-volume",phase="Failed"} 0
+# HELP kube_persistentvolume_info Information about persistentvolume.
+# TYPE kube_persistentvolume_info gauge
+kube_persistentvolume_info{persistentvolume="task-pv-volume",storageclass="generic",gce_persistent_disk_name="",ebs_volume_id="",azure_disk_name="",fc_wwids="",fc_lun="",fc_target_wwns="",iscsi_target_portal="",iscsi_iqn="",iscsi_lun="",iscsi_initiator_name="",nfs_server="",nfs_path=""} 1
+# HELP kube_persistentvolume_capacity_bytes Persistentvolume capacity in bytes.
+# TYPE kube_persistentvolume_capacity_bytes gauge
+kube_persistentvolume_capacity_bytes{persistentvolume="task-pv-volume"} 2048
+# HELP kube_poddisruptionbudget_created Unix creation timestamp
+# TYPE kube_poddisruptionbudget_created gauge
+# HELP kube_poddisruptionbudget_status_current_healthy Current number of healthy pods
+# TYPE kube_poddisruptionbudget_status_current_healthy gauge
+# HELP kube_poddisruptionbudget_status_desired_healthy Minimum desired number of healthy pods
+# TYPE kube_poddisruptionbudget_status_desired_healthy gauge
+# HELP kube_poddisruptionbudget_status_pod_disruptions_allowed Number of pod disruptions that are currently allowed
+# TYPE kube_poddisruptionbudget_status_pod_disruptions_allowed gauge
+# HELP kube_poddisruptionbudget_status_expected_pods Total number of pods counted by this disruption budget
+# TYPE kube_poddisruptionbudget_status_expected_pods gauge
+# HELP kube_poddisruptionbudget_status_observed_generation Most recent generation observed when updating this PDB status
+# TYPE kube_poddisruptionbudget_status_observed_generation gauge
+# HELP kube_pod_completion_time Completion time in unix timestamp for a pod.
+# TYPE kube_pod_completion_time gauge
+kube_pod_completion_time{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e"} 1.629448087e+09
+# HELP kube_pod_container_info Information about a container in a pod.
+# TYPE kube_pod_container_info gauge
+kube_pod_container_info{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd",image="k8s.gcr.io/etcd:3.3.15-0",image_id="sha256:b2756210eeabf84f3221da9959e9483f3919dc2aaab4cd45e7cd072fcbde27ed",container_id="containerd://3f9250f160ca15f681b8c7da78fdf34cd8be8a86fde3910b682ad413b940a8c5"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics",image="k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.1.0",image_id="k8s.gcr.io/kube-state-metrics/kube-state-metrics@sha256:9b5e1d695f1116d22b566515d6c41a2852959172312c491eb10b8e7cc4bf4586",container_id="containerd://ae513b826459c9382984bea986eb3546aa45fd0e650051cb9591ab7a8efed6ea"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver",image="k8s.gcr.io/kube-apiserver:v1.16.15",image_id="sha256:e289d9ed8fc5d792cb7f498cf2e001ab1350ac7eb328c3b13e5771329c6290d2",container_id="containerd://ffdc200c097349d8ed96f5768387d276751497297730121e6335a31c2d3332a4"} 1
+kube_pod_container_info{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",image="docker.io/kindest/kindnetd:v20210326-1e038dc5",image_id="sha256:6de166512aa223315ff9cfd49bd4f13aab1591cd8fc57e31270f0e4aa34129cb",container_id="containerd://9afadbf7fd5374d1849b008e8ad4287cdbfbbf499bab9740bf0c7a5cd6730ad9"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy",image="k8s.gcr.io/kube-proxy:v1.16.15",image_id="sha256:8ee1d2ab58f66ce1718c98ee957ff2198e76ab94ba417127ef2152882ce9c6ef",container_id="containerd://8af6de6644ef1e5bb36b9d1f87d65e9b893096ae2c0f3e57061fad70f094d1be"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy",image="k8s.gcr.io/kube-proxy:v1.16.15",image_id="sha256:8ee1d2ab58f66ce1718c98ee957ff2198e76ab94ba417127ef2152882ce9c6ef",container_id="containerd://f2926bdf120aa838838aa55640b5511291e7279eb07ee8c17e01bf23a8695c2c"} 1
+kube_pod_container_info{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",image="docker.io/kindest/kindnetd:v20210326-1e038dc5",image_id="sha256:6de166512aa223315ff9cfd49bd4f13aab1591cd8fc57e31270f0e4aa34129cb",container_id="containerd://3037e577635e9cbcefe1f273e5b06784d36807af76158e4add887e840c42e1ef"} 1
+kube_pod_container_info{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",image="docker.io/kindest/kindnetd:v20210326-1e038dc5",image_id="sha256:6de166512aa223315ff9cfd49bd4f13aab1591cd8fc57e31270f0e4aa34129cb",container_id="containerd://09603a8146bd6aacb32d55a1e52e929143f003ea30c84052f765efca129fd90a"} 1
+kube_pod_container_info{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis",image="docker.io/library/redis:5.0.4",image_id="docker.io/library/redis@sha256:2dfa6432744659268d001d16c39f7be52ee73ef7e1001ff80643f0f7bdee117e",container_id="containerd://fae8ef6fa6ea716f5ce0a65a1b2407d1e4839b04452d6013cdb6d5be8db8ada0"} 1
+kube_pod_container_info{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat",image="docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT",image_id="docker.elastic.co/beats/metricbeat@sha256:80c6e7fb24bc93fc1ad96832d9728cc3f06fbee949c5daff2630ca9b7cfd310a",container_id="containerd://d66f649ad0f6c1822039f1c4ea27b6f792f6a86029bf862e77afa2966042a1ce"} 1
+kube_pod_container_info{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello",image="docker.io/library/busybox:latest",image_id="docker.io/library/busybox@sha256:0f354ec1728d9ff32edcd7d1b8bbdfc798277ad36120dc3dc683be44524c8b60",container_id="containerd://a84953a247df489898d85ecfd0f893c2655ed1915ac902b309ee6e3658c7e258"} 1
+kube_pod_container_info{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns",image="k8s.gcr.io/coredns:1.6.2",image_id="sha256:bf261d157914477ee1a5969d28ec687f3fbfc9fb5a664b22df78e57023b0e03b",container_id="containerd://33315399455b7213d316f6f799155d890659ca407f80d58307075b3ee70e7e07"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager",image="k8s.gcr.io/kube-controller-manager:v1.16.15",image_id="sha256:556b3295368df101c6a35d49d0d642f0b5aa63cb93c6760b52bb81cbb95d8c19",container_id="containerd://1c1919c3b07bf3369b5e1a4bf187762f2724b3bc7eb113239af3919f12202337"} 1
+kube_pod_container_info{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat",image="docker.elastic.co/beats/metricbeat:7.15.0-SNAPSHOT",image_id="docker.elastic.co/beats/metricbeat@sha256:80c6e7fb24bc93fc1ad96832d9728cc3f06fbee949c5daff2630ca9b7cfd310a",container_id="containerd://90560da422742a41de53c281969942c25f24d7b6bf73af6e4f226ee62338f640"} 1
+kube_pod_container_info{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner",image="docker.io/rancher/local-path-provisioner:v0.0.14",image_id="sha256:e422121c9c5f97623245b7e600eeb5e223ee623f21fa04da985ae71057d8d70b",container_id="containerd://1a223dbb8b51a7404836789fd049701a9e4df7bb69878fb893ab10419ff4eb29"} 1
+kube_pod_container_info{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python",image="docker.io/odise/busybox-python:latest",image_id="sha256:686533f5e55e54a3809fef3b9b93ea249781183d260a812c25b8978642998e7d",container_id="containerd://02b0705f60dc6131a6b5d4e9a48e2510463f89a0f77e7e1bafa6b5f45cc595e8"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler",image="k8s.gcr.io/kube-scheduler:v1.16.15",image_id="sha256:b12c37d1ff1aa457bc59510bc27181c33e2d6159d95c11fdae2ce281c0520615",container_id="containerd://cd368e1731c278b039642fab2fe90902e2cfa470fd70a7ccfd5c2549a552cea5"} 1
+kube_pod_container_info{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns",image="k8s.gcr.io/coredns:1.6.2",image_id="sha256:bf261d157914477ee1a5969d28ec687f3fbfc9fb5a664b22df78e57023b0e03b",container_id="containerd://3101d1525d6133851881f4b7cd439033663daefeb4849e5322d1428f09620628"} 1
+kube_pod_container_info{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy",image="k8s.gcr.io/kube-proxy:v1.16.15",image_id="sha256:8ee1d2ab58f66ce1718c98ee957ff2198e76ab94ba417127ef2152882ce9c6ef",container_id="containerd://a55ee307ef431d293c02a7eb96417963d7b81b298a8ebfac2f77fe4ca58e1461"} 1
+# HELP kube_pod_container_resource_limits The number of requested limit resource by a container.
+# TYPE kube_pod_container_resource_limits gauge
+kube_pod_container_resource_limits{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat",node="kind-worker",resource="memory",unit="byte"} 2.097152e+08
+kube_pod_container_resource_limits{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns",node="kind-control-plane",resource="memory",unit="byte"} 1.7825792e+08
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",node="kind-worker",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",node="kind-worker",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",node="kind-worker2",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",node="kind-worker2",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",node="kind-control-plane",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_limits{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",node="kind-control-plane",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_limits{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis",node="kind-worker2",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_limits{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat",node="kind-worker2",resource="memory",unit="byte"} 2.097152e+08
+kube_pod_container_resource_limits{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns",node="kind-control-plane",resource="memory",unit="byte"} 1.7825792e+08
+# HELP kube_pod_container_resource_requests The number of requested request resource by a container.
+# TYPE kube_pod_container_resource_requests gauge
+kube_pod_container_resource_requests{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler",node="kind-control-plane",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns",node="kind-control-plane",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns",node="kind-control-plane",resource="memory",unit="byte"} 7.340032e+07
+kube_pod_container_resource_requests{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat",node="kind-worker",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat",node="kind-worker",resource="memory",unit="byte"} 1.048576e+08
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",node="kind-worker",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",node="kind-worker",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_requests{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver",node="kind-control-plane",resource="cpu",unit="core"} 0.25
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",node="kind-worker2",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",node="kind-worker2",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",node="kind-control-plane",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",node="kind-control-plane",resource="memory",unit="byte"} 5.24288e+07
+kube_pod_container_resource_requests{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns",node="kind-control-plane",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns",node="kind-control-plane",resource="memory",unit="byte"} 7.340032e+07
+kube_pod_container_resource_requests{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager",node="kind-control-plane",resource="cpu",unit="core"} 0.2
+kube_pod_container_resource_requests{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis",node="kind-worker2",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat",node="kind-worker2",resource="cpu",unit="core"} 0.1
+kube_pod_container_resource_requests{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat",node="kind-worker2",resource="memory",unit="byte"} 1.048576e+08
+# HELP kube_pod_container_state_started Start time in unix timestamp for a pod container.
+# TYPE kube_pod_container_state_started gauge
+kube_pod_container_state_started{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 1.629963861e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 1.629963861e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 1.629963861e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 1.629963856e+09
+kube_pod_container_state_started{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 1.629963859e+09
+kube_pod_container_state_started{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 1.629963859e+09
+kube_pod_container_state_started{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 1.629963859e+09
+kube_pod_container_state_started{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 1.629963859e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 1.629963861e+09
+kube_pod_container_state_started{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 1.629963859e+09
+kube_pod_container_state_started{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 1.629963905e+09
+kube_pod_container_state_started{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 1.629963872e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 1.629963856e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 1.629963861e+09
+kube_pod_container_state_started{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 1.629963855e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 1.62996389e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 1.629963855e+09
+kube_pod_container_state_started{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 1.629963861e+09
+# HELP kube_pod_container_status_last_terminated_reason Describes the last reason the container was in terminated state.
+# TYPE kube_pod_container_status_last_terminated_reason gauge
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner",reason="Error"} 1
+kube_pod_container_status_last_terminated_reason{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics",reason="Error"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns",reason="Unknown"} 1
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager",reason="Unknown"} 1
+# HELP kube_pod_container_status_ready Describes whether the containers readiness check succeeded.
+# TYPE kube_pod_container_status_ready gauge
+kube_pod_container_status_ready{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 1
+kube_pod_container_status_ready{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello"} 0
+kube_pod_container_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 1
+kube_pod_container_status_ready{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 1
+kube_pod_container_status_ready{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 1
+kube_pod_container_status_ready{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 1
+# HELP kube_pod_container_status_restarts_total The number of container restarts per container.
+# TYPE kube_pod_container_status_restarts_total counter
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 4
+kube_pod_container_status_restarts_total{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 1
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 1
+kube_pod_container_status_restarts_total{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello"} 0
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 1
+kube_pod_container_status_restarts_total{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 8
+kube_pod_container_status_restarts_total{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 18
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 0
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 2
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 0
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 4
+kube_pod_container_status_restarts_total{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 4
+# HELP kube_pod_container_status_running Describes whether the container is currently in running state.
+# TYPE kube_pod_container_status_running gauge
+kube_pod_container_status_running{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 1
+kube_pod_container_status_running{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 1
+kube_pod_container_status_running{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello"} 0
+kube_pod_container_status_running{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 1
+kube_pod_container_status_running{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 1
+kube_pod_container_status_running{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 1
+kube_pod_container_status_running{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 1
+# HELP kube_pod_container_status_terminated Describes whether the container is currently in terminated state.
+# TYPE kube_pod_container_status_terminated gauge
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 0
+kube_pod_container_status_terminated{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 0
+kube_pod_container_status_terminated{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello"} 1
+kube_pod_container_status_terminated{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 0
+kube_pod_container_status_terminated{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 0
+kube_pod_container_status_terminated{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 0
+kube_pod_container_status_terminated{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 0
+# HELP kube_pod_container_status_terminated_reason Describes the reason the container is currently in terminated state.
+# TYPE kube_pod_container_status_terminated_reason gauge
+kube_pod_container_status_terminated_reason{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello",reason="Completed"} 1
+# HELP kube_pod_container_status_waiting Describes whether the container is currently in waiting state.
+# TYPE kube_pod_container_status_waiting gauge
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",container="kube-proxy"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",container="kindnet-cni"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",container="kindnet-cni"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",container="kube-controller-manager"} 0
+kube_pod_container_status_waiting{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",container="redis"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",container="metricbeat"} 0
+kube_pod_container_status_waiting{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",container="hello"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",container="coredns"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",container="coredns"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",container="kube-proxy"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",container="metricbeat"} 0
+kube_pod_container_status_waiting{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",container="local-path-provisioner"} 0
+kube_pod_container_status_waiting{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",container="hello-python"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",container="kube-scheduler"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",container="kube-proxy"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",container="etcd"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",container="kube-state-metrics"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",container="kube-apiserver"} 0
+kube_pod_container_status_waiting{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",container="kindnet-cni"} 0
+# HELP kube_pod_container_status_waiting_reason Describes the reason the container is currently in waiting state.
+# TYPE kube_pod_container_status_waiting_reason gauge
+# HELP kube_pod_created Unix creation timestamp
+# TYPE kube_pod_created gauge
+kube_pod_created{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336"} 1.629890083e+09
+kube_pod_created{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb"} 1.628778303e+09
+kube_pod_created{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b"} 1.629815782e+09
+kube_pod_created{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43"} 1.628778366e+09
+kube_pod_created{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598"} 1.628778303e+09
+kube_pod_created{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6"} 1.628778302e+09
+kube_pod_created{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b"} 1.62996386e+09
+kube_pod_created{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304"} 1.629723843e+09
+kube_pod_created{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305"} 1.62996386e+09
+kube_pod_created{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6"} 1.628778316e+09
+kube_pod_created{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216"} 1.628778316e+09
+kube_pod_created{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22"} 1.628778316e+09
+kube_pod_created{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c"} 1.628778316e+09
+kube_pod_created{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533"} 1.628778302e+09
+kube_pod_created{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d"} 1.629794711e+09
+kube_pod_created{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059"} 1.629890083e+09
+kube_pod_created{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e"} 1.629448061e+09
+kube_pod_created{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03"} 1.628778303e+09
+kube_pod_created{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6"} 1.628778355e+09
+# HELP kube_pod_deletion_timestamp Unix deletion timestamp
+# TYPE kube_pod_deletion_timestamp gauge
+# HELP kube_pod_info Information about pod.
+# TYPE kube_pod_info gauge
+kube_pod_info{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="<none>",created_by_name="<none>",priority_class="system-cluster-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",host_ip="172.20.0.4",pod_ip="10.244.2.2",node="kind-worker",created_by_kind="ReplicaSet",created_by_name="kube-state-metrics-f655d484d",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="<none>",created_by_name="<none>",priority_class="system-cluster-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",host_ip="172.20.0.4",pod_ip="172.20.0.4",node="kind-worker",created_by_kind="DaemonSet",created_by_name="kindnet",priority_class="",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",host_ip="172.20.0.4",pod_ip="172.20.0.4",node="kind-worker",created_by_kind="DaemonSet",created_by_name="kube-proxy",priority_class="system-node-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",host_ip="172.20.0.3",pod_ip="172.20.0.3",node="kind-worker2",created_by_kind="DaemonSet",created_by_name="kube-proxy",priority_class="system-node-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",host_ip="172.20.0.3",pod_ip="172.20.0.3",node="kind-worker2",created_by_kind="DaemonSet",created_by_name="kindnet",priority_class="",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="DaemonSet",created_by_name="kindnet",priority_class="",host_network="true"} 1
+kube_pod_info{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",host_ip="172.20.0.3",pod_ip="10.244.1.2",node="kind-worker2",created_by_kind="<none>",created_by_name="<none>",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",host_ip="172.20.0.3",pod_ip="172.20.0.3",node="kind-worker2",created_by_kind="DaemonSet",created_by_name="metricbeat",priority_class="",host_network="true"} 1
+kube_pod_info{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",host_ip="172.20.0.3",pod_ip="10.244.2.2",node="kind-worker",created_by_kind="Job",created_by_name="hello",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",host_ip="172.20.0.2",pod_ip="10.244.0.2",node="kind-control-plane",created_by_kind="ReplicaSet",created_by_name="coredns-5644d7b6d9",priority_class="system-cluster-critical",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="<none>",created_by_name="<none>",priority_class="system-cluster-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",host_ip="172.20.0.4",pod_ip="172.20.0.4",node="kind-worker",created_by_kind="DaemonSet",created_by_name="metricbeat",priority_class="",host_network="true"} 1
+kube_pod_info{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",host_ip="172.20.0.2",pod_ip="10.244.0.4",node="kind-control-plane",created_by_kind="ReplicaSet",created_by_name="local-path-provisioner-5bf465b47d",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",host_ip="172.20.0.4",pod_ip="10.244.2.3",node="kind-worker",created_by_kind="ReplicaSet",created_by_name="hello-python-566b5479f5",priority_class="",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="<none>",created_by_name="<none>",priority_class="system-cluster-critical",host_network="true"} 1
+kube_pod_info{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",host_ip="172.20.0.2",pod_ip="10.244.0.3",node="kind-control-plane",created_by_kind="ReplicaSet",created_by_name="coredns-5644d7b6d9",priority_class="system-cluster-critical",host_network="false"} 1
+kube_pod_info{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",host_ip="172.20.0.2",pod_ip="172.20.0.2",node="kind-control-plane",created_by_kind="DaemonSet",created_by_name="kube-proxy",priority_class="system-node-critical",host_network="true"} 1
+# HELP kube_pod_init_container_info Information about an init container in a pod.
+# TYPE kube_pod_init_container_info gauge
+# HELP kube_pod_init_container_resource_limits_cpu_cores The number of CPU cores requested limit by an init container.
+# TYPE kube_pod_init_container_resource_limits_cpu_cores gauge
+# HELP kube_pod_init_container_resource_limits_ephemeral_storage_bytes Bytes of ephemeral-storage requested limit by an init container.
+# TYPE kube_pod_init_container_resource_limits_ephemeral_storage_bytes gauge
+# HELP kube_pod_init_container_resource_limits The number of requested limit resource by an init container.
+# TYPE kube_pod_init_container_resource_limits gauge
+# HELP kube_pod_init_container_resource_limits_memory_bytes Bytes of memory requested limit by an init container.
+# TYPE kube_pod_init_container_resource_limits_memory_bytes gauge
+# HELP kube_pod_init_container_resource_limits_storage_bytes Bytes of storage requested limit by an init container.
+# TYPE kube_pod_init_container_resource_limits_storage_bytes gauge
+# HELP kube_pod_init_container_resource_requests_cpu_cores The number of CPU cores requested by an init container.
+# TYPE kube_pod_init_container_resource_requests_cpu_cores gauge
+# HELP kube_pod_init_container_resource_requests_ephemeral_storage_bytes Bytes of ephemeral-storage requested by an init container.
+# TYPE kube_pod_init_container_resource_requests_ephemeral_storage_bytes gauge
+# HELP kube_pod_init_container_resource_requests The number of requested request resource by an init container.
+# TYPE kube_pod_init_container_resource_requests gauge
+# HELP kube_pod_init_container_resource_requests_memory_bytes Bytes of memory requested by an init container.
+# TYPE kube_pod_init_container_resource_requests_memory_bytes gauge
+# HELP kube_pod_init_container_resource_requests_storage_bytes Bytes of storage requested by an init container.
+# TYPE kube_pod_init_container_resource_requests_storage_bytes gauge
+# HELP kube_pod_init_container_status_last_terminated_reason Describes the last reason the init container was in terminated state.
+# TYPE kube_pod_init_container_status_last_terminated_reason gauge
+# HELP kube_pod_init_container_status_ready Describes whether the init containers readiness check succeeded.
+# TYPE kube_pod_init_container_status_ready gauge
+# HELP kube_pod_init_container_status_restarts_total The number of restarts for the init container.
+# TYPE kube_pod_init_container_status_restarts_total counter
+# HELP kube_pod_init_container_status_running Describes whether the init container is currently in running state.
+# TYPE kube_pod_init_container_status_running gauge
+# HELP kube_pod_init_container_status_terminated Describes whether the init container is currently in terminated state.
+# TYPE kube_pod_init_container_status_terminated gauge
+# HELP kube_pod_init_container_status_terminated_reason Describes the reason the init container is currently in terminated state.
+# TYPE kube_pod_init_container_status_terminated_reason gauge
+# HELP kube_pod_init_container_status_waiting Describes whether the init container is currently in waiting state.
+# TYPE kube_pod_init_container_status_waiting gauge
+# HELP kube_pod_init_container_status_waiting_reason Describes the reason the init container is currently in waiting state.
+# TYPE kube_pod_init_container_status_waiting_reason gauge
+# HELP kube_pod_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_pod_labels gauge
+kube_pod_labels{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43"} 1
+kube_pod_labels{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6"} 1
+kube_pod_labels{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336"} 1
+kube_pod_labels{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305"} 1
+kube_pod_labels{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216"} 1
+kube_pod_labels{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304"} 1
+kube_pod_labels{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22"} 1
+kube_pod_labels{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c"} 1
+kube_pod_labels{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e"} 1
+kube_pod_labels{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03"} 1
+kube_pod_labels{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6"} 1
+kube_pod_labels{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d"} 1
+kube_pod_labels{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059"} 1
+# HELP kube_pod_overhead_cpu_cores The pod overhead in regards to cpu cores associated with running a pod.
+# TYPE kube_pod_overhead_cpu_cores gauge
+# HELP kube_pod_overhead_memory_bytes The pod overhead in regards to memory associated with running a pod.
+# TYPE kube_pod_overhead_memory_bytes gauge
+# HELP kube_pod_owner Information about the Pod's owner.
+# TYPE kube_pod_owner gauge
+kube_pod_owner{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",owner_kind="ReplicaSet",owner_name="kube-state-metrics-f655d484d",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+kube_pod_owner{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",owner_kind="DaemonSet",owner_name="kindnet",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",owner_kind="DaemonSet",owner_name="kube-proxy",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",owner_kind="DaemonSet",owner_name="kube-proxy",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",owner_kind="DaemonSet",owner_name="kindnet",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",owner_kind="DaemonSet",owner_name="kindnet",owner_is_controller="true"} 1
+kube_pod_owner{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+kube_pod_owner{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",owner_kind="DaemonSet",owner_name="metricbeat",owner_is_controller="true"} 1
+kube_pod_owner{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",owner_kind="Job",owner_name="hello",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",owner_kind="ReplicaSet",owner_name="coredns-5644d7b6d9",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+kube_pod_owner{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",owner_kind="DaemonSet",owner_name="metricbeat",owner_is_controller="true"} 1
+kube_pod_owner{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",owner_kind="ReplicaSet",owner_name="local-path-provisioner-5bf465b47d",owner_is_controller="true"} 1
+kube_pod_owner{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",owner_kind="ReplicaSet",owner_name="hello-python-566b5479f5",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",owner_kind="<none>",owner_name="<none>",owner_is_controller="<none>"} 1
+kube_pod_owner{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",owner_kind="ReplicaSet",owner_name="coredns-5644d7b6d9",owner_is_controller="true"} 1
+kube_pod_owner{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",owner_kind="DaemonSet",owner_name="kube-proxy",owner_is_controller="true"} 1
+# HELP kube_pod_restart_policy Describes the restart policy in use by this pod.
+# TYPE kube_pod_restart_policy gauge
+kube_pod_restart_policy{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",type="Always"} 1
+kube_pod_restart_policy{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",type="Always"} 1
+kube_pod_restart_policy{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",type="OnFailure"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",type="Always"} 1
+kube_pod_restart_policy{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",type="Always"} 1
+kube_pod_restart_policy{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",type="Always"} 1
+kube_pod_restart_policy{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",type="Always"} 1
+# HELP kube_pod_runtimeclass_name_info The runtimeclass associated with the pod.
+# TYPE kube_pod_runtimeclass_name_info gauge
+# HELP kube_pod_spec_volumes_persistentvolumeclaims_info Information about persistentvolumeclaim volumes in a pod.
+# TYPE kube_pod_spec_volumes_persistentvolumeclaims_info gauge
+# HELP kube_pod_spec_volumes_persistentvolumeclaims_readonly Describes whether a persistentvolumeclaim is mounted read only.
+# TYPE kube_pod_spec_volumes_persistentvolumeclaims_readonly gauge
+# HELP kube_pod_start_time Start time in unix timestamp for a pod.
+# TYPE kube_pod_start_time gauge
+kube_pod_start_time{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305"} 1.62970302e+09
+kube_pod_start_time{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6"} 1.628778317e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216"} 1.628778317e+09
+kube_pod_start_time{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b"} 1.629963855e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304"} 1.629723843e+09
+kube_pod_start_time{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533"} 1.628778302e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22"} 1.628778316e+09
+kube_pod_start_time{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c"} 1.628778316e+09
+kube_pod_start_time{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e"} 1.629448061e+09
+kube_pod_start_time{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03"} 1.628778313e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6"} 1.629963855e+09
+kube_pod_start_time{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d"} 1.629794711e+09
+kube_pod_start_time{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059"} 1.629890083e+09
+kube_pod_start_time{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b"} 1.629815782e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43"} 1.628845056e+09
+kube_pod_start_time{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598"} 1.628778316e+09
+kube_pod_start_time{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6"} 1.628778302e+09
+kube_pod_start_time{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336"} 1.629890083e+09
+kube_pod_start_time{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb"} 1.628778313e+09
+# HELP kube_pod_status_phase The pods current phase.
+# TYPE kube_pod_status_phase gauge
+kube_pod_status_phase{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",phase="Running"} 1
+kube_pod_status_phase{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",phase="Pending"} 0
+kube_pod_status_phase{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",phase="Succeeded"} 1
+kube_pod_status_phase{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",phase="Failed"} 0
+kube_pod_status_phase{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",phase="Unknown"} 0
+kube_pod_status_phase{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",phase="Running"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",phase="Running"} 1
+kube_pod_status_phase{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",phase="Pending"} 0
+kube_pod_status_phase{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",phase="Failed"} 0
+kube_pod_status_phase{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",phase="Unknown"} 0
+kube_pod_status_phase{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",phase="Running"} 1
+kube_pod_status_phase{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",phase="Pending"} 0
+kube_pod_status_phase{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",phase="Failed"} 0
+kube_pod_status_phase{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",phase="Unknown"} 0
+kube_pod_status_phase{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",phase="Running"} 1
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",phase="Pending"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",phase="Failed"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",phase="Unknown"} 0
+kube_pod_status_phase{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",phase="Running"} 1
+kube_pod_status_phase{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",phase="Pending"} 0
+kube_pod_status_phase{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",phase="Succeeded"} 0
+kube_pod_status_phase{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",phase="Failed"} 0
+kube_pod_status_phase{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",phase="Unknown"} 0
+kube_pod_status_phase{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",phase="Running"} 1
+# HELP kube_pod_status_ready Describes whether the pod is ready to serve requests.
+# TYPE kube_pod_status_ready gauge
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="unknown"} 0
+kube_pod_status_ready{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="true"} 1
+kube_pod_status_ready{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="false"} 0
+kube_pod_status_ready{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="unknown"} 0
+kube_pod_status_ready{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="true"} 1
+kube_pod_status_ready{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="false"} 0
+kube_pod_status_ready{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="unknown"} 0
+kube_pod_status_ready{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="true"} 1
+kube_pod_status_ready{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="false"} 0
+kube_pod_status_ready{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="unknown"} 0
+kube_pod_status_ready{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="true"} 0
+kube_pod_status_ready{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="false"} 1
+kube_pod_status_ready{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="unknown"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="true"} 1
+kube_pod_status_ready{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="false"} 0
+kube_pod_status_ready{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="unknown"} 0
+# HELP kube_pod_status_reason The pod status reasons
+# TYPE kube_pod_status_reason gauge
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",reason="Evicted"} 0
+kube_pod_status_reason{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",reason="Evicted"} 0
+kube_pod_status_reason{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",reason="Evicted"} 0
+kube_pod_status_reason{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",reason="Evicted"} 0
+kube_pod_status_reason{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",reason="UnexpectedAdmissionError"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",reason="NodeLost"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",reason="Evicted"} 0
+kube_pod_status_reason{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",reason="UnexpectedAdmissionError"} 0
+# HELP kube_pod_status_scheduled Describes the status of the scheduling process for the pod.
+# TYPE kube_pod_status_scheduled gauge
+kube_pod_status_scheduled{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="true"} 1
+kube_pod_status_scheduled{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="false"} 0
+kube_pod_status_scheduled{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="true"} 1
+kube_pod_status_scheduled{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="false"} 0
+kube_pod_status_scheduled{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="true"} 1
+kube_pod_status_scheduled{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="false"} 0
+kube_pod_status_scheduled{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="true"} 1
+kube_pod_status_scheduled{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="false"} 0
+kube_pod_status_scheduled{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c",condition="unknown"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="true"} 1
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="false"} 0
+kube_pod_status_scheduled{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533",condition="unknown"} 0
+# HELP kube_pod_status_scheduled_time Unix timestamp when pod moved into scheduled status
+# TYPE kube_pod_status_scheduled_time gauge
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-controller-manager-kind-control-plane",uid="30c9f2a3-c57e-45b0-bdb0-d0b0d32779a6"} 1.629963855e+09
+kube_pod_status_scheduled_time{namespace="default",pod="redis",uid="e6581d57-0e08-4018-8bb5-5d3ef8686d0d"} 1.629794711e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="metricbeat-55fp7",uid="034173fd-90f6-4a20-950f-51fcc246f059"} 1.629890083e+09
+kube_pod_status_scheduled_time{namespace="default",pod="hello-zf6gh",uid="e82913ff-7f62-4ff1-adc8-1072c136114e"} 1.629448061e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="coredns-5644d7b6d9-nnwmb",uid="364cf0da-059a-47e0-85fd-da088f625c03"} 1.628778313e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="coredns-5644d7b6d9-zgdsx",uid="7bed6f18-9352-4016-a16c-c1d65a7c1598"} 1.628778316e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-proxy-cm525",uid="0c86ca0e-6cce-4572-8ba7-925081edc6e6"} 1.628778302e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="metricbeat-bvr2v",uid="3a5cbcbc-2c94-47b6-9716-fdd58d5d7336"} 1.629890083e+09
+kube_pod_status_scheduled_time{namespace="local-path-storage",pod="local-path-provisioner-5bf465b47d-h8hjn",uid="3fe415f2-2e19-405e-9e3a-3c066104babb"} 1.628778313e+09
+kube_pod_status_scheduled_time{namespace="default",pod="hello-python-566b5479f5-ndwdl",uid="b47c938e-f224-400b-829a-3f0c55e7f93b"} 1.629815782e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="1553c6ea-2e89-4693-a6f4-04ceaa49ca43"} 1.628845056e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-proxy-22znl",uid="7487a2d8-836a-4988-aecb-a1b561f56216"} 1.628778317e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="etcd-kind-control-plane",uid="43b699c8-2214-4648-a0fc-b9a3ea2a053b"} 1.629963855e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-state-metrics-f655d484d-hj69w",uid="92bb30a7-2ac3-4a5a-8674-969279ca7304"} 1.629723843e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-apiserver-kind-control-plane",uid="dd608f3a-e22c-4d11-ab89-349613c78305"} 1.62970302e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kindnet-9fgst",uid="5af2a780-8529-4b71-8349-6529de2c01b6"} 1.628778317e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kube-proxy-lf6md",uid="afa49cac-1090-4f9f-a4c0-aa744e3a6a22"} 1.628778316e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kindnet-tg7tl",uid="f73a0a99-1a34-4534-811c-5bdc47d40b1c"} 1.628778316e+09
+kube_pod_status_scheduled_time{namespace="kube-system",pod="kindnet-kch2v",uid="33fdd946-23d4-4625-9cce-9ae0ff535533"} 1.628778302e+09
+# HELP kube_pod_status_unschedulable Describes the unschedulable status for the pod.
+# TYPE kube_pod_status_unschedulable gauge
+# HELP kube_replicaset_created Unix creation timestamp
+# TYPE kube_replicaset_created gauge
+kube_replicaset_created{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1.629723843e+09
+kube_replicaset_created{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1.628778303e+09
+kube_replicaset_created{namespace="default",replicaset="hello-python-566b5479f5"} 1.629815782e+09
+kube_replicaset_created{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 1.628778303e+09
+# HELP kube_replicaset_status_replicas The number of replicas per ReplicaSet.
+# TYPE kube_replicaset_status_replicas gauge
+kube_replicaset_status_replicas{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_status_replicas{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 2
+kube_replicaset_status_replicas{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_status_replicas{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_status_fully_labeled_replicas The number of fully labeled replicas per ReplicaSet.
+# TYPE kube_replicaset_status_fully_labeled_replicas gauge
+kube_replicaset_status_fully_labeled_replicas{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_status_fully_labeled_replicas{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 2
+kube_replicaset_status_fully_labeled_replicas{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_status_fully_labeled_replicas{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_status_ready_replicas The number of ready replicas per ReplicaSet.
+# TYPE kube_replicaset_status_ready_replicas gauge
+kube_replicaset_status_ready_replicas{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_status_ready_replicas{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 2
+kube_replicaset_status_ready_replicas{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_status_ready_replicas{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_status_observed_generation The generation observed by the ReplicaSet controller.
+# TYPE kube_replicaset_status_observed_generation gauge
+kube_replicaset_status_observed_generation{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_status_observed_generation{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 1
+kube_replicaset_status_observed_generation{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_status_observed_generation{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_spec_replicas Number of desired pods for a ReplicaSet.
+# TYPE kube_replicaset_spec_replicas gauge
+kube_replicaset_spec_replicas{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_spec_replicas{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 2
+kube_replicaset_spec_replicas{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_spec_replicas{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_metadata_generation Sequence number representing a specific generation of the desired state.
+# TYPE kube_replicaset_metadata_generation gauge
+kube_replicaset_metadata_generation{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_metadata_generation{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 1
+kube_replicaset_metadata_generation{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+kube_replicaset_metadata_generation{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+# HELP kube_replicaset_owner Information about the ReplicaSet's owner.
+# TYPE kube_replicaset_owner gauge
+kube_replicaset_owner{namespace="default",replicaset="hello-python-566b5479f5",owner_kind="Deployment",owner_name="hello-python",owner_is_controller="true"} 1
+kube_replicaset_owner{namespace="kube-system",replicaset="coredns-5644d7b6d9",owner_kind="Deployment",owner_name="coredns",owner_is_controller="true"} 1
+kube_replicaset_owner{namespace="kube-system",replicaset="kube-state-metrics-f655d484d",owner_kind="Deployment",owner_name="kube-state-metrics",owner_is_controller="true"} 1
+kube_replicaset_owner{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d",owner_kind="Deployment",owner_name="local-path-provisioner",owner_is_controller="true"} 1
+# HELP kube_replicaset_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_replicaset_labels gauge
+kube_replicaset_labels{namespace="local-path-storage",replicaset="local-path-provisioner-5bf465b47d"} 1
+kube_replicaset_labels{namespace="default",replicaset="hello-python-566b5479f5"} 1
+kube_replicaset_labels{namespace="kube-system",replicaset="coredns-5644d7b6d9"} 1
+kube_replicaset_labels{namespace="kube-system",replicaset="kube-state-metrics-f655d484d"} 1
+# HELP kube_replicationcontroller_created Unix creation timestamp
+# TYPE kube_replicationcontroller_created gauge
+# HELP kube_replicationcontroller_status_replicas The number of replicas per ReplicationController.
+# TYPE kube_replicationcontroller_status_replicas gauge
+# HELP kube_replicationcontroller_status_fully_labeled_replicas The number of fully labeled replicas per ReplicationController.
+# TYPE kube_replicationcontroller_status_fully_labeled_replicas gauge
+# HELP kube_replicationcontroller_status_ready_replicas The number of ready replicas per ReplicationController.
+# TYPE kube_replicationcontroller_status_ready_replicas gauge
+# HELP kube_replicationcontroller_status_available_replicas The number of available replicas per ReplicationController.
+# TYPE kube_replicationcontroller_status_available_replicas gauge
+# HELP kube_replicationcontroller_status_observed_generation The generation observed by the ReplicationController controller.
+# TYPE kube_replicationcontroller_status_observed_generation gauge
+# HELP kube_replicationcontroller_spec_replicas Number of desired pods for a ReplicationController.
+# TYPE kube_replicationcontroller_spec_replicas gauge
+# HELP kube_replicationcontroller_metadata_generation Sequence number representing a specific generation of the desired state.
+# TYPE kube_replicationcontroller_metadata_generation gauge
+# HELP kube_replicationcontroller_owner Information about the ReplicationController's owner.
+# TYPE kube_replicationcontroller_owner gauge
+# HELP kube_resourcequota_created Unix creation timestamp
+# TYPE kube_resourcequota_created gauge
+# HELP kube_resourcequota Information about resource quota.
+# TYPE kube_resourcequota gauge
+# HELP kube_secret_info Information about secret.
+# TYPE kube_secret_info gauge
+kube_secret_info{namespace="kube-system",secret="metricbeat-token-dtjpp"} 1
+kube_secret_info{namespace="kube-system",secret="clusterrole-aggregation-controller-token-568kx"} 1
+kube_secret_info{namespace="kube-system",secret="disruption-controller-token-mgjhq"} 1
+kube_secret_info{namespace="kube-system",secret="coredns-token-m7bgv"} 1
+kube_secret_info{namespace="kube-system",secret="default-token-dn2kj"} 1
+kube_secret_info{namespace="kube-system",secret="expand-controller-token-8wfpg"} 1
+kube_secret_info{namespace="kube-system",secret="pod-garbage-collector-token-dzlhf"} 1
+kube_secret_info{namespace="kube-system",secret="replication-controller-token-dt9kz"} 1
+kube_secret_info{namespace="kube-system",secret="service-controller-token-vk22g"} 1
+kube_secret_info{namespace="kube-system",secret="node-controller-token-hfcsr"} 1
+kube_secret_info{namespace="kube-system",secret="endpoint-controller-token-s6wff"} 1
+kube_secret_info{namespace="local-path-storage",secret="local-path-provisioner-service-account-token-xw6mp"} 1
+kube_secret_info{namespace="kube-system",secret="token-cleaner-token-h6nqb"} 1
+kube_secret_info{namespace="kube-system",secret="kube-proxy-token-lzc9t"} 1
+kube_secret_info{namespace="kube-system",secret="kube-state-metrics-token-lxhp9"} 1
+kube_secret_info{namespace="kube-public",secret="default-token-c9h8g"} 1
+kube_secret_info{namespace="local-path-storage",secret="default-token-dsz4x"} 1
+kube_secret_info{namespace="kube-system",secret="persistent-volume-binder-token-jq49m"} 1
+kube_secret_info{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1
+kube_secret_info{namespace="kube-system",secret="job-controller-token-6r9x8"} 1
+kube_secret_info{namespace="kube-system",secret="horizontal-pod-autoscaler-token-lbvkk"} 1
+kube_secret_info{namespace="kube-node-lease",secret="default-token-ldm8r"} 1
+kube_secret_info{namespace="kube-system",secret="kindnet-token-584np"} 1
+kube_secret_info{namespace="kube-system",secret="generic-garbage-collector-token-zjpgj"} 1
+kube_secret_info{namespace="kube-system",secret="pvc-protection-controller-token-zmb2j"} 1
+kube_secret_info{namespace="kube-system",secret="deployment-controller-token-c6pbr"} 1
+kube_secret_info{namespace="kube-system",secret="pv-protection-controller-token-fn5s9"} 1
+kube_secret_info{namespace="kube-system",secret="certificate-controller-token-cmn6v"} 1
+kube_secret_info{namespace="kube-system",secret="replicaset-controller-token-m2z8z"} 1
+kube_secret_info{namespace="kube-system",secret="daemon-set-controller-token-2ctqq"} 1
+kube_secret_info{namespace="kube-system",secret="cronjob-controller-token-ljpkb"} 1
+kube_secret_info{namespace="kube-system",secret="resourcequota-controller-token-ssprx"} 1
+kube_secret_info{namespace="kube-system",secret="bootstrap-signer-token-f6md6"} 1
+kube_secret_info{namespace="kube-system",secret="namespace-controller-token-phphc"} 1
+kube_secret_info{namespace="kube-system",secret="service-account-controller-token-fdx9n"} 1
+kube_secret_info{namespace="kube-system",secret="attachdetach-controller-token-h7495"} 1
+kube_secret_info{namespace="kube-system",secret="ttl-controller-token-wwf8x"} 1
+kube_secret_info{namespace="default",secret="default-token-6xpxs"} 1
+# HELP kube_secret_type Type about secret.
+# TYPE kube_secret_type gauge
+kube_secret_type{namespace="kube-system",secret="pod-garbage-collector-token-dzlhf",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="replication-controller-token-dt9kz",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="metricbeat-token-dtjpp",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="clusterrole-aggregation-controller-token-568kx",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="disruption-controller-token-mgjhq",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="coredns-token-m7bgv",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="default-token-dn2kj",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="expand-controller-token-8wfpg",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="service-controller-token-vk22g",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="node-controller-token-hfcsr",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="endpoint-controller-token-s6wff",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="kube-state-metrics-token-lxhp9",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-public",secret="default-token-c9h8g",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="local-path-storage",secret="local-path-provisioner-service-account-token-xw6mp",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="token-cleaner-token-h6nqb",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="kube-proxy-token-lzc9t",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="local-path-storage",secret="default-token-dsz4x",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="persistent-volume-binder-token-jq49m",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="statefulset-controller-token-9lkhz",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="generic-garbage-collector-token-zjpgj",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="pvc-protection-controller-token-zmb2j",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="job-controller-token-6r9x8",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="horizontal-pod-autoscaler-token-lbvkk",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-node-lease",secret="default-token-ldm8r",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="kindnet-token-584np",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="replicaset-controller-token-m2z8z",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="daemon-set-controller-token-2ctqq",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="deployment-controller-token-c6pbr",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="pv-protection-controller-token-fn5s9",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="certificate-controller-token-cmn6v",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="cronjob-controller-token-ljpkb",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="resourcequota-controller-token-ssprx",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="bootstrap-signer-token-f6md6",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="ttl-controller-token-wwf8x",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="default",secret="default-token-6xpxs",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="namespace-controller-token-phphc",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="service-account-controller-token-fdx9n",type="kubernetes.io/service-account-token"} 1
+kube_secret_type{namespace="kube-system",secret="attachdetach-controller-token-h7495",type="kubernetes.io/service-account-token"} 1
+# HELP kube_secret_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_secret_labels gauge
+kube_secret_labels{namespace="kube-system",secret="pvc-protection-controller-token-zmb2j"} 1
+kube_secret_labels{namespace="kube-system",secret="job-controller-token-6r9x8"} 1
+kube_secret_labels{namespace="kube-system",secret="horizontal-pod-autoscaler-token-lbvkk"} 1
+kube_secret_labels{namespace="kube-node-lease",secret="default-token-ldm8r"} 1
+kube_secret_labels{namespace="kube-system",secret="kindnet-token-584np"} 1
+kube_secret_labels{namespace="kube-system",secret="generic-garbage-collector-token-zjpgj"} 1
+kube_secret_labels{namespace="kube-system",secret="daemon-set-controller-token-2ctqq"} 1
+kube_secret_labels{namespace="kube-system",secret="deployment-controller-token-c6pbr"} 1
+kube_secret_labels{namespace="kube-system",secret="pv-protection-controller-token-fn5s9"} 1
+kube_secret_labels{namespace="kube-system",secret="certificate-controller-token-cmn6v"} 1
+kube_secret_labels{namespace="kube-system",secret="replicaset-controller-token-m2z8z"} 1
+kube_secret_labels{namespace="kube-system",secret="cronjob-controller-token-ljpkb"} 1
+kube_secret_labels{namespace="kube-system",secret="resourcequota-controller-token-ssprx"} 1
+kube_secret_labels{namespace="kube-system",secret="bootstrap-signer-token-f6md6"} 1
+kube_secret_labels{namespace="default",secret="default-token-6xpxs"} 1
+kube_secret_labels{namespace="kube-system",secret="namespace-controller-token-phphc"} 1
+kube_secret_labels{namespace="kube-system",secret="service-account-controller-token-fdx9n"} 1
+kube_secret_labels{namespace="kube-system",secret="attachdetach-controller-token-h7495"} 1
+kube_secret_labels{namespace="kube-system",secret="ttl-controller-token-wwf8x"} 1
+kube_secret_labels{namespace="kube-system",secret="replication-controller-token-dt9kz"} 1
+kube_secret_labels{namespace="kube-system",secret="metricbeat-token-dtjpp"} 1
+kube_secret_labels{namespace="kube-system",secret="clusterrole-aggregation-controller-token-568kx"} 1
+kube_secret_labels{namespace="kube-system",secret="disruption-controller-token-mgjhq"} 1
+kube_secret_labels{namespace="kube-system",secret="coredns-token-m7bgv"} 1
+kube_secret_labels{namespace="kube-system",secret="default-token-dn2kj"} 1
+kube_secret_labels{namespace="kube-system",secret="expand-controller-token-8wfpg"} 1
+kube_secret_labels{namespace="kube-system",secret="pod-garbage-collector-token-dzlhf"} 1
+kube_secret_labels{namespace="kube-system",secret="service-controller-token-vk22g"} 1
+kube_secret_labels{namespace="kube-system",secret="node-controller-token-hfcsr"} 1
+kube_secret_labels{namespace="kube-system",secret="endpoint-controller-token-s6wff"} 1
+kube_secret_labels{namespace="kube-public",secret="default-token-c9h8g"} 1
+kube_secret_labels{namespace="local-path-storage",secret="local-path-provisioner-service-account-token-xw6mp"} 1
+kube_secret_labels{namespace="kube-system",secret="token-cleaner-token-h6nqb"} 1
+kube_secret_labels{namespace="kube-system",secret="kube-proxy-token-lzc9t"} 1
+kube_secret_labels{namespace="kube-system",secret="kube-state-metrics-token-lxhp9"} 1
+kube_secret_labels{namespace="local-path-storage",secret="default-token-dsz4x"} 1
+kube_secret_labels{namespace="kube-system",secret="persistent-volume-binder-token-jq49m"} 1
+kube_secret_labels{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1
+# HELP kube_secret_created Unix creation timestamp
+# TYPE kube_secret_created gauge
+kube_secret_created{namespace="kube-node-lease",secret="default-token-ldm8r"} 1.628778303e+09
+kube_secret_created{namespace="kube-system",secret="kindnet-token-584np"} 1.62877829e+09
+kube_secret_created{namespace="kube-system",secret="generic-garbage-collector-token-zjpgj"} 1.628778287e+09
+kube_secret_created{namespace="kube-system",secret="pvc-protection-controller-token-zmb2j"} 1.628778302e+09
+kube_secret_created{namespace="kube-system",secret="job-controller-token-6r9x8"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="horizontal-pod-autoscaler-token-lbvkk"} 1.6287783e+09
+kube_secret_created{namespace="kube-system",secret="pv-protection-controller-token-fn5s9"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="certificate-controller-token-cmn6v"} 1.628778288e+09
+kube_secret_created{namespace="kube-system",secret="replicaset-controller-token-m2z8z"} 1.628778288e+09
+kube_secret_created{namespace="kube-system",secret="daemon-set-controller-token-2ctqq"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="deployment-controller-token-c6pbr"} 1.628778288e+09
+kube_secret_created{namespace="kube-system",secret="resourcequota-controller-token-ssprx"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="bootstrap-signer-token-f6md6"} 1.628778287e+09
+kube_secret_created{namespace="kube-system",secret="cronjob-controller-token-ljpkb"} 1.628778299e+09
+kube_secret_created{namespace="kube-system",secret="service-account-controller-token-fdx9n"} 1.6287783e+09
+kube_secret_created{namespace="kube-system",secret="attachdetach-controller-token-h7495"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="ttl-controller-token-wwf8x"} 1.628778288e+09
+kube_secret_created{namespace="default",secret="default-token-6xpxs"} 1.628778303e+09
+kube_secret_created{namespace="kube-system",secret="namespace-controller-token-phphc"} 1.628778299e+09
+kube_secret_created{namespace="kube-system",secret="default-token-dn2kj"} 1.628778303e+09
+kube_secret_created{namespace="kube-system",secret="expand-controller-token-8wfpg"} 1.628778299e+09
+kube_secret_created{namespace="kube-system",secret="pod-garbage-collector-token-dzlhf"} 1.6287783e+09
+kube_secret_created{namespace="kube-system",secret="replication-controller-token-dt9kz"} 1.628778301e+09
+kube_secret_created{namespace="kube-system",secret="metricbeat-token-dtjpp"} 1.629890082e+09
+kube_secret_created{namespace="kube-system",secret="clusterrole-aggregation-controller-token-568kx"} 1.628778302e+09
+kube_secret_created{namespace="kube-system",secret="disruption-controller-token-mgjhq"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="coredns-token-m7bgv"} 1.628778287e+09
+kube_secret_created{namespace="kube-system",secret="service-controller-token-vk22g"} 1.628778301e+09
+kube_secret_created{namespace="kube-system",secret="endpoint-controller-token-s6wff"} 1.6287783e+09
+kube_secret_created{namespace="kube-system",secret="node-controller-token-hfcsr"} 1.628778288e+09
+kube_secret_created{namespace="kube-system",secret="token-cleaner-token-h6nqb"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="kube-proxy-token-lzc9t"} 1.628778287e+09
+kube_secret_created{namespace="kube-system",secret="kube-state-metrics-token-lxhp9"} 1.629723843e+09
+kube_secret_created{namespace="kube-public",secret="default-token-c9h8g"} 1.628778303e+09
+kube_secret_created{namespace="local-path-storage",secret="local-path-provisioner-service-account-token-xw6mp"} 1.628778292e+09
+kube_secret_created{namespace="kube-system",secret="persistent-volume-binder-token-jq49m"} 1.628778298e+09
+kube_secret_created{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 1.628778298e+09
+kube_secret_created{namespace="local-path-storage",secret="default-token-dsz4x"} 1.628778303e+09
+# HELP kube_secret_metadata_resource_version Resource version representing a specific version of secret.
+# TYPE kube_secret_metadata_resource_version gauge
+kube_secret_metadata_resource_version{namespace="local-path-storage",secret="local-path-provisioner-service-account-token-xw6mp"} 246
+kube_secret_metadata_resource_version{namespace="kube-system",secret="token-cleaner-token-h6nqb"} 296
+kube_secret_metadata_resource_version{namespace="kube-system",secret="kube-proxy-token-lzc9t"} 187
+kube_secret_metadata_resource_version{namespace="kube-system",secret="kube-state-metrics-token-lxhp9"} 173225
+kube_secret_metadata_resource_version{namespace="kube-public",secret="default-token-c9h8g"} 375
+kube_secret_metadata_resource_version{namespace="local-path-storage",secret="default-token-dsz4x"} 372
+kube_secret_metadata_resource_version{namespace="kube-system",secret="persistent-volume-binder-token-jq49m"} 299
+kube_secret_metadata_resource_version{namespace="kube-system",secret="statefulset-controller-token-9lkhz"} 284
+kube_secret_metadata_resource_version{namespace="kube-system",secret="job-controller-token-6r9x8"} 281
+kube_secret_metadata_resource_version{namespace="kube-system",secret="horizontal-pod-autoscaler-token-lbvkk"} 322
+kube_secret_metadata_resource_version{namespace="kube-node-lease",secret="default-token-ldm8r"} 366
+kube_secret_metadata_resource_version{namespace="kube-system",secret="kindnet-token-584np"} 231
+kube_secret_metadata_resource_version{namespace="kube-system",secret="generic-garbage-collector-token-zjpgj"} 192
+kube_secret_metadata_resource_version{namespace="kube-system",secret="pvc-protection-controller-token-zmb2j"} 336
+kube_secret_metadata_resource_version{namespace="kube-system",secret="deployment-controller-token-c6pbr"} 196
+kube_secret_metadata_resource_version{namespace="kube-system",secret="pv-protection-controller-token-fn5s9"} 287
+kube_secret_metadata_resource_version{namespace="kube-system",secret="certificate-controller-token-cmn6v"} 205
+kube_secret_metadata_resource_version{namespace="kube-system",secret="replicaset-controller-token-m2z8z"} 199
+kube_secret_metadata_resource_version{namespace="kube-system",secret="daemon-set-controller-token-2ctqq"} 290
+kube_secret_metadata_resource_version{namespace="kube-system",secret="cronjob-controller-token-ljpkb"} 306
+kube_secret_metadata_resource_version{namespace="kube-system",secret="resourcequota-controller-token-ssprx"} 278
+kube_secret_metadata_resource_version{namespace="kube-system",secret="bootstrap-signer-token-f6md6"} 185
+kube_secret_metadata_resource_version{namespace="kube-system",secret="namespace-controller-token-phphc"} 302
+kube_secret_metadata_resource_version{namespace="kube-system",secret="service-account-controller-token-fdx9n"} 319
+kube_secret_metadata_resource_version{namespace="kube-system",secret="attachdetach-controller-token-h7495"} 275
+kube_secret_metadata_resource_version{namespace="kube-system",secret="ttl-controller-token-wwf8x"} 202
+kube_secret_metadata_resource_version{namespace="default",secret="default-token-6xpxs"} 369
+kube_secret_metadata_resource_version{namespace="kube-system",secret="metricbeat-token-dtjpp"} 427565
+kube_secret_metadata_resource_version{namespace="kube-system",secret="clusterrole-aggregation-controller-token-568kx"} 333
+kube_secret_metadata_resource_version{namespace="kube-system",secret="disruption-controller-token-mgjhq"} 293
+kube_secret_metadata_resource_version{namespace="kube-system",secret="coredns-token-m7bgv"} 186
+kube_secret_metadata_resource_version{namespace="kube-system",secret="default-token-dn2kj"} 373
+kube_secret_metadata_resource_version{namespace="kube-system",secret="expand-controller-token-8wfpg"} 310
+kube_secret_metadata_resource_version{namespace="kube-system",secret="pod-garbage-collector-token-dzlhf"} 316
+kube_secret_metadata_resource_version{namespace="kube-system",secret="replication-controller-token-dt9kz"} 326
+kube_secret_metadata_resource_version{namespace="kube-system",secret="service-controller-token-vk22g"} 330
+kube_secret_metadata_resource_version{namespace="kube-system",secret="node-controller-token-hfcsr"} 208
+kube_secret_metadata_resource_version{namespace="kube-system",secret="endpoint-controller-token-s6wff"} 313
+# HELP kube_service_info Information about service.
+# TYPE kube_service_info gauge
+kube_service_info{namespace="default",service="kubernetes",cluster_ip="10.96.0.1",external_name="",load_balancer_ip=""} 1
+kube_service_info{namespace="kube-system",service="kube-dns",cluster_ip="10.96.0.10",external_name="",load_balancer_ip=""} 1
+kube_service_info{namespace="kube-system",service="kube-state-metrics",cluster_ip="None",external_name="",load_balancer_ip=""} 1
+# HELP kube_service_created Unix creation timestamp
+# TYPE kube_service_created gauge
+kube_service_created{namespace="default",service="kubernetes"} 1.628778285e+09
+kube_service_created{namespace="kube-system",service="kube-dns"} 1.628778286e+09
+kube_service_created{namespace="kube-system",service="kube-state-metrics"} 1.629723843e+09
+# HELP kube_service_spec_type Type about service.
+# TYPE kube_service_spec_type gauge
+kube_service_spec_type{namespace="default",service="kubernetes",type="ClusterIP"} 1
+kube_service_spec_type{namespace="kube-system",service="kube-dns",type="ClusterIP"} 1
+kube_service_spec_type{namespace="kube-system",service="kube-state-metrics",type="ClusterIP"} 1
+# HELP kube_service_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_service_labels gauge
+kube_service_labels{namespace="default",service="kubernetes"} 1
+kube_service_labels{namespace="kube-system",service="kube-dns"} 1
+kube_service_labels{namespace="kube-system",service="kube-state-metrics"} 1
+# HELP kube_service_spec_external_ip Service external ips. One series for each ip
+# TYPE kube_service_spec_external_ip gauge
+# HELP kube_service_status_load_balancer_ingress Service load balancer ingress status
+# TYPE kube_service_status_load_balancer_ingress gauge
+# HELP kube_statefulset_created Unix creation timestamp
+# TYPE kube_statefulset_created gauge
+# HELP kube_statefulset_status_replicas The number of replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas gauge
+# HELP kube_statefulset_status_replicas_current The number of current replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_current gauge
+# HELP kube_statefulset_status_replicas_ready The number of ready replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_ready gauge
+# HELP kube_statefulset_status_replicas_updated The number of updated replicas per StatefulSet.
+# TYPE kube_statefulset_status_replicas_updated gauge
+# HELP kube_statefulset_status_observed_generation The generation observed by the StatefulSet controller.
+# TYPE kube_statefulset_status_observed_generation gauge
+# HELP kube_statefulset_replicas Number of desired pods for a StatefulSet.
+# TYPE kube_statefulset_replicas gauge
+# HELP kube_statefulset_metadata_generation Sequence number representing a specific generation of the desired state for the StatefulSet.
+# TYPE kube_statefulset_metadata_generation gauge
+# HELP kube_statefulset_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_statefulset_labels gauge
+# HELP kube_statefulset_status_current_revision Indicates the version of the StatefulSet used to generate Pods in the sequence [0,currentReplicas).
+# TYPE kube_statefulset_status_current_revision gauge
+# HELP kube_statefulset_status_update_revision Indicates the version of the StatefulSet used to generate Pods in the sequence [replicas-updatedReplicas,replicas)
+# TYPE kube_statefulset_status_update_revision gauge
+# HELP kube_storageclass_info Information about storageclass.
+# TYPE kube_storageclass_info gauge
+kube_storageclass_info{storageclass="standard",provisioner="rancher.io/local-path",reclaim_policy="Delete",volume_binding_mode="WaitForFirstConsumer"} 1
+# HELP kube_storageclass_created Unix creation timestamp
+# TYPE kube_storageclass_created gauge
+kube_storageclass_created{storageclass="standard"} 1.628778292e+09
+# HELP kube_storageclass_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_storageclass_labels gauge
+kube_storageclass_labels{storageclass="standard"} 1
+# HELP kube_validatingwebhookconfiguration_info Information about the ValidatingWebhookConfiguration.
+# TYPE kube_validatingwebhookconfiguration_info gauge
+# HELP kube_validatingwebhookconfiguration_created Unix creation timestamp.
+# TYPE kube_validatingwebhookconfiguration_created gauge
+# HELP kube_validatingwebhookconfiguration_metadata_resource_version Resource version representing a specific version of the ValidatingWebhookConfiguration.
+# TYPE kube_validatingwebhookconfiguration_metadata_resource_version gauge
+# HELP kube_volumeattachment_labels Kubernetes labels converted to Prometheus labels.
+# TYPE kube_volumeattachment_labels gauge
+# HELP kube_volumeattachment_info Information about volumeattachment.
+# TYPE kube_volumeattachment_info gauge
+# HELP kube_volumeattachment_created Unix creation timestamp
+# TYPE kube_volumeattachment_created gauge
+# HELP kube_volumeattachment_spec_source_persistentvolume PersistentVolume source reference.
+# TYPE kube_volumeattachment_spec_source_persistentvolume gauge
+# HELP kube_volumeattachment_status_attached Information about volumeattachment.
+# TYPE kube_volumeattachment_status_attached gauge
+# HELP kube_volumeattachment_status_attachment_metadata volumeattachment metadata.
+# TYPE kube_volumeattachment_status_attachment_metadata gauge

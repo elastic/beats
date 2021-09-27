@@ -1,0 +1,64 @@
+{
+    "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\": false}",
+        "panelsJSON": "[{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"1\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"2\",\"w\":20,\"x\":12,\"y\":0},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"3\",\"w\":16,\"x\":32,\"y\":0},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"4\",\"w\":16,\"x\":0,\"y\":20},\"panelIndex\":\"4\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":16,\"x\":16,\"y\":20},\"panelIndex\":\"5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":25,\"i\":\"6\",\"w\":32,\"x\":0,\"y\":35},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":25,\"i\":\"7\",\"w\":16,\"x\":32,\"y\":35},\"panelIndex\":\"7\",\"embeddableConfig\":{\"vis\":{\"params\":{\"sort\":{\"columnIndex\":null,\"direction\":null}}},\"enhancements\":{}},\"panelRefName\":\"panel_6\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"8\",\"w\":16,\"x\":32,\"y\":20},\"panelIndex\":\"8\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_7\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] MongoDB ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Packetbeat-MongoDB-performance-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Navigation-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "MongoDB-errors-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "MongoDB-commands-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "MongoDB-errors-per-collection-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "MongoDB-in-slash-out-throughput-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "MongoDB-response-times-by-collection-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "Top-slowest-MongoDB-queries-ecs",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "Number-of-MongoDB-transactions-with-writeConcern-w-equal-0-ecs",
+            "name": "panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:42.017Z",
+    "version": "WzMxNzAsMV0="
+}

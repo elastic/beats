@@ -27,7 +27,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -219,7 +218,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath)
+	r = readfile.NewFilemeta(r, fs.newPath, offset)
 
 	r = inp.parsers.Create(r)
 
@@ -330,8 +329,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
-		if err := p.Publish(event, s); err != nil {
+		if err := p.Publish(message.ToEvent(), s); err != nil {
 			return err
 		}
 	}
@@ -364,22 +362,4 @@ func matchAny(matchers []match.Matcher, text string) bool {
 		}
 	}
 	return false
-}
-
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
-	if m.Fields == nil {
-		m.Fields = common.MapStr{}
-	}
-
-	if len(m.Content) > 0 {
-		if _, ok := m.Fields["message"]; !ok {
-			m.Fields["message"] = string(m.Content)
-		}
-	}
-
-	return beat.Event{
-		Timestamp: m.Ts,
-		Meta:      m.Meta,
-		Fields:    m.Fields,
-	}
 }

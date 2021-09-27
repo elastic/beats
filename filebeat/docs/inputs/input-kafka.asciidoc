@@ -51,7 +51,7 @@ link:https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-for-kafka-ecos
 [[kafka-input-compatibility]]
 ==== Compatibility
 
-This input works with all Kafka versions in between 0.11 and 2.1.0. Older versions
+This input works with all Kafka versions in between 0.11 and 2.8.0. Older versions
 might work as well, but are not supported.
 
 [id="{beatname_lc}-input-{type}-options"]
@@ -167,6 +167,71 @@ beta[]
 Configuration options for Kerberos authentication.
 
 See <<configuration-kerberos>> for more information.
+
+[float]
+===== `parsers`
+
+This option expects a list of parsers that the payload has to go through.
+
+Available parsers:
+
+* `ndjson`
+* `multiline`
+
+[float]
+===== `ndjson`
+
+These options make it possible for {beatname_uc} to decode the payload as
+JSON messages.
+
+Example configuration:
+
+[source,yaml]
+----
+- ndjson:
+  keys_under_root: true
+  add_error_key: true
+  message_key: log
+----
+
+*`keys_under_root`*:: By default, the decoded JSON is placed under a "json" key
+in the output document. If you enable this setting, the keys are copied top
+level in the output document. The default is false.
+
+*`overwrite_keys`*:: If `keys_under_root` and this setting are enabled, then the
+values from the decoded JSON object overwrite the fields that {beatname_uc}
+normally adds (type, source, offset, etc.) in case of conflicts.
+
+*`expand_keys`*:: If this setting is enabled, {beatname_uc} will recursively
+de-dot keys in the decoded JSON, and expand them into a hierarchical object
+structure. For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
+This setting should be enabled when the input is produced by an
+https://github.com/elastic/ecs-logging[ECS logger].
+
+*`add_error_key`*:: If this setting is enabled, {beatname_uc} adds an
+"error.message" and "error.type: json" key in case of JSON unmarshalling errors
+or when a `message_key` is defined in the configuration but cannot be used.
+
+*`message_key`*:: An optional configuration setting that specifies a JSON key on
+which to apply the line filtering and multiline settings. If specified the key
+must be at the top level in the JSON object and the value associated with the
+key must be a string, otherwise no filtering or multiline aggregation will
+occur.
+
+*`document_id`*:: Option configuration setting that specifies the JSON key to
+set the document id. If configured, the field will be removed from the original
+JSON document and stored in `@metadata._id`
+
+*`ignore_decoding_error`*:: An optional configuration setting that specifies if
+JSON decoding errors should be logged or not. If set to true, errors will not
+be logged. The default is false.
+
+[float]
+===== `multiline`
+
+Options that control how {beatname_uc} deals with log messages that span
+multiple lines. See <<multiline-examples>> for more information about
+configuring multiline options.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

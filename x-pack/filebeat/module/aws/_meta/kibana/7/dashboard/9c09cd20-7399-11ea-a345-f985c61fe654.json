@@ -1,0 +1,219 @@
+{
+    "attributes": {
+        "description": "Summary of events from AWS CloudTrail.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 17.90562,
+                        "lon": -12.20429,
+                        "zoom": 0.97
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "85d26d9a-2a71-4b98-a026-5f513094d6e5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "85d26d9a-2a71-4b98-a026-5f513094d6e5",
+                "panelRefName": "panel_85d26d9a-2a71-4b98-a026-5f513094d6e5",
+                "type": "map",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "failure": "#E24D42"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "failure": "#E24D42",
+                            "success": "#629E51"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6b3eff90-3071-451e-a827-ca569e0ac10b",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "6b3eff90-3071-451e-a827-ca569e0ac10b",
+                "panelRefName": "panel_6b3eff90-3071-451e-a827-ca569e0ac10b",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "952e456a-e9ae-4606-b838-e16019375336",
+                    "w": 12,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "952e456a-e9ae-4606-b838-e16019375336",
+                "panelRefName": "panel_952e456a-e9ae-4606-b838-e16019375336",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "802ad09d-5883-4e41-99ac-6c356144d24d",
+                    "w": 12,
+                    "x": 12,
+                    "y": 15
+                },
+                "panelIndex": "802ad09d-5883-4e41-99ac-6c356144d24d",
+                "panelRefName": "panel_802ad09d-5883-4e41-99ac-6c356144d24d",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "3e617d87-3acf-4203-b03b-c907c9145fce",
+                    "w": 12,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "3e617d87-3acf-4203-b03b-c907c9145fce",
+                "panelRefName": "panel_3e617d87-3acf-4203-b03b-c907c9145fce",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "d6f03440-c717-4f5e-928c-72ae9d450318",
+                    "w": 12,
+                    "x": 36,
+                    "y": 15
+                },
+                "panelIndex": "d6f03440-c717-4f5e-928c-72ae9d450318",
+                "panelRefName": "panel_d6f03440-c717-4f5e-928c-72ae9d450318",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "2b82a2c9-3809-447c-8e95-52125acccb42",
+                    "w": 30,
+                    "x": 0,
+                    "y": 28
+                },
+                "panelIndex": "2b82a2c9-3809-447c-8e95-52125acccb42",
+                "panelRefName": "panel_2b82a2c9-3809-447c-8e95-52125acccb42",
+                "type": "search",
+                "version": "8.0.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "40f0a89b-7ce5-498f-a0f0-5c7edf7f8b50",
+                    "w": 18,
+                    "x": 30,
+                    "y": 28
+                },
+                "panelIndex": "40f0a89b-7ce5-498f-a0f0-5c7edf7f8b50",
+                "panelRefName": "panel_40f0a89b-7ce5-498f-a0f0-5c7edf7f8b50",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat AWS] CloudTrail",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9c09cd20-7399-11ea-a345-f985c61fe654",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "dae24080-739a-11ea-a345-f985c61fe654",
+            "name": "85d26d9a-2a71-4b98-a026-5f513094d6e5:panel_85d26d9a-2a71-4b98-a026-5f513094d6e5",
+            "type": "map"
+        },
+        {
+            "id": "4c23e4c0-739a-11ea-a345-f985c61fe654",
+            "name": "6b3eff90-3071-451e-a827-ca569e0ac10b:panel_6b3eff90-3071-451e-a827-ca569e0ac10b",
+            "type": "visualization"
+        },
+        {
+            "id": "396089c0-7399-11ea-a345-f985c61fe654",
+            "name": "952e456a-e9ae-4606-b838-e16019375336:panel_952e456a-e9ae-4606-b838-e16019375336",
+            "type": "visualization"
+        },
+        {
+            "id": "0f056420-739e-11ea-a345-f985c61fe654",
+            "name": "802ad09d-5883-4e41-99ac-6c356144d24d:panel_802ad09d-5883-4e41-99ac-6c356144d24d",
+            "type": "visualization"
+        },
+        {
+            "id": "7bca4f50-739c-11ea-a345-f985c61fe654",
+            "name": "3e617d87-3acf-4203-b03b-c907c9145fce:panel_3e617d87-3acf-4203-b03b-c907c9145fce",
+            "type": "visualization"
+        },
+        {
+            "id": "f8b63860-739e-11ea-a345-f985c61fe654",
+            "name": "d6f03440-c717-4f5e-928c-72ae9d450318:panel_d6f03440-c717-4f5e-928c-72ae9d450318",
+            "type": "visualization"
+        },
+        {
+            "id": "30ccde50-7397-11ea-a345-f985c61fe654",
+            "name": "2b82a2c9-3809-447c-8e95-52125acccb42:panel_2b82a2c9-3809-447c-8e95-52125acccb42",
+            "type": "search"
+        },
+        {
+            "id": "8ec43590-739b-11ea-a345-f985c61fe654",
+            "name": "40f0a89b-7ce5-498f-a0f0-5c7edf7f8b50:panel_40f0a89b-7ce5-498f-a0f0-5c7edf7f8b50",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:35.213Z",
+    "version": "WzQ2ODgsMV0="
+}

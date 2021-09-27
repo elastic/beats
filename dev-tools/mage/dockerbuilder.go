@@ -86,7 +86,7 @@ func (b *dockerBuilder) Build() error {
 			return errors.Wrap(err, "failed to build docker")
 		}
 
-		if err := b.dockerSave(tag); err != nil {
+		if err := b.dockerSave(tag, variant); err != nil {
 			return errors.Wrap(err, "failed to save docker as artifact")
 		}
 	}
@@ -209,7 +209,7 @@ func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
 	return taggedImageName, sh.Run("docker", "build", "-t", taggedImageName, b.buildDir)
 }
 
-func (b *dockerBuilder) dockerSave(tag string) error {
+func (b *dockerBuilder) dockerSave(tag string, variant string) error {
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
 		err := os.MkdirAll(distributionsDir, 0750)
 		if err != nil {
@@ -220,7 +220,8 @@ func (b *dockerBuilder) dockerSave(tag string) error {
 	outputFile := b.OutputFile
 	if outputFile == "" {
 		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]interface{}{
-			"Name": b.imageName,
+			"Name":    b.imageName,
+			"Variant": variant,
 		})
 		if err != nil {
 			return err

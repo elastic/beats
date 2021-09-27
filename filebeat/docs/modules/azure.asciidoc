@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Azure module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The azure module retrieves different types of log data from Azure.
 There are several requirements before using the module since the logs will actually be read from azure event hubs.
 
@@ -47,35 +49,35 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
       storage_account_key: ""
       resource_manager_endpoint: ""
 
-   platformlogs:
-     enabled: false
-     var:
-       eventhub: ""
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  platformlogs:
+    enabled: false
+    var:
+      eventhub: ""
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
-   auditlogs:
-     enabled: false
-     var:
-       eventhub: "insights-logs-auditlogs"
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  auditlogs:
+    enabled: false
+    var:
+      eventhub: "insights-logs-auditlogs"
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
-   signinlogs:
-     enabled: false
-     var:
-       eventhub: "insights-logs-signinlogs"
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  signinlogs:
+    enabled: false
+    var:
+      eventhub: "insights-logs-signinlogs"
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
 ----
 
@@ -118,6 +120,7 @@ Users can also use this in case of a Hybrid Cloud model, where one may define th
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
+
 
 [float]
 === Dashboards

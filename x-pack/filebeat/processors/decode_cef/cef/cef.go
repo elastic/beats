@@ -134,7 +134,7 @@ func (e *Event) Unpack(data string, opts ...Option) error {
 
 		// Mark the data type and do the actual conversion.
 		field.Type = mapping.Type
-		field.Interface, err = ToType(field.String, mapping.Type)
+		field.Interface, err = toType(field.String, mapping.Type, &settings)
 		if err != nil {
 			// Drop the key because the field value is invalid.
 			delete(e.Extensions, key)

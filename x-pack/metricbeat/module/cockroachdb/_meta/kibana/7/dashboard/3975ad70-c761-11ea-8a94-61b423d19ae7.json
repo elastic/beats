@@ -1,0 +1,187 @@
+{
+    "attributes": {
+        "description": "CockroachDB SQL Performance",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "1",
+                    "w": 19,
+                    "x": 5,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_0",
+                "title": "Number of SQL connections",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "2f29ec8c-d61d-4b27-94e7-7c9437e5abda",
+                    "w": 5,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2f29ec8c-d61d-4b27-94e7-7c9437e5abda",
+                "panelRefName": "panel_1",
+                "title": "Dashboard Navigation",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "d5e26270-2ebe-45c2-9697-f7e24dcd8492",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "d5e26270-2ebe-45c2-9697-f7e24dcd8492",
+                "panelRefName": "panel_2",
+                "title": "SQL queries",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a63ed7f8-f4ea-411a-98d5-14427bf3237e",
+                    "w": 24,
+                    "x": 0,
+                    "y": 11
+                },
+                "panelIndex": "a63ed7f8-f4ea-411a-98d5-14427bf3237e",
+                "panelRefName": "panel_3",
+                "title": "Average Exec latency",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6660f8f4-c3af-4b56-9ecf-fffd8210a302",
+                    "w": 24,
+                    "x": 24,
+                    "y": 11
+                },
+                "panelIndex": "6660f8f4-c3af-4b56-9ecf-fffd8210a302",
+                "panelRefName": "panel_4",
+                "title": "Transactions",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "98d6be7f-9aba-4181-a1a1-2152be085550",
+                    "w": 24,
+                    "x": 0,
+                    "y": 26
+                },
+                "panelIndex": "98d6be7f-9aba-4181-a1a1-2152be085550",
+                "panelRefName": "panel_5",
+                "title": "SQL Bytes",
+                "version": "7.11.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f4c38787-07a3-431a-8b1e-df12214c5bec",
+                    "w": 24,
+                    "x": 24,
+                    "y": 26
+                },
+                "panelIndex": "f4c38787-07a3-431a-8b1e-df12214c5bec",
+                "panelRefName": "panel_6",
+                "title": "Schema Changes",
+                "version": "7.11.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat CockroachDB] SQL",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "3975ad70-c761-11ea-8a94-61b423d19ae7",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "79691920-9766-11e9-9eea-6f554992ec1f",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "5073ed20-9760-11e9-9eea-6f554992ec1f",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "89e96120-fe7a-11ea-a589-8d7d9f58c8fd",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "61999c30-c766-11ea-8a94-61b423d19ae7",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "7d13f0d0-c763-11ea-8a94-61b423d19ae7",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "6fdbdbe0-c767-11ea-8a94-61b423d19ae7",
+            "name": "panel_6",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MDcsMV0="
+}

@@ -1,0 +1,82 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top Destinations by Events [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "autoPrecision": true,
+                        "field": "destination.geo.location",
+                        "precision": 2,
+                        "useGeocentroid": true
+                    },
+                    "schema": "segment",
+                    "type": "geohash_grid"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addTooltip": true,
+                "heatBlur": 15,
+                "heatMaxZoom": 0,
+                "heatMinOpacity": 0.1,
+                "heatRadius": 25,
+                "isDesaturated": true,
+                "legendPosition": "bottomright",
+                "mapCenter": [
+                    0,
+                    0
+                ],
+                "mapType": "Shaded Circle Markers",
+                "mapZoom": 2,
+                "wms": {
+                    "enabled": false,
+                    "options": {
+                        "attribution": "Maps provided by USGS",
+                        "format": "image/png",
+                        "layers": "0",
+                        "styles": "",
+                        "transparent": true,
+                        "version": "1.3.0"
+                    },
+                    "url": "https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer"
+                }
+            },
+            "title": "Top Destinations by Events [Filebeat CEF]",
+            "type": "tile_map"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "1b521f56-8089-433f-88f7-56aba867e07d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3NDIsMV0="
+}

@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/testing"
 )
@@ -57,7 +58,8 @@ type Connection struct {
 
 // ConnectionSettings are the settings needed for a Connection
 type ConnectionSettings struct {
-	URL string
+	URL      string
+	Beatname string
 
 	Username string
 	Password string
@@ -110,6 +112,11 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		}
 	}
 
+	if s.Beatname == "" {
+		s.Beatname = "Libbeat"
+	}
+	userAgent := useragent.UserAgent(s.Beatname, true)
+
 	httpClient, err := s.Transport.Client(
 		httpcommon.WithLogger(logger),
 		httpcommon.WithIOStats(s.Observer),
@@ -119,6 +126,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 			// eg, like in https://github.com/elastic/apm-server/blob/7.7/elasticsearch/client.go
 			return apmelasticsearch.WrapRoundTripper(rt)
 		}),
+		httpcommon.WithHeaderRoundTripper(map[string]string{"User-Agent": userAgent}),
 	)
 	if err != nil {
 		return nil, err
@@ -160,7 +168,7 @@ func settingsWithDefaults(s ConnectionSettings) ConnectionSettings {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
-func NewClients(cfg *common.Config) ([]Connection, error) {
+func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
@@ -185,6 +193,7 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 
 		client, err := NewConnection(ConnectionSettings{
 			URL:              esURL,
+			Beatname:         beatname,
 			Kerberos:         config.Kerberos,
 			Username:         config.Username,
 			Password:         config.Password,
@@ -205,8 +214,8 @@ func NewClients(cfg *common.Config) ([]Connection, error) {
 	return clients, nil
 }
 
-func NewConnectedClient(cfg *common.Config) (*Connection, error) {
-	clients, err := NewClients(cfg)
+func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error) {
+	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err
 	}
