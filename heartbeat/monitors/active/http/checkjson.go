@@ -45,10 +45,6 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 	var conditionChecks []compiledJsonCheck
 
 	for _, check := range checks {
-		if check.Expression != "" && check.Condition != nil {
-			return nil, fmt.Errorf("only one of 'expression' and 'condition' can be specified for JSON check '%s'", check.Description)
-		}
-
 		if check.Expression != "" {
 			eval, err := gval.Full(jsonpath.PlaceholderExtension()).NewEvaluable(check.Expression)
 			if err != nil {
@@ -150,10 +146,8 @@ func decodeJson(body string, forCondition bool) (result interface{}, err error) 
 
 	if forCondition {
 		if resMap, ok := result.(map[string]interface{}); ok {
-			if forCondition {
-				jsontransform.TransformNumbers(resMap)
-			}
-			return interface{}(resMap), nil
+			jsontransform.TransformNumbers(resMap)
+			return resMap, nil
 		} else {
 			return nil, fmt.Errorf("received non-object JSON for condition, use expression syntax for arrays of JSON instead")
 		}

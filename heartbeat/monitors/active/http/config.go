@@ -83,6 +83,13 @@ type jsonResponseCheck struct {
 	Condition   *conditions.Config `config:"condition"`
 }
 
+func (check *jsonResponseCheck) Validate() error {
+	if check.Expression != "" && check.Condition != nil {
+		return fmt.Errorf("only one of 'expression' or 'condition' can be specified for JSON check '%s'", check.Description)
+	}
+	return nil
+}
+
 type compressionConfig struct {
 	Type  string `config:"type"`
 	Level int    `config:"level"`

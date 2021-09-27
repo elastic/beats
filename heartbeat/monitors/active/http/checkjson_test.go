@@ -31,6 +31,15 @@ import (
 	"github.com/elastic/beats/v7/libbeat/conditions"
 )
 
+func TestOnlyOneOfExpressionCondition(t *testing.T) {
+	check := jsonResponseCheck{
+		Description: "mydesk",
+		Expression:  "foo == \"bar\"",
+		Condition:   &conditions.Config{Equals: nil},
+	}
+
+	require.Error(t, check.Validate())
+}
 func TestCheckJsonExpression(t *testing.T) {
 	simpleJson := "{\"foo\": \"hi\", \"bar\": 3, \"baz\": {\"bot\": \"blah\"}}"
 	arrayJson := fmt.Sprintf("[%s, %s]", simpleJson, simpleJson)
