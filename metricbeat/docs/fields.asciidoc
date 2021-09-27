@@ -38209,7 +38209,7 @@ type: keyword
 --
 
 [[exported-fields-linux]]
-== linux fields
+== Linux fields
 
 linux module
 
