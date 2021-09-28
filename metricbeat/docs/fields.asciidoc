@@ -41578,32 +41578,6 @@ type: float
 
 --
 
-*`kubernetes.container.cpu.limit.nanocores`*::
-+
---
-
-deprecated:[6.4]
-
-Container CPU nanocores limit
-
-
-type: long
-
---
-
-*`kubernetes.container.cpu.request.nanocores`*::
-+
---
-
-deprecated:[6.4]
-
-Container CPU requested nanocores
-
-
-type: long
-
---
-
 
 *`kubernetes.container.memory.limit.bytes`*::
 +
@@ -42972,7 +42946,7 @@ type: keyword
 --
 
 [[exported-fields-linux]]
-== linux fields
+== Linux fields
 
 linux module
 
