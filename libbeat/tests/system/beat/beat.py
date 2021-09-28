@@ -742,11 +742,11 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         def get_config_paths(modules_path, module, fileset):
             fileset_path = os.path.abspath(modules_path +
-                                       "/" +
-                                       module +
-                                       "/" +
-                                       fileset +
-                                       "/")
+                                           "/" +
+                                           module +
+                                           "/" +
+                                           fileset +
+                                           "/")
             paths = []
             for x in ["config/*.yml", "ingest/*.yml", "ingest/*.json"]:
                 pathname = os.path.join(fileset_path, x)
