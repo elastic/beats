@@ -23,6 +23,8 @@ import (
 
 type kubeEventsConfig struct {
 	KubeConfig       string        `config:"kube_config"`
+	KubeClientQps    float32       `config:"kube_client_qps"`
+	KubeClientBurst  int           `config:"kube_client_burst"`
 	Namespace        string        `config:"namespace"`
 	SyncPeriod       time.Duration `config:"sync_period"`
 	LabelsDedot      bool          `config:"labels.dedot"`

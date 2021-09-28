@@ -26,11 +26,13 @@ import (
 )
 
 type kubeAnnotatorConfig struct {
-	KubeConfig string        `config:"kube_config"`
-	Host       string        `config:"host"`
-	Scope      string        `config:"scope"`
-	Namespace  string        `config:"namespace"`
-	SyncPeriod time.Duration `config:"sync_period"`
+	KubeConfig      string        `config:"kube_config"`
+	KubeClientQps   float32       `config:"kube_client_qps"`
+	KubeClientBurst int           `config:"kube_client_burst"`
+	Host            string        `config:"host"`
+	Scope           string        `config:"scope"`
+	Namespace       string        `config:"namespace"`
+	SyncPeriod      time.Duration `config:"sync_period"`
 	// Annotations are kept after pod is removed, until they haven't been accessed
 	// for a full `cleanup_timeout`:
 	CleanupTimeout  time.Duration `config:"cleanup_timeout"`

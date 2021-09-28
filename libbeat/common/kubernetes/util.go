@@ -65,7 +65,7 @@ func GetKubeConfigEnvironmentVariable() string {
 // GetKubernetesClient returns a kubernetes client. If inCluster is true, it returns an
 // in cluster configuration based on the secrets mounted in the Pod. If kubeConfig is passed,
 // it parses the config file to get the config required to build a client.
-func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
+func GetKubernetesClient(kubeconfig string, opt *KubeOptions) (kubernetes.Interface, error) {
 	if kubeconfig == "" {
 		kubeconfig = GetKubeConfigEnvironmentVariable()
 	}
@@ -74,7 +74,10 @@ func GetKubernetesClient(kubeconfig string) (kubernetes.Interface, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kube config due to error: %+v", err)
 	}
-
+	if opt != nil {
+		cfg.QPS = opt.QPS
+		cfg.Burst = opt.Burst
+	}
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to build kubernetes clientset: %+v", err)
@@ -191,7 +194,7 @@ func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) 
 	return
 }
 
-//GetMachineID returns the machine-id
+// GetMachineID returns the machine-id
 // borrowed from machineID of cadvisor.
 func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{

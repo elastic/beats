@@ -33,7 +33,10 @@ import (
 
 // Config for kubernetes autodiscover provider
 type Config struct {
-	KubeConfig     string        `config:"kube_config"`
+	KubeConfig      string  `config:"kube_config"`
+	KubeClientQps   float32 `config:"kube_client_qps"`
+	KubeClientBurst int     `config:"kube_client_burst"`
+
 	Namespace      string        `config:"namespace"`
 	SyncPeriod     time.Duration `config:"sync_period"`
 	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`

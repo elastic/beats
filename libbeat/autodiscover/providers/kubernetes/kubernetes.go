@@ -106,7 +106,7 @@ func AutodiscoverBuilder(
 		return nil, errWrap(err)
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, &kubernetes.KubeOptions{QPS: config.KubeClientQps, Burst: config.KubeClientBurst})
 	if err != nil {
 		return nil, errWrap(err)
 	}

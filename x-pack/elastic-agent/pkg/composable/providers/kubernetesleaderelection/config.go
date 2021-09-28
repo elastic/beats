@@ -9,7 +9,9 @@ package kubernetesleaderelection
 
 // Config for kubernetes_leaderelection provider
 type Config struct {
-	KubeConfig string `config:"kube_config"`
+	KubeConfig      string  `config:"kube_config"`
+	KubeClientQps   float32 `config:"kube_client_qps"`
+	KubeClientBurst int     `config:"kube_client_burst"`
 	// Name of the leaderelection lease
 	LeaderLease string `config:"leader_lease"`
 }

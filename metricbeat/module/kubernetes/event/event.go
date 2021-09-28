@@ -62,7 +62,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("fail to unpack the kubernetes event configuration: %s", err)
 	}
 
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	client, err := kubernetes.GetKubernetesClient(config.KubeConfig, &kubernetes.KubeOptions{QPS: config.KubeClientQps, Burst: config.KubeClientBurst})
 	if err != nil {
 		return nil, fmt.Errorf("fail to get kubernetes client: %s", err.Error())
 	}

@@ -19,10 +19,13 @@ type Config struct {
 	Scope     string    `config:"scope"`
 	Resources Resources `config:"resources"`
 
-	KubeConfig     string        `config:"kube_config"`
-	Namespace      string        `config:"namespace"`
-	SyncPeriod     time.Duration `config:"sync_period"`
-	CleanupTimeout time.Duration `config:"cleanup_timeout" validate:"positive"`
+	KubeConfig      string        `config:"kube_config"`
+	KubeClientQps   float32       `config:"kube_client_qps"`
+	KubeClientBurst int           `config:"kube_client_burst"`
+
+	Namespace       string        `config:"namespace"`
+	SyncPeriod      time.Duration `config:"sync_period"`
+	CleanupTimeout  time.Duration `config:"cleanup_timeout" validate:"positive"`
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`

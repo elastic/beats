@@ -93,5 +93,5 @@ func (p *contextProviderK8sSecrets) Run(comm corecomp.ContextProviderComm) error
 }
 
 func getK8sClient(kubeconfig string) (k8sclient.Interface, error) {
-	return kubernetes.GetKubernetesClient(kubeconfig)
+	return kubernetes.GetKubernetesClient(kubeconfig, nil)
 }
