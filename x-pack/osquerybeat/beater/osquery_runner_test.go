@@ -10,10 +10,11 @@ import (
 	"testing"
 	"time"
 
+	"golang.org/x/sync/errgroup"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
-	"golang.org/x/sync/errgroup"
 )
 
 func waitGroupWithTimeout(ctx context.Context, g *errgroup.Group, to time.Duration) error {
