@@ -19,7 +19,6 @@ package pipeline
 
 import (
 	"fmt"
-	"runtime/debug"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -106,10 +105,10 @@ func (p *testConsumer) Close() error {
 		fmt.Printf("calling testConsumer.close\n")
 		defer fmt.Printf("called testConsumer.close\n")
 		return p.close()
-	} else {
+	} /* else {
 		debug.PrintStack()
 		fmt.Printf("i don't have a close callback...\n")
-	}
+	}*/
 	return nil
 }
 

@@ -70,8 +70,9 @@ func newEventConsumer(
 	ctx *batchContext,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger: log,
-		sig:    make(chan consumerSignal, 3),
+		logger:        log,
+		sig:           make(chan consumerSignal, 3),
+		queueConsumer: queue.Consumer(),
 		//out:    nil,
 
 		queue: queue,
@@ -124,11 +125,14 @@ func (c *eventConsumer) sigHint() {
 	}
 }
 
+// only called from pipelineController.Set
 func (c *eventConsumer) updOutput(grp *outputGroup) {
-	if c.queueConsumer != nil {
-		c.queueConsumer.Close()
-		c.queueConsumer = nil
-	}
+	// The queue consumer needs to be closed in case the eventConsumer loop
+	// is currently blocked on a call to queueConsumer.Get. In this case, it
+	// would never receive the subsequent signal. Closing the consumer triggers
+	// an error return from queueConsumer.Get, ensuring the loop will receive
+	// the signal.
+	c.queueConsumer.Close()
 	// update output
 	c.sig <- consumerSignal{
 		tag: sigConsumerUpdateOutput,
@@ -139,7 +143,7 @@ func (c *eventConsumer) updOutput(grp *outputGroup) {
 func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 	defer fmt.Printf("eventConsumer.loop returning GOODBYE\n")
 	log := c.logger
-	consumer := c.queue.Consumer()
+	//consumer := c.queue.Consumer()
 
 	log.Debug("start pipeline event consumer")
 
@@ -158,6 +162,9 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 
 		// The output group that will receive the batches we're loading
 		outputGroup *outputGroup
+
+		// why do we need this??
+		consumer = c.queueConsumer
 	)
 
 	// handleSignal always returns nil unless it receives sigStop.
@@ -170,9 +177,10 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
+			//consumer.Close()
 			outputGroup = sig.out
-			consumer = c.queue.Consumer()
-			c.queueConsumer = consumer
+			c.queueConsumer = c.queue.Consumer()
+			consumer = c.queueConsumer
 		}
 
 		paused = c.paused()
