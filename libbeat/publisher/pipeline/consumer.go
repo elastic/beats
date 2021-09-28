@@ -148,23 +148,11 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 	log.Debug("start pipeline event consumer")
 
 	var (
-		// The channel batches should be sent to; output workers are listening
-		// on this channel.
-		out chan publisher.Batch
-
 		// The batch waiting to be sent, or nil if we don't yet have one
 		batch Batch
 
-		// The value of the atomic `c.paused`, the last time we read it.
-		// Updated when receiving a signal on the eventConsumer's signal
-		// channel `c.sig`.
-		paused = true
-
 		// The output group that will receive the batches we're loading
 		outputGroup *outputGroup
-
-		// why do we need this??
-		consumer = c.queueConsumer
 	)
 
 	// handleSignal always returns nil unless it receives sigStop.
@@ -175,47 +163,37 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 			return errStopped
 
 		case sigConsumerCheck:
+			// the only function of this case is to refresh the "paused" flag
 
 		case sigConsumerUpdateOutput:
-			//consumer.Close()
 			outputGroup = sig.out
 			c.queueConsumer = c.queue.Consumer()
-			consumer = c.queueConsumer
 		}
 
-		paused = c.paused()
-		if outputGroup != nil && batch != nil {
-			out = outputGroup.workQueue
-		} else {
-			out = nil
-		}
+		//paused = c.paused()
 		return nil
 	}
 
 	for {
-		fmt.Printf("loop iter\n")
 		// If we want a batch but don't yet have one
-		if !paused && outputGroup != nil && consumer != nil && batch == nil {
-			out = outputGroup.workQueue
-			fmt.Printf("before consumer.Get\n")
-			queueBatch, err := consumer.Get(outputGroup.batchSize)
-			fmt.Printf("after consumer.Get\n")
+		if outputGroup != nil && batch == nil && !c.paused() {
+			queueBatch, err := c.queueConsumer.Get(outputGroup.batchSize)
 			if err != nil {
-				out = nil
-				consumer = nil
+				// There is a problem with the queue consumer; most likely it has
+				// been closed, either for shutdown or because the output is
+				// reloading. In either case, stop writing to this output group
+				// until the next sigConsumerUpdateOutput tells us a new one is ready.
+				outputGroup = nil
 				continue
 			}
 			if queueBatch != nil {
 				batch = newBatch(c.ctx, queueBatch, outputGroup.timeToLive)
 			}
-
-			paused = c.paused()
-			if paused || batch == nil {
-				out = nil
-			}
+			//paused = c.paused()
 		}
-		fmt.Printf("about to select\n")
 
+		// Start by selecting only on the signal channel, so we don't try
+		// sending on the output channel until the signal channel is empty.
 		select {
 		case sig := <-c.sig:
 			if err := handleSignal(sig); err != nil {
@@ -225,16 +203,21 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 		default:
 		}
 
+		// If we have an output to send and we aren't paused, then the output
+		// channel points at the real work queue; otherwise, it is nil, and
+		// the select below will block until it gets something on the signal
+		// channel instead.
+		var outputChan chan publisher.Batch
+		if outputGroup != nil && batch != nil && !c.paused() {
+			outputChan = outputGroup.workQueue
+		}
 		select {
 		case sig := <-c.sig:
 			if err := handleSignal(sig); err != nil {
 				return
 			}
-		case out <- batch:
+		case outputChan <- batch:
 			batch = nil
-			if paused {
-				out = nil
-			}
 		}
 	}
 }
