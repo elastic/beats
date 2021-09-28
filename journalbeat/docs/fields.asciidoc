@@ -624,10 +624,10 @@ required: False
 
 --
 
-*`journald.process.capabilites`*::
+*`journald.process.capabilities`*::
 +
 --
-The effective capabilites of the process.
+The effective capabilities of the process.
 
 
 required: False
