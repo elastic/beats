@@ -6,7 +6,7 @@ services:
     build:
       context: ./_meta
       args:
-        ENT_VERSION: ${ENT_VERSION:-7.14.0}
+        ENT_VERSION: ${ENT_VERSION:-7.16.0-SNAPSHOT}
     depends_on:
       - "elasticsearch"
     environment:
@@ -27,7 +27,7 @@ services:
     image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-7.15.0}-1
     build:
       args:
-        ELASTICSEARCH_VERSION: ${ENT_VERSION:-7.15.0}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.15.0}
     extends:
       file: ../../../metricbeat/docker-compose.yml
       service: elasticsearch
