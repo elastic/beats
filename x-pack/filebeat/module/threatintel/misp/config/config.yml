@@ -47,6 +47,7 @@ response.pagination:
 - set:
     target: body.page
     value: '[[add .last_response.page 1]]'
+    fail_on_template_error: true
 cursor:
   timestamp:
     value: '[[.last_event.Event.timestamp]]'
