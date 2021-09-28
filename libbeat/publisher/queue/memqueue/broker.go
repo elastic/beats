@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
@@ -184,10 +185,13 @@ func NewQueue(
 }
 
 func (b *broker) Close() error {
+	fmt.Printf("memqueue Close\n")
 	close(b.done)
 	if b.waitOnClose {
+		fmt.Printf("waiting on broker.wg\n")
 		b.wg.Wait()
 	}
+	fmt.Printf("memqueue Close done\n")
 	return nil
 }
 

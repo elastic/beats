@@ -43,7 +43,10 @@ type eventConsumer struct {
 
 	queue queue.Queue
 
-	//out *outputGroup
+	// The active consumer to read event batches from. Stored here
+	// so that eventConsumer can wake up the worker if it's blocked reading
+	// the queue consumer during shutdown.
+	queueConsumer queue.Consumer
 }
 
 type consumerSignal struct {
@@ -86,7 +89,7 @@ func newEventConsumer(
 }
 
 func (c *eventConsumer) close() {
-	//c.consumer.Close()
+	c.queueConsumer.Close()
 	c.sig <- consumerSignal{tag: sigStop}
 	c.wg.Wait()
 }
@@ -122,6 +125,10 @@ func (c *eventConsumer) sigHint() {
 }
 
 func (c *eventConsumer) updOutput(grp *outputGroup) {
+	if c.queueConsumer != nil {
+		c.queueConsumer.Close()
+		c.queueConsumer = nil
+	}
 	// update output
 	c.sig <- consumerSignal{
 		tag: sigConsumerUpdateOutput,
@@ -158,16 +165,14 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 	handleSignal := func(sig consumerSignal) error {
 		switch sig.tag {
 		case sigStop:
-			fmt.Printf("got sigStop\n")
-			consumer.Close()
 			return errStopped
 
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
-			consumer.Close()
 			outputGroup = sig.out
 			consumer = c.queue.Consumer()
+			c.queueConsumer = consumer
 		}
 
 		paused = c.paused()

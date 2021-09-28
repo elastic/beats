@@ -23,6 +23,7 @@ package pipeline
 import (
 	"fmt"
 	"reflect"
+	"runtime/debug"
 	"sync"
 	"time"
 
@@ -227,7 +228,8 @@ func (p *Pipeline) Close() error {
 	p.output.Close()
 
 	// shutdown queue
-	fmt.Printf("Here goes the queue:\n")
+	debug.PrintStack()
+	fmt.Printf("Here goes the queue (%v):\n", p.queue)
 	err := p.queue.Close()
 	if err != nil {
 		log.Error("pipeline queue shutdown error: ", err)
