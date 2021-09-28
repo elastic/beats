@@ -43,7 +43,7 @@ type eventConsumer struct {
 
 	queue queue.Queue
 
-	out *outputGroup
+	//out *outputGroup
 }
 
 type consumerSignal struct {
@@ -69,7 +69,7 @@ func newEventConsumer(
 	c := &eventConsumer{
 		logger: log,
 		sig:    make(chan consumerSignal, 3),
-		out:    nil,
+		//out:    nil,
 
 		queue: queue,
 		ctx:   ctx,
@@ -148,6 +148,9 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 		// Updated when receiving a signal on the eventConsumer's signal
 		// channel `c.sig`.
 		paused = true
+
+		// The output group that will receive the batches we're loading
+		outputGroup *outputGroup
 	)
 
 	// handleSignal always returns nil unless it receives sigStop.
@@ -163,13 +166,13 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 
 		case sigConsumerUpdateOutput:
 			consumer.Close()
-			c.out = sig.out
+			outputGroup = sig.out
 			consumer = c.queue.Consumer()
 		}
 
 		paused = c.paused()
-		if c.out != nil && batch != nil {
-			out = c.out.workQueue
+		if outputGroup != nil && batch != nil {
+			out = outputGroup.workQueue
 		} else {
 			out = nil
 		}
@@ -179,16 +182,18 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 	for {
 		fmt.Printf("loop iter\n")
 		// If we want a batch but don't yet have one
-		if !paused && c.out != nil && consumer != nil && batch == nil {
-			out = c.out.workQueue
-			queueBatch, err := consumer.Get(c.out.batchSize)
+		if !paused && outputGroup != nil && consumer != nil && batch == nil {
+			out = outputGroup.workQueue
+			fmt.Printf("before consumer.Get\n")
+			queueBatch, err := consumer.Get(outputGroup.batchSize)
+			fmt.Printf("after consumer.Get\n")
 			if err != nil {
 				out = nil
 				consumer = nil
 				continue
 			}
 			if queueBatch != nil {
-				batch = newBatch(c.ctx, queueBatch, c.out.timeToLive)
+				batch = newBatch(c.ctx, queueBatch, outputGroup.timeToLive)
 			}
 
 			paused = c.paused()
@@ -196,6 +201,7 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 				out = nil
 			}
 		}
+		fmt.Printf("about to select\n")
 
 		select {
 		case sig := <-c.sig:
