@@ -4,17 +4,18 @@ import os
 import unittest
 from xpack_metricbeat import XPackTest, metricbeat
 
+
 class Test(XPackTest):
     COMPOSE_SERVICES = ['enterprise_search']
     COMPOSE_TIMEOUT = 600
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_health(self):
         """Tests the Health API and the associated metricset"""
 
         # Setup the environment
-        self.setup_environment(metricset = "health")
+        self.setup_environment(metricset="health")
 
         # Get a single event for testing
         evt = self.get_event()
@@ -25,13 +26,13 @@ class Test(XPackTest):
         health = evt["enterprisesearch"]["health"]
         self.assertIn("jvm", health)
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
     def test_stats(self):
         """Tests the Stats API and the associated metricset"""
 
         # Setup the environment
-        self.setup_environment(metricset = "stats")
+        self.setup_environment(metricset="stats")
 
         # Get a single event for testing
         evt = self.get_event()
@@ -42,7 +43,7 @@ class Test(XPackTest):
         stats = evt["enterprisesearch"]["stats"]
         self.assertIn("http", stats)
 
-    #--------------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     def setup_environment(self, metricset):
         """Sets up the testing environment and starts all components needed"""
 
