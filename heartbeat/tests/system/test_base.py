@@ -198,7 +198,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
         Test that the template can be loaded with `setup --index-management`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()])
+        es = Elasticsearch([self.get_elasticsearch_url()], http_auth=('elastic', 'changeme'))
         self.render_config_template(
             monitors=[{
                 "type": "http",

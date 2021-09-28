@@ -26,5 +26,5 @@ class BaseTest(TestCase):
         if self._es:
             return self._es
 
-        self._es = Elasticsearch([self.get_elasticsearch_url()])
+        self._es = Elasticsearch([self.get_elasticsearch_url()], http_auth=('elastic', 'changeme'))
         return self._es

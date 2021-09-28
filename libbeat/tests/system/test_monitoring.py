@@ -19,7 +19,7 @@ class Test(BaseTest):
         super(BaseTest, self).setUp()
 
         self.es = Elasticsearch([self.get_elasticsearch_url()])
-        self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()])
+        self.es_monitoring = Elasticsearch([self.get_elasticsearch_monitoring_url()], http_auth=('elastic', 'changeme'))
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')

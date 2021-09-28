@@ -27,7 +27,7 @@ class Test(BaseTest):
     def setUp(self):
         super(BaseTest, self).setUp()
         if INTEGRATION_TESTS:
-            self.es = Elasticsearch([self.get_elasticsearch_url()])
+            self.es = Elasticsearch([self.get_elasticsearch_url()], http_auth=('elastic', 'changeme'))
 
         # Copy system module
         shutil.copytree(os.path.join(self.beat_path, "tests", "system", "module", "test"),

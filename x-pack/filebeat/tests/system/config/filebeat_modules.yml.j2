@@ -14,6 +14,8 @@ filebeat.registry:
 
 output.elasticsearch.hosts: ["{{ elasticsearch_url }}"]
 output.elasticsearch.index: {{ index_name }}
+output.elasticsearch.username: elastic
+output.elasticsearch.password: changeme
 
 setup.template.name: {{ index_name }}
 setup.template.pattern: {{ index_name }}*

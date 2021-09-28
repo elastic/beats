@@ -15,7 +15,7 @@ class Test(BaseTest):
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
+        self.es = Elasticsearch([self.elasticsearch_url], http_auth=('elastic', 'changeme'))
 
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")

@@ -63,7 +63,7 @@ class Test(BaseTest):
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url])
+        self.es = Elasticsearch([self.elasticsearch_url], http_auth=('elastic', 'changeme'))
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
