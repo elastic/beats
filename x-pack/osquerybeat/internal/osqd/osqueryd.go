@@ -12,6 +12,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -24,7 +25,8 @@ import (
 )
 
 const (
-	osqueryDName = "osqueryd"
+	osqueryDName               = "osqueryd"
+	osqueryDarwinAppBundlePath = "osquery.app/Contents/MacOS"
 )
 
 const (
@@ -351,6 +353,10 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
+	if runtime.GOOS == "darwin" {
+		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename())
+
+	}
 	return filepath.Join(dir, osquerydFilename())
 }
 
