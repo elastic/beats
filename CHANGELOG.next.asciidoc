@@ -728,6 +728,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
 - Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 - Release checkpoint module as GA. {pull}27814[27814]
+- Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 
 *Heartbeat*
 
