@@ -19,10 +19,12 @@ package pipeline
 
 import (
 	"errors"
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -39,16 +41,14 @@ type eventConsumer struct {
 	sig   chan consumerSignal
 	wg    sync.WaitGroup
 
-	queue    queue.Queue
-	consumer queue.Consumer
+	queue queue.Queue
 
 	out *outputGroup
 }
 
 type consumerSignal struct {
-	tag      consumerEventTag
-	consumer queue.Consumer
-	out      *outputGroup
+	tag consumerEventTag
+	out *outputGroup
 }
 
 type consumerEventTag uint8
@@ -56,7 +56,6 @@ type consumerEventTag uint8
 const (
 	sigConsumerCheck consumerEventTag = iota
 	sigConsumerUpdateOutput
-	sigConsumerUpdateInput
 	sigStop
 )
 
@@ -67,15 +66,13 @@ func newEventConsumer(
 	queue queue.Queue,
 	ctx *batchContext,
 ) *eventConsumer {
-	consumer := queue.Consumer()
 	c := &eventConsumer{
 		logger: log,
 		sig:    make(chan consumerSignal, 3),
 		out:    nil,
 
-		queue:    queue,
-		consumer: consumer,
-		ctx:      ctx,
+		queue: queue,
+		ctx:   ctx,
 	}
 
 	c.pause.Store(true)
@@ -83,13 +80,13 @@ func newEventConsumer(
 	c.wg.Add(1)
 	go func() {
 		defer c.wg.Done()
-		c.loop(consumer)
+		c.loop()
 	}()
 	return c
 }
 
 func (c *eventConsumer) close() {
-	c.consumer.Close()
+	//c.consumer.Close()
 	c.sig <- consumerSignal{tag: sigStop}
 	c.wg.Wait()
 }
@@ -125,46 +122,49 @@ func (c *eventConsumer) sigHint() {
 }
 
 func (c *eventConsumer) updOutput(grp *outputGroup) {
-	// close consumer to break consumer worker from pipeline
-	c.consumer.Close()
-
 	// update output
 	c.sig <- consumerSignal{
 		tag: sigConsumerUpdateOutput,
 		out: grp,
 	}
-
-	// update eventConsumer with new queue connection
-	c.consumer = c.queue.Consumer()
-	c.sig <- consumerSignal{
-		tag:      sigConsumerUpdateInput,
-		consumer: c.consumer,
-	}
 }
 
-func (c *eventConsumer) loop(consumer queue.Consumer) {
+func (c *eventConsumer) loop() { //consumer queue.Consumer) {
+	defer fmt.Printf("eventConsumer.loop returning GOODBYE\n")
 	log := c.logger
+	consumer := c.queue.Consumer()
 
 	log.Debug("start pipeline event consumer")
 
 	var (
-		out    workQueue
-		batch  Batch
+		// The channel batches should be sent to; output workers are listening
+		// on this channel.
+		out chan publisher.Batch
+
+		// The batch waiting to be sent, or nil if we don't yet have one
+		batch Batch
+
+		// The value of the atomic `c.paused`, the last time we read it.
+		// Updated when receiving a signal on the eventConsumer's signal
+		// channel `c.sig`.
 		paused = true
 	)
 
+	// handleSignal always returns nil unless it receives sigStop.
+	// it updates `consumer`, `c.out`, `paused`, and `out`.
 	handleSignal := func(sig consumerSignal) error {
 		switch sig.tag {
 		case sigStop:
+			fmt.Printf("got sigStop\n")
+			consumer.Close()
 			return errStopped
 
 		case sigConsumerCheck:
 
 		case sigConsumerUpdateOutput:
+			consumer.Close()
 			c.out = sig.out
-
-		case sigConsumerUpdateInput:
-			consumer = sig.consumer
+			consumer = c.queue.Consumer()
 		}
 
 		paused = c.paused()
@@ -177,6 +177,8 @@ func (c *eventConsumer) loop(consumer queue.Consumer) {
 	}
 
 	for {
+		fmt.Printf("loop iter\n")
+		// If we want a batch but don't yet have one
 		if !paused && c.out != nil && consumer != nil && batch == nil {
 			out = c.out.workQueue
 			queueBatch, err := consumer.Get(c.out.batchSize)

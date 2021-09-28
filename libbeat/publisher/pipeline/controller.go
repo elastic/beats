@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -36,8 +38,7 @@ type outputController struct {
 	monitors Monitors
 	observer outputObserver
 
-	queue     queue.Queue
-	workQueue workQueue
+	workQueue chan publisher.Batch
 
 	retryer  *retryer
 	consumer *eventConsumer
@@ -46,14 +47,15 @@ type outputController struct {
 
 // outputGroup configures a group of load balanced outputs with shared work queue.
 type outputGroup struct {
-	workQueue workQueue
+	// workQueue is a channel that receives event batches that
+	// are ready to send. Each output worker in outputs reads from
+	// workQueue for events to send.
+	workQueue chan publisher.Batch
 	outputs   []outputWorker
 
 	batchSize  int
 	timeToLive int // event lifetime
 }
-
-type workQueue chan publisher.Batch
 
 // outputWorker instances pass events from the shared workQueue to the outputs.Client
 // instances.
@@ -71,8 +73,7 @@ func newOutputController(
 		beat:      beat,
 		monitors:  monitors,
 		observer:  observer,
-		queue:     queue,
-		workQueue: makeWorkQueue(),
+		workQueue: make(chan publisher.Batch),
 	}
 
 	ctx := &batchContext{}
@@ -87,17 +88,23 @@ func newOutputController(
 }
 
 func (c *outputController) Close() error {
+	fmt.Printf("sigPause\n")
 	c.consumer.sigPause()
+	fmt.Printf("eventConsumer.close\n")
 	c.consumer.close()
+	fmt.Printf("retryer.close\n")
 	c.retryer.close()
+	fmt.Printf("closing work queue\n")
 	close(c.workQueue)
 
 	if c.out != nil {
 		for _, out := range c.out.outputs {
+			fmt.Printf("closing outputWorker\n")
 			out.Close()
 		}
 	}
 
+	fmt.Printf("finished outputController.Close\n")
 	return nil
 }
 
@@ -141,10 +148,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.consumer.sigContinue()
 
 	c.observer.updateOutputGroup()
-}
-
-func makeWorkQueue() workQueue {
-	return workQueue(make(chan publisher.Batch, 0))
 }
 
 // Reload the output

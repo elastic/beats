@@ -19,6 +19,8 @@ package pipeline
 
 import (
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 // retryer is responsible for accepting and managing failed send attempts. It
@@ -37,7 +39,7 @@ type retryer struct {
 	consumer interruptor
 
 	sig        chan retryerSignal
-	out        workQueue
+	out        chan publisher.Batch
 	in         retryQueue
 	doneWaiter sync.WaitGroup
 }
@@ -51,7 +53,7 @@ type retryQueue chan batchEvent
 
 type retryerSignal struct {
 	tag     retryerEventTag
-	channel workQueue
+	channel chan publisher.Batch
 }
 
 type batchEvent struct {
@@ -77,7 +79,7 @@ const (
 func newRetryer(
 	log logger,
 	observer outputObserver,
-	out workQueue,
+	out chan publisher.Batch,
 	c interruptor,
 ) *retryer {
 	r := &retryer{
@@ -120,7 +122,7 @@ func (r *retryer) cancelled(b Batch) {
 func (r *retryer) loop() {
 	defer r.doneWaiter.Done()
 	var (
-		out             workQueue
+		out             chan publisher.Batch
 		consumerBlocked bool
 
 		active     Batch

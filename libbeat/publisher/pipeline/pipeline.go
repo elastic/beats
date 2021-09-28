@@ -21,6 +21,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 	"time"
@@ -222,19 +223,23 @@ func (p *Pipeline) Close() error {
 	// TODO: close/disconnect still active clients
 
 	// close output before shutting down queue
+	fmt.Printf("Here goes the outputController:\n")
 	p.output.Close()
 
 	// shutdown queue
+	fmt.Printf("Here goes the queue:\n")
 	err := p.queue.Close()
 	if err != nil {
 		log.Error("pipeline queue shutdown error: ", err)
 	}
 
+	fmt.Printf("Here goes the observer:\n")
 	p.observer.cleanup()
 	if p.sigNewClient != nil {
 		close(p.sigNewClient)
 	}
 
+	fmt.Printf("pipeline closed!\n")
 	return nil
 }
 

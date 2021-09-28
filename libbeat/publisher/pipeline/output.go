@@ -31,7 +31,7 @@ import (
 type worker struct {
 	id       uint
 	observer outputObserver
-	qu       workQueue
+	qu       chan publisher.Batch
 	done     chan struct{}
 }
 
@@ -53,7 +53,7 @@ type netClientWorker struct {
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu workQueue, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(observer outputObserver, qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
 		observer: observer,
 		qu:       qu,

@@ -52,7 +52,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				logger := makeBufLogger(t)
 
-				wqu := makeWorkQueue()
+				wqu := make(chan publisher.Batch)
 				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
@@ -114,7 +114,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				logger := makeBufLogger(t)
 
-				wqu := makeWorkQueue()
+				wqu := make(chan publisher.Batch)
 				retryer := newRetryer(logger, nilObserver, wqu, nil)
 				defer retryer.close()
 
@@ -214,7 +214,7 @@ func TestMakeClientTracer(t *testing.T) {
 
 	logger := makeBufLogger(t)
 
-	wqu := makeWorkQueue()
+	wqu := make(chan publisher.Batch)
 	retryer := newRetryer(logger, nilObserver, wqu, nil)
 	defer retryer.close()
 
