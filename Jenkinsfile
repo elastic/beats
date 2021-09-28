@@ -809,11 +809,11 @@ def archiveTestOutput(Map args = [:]) {
         files.each { file ->
           echo "${file.name}"
         }
-        dir("${BASE_DIR}"){
+        dir("build"){
           googleStorageUploadExt(
             bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
             credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
-            pattern: "${BASE_DIR}/${fileName}",
+            pattern: "${fileName}",
             sharedPublicly: true
           )
         }
