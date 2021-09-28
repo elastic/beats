@@ -1,65 +1,65 @@
 [
-  {
-    "enterprisesearch":{
-      "health":{
-        "cluster_uuid":"MTD6fXYGTZylTMoW5AG5JA",
-        "crawler":{
-          "workers":{
-            "active":0,
-            "available":16,
-            "pool_size":16
-          }
+    {
+        "enterprisesearch": {
+            "health": {
+                "cluster_uuid": "MTD6fXYGTZylTMoW5AG5JA",
+                "crawler": {
+                    "workers": {
+                        "active": 0,
+                        "available": 16,
+                        "pool_size": 16
+                    }
+                },
+                "jvm": {
+                    "gc": {
+                        "collection_count": 20,
+                        "collection_time.msec": 2303
+                    },
+                    "memory_usage": {
+                        "heap_committed.bytes": 1279262720,
+                        "heap_init.bytes": 268435456,
+                        "heap_max.bytes": 1908932608,
+                        "heap_used.bytes": 736601248,
+                        "non_heap_committed.bytes": 99745792,
+                        "non_heap_init.bytes": 2555904,
+                        "object_pending_finalization_count": 0
+                    },
+                    "threads": {
+                        "daemon_thread_count": 17,
+                        "peak_thread_count": 32,
+                        "thread_count": 27,
+                        "total_started_thread_count": 35
+                    },
+                    "version": "1.8.0_292"
+                },
+                "name": "elastic-m1.local",
+                "process": {
+                    "filebeat": {
+                        "pid": 60067,
+                        "restart_count": 0,
+                        "time_since_last_restart.sec": -1
+                    },
+                    "pid": 59623,
+                    "uptime.sec": 170377
+                },
+                "version": {
+                    "build_hash": "unknown",
+                    "number": "8.0.0"
+                }
+            }
         },
-        "jvm":{
-          "gc":{
-            "collection_count":20,
-            "collection_time.msec":2303
-          },
-          "memory_usage":{
-            "heap_committed.bytes":1279262720,
-            "heap_init.bytes":268435456,
-            "heap_max.bytes":1908932608,
-            "heap_used.bytes":736601248,
-            "non_heap_committed.bytes":99745792,
-            "non_heap_init.bytes":2555904,
-            "object_pending_finalization_count":0
-          },
-          "threads":{
-            "daemon_thread_count":17,
-            "peak_thread_count":32,
-            "thread_count":27,
-            "total_started_thread_count":35
-          },
-          "version":"1.8.0_292"
+        "event": {
+            "dataset": "enterprisesearch.health",
+            "duration": 115000,
+            "module": "enterprisesearch"
         },
-        "name":"elastic-m1.local",
-        "process":{
-          "filebeat":{
-            "pid":60067,
-            "restart_count":0,
-            "time_since_last_restart.sec":-1
-          },
-          "pid":59623,
-          "uptime.sec":170377
+        "metricset": {
+            "name": "health",
+            "period": 10000
         },
-        "version":{
-          "build_hash":"unknown",
-          "number":"8.0.0"
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "enterprisesearch"
         }
-      }
-    },
-    "event":{
-      "dataset":"enterprisesearch.health",
-      "duration":115000,
-      "module":"enterprisesearch"
-    },
-    "metricset":{
-      "name":"health",
-      "period":10000
-    },
-    "service":{
-      "address":"127.0.0.1:55555",
-      "type":"enterprisesearch"
     }
-  }
 ]
