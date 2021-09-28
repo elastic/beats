@@ -151406,23 +151406,6 @@ type: text
 --
 
 [float]
-=== binlog
-
-Contains fields from the binlog(pump and drainer) instance logs.
-
-
-
-*`tidb.binlog.*`*::
-+
---
-Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
-
-
-type: keyword
-
---
-
-[float]
 === log
 
 Contains fields from the TiDB instance logs.
@@ -152137,46 +152120,6 @@ type: double
 type: double
 
 --
-
-[float]
-=== ticdc
-
-Contains fields from the TiCDC instance logs.
-
-
-
-*`tidb.ticdc.*`*::
-+
---
-Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
-
-
-type: keyword
-
---
-
-[float]
-=== tiflash
-
-Contains fields from the TiFlash instance logs.
-
-
-
-*`tidb.tiflash.*`*::
-+
---
-Log fields defined in the application. The type of values are always string. You can use a global convert(https://www.elastic.co/guide/en/beats/filebeat/master/convert.html) processor to specify type.
-
-
-type: keyword
-
---
-
-[float]
-=== tispark
-
-Contains fields from the TiSpark instance logs.
-
 
 [[exported-fields-tomcat]]
 == Apache Tomcat fields

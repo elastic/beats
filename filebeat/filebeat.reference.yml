@@ -440,18 +440,6 @@ filebeat.modules:
 #
 #  slowlog:
 #    enabled: false
-#
-#  tiflash:
-#    enabled: false
-#
-#  binlog:
-#    enabled: false
-#
-#  ticdc:
-#    enabled: false
-#
-#  tispark:
-#    enabled: false
 
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik

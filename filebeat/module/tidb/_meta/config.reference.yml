@@ -48,15 +48,3 @@
 #
 #  slowlog:
 #    enabled: false
-#
-#  tiflash:
-#    enabled: false
-#
-#  binlog:
-#    enabled: false
-#
-#  ticdc:
-#    enabled: false
-#
-#  tispark:
-#    enabled: false

@@ -36,14 +36,6 @@ There are two places of filebeat config files, which you can edit to enable TiDB
     input:
       exclude_files:
         - '.*slowlog.*\.log$'
-  tiflash:
-    enabled: true
-  binlog:
-    enabled: true
-  ticdc:
-    enabled: true
-  tispark:
-    enabled: true
 -----
 
 * In the +filebeat.yml+ file
@@ -59,14 +51,6 @@ filebeat.modules:
     input:
       exclude_files:
         - '.*slowlog.*\.log$'
-  tiflash:
-    enabled: true
-  binlog:
-    enabled: true
-  ticdc:
-    enabled: true
-  tispark:
-    enabled: true
 -----
 
 To specify the same settings at the command line, you use:
@@ -101,22 +85,6 @@ filebeat.modules:
     input:
       exclude_files:
         - '.*slowlog.*\.log$'
-  tiflash:
-    enabled: true
-    var:
-      deployment: container
-  binlog:
-    enabled: true
-    var:
-      deployment: container
-  ticdc:
-    enabled: true
-    var:
-      deployment: container
-  tispark:
-    enabled: true
-    var:
-      deployment: container
 -----
 
 [float]
@@ -144,22 +112,6 @@ filebeat.modules:
     input:
       exclude_files:
         - '.*slowlog.*\.log$'
-  tiflash:
-    enabled: true
-    var:
-      paths: ["/tidb-deploy/tiflash-9000/log/*.log"]
-  binlog:
-    enabled: true
-    var:
-      paths: ["/tidb-deploy/pump-8250/log/*.log","/tidb-deploy/drainer-8249/log/*.log"]
-  ticdc:
-    enabled: true
-    var:
-      paths: ["/tidb-deploy/cdc-8300/log/*.log"]
-  tispark:
-    enabled: true
-    var:
-      paths: ["/tidb-deploy/tispark-master-7077/log/*.log","/tidb-deploy/tispark-worker-7078/log/*.log"]
 -----
 
 include::../include/config-option-intro.asciidoc[]
