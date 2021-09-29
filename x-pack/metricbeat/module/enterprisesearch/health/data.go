@@ -6,7 +6,9 @@ package health
 
 import (
 	"encoding/json"
-	"errors"
+
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -77,27 +79,35 @@ func eventMapping(input []byte) (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
-
-	system, ok := data["system"].(map[string]interface{})
-	if !ok {
-		return nil, errors.New("system is not a map")
-	}
-
-	jvm, ok := data["jvm"].(map[string]interface{})
-	if !ok {
-		return nil, errors.New("jvm is not a map")
-	}
-
-	// Add version info to the JVM section to help the schema mapper find it
-	jvm["version"] = system["java_version"]
+	var errs multierror.Errors
 
 	// Collect process info in a form ready for mapping
 	process := make(map[string]interface{})
-	process["pid"] = jvm["pid"]
-	process["uptime"] = jvm["uptime"]
 	process["filebeat"] = data["filebeat"]
+
+	jvm, ok := data["jvm"].(map[string]interface{})
+	if ok {
+		process["pid"] = jvm["pid"]
+		process["uptime"] = jvm["uptime"]
+
+		// Add version info to the JVM section to help the schema mapper find it
+		system, ok := data["system"].(map[string]interface{})
+		if ok {
+			jvm["version"] = system["java_version"]
+		} else {
+			errs = append(errs, errors.New("system is not a map"))
+		}
+	} else {
+		errs = append(errs, errors.New("jvm is not a map"))
+	}
+
+	// Set the process info we have collected
 	data["process"] = process
 
 	dataFields, err := schema.Apply(data)
-	return dataFields, err
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "failure to apply health schema"))
+	}
+
+	return dataFields, errs.Err()
 }
