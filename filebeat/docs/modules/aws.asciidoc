@@ -160,7 +160,10 @@ Default to be 300 seconds.
 
 *`var.api_timeout`*::
 
-Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
+call will be interrupted. The default AWS API timeout is `120s`.
+
+The API timeout must be longer than the `sqs.wait_time` value.
 
 *`var.bucket_arn`*::
 
