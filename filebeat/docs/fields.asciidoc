@@ -151163,7 +151163,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.id`*::
+*`threatintel.misp.context.attribute.id`*::
 +
 --
 The ID of the secondary attribute related to the event object.
@@ -151173,7 +151173,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.type`*::
+*`threatintel.misp.context.attribute.type`*::
 +
 --
 The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
@@ -151183,7 +151183,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.category`*::
+*`threatintel.misp.context.attribute.category`*::
 +
 --
 The category of the secondary attribute related to the event object. For example "Network Activity".
@@ -151193,7 +151193,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.to_ids`*::
+*`threatintel.misp.context.attribute.to_ids`*::
 +
 --
 If the secondary attribute should be automatically synced with an IDS.
@@ -151203,7 +151203,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.object.attribute.uuid`*::
+*`threatintel.misp.context.attribute.uuid`*::
 +
 --
 The UUID of the secondary attribute related to the event.
@@ -151213,7 +151213,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.event_id`*::
+*`threatintel.misp.context.attribute.event_id`*::
 +
 --
 The local event ID of the secondary attribute related to the event.
@@ -151223,7 +151223,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.distribution`*::
+*`threatintel.misp.context.attribute.distribution`*::
 +
 --
 How the secondary attribute has been distributed, represented by integer numbers.
@@ -151233,7 +151233,7 @@ type: long
 
 --
 
-*`threatintel.misp.object.attribute.timestamp`*::
+*`threatintel.misp.context.attribute.timestamp`*::
 +
 --
 The timestamp in which the secondary attribute was attached to the event object.
@@ -151243,7 +151243,7 @@ type: date
 
 --
 
-*`threatintel.misp.object.attribute.comment`*::
+*`threatintel.misp.context.attribute.comment`*::
 +
 --
 Comments made to the secondary attribute itself.
@@ -151253,7 +151253,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.sharing_group_id`*::
+*`threatintel.misp.context.attribute.sharing_group_id`*::
 +
 --
 The group ID of the sharing group related to the specific secondary attribute.
@@ -151263,7 +151263,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.deleted`*::
+*`threatintel.misp.context.attribute.deleted`*::
 +
 --
 If the secondary attribute has been removed from the event object.
@@ -151273,7 +151273,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.object.attribute.disable_correlation`*::
+*`threatintel.misp.context.attribute.disable_correlation`*::
 +
 --
 If correlation has been enabled on the secondary attribute related to the event object.
@@ -151283,7 +151283,7 @@ type: boolean
 
 --
 
-*`threatintel.misp.object.attribute.object_id`*::
+*`threatintel.misp.context.attribute.object_id`*::
 +
 --
 The ID of the Object in which the secondary attribute is attached.
@@ -151293,7 +151293,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.object_relation`*::
+*`threatintel.misp.context.attribute.object_relation`*::
 +
 --
 The type of relation the secondary attribute has with the event object itself.
@@ -151303,7 +151303,7 @@ type: keyword
 
 --
 
-*`threatintel.misp.object.attribute.value`*::
+*`threatintel.misp.context.attribute.value`*::
 +
 --
 The value of the attribute, depending on the type like "url, sha1, email-src".
