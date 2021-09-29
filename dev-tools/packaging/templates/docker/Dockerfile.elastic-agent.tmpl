@@ -142,7 +142,12 @@ COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 COPY --from=home /opt /opt
 {{- end }}
 
-{{- if ne .user "root" }}
+{{- if eq .user "root" }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+{{- end }}
+{{- else }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal")))  }}
@@ -152,11 +157,6 @@ RUN chown {{ .user }} $NODE_PATH
 # Generate folder for a stub command that will be overwritten at runtime
 RUN mkdir /app
 RUN chown {{ .user }} /app
-{{- end }}
-{{- else }}
-{{- if contains .image_name "-cloud" }}
-# Generate folder for a stub command that will be overwritten at runtime
-RUN mkdir /app
 {{- end }}
 {{- end }}
 USER {{ .user }}
