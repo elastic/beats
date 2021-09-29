@@ -110,7 +110,7 @@
         "kubernetes.pod.uid": "d57d545e-2a9d-11e9-995f-08002730e0dc",
         "kubernetes.replicaset.name": "coredns-86c58d9df4",
         "log.level": "INFO",
-        "log.offset": 550,
+        "log.offset": 562,
         "message": "2019-03-19T02:57:23.213Z [INFO] 172.17.0.9:37723 - 6966 \"A IN httpbin.org. udp 29 false 512\" NOERROR qr,rd,ra 83 0.000082083s\n",
         "network.protocol": "dns",
         "network.transport": "udp",
