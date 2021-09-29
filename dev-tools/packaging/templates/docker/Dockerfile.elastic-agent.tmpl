@@ -23,7 +23,7 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
-{{- if (and (eq .Variant "cloud") (not (contains .from "ubi-minimal")))  }}
+{{- if contains .from "-cloud" }}
     tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*metricbeat" --directory && \
     tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*filebeat" --directory && \
 {{- end }}
@@ -138,7 +138,7 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
-{{- if (and (eq .Variant "cloud") (not (contains .from "ubi-minimal")))  }}
+{{- if contains .from "-cloud" }}
 COPY --from=home /opt/filebeat /opt/filebeat
 COPY --from=home /opt/metricbeat /opt/metricbeat
 {{- end }}
