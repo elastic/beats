@@ -118,7 +118,7 @@ func GenerateAllInOneFieldsGo() error {
 	return GenerateFieldsGo("fields.yml", "include/fields.go")
 }
 
-// GenerateMetricbeatAllInOneFieldsGo generates an all-in-one fields.go file.
+// GenerateMetricbeatAllInOneFieldsGo generates an all-in-one fields.go file for metricbeat.
 func GenerateMetricbeatAllInOneFieldsGo() error {
 	return GenerateFieldsGo("fields.yml", "include/fields/fields.go")
 }

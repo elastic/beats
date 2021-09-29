@@ -131,7 +131,7 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 		p.newQueryInfoMap = nil
 	}
 
-	p.log.Info("Osqueryd configuration:", c)
+	p.log.Debug("Osqueryd configuration:", c)
 
 	return map[string]string{
 		configName: c,

@@ -137,10 +137,6 @@ func Fields() {
 	mg.Deps(fieldsYML)
 }
 
-func fieldsYML() error {
-	return devtools.GenerateFieldsYAML("module")
-}
-
 // libbeatAndMetricbeatCommonFieldsGo generates a fields.go containing both
 // libbeat and metricbeat's common fields.
 func libbeatAndMetricbeatCommonFieldsGo() error {
@@ -148,6 +144,10 @@ func libbeatAndMetricbeatCommonFieldsGo() error {
 		return err
 	}
 	return devtools.GenerateMetricbeatAllInOneFieldsGo()
+}
+
+func fieldsYML() error {
+	return devtools.GenerateFieldsYAML("module")
 }
 
 func moduleFieldsGo() error {
