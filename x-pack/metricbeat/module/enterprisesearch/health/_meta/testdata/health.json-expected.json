@@ -13,15 +13,29 @@
                 "jvm": {
                     "gc": {
                         "collection_count": 20,
-                        "collection_time.msec": 2303
+                        "collection_time": {
+                            "ms": 2303
+                        }
                     },
                     "memory_usage": {
-                        "heap_committed.bytes": 1279262720,
-                        "heap_init.bytes": 268435456,
-                        "heap_max.bytes": 1908932608,
-                        "heap_used.bytes": 736601248,
-                        "non_heap_committed.bytes": 99745792,
-                        "non_heap_init.bytes": 2555904,
+                        "heap_committed": {
+                            "bytes": 1279262720
+                        },
+                        "heap_init": {
+                            "bytes": 268435456
+                        },
+                        "heap_max": {
+                            "bytes": 1908932608
+                        },
+                        "heap_used": {
+                            "bytes": 736601248
+                        },
+                        "non_heap_committed": {
+                            "bytes": 99745792
+                        },
+                        "non_heap_init": {
+                            "bytes": 2555904
+                        },
                         "object_pending_finalization_count": 0
                     },
                     "threads": {
@@ -40,7 +54,9 @@
                         "time_since_last_restart.sec": -1
                     },
                     "pid": 59623,
-                    "uptime.sec": 170377
+                    "uptime": {
+                        "sec": 170377
+                    }
                 },
                 "version": {
                     "build_hash": "unknown",

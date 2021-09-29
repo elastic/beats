@@ -67,7 +67,7 @@
               type: long
               description: Total number of Java garbage collector invocations since the start of the process
 
-            - name: collection_time.msec
+            - name: collection_time.ms
               type: long
               description: Total time spent running Java garbage collector since the start of the process
 
