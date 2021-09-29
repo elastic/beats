@@ -95,7 +95,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 - Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
-
+- Rename field `journald.process.capabilites` to `journald.process.capabilities` to fix spelling. {pull}28065[28065]
+- Rename field `log.syslog.facility.name` to `log.syslog.facility.code` because the value is numeric rather than the facility name. {pull}28065[28065]
 
 *Metricbeat*
 
@@ -405,6 +406,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- `beat` module respects `basepath` config option. {pull}28162[28162]
 
 *Packetbeat*
 
@@ -728,6 +730,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 - Release checkpoint module as GA. {pull}27814[27814]
 - Make aws-cloudwatch input GA. {pull}28161[28161]
+- Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 
 *Heartbeat*
 
