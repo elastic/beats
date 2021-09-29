@@ -45,7 +45,6 @@ RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
         yum install -y epel-release &&  \
         yum update -y $YUM_FLAGS && \
         yum install -y jq && \
-
         yum clean all && \
         exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
     done; \
