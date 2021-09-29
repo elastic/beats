@@ -454,7 +454,6 @@ shared:
     extra_vars:
       image_name: '{{.BeatName}}-cloud'
 
-
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
