@@ -74,6 +74,8 @@ setup.kibana.host: "{{ kibana.host }}"
 output:
   elasticsearch:
     hosts: ["{{ elasticsearch.host }}"]
+    username: "elastic"
+    password: "changeme"
   {% if elasticsearch.pipeline %}
     pipeline: {{elasticsearch.pipeline}}
   {% endif %}

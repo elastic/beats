@@ -67,7 +67,7 @@ services:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
       service: elasticsearch
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      test: ["CMD-SHELL", "curl -u elastic:changeme -s http://localhost:9200/_cat/health?h=status | grep -q green"]
   elasticsearchssl:
     extends:
       file: ${ES_BEATS}/testing/environments/${TESTING_ENVIRONMENT}.yml
