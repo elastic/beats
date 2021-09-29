@@ -70,13 +70,19 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - decode_json_fields:
       fields: [message]
-      document_id: Event.Attribute.uuid
       target: json
   - script:
       lang: javascript
       id: my_filter
       source: >
         function process(event) {
+            var uuid = event.Get("json.Event.Object.Attribute.uuid");
+            if (!uuid) {
+              uuid = event.Get("json.Event.Attribute.uuid");
+            }
+            if (uuid) {
+              event.Put("@metadata._id", uuid);
+            }
             event.Put("@metadata.op_type", "index");
         }
   - add_fields:
