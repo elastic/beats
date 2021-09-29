@@ -25,15 +25,19 @@ import (
 
 // retryer is responsible for accepting and managing failed send attempts. It
 // will also accept not yet published events from outputs being dynamically closed
-// by the controller. Cancelled batches will be forwarded to the new workQueue,
+// by outputController. Cancelled batches will be forwarded to the new workQueue,
 // without updating the events retry counters.
 // If too many batches (number of outputs/3) are stored in the retry buffer,
-// will the consumer be paused, until some batches have been processed by some
-// outputs.
+// the eventConsumer will be paused until more have been processed.
 type retryer struct {
-	logger   logger
+	logger logger
+
+	// retryer calls the observer methods eventsRetry, eventsDropped,
+	// and eventsFailed.
 	observer outputObserver
 
+	// Closing this channel signals to the worker goroutine that it should
+	// return.
 	done chan struct{}
 
 	consumer interruptor
@@ -206,7 +210,7 @@ func (r *retryer) loop() {
 }
 
 func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
-	consumerBlocked := blockConsumer(numOutputs, numBatches)
+	consumerBlocked := shouldBlockConsumer(numOutputs, numBatches)
 	if r.consumer == nil {
 		return consumerBlocked
 	}
@@ -228,6 +232,6 @@ func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	return consumerBlocked
 }
 
-func blockConsumer(numOutputs, numBatches int) bool {
+func shouldBlockConsumer(numOutputs, numBatches int) bool {
 	return numBatches/3 >= numOutputs
 }
