@@ -26,15 +26,18 @@ const (
 	osqueryDownloadBaseURL = "https://pkg.osquery.io"
 	osqueryName            = "osquery"
 	osqueryDName           = "osqueryd"
-	osqueryPath            = "usr/local/bin"
-	osqueryVersion         = "4.9.0"
-	osqueryMSIExt          = ".msi"
-	osqueryPkgExt          = ".pkg"
+	osqueryDarwinApp       = "osquery.app"
+	osqueryDarwinPath      = "opt/osquery/lib/" + osqueryDarwinApp
 
-	osqueryDistroDarwinSHA256   = "3f9ab772596f4da69687a2d7db9a382535b5eabf2346abd452b24666b8f25102"
-	osqueryDistroLinuxSHA256    = "4187f5b76e21ce96f765e509f96cb04708c43596b7609eba0e5a10ab5fdf58c5"
-	osqueryDistroLinuxARMSHA256 = "f3f5f3d6d81d727aad52a50b9f252aea3d7200add643eca06e9f462e66daeb18"
-	osqueryDistroWindowsSHA256  = "ae5e8b5948f3e2783aadc66e8b9d5d417b8606b39abf79f06af466c3455ce249"
+	osqueryLinuxPath = "opt/osquery/bin"
+	osqueryVersion   = "5.0.1"
+	osqueryMSIExt    = ".msi"
+	osqueryPkgExt    = ".pkg"
+
+	osqueryDistroDarwinSHA256   = "ec58996e64637d861ccead8dc6bc8865662728f6e5bc2694a3c92f0f4a371095"
+	osqueryDistroLinuxSHA256    = "acac95714d388f02d5f417b0aaf86de7dbb8f6b3788340a6f8517ee2cd314235"
+	osqueryDistroLinuxARMSHA256 = "712b704036929df14cbe5d3e41bd4e0ae325e698296691763af46dc0d6e77394"
+	osqueryDistroWindowsSHA256  = "e0d01f56e0739a0ce2b3beb03ecea277ed146754884e225cba45083043442acc"
 )
 
 type OSArch struct {
@@ -61,12 +64,20 @@ func OsquerydFilename() string {
 	return osqueryDName
 }
 
+func OsquerydDarwinApp() string {
+	return osqueryDarwinApp
+}
+
 func OsquerydPath(dir string) string {
 	return filepath.Join(dir, OsquerydFilename())
 }
 
-func OsquerydDistroPath() string {
-	return OsquerydPath(osqueryPath)
+func OsquerydDarwinDistroPath() string {
+	return osqueryDarwinPath
+}
+
+func OsquerydLinuxDistroPath() string {
+	return OsquerydPath(osqueryLinuxPath)
 }
 
 func OsquerydDistroFilename() string {

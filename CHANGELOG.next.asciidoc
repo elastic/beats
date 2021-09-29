@@ -95,7 +95,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Journalbeat*
 
 - Improve parsing of syslog.pid in journalbeat to strip the username when present {pull}16116[16116]
-
+- Rename field `journald.process.capabilites` to `journald.process.capabilities` to fix spelling. {pull}28065[28065]
+- Rename field `log.syslog.facility.name` to `log.syslog.facility.code` because the value is numeric rather than the facility name. {pull}28065[28065]
 
 *Metricbeat*
 
@@ -405,6 +406,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix remote_write flaky test. {pull}21173[21173]
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
+- `beat` module respects `basepath` config option. {pull}28162[28162]
 
 *Packetbeat*
 
@@ -503,6 +505,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Kafka is now supported up to version 2.8.0. {pull}27720[27720]
 - Add Huawei Cloud provider to add_cloud_metadata. {pull}27607[27607]
 - Add default seccomp policy for linux arm64. {pull}27955[27955]
+- Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
 
 *Auditbeat*
 
@@ -726,10 +729,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add write access to `url.value` from `request.transforms` in `httpjson` input. {pull}27937[27937]
 - Add Base64 encoded HMAC and UUID template functions to `httpjson` input {pull}27873[27873]
 - Release checkpoint module as GA. {pull}27814[27814]
+- Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
+- Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
 
 *Journalbeat*
 

@@ -40,8 +40,6 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
-    booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
-    booleanParam(name: 'arm', defaultValue: true, description: 'Allow ARM stages.')
   }
   stages {
     stage('Filter build') {
@@ -125,12 +123,6 @@ pipeline {
               stage('Package Linux'){
                 agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.linux
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PLATFORMS = [
@@ -224,12 +216,6 @@ pipeline {
               stage('Package Docker images for linux/arm64'){
                 agent { label 'arm' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.arm
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PACKAGES = "docker"
