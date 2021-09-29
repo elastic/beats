@@ -18,8 +18,7 @@ const (
 	// the host config.
 	defaultScheme = "http"
 
-	// defaultPath is the default path to the mod_status endpoint on the
-	// Apache HTTPD server.
+	// defaultPath is the default path to the Enterprise Search Health API
 	defaultPath = "/api/ent/v1/internal/health"
 )
 
@@ -30,10 +29,6 @@ var (
 	}.Build()
 )
 
-// init registers the MetricSet with the central registry as soon as the program
-// starts. The New function will be called later to instantiate an instance of
-// the MetricSet for each host defined in the module's configuration. After the
-// MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
 	mb.Registry.MustAddMetricSet("enterprisesearch", "health", New,
 		mb.WithHostParser(hostParser),
@@ -41,17 +36,11 @@ func init() {
 	)
 }
 
-// MetricSet holds any configuration or state information. It must implement
-// the mb.MetricSet interface. And this is best achieved by embedding
-// mb.BaseMetricSet because it implements all of the required mb.MetricSet
-// interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
 	http *helper.HTTP
 }
 
-// New creates a new instance of the MetricSet. New is responsible for unpacking
-// any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Beta("The Enterprise Search health metricset is currently in beta.")
 
@@ -65,9 +54,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}, nil
 }
 
-// Fetch methods implements the data gathering and data conversion to the right
-// format. It publishes the event which is then forwarded to the output. In case
-// of an error set the Error field of mb.Event or simply call report.Error().
+// Makes a GET request to Enterprise Search Health API (see defaultPath)
+// and generates a monitoring event based on the fetched metrics.
+// Returns nil or an error object.
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
