@@ -16,7 +16,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 570, "enterprise_search")
+	service := compose.EnsureUpWithTimeout(t, 300, "enterprise_search")
 
 	config := getConfig("stats", service.Host())
 	f := mbtest.NewReportingMetricSetV2Error(t, config)
@@ -30,7 +30,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	service := compose.EnsureUpWithTimeout(t, 570, "enterprise_search")
+	service := compose.EnsureUpWithTimeout(t, 300, "enterprise_search")
 
 	config := getConfig("stats", service.Host())
 
