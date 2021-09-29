@@ -24,8 +24,8 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
 {{- if contains .from "-cloud" }}
-    tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*metricbeat" --directory && \
-    tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*filebeat" --directory && \
+    tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*metricbeat" && \
+    tar -xvf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz --strip-components 1 --directory /opt --wildcards "*filebeat" && \
 {{- end }}
     true
 
