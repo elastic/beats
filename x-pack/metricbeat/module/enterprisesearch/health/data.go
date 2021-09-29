@@ -87,8 +87,12 @@ func eventMapping(input []byte) (common.MapStr, error) {
 
 	jvm, ok := data["jvm"].(map[string]interface{})
 	if ok {
-		process["pid"] = jvm["pid"]
-		process["uptime"] = jvm["uptime"]
+		if pid, ok := jvm["pid"]; ok {
+			process["pid"] = pid
+		}
+		if uptime, ok := jvm["uptime"]; ok {
+			process["uptime"] = uptime
+		}
 
 		// Add version info to the JVM section to help the schema mapper find it
 		system, ok := data["system"].(map[string]interface{})
