@@ -197,7 +197,7 @@ ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 WORKDIR {{ $beatHome }}
 
 {{- if contains .image_name "-cloud" }}
-ENTRYPOINT ["/usr/bin/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["/app/apm.sh"]
 # Generate a stub command that will be overwritten at runtime
 RUN echo -e '#!/bin/sh\nexec /usr/local/bin/docker-entrypoint' > /app/apm.sh && \
