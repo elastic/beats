@@ -43042,16 +43042,6 @@ kubernetes pod metrics
 
 
 
-*`kubernetes.pod.ip`*::
-+
---
-Kubernetes pod IP
-
-
-type: ip
-
---
-
 *`kubernetes.pod.host_ip`*::
 +
 --
