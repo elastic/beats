@@ -108,10 +108,7 @@ func defaultAccessConfig() (setupConfig, error) {
 		},
 		Kibana: kibanaConfig{
 			Fleet: kibanaFleetConfig{
-				// Remove FLEET_SETUP in 8.x
-				// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
-				// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
-				Setup:        envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP"),
+				Setup:        envBool("KIBANA_FLEET_SETUP"),
 				Host:         envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
 				Username:     envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME"),
 				Password:     envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),

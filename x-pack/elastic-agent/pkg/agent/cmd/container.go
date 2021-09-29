@@ -110,7 +110,7 @@ The following actions are possible and grouped based on the actions.
   before Fleet Server will actually successfully start. All the Kibana variables are not needed in case Elastic Agent
   should not setup Fleet. To manually trigger KIBANA_FLEET_SETUP navigate to Kibana -> Fleet -> Agents and enabled it.
 
-  KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent. This was previously FLEET_SETUP.
+  KIBANA_FLEET_SETUP - set to 1 enables the setup of Fleet in Kibana by Elastic Agent.
   KIBANA_FLEET_HOST - Kibana host accessible from fleet-server. [$KIBANA_HOST]
   KIBANA_FLEET_USERNAME - kibana username to enable Fleet [$KIBANA_USERNAME]
   KIBANA_FLEET_PASSWORD - kibana password to enable Fleet [$KIBANA_PASSWORD]
