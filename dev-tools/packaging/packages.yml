@@ -1007,7 +1007,7 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image.
+        # packages too big to fit in the main image
         variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
@@ -1034,7 +1034,7 @@ specs:
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image.
+        # packages too big to fit in the main image
         variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
