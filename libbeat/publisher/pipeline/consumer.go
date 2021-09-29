@@ -36,10 +36,9 @@ type eventConsumer struct {
 	logger *logp.Logger
 	ctx    *batchContext
 
-	pause atomic.Bool
-	wait  atomic.Bool
-	sig   chan consumerSignal
-	wg    sync.WaitGroup
+	wait atomic.Bool
+	sig  chan consumerTarget
+	wg   sync.WaitGroup
 
 	queue queue.Queue
 
@@ -49,9 +48,10 @@ type eventConsumer struct {
 	queueConsumer queue.Consumer
 }
 
-type consumerSignal struct {
-	tag consumerEventTag
-	out *outputGroup
+type consumerTarget struct {
+	ch         chan publisher.Batch
+	timeToLive int
+	batchSize  int
 }
 
 type consumerEventTag uint8
@@ -71,15 +71,12 @@ func newEventConsumer(
 ) *eventConsumer {
 	c := &eventConsumer{
 		logger:        log,
-		sig:           make(chan consumerSignal, 3),
+		sig:           make(chan consumerTarget, 3),
 		queueConsumer: queue.Consumer(),
-		//out:    nil,
 
 		queue: queue,
 		ctx:   ctx,
 	}
-
-	c.pause.Store(true)
 
 	c.wg.Add(1)
 	go func() {
@@ -92,7 +89,6 @@ func newEventConsumer(
 func (c *eventConsumer) close() {
 	c.queueConsumer.Close()
 	close(c.sig)
-	//c.sig <- consumerSignal{tag: sigStop}
 	c.wg.Wait()
 }
 
@@ -103,16 +99,6 @@ func (c *eventConsumer) sigWait() {
 
 func (c *eventConsumer) sigUnWait() {
 	c.wait.Store(false)
-	c.sigHint()
-}
-
-func (c *eventConsumer) sigPause() {
-	c.pause.Store(true)
-	c.sigHint()
-}
-
-func (c *eventConsumer) sigContinue() {
-	c.pause.Store(false)
 	c.sigHint()
 }
 
@@ -127,18 +113,14 @@ func (c *eventConsumer) sigHint() {
 }
 
 // only called from pipelineController.Set
-func (c *eventConsumer) updOutput(grp *outputGroup) {
+func (c *eventConsumer) setTarget(target consumerTarget) {
 	// The queue consumer needs to be closed in case the eventConsumer loop
 	// is currently blocked on a call to queueConsumer.Get. In this case, it
 	// would never receive the subsequent signal. Closing the consumer triggers
 	// an error return from queueConsumer.Get, ensuring the loop will receive
 	// the signal.
 	c.queueConsumer.Close()
-	// update output
-	c.sig <- consumerSignal{
-		tag: sigConsumerUpdateOutput,
-		out: grp,
-	}
+	c.sig <- target
 }
 
 func (c *eventConsumer) loop() { //consumer queue.Consumer) {
@@ -150,76 +132,64 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 
 	var (
 		// The batch waiting to be sent, or nil if we don't yet have one
-		batch Batch
+		batch TTLBatch
 
-		// The output group that will receive the batches we're loading
-		outputGroup *outputGroup
+		// The output channel (and associated parameters) that will receive
+		// the batches we're loading. Set to empty consumerTarget{} to
+		// pause queue operation.
+		target consumerTarget
 	)
-
-	// handleSignal can update `outputGroup` and `c.queueConsumer`
-	handleSignal := func(sig consumerSignal) {
-		switch sig.tag {
-
-		case sigConsumerCheck:
-			// the only function of this case is to refresh the "paused" flag
-
-		case sigConsumerUpdateOutput:
-			outputGroup = sig.out
-			c.queueConsumer = c.queue.Consumer()
-		}
-	}
 
 	for {
 		// If we want a batch but don't yet have one
-		if outputGroup != nil && batch == nil && !c.paused() {
-			queueBatch, err := c.queueConsumer.Get(outputGroup.batchSize)
+		if target.ch != nil && batch == nil {
+			queueBatch, err := c.queueConsumer.Get(target.batchSize)
 			if err != nil {
-				// There is a problem with the queue consumer; most likely it has
+				// The queue consumer returned an error; most likely it has
 				// been closed, either for shutdown or because the output is
 				// reloading. In either case, stop writing to this output group
-				// until the next sigConsumerUpdateOutput tells us a new one is ready.
-				outputGroup = nil
+				// until we get a new one.
+				target.ch = nil
 				continue
 			}
 			if queueBatch != nil {
-				batch = newBatch(c.ctx, queueBatch, outputGroup.timeToLive)
+				batch = newBatch(c.ctx, queueBatch, target.timeToLive)
 			}
 		}
 
 		// Start by selecting only on the signal channel, so we don't try
 		// sending on the output channel until the signal channel is empty.
 		select {
-		case sig, ok := <-c.sig:
+		case newTarget, ok := <-c.sig:
 			if !ok {
 				// signal channel closed, eventConsumer is shutting down
 				return
 			}
-			handleSignal(sig)
+			target = newTarget
 			continue
 		default:
 		}
 
-		// If we have a batch to send and we aren't paused, then point the
-		// output channel at the real work queue; otherwise, it is nil, and
-		// the select below will block until we get something on the signal
-		// channel instead.
-		var outputChan chan publisher.Batch
-		if outputGroup != nil && batch != nil && !c.paused() {
-			outputChan = outputGroup.workQueue
-		}
-		select {
-		case sig, ok := <-c.sig:
-			if !ok {
-				// signal channel closed, eventConsumer is shutting down
-				return
+		// If we have a batch to send and we aren't paused, send it to our
+		// target channel. If we have no target, or the target channel was
+		// set to nil because of an error in queueConsumer.Get, then the
+		// send will block forever, and this select will wait until we
+		// either get a new target or our signal channel is closed.
+		if batch != nil && !c.paused() {
+			select {
+			case newTarget, ok := <-c.sig:
+				if !ok {
+					// signal channel closed, eventConsumer is shutting down
+					return
+				}
+				target = newTarget
+			case target.ch <- batch:
+				batch = nil
 			}
-			handleSignal(sig)
-		case outputChan <- batch:
-			batch = nil
 		}
 	}
 }
 
 func (c *eventConsumer) paused() bool {
-	return c.pause.Load() || c.wait.Load()
+	return c.wait.Load()
 }

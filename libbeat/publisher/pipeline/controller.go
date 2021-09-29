@@ -80,13 +80,11 @@ func newOutputController(
 	ctx.observer = observer
 	ctx.retryer = c.retryer
 
-	c.consumer.sigContinue()
-
 	return c
 }
 
 func (c *outputController) Close() error {
-	c.consumer.sigPause()
+	c.consumer.setTarget(consumerTarget{})
 	c.consumer.close()
 	c.retryer.close()
 	close(c.workQueue)
@@ -115,8 +113,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		batchSize:  outGrp.BatchSize,
 	}
 
-	// update consumer and retryer
-	c.consumer.sigPause()
+	// Set consumer to empty target to pause it while we reload
+	c.consumer.setTarget(consumerTarget{})
+
+	// Notify the retryer that the outputs have changed
 	if c.out != nil {
 		for range c.out.outputs {
 			c.retryer.sigOutputRemoved()
@@ -125,9 +125,9 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	for range clients {
 		c.retryer.sigOutputAdded()
 	}
-	c.consumer.updOutput(grp)
 
-	// close old group, so events are send to new workQueue via retryer
+	// Close old outputWorkers, so they send their remaining events
+	// back to the workQueue via the retryer
 	if c.out != nil {
 		for _, w := range c.out.outputs {
 			w.Close()
@@ -136,8 +136,13 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	c.out = grp
 
-	// restart consumer (potentially blocked by retryer)
-	c.consumer.sigContinue()
+	// Resume consumer targeting the new work queue
+	c.consumer.setTarget(
+		consumerTarget{
+			ch:         c.workQueue,
+			batchSize:  grp.batchSize,
+			timeToLive: grp.timeToLive,
+		})
 
 	c.observer.updateOutputGroup()
 }

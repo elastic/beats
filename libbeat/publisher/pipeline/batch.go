@@ -24,7 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-type Batch interface {
+type TTLBatch interface {
 	publisher.Batch
 
 	reduceTTL() bool

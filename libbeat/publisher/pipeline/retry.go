@@ -40,6 +40,8 @@ type retryer struct {
 	// return.
 	done chan struct{}
 
+	// When the retry queue gets too big, this interface can signal the
+	// eventConsumer to stop sending to the work queue.
 	consumer interruptor
 
 	sig        chan retryerSignal
@@ -62,7 +64,7 @@ type retryerSignal struct {
 
 type batchEvent struct {
 	tag   retryerBatchTag
-	batch Batch
+	batch TTLBatch
 }
 
 type retryerEventTag uint8
@@ -115,11 +117,11 @@ func (r *retryer) sigOutputRemoved() {
 	r.sig <- retryerSignal{tag: sigRetryerOutputRemoved}
 }
 
-func (r *retryer) retry(b Batch) {
+func (r *retryer) retry(b TTLBatch) {
 	r.in <- batchEvent{tag: retryBatch, batch: b}
 }
 
-func (r *retryer) cancelled(b Batch) {
+func (r *retryer) cancelled(b TTLBatch) {
 	r.in <- batchEvent{tag: cancelledBatch, batch: b}
 }
 
@@ -129,9 +131,9 @@ func (r *retryer) loop() {
 		out             chan publisher.Batch
 		consumerBlocked bool
 
-		active     Batch
+		active     TTLBatch
 		activeSize int
-		buffer     []Batch
+		buffer     []TTLBatch
 		numOutputs int
 
 		log = r.logger
