@@ -153,6 +153,11 @@ RUN chown {{ .user }} $NODE_PATH
 RUN mkdir /app
 RUN chown {{ .user }} /app
 {{- end }}
+{{- else }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+{{- end }}
 {{- end }}
 USER {{ .user }}
 
