@@ -12,8 +12,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/otiai10/copy"
+
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -62,7 +65,7 @@ type Action interface {
 }
 
 type reexecManager interface {
-	ReExec(argOverrides ...string)
+	ReExec(callback reexec.ShutdownCallbackFn, argOverrides ...string)
 }
 
 type acker interface {
@@ -101,8 +104,9 @@ func (u *Upgrader) Upgradeable() bool {
 	return u.upgradeable
 }
 
-// Upgrade upgrades running agent
-func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err error) {
+// Upgrade upgrades running agent, function returns shutdown callback if some needs to be executed for cases when
+// reexec is called by caller.
+func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (_ reexec.ShutdownCallbackFn, err error) {
 	// report failed
 	defer func() {
 		if err != nil {
@@ -113,14 +117,14 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 	}()
 
 	if !u.upgradeable {
-		return fmt.Errorf(
+		return nil, fmt.Errorf(
 			"cannot be upgraded; must be installed with install sub-command and " +
 				"running under control of the systems supervisor")
 	}
 
 	if u.caps != nil {
 		if _, err := u.caps.Apply(a); err == capabilities.ErrBlocked {
-			return nil
+			return nil, nil
 		}
 	}
 
@@ -129,16 +133,16 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 	sourceURI, err := u.sourceURI(a.Version(), a.SourceURI())
 	archivePath, err := u.downloadArtifact(ctx, a.Version(), sourceURI)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	newHash, err := u.unpack(ctx, a.Version(), archivePath)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if newHash == "" {
-		return errors.New("unknown hash")
+		return nil, errors.New("unknown hash")
 	}
 
 	if strings.HasPrefix(release.Commit(), newHash) {
@@ -147,32 +151,35 @@ func (u *Upgrader) Upgrade(ctx context.Context, a Action, reexecNow bool) (err e
 			u.ackAction(ctx, action)
 		}
 		u.log.Warn("upgrading to same version")
-		return nil
+		return nil, nil
 	}
 
 	if err := copyActionStore(newHash); err != nil {
-		return errors.New(err, "failed to copy action store")
+		return nil, errors.New(err, "failed to copy action store")
 	}
 
 	if err := ChangeSymlink(ctx, newHash); err != nil {
 		rollbackInstall(ctx, newHash)
-		return err
+		return nil, err
 	}
 
 	if err := u.markUpgrade(ctx, newHash, a); err != nil {
 		rollbackInstall(ctx, newHash)
-		return err
+		return nil, err
 	}
 
 	if err := InvokeWatcher(u.log); err != nil {
 		rollbackInstall(ctx, newHash)
-		return errors.New("failed to invoke rollback watcher", err)
+		return nil, errors.New("failed to invoke rollback watcher", err)
 	}
 
+	cb := shutdownCallback(u.log, paths.Home(), release.Version(), a.Version(), release.TrimCommit(newHash))
 	if reexecNow {
-		u.reexec.ReExec()
+		u.reexec.ReExec(cb)
+		return nil, nil
 	}
-	return nil
+
+	return cb, nil
 }
 
 // Ack acks last upgrade action
@@ -276,4 +283,80 @@ func copyActionStore(newHash string) error {
 	}
 
 	return nil
+}
+
+// shutdownCallback returns a callback function to be executing during shutdown once all processes are closed.
+// this goes through runtime directory of agent and copies all the state files created by processes to new versioned
+// home directory with updated process name to match new version.
+func shutdownCallback(log *logger.Logger, homePath, prevVersion, newVersion, newHash string) reexec.ShutdownCallbackFn {
+	if release.Snapshot() {
+		// SNAPSHOT is part of newVersion
+		prevVersion += "-SNAPSHOT"
+	}
+
+	return func() error {
+		runtimeDir := filepath.Join(homePath, "run")
+		processDirs, err := readProcessDirs(log, runtimeDir)
+		if err != nil {
+			return err
+		}
+
+		oldHome := homePath
+		newHome := filepath.Join(filepath.Dir(homePath), fmt.Sprintf("%s-%s", agentName, newHash))
+		for _, processDir := range processDirs {
+			newDir := strings.ReplaceAll(processDir, prevVersion, newVersion)
+			newDir = strings.ReplaceAll(newDir, oldHome, newHome)
+			if err := copyDir(processDir, newDir); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
+func readProcessDirs(log *logger.Logger, runtimeDir string) ([]string, error) {
+	pipelines, err := readDirs(log, runtimeDir)
+	if err != nil {
+		return nil, err
+	}
+
+	processDirs := make([]string, 0)
+	for _, p := range pipelines {
+		dirs, err := readDirs(log, p)
+		if err != nil {
+			return nil, err
+		}
+
+		processDirs = append(processDirs, dirs...)
+	}
+
+	return processDirs, nil
+}
+
+// readDirs returns list of absolute paths to directories inside specified path.
+func readDirs(log *logger.Logger, dir string) ([]string, error) {
+	dirEntries, err := os.ReadDir(dir)
+	if err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	dirs := make([]string, 0, len(dirEntries))
+	for _, de := range dirEntries {
+		if !de.IsDir() {
+			continue
+		}
+
+		dirs = append(dirs, filepath.Join(dir, de.Name()))
+	}
+
+	return dirs, nil
+}
+
+func copyDir(from, to string) error {
+	return copy.Copy(from, to, copy.Options{
+		OnSymlink: func(_ string) copy.SymlinkAction {
+			return copy.Shallow
+		},
+		Sync: true,
+	})
 }

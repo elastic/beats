@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: windows
+
 [[metricbeat-module-windows]]
 == Windows module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This is the `windows` module which collects metrics from Windows systems.
 The module contains the `service` metricset, which is set up by default when the `windows` module is enabled.

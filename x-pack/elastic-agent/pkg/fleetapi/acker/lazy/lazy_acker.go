@@ -37,8 +37,7 @@ func NewAcker(baseAcker batchAcker, log *logger.Logger) *Acker {
 
 // Ack acknowledges action.
 func (f *Acker) Ack(ctx context.Context, action fleetapi.Action) error {
-	f.queue = append(f.queue, action)
-	f.log.Debugf("appending action with id '%s' to the queue", action.ID())
+	f.enqueue(action)
 
 	if _, isAckForced := action.(ackForcer); isAckForced {
 		return f.Commit(ctx)
@@ -57,4 +56,15 @@ func (f *Acker) Commit(ctx context.Context) error {
 
 	f.queue = make([]fleetapi.Action, 0)
 	return nil
+}
+
+func (f *Acker) enqueue(action fleetapi.Action) {
+	for _, a := range f.queue {
+		if a.ID() == action.ID() {
+			f.log.Debugf("action with id '%s' has already been queued", action.ID())
+			return
+		}
+	}
+	f.queue = append(f.queue, action)
+	f.log.Debugf("appending action with id '%s' to the queue", action.ID())
 }

@@ -51,7 +51,9 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 	message.Fields.DeepUpdate(common.MapStr{
 		"log": common.MapStr{
 			"offset": r.offset,
-			"path":   r.path,
+			"file": common.MapStr{
+				"path": r.path,
+			},
 		},
 	})
 	return message, err
