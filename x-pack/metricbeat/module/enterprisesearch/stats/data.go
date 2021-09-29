@@ -6,7 +6,9 @@ package stats
 
 import (
 	"encoding/json"
-	"errors"
+
+	"github.com/joeshaw/multierror"
+	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -91,22 +93,26 @@ func eventMapping(input []byte) (common.MapStr, error) {
 	if err != nil {
 		return nil, err
 	}
+	var errs multierror.Errors
 
 	// Get queues information
 	queues, ok := data["queues"].(map[string]interface{})
-	if !ok {
-		return nil, errors.New("queues is not a map")
+	if ok {
+		// Get the list of failed items
+		failed, ok := queues["failed"].([]interface{})
+		if ok {
+			// Use the failed items count as a metric
+			queues["failed.count"] = len(failed)
+		} else {
+			errs = append(errs, errors.New("queues.failed is not an array of maps"))
+		}
+	} else {
+		errs = append(errs, errors.New("queues is not a map"))
 	}
-
-	// Get the list of failed items
-	failed, ok := queues["failed"].([]interface{})
-	if !ok {
-		return nil, errors.New("queues.failed is not an array of maps")
-	}
-
-	// Generate a failes items count to be used as a metric
-	queues["failed.count"] = len(failed)
 
 	dataFields, err := schema.Apply(data)
-	return dataFields, err
+	if err != nil {
+		errs = append(errs, errors.Wrap(err, "failure to apply stats schema"))
+	}
+	return dataFields, errs.Err()
 }
