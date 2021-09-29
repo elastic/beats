@@ -449,13 +449,8 @@ shared:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
 
-  - &cloud_agent_docker_spec
+  - &agent_docker_cloud_spec
     <<: *agent_docker_spec
-    extra_vars:
-      image_name: '{{.BeatName}}-cloud'
-
-  - &cloud_agent_docker_arm_spec
-    <<: *agent_docker_arm_spec
     extra_vars:
       image_name: '{{.BeatName}}-cloud'
 
@@ -1008,11 +1003,11 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_spec
-        <<: *cloud_agent_docker_spec
+        <<: *agent_docker_cloud_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image.
+        # packages too big to fit in the main image
         variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
@@ -1035,11 +1030,11 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_arm_spec
-        <<: *cloud_agent_docker_arm_spec
+        <<: *agent_docker_cloud_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
-        # packages too big to fit in the main image.
+        # packages too big to fit in the main image
         variants: ["complete"]
         files:
           '{{.BeatName}}{{.BinaryExt}}':
