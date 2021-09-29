@@ -15,39 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-<<<<<<< HEAD
-package beat_test
-
-import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/beat"
-
-	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/state"
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
-)
-
-func TestXPackEnabledMetricsets(t *testing.T) {
-	config := map[string]interface{}{
-		"module":        beat.ModuleName,
-		"hosts":         []string{"foobar:5066"},
-		"xpack.enabled": true,
-	}
-
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 2)
-	for _, ms := range metricSets {
-		name := ms.Name()
-		switch name {
-		case "state", "stats":
-		default:
-			t.Errorf("unexpected metricset name = %v", name)
-		}
-=======
 package beat
 
 import (
@@ -102,6 +69,5 @@ func TestFetchURI(t *testing.T) {
 		require.NoError(t, err)
 		got := fetchURI(u, tc.path)
 		assert.Equal(t, tc.want, got)
->>>>>>> dda584849f ([metricbeat] support basepath in beat module (#28162))
 	}
 }
