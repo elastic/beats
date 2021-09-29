@@ -76,12 +76,17 @@ processors:
       id: my_filter
       source: >
         function process(event) {
+            var uuids = [];
             var uuid = event.Get("json.Event.Object.Attribute.uuid");
-            if (!uuid) {
-              uuid = event.Get("json.Event.Attribute.uuid");
-            }
             if (uuid) {
-              event.Put("@metadata._id", uuid);
+              uuids.push(uuid);
+            }
+            uuid = event.Get("json.Event.Attribute.uuid");
+            if (uuid) {
+              uuids.push(uuid);
+            }
+            if (uuids.length !== 0) {
+              event.Put("@metadata._id", uuids.join('+'));
             }
             event.Put("@metadata.op_type", "index");
         }

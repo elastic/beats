@@ -86,6 +86,20 @@ processors:
       target_field: threatintel.misp.tag
       ignore_missing: true
 
+  # # Dance around issue of not being able to split the document into two.
+  # # Make the Object.Attribute field primary if it exists, but keep the
+  # # outer Attribute as context.
+  - rename:
+      field: threatintel.misp.attribute
+      target_field: threatintel.misp.context.attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.object != null
+  - rename:
+      field: threatintel.misp.object.attribute
+      target_field: threatintel.misp.attribute
+      ignore_missing: true
+      if: ctx?.threatintel?.misp?.object != null
+
   #####################
   # Threat ECS Fields #
   #####################
