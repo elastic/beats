@@ -30957,7 +30957,7 @@ type: long
 
 --
 
-*`enterprisesearch.health.jvm.gc.collection_time.msec`*::
+*`enterprisesearch.health.jvm.gc.collection_time.ms`*::
 +
 --
 Total time spent running Java garbage collector since the start of the process
@@ -31054,16 +31054,25 @@ type: long
 Threads information
 
 
-*`enterprisesearch.health.jvm.threads.thread_count`*::
+*`enterprisesearch.health.jvm.threads.current`*::
 +
 --
-The number of live threads.
+Current number of live threads.
 
 type: long
 
 --
 
-*`enterprisesearch.health.jvm.threads.peak_thread_count`*::
+*`enterprisesearch.health.jvm.threads.daemon`*::
++
+--
+Current number of live daemon threads.
+
+type: long
+
+--
+
+*`enterprisesearch.health.jvm.threads.max`*::
 +
 --
 Peak live thread count since the JVM started or the peak was reset.
@@ -31072,19 +31081,10 @@ type: long
 
 --
 
-*`enterprisesearch.health.jvm.threads.total_started_thread_count`*::
+*`enterprisesearch.health.jvm.threads.total_started`*::
 +
 --
 Total number of threads created and/or started since the JVM started.
-
-type: long
-
---
-
-*`enterprisesearch.health.jvm.threads.daemon_thread_count`*::
-+
---
-Current number of live daemon threads.
 
 type: long
 
@@ -31488,7 +31488,7 @@ format: bytes
 Aggregate HTTP request duration statistics.
 
 
-*`enterprisesearch.stats.http.request_duration.max.msec`*::
+*`enterprisesearch.stats.http.request_duration.max.ms`*::
 +
 --
 Longest HTTP connection duration since the start of the instance.
@@ -31497,7 +31497,7 @@ type: long
 
 --
 
-*`enterprisesearch.stats.http.request_duration.mean.msec`*::
+*`enterprisesearch.stats.http.request_duration.mean.ms`*::
 +
 --
 Average HTTP connection duration since the start of the instance.
@@ -31506,7 +31506,7 @@ type: long
 
 --
 
-*`enterprisesearch.stats.http.request_duration.std_dev.msec`*::
+*`enterprisesearch.stats.http.request_duration.std_dev.ms`*::
 +
 --
 Standard deviation for HTTP connection duration values since the start of the instance.
