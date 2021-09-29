@@ -433,6 +433,7 @@ shared:
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
+      image_name: ''
     files:
       'elastic-agent.yml':
         source: 'elastic-agent.docker.yml'
@@ -1003,12 +1004,24 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_spec
-        <<: *agent_docker_cloud_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Cloud specific docker image
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_cloud_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1030,12 +1043,24 @@ specs:
       types: [docker]
       spec:
         <<: *agent_docker_arm_spec
-        <<: *agent_docker_cloud_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Cloud specific docker image
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_cloud_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
