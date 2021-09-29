@@ -24,6 +24,7 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
 {{- if contains .image_name "-cloud" }}
+    mkdir -p /opt/filebeat /opt/metricbeat && \
     tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz -C /opt/filebeat --strip-components=1 && \
     tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz -C /opt/metricbeat --strip-components=1 && \
 {{- end }}
@@ -147,6 +148,11 @@ RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user 
 {{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal")))  }}
 RUN chown {{ .user }} $NODE_PATH
 {{- end }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+RUN chown {{ .user }} /app
+{{- end }}
 {{- end }}
 USER {{ .user }}
 
@@ -191,8 +197,11 @@ ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 WORKDIR {{ $beatHome }}
 
 {{- if contains .image_name "-cloud" }}
-ENTRYPOINT ["/bin/tini", "--"]
+ENTRYPOINT ["/usr/bin/bin/tini", "--"]
 CMD ["/app/apm.sh"]
+# Generate a stub command that will be overwritten at runtime
+RUN echo -e '#!/bin/sh\nexec /usr/local/bin/docker-entrypoint' > /app/apm.sh && \
+    chmod 0555 /app/apm.sh
 {{- else }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
 {{- end }}
