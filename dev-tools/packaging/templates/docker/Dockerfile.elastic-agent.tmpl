@@ -179,7 +179,6 @@ RUN cd {{$beatHome}}/.node \
 {{- end }}
 
 
-
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
 {{- end }}
@@ -190,4 +189,10 @@ EXPOSE {{ $port }}
 ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 
 WORKDIR {{ $beatHome }}
+
+{{- if contains .image_name "-cloud" }}
+ENTRYPOINT ["/bin/tini", "--"]
+CMD ["/app/apm.sh"]
+{{- else }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
+{{- end }}
