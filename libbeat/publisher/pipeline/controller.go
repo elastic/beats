@@ -18,8 +18,6 @@
 package pipeline
 
 import (
-	"fmt"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -88,23 +86,17 @@ func newOutputController(
 }
 
 func (c *outputController) Close() error {
-	fmt.Printf("sigPause\n")
 	c.consumer.sigPause()
-	fmt.Printf("eventConsumer.close\n")
 	c.consumer.close()
-	fmt.Printf("retryer.close\n")
 	c.retryer.close()
-	fmt.Printf("closing work queue\n")
 	close(c.workQueue)
 
 	if c.out != nil {
 		for _, out := range c.out.outputs {
-			fmt.Printf("closing outputWorker\n")
 			out.Close()
 		}
 	}
 
-	fmt.Printf("finished outputController.Close\n")
 	return nil
 }
 

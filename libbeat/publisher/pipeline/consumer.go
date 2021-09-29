@@ -59,7 +59,7 @@ type consumerEventTag uint8
 const (
 	sigConsumerCheck consumerEventTag = iota
 	sigConsumerUpdateOutput
-	sigStop
+	//sigStop
 )
 
 var errStopped = errors.New("stopped")
@@ -91,7 +91,8 @@ func newEventConsumer(
 
 func (c *eventConsumer) close() {
 	c.queueConsumer.Close()
-	c.sig <- consumerSignal{tag: sigStop}
+	close(c.sig)
+	//c.sig <- consumerSignal{tag: sigStop}
 	c.wg.Wait()
 }
 
@@ -119,10 +120,10 @@ func (c *eventConsumer) sigHint() {
 	// send signal to unblock a consumer trying to publish events.
 	// With flags being set atomically, multiple signals can be compressed into one
 	// signal -> drop if queue is not empty
-	select {
+	/*select {
 	case c.sig <- consumerSignal{tag: sigConsumerCheck}:
 	default:
-	}
+	}*/
 }
 
 // only called from pipelineController.Set
@@ -155,12 +156,9 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 		outputGroup *outputGroup
 	)
 
-	// handleSignal always returns nil unless it receives sigStop.
-	// it updates `consumer`, `c.out`, `paused`, and `out`.
-	handleSignal := func(sig consumerSignal) error {
+	// handleSignal can update `outputGroup` and `c.queueConsumer`
+	handleSignal := func(sig consumerSignal) {
 		switch sig.tag {
-		case sigStop:
-			return errStopped
 
 		case sigConsumerCheck:
 			// the only function of this case is to refresh the "paused" flag
@@ -169,9 +167,6 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 			outputGroup = sig.out
 			c.queueConsumer = c.queue.Consumer()
 		}
-
-		//paused = c.paused()
-		return nil
 	}
 
 	for {
@@ -189,33 +184,36 @@ func (c *eventConsumer) loop() { //consumer queue.Consumer) {
 			if queueBatch != nil {
 				batch = newBatch(c.ctx, queueBatch, outputGroup.timeToLive)
 			}
-			//paused = c.paused()
 		}
 
 		// Start by selecting only on the signal channel, so we don't try
 		// sending on the output channel until the signal channel is empty.
 		select {
-		case sig := <-c.sig:
-			if err := handleSignal(sig); err != nil {
+		case sig, ok := <-c.sig:
+			if !ok {
+				// signal channel closed, eventConsumer is shutting down
 				return
 			}
+			handleSignal(sig)
 			continue
 		default:
 		}
 
-		// If we have an output to send and we aren't paused, then the output
-		// channel points at the real work queue; otherwise, it is nil, and
-		// the select below will block until it gets something on the signal
+		// If we have a batch to send and we aren't paused, then point the
+		// output channel at the real work queue; otherwise, it is nil, and
+		// the select below will block until we get something on the signal
 		// channel instead.
 		var outputChan chan publisher.Batch
 		if outputGroup != nil && batch != nil && !c.paused() {
 			outputChan = outputGroup.workQueue
 		}
 		select {
-		case sig := <-c.sig:
-			if err := handleSignal(sig); err != nil {
+		case sig, ok := <-c.sig:
+			if !ok {
+				// signal channel closed, eventConsumer is shutting down
 				return
 			}
+			handleSignal(sig)
 		case outputChan <- batch:
 			batch = nil
 		}
