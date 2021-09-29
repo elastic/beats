@@ -32,16 +32,20 @@ var (
 			}),
 
 			"request_duration": c.Dict("request_duration_ms", s.Schema{
-				"max.msec":     c.Int("max"),
-				"mean.msec":    c.Int("mean"),
-				"std_dev.msec": c.Int("std_dev"),
+				"max":     s.Object{"ms": c.Int("max")},
+				"mean":    s.Object{"ms": c.Int("mean")},
+				"std_dev": s.Object{"ms": c.Int("std_dev")},
 			}),
 
 			"network": c.Dict("network_bytes", s.Schema{
-				"received.bytes":         c.Int("received_total"),
-				"received.bytes_per_sec": c.Int("received_rate"),
-				"sent.bytes":             c.Int("sent_total"),
-				"sent.bytes_per_sec":     c.Int("sent_rate"),
+				"received": s.Object{
+					"bytes":         c.Int("received_total"),
+					"bytes_per_sec": c.Int("received_rate"),
+				},
+				"sent": s.Object{
+					"bytes":         c.Int("sent_total"),
+					"bytes_per_sec": c.Int("sent_rate"),
+				},
 			}),
 
 			"responses": c.Dict("responses", s.Schema{
@@ -54,10 +58,10 @@ var (
 		}),
 
 		"queues": c.Dict("queues", s.Schema{
-			"engine_destroyer.count": c.Int("engine_destroyer.pending"),
-			"process_crawl.count":    c.Int("process_crawl.pending"),
-			"mailer.count":           c.Int("mailer.pending"),
-			"failed.count":           c.Int("failed.count"),
+			"engine_destroyer": s.Object{"count": c.Int("engine_destroyer.pending")},
+			"process_crawl":    s.Object{"count": c.Int("process_crawl.pending")},
+			"mailer":           s.Object{"count": c.Int("mailer.pending")},
+			"failed":           s.Object{"count": c.Int("failed.count")},
 		}),
 
 		"connectors": c.Dict("connectors", s.Schema{

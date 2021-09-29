@@ -175,15 +175,15 @@
           type: group
           description: Aggregate HTTP request duration statistics.
           fields:
-            - name: max.msec
+            - name: max.ms
               type: long
               description: Longest HTTP connection duration since the start of the instance.
 
-            - name: mean.msec
+            - name: mean.ms
               type: long
               description: Average HTTP connection duration since the start of the instance.
 
-            - name: std_dev.msec
+            - name: std_dev.ms
               type: long
               description: Standard deviation for HTTP connection duration values since the start of the instance.
 

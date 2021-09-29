@@ -47,15 +47,25 @@
                         "total": 29
                     },
                     "network": {
-                        "received.bytes": 231403,
-                        "received.bytes_per_sec": 42,
-                        "sent.bytes": 704357,
-                        "sent.bytes_per_sec": 5
+                        "received": {
+                            "bytes": 231403,
+                            "bytes_per_sec": 42
+                        },
+                        "sent": {
+                            "bytes": 704357,
+                            "bytes_per_sec": 5
+                        }
                     },
                     "request_duration": {
-                        "max.msec": 3528004,
-                        "mean.msec": 922170,
-                        "std_dev.msec": 1068785
+                        "max": {
+                            "ms": 3528004
+                        },
+                        "mean": {
+                            "ms": 922170
+                        },
+                        "std_dev": {
+                            "ms": 1068785
+                        }
                     },
                     "responses": {
                         "1xx": 1,
@@ -66,10 +76,18 @@
                     }
                 },
                 "queues": {
-                    "engine_destroyer.count": 1,
-                    "failed.count": 1,
-                    "mailer.count": 3,
-                    "process_crawl.count": 2
+                    "engine_destroyer": {
+                        "count": 1
+                    },
+                    "failed": {
+                        "count": 1
+                    },
+                    "mailer": {
+                        "count": 3
+                    },
+                    "process_crawl": {
+                        "count": 2
+                    }
                 }
             }
         },
