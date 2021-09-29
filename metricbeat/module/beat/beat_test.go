@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+<<<<<<< HEAD
 package beat_test
 
 import (
@@ -46,5 +47,61 @@ func TestXPackEnabledMetricsets(t *testing.T) {
 		default:
 			t.Errorf("unexpected metricset name = %v", name)
 		}
+=======
+package beat
+
+import (
+	"net/url"
+	"testing"
+
+	"github.com/stretchr/testify/require"
+	"gotest.tools/assert"
+)
+
+func TestFetchURI(t *testing.T) {
+	tcs := []struct {
+		orig, path, want string
+	}{
+		{
+			orig: "https://localhost:5000/some/proxy/path",
+			path: "/state",
+			want: "https://localhost:5000/some/proxy/path/state",
+		}, {
+			orig: "https://localhost:5000/some/proxy/path/state",
+			path: "/state",
+			want: "https://localhost:5000/some/proxy/path/state",
+		}, {
+			orig: "https://localhost:5000/some/proxy/path/state",
+			path: "/",
+			want: "https://localhost:5000/some/proxy/path",
+		}, {
+			orig: "http://localhost:5000",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/state",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/stats",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/stats",
+			path: "/",
+			want: "http://localhost:5000/",
+		}, {
+			orig: "http://localhost:5000/state",
+			path: "/",
+			want: "http://localhost:5000/",
+		},
+	}
+
+	for _, tc := range tcs {
+		u, err := url.Parse(tc.orig)
+		require.NoError(t, err)
+		got := fetchURI(u, tc.path)
+		assert.Equal(t, tc.want, got)
+>>>>>>> dda584849f ([metricbeat] support basepath in beat module (#28162))
 	}
 }
