@@ -39,10 +39,10 @@
                         "object_pending_finalization_count": 0
                     },
                     "threads": {
-                        "daemon_thread_count": 17,
-                        "peak_thread_count": 32,
-                        "thread_count": 27,
-                        "total_started_thread_count": 35
+                        "current": 27,
+                        "daemon": 17,
+                        "max": 32,
+                        "total_started": 35
                     },
                     "version": "1.8.0_292"
                 },
@@ -51,7 +51,9 @@
                     "filebeat": {
                         "pid": 60067,
                         "restart_count": 0,
-                        "time_since_last_restart.sec": -1
+                        "time_since_last_restart": {
+                            "sec": -1
+                        }
                     },
                     "pid": 59623,
                     "uptime": {

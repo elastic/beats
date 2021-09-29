@@ -114,21 +114,21 @@
           type: group
           description: Threads information
           fields:
-            - name: thread_count
+            - name: current
               type: long
-              description: The number of live threads.
+              description: Current number of live threads.
 
-            - name: peak_thread_count
+            - name: daemon
+              type: long
+              description: Current number of live daemon threads.
+
+            - name: max
               type: long
               description: Peak live thread count since the JVM started or the peak was reset.
 
-            - name: total_started_thread_count
+            - name: total_started
               type: long
               description: Total number of threads created and/or started since the JVM started.
-
-            - name: daemon_thread_count
-              type: long
-              description: Current number of live daemon threads.
 
     - name: crawler
       type: group

@@ -43,10 +43,10 @@ var (
 			}),
 
 			"threads": c.Dict("threads", s.Schema{
-				"thread_count":               c.Int("thread_count"),
-				"peak_thread_count":          c.Int("peak_thread_count"),
-				"total_started_thread_count": c.Int("total_started_thread_count"),
-				"daemon_thread_count":        c.Int("daemon_thread_count"),
+				"current":       c.Int("thread_count"),
+				"daemon":        c.Int("daemon_thread_count"),
+				"max":           c.Int("peak_thread_count"),
+				"total_started": c.Int("total_started_thread_count"),
 			}),
 		}),
 
@@ -55,9 +55,9 @@ var (
 			"uptime": s.Object{"sec": c.Int("uptime")},
 
 			"filebeat": c.Dict("filebeat", s.Schema{
-				"pid":                         c.Int("pid"),
-				"restart_count":               c.Int("restart_count"),
-				"time_since_last_restart.sec": c.Int("seconds_since_last_restart"),
+				"pid":                     c.Int("pid"),
+				"restart_count":           c.Int("restart_count"),
+				"time_since_last_restart": s.Object{"sec": c.Int("seconds_since_last_restart")},
 			}),
 		}),
 
