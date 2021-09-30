@@ -25486,33 +25486,6 @@ type: keyword
 
 --
 
-<<<<<<< HEAD
-=======
-*`elasticsearch.shard.relocating_node.id`*::
-+
---
-The node the shard was relocated from. It has the exact same value than relocating_node.name for compatibility purposes.
-
-
-type: keyword
-
---
-
-
-*`elasticsearch.shard.source_node.name`*::
-+
---
-type: keyword
-
---
-
-*`elasticsearch.shard.source_node.uuid`*::
-+
---
-type: keyword
-
---
-
 [[exported-fields-enterprisesearch]]
 == enterprisesearch fields
 
@@ -26313,7 +26286,6 @@ type: long
 
 --
 
->>>>>>> 3c77c9a92a ([Metricbeat] Enterprise Search Module (#27549))
 [[exported-fields-envoyproxy]]
 == Envoyproxy fields
 
