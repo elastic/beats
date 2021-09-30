@@ -29,7 +29,6 @@ import (
 )
 
 type worker struct {
-	id       uint
 	observer outputObserver
 	qu       chan publisher.Batch
 	done     chan struct{}
