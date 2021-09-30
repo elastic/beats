@@ -24,12 +24,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
-type TTLBatch interface {
-	publisher.Batch
-
-	reduceTTL() bool
-}
-
 type retryer interface {
 	retry(batch *ttlBatch, decreaseTTL bool)
 }
