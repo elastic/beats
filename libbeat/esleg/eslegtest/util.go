@@ -76,12 +76,22 @@ func getEsPort() string {
 
 // GetUser returns the Elasticsearch testing user.
 func GetUser() string {
-	return getEnv("ES_USER", "elastic")
+	return getEnv("ES_USER", "")
 }
 
 // GetPass returns the Elasticsearch testing user's password.
 func GetPass() string {
-	return getEnv("ES_PASS", "changeme")
+	return getEnv("ES_PASS", "")
+}
+
+// GetXPackUser returns the admin user for Elasticsearch
+func GetXPackUser() string {
+	return getEnv("ES_XPACK_USER", "elastic")
+}
+
+// GetXpackPass returns the admin pass for Elasticsearch
+func GetXPackPass() string {
+	return getEnv("ES_XPACK_PASS", "changeme")
 }
 
 func getEnv(name, def string) string {
