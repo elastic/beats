@@ -94,6 +94,17 @@ func (c *outputController) Close() error {
 }
 
 func (c *outputController) Set(outGrp outputs.Group) {
+	// Set consumer to empty target to pause it while we reload
+	c.consumer.setTarget(consumerTarget{})
+
+	// Close old outputWorkers, so they send their remaining events
+	// back to eventConsumer's retry channel
+	if c.out != nil {
+		for _, w := range c.out.outputs {
+			w.Close()
+		}
+	}
+
 	// create new output group with the shared work queue
 	clients := outGrp.Clients
 	worker := make([]outputWorker, len(clients))
@@ -106,17 +117,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		outputs:    worker,
 		timeToLive: outGrp.Retry + 1,
 		batchSize:  outGrp.BatchSize,
-	}
-
-	// Set consumer to empty target to pause it while we reload
-	c.consumer.setTarget(consumerTarget{})
-
-	// Close old outputWorkers, so they send their remaining events
-	// back to the workQueue via the retryer
-	if c.out != nil {
-		for _, w := range c.out.outputs {
-			w.Close()
-		}
 	}
 
 	c.out = grp
