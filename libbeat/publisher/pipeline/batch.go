@@ -31,8 +31,8 @@ type retryer interface {
 type ttlBatch struct {
 	original queue.Batch
 
-	// The batch uses the consumer that created it to handle retries
-	// and termination.
+	// The internal hook back to the eventConsumer, used to implement the
+	// publisher.Batch retry interface.
 	retryer retryer
 
 	// How many retries until we drop this batch. -1 means it can't be dropped.
