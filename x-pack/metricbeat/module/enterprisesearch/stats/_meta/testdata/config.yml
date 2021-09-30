@@ -1,0 +1,2 @@
+type: http
+url: "/api/ent/v1/internal/stats"

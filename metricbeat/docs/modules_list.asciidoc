@@ -107,6 +107,9 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-elasticsearch-node_stats,node_stats>>   
 |<<metricbeat-metricset-elasticsearch-pending_tasks,pending_tasks>>   
 |<<metricbeat-metricset-elasticsearch-shard,shard>>   
+|<<metricbeat-module-enterprisesearch,enterprisesearch>>  beta[]   |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
+.2+| .2+|  |<<metricbeat-metricset-enterprisesearch-health,health>> beta[]  
+|<<metricbeat-metricset-enterprisesearch-stats,stats>> beta[]  
 |<<metricbeat-module-envoyproxy,Envoyproxy>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-envoyproxy-server,server>>   
 |<<metricbeat-module-etcd,Etcd>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
@@ -327,6 +330,7 @@ include::modules/couchdb.asciidoc[]
 include::modules/docker.asciidoc[]
 include::modules/dropwizard.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
+include::modules/enterprisesearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/etcd.asciidoc[]
 include::modules/gcp.asciidoc[]
