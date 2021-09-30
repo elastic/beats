@@ -23,7 +23,7 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
     true
 
 {{- if .linux_capabilities }}
-RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }} {{ $beatBinary }}
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
 {{- end }}
 
 FROM {{ .from }}
