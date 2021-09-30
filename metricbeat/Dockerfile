@@ -5,6 +5,7 @@ RUN \
       && apt install -qq -y --no-install-recommends \
          netcat \
          python3 \
+         python3-dev \
          python3-pip \
          python3-venv \
          libaio-dev \
