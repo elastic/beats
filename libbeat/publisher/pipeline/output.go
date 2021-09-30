@@ -102,7 +102,6 @@ func (w *clientWorker) run() {
 			if batch == nil {
 				continue
 			}
-			w.observer.outBatchSend(len(batch.Events()))
 			if err := w.client.Publish(context.TODO(), batch); err != nil {
 				return
 			}
