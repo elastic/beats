@@ -27,27 +27,25 @@ import (
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
-// The eventConsumer is managed by the controller and receives additional pause signals
-// from the retryer in case of too many events failing to be send or if retryer
-// is receiving cancelled batches from outputs to be closed on output reloading.
-
-type retryRequest struct {
-	batch       *ttlBatch
-	decreaseTTL bool
-}
+// It accepts retry requests from batches it vends, which will resend them
+// to the next available output.
 type eventConsumer struct {
 	logger *logp.Logger
-	//ctx    batchContext
 
-	// When the output changes, send the new information to targetChan.
-	// Set to empty consumerTarget to disable sending until the target is
-	// reset.
+	// eventConsumer calls the observer methods eventsRetry, eventsDropped,
+	// and eventsFailed.
+	observer outputObserver
+
+	// When the output changes, the new target is sent to the worker routine
+	// on this channel. Clients should call eventConsumer.setTarget().
 	targetChan chan consumerTarget
 
-	// Failed batches are sent to this channel to retry
+	// Failed batches are sent to this channel to retry. Clients should call
+	// eventConsumer.retry().
 	retryChan chan retryRequest
 
-	// Close the done channel to signal shutdown
+	// Closing this channel signals consumer shutdown. Clients should call
+	// eventConsumer.close().
 	done chan struct{}
 
 	// This waitgroup is released when this eventConsumer's worker
@@ -57,26 +55,35 @@ type eventConsumer struct {
 	// The queue the eventConsumer will retrieve batches from.
 	queue queue.Queue
 }
+
+// consumerTarget specifies the output channel and parameters needed for
+// eventConsumer to generate a batch.
 type consumerTarget struct {
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
 }
 
+// retryRequest is used by ttlBatch to add itself back to the eventConsumer
+// queue for distribution to an output.
+type retryRequest struct {
+	batch       *ttlBatch
+	decreaseTTL bool
+}
+
 func newEventConsumer(
 	log *logp.Logger,
 	queue queue.Queue,
-	//ctx batchContext,
+	observer outputObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger: log,
+		logger:   log,
+		observer: observer,
+		queue:    queue,
 
 		targetChan: make(chan consumerTarget),
 		retryChan:  make(chan retryRequest),
 		done:       make(chan struct{}),
-
-		queue: queue,
-		//ctx:   ctx,
 	}
 
 	c.wg.Add(1)
@@ -85,16 +92,6 @@ func newEventConsumer(
 		c.run()
 	}()
 	return c
-}
-
-func (c *eventConsumer) close() {
-	close(c.done)
-	c.wg.Wait()
-}
-
-// only called from pipelineController.Set
-func (c *eventConsumer) setTarget(target consumerTarget) {
-	c.targetChan <- target
 }
 
 func (c *eventConsumer) run() {
@@ -114,15 +111,15 @@ func (c *eventConsumer) run() {
 		// Whether there's an outstanding request to queueReader
 		pendingRead bool
 
-		// The batches waiting to be sent.
-		buffer []*ttlBatch
+		// The batches waiting to be retried.
+		retryBatches []*ttlBatch
+
+		// The batch read from the queue and waiting to be sent, if any
+		queueBatch *ttlBatch
 
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
-
-		// The most recent value received on pauseChan
-		paused bool
 
 		// The queue.Consumer we get the raw batches from. Reset whenever
 		// the target changes.
@@ -131,43 +128,74 @@ func (c *eventConsumer) run() {
 
 outerLoop:
 	for {
-		fmt.Printf("eventConsumer loop begin\n")
 		// If possible, start reading the next batch in the background.
-		if len(buffer) == 0 && !pendingRead && !paused {
-			fmt.Printf("sending reader request\n")
+		if queueBatch == nil && !pendingRead {
+			fmt.Printf("event consumer sending reader request...\n")
 			pendingRead = true
 			queueReader.req <- queueReaderRequest{
-				//ctx:      c.ctx,
-				target:   target,
-				consumer: consumer,
+				consumer:   consumer,
+				retryer:    c,
+				batchSize:  target.batchSize,
+				timeToLive: target.timeToLive,
 			}
 			fmt.Printf("sent\n")
 		}
-		// If we have a batch and are unpaused, we'll set the output
-		// channel to the target channel and try to send to it. Otherwise,
-		// it will remain nil, and sends to it will always block, so the
-		// output case of the select will be ignored.
+
+		var active *ttlBatch
+		// Choose the active batch: if we have batches to retry, use the first
+		// one. Otherwise, use a new batch if we have one.
+		if len(retryBatches) > 0 {
+			active = retryBatches[0]
+		} else if queueBatch != nil {
+			active = queueBatch
+		}
+
+		// If we have a batch, we'll point the output channel at the target
+		// and try to send to it. Otherwise, it will remain nil, and sends
+		// to it will always block, so the output case of the select below
+		// will be ignored.
 		var outputChan chan publisher.Batch
-		var batch *ttlBatch
-		if !paused && len(buffer) > 0 {
+		if active != nil {
 			outputChan = target.ch
-			batch = buffer[0]
 		}
 
 		// Now we can block until the next state change.
 		select {
-		case outputChan <- batch:
-			buffer = buffer[1:]
+		case outputChan <- active:
+			// Successfully sent a batch to the output workers
+			if len(retryBatches) > 0 {
+				// This was a retry, report it to the observer
+				c.observer.eventsRetry(len(active.Events()))
+				retryBatches = retryBatches[1:]
+			} else {
+				// This was directly from the queue, clear the value so we can
+				// fetch a new one
+				queueBatch = nil
+			}
 
 		case target = <-c.targetChan:
 
-		case batch = <-queueReader.resp:
+		case queueBatch = <-queueReader.resp:
 			pendingRead = false
-			buffer = append(buffer, batch)
 
 		case req := <-c.retryChan:
+			alive := true
+			if req.decreaseTTL {
+				countFailed := len(req.batch.Events())
+				c.observer.eventsFailed(countFailed)
 
-			buffer = append(buffer, req.batch)
+				alive = req.batch.reduceTTL()
+
+				countDropped := countFailed - len(req.batch.Events())
+				c.observer.eventsDropped(countDropped)
+
+				if !alive {
+					log.Info("Drop batch")
+					req.batch.Drop()
+					continue
+				}
+			}
+			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
 			fmt.Printf("\u001b[31mgot done signal\033[0m\n")
@@ -186,8 +214,6 @@ outerLoop:
 	// to unblock it, but we won't pass on the value.
 	if pendingRead {
 		batch := <-queueReader.resp
-		pendingRead = false
-
 		if batch != nil {
 			// Inform any listeners that we couldn't deliver this batch.
 			batch.Drop()
@@ -195,41 +221,24 @@ outerLoop:
 	}
 }
 
-// queueReader is a standalone stateless helper goroutine to dispatch
-// reads of the queue without blocking eventConsumer's main loop.
-type queueReader struct {
-	req  chan queueReaderRequest // "give me a batch for this target"
-	resp chan *ttlBatch          // "here is your batch"
-}
-
-type queueReaderRequest struct {
-	batchFactory func(queue.Batch) *ttlBatch
-	target       consumerTarget
-	consumer     queue.Consumer
-}
-
-func makeQueueReader() queueReader {
-	qr := queueReader{
-		req:  make(chan queueReaderRequest, 1),
-		resp: make(chan *ttlBatch),
+func (c *eventConsumer) setTarget(target consumerTarget) {
+	select {
+	case c.targetChan <- target:
+	case <-c.done:
 	}
-	return qr
 }
 
-func (qr *queueReader) run(logger *logp.Logger) {
-	logger.Debug("pipeline event consumer queue reader: start")
-	for {
-		req, ok := <-qr.req
-		if !ok {
-			// The request channel is closed, we're shutting down
-			logger.Debug("pipeline event consumer queue reader: stop")
-			return
-		}
-		queueBatch, _ := req.consumer.Get(req.target.batchSize)
-		var batch *ttlBatch
-		if queueBatch != nil {
-			batch = req.batchFactory(queueBatch) //newBatch(req.ctx.retryer, queueBatch, req.target.timeToLive)
-		}
-		qr.resp <- batch
+func (c *eventConsumer) retry(batch *ttlBatch, decreaseTTL bool) {
+	select {
+	case c.retryChan <- retryRequest{batch: batch, decreaseTTL: decreaseTTL}:
+		// The batch is back in eventConsumer's retry queue
+	case <-c.done:
+		// The consumer has already shut down, drop the batch
+		batch.Drop()
 	}
+}
+
+func (c *eventConsumer) close() {
+	close(c.done)
+	c.wg.Wait()
 }

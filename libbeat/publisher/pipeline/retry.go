@@ -17,20 +17,14 @@
 
 package pipeline
 
-import (
-	"fmt"
-	"sync"
-
-	"github.com/elastic/beats/v7/libbeat/publisher"
-)
-
-// retryer is responsible for accepting and managing failed send attempts. It
+/*
+// oldRetryer is responsible for accepting and managing failed send attempts. It
 // will also accept not yet published events from outputs being dynamically closed
 // by outputController. Cancelled batches will be forwarded to the new workQueue,
 // without updating the events retry counters.
 // If too many batches (number of outputs/3) are stored in the retry buffer,
 // the eventConsumer will be paused until more have been processed.
-type retryer struct {
+type oldRetryer struct {
 	logger logger
 
 	// retryer calls the observer methods eventsRetry, eventsDropped,
@@ -58,21 +52,10 @@ type interruptor interface {
 
 type retryQueue chan batchEvent
 
-/*type retryerSignal struct {
-	tag retryerEventTag
-}*/
-
 type batchEvent struct {
 	tag   retryerBatchTag
 	batch TTLBatch
 }
-
-/*type retryerEventTag uint8
-
-const (
-	sigRetryerOutputAdded retryerEventTag = iota
-	sigRetryerOutputRemoved
-)*/
 
 type retryerBatchTag uint8
 
@@ -85,8 +68,8 @@ func newRetryer(
 	log logger,
 	observer outputObserver,
 	out chan publisher.Batch,
-) *retryer {
-	r := &retryer{
+) *oldRetryer {
+	r := &oldRetryer{
 		logger:      log,
 		observer:    observer,
 		done:        make(chan struct{}),
@@ -100,33 +83,26 @@ func newRetryer(
 	return r
 }
 
-func (r *retryer) close() {
+func (r *oldRetryer) close() {
 	fmt.Printf("retryer.close\n")
 	close(r.done)
 	//Block until loop() is properly closed
 	r.doneWaiter.Wait()
 }
 
-/*func (r *retryer) sigOutputAdded() {
-	r.sig <- retryerSignal{tag: sigRetryerOutputAdded}
-}
-
-func (r *retryer) sigOutputRemoved() {
-	r.sig <- retryerSignal{tag: sigRetryerOutputRemoved}
-}*/
-func (r *retryer) setOutputCount(n int) {
+func (r *oldRetryer) setOutputCount(n int) {
 	r.outputCount <- n
 }
 
-func (r *retryer) retry(b TTLBatch) {
+func (r *oldRetryer) retry(b TTLBatch) {
 	r.in <- batchEvent{tag: retryBatch, batch: b}
 }
 
-func (r *retryer) cancelled(b TTLBatch) {
+func (r *oldRetryer) cancelled(b TTLBatch) {
 	r.in <- batchEvent{tag: cancelledBatch, batch: b}
 }
 
-func (r *retryer) loop() {
+func (r *oldRetryer) loop() {
 	defer r.doneWaiter.Done()
 	var (
 		out             chan publisher.Batch
@@ -197,7 +173,7 @@ func (r *retryer) loop() {
 	}
 }
 
-func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
+func (r *oldRetryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	consumerBlocked := shouldBlockConsumer(numOutputs, numBatches)
 	fmt.Printf("checkConsumerBlock: %v\n", consumerBlocked)
 	if r.throttle != nil {
@@ -220,3 +196,4 @@ func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 func shouldBlockConsumer(numOutputs, numBatches int) bool {
 	return numBatches/3 >= numOutputs
 }
+*/

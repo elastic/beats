@@ -53,8 +53,8 @@ func TestMakeClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := make(chan publisher.Batch)
-				retryer := newRetryer(logger, nilObserver, wqu)
-				defer retryer.close()
+				//retryer := newRetryer(logger, nilObserver, wqu)
+				//defer retryer.close()
 
 				var published atomic.Uint
 				publishFn := func(batch publisher.Batch) error {
@@ -68,7 +68,7 @@ func TestMakeClientWorker(t *testing.T) {
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
-					batch := randomBatch(50, 150).withRetryer(retryer)
+					batch := randomBatch(50, 150) //.withRetryer(retryer)
 					numEvents += uint(len(batch.Events()))
 					wqu <- batch
 				}
@@ -115,13 +115,13 @@ func TestReplaceClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := make(chan publisher.Batch)
-				retryer := newRetryer(logger, nilObserver, wqu)
-				defer retryer.close()
+				//retryer := newRetryer(logger, nilObserver, wqu)
+				//defer retryer.close()
 
 				var batches []publisher.Batch
 				var numEvents int
 				for i := uint(0); i < numBatches; i++ {
-					batch := randomBatch(minEventsInBatch, maxEventsInBatch).withRetryer(retryer)
+					batch := randomBatch(minEventsInBatch, maxEventsInBatch) //.withRetryer(retryer)
 					batch.events[0].Content.Private = i
 					numEvents += batch.Len()
 					batches = append(batches, batch)
@@ -215,8 +215,8 @@ func TestMakeClientTracer(t *testing.T) {
 	logger := makeBufLogger(t)
 
 	wqu := make(chan publisher.Batch)
-	retryer := newRetryer(logger, nilObserver, wqu)
-	defer retryer.close()
+	//retryer := newRetryer(logger, nilObserver, wqu)
+	//defer retryer.close()
 
 	var published atomic.Uint
 	publishFn := func(batch publisher.Batch) error {
@@ -233,7 +233,7 @@ func TestMakeClientTracer(t *testing.T) {
 	defer worker.Close()
 
 	for i := 0; i < numBatches; i++ {
-		batch := randomBatch(10, 15).withRetryer(retryer)
+		batch := randomBatch(10, 15) //.withRetryer(retryer)
 		numEvents += uint(len(batch.Events()))
 		wqu <- batch
 	}

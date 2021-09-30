@@ -30,15 +30,23 @@ type TTLBatch interface {
 	reduceTTL() bool
 }
 
-type ttlBatch struct {
-	original queue.Batch
-	consumer *eventConsumer
-	ttl      int
-	events   []publisher.Event
+type retryer interface {
+	retry(batch *ttlBatch, decreaseTTL bool)
 }
 
-type batchContext struct {
-	retryer *retryer
+type ttlBatch struct {
+	original queue.Batch
+
+	// The batch uses the consumer that created it to handle retries
+	// and termination.
+	retryer retryer
+
+	// How many retries until we drop this batch. -1 means it can't be dropped.
+	ttl int
+
+	// The cached events returned from original.Events(). If some but not
+	// all of the events are ACKed, those ones are removed from the list.
+	events []publisher.Event
 }
 
 var batchPool = sync.Pool{
@@ -47,7 +55,7 @@ var batchPool = sync.Pool{
 	},
 }
 
-func newBatch(consumer *eventConsumer, original queue.Batch, ttl int) *ttlBatch {
+func newBatch(retryer retryer, original queue.Batch, ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
 	}
@@ -55,7 +63,7 @@ func newBatch(consumer *eventConsumer, original queue.Batch, ttl int) *ttlBatch 
 	b := batchPool.Get().(*ttlBatch)
 	*b = ttlBatch{
 		original: original,
-		consumer: consumer,
+		retryer:  retryer,
 		ttl:      ttl,
 		events:   original.Events(),
 	}
@@ -82,24 +90,11 @@ func (b *ttlBatch) Drop() {
 }
 
 func (b *ttlBatch) Retry() {
-	//b.ctx.retryer.retry(b)
-	select {
-	case b.consumer.retryChan <- retryRequest{batch: b, decreaseTTL: true}:
-	case <-b.consumer.done:
-		// The consumer has already shut down
-		b.Drop()
-	}
+	b.retryer.retry(b, true)
 }
 
 func (b *ttlBatch) Cancelled() {
-	//b.ctx.retryer.cancelled(b)
-	select {
-	// TODO: have retryChan include a cancel vs retry param
-	case b.consumer.retryChan <- retryRequest{batch: b, decreaseTTL: false}:
-	case <-b.consumer.done:
-		// The consumer has already shut down
-		b.Drop()
-	}
+	b.retryer.retry(b, false)
 }
 
 func (b *ttlBatch) RetryEvents(events []publisher.Event) {

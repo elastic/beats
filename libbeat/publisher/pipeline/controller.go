@@ -40,7 +40,7 @@ type outputController struct {
 
 	workQueue chan publisher.Batch
 
-	retryer  *retryer
+	//retryer  *oldRetryer
 	consumer *eventConsumer
 	out      *outputGroup
 }
@@ -69,35 +69,18 @@ func newOutputController(
 	observer outputObserver,
 	queue queue.Queue,
 ) *outputController {
-	c := &outputController{
+	return &outputController{
 		beat:      beat,
 		monitors:  monitors,
 		observer:  observer,
 		workQueue: make(chan publisher.Batch),
+		consumer:  newEventConsumer(monitors.Logger, queue, observer),
 	}
-
-	//c.retryer = newRetryer(monitors.Logger, observer, c.workQueue)
-	//ctx := batchContext{
-	//	retryer: c.retryer,
-	//}
-	c.consumer = newEventConsumer(monitors.Logger, queue) //, ctx)
-	// The retryer needs a link back to the consumer's pause channel
-	// in case of output congestion.
-	//c.retryer.throttle = boolChanInterruptor{c.consumer.pauseChan}
-
-	return c
 }
 
 func (c *outputController) Close() error {
-	// Remove the retryer's throttle link to the eventConsumer, so
-	// it doesn't try to send any messages after the consumer shuts down.
-	c.retryer.throttle = nil
-	//fmt.Printf("\033[94msetTarget:\033[0m\n")
-	//c.consumer.setTarget(consumerTarget{})
 	fmt.Printf("\033[94mconsumer.close:\033[0m\n")
 	c.consumer.close()
-	fmt.Printf("\033[94mretryer.close:\033[0m\n")
-	c.retryer.close()
 	close(c.workQueue)
 
 	if c.out != nil {
@@ -128,17 +111,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 
 	// Set consumer to empty target to pause it while we reload
 	c.consumer.setTarget(consumerTarget{})
-
-	// Notify the retryer that the outputs have changed
-	/*if c.out != nil {
-		for range c.out.outputs {
-			c.retryer.sigOutputRemoved()
-		}
-	}
-	for range clients {
-		c.retryer.sigOutputAdded()
-	}*/
-	c.retryer.setOutputCount(len(clients))
 
 	// Close old outputWorkers, so they send their remaining events
 	// back to the workQueue via the retryer
@@ -185,16 +157,4 @@ func (c *outputController) Reload(
 	c.Set(output)
 
 	return nil
-}
-
-type boolChanInterruptor struct {
-	ch chan bool
-}
-
-func (bci boolChanInterruptor) sigWait() {
-	bci.ch <- true
-}
-
-func (bci boolChanInterruptor) sigUnWait() {
-	bci.ch <- false
 }
