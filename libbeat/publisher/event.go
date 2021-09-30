@@ -24,24 +24,24 @@ import (
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening
 // for signals from these outpts. After a batch is processed (completed or
-// errors), one of the signal methods must be called.
+// errors), one of the signal methods must be called. In normal operation
+// every batch will eventually receive an ACK() or a Drop().
 type Batch interface {
 	Events() []Event
-
-	// signals
 
 	// All events have been acknowledged by the output.
 	ACK()
 
-	// We are giving up on these events, report acknowledgement
-	// to any waiting listeners and discoard the events.
+	// Give up on these events permanently without sending.
 	Drop()
 
+	// Try sending this batch again
 	Retry()
 
-	// All events have been acknowledged except those in the given list.
+	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
+	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()
 }
 
