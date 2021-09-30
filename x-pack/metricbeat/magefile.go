@@ -232,7 +232,7 @@ func PythonIntegTest(ctx context.Context) error {
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"
 		}
-		return devtools.PythonTest(args)
+		return devtools.PythonTestForModule(args)
 	})
 }
 
