@@ -29,12 +29,20 @@ type Batch interface {
 	Events() []Event
 
 	// signals
+
+	// All events have been acknowledged by the output.
 	ACK()
+
+	// We are giving up on these events, report acknowledgement
+	// to any waiting listeners and discoard the events.
 	Drop()
+
 	Retry()
+
+	// All events have been acknowledged except those in the given list.
 	RetryEvents(events []Event)
+
 	Cancelled()
-	CancelledEvents(events []Event)
 }
 
 // Event is used by the publisher pipeline and broker to pass additional

@@ -41,7 +41,6 @@ const (
 	BatchRetry
 	BatchRetryEvents
 	BatchCancelled
-	BatchCancelledEvents
 )
 
 func NewBatch(in ...beat.Event) *Batch {
@@ -74,10 +73,6 @@ func (b *Batch) RetryEvents(events []publisher.Event) {
 
 func (b *Batch) Cancelled() {
 	b.doSignal(BatchSignal{Tag: BatchCancelled})
-}
-
-func (b *Batch) CancelledEvents(events []publisher.Event) {
-	b.doSignal(BatchSignal{Tag: BatchCancelledEvents, Events: events})
 }
 
 func (b *Batch) doSignal(sig BatchSignal) {

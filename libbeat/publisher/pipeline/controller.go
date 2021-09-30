@@ -74,13 +74,28 @@ func newOutputController(
 		workQueue: make(chan publisher.Batch),
 	}
 
-	ctx := &batchContext{}
+	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue)
+	ctx := batchContext{
+		retryer: c.retryer,
+	}
 	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
-	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue, c.consumer)
-	ctx.observer = observer
-	ctx.retryer = c.retryer
+	// The retryer needs a link back to the consumer's pause channel
+	// in case of output congestion.
+	c.retryer.consumer = boolChanInterruptor{c.consumer.pauseChan}
 
 	return c
+}
+
+type boolChanInterruptor struct {
+	ch chan bool
+}
+
+func (bci boolChanInterruptor) sigWait() {
+	bci.ch <- true
+}
+
+func (bci boolChanInterruptor) sigUnWait() {
+	bci.ch <- false
 }
 
 func (c *outputController) Close() error {

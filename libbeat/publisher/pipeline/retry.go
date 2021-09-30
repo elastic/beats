@@ -52,7 +52,7 @@ type retryer struct {
 
 type interruptor interface {
 	sigWait()
-	sigUnWait(chan publisher.Batch)
+	sigUnWait()
 }
 
 type retryQueue chan batchEvent
@@ -86,7 +86,6 @@ func newRetryer(
 	log logger,
 	observer outputObserver,
 	out chan publisher.Batch,
-	c interruptor,
 ) *retryer {
 	r := &retryer{
 		logger:     log,
@@ -95,7 +94,6 @@ func newRetryer(
 		sig:        make(chan retryerSignal, 3),
 		in:         retryQueue(make(chan batchEvent, 3)),
 		out:        out,
-		consumer:   c,
 		doneWaiter: sync.WaitGroup{},
 	}
 	r.doneWaiter.Add(1)
@@ -226,7 +224,7 @@ func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	} else {
 		r.logger.Info("retryer: send unwait signal to consumer")
 		if r.consumer != nil {
-			r.consumer.sigUnWait(r.out)
+			r.consumer.sigUnWait()
 		}
 		r.logger.Info("  done")
 	}

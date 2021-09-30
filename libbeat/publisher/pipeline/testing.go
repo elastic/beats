@@ -107,11 +107,6 @@ func (b *mockBatch) reduceTTL() bool {
 	return true
 }
 
-func (b *mockBatch) CancelledEvents(events []publisher.Event) {
-	b.updateEvents(events)
-	signalFn(b.onCancelled)
-}
-
 func (b *mockBatch) updateEvents(events []publisher.Event) {
 	b.mu.Lock()
 	defer b.mu.Unlock()

@@ -32,14 +32,13 @@ type TTLBatch interface {
 
 type batch struct {
 	original queue.Batch
-	ctx      *batchContext
+	ctx      batchContext
 	ttl      int
 	events   []publisher.Event
 }
 
 type batchContext struct {
-	observer outputObserver
-	retryer  *retryer
+	retryer *retryer
 }
 
 var batchPool = sync.Pool{
@@ -48,7 +47,7 @@ var batchPool = sync.Pool{
 	},
 }
 
-func newBatch(ctx *batchContext, original queue.Batch, ttl int) *batch {
+func newBatch(ctx batchContext, original queue.Batch, ttl int) *batch {
 	if original == nil {
 		panic("empty batch")
 	}
@@ -73,9 +72,6 @@ func (b *batch) Events() []publisher.Event {
 }
 
 func (b *batch) ACK() {
-	if b.ctx != nil {
-		b.ctx.observer.outBatchACKed(len(b.events))
-	}
 	b.original.ACK()
 	releaseBatch(b)
 }
@@ -98,19 +94,7 @@ func (b *batch) RetryEvents(events []publisher.Event) {
 	b.Retry()
 }
 
-func (b *batch) CancelledEvents(events []publisher.Event) {
-	b.updEvents(events)
-	b.Cancelled()
-}
-
 func (b *batch) updEvents(events []publisher.Event) {
-	l1 := len(b.events)
-	l2 := len(events)
-	if l1 > l2 {
-		// report subset of events not to be retried as ACKed
-		b.ctx.observer.outBatchACKed(l1 - l2)
-	}
-
 	b.events = events
 }
 
