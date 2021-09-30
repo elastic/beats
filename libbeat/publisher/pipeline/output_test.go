@@ -53,7 +53,7 @@ func TestMakeClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := make(chan publisher.Batch)
-				retryer := newRetryer(logger, nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu)
 				defer retryer.close()
 
 				var published atomic.Uint

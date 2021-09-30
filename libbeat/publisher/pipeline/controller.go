@@ -81,7 +81,7 @@ func newOutputController(
 	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
 	// The retryer needs a link back to the consumer's pause channel
 	// in case of output congestion.
-	c.retryer.consumer = boolChanInterruptor{c.consumer.pauseChan}
+	c.retryer.throttle = boolChanInterruptor{c.consumer.pauseChan}
 
 	return c
 }

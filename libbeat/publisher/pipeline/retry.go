@@ -42,7 +42,7 @@ type retryer struct {
 
 	// When the retry queue gets too big, this interface can signal the
 	// eventConsumer to stop sending to the work queue.
-	consumer interruptor
+	throttle interruptor
 
 	sig        chan retryerSignal
 	out        chan publisher.Batch
@@ -165,7 +165,6 @@ func (r *retryer) loop() {
 				log.Info("Drop batch")
 				batch.Drop()
 			} else {
-				out = r.out
 				buffer = append(buffer, batch)
 				out = r.out
 				active = buffer[0]
@@ -211,22 +210,17 @@ func (r *retryer) loop() {
 
 func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	consumerBlocked := shouldBlockConsumer(numOutputs, numBatches)
-	if r.consumer == nil {
-		return consumerBlocked
-	}
 
-	if consumerBlocked {
-		r.logger.Info("retryer: send wait signal to consumer")
-		if r.consumer != nil {
-			r.consumer.sigWait()
+	if r.throttle != nil {
+		if consumerBlocked {
+			r.logger.Info("retryer: send wait signal to consumer")
+			r.throttle.sigWait()
+			r.logger.Info("  done")
+		} else {
+			r.logger.Info("retryer: send unwait signal to consumer")
+			r.throttle.sigUnWait()
+			r.logger.Info("  done")
 		}
-		r.logger.Info("  done")
-	} else {
-		r.logger.Info("retryer: send unwait signal to consumer")
-		if r.consumer != nil {
-			r.consumer.sigUnWait()
-		}
-		r.logger.Info("  done")
 	}
 
 	return consumerBlocked
