@@ -5,7 +5,6 @@ import unittest
 import glob
 import subprocess
 
-from elasticsearch import Elasticsearch
 import json
 import logging
 from parameterized import parameterized
@@ -63,7 +62,7 @@ class Test(BaseTest):
     def init(self):
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = Elasticsearch([self.elasticsearch_url], http_auth=('elastic', 'changeme'))
+        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url)
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
