@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -29,17 +30,22 @@ import (
 // The eventConsumer is managed by the controller and receives additional pause signals
 // from the retryer in case of too many events failing to be send or if retryer
 // is receiving cancelled batches from outputs to be closed on output reloading.
+
+type retryRequest struct {
+	batch       *ttlBatch
+	decreaseTTL bool
+}
 type eventConsumer struct {
 	logger *logp.Logger
-	ctx    batchContext
+	//ctx    batchContext
 
 	// When the output changes, send the new information to targetChan.
 	// Set to empty consumerTarget to disable sending until the target is
 	// reset.
 	targetChan chan consumerTarget
 
-	// Send true / false to pauseChan to pause / unpause the consumer.
-	pauseChan chan bool
+	// Failed batches are sent to this channel to retry
+	retryChan chan retryRequest
 
 	// Close the done channel to signal shutdown
 	done chan struct{}
@@ -50,11 +56,6 @@ type eventConsumer struct {
 
 	// The queue the eventConsumer will retrieve batches from.
 	queue queue.Queue
-
-	// The active consumer to read event batches from. Stored here
-	// so that eventConsumer can wake up the worker if it's blocked reading
-	// the queue consumer during shutdown.
-	consumer queue.Consumer
 }
 type consumerTarget struct {
 	ch         chan publisher.Batch
@@ -65,30 +66,23 @@ type consumerTarget struct {
 func newEventConsumer(
 	log *logp.Logger,
 	queue queue.Queue,
-	ctx batchContext,
+	//ctx batchContext,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger:     log,
-		targetChan: make(chan consumerTarget, 3),
-		consumer:   queue.Consumer(),
+		logger: log,
+
+		targetChan: make(chan consumerTarget),
+		retryChan:  make(chan retryRequest),
+		done:       make(chan struct{}),
 
 		queue: queue,
-		ctx:   ctx,
+		//ctx:   ctx,
 	}
 
 	c.wg.Add(1)
-	queueReader := makeQueueReader()
 	go func() {
 		defer c.wg.Done()
-		queueReader.run(log)
-	}()
-
-	c.wg.Add(1)
-	go func() {
-		defer c.wg.Done()
-		//c.loop()
-		c.run(queueReader)
-
+		c.run()
 	}()
 	return c
 }
@@ -103,17 +97,25 @@ func (c *eventConsumer) setTarget(target consumerTarget) {
 	c.targetChan <- target
 }
 
-func (c *eventConsumer) run(queueReader queueReader) { //consumer queue.Consumer) {
+func (c *eventConsumer) run() {
 	log := c.logger
 
 	log.Debug("start pipeline event consumer")
+
+	// Create a queueReader to run our queue fetches in the background
+	c.wg.Add(1)
+	queueReader := makeQueueReader()
+	go func() {
+		defer c.wg.Done()
+		queueReader.run(log)
+	}()
 
 	var (
 		// Whether there's an outstanding request to queueReader
 		pendingRead bool
 
-		// The batch waiting to be sent, or nil if we don't yet have one
-		batch TTLBatch
+		// The batches waiting to be sent.
+		buffer []*ttlBatch
 
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
@@ -129,57 +131,53 @@ func (c *eventConsumer) run(queueReader queueReader) { //consumer queue.Consumer
 
 outerLoop:
 	for {
+		fmt.Printf("eventConsumer loop begin\n")
 		// If possible, start reading the next batch in the background.
-		if consumer != nil && batch == nil && !pendingRead && !paused {
+		if len(buffer) == 0 && !pendingRead && !paused {
+			fmt.Printf("sending reader request\n")
 			pendingRead = true
 			queueReader.req <- queueReaderRequest{
-				ctx:      c.ctx,
+				//ctx:      c.ctx,
 				target:   target,
 				consumer: consumer,
 			}
+			fmt.Printf("sent\n")
 		}
-
 		// If we have a batch and are unpaused, we'll set the output
 		// channel to the target channel and try to send to it. Otherwise,
 		// it will remain nil, and sends to it will always block, so the
 		// output case of the select will be ignored.
 		var outputChan chan publisher.Batch
-		if !paused && batch != nil {
+		var batch *ttlBatch
+		if !paused && len(buffer) > 0 {
 			outputChan = target.ch
+			batch = buffer[0]
 		}
 
 		// Now we can block until the next state change.
 		select {
 		case outputChan <- batch:
-			batch = nil
+			buffer = buffer[1:]
 
 		case target = <-c.targetChan:
-			if consumer != nil {
-				consumer.Close()
-			}
-			consumer = c.queue.Consumer()
 
-		case paused = <-c.pauseChan:
-
-		case resp := <-queueReader.resp:
+		case batch = <-queueReader.resp:
 			pendingRead = false
-			if resp.err != nil && resp.consumer == consumer {
-				// The current consumer returned an error; most likely it has
-				// been closed, either for shutdown or because the output is
-				// reloading. In either case, stop using this consumer until
-				// we get a new one.
-				consumer = nil
-			} else {
-				batch = resp.batch
-			}
+			buffer = append(buffer, batch)
+
+		case req := <-c.retryChan:
+
+			buffer = append(buffer, req.batch)
+
 		case <-c.done:
+			fmt.Printf("\u001b[31mgot done signal\033[0m\n")
 			break outerLoop
 		}
 	}
 
 	// Close the queue.Consumer, otherwise queueReader can get blocked
 	// waiting on a read.
-	c.consumer.Close()
+	consumer.Close()
 
 	// Close the queueReader request channel so it knows to shutdown.
 	close(queueReader.req)
@@ -187,38 +185,33 @@ outerLoop:
 	// If there's an outstanding request, we need to read the response
 	// to unblock it, but we won't pass on the value.
 	if pendingRead {
-		resp := <-queueReader.resp
+		batch := <-queueReader.resp
 		pendingRead = false
 
-		if resp.batch != nil {
-			// Inform the
-			resp.batch.Drop()
+		if batch != nil {
+			// Inform any listeners that we couldn't deliver this batch.
+			batch.Drop()
 		}
 	}
-
 }
 
+// queueReader is a standalone stateless helper goroutine to dispatch
+// reads of the queue without blocking eventConsumer's main loop.
 type queueReader struct {
-	req  chan queueReaderRequest  // "give me a batch for this target"
-	resp chan queueReaderResponse // "here is your batch"
+	req  chan queueReaderRequest // "give me a batch for this target"
+	resp chan *ttlBatch          // "here is your batch"
 }
 
 type queueReaderRequest struct {
-	ctx      batchContext
-	target   consumerTarget
-	consumer queue.Consumer
-}
-
-type queueReaderResponse struct {
-	consumer queue.Consumer
-	batch    TTLBatch
-	err      error
+	batchFactory func(queue.Batch) *ttlBatch
+	target       consumerTarget
+	consumer     queue.Consumer
 }
 
 func makeQueueReader() queueReader {
 	qr := queueReader{
 		req:  make(chan queueReaderRequest, 1),
-		resp: make(chan queueReaderResponse),
+		resp: make(chan *ttlBatch),
 	}
 	return qr
 }
@@ -232,14 +225,11 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
-		queueBatch, err := req.consumer.Get(req.target.batchSize)
-		var batch TTLBatch
+		queueBatch, _ := req.consumer.Get(req.target.batchSize)
+		var batch *ttlBatch
 		if queueBatch != nil {
-			batch = newBatch(req.ctx, queueBatch, req.target.timeToLive)
+			batch = req.batchFactory(queueBatch) //newBatch(req.ctx.retryer, queueBatch, req.target.timeToLive)
 		}
-		qr.resp <- queueReaderResponse{
-			consumer: req.consumer,
-			batch:    batch,
-			err:      err}
+		qr.resp <- batch
 	}
 }

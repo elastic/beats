@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -44,10 +45,10 @@ type retryer struct {
 	// eventConsumer to stop sending to the work queue.
 	throttle interruptor
 
-	sig        chan retryerSignal
-	out        chan publisher.Batch
-	in         retryQueue
-	doneWaiter sync.WaitGroup
+	outputCount chan int
+	out         chan publisher.Batch
+	in          retryQueue
+	doneWaiter  sync.WaitGroup
 }
 
 type interruptor interface {
@@ -57,23 +58,21 @@ type interruptor interface {
 
 type retryQueue chan batchEvent
 
-type retryerSignal struct {
-	tag     retryerEventTag
-	channel chan publisher.Batch
-}
+/*type retryerSignal struct {
+	tag retryerEventTag
+}*/
 
 type batchEvent struct {
 	tag   retryerBatchTag
 	batch TTLBatch
 }
 
-type retryerEventTag uint8
+/*type retryerEventTag uint8
 
 const (
 	sigRetryerOutputAdded retryerEventTag = iota
 	sigRetryerOutputRemoved
-	sigRetryerUpdateOutput
-)
+)*/
 
 type retryerBatchTag uint8
 
@@ -88,13 +87,13 @@ func newRetryer(
 	out chan publisher.Batch,
 ) *retryer {
 	r := &retryer{
-		logger:     log,
-		observer:   observer,
-		done:       make(chan struct{}),
-		sig:        make(chan retryerSignal, 3),
-		in:         retryQueue(make(chan batchEvent, 3)),
-		out:        out,
-		doneWaiter: sync.WaitGroup{},
+		logger:      log,
+		observer:    observer,
+		done:        make(chan struct{}),
+		outputCount: make(chan int, 3),
+		in:          retryQueue(make(chan batchEvent, 3)),
+		out:         out,
+		doneWaiter:  sync.WaitGroup{},
 	}
 	r.doneWaiter.Add(1)
 	go r.loop()
@@ -102,17 +101,21 @@ func newRetryer(
 }
 
 func (r *retryer) close() {
+	fmt.Printf("retryer.close\n")
 	close(r.done)
 	//Block until loop() is properly closed
 	r.doneWaiter.Wait()
 }
 
-func (r *retryer) sigOutputAdded() {
+/*func (r *retryer) sigOutputAdded() {
 	r.sig <- retryerSignal{tag: sigRetryerOutputAdded}
 }
 
 func (r *retryer) sigOutputRemoved() {
 	r.sig <- retryerSignal{tag: sigRetryerOutputRemoved}
+}*/
+func (r *retryer) setOutputCount(n int) {
+	r.outputCount <- n
 }
 
 func (r *retryer) retry(b TTLBatch) {
@@ -130,7 +133,6 @@ func (r *retryer) loop() {
 		consumerBlocked bool
 
 		active     TTLBatch
-		activeSize int
 		buffer     []TTLBatch
 		numOutputs int
 
@@ -138,26 +140,25 @@ func (r *retryer) loop() {
 	)
 
 	for {
+		fmt.Printf("retryer loop begin:\n")
 		select {
 		case <-r.done:
+			fmt.Printf("retryer.loop got done signal!\n")
 			return
 		case evt := <-r.in:
+			fmt.Printf("retryer.in: evt %v\n", evt)
 			var (
-				countFailed  int
-				countDropped int
-				batch        = evt.batch
-				countRetry   = len(batch.Events())
-				alive        = true
+				batch = evt.batch
+				alive = true
 			)
 
 			if evt.tag == retryBatch {
-				countFailed = len(batch.Events())
+				countFailed := len(batch.Events())
 				r.observer.eventsFailed(countFailed)
 
 				alive = batch.reduceTTL()
 
-				countRetry = len(batch.Events())
-				countDropped = countFailed - countRetry
+				countDropped := countFailed - len(batch.Events())
 				r.observer.eventsDropped(countDropped)
 			}
 
@@ -168,59 +169,49 @@ func (r *retryer) loop() {
 				buffer = append(buffer, batch)
 				out = r.out
 				active = buffer[0]
-				activeSize = len(active.Events())
 				if !consumerBlocked {
 					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
 				}
 			}
 
 		case out <- active:
-			r.observer.eventsRetry(activeSize)
+			fmt.Printf("retryer wrote to the work queue\n")
+			r.observer.eventsRetry(len(active.Events()))
 
 			buffer = buffer[1:]
-			active, activeSize = nil, 0
+			active = nil
 
 			if len(buffer) == 0 {
 				out = nil
 			} else {
 				active = buffer[0]
-				activeSize = len(active.Events())
 			}
 
 			if consumerBlocked {
 				consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
 			}
 
-		case sig := <-r.sig:
-			switch sig.tag {
-			case sigRetryerOutputAdded:
-				numOutputs++
-				if consumerBlocked {
-					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
-				}
-			case sigRetryerOutputRemoved:
-				numOutputs--
-				if !consumerBlocked {
-					consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
-				}
-			}
+		case numOutputs = <-r.outputCount:
+			consumerBlocked = r.checkConsumerBlock(numOutputs, len(buffer))
 		}
 	}
 }
 
 func (r *retryer) checkConsumerBlock(numOutputs, numBatches int) bool {
 	consumerBlocked := shouldBlockConsumer(numOutputs, numBatches)
-
+	fmt.Printf("checkConsumerBlock: %v\n", consumerBlocked)
 	if r.throttle != nil {
 		if consumerBlocked {
 			r.logger.Info("retryer: send wait signal to consumer")
 			r.throttle.sigWait()
-			r.logger.Info("  done")
 		} else {
+			fmt.Printf("sending unwait?\n")
 			r.logger.Info("retryer: send unwait signal to consumer")
 			r.throttle.sigUnWait()
-			r.logger.Info("  done")
+			fmt.Printf("sent\n")
 		}
+	} else {
+		fmt.Printf("we have no more throttle\n")
 	}
 
 	return consumerBlocked

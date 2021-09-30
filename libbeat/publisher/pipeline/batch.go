@@ -30,9 +30,9 @@ type TTLBatch interface {
 	reduceTTL() bool
 }
 
-type batch struct {
+type ttlBatch struct {
 	original queue.Batch
-	ctx      batchContext
+	consumer *eventConsumer
 	ttl      int
 	events   []publisher.Event
 }
@@ -43,64 +43,73 @@ type batchContext struct {
 
 var batchPool = sync.Pool{
 	New: func() interface{} {
-		return &batch{}
+		return &ttlBatch{}
 	},
 }
 
-func newBatch(ctx batchContext, original queue.Batch, ttl int) *batch {
+func newBatch(consumer *eventConsumer, original queue.Batch, ttl int) *ttlBatch {
 	if original == nil {
 		panic("empty batch")
 	}
 
-	b := batchPool.Get().(*batch)
-	*b = batch{
+	b := batchPool.Get().(*ttlBatch)
+	*b = ttlBatch{
 		original: original,
-		ctx:      ctx,
+		consumer: consumer,
 		ttl:      ttl,
 		events:   original.Events(),
 	}
 	return b
 }
 
-func releaseBatch(b *batch) {
-	*b = batch{} // clear batch
+func releaseBatch(b *ttlBatch) {
+	*b = ttlBatch{} // clear batch
 	batchPool.Put(b)
 }
 
-func (b *batch) Events() []publisher.Event {
+func (b *ttlBatch) Events() []publisher.Event {
 	return b.events
 }
 
-func (b *batch) ACK() {
+func (b *ttlBatch) ACK() {
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Drop() {
+func (b *ttlBatch) Drop() {
 	b.original.ACK()
 	releaseBatch(b)
 }
 
-func (b *batch) Retry() {
-	b.ctx.retryer.retry(b)
+func (b *ttlBatch) Retry() {
+	//b.ctx.retryer.retry(b)
+	select {
+	case b.consumer.retryChan <- retryRequest{batch: b, decreaseTTL: true}:
+	case <-b.consumer.done:
+		// The consumer has already shut down
+		b.Drop()
+	}
 }
 
-func (b *batch) Cancelled() {
-	b.ctx.retryer.cancelled(b)
+func (b *ttlBatch) Cancelled() {
+	//b.ctx.retryer.cancelled(b)
+	select {
+	// TODO: have retryChan include a cancel vs retry param
+	case b.consumer.retryChan <- retryRequest{batch: b, decreaseTTL: false}:
+	case <-b.consumer.done:
+		// The consumer has already shut down
+		b.Drop()
+	}
 }
 
-func (b *batch) RetryEvents(events []publisher.Event) {
-	b.updEvents(events)
-	b.Retry()
-}
-
-func (b *batch) updEvents(events []publisher.Event) {
+func (b *ttlBatch) RetryEvents(events []publisher.Event) {
 	b.events = events
+	b.Retry()
 }
 
 // reduceTTL reduces the time to live for all events that have no 'guaranteed'
 // sending requirements.  reduceTTL returns true if the batch is still alive.
-func (b *batch) reduceTTL() bool {
+func (b *ttlBatch) reduceTTL() bool {
 	if b.ttl <= 0 {
 		return true
 	}

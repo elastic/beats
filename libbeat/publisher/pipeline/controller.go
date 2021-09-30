@@ -18,6 +18,8 @@
 package pipeline
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
@@ -74,42 +76,38 @@ func newOutputController(
 		workQueue: make(chan publisher.Batch),
 	}
 
-	c.retryer = newRetryer(monitors.Logger, observer, c.workQueue)
-	ctx := batchContext{
-		retryer: c.retryer,
-	}
-	c.consumer = newEventConsumer(monitors.Logger, queue, ctx)
+	//c.retryer = newRetryer(monitors.Logger, observer, c.workQueue)
+	//ctx := batchContext{
+	//	retryer: c.retryer,
+	//}
+	c.consumer = newEventConsumer(monitors.Logger, queue) //, ctx)
 	// The retryer needs a link back to the consumer's pause channel
 	// in case of output congestion.
-	c.retryer.throttle = boolChanInterruptor{c.consumer.pauseChan}
+	//c.retryer.throttle = boolChanInterruptor{c.consumer.pauseChan}
 
 	return c
 }
 
-type boolChanInterruptor struct {
-	ch chan bool
-}
-
-func (bci boolChanInterruptor) sigWait() {
-	bci.ch <- true
-}
-
-func (bci boolChanInterruptor) sigUnWait() {
-	bci.ch <- false
-}
-
 func (c *outputController) Close() error {
-	c.consumer.setTarget(consumerTarget{})
+	// Remove the retryer's throttle link to the eventConsumer, so
+	// it doesn't try to send any messages after the consumer shuts down.
+	c.retryer.throttle = nil
+	//fmt.Printf("\033[94msetTarget:\033[0m\n")
+	//c.consumer.setTarget(consumerTarget{})
+	fmt.Printf("\033[94mconsumer.close:\033[0m\n")
 	c.consumer.close()
+	fmt.Printf("\033[94mretryer.close:\033[0m\n")
 	c.retryer.close()
 	close(c.workQueue)
 
 	if c.out != nil {
 		for _, out := range c.out.outputs {
+			fmt.Printf("\033[94mclosing outputWorker:\033[0m\n")
 			out.Close()
+			fmt.Printf("\033[94mclosed\033[0m\n")
 		}
 	}
-
+	fmt.Printf("\033[94mdone\033[0m\n")
 	return nil
 }
 
@@ -132,14 +130,15 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.consumer.setTarget(consumerTarget{})
 
 	// Notify the retryer that the outputs have changed
-	if c.out != nil {
+	/*if c.out != nil {
 		for range c.out.outputs {
 			c.retryer.sigOutputRemoved()
 		}
 	}
 	for range clients {
 		c.retryer.sigOutputAdded()
-	}
+	}*/
+	c.retryer.setOutputCount(len(clients))
 
 	// Close old outputWorkers, so they send their remaining events
 	// back to the workQueue via the retryer
@@ -186,4 +185,16 @@ func (c *outputController) Reload(
 	c.Set(output)
 
 	return nil
+}
+
+type boolChanInterruptor struct {
+	ch chan bool
+}
+
+func (bci boolChanInterruptor) sigWait() {
+	bci.ch <- true
+}
+
+func (bci boolChanInterruptor) sigUnWait() {
+	bci.ch <- false
 }

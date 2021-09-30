@@ -115,7 +115,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				logger := makeBufLogger(t)
 
 				wqu := make(chan publisher.Batch)
-				retryer := newRetryer(logger, nilObserver, wqu, nil)
+				retryer := newRetryer(logger, nilObserver, wqu)
 				defer retryer.close()
 
 				var batches []publisher.Batch
@@ -215,7 +215,7 @@ func TestMakeClientTracer(t *testing.T) {
 	logger := makeBufLogger(t)
 
 	wqu := make(chan publisher.Batch)
-	retryer := newRetryer(logger, nilObserver, wqu, nil)
+	retryer := newRetryer(logger, nilObserver, wqu)
 	defer retryer.close()
 
 	var published atomic.Uint

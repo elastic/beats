@@ -228,7 +228,6 @@ func (p *Pipeline) Close() error {
 	p.output.Close()
 
 	// shutdown queue
-	debug.PrintStack()
 	fmt.Printf("Here goes the queue (%v):\n", p.queue)
 	err := p.queue.Close()
 	if err != nil {
@@ -242,6 +241,7 @@ func (p *Pipeline) Close() error {
 	}
 
 	fmt.Printf("pipeline closed!\n")
+	debug.PrintStack()
 	return nil
 }
 

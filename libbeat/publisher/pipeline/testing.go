@@ -69,7 +69,7 @@ func (p mockProducer) Cancel() int                           { return 0 }
 
 type mockConsumer struct{}
 
-func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &batch{}, nil }
+func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &ttlBatch{}, nil }
 func (c mockConsumer) Close() error                            { return nil }
 
 type mockBatch struct {
