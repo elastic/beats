@@ -15,36 +15,59 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package beat_test
+package beat
 
 import (
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/metricbeat/module/beat"
-
-	// Make sure metricsets are registered in mb.Registry
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/state"
-	_ "github.com/elastic/beats/v7/metricbeat/module/beat/stats"
+	"gotest.tools/assert"
 )
 
-func TestXPackEnabledMetricsets(t *testing.T) {
-	config := map[string]interface{}{
-		"module":        beat.ModuleName,
-		"hosts":         []string{"foobar:5066"},
-		"xpack.enabled": true,
+func TestFetchURI(t *testing.T) {
+	tcs := []struct {
+		orig, path, want string
+	}{
+		{
+			orig: "https://localhost:5000/some/proxy/path",
+			path: "/state",
+			want: "https://localhost:5000/some/proxy/path/state",
+		}, {
+			orig: "https://localhost:5000/some/proxy/path/state",
+			path: "/state",
+			want: "https://localhost:5000/some/proxy/path/state",
+		}, {
+			orig: "https://localhost:5000/some/proxy/path/state",
+			path: "/",
+			want: "https://localhost:5000/some/proxy/path",
+		}, {
+			orig: "http://localhost:5000",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/state",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/stats",
+			path: "/state",
+			want: "http://localhost:5000/state",
+		}, {
+			orig: "http://localhost:5000/stats",
+			path: "/",
+			want: "http://localhost:5000/",
+		}, {
+			orig: "http://localhost:5000/state",
+			path: "/",
+			want: "http://localhost:5000/",
+		},
 	}
 
-	metricSets := mbtest.NewReportingMetricSetV2Errors(t, config)
-	require.Len(t, metricSets, 2)
-	for _, ms := range metricSets {
-		name := ms.Name()
-		switch name {
-		case "state", "stats":
-		default:
-			t.Errorf("unexpected metricset name = %v", name)
-		}
+	for _, tc := range tcs {
+		u, err := url.Parse(tc.orig)
+		require.NoError(t, err)
+		got := fetchURI(u, tc.path)
+		assert.Equal(t, tc.want, got)
 	}
 }
