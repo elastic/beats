@@ -1,11 +1,29 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package opentelemetry
 
 import (
 	"context"
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"sync"
+	"testing"
+	"time"
+
 	"github.com/stretchr/testify/assert"
 	colmetricpb "go.opentelemetry.io/proto/otlp/collector/metrics/v1"
 	commonpb "go.opentelemetry.io/proto/otlp/common/v1"
@@ -14,26 +32,24 @@ import (
 	v1 "go.opentelemetry.io/proto/otlp/resource/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"sync"
-	"testing"
-	"time"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 )
 
 const chunkSize = 1000
 
-
-
-
 var instrumentationLibrary = &commonpb.InstrumentationLibrary{
-Name:    "beats",
-Version: "1.0.0",
+	Name:    "beats",
+	Version: "1.0.0",
 }
 
-func TestMapping(t *testing.T){
+func TestMapping(t *testing.T) {
 	event := publisher.Event{Content: beat.Event{Fields: common.MapStr{"bar": 1}, Meta: common.MapStr{"hello": 1}}}
 
-	for he, da:= range event.Content.Fields {
-		_= he
+	for he, da := range event.Content.Fields {
+		_ = he
 		_ = da
 	}
 }
@@ -44,18 +60,17 @@ func TestValidate(t *testing.T) {
 	ctx := context.Background()
 	conn, outcont, err := createConnection(ctx, "0.0.0.0:4317")
 	metricsClient := colmetricpb.NewMetricsServiceClient(conn)
-	event:= beat.Event{
+	event := beat.Event{
 		Timestamp:  time.Time{},
 		Meta:       nil,
 		Fields:     nil,
 		Private:    nil,
 		TimeSeries: false,
 	}
-_= event
+	_ = event
 	//metrics,_ := Adapt(event)
 	metrics := Mock()
 	lenMetrics := len(metrics)
-
 
 	processed := 0
 	var wg sync.WaitGroup
@@ -70,7 +85,7 @@ _= event
 			out, err := metricsClient.Export(outcont, &colmetricpb.ExportMetricsServiceRequest{
 				ResourceMetrics: batch,
 			})
-			_= out
+			_ = out
 			if err != nil {
 				_ = err
 			} else {
@@ -81,7 +96,6 @@ _= event
 	}
 	wg.Wait()
 }
-
 
 func createConnection(ctx context.Context, endpoint string) (*grpc.ClientConn, context.Context, error) {
 	outgoingCtx := metadata.NewOutgoingContext(ctx, nil)
@@ -101,9 +115,8 @@ func createConnection(ctx context.Context, endpoint string) (*grpc.ClientConn, c
 func Adapt(event beat.Event) ([]*metricpb.ResourceMetrics, error) {
 	//timestamp, _ := event.Fields.GetValue("timestamp")
 
-
 	resource := createResources(event)
-resources:= []resourcepb.Resource{resource}
+	resources := []resourcepb.Resource{resource}
 	return createArrayOfMetrics(resources, []*metricpb.InstrumentationLibraryMetrics{{InstrumentationLibrary: instrumentationLibrary}}), nil
 }
 
@@ -165,5 +178,5 @@ func Mock() []*metricpb.ResourceMetrics {
 		SchemaUrl: "",
 	}
 
-	return []*metricpb.ResourceMetrics { &sfs}
+	return []*metricpb.ResourceMetrics{&sfs}
 }

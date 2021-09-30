@@ -15,7 +15,6 @@
 // specific language governing permissions and limitations
 // under the License.
 
-
 package opentelemetry
 
 import (
@@ -49,139 +48,110 @@ type eventInfo struct {
 
 func TestOpenTelemetryPublish(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("opentelemetry"))
-
 	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	testTopic := fmt.Sprintf("test-libbeat-%s", id)
-	logType := fmt.Sprintf("log-type-%s", id)
 
 	tests := []struct {
 		title  string
-		config map[string]interface{}
-		topic  string
 		events []eventInfo
 	}{
 		{
-			"publish single event to test topic",
-			nil,
-			testTopic,
+			"publish single event to test",
 			single(common.MapStr{
-				"host":    "test-host",
-				"message": id,
+				"host":          "test-host",
+				"message":       id,
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"publish single event with topic from type",
-			map[string]interface{}{
-				"topic": "%{[type]}",
-			},
-			logType,
 			single(common.MapStr{
-				"host":    "test-host",
-				"type":    logType,
-				"message": id,
+				"host":          "test-host",
+				"message":       id,
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"publish single event with formating to test topic",
-			map[string]interface{}{
-				"codec.format.string": "%{[message]}",
-			},
-			testTopic,
 			single(common.MapStr{
-				"host":    "test-host",
-				"message": id,
+				"host":          "test-host",
+				"message":       id,
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"batch publish to test topic",
-			nil,
-			testTopic,
 			randMulti(5, 100, common.MapStr{
-				"host": "test-host",
+				"host":          "test-host",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"batch publish to test topic from type",
-			map[string]interface{}{
-				"topic": "%{[type]}",
-			},
-			logType,
 			randMulti(5, 100, common.MapStr{
-				"host": "test-host",
-				"type": logType,
+				"host":          "test-host",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"batch publish with random partitioner",
-			map[string]interface{}{
-				"partition.random": map[string]interface{}{
-					"group_events": 1,
-				},
-			},
-			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"host": "test-host",
-				"type": "log",
+				"host":          "test-host",
+				"type":          "log",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"batch publish with round robin partitioner",
-			map[string]interface{}{
-				"partition.round_robin": map[string]interface{}{
-					"group_events": 1,
-				},
-			},
-			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"host": "test-host",
-				"type": "log",
+				"host":          "test-host",
+				"type":          "log",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			"batch publish with hash partitioner without key (fallback to random)",
-			map[string]interface{}{
-				"partition.hash": map[string]interface{}{},
-			},
-			testTopic,
+
 			randMulti(1, 10, common.MapStr{
-				"host": "test-host",
-				"type": "log",
+				"host":          "test-host",
+				"type":          "log",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			// warning: this test uses random keys. In case keys are reused, test might fail.
 			"batch publish with hash partitioner with key",
-			map[string]interface{}{
-				"key":            "%{[message]}",
-				"partition.hash": map[string]interface{}{},
-			},
-			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"host": "test-host",
-				"type": "log",
+				"host":          "test-host",
+				"type":          "log",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 		{
 			// warning: this test uses random keys. In case keys are reused, test might fail.
 			"batch publish with fields hash partitioner",
-			map[string]interface{}{
-				"partition.hash.hash": []string{
-					"@timestamp",
-					"type",
-					"message",
-				},
-			},
-			testTopic,
 			randMulti(1, 10, common.MapStr{
-				"host": "test-host",
-				"type": "log",
+				"host":          "test-host",
+				"type":          "log",
+				"cpu.nr":        2,
+				"cpu.processor": 23.4545,
 			}),
 		},
 	}
 
 	defaultConfig := map[string]interface{}{
-		"hosts":   []string{fmt.Sprintf("%s:%s", opentelementryDefaultHost, opentelementryDefaultPort)},
-		"timeout": "1s",
+		"hosts":         []string{fmt.Sprintf("%s:%s", opentelementryDefaultHost, opentelementryDefaultPort)},
+		"timeout":       "1s",
+		"cpu.nr":        2,
+		"cpu.processor": 23.4545,
 	}
 
 	for i, test := range tests {
@@ -189,9 +159,6 @@ func TestOpenTelemetryPublish(t *testing.T) {
 		name := fmt.Sprintf("run test(%v): %v", i, test.title)
 
 		cfg := makeConfig(t, defaultConfig)
-		if test.config != nil {
-			cfg.Merge(makeConfig(t, test.config))
-		}
 
 		t.Run(name, func(t *testing.T) {
 			grp, err := makeOtel(nil, beat.Info{Beat: "libbeat", IndexPrefix: "testbeat"}, outputs.NewNilObserver(), cfg)

@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package opentelemetry
 
 import (
@@ -8,8 +25,8 @@ import (
 )
 
 type otelConfig struct {
-	UserAgent    string                `config:"user_agent"`
-	Endpoint       string                `config:"endpoint"`
+	UserAgent   string                `config:"user_agent"`
+	Endpoint    string                `config:"endpoint"`
 	Key         string                `config:"key"`
 	LoadBalance bool                  `config:"loadbalance"`
 	Timeout     time.Duration         `config:"timeout"`
@@ -17,7 +34,7 @@ type otelConfig struct {
 	MaxRetries  int                   `config:"max_retries"`
 	TLS         *tlscommon.Config     `config:"ssl"`
 	Proxy       transport.ProxyConfig `config:",inline"`
-	DataSource    string                `config:"datasource"`
+	DataSource  string                `config:"datasource"`
 	Backoff     backoff               `config:"backoff"`
 }
 
@@ -33,7 +50,7 @@ var (
 		BulkMaxSize: 2048,
 		MaxRetries:  3,
 		TLS:         nil,
-		DataSource:    "metrics",
+		DataSource:  "metrics",
 		Backoff: backoff{
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
