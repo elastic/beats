@@ -24,7 +24,7 @@ import (
 )
 
 func init() {
-	outputs.RegisterType("opentelementry", makeOtel)
+	outputs.RegisterType("opentelemetry", makeOtel)
 }
 
 // makeFileout instantiates a new file output instance.
@@ -42,6 +42,6 @@ func makeOtel(
 		cfg.SetString("index", -1, beat.Beat)
 	}
 
-	client := newClient(observer, config.Timeout)
+	client := newClient(observer, config.Timeout, config.Endpoint)
 	return outputs.Success(-1, 0, client)
 }

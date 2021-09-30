@@ -52,23 +52,26 @@ type client struct {
 	metricsClient colmetricpb.MetricsServiceClient
 	logsClient    *collogspb.LogsServiceClient
 	outgoingCtx   context.Context
+	endpoint      string
 }
 
 func newClient(
 	observer outputs.Observer,
 	timeout time.Duration,
+	endpoint string,
 ) *client {
 	return &client{
 		log:      logp.NewLogger("opentelemetry"),
 		observer: observer,
 		timeout:  timeout,
+		endpoint: endpoint,
 	}
 }
 
 func (c *client) Connect() error {
 	c.log.Debug("connect")
 	ctx := context.Background()
-	conn, outgoingCtx, err := initConnection(ctx, "0.0.0.0:4317")
+	conn, outgoingCtx, err := initConnection(ctx, c.endpoint)
 	metricsClient := colmetricpb.NewMetricsServiceClient(conn)
 	defer func() {
 		if err != nil {
@@ -172,9 +175,10 @@ func initMetrics(event beat.Event) metricpb.InstrumentationLibraryMetrics {
 	metrics := []*metricpb.Metric{}
 	time := event.Timestamp.UnixNano()
 	gauge := metricpb.Gauge{}
-	for key, val := range event.Fields {
+	fields := event.Fields.Flatten()
+	for key, val := range fields {
 		switch val.(type) {
-		case int, int64:
+		case int:
 			var i = val.(int)
 			gauge = metricpb.Gauge{
 				DataPoints: []*metricpb.NumberDataPoint{
@@ -186,7 +190,18 @@ func initMetrics(event beat.Event) metricpb.InstrumentationLibraryMetrics {
 					},
 				},
 			}
-		case float64, common.Float:
+		case int64:
+			gauge = metricpb.Gauge{
+				DataPoints: []*metricpb.NumberDataPoint{
+					{
+
+						StartTimeUnixNano: uint64(time),
+						TimeUnixNano:      uint64(time),
+						Value:             &metricpb.NumberDataPoint_AsInt{AsInt: val.(int64)},
+					},
+				},
+			}
+		case float64:
 			gauge = metricpb.Gauge{
 				DataPoints: []*metricpb.NumberDataPoint{
 					{
@@ -194,6 +209,17 @@ func initMetrics(event beat.Event) metricpb.InstrumentationLibraryMetrics {
 						StartTimeUnixNano: uint64(time),
 						TimeUnixNano:      uint64(time),
 						Value:             &metricpb.NumberDataPoint_AsDouble{AsDouble: val.(float64)},
+					},
+				},
+			}
+		case common.Float:
+			gauge = metricpb.Gauge{
+				DataPoints: []*metricpb.NumberDataPoint{
+					{
+
+						StartTimeUnixNano: uint64(time),
+						TimeUnixNano:      uint64(time),
+						Value:             &metricpb.NumberDataPoint_AsDouble{AsDouble: float64(val.(common.Float))},
 					},
 				},
 			}
@@ -237,7 +263,8 @@ func initResource(event beat.Event) resourcepb.Resource {
 		resource.Attributes = append(resource.Attributes, &keyVal)
 
 	}
-	for name, val := range event.Fields {
+	fields := event.Fields.Flatten()
+	for name, val := range fields {
 		switch val.(type) {
 		case string, bool:
 			keyVal := commonpb.KeyValue{Key: name, Value: &commonpb.AnyValue{Value: &commonpb.AnyValue_StringValue{StringValue: fmt.Sprintf("%v", val)}}}

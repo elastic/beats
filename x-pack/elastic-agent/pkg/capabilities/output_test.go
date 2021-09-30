@@ -26,8 +26,8 @@ func TestMultiOutput(t *testing.T) {
 			}},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
-		expectedOutputs := []string{"elasticsearch", "logstash"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
+		expectedOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
 		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
@@ -39,8 +39,8 @@ func TestMultiOutput(t *testing.T) {
 			}},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
-		expectedOutputs := []string{"elasticsearch"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
+		expectedOutputs := []string{"elasticsearch", "opentelemetry"}
 		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
@@ -58,7 +58,7 @@ func TestMultiOutput(t *testing.T) {
 			},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
 		expectedOutputs := []string{"logstash"}
 		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
@@ -71,8 +71,8 @@ func TestMultiOutput(t *testing.T) {
 			}},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
-		expectedOutputs := []string{"elasticsearch", "logstash"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
+		expectedOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
 		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
 
@@ -84,7 +84,7 @@ func TestMultiOutput(t *testing.T) {
 			}},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
 		expectedOutputs := []string{}
 		runMultiOutputTest(t, l, rd, expectedOutputs, initialOutputs)
 	})
@@ -97,7 +97,7 @@ func TestMultiOutput(t *testing.T) {
 			}},
 		}
 
-		initialOutputs := []string{"elasticsearch", "logstash"}
+		initialOutputs := []string{"elasticsearch", "logstash", "opentelemetry"}
 		expectedOutputs := []string{"elasticsearch"}
 
 		cap, err := newOutputsCapability(l, rd, tr)

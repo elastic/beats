@@ -255,3 +255,48 @@ func randChar() byte {
 	}
 	return byte(rand.Int31n(end-start+1) + start)
 }
+
+func TestPublishOT(t *testing.T) {
+
+	redisConfig := map[string]interface{}{
+		"hosts": []string{"0.0.0.0:423"},
+	}
+
+	testPublishList(t, redisConfig)
+}
+
+func testPublishList(t *testing.T, cfg map[string]interface{}) {
+
+	out := newOpenTelemetryTestingOutput(t, cfg)
+	_ = out
+	//err = sendTestEvents(out, batches, batchSize)
+	//assert.NoError(t, err)
+
+}
+
+const (
+	testBeatname    = "libbeat"
+	testBeatversion = "1.2.3"
+	testMetaValue   = "private"
+)
+
+func newOpenTelemetryTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
+	config, err := common.NewConfigFrom(cfg)
+	if err != nil {
+		t.Fatalf("Error reading config: %v", err)
+	}
+
+	plugin := outputs.FindFactory("opentelemetry")
+	if plugin == nil {
+		t.Fatalf("redis output module not registered")
+	}
+
+	out, err := plugin(nil, beat.Info{Beat: testBeatname, Version: testBeatversion}, outputs.NewNilObserver(), config)
+	if err != nil {
+		t.Fatalf("Failed to initialize redis output: %v", err)
+	}
+
+	client := out.Clients[0]
+
+	return client
+}
