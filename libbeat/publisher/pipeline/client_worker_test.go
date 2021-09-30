@@ -214,7 +214,7 @@ func TestMakeClientTracer(t *testing.T) {
 
 	logger := makeBufLogger(t)
 
-	wqu := make(chan publisher.Batch)
+	workQueue := make(chan publisher.Batch)
 	//retryer := newRetryer(logger, nilObserver, wqu)
 	//defer retryer.close()
 
@@ -229,13 +229,13 @@ func TestMakeClientTracer(t *testing.T) {
 	recorder := apmtest.NewRecordingTracer()
 	defer recorder.Close()
 
-	worker := makeClientWorker(nilObserver, wqu, client, logger, recorder.Tracer)
+	worker := makeClientWorker(nilObserver, workQueue, client, logger, recorder.Tracer)
 	defer worker.Close()
 
 	for i := 0; i < numBatches; i++ {
 		batch := randomBatch(10, 15) //.withRetryer(retryer)
 		numEvents += uint(len(batch.Events()))
-		wqu <- batch
+		workQueue <- batch
 	}
 
 	// Give some time for events to be published

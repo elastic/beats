@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -100,15 +99,9 @@ func (p *testConsumer) Get(sz int) (queue.Batch, error) {
 }
 
 func (p *testConsumer) Close() error {
-	fmt.Printf("hello? (%v)\n", p)
 	if p.close() != nil {
-		fmt.Printf("calling testConsumer.close\n")
-		defer fmt.Printf("called testConsumer.close\n")
 		return p.close()
-	} /* else {
-		debug.PrintStack()
-		fmt.Printf("i don't have a close callback...\n")
-	}*/
+	}
 	return nil
 }
 
@@ -128,17 +121,13 @@ func makeTestQueue(
 	return &testQueue{
 		close: func() error {
 			mux.Lock()
-			fmt.Printf("closing consumers\n")
 			for consumer := range consumers {
-				fmt.Printf("closing %v\n", consumer)
 				consumer.Close()
 			}
-			fmt.Printf("cancelling producers\n")
 			for producer := range producers {
 				producer.Cancel()
 			}
 			mux.Unlock()
-			fmt.Printf("waiting...\n")
 
 			wg.Wait()
 			return nil
