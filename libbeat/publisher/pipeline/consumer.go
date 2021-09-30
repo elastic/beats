@@ -32,8 +32,7 @@ import (
 type eventConsumer struct {
 	logger *logp.Logger
 
-	// eventConsumer calls the observer methods eventsRetry, eventsDropped,
-	// and eventsFailed.
+	// eventConsumer calls the observer methods eventsRetry and eventsDropped.
 	observer outputObserver
 
 	// When the output changes, the new target is sent to the worker routine
@@ -182,7 +181,6 @@ outerLoop:
 			alive := true
 			if req.decreaseTTL {
 				countFailed := len(req.batch.Events())
-				c.observer.eventsFailed(countFailed)
 
 				alive = req.batch.reduceTTL()
 

@@ -128,8 +128,6 @@ func (c *outputController) Set(outGrp outputs.Group) {
 			batchSize:  grp.batchSize,
 			timeToLive: grp.timeToLive,
 		})
-
-	c.observer.updateOutputGroup()
 }
 
 // Reload the output
