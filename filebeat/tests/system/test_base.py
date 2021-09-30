@@ -1,7 +1,6 @@
 import os
 import unittest
 from filebeat import BaseTest
-from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
 
@@ -32,9 +31,10 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         """
         Test that the template can be loaded with `setup --index-management`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()], http_auth=('elastic', 'changeme'))
+        es_url = self.get_elasticsearch_url()
+        es = self.get_elasticsearch_instance(url=es_url)
         self.render_config_template(
-            elasticsearch={"host": self.get_elasticsearch_url()},
+            elasticsearch={"host": es_url},
         )
         exit_code = self.run_beat(extra_args=["setup", "--index-management"])
 
@@ -47,9 +47,10 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         """
         Test that the template can be loaded with `setup --template`
         """
-        es = Elasticsearch([self.get_elasticsearch_url()], http_auth=('elastic', 'changeme'))
+        es_url = self.get_elasticsearch_url()
+        es = self.get_elasticsearch_instance(url=es_url)
         self.render_config_template(
-            elasticsearch={"host": self.get_elasticsearch_url()},
+            elasticsearch={"host": es_url},
         )
         exit_code = self.run_beat(extra_args=["setup", "--template",
                                               "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
