@@ -52,9 +52,8 @@ func TestMakeClientWorker(t *testing.T) {
 
 				logger := makeBufLogger(t)
 
-				wqu := make(chan publisher.Batch)
-				//retryer := newRetryer(logger, nilObserver, wqu)
-				//defer retryer.close()
+				workQueue := make(chan publisher.Batch)
+				retryer := newStandaloneRetryer(workQueue)
 
 				var published atomic.Uint
 				publishFn := func(batch publisher.Batch) error {
@@ -64,13 +63,13 @@ func TestMakeClientWorker(t *testing.T) {
 
 				client := ctor(publishFn)
 
-				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
+				worker := makeClientWorker(nilObserver, workQueue, client, logger, nil)
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
-					batch := randomBatch(50, 150) //.withRetryer(retryer)
+					batch := randomBatch(50, 150).withRetryer(retryer)
 					numEvents += uint(len(batch.Events()))
-					wqu <- batch
+					workQueue <- batch
 				}
 
 				// Give some time for events to be published
@@ -114,14 +113,15 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				logger := makeBufLogger(t)
 
-				wqu := make(chan publisher.Batch)
-				//retryer := newRetryer(logger, nilObserver, wqu)
-				//defer retryer.close()
+				workQueue := make(chan publisher.Batch)
+				retryer := newStandaloneRetryer(workQueue)
 
 				var batches []publisher.Batch
 				var numEvents int
 				for i := uint(0); i < numBatches; i++ {
-					batch := randomBatch(minEventsInBatch, maxEventsInBatch) //.withRetryer(retryer)
+					batch := randomBatch(
+						minEventsInBatch, maxEventsInBatch,
+					).withRetryer(retryer)
 					batch.events[0].Content.Private = i
 					numEvents += batch.Len()
 					batches = append(batches, batch)
@@ -133,7 +133,7 @@ func TestReplaceClientWorker(t *testing.T) {
 					defer wg.Done()
 					for _, batch := range batches {
 						t.Logf("publish batch: %v", batch.(*mockBatch).events[0].Content.Private)
-						wqu <- batch
+						workQueue <- batch
 					}
 				}()
 
@@ -156,7 +156,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(nilObserver, wqu, client, logger, nil)
+				worker := makeClientWorker(nilObserver, workQueue, client, logger, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -183,7 +183,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(nilObserver, wqu, client, logger, nil)
+				makeClientWorker(nilObserver, workQueue, client, logger, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
@@ -215,8 +215,7 @@ func TestMakeClientTracer(t *testing.T) {
 	logger := makeBufLogger(t)
 
 	workQueue := make(chan publisher.Batch)
-	//retryer := newRetryer(logger, nilObserver, wqu)
-	//defer retryer.close()
+	retryer := newStandaloneRetryer(workQueue)
 
 	var published atomic.Uint
 	publishFn := func(batch publisher.Batch) error {
@@ -233,7 +232,7 @@ func TestMakeClientTracer(t *testing.T) {
 	defer worker.Close()
 
 	for i := 0; i < numBatches; i++ {
-		batch := randomBatch(10, 15) //.withRetryer(retryer)
+		batch := randomBatch(10, 15).withRetryer(retryer)
 		numEvents += uint(len(batch.Events()))
 		workQueue <- batch
 	}

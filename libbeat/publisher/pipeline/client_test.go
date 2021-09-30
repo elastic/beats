@@ -19,7 +19,6 @@ package pipeline
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -114,9 +113,7 @@ func TestClient(t *testing.T) {
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					fmt.Printf("\033[0;32mclient.Publish:\033[0m\n")
 					client.Publish(beat.Event{})
-					fmt.Printf("\033[0;32mreturned!\033[0m\n")
 				}()
 
 				test.close(client, cancel)

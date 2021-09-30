@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -194,7 +193,6 @@ outerLoop:
 			retryBatches = append(retryBatches, req.batch)
 
 		case <-c.done:
-			fmt.Printf("\u001b[31mgot done signal\033[0m\n")
 			break outerLoop
 		}
 	}
