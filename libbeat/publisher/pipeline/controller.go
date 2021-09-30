@@ -40,7 +40,6 @@ type outputController struct {
 
 	workQueue chan publisher.Batch
 
-	//retryer  *oldRetryer
 	consumer *eventConsumer
 	out      *outputGroup
 }
