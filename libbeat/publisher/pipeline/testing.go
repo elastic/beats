@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 type mockPublishFn func(publisher.Batch) error
@@ -54,24 +53,6 @@ type mockNetworkClient struct {
 
 func (c *mockNetworkClient) Connect() error { return nil }
 
-type mockQueue struct{}
-
-func (q mockQueue) Close() error                                     { return nil }
-func (q mockQueue) BufferConfig() queue.BufferConfig                 { return queue.BufferConfig{} }
-func (q mockQueue) Producer(cfg queue.ProducerConfig) queue.Producer { return mockProducer{} }
-func (q mockQueue) Consumer() queue.Consumer                         { return mockConsumer{} }
-
-type mockProducer struct{}
-
-func (p mockProducer) Publish(event publisher.Event) bool    { return true }
-func (p mockProducer) TryPublish(event publisher.Event) bool { return true }
-func (p mockProducer) Cancel() int                           { return 0 }
-
-type mockConsumer struct{}
-
-func (c mockConsumer) Get(eventCount int) (queue.Batch, error) { return &ttlBatch{}, nil }
-func (c mockConsumer) Close() error                            { return nil }
-
 type mockBatch struct {
 	mu     sync.Mutex
 	events []publisher.Event
@@ -81,7 +62,6 @@ type mockBatch struct {
 	onDrop      func()
 	onRetry     func()
 	onCancelled func()
-	onReduceTTL func() bool
 }
 
 func (b *mockBatch) Events() []publisher.Event {
@@ -98,13 +78,6 @@ func (b *mockBatch) Cancelled() { signalFn(b.onCancelled) }
 func (b *mockBatch) RetryEvents(events []publisher.Event) {
 	b.updateEvents(events)
 	signalFn(b.onRetry)
-}
-
-func (b *mockBatch) reduceTTL() bool {
-	if b.onReduceTTL != nil {
-		return b.onReduceTTL()
-	}
-	return true
 }
 
 func (b *mockBatch) updateEvents(events []publisher.Event) {
