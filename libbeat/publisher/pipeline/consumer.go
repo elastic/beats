@@ -129,7 +129,6 @@ outerLoop:
 	for {
 		// If possible, start reading the next batch in the background.
 		if queueBatch == nil && !pendingRead {
-			fmt.Printf("event consumer sending reader request...\n")
 			pendingRead = true
 			queueReader.req <- queueReaderRequest{
 				consumer:   consumer,
@@ -137,7 +136,6 @@ outerLoop:
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
 			}
-			fmt.Printf("sent\n")
 		}
 
 		var active *ttlBatch
