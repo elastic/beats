@@ -46,9 +46,7 @@ type netClientWorker struct {
 	worker
 	client outputs.NetworkClient
 
-	batchSize  int
-	batchSizer func() int
-	logger     logger
+	logger logger
 
 	tracer *apm.Tracer
 }
