@@ -17,7 +17,6 @@
 
 // TODO: Support other architectures (e.g. arm)
 // +build linux
-// +build 386 amd64
 
 package main
 
