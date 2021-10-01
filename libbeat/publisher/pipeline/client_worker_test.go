@@ -54,6 +54,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				workQueue := make(chan publisher.Batch)
 				retryer := newStandaloneRetryer(workQueue)
+				defer retryer.close()
 
 				var published atomic.Uint
 				publishFn := func(batch publisher.Batch) error {
@@ -115,6 +116,7 @@ func TestReplaceClientWorker(t *testing.T) {
 
 				workQueue := make(chan publisher.Batch)
 				retryer := newStandaloneRetryer(workQueue)
+				defer retryer.close()
 
 				var batches []publisher.Batch
 				var numEvents int
@@ -216,6 +218,7 @@ func TestMakeClientTracer(t *testing.T) {
 
 	workQueue := make(chan publisher.Batch)
 	retryer := newStandaloneRetryer(workQueue)
+	defer retryer.close()
 
 	var published atomic.Uint
 	publishFn := func(batch publisher.Batch) error {
