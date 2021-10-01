@@ -11,11 +11,10 @@
     },
     "prometheus": {
         "labels": {
-            "device": "br-3a285aa5e58c",
             "job": "prometheus"
         },
-        "node_network_carrier": {
-            "value": 0
+        "up": {
+            "value": 1
         }
     },
     "service": {
