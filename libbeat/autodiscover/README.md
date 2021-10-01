@@ -186,7 +186,6 @@ Everything works the same as Autodiscover without LeaderElection until step 8.
 13. The process after that is same as in `Autodiscover without LeaderElection` step 9 and onward.
 
 
-##  Autodiscover provider in Elastic Agent
 
 ##  Autodiscover provider in Elastic Agent
 
