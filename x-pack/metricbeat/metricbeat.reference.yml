@@ -513,6 +513,15 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
+#--------------------------- Enterprisesearch Module ---------------------------
+- module: enterprisesearch
+  metricsets: ["health", "stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  username: elastic
+  password: changeme
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
