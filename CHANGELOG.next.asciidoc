@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
+- Remove deprecated config option aws_partition. {pull}28120[28120]
 
 *Auditbeat*
 
@@ -110,6 +111,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
+- Remove deprecated config option default_region from aws module. {pull}28120[28120]
 
 *Packetbeat*
 
