@@ -48,6 +48,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 )
 
 var (
@@ -306,62 +307,90 @@ func (h *FileHarvester) HasState() bool {
 
 //Run: 从最小的Offset读取一行，并发送给所有匹配的reader
 func (h *FileHarvester) Run() {
-	var message reader.Message
-	var err error
-
 	defer func() {
 	L:
 		for {
 			select {
-			case  _ = <-h.forwarder:
+			case  rr := <-h.forwarder:
+				logp.Info("forwarder(%s) cannot join. now exit. file:%s", rr.HarvesterID, h.state.Source)
 				continue
 			default:
 				break L
 			}
 		}
 		h.Close()
-		close(h.done)
+	}()
+
+	newForwarders := make([]*ReuseHarvester, 0)
+	tick := time.NewTicker(10 * time.Second)
+	defer tick.Stop()
+	for {
+		logp.Info("current len of forwarder is %d, file:%s", len(h.forwarders), h.state.Source)
+		select {
+		case <-h.done:
+			return
+		case reuseReader := <-h.forwarder:
+			logp.Info("new forward join. ID(%s), file:%s", reuseReader.HarvesterID, h.state.Source)
+			newForwarders = append(newForwarders, reuseReader)
+		case <-tick.C:
+			if len(newForwarders) > 0 {
+				logp.Info("time is up, reload file:%s", h.state.Source)
+				for _, reuseReader := range newForwarders {
+					h.forwarders[reuseReader.HarvesterID] = reuseReader
+				}
+				newForwarders = make([]*ReuseHarvester, 0)
+
+				offset, err := h.reloadFileOffset()
+				if err != nil {
+					logp.Err("reload file offset err: %v, file:%s", err, h.state.Source)
+					return
+				}
+				h.state.Offset = offset
+				logp.Info("reload file offset to (%d) success. file:%s", offset, h.state.Source)
+
+				// read file
+				go h.loopRead()
+			}
+		}
+	}
+}
+
+// loopRead: loop read file, then forward to receive
+func (h *FileHarvester) loopRead() {
+	defer func() {
+		logp.Info("loop Read quit. because file(%s) is close.", h.state.Source)
 	}()
 
 	for {
-		//Step 1: reload offset
-		var reuseReader *ReuseHarvester
-		isReload := false
-		isBreak := false
-		for !isBreak {
-			select {
-			case reuseReader = <-h.forwarder:
-				isReload = true
-				h.forwarders[reuseReader.HarvesterID] = reuseReader
-			default:
-				isBreak = true
-			}
-		}
-		if isReload {
-			offset, err := h.reloadFileOffset()
+		select {
+		case <-h.done:
+			return
+		default:
+			message, err := h.reader.Next()
 			if err != nil {
-				logp.Err("reload file offset err: %v", err)
+				logp.Info("read message error: %v, file:%s", err, h.state.Source)
+
+				// 文件被关闭异常，不需要转发到外层。 在调用Close()后会引发，属于内部错误
+				if err != os.ErrClosed {
+					h.forward(message, err)
+
+					// 读取文件异常，关闭整个reader
+					close(h.done)
+				}
 				return
 			}
-			h.state.Offset = offset
-		}
 
-		//Step 2: 读取日志
-		message, err = h.reader.Next()
-		if err != nil {
+			// Strip UTF-8 BOM if beginning of file
+			// As all BOMS are converted to UTF-8 it is enough to only remove this one
+			if h.state.Offset == 0 {
+				message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
+			}
+
+			//Step 3: 转发消息，并添加offset
 			h.forward(message, err)
-			return
+			h.state.Offset += int64(message.Bytes)
+			logp.Info("after read, Offset is:%d, file:%s", h.state.Offset, h.state.Source)
 		}
-
-		// Strip UTF-8 BOM if beginning of file
-		// As all BOMS are converted to UTF-8 it is enough to only remove this one
-		if h.state.Offset == 0 {
-			message.Content = bytes.Trim(message.Content, "\xef\xbb\xbf")
-		}
-
-		//Step 3: 转发消息，并添加offset
-		h.forward(message, err)
-		h.state.Offset += int64(message.Bytes)
 	}
 }
 
@@ -429,6 +458,7 @@ func (h *FileHarvester) Setup() error {
 //Close: 关闭FD
 func (h *FileHarvester) Close() {
 	if h.source != nil {
+		logp.Info("file harvester is close, file:%s", h.state.Source)
 		err := h.source.Close()
 		if err != nil {
 			logp.Err("harvester reuse reader close failed. Unexpected error: %s", err)
