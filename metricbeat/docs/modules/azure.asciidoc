@@ -2,11 +2,18 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: azure
+
 [[metricbeat-module-azure]]
 [role="xpack"]
 == Azure module
 
-This is the azure module.
+//override value inherited for modulename
+:modulename: azure_metrics
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 The Azure Monitor feature collects and aggregates logs and metrics from a variety of sources into a common data platform where it can be used for analysis, visualization, and alerting.
 
