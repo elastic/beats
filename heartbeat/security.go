@@ -36,7 +36,7 @@ import (
 func init() {
 	// Here we set a bunch of linux specific security stuff.
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
-	// and add capabilities to make this actually run as a regular user. This also helps node in synthetics, which
+	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
 	// does not want to run as root. It's also just generally more secure.
 	if localUserName := os.Getenv("BEAT_SETUID_AS"); localUserName != "" && syscall.Geteuid() == 0 {
 		err := changeUser(localUserName)
@@ -78,7 +78,7 @@ func changeUser(localUserName string) error {
 	// in the container, but we need to repeat that here.
 	err = syscall.Setgroups([]int{localUserGid, 0})
 	if err != nil {
-		return fmt.Errorf("could not prsetgroups: %w", err)
+		return fmt.Errorf("could not set groups: %w", err)
 	}
 
 	// Set the main group as localUserUid so new files created are owned by the user's group

@@ -37,8 +37,7 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 
 	// We do not use user.Current() which does not reflect setuid changes!
 	if syscall.Geteuid() == 0 {
-		euid := syscall.Geteuid()
-		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root! Current EUID is %d", euid)
+		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root!")
 	}
 
 	s, err := NewSuite(cfg)
