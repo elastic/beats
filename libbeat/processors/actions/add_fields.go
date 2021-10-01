@@ -77,7 +77,9 @@ func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 		fields = fields.Clone()
 	}
 
-	if af.overwrite {
+	if event.Fields == nil {
+		event.Fields = fields
+	} else if af.overwrite {
 		event.Fields.DeepUpdate(fields)
 	} else {
 		event.Fields.DeepUpdateNoOverwrite(fields)
