@@ -67,9 +67,14 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 			// proxy stats for elastic agent process
 			return statsHandler(w, r)
 		}
+		// TODO: allowlist of accepted endpoints to proxy to?
 		beatsEndpoint := vars["beatsEndpoint"]
 
-		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id, beatsEndpoint)
+		endpoint, err := generateEndpoint(id)
+		if err != nil {
+			return err
+		}
+		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), endpoint, beatsEndpoint)
 		if metricsErr != nil {
 			return metricsErr
 		}
@@ -83,22 +88,7 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 	}
 }
 
-func processMetrics(ctx context.Context, id, path string) ([]byte, int, error) {
-	detail, err := parseID(id)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	endpoint := beats.MonitoringEndpoint(detail.spec, artifact.DefaultConfig().OS(), detail.output)
-	if !strings.HasPrefix(endpoint, httpPlusPrefix) && !strings.HasPrefix(endpoint, "http") {
-		// add prefix for npipe and unix
-		endpoint = httpPlusPrefix + endpoint
-	}
-
-	if detail.isMonitoring {
-		endpoint += "_monitor"
-	}
-
+func processMetrics(ctx context.Context, endpoint, path string) ([]byte, int, error) {
 	hostData, err := parse.ParseURL(endpoint, "http", "", "", path, "")
 	if err != nil {
 		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
@@ -144,6 +134,24 @@ func processMetrics(ctx context.Context, id, path string) ([]byte, int, error) {
 	}
 
 	return rb, resp.StatusCode, nil
+}
+
+func generateEndpoint(id string) (string, error) {
+	detail, err := parseID(id)
+	if err != nil {
+		return "", err
+	}
+
+	endpoint := beats.MonitoringEndpoint(detail.spec, artifact.DefaultConfig().OS(), detail.output)
+	if !strings.HasPrefix(endpoint, httpPlusPrefix) && !strings.HasPrefix(endpoint, "http") {
+		// add prefix for npipe and unix
+		endpoint = httpPlusPrefix + endpoint
+	}
+
+	if detail.isMonitoring {
+		endpoint += "_monitor"
+	}
+	return endpoint, nil
 }
 
 func writeResponse(w http.ResponseWriter, c interface{}) {
