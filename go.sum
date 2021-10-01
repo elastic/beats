@@ -301,6 +301,12 @@ github.com/evanphx/json-patch v4.9.0+incompatible h1:kLcOMZeuLAJvL2BPWLMIj5oaZQo
 github.com/evanphx/json-patch v4.9.0+incompatible/go.mod h1:50XU6AFN0ol/bzJsmQLiYLvXMP4fmwYFNcr97nuDLSk=
 github.com/fatih/color v1.9.0 h1:8xPHl4/q1VyqGIPif1F+1V3Y3lSmrq01EabUW3CoW5s=
 github.com/fatih/color v1.9.0/go.mod h1:eQcE1qtQxscV5RaZvpXrrb8Drkc3/DdQ+uUYCNjL+zU=
+github.com/fearful-symmetry/gomsr v0.0.1 h1:m208RzdTApWVbv8a9kf78rdPLQe+BY9AxRb/nSbHxSA=
+github.com/fearful-symmetry/gomsr v0.0.1/go.mod h1:Qb/0Y7zwobP7v8Sji+M5mlL4N7Voyz5WaKXXRFPnLio=
+github.com/fearful-symmetry/gorapl v0.0.2 h1:w0yVeVF32tr04PCzjdjZNlFjWbnFX5HHPDOVgq/Twx4=
+github.com/fearful-symmetry/gorapl v0.0.2/go.mod h1:ms2Sy+VZ3eNm6EJQCLLyfzBpy1DP1maizjJiCQvZNnk=
+github.com/fearful-symmetry/gorapl v0.0.3 h1:TQ2BtpgfAWZsAoQYKqdfPl7aymPUFl9tR0+5OYx1LBI=
+github.com/fearful-symmetry/gorapl v0.0.3/go.mod h1:XoeZ+5v0tJX9WMvzqdPaaKAdX7y17mDN3pxDGemINR0=
 github.com/fortytw2/leaktest v1.3.0 h1:u8491cBMTQ8ft8aeV+adlcytMZylmA5nnwwkRZjI8vw=
 github.com/fortytw2/leaktest v1.3.0/go.mod h1:jDsjWgpAGjm2CA7WthBh/CdZYEPF31XHquHwclZch5g=
 github.com/frankban/quicktest v1.11.3 h1:8sXhOn0uLys67V8EsXLc6eszDs8VXWxL3iRvebPhedY=

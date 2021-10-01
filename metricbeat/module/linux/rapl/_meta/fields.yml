@@ -1,0 +1,10 @@
+- name: rapl
+  type: group
+  release: beta
+  description: >
+    rapl
+  fields:
+    - name: example
+      type: keyword
+      description: >
+        Example field
