@@ -408,7 +408,7 @@ func getTestingElasticsearch(t eslegtest.TestLogger) *eslegclient.Connection {
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:       eslegtest.GetURL(),
 		Transport: httpcommon.DefaultHTTPTransportSettings(),
-		Username:  eslegtest.GetUser(),
+		Username:  eslegtest.GetXPackUser(),
 		Password:  eslegtest.GetPass(),
 	})
 	if err != nil {

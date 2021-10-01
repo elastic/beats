@@ -102,8 +102,8 @@ func esConnect(t *testing.T, index string) *esConnection {
 		Timestamp: ts,
 	})
 
-	username := os.Getenv("ES_USER")
-	password := os.Getenv("ES_PASS")
+	username := os.Getenv("ES_XPACK_USER", "elastic")
+	password := os.Getenv("ES_XPACK_PASS", "changeme")
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = 60 * time.Second
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{

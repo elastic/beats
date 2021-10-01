@@ -687,7 +687,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
             port=os.getenv("ES_PORT_SSL", "9205"),
         )
 
-    def get_elasticsearch_instance(self, xpack_security=True, ssl=False, url=None):
+    def get_elasticsearch_instance(self, security=True, ssl=False, url=None, user=None):
         """
         Returns an elasticsearch.Elasticsearch instance built from the
         env variables like the integration tests.
@@ -698,9 +698,9 @@ class TestCase(unittest.TestCase, ComposeMixin):
             else:
                 url = self.get_elasticsearch_url()
 
-        if xpack_security:
-            username = os.getenv("ES_XPACK_USER", "elastic")
-            password = os.getenv("ES_XPACK_PASS", "changeme")
+        if security:
+            username = os.getenv("ES_USER", user)
+            password = os.getenv("ES_PASS")
             es_instance = Elasticsearch([url], http_auth=(username, password))
         else:
             es_instance = Elasticsearch([url])

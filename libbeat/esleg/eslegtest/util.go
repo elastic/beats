@@ -84,16 +84,6 @@ func GetPass() string {
 	return getEnv("ES_PASS", "")
 }
 
-// GetXPackUser returns the admin user for Elasticsearch
-func GetXPackUser() string {
-	return getEnv("ES_XPACK_USER", "elastic")
-}
-
-// GetXpackPass returns the admin pass for Elasticsearch
-func GetXPackPass() string {
-	return getEnv("ES_XPACK_PASS", "changeme")
-}
-
 func getEnv(name, def string) string {
 	if v := os.Getenv(name); len(v) > 0 {
 		return v

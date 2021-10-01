@@ -7,6 +7,17 @@ from beat import common_tests
 
 class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMixin):
 
+    def setUp(self):
+        super(Test, self).setUp()
+        self.render_config_template(
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
+        )
+        self.es = self.get_elasticsearch_instance(url=self.get_elasticsearch_url(), user='filebeat_user')
+
     def test_base(self):
         """
         Test if the basic fields exist.
@@ -40,21 +51,16 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='filebeat-*', h='name')) > 0
+        assert len(self.es.cat.templates(name='filebeat-*', h='name')) > 0
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_template_migration(self):
         """
         Test that the template can be loaded with `setup --template`
         """
-        es_url = self.get_elasticsearch_url()
-        es = self.get_elasticsearch_instance(url=es_url)
-        self.render_config_template(
-            elasticsearch={"host": es_url},
-        )
         exit_code = self.run_beat(extra_args=["setup", "--template",
                                               "-E", "setup.template.overwrite=true", "-E", "migration.6_to_7.enabled=true"])
 
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
-        assert len(es.cat.templates(name='filebeat-*', h='name')) > 0
+        assert len(self.es.cat.templates(name='filebeat-*', h='name')) > 0

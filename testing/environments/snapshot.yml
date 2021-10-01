@@ -5,12 +5,11 @@ services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.0.0-2f347a19-SNAPSHOT
     healthcheck:
-      test: ["CMD-SHELL", "curl -u elastic:changeme -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
     environment:
     - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
-    - "ELASTIC_PASSWORD=changeme"
     - "network.host="
     - "transport.host=127.0.0.1"
     - "http.host=0.0.0.0"
@@ -28,6 +27,9 @@ services:
     - "./GeoLite2-ASN.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-ASN.mmdb:ro"
     - "./GeoLite2-City.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-City.mmdb:ro"
     - "./GeoLite2-Country.mmdb:/usr/share/elasticsearch/config/ingest-geoip/GeoLite2-Country.mmdb:ro"
+    - "./docker/elasticsearch/roles.yml:/usr/share/elasticsearch/config/roles.yml"
+    - "./docker/elasticsearch/users:/usr/share/elasticsearch/config/users"
+    - "./docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
 
   logstash:
     image: docker.elastic.co/logstash/logstash@sha256:e01cf165142edf8d67485115b938c94deeda66153e9516aa2ce69ee417c5fc33
@@ -44,10 +46,10 @@ services:
     healthcheck:
       test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
-      interval: 1s
+      interval: 10s
     environment:
-    - "ELASTICSEARCH_USERNAME=elastic"
-    - "ELASTICSEARCH_PASSWORD=changeme"
+    - "ELASTICSEARCH_USERNAME=kibana_system_user"
+    - "ELASTICSEARCH_PASSWORD=testing"
     - "XPACK_SECURITY_ENCRYPTIONKEY=wZSVeczkXAmebqNgfcKEzNMmQCBZKkSH"
     - "XPACK_XPACK_MAIN_TELEMETRY_ENABLED=false"
     - "XPACK_REPORTING_ENCRYPTIONKEY=xCyqJUFqrUJJKxjZVGfnhrRkyqqaKeAG"

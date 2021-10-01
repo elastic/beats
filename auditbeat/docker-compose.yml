@@ -8,7 +8,7 @@ services:
     environment:
       - ES_HOST=elasticsearch
       - ES_PORT=9200
-      - ES_USER=beats
+      - ES_USER=auditbeat_user
       - ES_PASS=testing
       - KIBANA_HOST=kibana
       - KIBANA_PORT=5601

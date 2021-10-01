@@ -19,7 +19,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -55,7 +60,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -114,6 +124,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -162,7 +177,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -214,6 +234,11 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             clean_removed="false",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -274,6 +299,11 @@ class Test(BaseTest):
             close_removed="true",
             scan_frequency="0.1s",
             clean_removed="false",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -339,7 +369,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -373,7 +408,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -419,7 +459,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -457,7 +502,12 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            tail_files="true"
+            tail_files="true",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -501,7 +551,12 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            encoding="utf-8"
+            encoding="utf-8",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -613,7 +668,12 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            include_lines=["^ERR", "^WARN"]
+            include_lines=["^ERR", "^WARN"],
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -650,7 +710,12 @@ class Test(BaseTest):
         """
 
         self.render_config_template(
-            path=os.path.abspath(self.working_dir) + "/log/*"
+            path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -688,7 +753,12 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
-            exclude_lines=["^DBG"]
+            exclude_lines=["^DBG"],
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -727,7 +797,12 @@ class Test(BaseTest):
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
             exclude_lines=["^DBG"],
-            include_lines=["apache"]
+            include_lines=["apache"],
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 
@@ -768,6 +843,11 @@ class Test(BaseTest):
 
         self.render_config_template(
             path=os.path.abspath(self.working_dir) + "/log/*",
+            elasticsearch={
+                "host": self.get_elasticsearch_url(),
+                "user": "filebeat_user",
+                "pass": os.getenv('ES_PASS')
+            },
         )
         os.mkdir(self.working_dir + "/log/")
 

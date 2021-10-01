@@ -1,0 +1,8 @@
+admin:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+beats:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+filebeat_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+heartbeat_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+kibana_system_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+metricbeat_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+auditbeat_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2
+journalbeat_user:$2a$10$3y5UdMFkcUWtBfDhAJtYieGwZobnb6GNxCBlTt4ymMkEgImZk.vl2

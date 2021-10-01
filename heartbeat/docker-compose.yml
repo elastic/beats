@@ -8,6 +8,8 @@ services:
     - REDIS_HOST=redis
     - REDIS_PORT=6379
     - ES_HOST=elasticsearch
+    - ES_USER=heartbeat_user
+    - ES_PASS=testing
     - ES_PORT=9200
     working_dir: /go/src/github.com/elastic/beats/heartbeat
     volumes:
