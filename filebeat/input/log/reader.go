@@ -231,8 +231,11 @@ func (m *FileReaderManager) cleanup() {
 type FileHarvester struct {
 	config  config
 	state   file.State
-	done    chan struct{}
+
 	runOnce sync.Once
+
+	done      chan struct{}
+	closeOnce sync.Once
 
 	// file reader pipeline
 	source          harvester.Source // the source being watched
@@ -318,11 +321,12 @@ func (h *FileHarvester) Run() {
 				break L
 			}
 		}
+		h.closeFile()
 		h.Close()
 	}()
 
 	newForwarders := make([]*ReuseHarvester, 0)
-	tick := time.NewTicker(10 * time.Second)
+	tick := time.NewTicker(3 * time.Second)
 	defer tick.Stop()
 	for {
 		logp.Info("current len of forwarder is %d, file:%s", len(h.forwarders), h.state.Source)
@@ -375,7 +379,7 @@ func (h *FileHarvester) loopRead() {
 					h.forward(message, err)
 
 					// 读取文件异常，关闭整个reader
-					close(h.done)
+					h.Close()
 				}
 				return
 			}
@@ -439,6 +443,12 @@ func (h *FileHarvester) open() error {
 	}
 }
 
+func (h *FileHarvester) Close() {
+	h.closeOnce.Do(func() {
+		close(h.done)
+	})
+}
+
 //Setup: 打开文件FD，首次执行会直接转到第一个state.offset
 func (h *FileHarvester) Setup() error {
 	err := h.open()
@@ -448,7 +458,7 @@ func (h *FileHarvester) Setup() error {
 
 	h.reader, err = h.newLogFileReader()
 	if err != nil {
-		h.Close()
+		h.closeFile()
 		return fmt.Errorf("harvester setup failed. Unexpected encoding line reader error: %s", err)
 	}
 
@@ -456,7 +466,7 @@ func (h *FileHarvester) Setup() error {
 }
 
 //Close: 关闭FD
-func (h *FileHarvester) Close() {
+func (h *FileHarvester) closeFile() {
 	if h.source != nil {
 		logp.Info("file harvester is close, file:%s", h.state.Source)
 		err := h.source.Close()
@@ -553,7 +563,7 @@ func (h *FileHarvester) reloadFileOffset() (int64, error) {
 	}
 
 	//重新打开文件
-	h.Close()
+	h.closeFile()
 	h.state.Offset = minOffset
 	return minOffset, h.Setup()
 }
