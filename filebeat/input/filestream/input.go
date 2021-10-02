@@ -341,13 +341,13 @@ func (inp *filestream) readFromSource(
 func (inp *filestream) isDroppedLine(log *logp.Logger, line []byte) bool {
 	if len(inp.readerConfig.IncludeLines) > 0 {
 		if !matchAny(inp.readerConfig.IncludeLines, line) {
-			log.Debug("Drop line as it does not match any of the include patterns %s", line)
+			log.Debug("Drop line as it does not match any of the include patterns %s", string(line))
 			return true
 		}
 	}
 	if len(inp.readerConfig.ExcludeLines) > 0 {
 		if matchAny(inp.readerConfig.ExcludeLines, line) {
-			log.Debug("Drop line as it does match one of the exclude patterns%s", line)
+			log.Debug("Drop line as it does match one of the exclude patterns%s", string(line))
 			return true
 		}
 	}
