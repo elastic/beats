@@ -375,12 +375,15 @@ func (h *FileHarvester) loopRead() {
 				logp.Info("read message error: %v, file:%s", err, h.state.Source)
 
 				// 文件被关闭异常，不需要转发到外层。 在调用Close()后会引发，属于内部错误
-				if err != os.ErrClosed {
-					h.forward(message, err)
-
-					// 读取文件异常，关闭整个reader
-					h.Close()
+				if pathErr, ok := err.(*os.PathError); ok {
+					if pathErr.Err == os.ErrClosed {
+						return
+					}
 				}
+
+				h.forward(message, err)
+				// 读取文件异常，关闭整个reader
+				h.Close()
 				return
 			}
 
