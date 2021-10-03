@@ -319,20 +319,11 @@ processors:
       if: ctx?.threatintel?.indicator?.type != 'unknown'
   - remove:
       field:
-        - threatintel.misp.object.template_version
-        - threatintel.misp.object.template_uuid
-        - threatintel.misp.object.description
-        - threatintel.misp.object.distribution
-        - threatintel.misp.object.uuid
-        - threatintel.misp.object.deleted
-        - threatintel.misp.object.event_id
-        - threatintel.misp.object.sharing_group_id
-        - threatintel.misp.object.ObjectReference
-        - threatintel.misp.object.name
-        - threatintel.misp.object.meta-category
-        - threatintel.misp.object.comment
-        - threatintel.misp.object.id
-        - threatintel.misp.object.timestamp
+        # This removes a number of fields that may be wanted in the future when
+        # threatintel.misp.attribute and threatintel.misp.object.attribute can
+        # be separated. At the root of .object are fields that mirror fields at
+        # the root of threatintel.misp.
+        - threatintel.misp.object
       ignore_missing: true
   - remove:
       field:
