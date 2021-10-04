@@ -15,18 +15,4 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !aix
-
-package autodiscover
-
-import (
-	"time"
-
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/docker"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-)
-
-func init() {
-	docker.DefaultCleanupTimeout = 60 * time.Second
-	kubernetes.DefaultCleanupTimeout = 60 * time.Second
-}
+package kubernetes
