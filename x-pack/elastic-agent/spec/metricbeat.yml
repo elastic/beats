@@ -5,14 +5,11 @@ args: [
   "-E", "setup.template.enabled=false",
   "-E", "management.enabled=true",
   "-E", "logging.level=debug",
-  "-E", "gc_percent=${METRICBEAT_GOGC:100}"
+  "-E", "gc_percent=${METRICBEAT_GOGC:100}",
+  "-E", "metricbeat.config.modules.enabled=false"
 ]
 artifact: beats/metricbeat
 restart_on_output_change: true
-post_install:
-  - move_file:
-      path: "modules.d/system.yml"
-      target: "modules.d/system.yml.disabled"
 rules:
 - fix_stream: {}
 - inject_index:

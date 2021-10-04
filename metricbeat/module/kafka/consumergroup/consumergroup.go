@@ -94,19 +94,21 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		// Helpful IDs to avoid scripts on queries
 		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
 
-		// TODO (deprecation): Remove fields from MetricSetFields moved to ModuleFields
-		event["broker"] = brokerInfo
-		r.Event(mb.Event{
-			ModuleFields: common.MapStr{
-				"broker": brokerInfo,
-				"topic": common.MapStr{
-					"name": event["topic"],
-				},
-				"partition": common.MapStr{
-					"id":       event["partition"],
-					"topic_id": partitionTopicID,
-				},
+		moduleFields := common.MapStr{
+			"broker": brokerInfo,
+			"topic": common.MapStr{
+				"name": event["topic"],
 			},
+			"partition": common.MapStr{
+				"id":       event["partition"],
+				"topic_id": partitionTopicID,
+			},
+		}
+		delete(event, "topic")
+		delete(event, "partition")
+
+		r.Event(mb.Event{
+			ModuleFields:    moduleFields,
 			MetricSetFields: event,
 		})
 	}

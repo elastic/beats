@@ -212,10 +212,10 @@
               example: 1
               description: >
                 The ID of the user which runs the process.
-            - name: capabilites
+            - name: capabilities
               required: false
               description: >
-                The effective capabilites of the process.
+                The effective capabilities of the process.
     - name: systemd
       type: group
       description: >
