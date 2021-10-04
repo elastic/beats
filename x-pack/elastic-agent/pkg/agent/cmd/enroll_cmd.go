@@ -189,7 +189,7 @@ func (c *enrollCmd) Execute(ctx context.Context, streams *cli.IOStreams) error {
 	// Connection setup should disable proxies in that case.
 	localFleetServer := c.options.FleetServer.ConnStr != ""
 	if localFleetServer && !c.options.DelayEnroll {
-		token, err := c.fleetServerBootstrap(ctx)
+		token, err := c.fleetServerBootstrap(ctx, persistentConfig)
 		if err != nil {
 			return err
 		}
@@ -276,7 +276,7 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 	return nil
 }
 
-func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
+func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig map[string]interface{}) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
 	_, err := getDaemonStatus(ctx)
@@ -297,6 +297,11 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		return "", err
 	}
 
+	agentConfig, err := c.createAgentConfig("", persistentConfig, c.options.FleetServer.Headers)
+	if err != nil {
+		return "", err
+	}
+
 	fleetConfig, err := createFleetServerBootstrapConfig(
 		c.options.FleetServer.ConnStr, c.options.FleetServer.ServiceToken,
 		c.options.FleetServer.PolicyID,
@@ -312,6 +317,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 	}
 
 	configToStore := map[string]interface{}{
+		"agent": agentConfig,
 		"fleet": fleetConfig,
 	}
 	reader, err := yamlToReader(configToStore)
