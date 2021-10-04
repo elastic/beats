@@ -1,3 +1,20 @@
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
+
 package rapl
 
 import (
@@ -11,13 +28,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fearful-symmetry/gorapl/rapl"
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/fearful-symmetry/gorapl/rapl"
-	"github.com/pkg/errors"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -98,29 +116,46 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	}
 
-	// Get initial time values
-
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		handlers:      handlers,
-	}, nil
+	}
+
+	ms.updatePower()
+
+	// Get initial time values
+
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
-	report.Event(mb.Event{
-		MetricSetFields: common.MapStr{},
-	})
+
+	watts := m.updatePower()
+
+	for cpu, metric := range watts {
+		evt := common.MapStr{
+			"cpu": cpu,
+		}
+		for domain, wattage := range metric {
+			evt[domain.Name] = common.Round(wattage, common.DefaultDecimalPlacesCount)
+		}
+		report.Event(mb.Event{
+			MetricSetFields: evt,
+		})
+	}
 
 	return nil
 }
 
 func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
-	newEnergy := map[int]map[rapl.RAPLDomain]float64{}
+	newEnergy := make(map[int]map[rapl.RAPLDomain]energyTrack)
+	watts := make(map[int]map[rapl.RAPLDomain]float64)
 	for cpu, handler := range m.handlers {
-		domainList := map[rapl.RAPLDomain]float64{}
+		watts[cpu] = make(map[rapl.RAPLDomain]float64)
+		domainList := map[rapl.RAPLDomain]energyTrack{}
 		for _, domain := range handler.GetDomains() {
 			joules, err := handler.ReadEnergyStatus(domain)
 			// This is a bit hard to check for, as many of the registers are model-specific
@@ -132,12 +167,22 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
 				logp.L().Infof("Error reading MSR from domain %s: %s skipping.", domain, err)
 				continue
 			}
-			domainList[domain] = joules
+			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
+			if m.lastValues != nil {
+				delta := m.lastValues[cpu][domain].joules - joules
+				timeDelta := m.lastValues[cpu][domain].time.Sub(domainList[domain].time)
+				watts[cpu][domain] = delta / timeDelta.Seconds()
+			}
 		}
 		newEnergy[cpu] = domainList
 	}
 
-	return newEnergy
+	if m.lastValues == nil {
+		m.lastValues = newEnergy
+		return nil
+	}
+
+	return watts
 }
 
 // getMSRCPUs forms a list of MSR paths to query

@@ -77,7 +77,7 @@ require (
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.1
 	github.com/fatih/color v1.9.0
-	github.com/fearful-symmetry/gorapl v0.0.3 // indirect
+	github.com/fearful-symmetry/gorapl v0.0.4 // indirect
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
