@@ -106,7 +106,7 @@ runLoop:
 		openErr := api.Open(evtCheckpoint)
 		if eventlog.IsRecoverable(openErr) {
 			log.Errorf("Encountered recoverable error when opening Windows Event Log: %v", openErr)
-			timed.Wait(cancelCtx, 5 * time.Second)
+			timed.Wait(cancelCtx, 5*time.Second)
 			continue
 		} else if openErr != nil {
 			return fmt.Errorf("failed to open windows event log: %v", openErr)
