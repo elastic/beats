@@ -17,7 +17,7 @@ var:
   - name: session_token
   - name: role_arn
   - name: tags
-    default: [forwarded]
+    default: [forwarded, preserve_original_event]
   - name: fips_enabled
   - name: proxy_url
   - name: max_number_of_messages
