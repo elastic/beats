@@ -11,8 +11,6 @@
 <titleabbrev>AWS CloudWatch</titleabbrev>
 ++++
 
-beta[]
-
 `aws-cloudwatch` input can be used to retrieve all logs from all log streams in a
 specific log group. `filterLogEvents` AWS API is used to list log events from
 the specified log group. Amazon CloudWatch Logs can be used to store log files
