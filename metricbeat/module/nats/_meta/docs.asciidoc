@@ -1,4 +1,8 @@
-This is the Nats module. The Nats module uses https://nats.io/documentation/managing_the_server/monitoring/[Nats monitoring server APIs] to collect metrics.
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
+The Nats module uses https://nats.io/documentation/managing_the_server/monitoring/[Nats monitoring server APIs] to collect metrics.
 
 The default metricsets are `stats`, `connections`, `routes` and `subscriptions` while `connection` and `route`
 metricsets can be enabled to collect detailed metrics per connection/route.

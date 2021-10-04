@@ -20,6 +20,8 @@ require (
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.4.2
 	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
+	github.com/PaesslerAG/gval v1.0.0
+	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/Shopify/sarama v1.27.0
 	github.com/StackExchange/wmi v0.0.0-20170221213301-9f32b5905fd6
 	github.com/aerospike/aerospike-client-go v1.27.1-0.20170612174108-0f3b54da6bdc
@@ -59,7 +61,7 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/ecs v1.11.0
+	github.com/elastic/ecs v1.12.0
 	github.com/elastic/elastic-agent-client/v7 v7.0.0-20210727140539-f0905d9377f6
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.2.0
