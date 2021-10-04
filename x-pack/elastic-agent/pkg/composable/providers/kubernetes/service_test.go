@@ -61,8 +61,11 @@ func TestGenerateServiceData(t *testing.T) {
 			"name": service.GetName(),
 			"ip":   service.Spec.ClusterIP,
 		},
-		"namespace_annotations": common.MapStr{
-			"nsa": "nsb",
+		"namespace": common.MapStr{
+			"annotations": common.MapStr{
+				"nsa": "nsb",
+			},
+			"name": "testns",
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",
@@ -82,6 +85,9 @@ func TestGenerateServiceData(t *testing.T) {
 				"uid":  string(service.GetUID()),
 				"name": service.GetName(),
 				"ip":   "1.2.3.4",
+			},
+			"namespace": common.MapStr{
+				"name": "testns",
 			},
 			"labels": common.MapStr{
 				"foo": "bar",
@@ -147,6 +153,9 @@ func (s *svcMeta) GenerateK8s(obj kubernetes.Resource, opts ...metadata.FieldOpt
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",
+		},
+		"namespace": common.MapStr{
+			"name": k8sNode.GetNamespace(),
 		},
 	}
 }

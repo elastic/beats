@@ -169,8 +169,7 @@ func generateServiceData(
 	k8sMapping := map[string]interface{}(kubemetaMap.(common.MapStr).Clone())
 
 	if len(namespaceAnnotations) != 0 {
-		// TODO: convert it to namespace.annotations for 8.0
-		k8sMapping["namespace_annotations"] = namespaceAnnotations
+		k8sMapping["namespace"].(common.MapStr).Put("annotations", namespaceAnnotations)
 	}
 
 	// Pass annotations to all events so that it can be used in templating and by annotation builders.
