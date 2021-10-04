@@ -13,6 +13,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go/service/kinesis"
+	"github.com/awslabs/kinesis-aggregation/go/deaggregator"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -83,34 +85,48 @@ func APIGatewayProxyRequest(request events.APIGatewayProxyRequest) beat.Event {
 
 // KinesisEvent takes a kinesis event and create multiples beat events.
 // DOCS: https://docs.aws.amazon.com/lambda/latest/dg/with-kinesis.html
-func KinesisEvent(request events.KinesisEvent) []beat.Event {
-	events := make([]beat.Event, len(request.Records))
-	for idx, record := range request.Records {
-		events[idx] = beat.Event{
-			Timestamp: time.Now(),
-			Fields: common.MapStr{
-				"event": common.MapStr{
-					"kind": "event",
+func KinesisEvent(request events.KinesisEvent) ([]beat.Event, error) {
+	var events []beat.Event
+	for _, record := range request.Records {
+		kr := &kinesis.Record{
+			ApproximateArrivalTimestamp: &record.Kinesis.ApproximateArrivalTimestamp.Time,
+			Data:                        record.Kinesis.Data,
+			EncryptionType:              &record.Kinesis.EncryptionType,
+			PartitionKey:                &record.Kinesis.PartitionKey,
+			SequenceNumber:              &record.Kinesis.SequenceNumber,
+		}
+		deaggRecords, err := deaggregator.DeaggregateRecords([]*kinesis.Record{kr})
+		if err != nil {
+			return nil, err
+		}
+
+		for _, deaggRecord := range deaggRecords {
+			events = append(events, beat.Event{
+				Timestamp: time.Now(),
+				Fields: common.MapStr{
+					"event": common.MapStr{
+						"kind": "event",
+					},
+					"cloud": common.MapStr{
+						"provider": "aws",
+						"region":   record.AwsRegion,
+					},
+					"event_id":                record.EventID,
+					"event_name":              record.EventName,
+					"event_source":            record.EventSource,
+					"event_source_arn":        record.EventSourceArn,
+					"event_version":           record.EventVersion,
+					"aws_region":              record.AwsRegion,
+					"message":                 string(deaggRecord.Data),
+					"kinesis_partition_key":   *deaggRecord.PartitionKey,
+					"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
+					"kinesis_sequence_number": *deaggRecord.SequenceNumber,
+					"kinesis_encryption_type": *deaggRecord.EncryptionType,
 				},
-				"cloud": common.MapStr{
-					"provider": "aws",
-					"region":   record.AwsRegion,
-				},
-				"event_id":                record.EventID,
-				"event_name":              record.EventName,
-				"event_source":            record.EventSource,
-				"event_source_arn":        record.EventSourceArn,
-				"event_version":           record.EventVersion,
-				"aws_region":              record.AwsRegion,
-				"message":                 string(record.Kinesis.Data),
-				"kinesis_partition_key":   record.Kinesis.PartitionKey,
-				"kinesis_schema_version":  record.Kinesis.KinesisSchemaVersion,
-				"kinesis_sequence_number": record.Kinesis.SequenceNumber,
-				"kinesis_encryption_type": record.Kinesis.EncryptionType,
-			},
+			})
 		}
 	}
-	return events
+	return events, nil
 }
 
 // CloudwatchKinesisEvent takes a Kinesis event containing Cloudwatch logs and creates events for all
