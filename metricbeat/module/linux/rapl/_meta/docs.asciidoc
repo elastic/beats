@@ -9,7 +9,9 @@ If that command returns a hex value such as `a1003`, RAPL is supported.
 
 RAPL divides a CPU into four domains, each one corresponding to a component within the hardware itself: `Package`, `DRAM`, `PP0` (usually the collective power usage of the cores), and `PP1` (usually the integrated GPU). Not all packages are available on all CPUs, and the RAPL metricset will report all RAPL domains that it finds.
 
-## msr-safe usage
+
+[float]
+=== msr-safe usage
 
 
 This metricset also supports https://github.com/LLNL/msr-safe[msr-safe], which allows a user to access an msr device without root permissions. The `rapl.use_msr_safe` flag in the linux module config will enable usage of the `/dev/cpu/[CPU]/msr_safe` device.
