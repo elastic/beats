@@ -37,10 +37,10 @@ func TestProcessProxyRequest(t *testing.T) {
 	server.Start()
 	defer server.Close()
 
-	for _, path := range []string{"/stats", "/", "/state"} {
+	for _, path := range []string{"stats", "", "state"} {
 		respBytes, _, err := processMetrics(context.Background(), endpoint, path)
 		require.NoError(t, err)
 		// Verify that the server saw the path we tried to request
-		assert.Equal(t, path, string(respBytes))
+		assert.Equal(t, "/"+path, string(respBytes))
 	}
 }
