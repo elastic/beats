@@ -28,7 +28,7 @@ type MonitorService struct {
 
 const (
 	metricNameLimit = 20
-	ApiVersion      = "2019-10-01"
+	ApiVersion      = "2019-12-01"
 )
 
 // NewService instantiates the Azure monitoring service
