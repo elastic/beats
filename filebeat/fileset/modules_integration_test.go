@@ -105,7 +105,13 @@ func TestSetupNginx(t *testing.T) {
 	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		{Module: "nginx"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"error":  {},
+				"access": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, makeTestInfo("5.2.0"))

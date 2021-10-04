@@ -160,7 +160,7 @@ func extractOrCopy(osarch distro.OSArch, spec distro.Spec) error {
 		}
 		defer os.RemoveAll(tmpdir)
 
-		osdp := distro.OsquerydDistroPath()
+		osdp := distro.OsquerydLinuxDistroPath()
 		if err := tar.ExtractFile(src, tmpdir, osdp); err != nil {
 			return err
 		}

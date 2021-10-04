@@ -36,7 +36,7 @@ pipeline {
     rateLimitBuilds(throttle: [count: 60, durationName: 'hour', userBoost: true])
   }
   triggers {
-    issueCommentTrigger('(?i)(.*(?:jenkins\\W+)?run\\W+(?:the\\W+)?tests(?:\\W+please)?.*|^/test(?:\\W+.*)?$)')
+    issueCommentTrigger("${obltGitHubComments()}")
   }
   parameters {
     booleanParam(name: 'allCloudTests', defaultValue: false, description: 'Run all cloud integration tests.')
@@ -806,7 +806,10 @@ def archiveTestOutput(Map args = [:]) {
         }
         def fileName = 'build/system-tests-*.tar.gz' // see dev-tools/mage/target/common/package.go#PackageSystemTests method
         dir("${BASE_DIR}"){
-          cmd(label: "List files to upload", script: "ls -l ${BASE_DIR}/${fileName}")
+          def files = findFiles(glob: "${fileName}")
+          files.each { file ->
+            echo "${file.name}"
+          }
           googleStorageUploadExt(
             bucket: "gs://${JOB_GCS_BUCKET}/${env.JOB_NAME}-${env.BUILD_ID}",
             credentialsId: "${JOB_GCS_EXT_CREDENTIALS}",
