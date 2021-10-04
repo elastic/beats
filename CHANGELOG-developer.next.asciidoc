@@ -121,3 +121,4 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
 -- The `enable_idempotent` config is a boolean setting to enable or disable the output support Idempotent. {pull}28095[28095]
+- Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
