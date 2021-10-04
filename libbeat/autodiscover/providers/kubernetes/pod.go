@@ -372,7 +372,6 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 
 	// Information that can be used in discovering a workload
 	kubemetaMap, _ := meta.GetValue("kubernetes")
-
 	kubemeta, _ := kubemetaMap.(common.MapStr)
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
