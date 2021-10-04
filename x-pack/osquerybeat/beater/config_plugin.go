@@ -6,7 +6,6 @@ package beater
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -18,9 +17,9 @@ import (
 )
 
 const (
-	configName           = "osq_config"
-	scheduleSplayPercent = 10
-	maxECSMappingDepth   = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
+	configName                  = "osq_config"
+	defaultScheduleSplayPercent = 10
+	maxECSMappingDepth          = 25 // Max ECS dot delimited key path, that is sufficient for the current ECS mapping
 
 	keyField = "field"
 	keyValue = "value"
@@ -32,8 +31,8 @@ var (
 )
 
 type QueryInfo struct {
-	QueryConfig query
-	ECSMapping  ecs.Mapping
+	Query      string
+	ECSMapping ecs.Mapping
 }
 
 type queryInfoMap map[string]QueryInfo
@@ -61,11 +60,15 @@ type ConfigPlugin struct {
 	// we could be sending data into the datastream with namespace that we don't have permissions meanwhile
 	namespaces map[string]string
 
-	// Packs
-	packs map[string]pack
+	// Osquery configuration
+	osqueryConfig *config.OsqueryConfig
 
 	// Raw config bytes cached
 	configString string
+
+	// One common namespace from the first input as of 7.16
+	// This is used to ad-hoc queries results over GetNamespace API
+	namespace string
 }
 
 func NewConfigPlugin(log *logp.Logger) *ConfigPlugin {
@@ -85,6 +88,9 @@ func (p *ConfigPlugin) Set(inputs []config.InputConfig) error {
 }
 
 func (p *ConfigPlugin) Count() int {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+
 	return p.queriesCount
 }
 
@@ -100,6 +106,12 @@ func (p *ConfigPlugin) LookupNamespace(name string) (ns string, ok bool) {
 	defer p.mx.RUnlock()
 	ns, ok = p.namespaces[name]
 	return ns, ok
+}
+
+func (p *ConfigPlugin) GetNamespace() string {
+	p.mx.RLock()
+	defer p.mx.RUnlock()
+	return p.namespace
 }
 
 func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, error) {
@@ -119,47 +131,30 @@ func (p *ConfigPlugin) GenerateConfig(ctx context.Context) (map[string]string, e
 		p.newQueryInfoMap = nil
 	}
 
+	p.log.Debug("Osqueryd configuration:", c)
+
 	return map[string]string{
 		configName: c,
 	}, nil
 }
 
-type query struct {
-	Query    string `json:"query"`
-	Interval int    `json:"interval,omitempty"`
-	Platform string `json:"platform,omitempty"`
-	Version  string `json:"version,omitempty"`
-	Snapshot bool   `json:"snapshot,omitempty"`
-}
-
-type pack struct {
-	Discovery []string         `json:"discovery,omitempty"`
-	Platform  string           `json:"platform,omitempty"`
-	Version   string           `json:"version,omitempty"`
-	Queries   map[string]query `json:"queries,omitempty"`
-}
-
-type osqueryConfig struct {
-	Options map[string]interface{} `json:"options"`
-	Packs   map[string]pack        `json:"packs,omitempty"`
-}
-
-func newOsqueryConfig(packs map[string]pack) osqueryConfig {
-	return osqueryConfig{
-		Options: map[string]interface{}{
-			"schedule_splay_percent": scheduleSplayPercent,
-		},
-		Packs: packs,
+func newOsqueryConfig(osqueryConfig *config.OsqueryConfig) *config.OsqueryConfig {
+	if osqueryConfig == nil {
+		osqueryConfig = &config.OsqueryConfig{}
 	}
-}
-
-func (c osqueryConfig) render() ([]byte, error) {
-	return json.MarshalIndent(c, "", "    ")
+	if osqueryConfig.Options == nil {
+		osqueryConfig.Options = make(map[string]interface{})
+	}
+	const scheduleSplayPercentKey = "schedule_splay_percent"
+	if _, ok := osqueryConfig.Options[scheduleSplayPercentKey]; !ok {
+		osqueryConfig.Options[scheduleSplayPercentKey] = defaultScheduleSplayPercent
+	}
+	return osqueryConfig
 }
 
 func (p *ConfigPlugin) render() (string, error) {
 	if p.configString == "" {
-		raw, err := newOsqueryConfig(p.packs).render()
+		raw, err := newOsqueryConfig(p.osqueryConfig).Render()
 		if err != nil {
 			return "", err
 		}
@@ -169,57 +164,129 @@ func (p *ConfigPlugin) render() (string, error) {
 	return p.configString, nil
 }
 
-func (p *ConfigPlugin) set(inputs []config.InputConfig) error {
-	var err error
+func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 
 	p.configString = ""
+	p.namespace = ""
+
 	queriesCount := 0
+	osqueryConfig := &config.OsqueryConfig{}
 	newQueryInfoMap := make(map[string]QueryInfo)
 	namespaces := make(map[string]string)
-	p.packs = make(map[string]pack)
+
+	// Set the members if no errors
+	defer func() {
+		if err != nil {
+			return
+		}
+		p.osqueryConfig = osqueryConfig
+		p.newQueryInfoMap = newQueryInfoMap
+		p.namespaces = namespaces
+		p.queriesCount = queriesCount
+	}()
+
+	// Return if no inputs, all the members will be reset by deferred call above
+	if len(inputs) == 0 {
+		return nil
+	}
+
+	// Read namespace from the first input as of 7.16
+	p.namespace = inputs[0].Datastream.Namespace
+	if p.namespace == "" {
+		p.namespace = config.DefaultNamespace
+	}
+
+	// Since 7.16 version only one integration/input is expected
+	// The inputs[0].Osquery can be nil if this is pre 7.16 integration configuration
+	if inputs[0].Osquery != nil {
+		osqueryConfig = inputs[0].Osquery
+	}
+
+	// Common code to register query with lookup maps, enforce snapshot and increment queries count
+	registerQuery := func(name, ns string, qi config.Query) (config.Query, error) {
+		var ecsm ecs.Mapping
+		ecsm, err = flattenECSMapping(qi.ECSMapping)
+		if err != nil {
+			return qi, err
+		}
+
+		newQueryInfoMap[name] = QueryInfo{
+			Query:      qi.Query,
+			ECSMapping: ecsm,
+		}
+		namespaces[name] = p.namespace
+		queriesCount++
+
+		qi.Snapshot = true
+		return qi, nil
+	}
+
+	// Iterate osquery configuration's scheduled queries, add flattened ECS mappings to lookup map
+	for name, qi := range osqueryConfig.Schedule {
+		qi, err = registerQuery(name, p.namespace, qi)
+		if err != nil {
+			return err
+		}
+		osqueryConfig.Schedule[name] = qi
+	}
+
+	// Iterate osquery configuration's packs queries, add flattened ECS mappings to lookup map
+	for packName, pack := range osqueryConfig.Packs {
+		for name, qi := range pack.Queries {
+			qi, err = registerQuery(getPackQueryName(packName, name), p.namespace, qi)
+			if err != nil {
+				return err
+			}
+			pack.Queries[name] = qi
+		}
+	}
+
+	// Iterate inputs for Osquery configuration for backwards compatibility
 	for _, input := range inputs {
-		pack := pack{
-			Queries:   make(map[string]query),
+		pack := config.Pack{
+			Queries:   make(map[string]config.Query),
 			Platform:  input.Platform,
 			Version:   input.Version,
 			Discovery: input.Discovery,
 		}
 		for _, stream := range input.Streams {
-			id := "pack_" + input.Name + "_" + stream.ID
-			query := query{
-				Query:    stream.Query,
-				Interval: stream.Interval,
-				Platform: stream.Platform,
-				Version:  stream.Version,
-				Snapshot: true, // enforce snapshot for all queries
+			qi := config.Query{
+				Query:      stream.Query,
+				Interval:   stream.Interval,
+				Platform:   stream.Platform,
+				Version:    stream.Version,
+				ECSMapping: stream.ECSMapping,
 			}
-			var ecsm ecs.Mapping
-			if len(stream.ECSMapping) > 0 {
-				ecsm, err = flattenECSMapping(stream.ECSMapping)
-				if err != nil {
-					return err
-				}
+
+			qi, err = registerQuery(getPackQueryName(input.Name, stream.ID), p.namespace, qi)
+			if err != nil {
+				return err
 			}
-			newQueryInfoMap[id] = QueryInfo{
-				QueryConfig: query,
-				ECSMapping:  ecsm,
-			}
-			namespaces[id] = input.Datastream.Namespace
-			pack.Queries[stream.ID] = query
-			queriesCount++
+			pack.Queries[stream.ID] = qi
 		}
-		p.packs[input.Name] = pack
+
+		if len(pack.Queries) != 0 {
+			if osqueryConfig.Packs == nil {
+				osqueryConfig.Packs = make(map[string]config.Pack)
+			}
+			osqueryConfig.Packs[input.Name] = pack
+		}
 	}
-	p.newQueryInfoMap = newQueryInfoMap
-	p.namespaces = namespaces
-	p.queriesCount = queriesCount
+
 	return nil
+}
+
+func getPackQueryName(packName, queryName string) string {
+	return "pack_" + packName + "_" + queryName
 }
 
 // Due to current configuration passing between the agent and beats the keys that contain dots (".")
 // are split into the nested tree-like structure.
 // This converts this dynamic map[string]interface{} tree into strongly typed flat map.
 func flattenECSMapping(m map[string]interface{}) (ecs.Mapping, error) {
+	if m == nil {
+		return nil, nil
+	}
 	ecsm := make(ecs.Mapping)
 	for k, v := range m {
 		if strings.TrimSpace(k) == "" {

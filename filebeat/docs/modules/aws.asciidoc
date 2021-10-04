@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 == AWS module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for aws logs. It uses filebeat s3 input to get log files from
 AWS S3 buckets with SQS notification or directly polling list of S3 objects in an S3 bucket.
 The use of SQS notification is preferred: polling list of S3 objects is expensive
@@ -158,7 +160,10 @@ Default to be 300 seconds.
 
 *`var.api_timeout`*::
 
-Maximum duration before AWS API request will be interrupted. Default to be 120 seconds.
+The maximum duration of the AWS API call. If it exceeds the timeout, the AWS API
+call will be interrupted. The default AWS API timeout is `120s`.
+
+The API timeout must be longer than the `sqs.wait_time` value.
 
 *`var.bucket_arn`*::
 
