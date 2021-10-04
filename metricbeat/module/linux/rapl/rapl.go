@@ -65,6 +65,11 @@ type energyTrack struct {
 	time   time.Time
 }
 
+type energyUsage struct {
+	joules float64
+	watts  float64
+}
+
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
@@ -137,8 +142,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		evt := common.MapStr{
 			"core": cpu,
 		}
-		for domain, wattage := range metric {
-			evt[domain.Name] = common.MapStr{"watts": common.Round(wattage, common.DefaultDecimalPlacesCount)}
+		for domain, power := range metric {
+			evt[strings.ToLower(domain.Name)] = common.MapStr{
+				"watts":  common.Round(power.watts, common.DefaultDecimalPlacesCount),
+				"joules": common.Round(power.joules, common.DefaultDecimalPlacesCount),
+			}
 		}
 		report.Event(mb.Event{
 			MetricSetFields: evt,
@@ -148,12 +156,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
+func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]energyUsage {
 	newEnergy := make(map[int]map[rapl.RAPLDomain]energyTrack)
-	watts := make(map[int]map[rapl.RAPLDomain]float64)
+	powerUsage := make(map[int]map[rapl.RAPLDomain]energyUsage)
 
 	for cpu, handler := range m.handlers {
-		watts[cpu] = make(map[rapl.RAPLDomain]float64)
+		powerUsage[cpu] = make(map[rapl.RAPLDomain]energyUsage)
 		domainList := map[rapl.RAPLDomain]energyTrack{}
 
 		for _, domain := range handler.GetDomains() {
@@ -170,20 +178,24 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
 			// divide the delta of joules by the time interval to get watts
 			if m.lastValues != nil {
+				// This register can roll over. If/when it does, skip reporting
+				if m.lastValues[cpu][domain].joules > joules {
+					continue
+				}
 				delta := m.lastValues[cpu][domain].joules - joules
 				timeDelta := m.lastValues[cpu][domain].time.Sub(domainList[domain].time)
-				watts[cpu][domain] = delta / timeDelta.Seconds()
+				powerUsage[cpu][domain] = energyUsage{watts: delta / timeDelta.Seconds(), joules: joules}
 			}
 		}
 		newEnergy[cpu] = domainList
 	}
 
+	m.lastValues = newEnergy
 	if m.lastValues == nil {
-		m.lastValues = newEnergy
 		return nil
 	}
 
-	return watts
+	return powerUsage
 }
 
 // getMSRCPUs forms a list of CPU cores to query

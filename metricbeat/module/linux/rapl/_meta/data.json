@@ -7,16 +7,19 @@
     },
     "linux": {
         "rapl": {
-            "DRAM": {
-                "watts": 5.5727
+            "core": 0,
+            "dram": {
+                "joules": 38106.59,
+                "watts": 5.912
             },
-            "PP0": {
-                "watts": 2.3126
+            "package": {
+                "joules": 25764.9984,
+                "watts": 11.5784
             },
-            "Package": {
-                "watts": 11.5008
-            },
-            "core": 0
+            "pp0": {
+                "joules": 27353.5644,
+                "watts": 2.7159
+            }
         }
     },
     "metricset": {

@@ -8,19 +8,38 @@
       type: long
       description: >
         The core where the RAPL request originated from. Only one core is queried per hardware CPU.
-    - name: DRAM.watts
+    - name: dram.watts
       type: float
       description: >
         Power usage in watts on the DRAM RAPL domain
-    - name: PP0.watts
+    - name: dram.joules
+      type: float
+      description: >
+        Raw power usage counter for the DRAM domain
+
+    - name: pp0.watts
       type: float
       description: >
         Power usage in watts on the PP0 RAPL domain
-    - name: PP1.watts
+    - name: pp0.joules
+      type: float
+      description: >
+        Raw power usage counter for the PP0 domain
+
+    - name: pp1.watts
       type: float
       description: >
         Power usage in watts on the PP1 RAPL domain
-    - name: Package.watts
+    - name: pp1.joules
+      type: float
+      description: >
+        Raw power usage counter for the PP1 domain
+
+    - name: package.watts
       type: float
       description: >
         Power usage in watts on the Package RAPL domain
+    - name: package.joules
+      type: float
+      description: >
+        Raw power usage counter for the package domain

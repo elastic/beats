@@ -43842,7 +43842,7 @@ type: long
 
 --
 
-*`linux.rapl.DRAM.watts`*::
+*`linux.rapl.dram.watts`*::
 +
 --
 Power usage in watts on the DRAM RAPL domain
@@ -43852,7 +43852,17 @@ type: float
 
 --
 
-*`linux.rapl.PP0.watts`*::
+*`linux.rapl.dram.joules`*::
++
+--
+Raw power usage counter for the DRAM domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp0.watts`*::
 +
 --
 Power usage in watts on the PP0 RAPL domain
@@ -43862,7 +43872,17 @@ type: float
 
 --
 
-*`linux.rapl.PP1.watts`*::
+*`linux.rapl.pp0.joules`*::
++
+--
+Raw power usage counter for the PP0 domain
+
+
+type: float
+
+--
+
+*`linux.rapl.pp1.watts`*::
 +
 --
 Power usage in watts on the PP1 RAPL domain
@@ -43872,10 +43892,30 @@ type: float
 
 --
 
-*`linux.rapl.Package.watts`*::
+*`linux.rapl.pp1.joules`*::
++
+--
+Raw power usage counter for the PP1 domain
+
+
+type: float
+
+--
+
+*`linux.rapl.package.watts`*::
 +
 --
 Power usage in watts on the Package RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.package.joules`*::
++
+--
+Raw power usage counter for the package domain
 
 
 type: float
