@@ -875,6 +875,11 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+		if b.OutputConfigReloader != nil {
+			if err := b.OutputConfigReloader.Reload(config); err != nil {
+				return err
+			}
+		}
 		return outReloader.Reload(config, b.createOutput)
 	})
 }
