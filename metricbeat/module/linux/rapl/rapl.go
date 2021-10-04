@@ -123,8 +123,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	ms.updatePower()
 
-	// Get initial time values
-
 	return ms, nil
 }
 
@@ -137,10 +135,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for cpu, metric := range watts {
 		evt := common.MapStr{
-			"cpu": cpu,
+			"core": cpu,
 		}
 		for domain, wattage := range metric {
-			evt[domain.Name] = common.Round(wattage, common.DefaultDecimalPlacesCount)
+			evt[domain.Name] = common.MapStr{"watts": common.Round(wattage, common.DefaultDecimalPlacesCount)}
 		}
 		report.Event(mb.Event{
 			MetricSetFields: evt,
@@ -153,13 +151,15 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
 	newEnergy := make(map[int]map[rapl.RAPLDomain]energyTrack)
 	watts := make(map[int]map[rapl.RAPLDomain]float64)
+
 	for cpu, handler := range m.handlers {
 		watts[cpu] = make(map[rapl.RAPLDomain]float64)
 		domainList := map[rapl.RAPLDomain]energyTrack{}
+
 		for _, domain := range handler.GetDomains() {
 			joules, err := handler.ReadEnergyStatus(domain)
 			// This is a bit hard to check for, as many of the registers are model-specific
-			// Unless we want a map of every CPU we want to maintain, we sort of have to play it fast and loose.
+			// Unless we want to maintain a map of every CPU, we sort of have to play it fast and loose.
 			if err == rapl.ErrMSRDoesNotExist {
 				continue
 			}
@@ -168,6 +168,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
 				continue
 			}
 			domainList[domain] = energyTrack{joules: joules, time: time.Now()}
+			// divide the delta of joules by the time interval to get watts
 			if m.lastValues != nil {
 				delta := m.lastValues[cpu][domain].joules - joules
 				timeDelta := m.lastValues[cpu][domain].time.Sub(domainList[domain].time)
@@ -185,7 +186,7 @@ func (m *MetricSet) updatePower() map[int]map[rapl.RAPLDomain]float64 {
 	return watts
 }
 
-// getMSRCPUs forms a list of MSR paths to query
+// getMSRCPUs forms a list of CPU cores to query
 // For multi-processor systems, this will be more than 1.
 func getMSRCPUs() ([]int, error) {
 	CPUs, err := topoPkgCPUMap()
@@ -201,7 +202,7 @@ func getMSRCPUs() ([]int, error) {
 }
 
 //I'm not really sure how portable this algo is
-//it is, however, the simplest way to do this. The intel power gaget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
+//it is, however, the simplest way to do this. The intel power gadget iterates through each CPU using affinity masks, and runs `cpuid` in a loop to
 //figure things out
 //This uses /sys/devices/system/cpu/cpu*/topology/physical_package_id, which is what lscpu does. I *think* geopm does something similar to this.
 func topoPkgCPUMap() (map[int][]int, error) {

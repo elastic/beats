@@ -2,9 +2,25 @@
   type: group
   release: beta
   description: >
-    rapl
+    Wattage as reported by Intel RAPL
   fields:
-    - name: example
-      type: keyword
+    - name: core
+      type: long
       description: >
-        Example field
+        The core where the RAPL request originated from. Only one core is queried per hardware CPU.
+    - name: DRAM.watts
+      type: float
+      description: >
+        Power usage in watts on the DRAM RAPL domain
+    - name: PP0.watts
+      type: float
+      description: >
+        Power usage in watts on the PP0 RAPL domain
+    - name: PP1.watts
+      type: float
+      description: >
+        Power usage in watts on the PP1 RAPL domain
+    - name: Package.watts
+      type: float
+      description: >
+        Power usage in watts on the Package RAPL domain

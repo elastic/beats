@@ -43825,6 +43825,63 @@ type: long
 
 --
 
+[float]
+=== rapl
+
+Wattage as reported by Intel RAPL
+
+
+
+*`linux.rapl.core`*::
++
+--
+The core where the RAPL request originated from. Only one core is queried per hardware CPU.
+
+
+type: long
+
+--
+
+*`linux.rapl.DRAM.watts`*::
++
+--
+Power usage in watts on the DRAM RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.PP0.watts`*::
++
+--
+Power usage in watts on the PP0 RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.PP1.watts`*::
++
+--
+Power usage in watts on the PP1 RAPL domain
+
+
+type: float
+
+--
+
+*`linux.rapl.Package.watts`*::
++
+--
+Power usage in watts on the Package RAPL domain
+
+
+type: float
+
+--
+
 [[exported-fields-logstash]]
 == Logstash fields
 
