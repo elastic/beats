@@ -37,6 +37,7 @@ const (
 var (
 	// ErrProgramNotSupported returned when requesting metrics for not supported program.
 	ErrProgramNotSupported = errors.New("specified program is not supported")
+	errPathNotFound        = errors.New("endpoint not found")
 	invalidChars           = map[rune]struct{}{
 		'"':  {},
 		'<':  {},
@@ -67,14 +68,13 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 			// proxy stats for elastic agent process
 			return statsHandler(w, r)
 		}
-		// TODO: allowlist of accepted endpoints to proxy to?
-		beatsEndpoint := vars["beatsEndpoint"]
+		beatsPath := vars["beatsPath"]
 
 		endpoint, err := generateEndpoint(id)
 		if err != nil {
 			return err
 		}
-		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), endpoint, beatsEndpoint)
+		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), endpoint, beatsPath)
 		if metricsErr != nil {
 			return metricsErr
 		}
@@ -88,7 +88,17 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 	}
 }
 
+var beatsPathAllowlist = map[string]struct{}{
+	"":      struct{}{},
+	"stats": struct{}{},
+	"state": struct{}{},
+}
+
 func processMetrics(ctx context.Context, endpoint, path string) ([]byte, int, error) {
+	if _, ok := beatsPathAllowlist[path]; !ok {
+		return nil, http.StatusNotFound, errPathNotFound
+	}
+
 	hostData, err := parse.ParseURL(endpoint, "http", "", "", path, "")
 	if err != nil {
 		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
