@@ -71,35 +71,8 @@ processors:
   - remove:
       field:
         - coredns.duration
+        - coredns.dnssec_ok
       ignore_missing: true
-  # The following copies values from dns namespace (ECS) to the coredns
-  # namespace to avoid introducing breaking change. This should be removed
-  # for 8.0.0. Additionally coredns.dnssec_ok can be removed.
-  - set:
-      field: coredns.id
-      value: '{{dns.id}}'
-      ignore_empty_value: true
-  - set:
-      field: coredns.query.class
-      value: '{{dns.question.class}}'
-      ignore_empty_value: true
-  - set:
-      field: coredns.query.name
-      value: '{{dns.question.name}}'
-      ignore_empty_value: true
-  - set:
-      field: coredns.query.type
-      value: '{{dns.question.type}}'
-      ignore_empty_value: true
-  - set:
-      field: coredns.response.code
-      value: '{{dns.response_code}}'
-      ignore_empty_value: true
-  - script:
-      if: ctx.dns?.header_flags != null
-      lang: painless
-      source: >
-        ctx.coredns.response.flags = ctx.dns.header_flags;
   # Right trim the trailing dot from domain names.
   - script:
       if: ctx.dns?.question?.name != null
