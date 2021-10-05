@@ -179,7 +179,7 @@ Use to vertically scale the input.
 
 Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
 
-*`var.bucket_bucket_list_prefix`*::
+*`var.bucket_list_prefix`*::
 
 Prefix to apply for the list request to the S3 bucket. Default empty.
 
