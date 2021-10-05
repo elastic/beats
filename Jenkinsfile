@@ -1106,16 +1106,6 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
                      enableRetry: enableRetry
                      stackEnvironment: stackEnvironment)
       }
-      if(args?.content?.containsKey('mageMinor')) {
-        steps.mageMinor(context: args.context,
-                     command: args.content.mage,
-                     directory: args.project,
-                     label: args.label,
-                     withModule: withModule,
-                     isMage: true,
-                     id: args.id,
-                     enableRetry: enableRetry)
-      }
       if(args?.content?.containsKey('packaging-arm')) {
         steps.packagingArm(context: args.context,
                            command: args.content.get('packaging-arm'),
