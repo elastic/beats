@@ -2358,8 +2358,7 @@ alias to: error.message
 [float]
 === geoip
 
-The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or the
-{es} `geoip` ingest processor.
+The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or Elasticsearch geoip ingest processor.
 
 
 
