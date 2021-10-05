@@ -36,7 +36,7 @@ type nodeData struct {
 	processors []map[string]interface{}
 }
 
-// NewNodeEventer creates a watcher that can discover and process node objects
+// NewNodeEventer creates an eventer that can discover and process node objects
 func NewNodeEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
