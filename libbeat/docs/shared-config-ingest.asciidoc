@@ -18,7 +18,7 @@ indexing takes place in Elasticsearch.
 ifndef::no-output-logstash[]
 An ingest pipeline is a convenient processing option when you want to do some
 extra processing on your data, but you do not require the full power of
-Logstash.
+{ls}.
 endif::[]
 For example, you can create an ingest pipeline
 in {es} that consists of one processor that removes a field in a
