@@ -170,8 +170,10 @@ func BuildPkgForFunctions() error {
 		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
 		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
 		filepath.Join("provider", "gcp", "pubsub", "go.mod"):      filepath.Join("pkg", "pubsub", "go.mod"),
+		filepath.Join("provider", "gcp", "pubsub", "go.sum"):      filepath.Join("pkg", "pubsub", "go.sum"),
 		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
 		filepath.Join("provider", "gcp", "storage", "go.mod"):     filepath.Join("pkg", "storage", "go.mod"),
+		filepath.Join("provider", "gcp", "storage", "go.sum"):     filepath.Join("pkg", "storage", "go.sum"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{
