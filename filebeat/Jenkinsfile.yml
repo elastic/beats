@@ -49,7 +49,7 @@ stages:
         TESTING_FILEBEAT_SKIP_DIFF=1
         PYTEST_ADDOPTS='-k test_modules'
         mage pythonIntegTest
-      stack_environment: '7.<minor>'  ## Run module integration tests under ES 7.11 to ensure ingest pipeline compatibility.
+      stackEnvironment: '7.<minor>'  ## Run module integration tests under ES 7.11 to ensure ingest pipeline compatibility.
       withModule: true
       stage: mandatory
     macos:
