@@ -441,4 +441,4 @@ data:
       #      maxconn: 10
       #      network: tcp
       #      period: 10s
-      #      condition: ${kubernetes.pod.labels.app} == 'redis'
+      #      condition: ${kubernetes.labels.app} == 'redis'
