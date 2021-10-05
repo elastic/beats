@@ -67,7 +67,7 @@ type namespacePodUpdater struct {
 	locker  sync.Locker
 }
 
-// NewPodEventer creates a watcher that can discover and process pod objects
+// NewPodEventer creates an eventer that can discover and process pod objects
 func NewPodEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
