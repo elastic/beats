@@ -10,21 +10,20 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[configuring-ingest-node]]
-== Parse data using an ingest pipeline
+== Parse data by using ingest node
 
 When you use Elasticsearch for output, you can configure {beatname_uc} to use
-an {ref}/ingest.html[ingest pipeline] to pre-process documents before the actual
+{ref}/ingest.html[ingest node] to pre-process documents before the actual
 indexing takes place in Elasticsearch.
 ifndef::no-output-logstash[]
 An ingest pipeline is a convenient processing option when you want to do some
-extra processing on your data, but you do not require the full power of
-{ls}.
+extra processing on your data, but you do not require the full power of {ls}.
 endif::[]
-For example, you can create an ingest pipeline
-in {es} that consists of one processor that removes a field in a
+For example, you can create an ingest node pipeline
+in Elasticsearch that consists of one processor that removes a field in a
 document followed by another processor that renames a field.
 
-After defining the pipeline in {es}, you simply configure {beatname_uc}
+After defining the pipeline in Elasticsearch, you simply configure {beatname_uc}
 to use the pipeline. To configure {beatname_uc}, you specify the pipeline ID in
 the `parameters` option under `elasticsearch` in the +{beatname_lc}.yml+ file:
 
@@ -35,5 +34,40 @@ output.elasticsearch:
   pipeline: my_pipeline_id
 ------------------------------------------------------------------------------
 
+For example, let's say that you've defined the following pipeline in a file
+named `pipeline.json`:
+
+[source,json]
+------------------------------------------------------------------------------
+{
+    "description": "Test pipeline",
+    "processors": [
+        {
+            "lowercase": {
+                "field": "agent.name"
+            }
+        }
+    ]
+}
+------------------------------------------------------------------------------
+
+To add the pipeline in Elasticsearch, you would run:
+
+[source,shell]
+------------------------------------------------------------------------------
+curl -H 'Content-Type: application/json' -XPUT 'http://localhost:9200/_ingest/pipeline/test-pipeline' -d@pipeline.json
+------------------------------------------------------------------------------
+
+Then in the +{beatname_lc}.yml+ file, you would specify:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  pipeline: "test-pipeline"
+------------------------------------------------------------------------------
+
+When you run {beatname_uc}, the value of `agent.name` is converted to lowercase before indexing.
+
 For more information about defining a pre-processing pipeline, see the
-{ref}/ingest.html[ingest pipeline] documentation.
+{ref}/ingest.html[Ingest Node] documentation.
