@@ -28,6 +28,8 @@ type pod struct {
 	scope            string
 	config           *Config
 	metagen          metadata.MetaGen
+	watcher          kubernetes.Watcher
+	nodeWatcher      kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
 
 	// Mutex used by configuration updates not triggered by the main watcher,
@@ -65,13 +67,13 @@ type namespacePodUpdater struct {
 	locker  sync.Locker
 }
 
-// NewPodWatcher creates a watcher that can discover and process pod objects
-func NewPodWatcher(
+// NewPodEventer creates an eventer that can discover and process pod objects
+func NewPodEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string) (Eventer, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Pod{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -107,24 +109,57 @@ func NewPodWatcher(
 	}
 	metaGen := metadata.GetPodMetaGen(rawConfig, watcher, nodeWatcher, namespaceWatcher, metaConf)
 
-	p := pod{
+	p := &pod{
 		logger:           logger,
 		cleanupTimeout:   cfg.CleanupTimeout,
 		comm:             comm,
 		scope:            scope,
 		config:           cfg,
 		metagen:          metaGen,
+		watcher:          watcher,
+		nodeWatcher:      nodeWatcher,
 		namespaceWatcher: namespaceWatcher,
 	}
 
-	watcher.AddEventHandler(&p)
+	watcher.AddEventHandler(p)
 
 	if namespaceWatcher != nil && metaConf.Namespace.Enabled() {
 		updater := newNamespacePodUpdater(p.unlockedUpdate, watcher.Store(), &p.crossUpdate)
 		namespaceWatcher.AddEventHandler(updater)
 	}
 
-	return watcher, nil
+	return p, nil
+}
+
+// Start starts the eventer
+func (p *pod) Start() error {
+	if p.nodeWatcher != nil {
+		err := p.nodeWatcher.Start()
+		if err != nil {
+			return err
+		}
+	}
+
+	if p.namespaceWatcher != nil {
+		if err := p.namespaceWatcher.Start(); err != nil {
+			return err
+		}
+	}
+
+	return p.watcher.Start()
+}
+
+// Stop stops the eventer
+func (p *pod) Stop() {
+	p.watcher.Stop()
+
+	if p.namespaceWatcher != nil {
+		p.namespaceWatcher.Stop()
+	}
+
+	if p.nodeWatcher != nil {
+		p.nodeWatcher.Stop()
+	}
 }
 
 func (p *pod) emitRunning(pod *kubernetes.Pod) {

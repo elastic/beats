@@ -27,6 +27,7 @@ type service struct {
 	scope            string
 	config           *Config
 	metagen          metadata.MetaGen
+	watcher          kubernetes.Watcher
 	namespaceWatcher kubernetes.Watcher
 }
 
@@ -36,13 +37,13 @@ type serviceData struct {
 	processors []map[string]interface{}
 }
 
-// NewServiceWatcher creates a watcher that can discover and process service objects
-func NewServiceWatcher(
+// NewServiceEventer creates an eventer that can discover and process service objects
+func NewServiceEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
 	logger *logp.Logger,
 	client k8s.Interface,
-	scope string) (kubernetes.Watcher, error) {
+	scope string) (Eventer, error) {
 	watcher, err := kubernetes.NewWatcher(client, &kubernetes.Service{}, kubernetes.WatchOptions{
 		SyncTimeout:  cfg.SyncPeriod,
 		Node:         cfg.Node,
@@ -68,17 +69,38 @@ func NewServiceWatcher(
 	}
 
 	metaGen := metadata.NewServiceMetadataGenerator(rawConfig, watcher.Store(), namespaceMeta, client)
-	watcher.AddEventHandler(&service{
+	s := &service{
 		logger,
 		cfg.CleanupTimeout,
 		comm,
 		scope,
 		cfg,
 		metaGen,
+		watcher,
 		namespaceWatcher,
-	})
+	}
+	watcher.AddEventHandler(s)
 
-	return watcher, nil
+	return s, nil
+}
+
+// Start starts the eventer
+func (s *service) Start() error {
+	if s.namespaceWatcher != nil {
+		if err := s.namespaceWatcher.Start(); err != nil {
+			return err
+		}
+	}
+	return s.watcher.Start()
+}
+
+// Stop stops the eventer
+func (s *service) Stop() {
+	s.watcher.Stop()
+
+	if s.namespaceWatcher != nil {
+		s.namespaceWatcher.Stop()
+	}
 }
 
 func (s *service) emitRunning(service *kubernetes.Service) {
