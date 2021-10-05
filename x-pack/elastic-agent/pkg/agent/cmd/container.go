@@ -384,6 +384,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.InsecureHTTP || cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
+		if cfg.FleetServer.Timeout != 0 {
+			args = append(args, "--fleet-server-timeout")
+			args = append(args, cfg.FleetServer.Timeout.String())
+		}
 	} else {
 		if cfg.Fleet.URL == "" {
 			return nil, errors.New("FLEET_URL is required when FLEET_ENROLL is true without FLEET_SERVER_ENABLE")
@@ -398,6 +402,10 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 	}
 	if token != "" {
 		args = append(args, "--enrollment-token", token)
+	}
+	if cfg.Fleet.DaemonTimeout != 0 {
+		args = append(args, "--daemon-timeout")
+		args = append(args, cfg.Fleet.DaemonTimeout.String())
 	}
 	return args, nil
 }
@@ -534,6 +542,19 @@ func envBool(keys ...string) bool {
 		}
 	}
 	return false
+}
+
+func envTimeout(keys ...string) time.Duration {
+	for _, key := range keys {
+		val, ok := os.LookupEnv(key)
+		if ok {
+			dur, err := time.ParseDuration(val)
+			if err == nil {
+				return dur
+			}
+		}
+	}
+	return 0
 }
 
 func envMap(key string) map[string]string {
