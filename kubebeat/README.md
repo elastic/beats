@@ -1,3 +1,71 @@
+# POC Documentation
+
+I generated this repo using the [beats development guide](https://www.elastic.co/guide/en/beats/devguide/current/newbeat-generate.html).
+The kube-api call is based on the [k8s go-client example](https://github.com/kubernetes/client-go/tree/master/examples/in-cluster-client-configuration).
+
+The interesting files are:
+* `beater/kubebeat.go` - the beats logic
+* `kubebeat.yml` - the beats config
+* `Dockerfile` - runs the beat dockerized with debug flags
+* `pod.yaml` - deploy the beat
+
+
+## Running this example
+
+This example assumes you have:
+1. Elasticsearch with the default username & password (`elastic` & `changeme`) running on the default port (`http://localhost:9200`)
+2. Kibana with running on the default port (`http://localhost:5601`)
+3. Minikube cluster running locally (`minikube start`)
+
+First compile the application for Linux:
+
+    GOOS=linux go build
+
+Then use the patch file to change the configuration for Minikube (or change the configuration according to your setup):
+
+    patch kubebeat.yml kubebeat_minikube.yml.patch
+
+Then package it to a docker image using the provided Dockerfile to run it on Kubernetes:
+
+Running a [Minikube](https://minikube.sigs.k8s.io/docs/) cluster, you can build this image directly on the Docker engine of the Minikube node without pushing it to a registry. To build the image on Minikube:
+
+    eval $(minikube docker-env)
+    docker build -t kubebeat .
+
+If you are not using Minikube, you should build this image and push it to a registry that your Kubernetes cluster can pull from.
+
+If you have RBAC enabled on your cluster, use the following snippet to create role binding which will grant the default service account view permissions:
+
+```
+kubectl create clusterrolebinding default-view --clusterrole=view --serviceaccount=default:default
+```
+
+Then, run the image in a Pod with a single instance Deployment:
+
+    kubectl apply -f pod.yml
+
+The example now sends requests to the Kubernetes API and sends to elastic events with pod information from the cluster every 5 seconds.
+
+To validate check the logs:
+
+    kubectl logs -f kubebeat-demo
+
+Now go and check out the data on your Kibana! Make sure to add an index pattern `kubebeat*`
+
+note: when changing the fields kibana will reject events dent from the kubebeat for not matching the existing scheme. make sure to delete the index when changing the event fields in your code.
+
+### Clean up
+
+To stop this example and clean up the pod, run:
+
+    kubectl delete pod kubebeat-demo
+
+### Open questions
+
+1. Could we use some code from `kube-mgmt`/`gatekeeper`/`metricbeat` to do the kube-api querying and data management?
+2. How should we integrate this to the agent?
+3. ... many more
+
 # {Beat}
 
 Welcome to {Beat}.
