@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 {{ if .audit_type }}
 {{ if eq .audit_type "group" }}
