@@ -4,6 +4,9 @@
 
 // See _meta/terraform/README.md for integration test usage instructions.
 
+// +build integration
+// +build aws
+
 package awss3
 
 import (
