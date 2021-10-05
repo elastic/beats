@@ -18,7 +18,7 @@ NetFlow versions older than 9, fields are mapped automatically to NetFlow v9.
 
 This module wraps the <<filebeat-input-netflow,netflow input>> to enrich the
 flow records with geolocation information about the IP endpoints by using
-Elasticsearch Ingest Node.
+an {es} ingest pipeline.
 
 include::../include/gs-link.asciidoc[]
 
