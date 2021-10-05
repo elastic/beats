@@ -561,9 +561,10 @@ def target(Map args = [:]) {
   def isPackaging = args.get('package', false)
   def dockerArch = args.get('dockerArch', 'amd64')
   def enableRetry = args.get('enableRetry', false)
+  def stackEnvironment = args.get('stackEnvironment', '')
   withNode(labels: args.label, forceWorkspace: true){
     withGithubNotify(context: "${context}") {
-      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id) {
+      withBeatsEnv(archive: true, withModule: withModule, directory: directory, id: args.id, stackEnvironment: stackEnvironment) {
         dumpVariables()
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
@@ -635,7 +636,8 @@ def withBeatsEnv(Map args = [:], Closure body) {
   unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
   // NOTE: This is required to run after the unstash
   def module = withModule ? getCommonModuleInTheChangeSet(directory) : ''
-  withEnv([
+
+  def listOfEnv = [
     "DOCKER_PULL=0",
     "GOPATH=${env.WORKSPACE}",
     "GOX_FLAGS=${gox_flags}",
@@ -649,7 +651,14 @@ def withBeatsEnv(Map args = [:], Closure body) {
     "TEST_TAGS=${env.TEST_TAGS},oracle",
     "OLD_USERPROFILE=${env.USERPROFILE}",
     "USERPROFILE=${userProfile}"
-  ]) {
+  ]
+
+  def stackEnvironment = getStackEnvironment(args.get('stackEnvironment',''))
+  if (stackEnvironment) {
+    listOfEnv << "STACK_ENVIRONMENT=${stackEnvironment}"
+  }
+
+  withEnv(listOfEnv) {
     if(isDockerInstalled()) {
       dockerLogin(secret: "${DOCKER_ELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dockerLogin(secret: "${DOCKERHUB_SECRET}", registry: 'docker.io')
@@ -683,6 +692,20 @@ def withBeatsEnv(Map args = [:], Closure body) {
       }
     }
   }
+}
+
+/**
+* Given the stack version it returns the version to be tested.
+* It supports 7.<minor> -> then it calculates the latest minor to be tested with
+*/
+def getStackEnvironment(String stackEnvironment) {
+  if (stackEnvironment?.trim()) {
+    if (stackEnvironment.contains('<minor>')) {
+      return '7.15'
+    }
+    return stackEnvironment
+  }
+  return null
 }
 
 /**
@@ -1051,6 +1074,7 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
   public run(Map args = [:]){
     steps.stageStatusCache(args){
       def withModule = args.content.get('withModule', false)
+      def stackEnvironment = args.content.get('stackEnvironment', '')
       //
       // What's the retry policy for fighting the flakiness:
       //   1) Lint/Packaging/Cloud/k8sTest stages don't retry, since their failures are normally legitim
@@ -1073,6 +1097,17 @@ class RunCommand extends co.elastic.beats.BeatsFunction {
       }
       if(args?.content?.containsKey('mage')) {
         steps.target(context: args.context,
+                     command: args.content.mage,
+                     directory: args.project,
+                     label: args.label,
+                     withModule: withModule,
+                     isMage: true,
+                     id: args.id,
+                     enableRetry: enableRetry
+                     stackEnvironment: stackEnvironment)
+      }
+      if(args?.content?.containsKey('mageMinor')) {
+        steps.mageMinor(context: args.context,
                      command: args.content.mage,
                      directory: args.project,
                      label: args.label,
