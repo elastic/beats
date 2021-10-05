@@ -306,6 +306,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add Huawei Cloud provider to add_cloud_metadata. {pull}27607[27607]
 - Add default seccomp policy for linux arm64. {pull}27955[27955]
 - Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
+- Update cloud.google.com/go library. {pull}28229[28229]
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
 
