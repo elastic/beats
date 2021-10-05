@@ -28,7 +28,7 @@ There is one configuration variable that differentiates in a way how the autosic
 This variable is `unique`
 
 ### Autodiscover with LeaderElection
-When setting `unique: true` the Leader Election mechanism is activated. That way **only** the beat process that will gain the leader lease will enable the provided template.
+When setting `unique: true` the Leader Election mechanism is activated. That way **only** the Beat instance that will gain the leader lease/lock will enable the provided template.
 The best appliance of this feature is when collecting cluster wide metrics from `kube-state-metrics` or `apiserver`.
 In that case having all instances of metricbeat collecting the same metrics is not desirable.
 
@@ -58,12 +58,12 @@ We will deep dive in the internals of [libbeat kubernetes autodiscover provider]
 We will use metricbeat as an example.
 
 Step-by-step walkthrough
-1. Kubernetes provider `init` function [adds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L46) the provider in the autodiscover providers registry at startup. For Kubernetes provider a `AutodiscoverBuilder` func is passed as an argument.
-2. Metricbeat calls `NewAutodiscover` [function](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L183) which checks in the config for enabled providers and [builds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/provider.go#L90) them on by one by calling the `AutodiscoverBuilder` func.
-3. Kubernetes `AutodiscoverBuilder` creates and returns a [Kubernetes Provider struct](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L131) which is then added in a Autodiscover manager struct.
+1. Kubernetes provider `init` function [adds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L46) the provider in the autodiscover providers registry at startup. For Kubernetes provider an `AutodiscoverBuilder` func is passed as an argument.
+2. Metricbeat calls `NewAutodiscover` [function](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L183) which checks in the config for enabled providers and [builds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/provider.go#L90) them one by one, calling the `AutodiscoverBuilder` func.
+3. Kubernetes `AutodiscoverBuilder` creates and returns a [Kubernetes Provider struct](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L131) which is then added to an Autodiscover manager struct.
 4. When unique is set to true [NewLeaderElectionManager](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L141) is set as the eventManager of Kubernetes Provider.
 4. Metricbeat [starts](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L249) the Autodiscover manager which starts for Kubernets provider the [leaderElectionManager](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L326). Before starting the providers it also starts a worker for listening of events that will be published by the eventers of each provider.
-5. OnStartedLeading is executed when the specific metricbeat instance gains the leader election lock. [StartLeading](startLeading) cretaes a bus event with `"start":    true,`  and publishes it. The template configurations is also added in this event.
+5. `OnStartedLeading` is executed when the specific metricbeat instance gains the leader election lock. [StartLeading](startLeading) cretaes a bus event with `"start":    true,`  and publishes it. The template configurations is also added in this event.
 6. [Listener](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L140) of events get the published event and generates [configs](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L185) for it. Configs include the variables and settings from the template set by the user.
 7. For each config the worker checks if it already [exists](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L225)(It was already handled). If at least of the configs of the event does not then the config is marked as `updated`.
 8. The runners list get [reloaded](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/cfgfile/list.go#L54). It is checked from the list of current runners if each config is handled by one of them.
@@ -72,7 +72,7 @@ Step-by-step walkthrough
 
 ### Autodiscover without LeaderElection
 
-When setting `unique: false` or not setting it at all the Leader Election mechanism is disabled. That way all the beat instances will enable the provided template. Or at least the ones that match a condition.
+When setting `unique: false` or not setting it at all the Leader Election mechanism is disabled. That way all Beat instances will enable the provided template. Or at least the ones that match a condition.
 A good appliance of this is when user wants to enable a specific module(for example redis) each time a pod with a specific label appears in each kubernetes node.
 
 Example:
@@ -202,7 +202,7 @@ Hints based autodiscover is not supported yet.
 ### Template based autodiscover
 
 Example:
-As en example we will use gain redis module.
+As an example we will use gain redis module.
 In agent.yml(configmap) an extra input block needs to be added.
 ```
       # Add extra input blocks here, based on conditions
