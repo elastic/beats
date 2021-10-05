@@ -1,6 +1,5 @@
 {{ if eq .input "httpjson" }}
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 auth.oauth2.provider: google
 auth.oauth2.google.jwt_file: {{ .jwt_file }}

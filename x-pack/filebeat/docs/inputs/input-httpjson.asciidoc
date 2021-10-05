@@ -31,7 +31,6 @@ Example configurations:
 filebeat.inputs:
 # Fetch your public IP every minute.
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   processors:
@@ -44,7 +43,6 @@ filebeat.inputs:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   response.split:
@@ -69,7 +67,6 @@ Example configurations with authentication:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost
   request.transforms:
     - set:
@@ -81,7 +78,6 @@ filebeat.inputs:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   auth.oauth2:
     client.id: 12345678901234567890abcdef
     client.secret: abcdef12345678901234567890
@@ -218,13 +214,6 @@ The `httpjson` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
-==== `config_version`
-
-Defines the configuration version. Current supported versions are: `1` and `2`. Default: `1`.
-
-NOTE: This setting defaults to `1` to avoid breaking current configurations. V1 configuration is deprecated and will be unsupported in future releases. Any new configuration should use `config_version: 2`.
-
-[float]
 ==== `interval`
 
 Duration between repeated requests. It may make additional pagination requests in response to the initial request if pagination is enabled. Default: `60s`.
@@ -296,7 +285,6 @@ Can be set for all providers except `google`.
 ["source","yaml",subs="attributes"]
 ----
 - type: httpjson
-  config_version: 2
   auth.oauth2:
     endpoint_params:
       Param1:
@@ -374,7 +362,6 @@ Defaults to `null` (no HTTP body).
 ["source","yaml",subs="attributes"]
 ----
 - type: httpjson
-  config_version: 2
   request.method: POST
   request.body:
     query:
@@ -406,7 +393,6 @@ This specifies proxy configuration in the form of `http[s]://<user>:<password>@<
 filebeat.inputs:
 # Fetch your public IP every minute.
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   request.proxy_url: http://proxy.example:8080
@@ -474,7 +460,6 @@ Can write state to: [`body.*`, `header.*`, `url.*`].
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   request.transforms:
@@ -504,7 +489,6 @@ Can write state to: [`body.*`].
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   request.url: http://localhost:9200/_search?scroll=5m
   request.method: POST
   response.transforms:
@@ -639,7 +623,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -735,7 +718,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -810,7 +792,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -862,7 +843,6 @@ The config will look like:
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://example.com
   response.split:
@@ -913,7 +893,6 @@ NOTE: Default templates do not have access to any state, only to functions.
 ----
 filebeat.inputs:
 - type: httpjson
-  config_version: 2
   interval: 1m
   request.url: https://api.ipify.org/?format=json
   response.transforms:
@@ -929,76 +908,6 @@ filebeat.inputs:
         fields: ["message"]
         target: "json"
 ----
-
-[float]
-==== `api_key`
-
-Deprecated, use `request.transforms`.
-
-[float]
-==== `http_client_timeout`
-
-Deprecated, use `request.timeout`.
-
-[float]
-==== `http_headers`
-
-Deprecated, use `request.transforms`.
-
-[float]
-==== `http_method`
-
-Deprecated, use `request.method`.
-
-[float]
-==== `http_request_body`
-
-Deprecated, use `request.body`.
-
-[float]
-==== `json_objects_array`
-
-Deprecated, use `request.split`.
-
-[float]
-==== `split_events_by`
-
-Deprecated, use `request.split`.
-
-[float]
-==== `no_http_body`
-
-Deprecated.
-
-[float]
-==== `pagination.*`
-
-Deprecated, use `response.pagination`.
-
-[float]
-==== `rate_limit.*`
-
-Deprecated, use `request.rate_limit.*`.
-
-[float]
-==== `retry.*`
-
-Deprecated, use `request.retry.*`.
-
-[float]
-==== `ssl`
-
-Deprecated, use `request.ssl`.
-
-[float]
-==== `url`
-
-Deprecated, use `request.url`.
-
-[float]
-==== `oauth2.*`
-
-Deprecated, use `auth.oauth2.*`.
 
 ==== Request life cycle
 
