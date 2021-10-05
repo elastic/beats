@@ -110,42 +110,50 @@ func (p *dynamicProvider) watchResource(
 		p.config.Node = ""
 	}
 
-	watcher, err := p.newWatcher(resourceType, comm, client)
+	eventer, err := p.newEventer(resourceType, comm, client)
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher for resource %s", resourceType)
 	}
 
-	err = watcher.Start()
+	err = eventer.Start()
 	if err != nil {
-		return errors.New(err, "couldn't start kubernetes watcher for resource %s", resourceType)
+		return errors.New(err, "couldn't start kubernetes eventer for resource %s", resourceType)
 	}
+
 	return nil
 }
 
+// Eventer allows defining ways in which kubernetes resource events are observed and processed
+type Eventer interface {
+	kubernetes.ResourceEventHandler
+	Start() error
+	Stop()
+}
+
 // newWatcher initializes the proper watcher according to the given resource (pod, node, service).
-func (p *dynamicProvider) newWatcher(
+func (p *dynamicProvider) newEventer(
 	resourceType string,
 	comm composable.DynamicProviderComm,
-	client k8s.Interface) (kubernetes.Watcher, error) {
+	client k8s.Interface) (Eventer, error) {
 	switch resourceType {
 	case "pod":
-		watcher, err := NewPodWatcher(comm, p.config, p.logger, client, p.config.Scope)
+		eventer, err := NewPodEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	case "node":
-		watcher, err := NewNodeWatcher(comm, p.config, p.logger, client, p.config.Scope)
+		eventer, err := NewNodeEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	case "service":
-		watcher, err := NewServiceWatcher(comm, p.config, p.logger, client, p.config.Scope)
+		eventer, err := NewServiceEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", resourceType)
 	}
