@@ -21,27 +21,41 @@ package rapl
 
 import (
 	"testing"
-	"time"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/libbeat/paths"
 )
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	// Do a first fetch to have percentages
-	mbtest.ReportingFetchV2Error(f)
-	time.Sleep(3 * time.Second)
+// func TestData(t *testing.T) {
+// 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
+// 	// Do a first fetch to have percentages
+// 	mbtest.ReportingFetchV2Error(f)
+// 	time.Sleep(3 * time.Second)
 
-	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
+// 	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
+// 	if err != nil {
+// 		t.Fatal("write", err)
+// 	}
+// }
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":            "linux",
-		"metricsets":        []string{"rapl"},
-		"rapl.use_msr_safe": true,
+// func getConfig() map[string]interface{} {
+// 	return map[string]interface{}{
+// 		"module":            "linux",
+// 		"metricsets":        []string{"rapl"},
+// 		"rapl.use_msr_safe": true,
+// 	}
+// }
+
+func TestTopo(t *testing.T) {
+	paths.Paths.Hostfs = "./testdata/"
+
+	cpus, err := topoPkgCPUMap()
+	assert.NoError(t, err)
+	good := map[int][]int{
+		0: {0, 1},
+		1: {2},
 	}
+	assert.Equal(t, good, cpus)
+	t.Logf("CPUs: %#v", cpus)
 }

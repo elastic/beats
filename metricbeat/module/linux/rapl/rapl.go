@@ -229,7 +229,7 @@ func topoPkgCPUMap() (map[int][]int, error) {
 	sysdir := "/sys/devices/system/cpu/"
 	cpuMap := make(map[int][]int)
 
-	files, err := ioutil.ReadDir(sysdir)
+	files, err := ioutil.ReadDir(filepath.Join(paths.Paths.Hostfs, sysdir))
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func topoPkgCPUMap() (map[int][]int, error) {
 	for _, file := range files {
 		if file.IsDir() && re.MatchString(file.Name()) {
 
-			fullPkg := filepath.Join(sysdir, file.Name(), "/topology/physical_package_id")
+			fullPkg := filepath.Join(paths.Paths.Hostfs, sysdir, file.Name(), "/topology/physical_package_id")
 			dat, err := ioutil.ReadFile(fullPkg)
 			if err != nil {
 				return nil, errors.Wrapf(err, "error reading file %s", fullPkg)
