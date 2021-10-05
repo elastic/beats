@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -166,11 +167,11 @@ func BuildPkgForFunctions() error {
 	err := os.RemoveAll("pkg")
 
 	filesToCopy := map[string]string{
-		filepath.Join("provider", "aws", "functionbeat-aws"):           filepath.Join("pkg", "functionbeat-aws"),
-		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):        filepath.Join("pkg", "pubsub", "pubsub.go"),
-		filepath.Join("provider", "gcp", "storage", "storage.go"):      filepath.Join("pkg", "storage", "storage.go"),
-		filepath.Join("provider", "gcp", "build", "pubsub", "vendor"):  filepath.Join("pkg", "pubsub", "vendor"),
-		filepath.Join("provider", "gcp", "build", "storage", "vendor"): filepath.Join("pkg", "storage", "vendor"),
+		filepath.Join("provider", "aws", "functionbeat-aws"):      filepath.Join("pkg", "functionbeat-aws"),
+		filepath.Join("provider", "gcp", "pubsub", "pubsub.go"):   filepath.Join("pkg", "pubsub", "pubsub.go"),
+		filepath.Join("provider", "gcp", "pubsub", "go.mod"):      filepath.Join("pkg", "pubsub", "go.mod"),
+		filepath.Join("provider", "gcp", "storage", "storage.go"): filepath.Join("pkg", "storage", "storage.go"),
+		filepath.Join("provider", "gcp", "storage", "go.mod"):     filepath.Join("pkg", "storage", "go.mod"),
 	}
 	for src, dest := range filesToCopy {
 		c := &devtools.CopyTask{
