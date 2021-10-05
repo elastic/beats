@@ -11,6 +11,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -72,6 +75,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -120,6 +126,9 @@
 
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
@@ -170,6 +179,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -219,6 +231,9 @@
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
 
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
+
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s
 
@@ -267,6 +282,9 @@
 
     # AWS S3 bucket arn
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # AWS S3 list prefix
+    #var.bucket_list_prefix: 'prefix'
 
     # Bucket list interval on S3 bucket
     #var.bucket_list_interval: 300s

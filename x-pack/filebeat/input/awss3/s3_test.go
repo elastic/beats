@@ -48,9 +48,9 @@ func TestS3Poller(t *testing.T) {
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket)).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
 				Times(1).
-				DoAndReturn(func(_ string) s3Pager {
+				DoAndReturn(func(_, _ string) s3Pager {
 					return mockPager
 				}),
 		)
@@ -133,7 +133,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "region", numberOfWorkers, pollInterval)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})
@@ -158,16 +158,16 @@ func TestS3Poller(t *testing.T) {
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
 			mockAPI.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket)).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
 				Times(1).
-				DoAndReturn(func(_ string) s3Pager {
+				DoAndReturn(func(_, _ string) s3Pager {
 					return mockPagerFirst
 				}),
 			// After waiting for pollInterval, it retries.
 			mockAPI.EXPECT().
-				ListObjectsPaginator(gomock.Eq(bucket)).
+				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
 				Times(1).
-				DoAndReturn(func(_ string) s3Pager {
+				DoAndReturn(func(_, _ string) s3Pager {
 					return mockPagerSecond
 				}),
 		)
@@ -263,7 +263,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, nil)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "region", numberOfWorkers, pollInterval)
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
 		assert.Equal(t, numberOfWorkers, receiver.workerSem.available)
 	})
