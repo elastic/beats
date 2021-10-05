@@ -37,7 +37,7 @@ type serviceData struct {
 	processors []map[string]interface{}
 }
 
-// NewServiceEventer creates a watcher that can discover and process service objects
+// NewServiceEventer creates an eventer that can discover and process service objects
 func NewServiceEventer(
 	comm composable.DynamicProviderComm,
 	cfg *Config,
