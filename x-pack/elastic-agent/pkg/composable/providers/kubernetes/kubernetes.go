@@ -130,7 +130,7 @@ type Eventer interface {
 	Stop()
 }
 
-// newWatcher initializes the proper watcher according to the given resource (pod, node, service).
+// newEventer initializes the proper eventer according to the given resource (pod, node, service).
 func (p *dynamicProvider) newEventer(
 	resourceType string,
 	comm composable.DynamicProviderComm,
