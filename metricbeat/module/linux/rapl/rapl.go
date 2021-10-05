@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+// +build linux
+
 package rapl
 
 import (
@@ -208,6 +210,11 @@ func getMSRCPUs() ([]int, error) {
 	coreList := []int{}
 	for _, cores := range CPUs {
 		coreList = append(coreList, cores[0])
+	}
+
+	// if we don't have any cores, assume something has gone wrong
+	if len(coreList) == 0 {
+		return coreList, errors.New("no cores found")
 	}
 
 	return coreList, nil
