@@ -31086,7 +31086,7 @@ type: keyword
 --
 
 [[exported-fields-enterprisesearch]]
-== enterprisesearch fields
+== Enterprise Search fields
 
 Enterprise Search module
 
