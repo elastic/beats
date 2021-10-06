@@ -19,6 +19,7 @@ package beat
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -62,6 +63,12 @@ type Beat struct {
 	//      It's currently used by filebeat modules to setup the Ingest Node
 	//      pipeline and ML jobs.
 	Config *BeatConfig // Common Beat configuration data.
+
+	// OutputConfigReloader may be set by a Creator to watch for output config changes.
+	//
+	// This reloader is called in addition to libbeat's internal output reloader, which
+	// is responsible for reconfiguring Publisher.
+	OutputConfigReloader reload.Reloadable
 
 	BeatConfig *common.Config // The beat's own configuration section
 

@@ -115,6 +115,13 @@ pull_request_rules:
       label:
         add:
           - backport-skip
+  - name: remove-backport label
+    conditions:
+      - label~=backport-v
+    actions:
+      label:
+        remove:
+          - backport-skip
   - name: backport patches to 7.x branch
     conditions:
       - merged
