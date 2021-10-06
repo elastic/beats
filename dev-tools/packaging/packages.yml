@@ -433,6 +433,7 @@ shared:
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
       linux_capabilities: ''
+      image_name: ''
     files:
       'elastic-agent.yml':
         source: 'elastic-agent.docker.yml'
@@ -448,6 +449,11 @@ shared:
     extra_vars:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
+
+  - &agent_docker_cloud_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-cloud'
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -1007,6 +1013,19 @@ specs:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
+    # Cloud specific docker image
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_cloud_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
     - os: linux
       arch: amd64
       types: [docker]
@@ -1029,6 +1048,19 @@ specs:
         # This image gets a 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Cloud specific docker image
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_cloud_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}

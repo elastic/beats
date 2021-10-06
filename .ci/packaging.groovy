@@ -321,10 +321,12 @@ def tagAndPush(Map args = [:]) {
   }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
-  //
+
   if(beatName == 'elastic-agent'){
       variants.add("-complete")
+      variants.add("-cloud")
   }
+
   variants.each { variant ->
     tags.each { tag ->
       // TODO:

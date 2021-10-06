@@ -459,9 +459,9 @@ def tagAndPush(Map args = [:]) {
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
 
-  // only add complete variant for the elastic-agent
   if(beatName == 'elastic-agent'){
       variants.add("-complete")
+      variants.add("-cloud")
   }
 
   variants.each { variant ->
