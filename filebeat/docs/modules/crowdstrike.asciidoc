@@ -8,7 +8,7 @@ This file is generated! See scripts/docs_collector.py
 :modulename: crowdstrike
 :has-dashboards: true
 
-== Crowdstrike module
+== CrowdStrike module
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
@@ -23,7 +23,7 @@ include::../include/gs-link.asciidoc[]
 [float]
 === Compatibility
 
-This input supports Crowdstrike Falcon SIEM-Connector-v2.0.
+This input supports CrowdStrike Falcon SIEM-Connector-v2.0.
 
 include::../include/configuring-intro.asciidoc[]
 
