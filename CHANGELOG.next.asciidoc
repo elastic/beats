@@ -92,6 +92,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
 - Remove old `httpjson` config implementation. {pull}28054[28054]
+- Fix initialization of http client in Cloudfoundry input. {pull}[]
 
 *Heartbeat*
 
