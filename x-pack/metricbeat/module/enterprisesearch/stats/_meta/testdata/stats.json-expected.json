@@ -2,6 +2,7 @@
     {
         "enterprisesearch": {
             "stats": {
+                "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
                 "connectors": {
                     "job_store": {
                         "job_types": {

@@ -3,6 +3,10 @@
   release: beta
   description: Enterprise Search stats.
   fields:
+    - name: cluster_uuid
+      type: keyword
+      description: Elasticsearch Cluster UUID used by Enterprise Search
+
     - name: connectors
       type: group
       description: Workplace Search connectors subsystem stats.

@@ -26,6 +26,7 @@ var (
 	}
 
 	schema = s.Schema{
+		"cluster_uuid": c.Str("cluster_uuid"), // This is going to be included in 7.16+
 		"http": c.Dict("http", s.Schema{
 			"connections": c.Dict("connections", s.Schema{
 				"current": c.Int("current"),

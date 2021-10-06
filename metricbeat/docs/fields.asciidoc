@@ -31412,6 +31412,15 @@ type: long
 Enterprise Search stats.
 
 
+*`enterprisesearch.stats.cluster_uuid`*::
++
+--
+Elasticsearch Cluster UUID used by Enterprise Search
+
+type: keyword
+
+--
+
 [float]
 === connectors
 
