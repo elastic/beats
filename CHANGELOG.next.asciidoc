@@ -91,6 +91,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
+- Remove old `httpjson` config implementation. {pull}28054[28054]
 
 *Heartbeat*
 
@@ -306,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
 - sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
 - Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
+- Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 
 *Heartbeat*
 
@@ -422,6 +424,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
+- Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 
 *Functionbeat*
 
@@ -513,6 +516,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
 - Update cloud.google.com/go library. {pull}28229[28229]
+- Upgrade k8s.io/client-go library. {pull}28228[28228]
 
 *Auditbeat*
 
