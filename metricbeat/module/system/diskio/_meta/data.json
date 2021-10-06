@@ -15,49 +15,19 @@
     "system": {
         "diskio": {
             "io": {
-                "time": 1296
+                "ops": 0,
+                "time": 545105
             },
-            "iostat": {
-                "await": 0,
-                "busy": 0,
-                "queue": {
-                    "avg_size": 0
-                },
-                "read": {
-                    "await": 0,
-                    "per_sec": {
-                        "bytes": 0
-                    },
-                    "request": {
-                        "merges_per_sec": 0,
-                        "per_sec": 0
-                    }
-                },
-                "request": {
-                    "avg_size": 0
-                },
-                "service_time": 0,
-                "write": {
-                    "await": 0,
-                    "per_sec": {
-                        "bytes": 0
-                    },
-                    "request": {
-                        "merges_per_sec": 0,
-                        "per_sec": 0
-                    }
-                }
-            },
-            "name": "sda6",
+            "name": "sda",
             "read": {
-                "bytes": 335872,
-                "count": 82,
-                "time": 1296
+                "bytes": 4242313728,
+                "count": 181371,
+                "time": 2744086
             },
             "write": {
-                "bytes": 0,
-                "count": 0,
-                "time": 0
+                "bytes": 9611375104,
+                "count": 352596,
+                "time": 10641320
             }
         }
     }

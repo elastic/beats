@@ -86,22 +86,6 @@
           description: >
             Available swap memory.
 
-        - name: out.pages
-          type: long
-          description: count of pages swapped out
-
-        - name: in.pages
-          type: long
-          description: count of pages swapped in
-
-        - name: readahead.pages
-          type: long
-          description: swap readahead pages
-
-        - name: readahead.cached
-          type: long
-          description: swap readahead cache hits
-
         - name: used.pct
           type: scaled_float
           format: percent

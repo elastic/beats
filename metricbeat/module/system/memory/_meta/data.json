@@ -15,76 +15,26 @@
     "system": {
         "memory": {
             "actual": {
-                "free": 46533455872,
+                "free": 59377467392,
                 "used": {
-                    "bytes": 20981358592,
-                    "pct": 0.3108
+                    "bytes": 3743330304,
+                    "pct": 0.0593
                 }
             },
-            "cached": 42114609152,
-            "free": 3916599296,
-            "hugepages": {
-                "default_size": 2097152,
-                "free": 0,
-                "reserved": 0,
-                "surplus": 0,
-                "swap": {
-                    "out": {
-                        "fallback": 0,
-                        "pages": 0
-                    }
-                },
-                "total": 0,
+            "cached": 7460179968,
+            "free": 52030529536,
+            "swap": {
+                "free": 8589930496,
+                "total": 8589930496,
                 "used": {
                     "bytes": 0,
                     "pct": 0
                 }
             },
-            "page_stats": {
-                "direct_efficiency": {
-                    "pct": 0.9871
-                },
-                "kswapd_efficiency": {
-                    "pct": 0.7105
-                },
-                "pgfree": {
-                    "pages": 69780946234
-                },
-                "pgscan_direct": {
-                    "pages": 1512375
-                },
-                "pgscan_kswapd": {
-                    "pages": 25880646
-                },
-                "pgsteal_direct": {
-                    "pages": 1492831
-                },
-                "pgsteal_kswapd": {
-                    "pages": 18387096
-                }
-            },
-            "swap": {
-                "free": 8560832512,
-                "in": {
-                    "pages": 727
-                },
-                "out": {
-                    "pages": 11197
-                },
-                "readahead": {
-                    "cached": 9,
-                    "pages": 45
-                },
-                "total": 8589930496,
-                "used": {
-                    "bytes": 29097984,
-                    "pct": 0.0034
-                }
-            },
-            "total": 67514814464,
+            "total": 63120797696,
             "used": {
-                "bytes": 63598215168,
-                "pct": 0.942
+                "bytes": 11090268160,
+                "pct": 0.1757
             }
         }
     }
