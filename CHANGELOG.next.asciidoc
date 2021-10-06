@@ -308,6 +308,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
 - Update cloud.google.com/go library. {pull}28229[28229]
 - Upgrade k8s.io/client-go library. {pull}28228[28228]
+- Update ECS to 1.12.0. {pull}27770[27770]
+- Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
 
 *Auditbeat*
 
