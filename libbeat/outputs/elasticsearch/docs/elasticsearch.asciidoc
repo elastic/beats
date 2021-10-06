@@ -39,7 +39,7 @@ output.elasticsearch:
 ----
 output.elasticsearch:
   hosts: ["https://myEShost:9200"]
-  api_key: "Ym9yYWJhZWFtaW5oYXBvcnJhCg:KnR6yE41RrSowb0kQ0HWoA"
+  api_key: "ZCV7VnwBgnX0T19fN8Qe:KnR6yE41RrSowb0kQ0HWoA"
 ----
 
 *PKI certificate authentication:*
