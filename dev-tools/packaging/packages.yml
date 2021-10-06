@@ -1019,6 +1019,7 @@ specs:
       arch: amd64
       types: [docker]
       spec:
+        <<: *elastic_docker_spec
         <<: *agent_docker_spec
         <<: *agent_docker_cloud_spec
         <<: *elastic_license_for_binaries
@@ -1057,6 +1058,7 @@ specs:
       arch: arm64
       types: [docker]
       spec:
+        <<: *elastic_docker_spec
         <<: *agent_docker_arm_spec
         <<: *agent_docker_cloud_spec
         <<: *elastic_license_for_binaries
