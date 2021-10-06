@@ -185,7 +185,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-kvm,KVM>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-kvm-dommemstat,dommemstat>> beta[]  
 |<<metricbeat-metricset-kvm-status,status>> beta[]  
-|<<metricbeat-module-linux,linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+|<<metricbeat-module-linux,Linux>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .5+| .5+|  |<<metricbeat-metricset-linux-conntrack,conntrack>> beta[]  
 |<<metricbeat-metricset-linux-iostat,iostat>> beta[]  
 |<<metricbeat-metricset-linux-ksm,ksm>> beta[]  
