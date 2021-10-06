@@ -4,14 +4,11 @@
 package server
 
 import (
-	"context"
 	"errors"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"gotest.tools/assert"
 )
 
 func TestParseID(t *testing.T) {
@@ -88,33 +85,5 @@ func TestStatusErr(t *testing.T) {
 
 			require.Equal(t, tc.ExpectedStatusCode, tw.statusCode)
 		})
-	}
-}
-
-func TestBeatsPathAllowlist(t *testing.T) {
-	ctx := context.Background()
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("OK"))
-	}))
-	defer server.Close()
-	endpoint := server.URL
-
-	tcs := []struct {
-		path       string
-		statusCode int
-	}{
-		{"", http.StatusOK},
-		{"stats", http.StatusOK},
-		{"state", http.StatusOK},
-		{"not-allowed", http.StatusNotFound},
-		{"nested/path", http.StatusNotFound},
-	}
-
-	for _, tc := range tcs {
-		_, respCode, err := processMetrics(ctx, endpoint, tc.path)
-		assert.Equal(t, respCode, tc.statusCode)
-		if tc.statusCode > 299 {
-			assert.Error(t, err, errPathNotFound.Error())
-		}
 	}
 }
