@@ -68,7 +68,16 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 			return statsHandler(w, r)
 		}
 
-		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), id)
+		beatsPath := vars["beatsPath"]
+		if _, ok := beatsPathAllowlist[beatsPath]; !ok {
+			return errorfWithStatus(http.StatusNotFound, "endpoint not found")
+		}
+
+		endpoint, err := generateEndpoint(id)
+		if err != nil {
+			return err
+		}
+		metricsBytes, statusCode, metricsErr := processMetrics(r.Context(), endpoint, beatsPath)
 		if metricsErr != nil {
 			return metricsErr
 		}
@@ -82,23 +91,14 @@ func processHandler(statsHandler func(http.ResponseWriter, *http.Request) error)
 	}
 }
 
-func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
-	detail, err := parseID(id)
-	if err != nil {
-		return nil, 0, err
-	}
+var beatsPathAllowlist = map[string]struct{}{
+	"":      struct{}{},
+	"stats": struct{}{},
+	"state": struct{}{},
+}
 
-	endpoint := beats.MonitoringEndpoint(detail.spec, artifact.DefaultConfig().OS(), detail.output)
-	if !strings.HasPrefix(endpoint, httpPlusPrefix) && !strings.HasPrefix(endpoint, "http") {
-		// add prefix for npipe and unix
-		endpoint = httpPlusPrefix + endpoint
-	}
-
-	if detail.isMonitoring {
-		endpoint += "_monitor"
-	}
-
-	hostData, err := parse.ParseURL(endpoint, "http", "", "", "stats", "")
+func processMetrics(ctx context.Context, endpoint, path string) ([]byte, int, error) {
+	hostData, err := parse.ParseURL(endpoint, "http", "", "", path, "")
 	if err != nil {
 		return nil, 0, errorWithStatus(http.StatusInternalServerError, err)
 	}
@@ -143,6 +143,24 @@ func processMetrics(ctx context.Context, id string) ([]byte, int, error) {
 	}
 
 	return rb, resp.StatusCode, nil
+}
+
+func generateEndpoint(id string) (string, error) {
+	detail, err := parseID(id)
+	if err != nil {
+		return "", err
+	}
+
+	endpoint := beats.MonitoringEndpoint(detail.spec, artifact.DefaultConfig().OS(), detail.output)
+	if !strings.HasPrefix(endpoint, httpPlusPrefix) && !strings.HasPrefix(endpoint, "http") {
+		// add prefix for npipe and unix
+		endpoint = httpPlusPrefix + endpoint
+	}
+
+	if detail.isMonitoring {
+		endpoint += "_monitor"
+	}
+	return endpoint, nil
 }
 
 func writeResponse(w http.ResponseWriter, c interface{}) {
