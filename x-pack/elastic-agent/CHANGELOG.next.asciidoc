@@ -144,3 +144,4 @@
 - Agent now adapts the beats queue size based on output settings. {issue}26638[26638] {pull}27429[27429]
 - Support ephemeral containers in Kubernetes dynamic provider. {issue}27020[#27020] {pull}27707[27707]
 - Add complete k8s metadata through composable provider. {pull}27691[27691]
+- Add diagnostics command to gather beat metadata. {pull}28265[28265]

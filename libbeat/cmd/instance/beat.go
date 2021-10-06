@@ -163,7 +163,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
-	setVersion := settings.Version
+	agentVersion := settings.Version
 	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
@@ -173,7 +173,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, setVersion, elasticLicensed)
+		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
 		if err != nil {
 			return err
 		}
