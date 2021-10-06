@@ -428,6 +428,7 @@ func (procStats *Stats) Init() error {
 	var err error
 	procStats.host, err = sysinfo.Host()
 	if err != nil {
+		procStats.host = nil
 		procStats.logger.Warnf("Getting host details: %v", err)
 	}
 
