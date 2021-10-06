@@ -27,18 +27,18 @@ type kubebeat struct {
 func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("Error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %v", err)
 	}
 
 	// could we later use code from gatekeeper/kube-mgmt?
 	config, err := rest.InClusterConfig()
 	if err != nil {
-		panic(err.Error())
+		return nil, fmt.Errorf("error getting in-cluster configuration: %v", err)
 	}
 	// creates the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		panic(err.Error())
+		return nil, fmt.Errorf("error creating k8s client set: %v", err)
 	}
 
 	bt := &kubebeat{
@@ -73,7 +73,8 @@ func (bt *kubebeat) Run(b *beat.Beat) error {
 			})
 		timestamp := time.Now()
 		if err != nil {
-			panic(err.Error())
+			logp.Error(fmt.Errorf("error fetching pods data: %v", err))
+			continue
 		}
 
 		events := make([]beat.Event, len(pods.Items))
