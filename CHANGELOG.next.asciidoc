@@ -424,6 +424,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Functionbeat*
 
+- Update Google Cloud Functions to use 1.16.x environment on GCP to avoid import errors. {pull}28251[28251]
 
 *Elastic Logging Plugin*
 
