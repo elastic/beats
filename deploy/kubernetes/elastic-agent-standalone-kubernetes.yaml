@@ -196,7 +196,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.9.0
+                    ecs.version: 1.12.0
           - data_stream:
               dataset: system.syslog
               type: logs
@@ -212,7 +212,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.9.0
+                    ecs.version: 1.12.0
       - name: container-log
         type: logfile
         use_output: default
