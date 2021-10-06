@@ -303,7 +303,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, fromFlag bool, kibanaConfig *com
 
 func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, fromFlag bool, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
 	if !mlimporter.IsCompatible(esClient) && fromFlag {
-		return fmt.Errorf("Machine learning jobs are not loaded because Elasticsearch version is too new. Use the Machine learning UI in Kibana.")
+		return fmt.Errorf("Machine learning jobs are not loaded because Elasticsearch version is too new. It must be 7.x for setting up ML using Beats. Use the Machine learning UI in Kibana.")
 	}
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
