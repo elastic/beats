@@ -90,7 +90,7 @@ type BeatConfig struct {
 
 // SetupMLCallback can be used by the Beat to register MachineLearning configurations
 // for the enabled modules.
-type SetupMLCallback func(*Beat, *common.Config) error
+type SetupMLCallback func(*Beat, bool, *common.Config) error
 
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.

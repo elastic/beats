@@ -309,6 +309,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update cloud.google.com/go library. {pull}28229[28229]
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
+- Do not load ML jobs to Elasticsearch 8.x from new Beats 7.x releases. {pull}27771[27771]
 
 *Auditbeat*
 
