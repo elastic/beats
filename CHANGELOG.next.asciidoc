@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated/undocumented IncludeCreatorMetadata setting from kubernetes metadata config options {pull}28006[28006]
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
 - Remove deprecated config option aws_partition. {pull}28120[28120]
+- Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 
 *Auditbeat*
 
