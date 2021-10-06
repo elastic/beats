@@ -24,7 +24,7 @@ setup.template.pattern: "customname-*"
 -----
 
 ifndef::no_ilm[]
-WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored. Thus you need to set `setup.ilm.enabled: false` for it to work.
+WARNING: If <<ilm,index lifecycle management>> is enabled (which is typically the default), `setup.template.name` and `setup.template.pattern` are ignored. Thus you must also set setup.ilm.enabled: false to disable index lifecycle management.
 endif::no_ilm[]
 
 ifndef::no_dashboards[]
