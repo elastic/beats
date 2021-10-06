@@ -40,3 +40,23 @@ func GetConfig(t *testing.T, metricSetName string) map[string]interface{} {
 		"subscription_id":       subId,
 	}
 }
+
+// GetConfigForInsights function gets azure credentials for integration tests.
+func GetConfigForInsights(t *testing.T, metricSetName string) map[string]interface{} {
+	t.Helper()
+	applicationId, ok := os.LookupEnv("AZURE_APPLICATION_ID")
+	if !ok {
+		t.Fatal("Could not find var AZURE_APPLICATION_ID")
+	}
+	apiKey, ok := os.LookupEnv("AZURE_API_KEY")
+	if !ok {
+		t.Fatal("Could not find var AZURE_API_KEY")
+	}
+	return map[string]interface{}{
+		"module":         "azure",
+		"period":         "300s",
+		"metricsets":     []string{metricSetName},
+		"application_id": applicationId,
+		"api_key":        apiKey,
+	}
+}

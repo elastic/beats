@@ -20,12 +20,17 @@
 package memory
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	mem "github.com/elastic/beats/v7/libbeat/metric/system/memory"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"fmt"
+	"runtime"
 
 	"github.com/pkg/errors"
+
+	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system"
 )
 
 func init() {
@@ -38,133 +43,48 @@ func init() {
 // MetricSet for fetching system memory metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
+	IsAgent bool
 }
 
 // New is a mb.MetricSetFactory that returns a memory.MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{base}, nil
+
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
+	}
+
+	return &MetricSet{BaseMetricSet: base, IsAgent: systemModule.IsAgent}, nil
 }
 
 // Fetch fetches memory metrics from the OS.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	memStat, err := mem.Get()
+
+	eventRaw, err := metrics.Get("")
 	if err != nil {
-		return errors.Wrap(err, "memory")
-	}
-	mem.AddMemPercentage(memStat)
-
-	swapStat, err := mem.GetSwap()
-	if err != nil {
-		return errors.Wrap(err, "swap")
-	}
-	mem.AddSwapPercentage(swapStat)
-
-	memory := common.MapStr{
-		"total": memStat.Total,
-		"used": common.MapStr{
-			"bytes": memStat.Used,
-			"pct":   memStat.UsedPercent,
-		},
-		"free": memStat.Free,
-		"actual": common.MapStr{
-			"free": memStat.ActualFree,
-			"used": common.MapStr{
-				"pct":   memStat.ActualUsedPercent,
-				"bytes": memStat.ActualUsed,
-			},
-		},
+		return errors.Wrap(err, "error fetching memory metrics")
 	}
 
-	vmstat, err := mem.GetVMStat()
-	if err != nil {
-		return errors.Wrap(err, "VMStat")
-	}
+	memory := common.MapStr{}
+	err = typeconv.Convert(&memory, &eventRaw)
 
-	swap := common.MapStr{
-		"total": swapStat.Total,
-		"used": common.MapStr{
-			"bytes": swapStat.Used,
-			"pct":   swapStat.UsedPercent,
-		},
-		"free": swapStat.Free,
-	}
-
-	if vmstat != nil {
+	// for backwards compatibility, only report if we're not in fleet mode
+	// This is entirely linux-specific data that should live in linux/memory.
+	// DEPRECATE: remove this for 8.0
+	if !m.IsAgent && runtime.GOOS == "linux" {
+		err := fetchLinuxMemStats(memory)
+		if err != nil {
+			return errors.Wrap(err, "error getting page stats")
+		}
+		vmstat, err := getVMStat()
+		if err != nil {
+			return errors.Wrap(err, "Error getting VMStat data")
+		}
 		// Swap in and swap out numbers
-		swap["in"] = common.MapStr{
-			"pages": vmstat.Pswpin,
-		}
-		swap["out"] = common.MapStr{
-			"pages": vmstat.Pswpout,
-		}
-		//Swap readahead
-		//See https://www.kernel.org/doc/ols/2007/ols2007v2-pages-273-284.pdf
-		swap["readahead"] = common.MapStr{
-			"pages":  vmstat.SwapRa,
-			"cached": vmstat.SwapRaHit,
-		}
-		pageStats := common.MapStr{
-			"pgscan_kswapd": common.MapStr{
-				"pages": vmstat.PgscanKswapd,
-			},
-			"pgscan_direct": common.MapStr{
-				"pages": vmstat.PgscanDirect,
-			},
-			"pgfree": common.MapStr{
-				"pages": vmstat.Pgfree,
-			},
-			"pgsteal_kswapd": common.MapStr{
-				"pages": vmstat.PgstealKswapd,
-			},
-			"pgsteal_direct": common.MapStr{
-				"pages": vmstat.PgstealDirect,
-			},
-		}
-		// This is similar to the vmeff stat gathered by sar
-		// these ratios calculate thhe efficiency of page reclaim
-		if vmstat.PgscanDirect != 0 {
-			pageStats["direct_efficiency"] = common.MapStr{
-				"pct": common.Round(float64(vmstat.PgstealDirect)/float64(vmstat.PgscanDirect), common.DefaultDecimalPlacesCount),
-			}
-		}
-
-		if vmstat.PgscanKswapd != 0 {
-			pageStats["kswapd_efficiency"] = common.MapStr{
-				"pct": common.Round(float64(vmstat.PgstealKswapd)/float64(vmstat.PgscanKswapd), common.DefaultDecimalPlacesCount),
-			}
-		}
-
-		memory["page_stats"] = pageStats
-	}
-
-	memory["swap"] = swap
-
-	hugePagesStat, err := mem.GetHugeTLBPages()
-	if err != nil {
-		return errors.Wrap(err, "hugepages")
-	}
-	if hugePagesStat != nil {
-		mem.AddHugeTLBPagesPercentage(hugePagesStat)
-		thp := common.MapStr{
-			"total": hugePagesStat.Total,
-			"used": common.MapStr{
-				"bytes": hugePagesStat.TotalAllocatedSize,
-				"pct":   hugePagesStat.UsedPercent,
-			},
-			"free":         hugePagesStat.Free,
-			"reserved":     hugePagesStat.Reserved,
-			"surplus":      hugePagesStat.Surplus,
-			"default_size": hugePagesStat.DefaultSize,
-		}
-		if vmstat != nil {
-			thp["swap"] = common.MapStr{
-				"out": common.MapStr{
-					"pages":    vmstat.ThpSwpout,
-					"fallback": vmstat.ThpSwpoutFallback,
-				},
-			}
-		}
-		memory["hugepages"] = thp
+		memory.Put("swap.in.pages", vmstat.Pswpin)
+		memory.Put("swap.out.pages", vmstat.Pswpout)
+		memory.Put("swap.readahead.pages", vmstat.SwapRa)
+		memory.Put("swap.readahead.cached", vmstat.SwapRaHit)
 	}
 
 	r.Event(mb.Event{

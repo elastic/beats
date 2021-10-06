@@ -19,8 +19,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -32,9 +32,12 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
-            "89.40.182.58",
-            "172.16.68.20"
+            "172.16.68.20",
+            "89.40.182.58"
         ],
         "rule.category": "access to a potentially vulnerable web application",
         "rule.id": "1881",
@@ -61,13 +64,14 @@
         "source.as.organization.name": "Bestnet Service SRL",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RO",
+        "source.geo.country_name": "Romania",
         "source.geo.location.lat": 46.0,
         "source.geo.location.lon": 25.0,
         "source.ip": "89.40.182.58",
         "source.port": 41528,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -90,8 +94,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "my_fancy_host",
@@ -103,6 +107,9 @@
         "observer.serial_number": "1234567890123456",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "my_fancy_host"
+        ],
         "related.ip": [
             "117.50.11.192",
             "172.16.66.155"
@@ -132,6 +139,7 @@
         "source.as.organization.name": "China Unicom Beijing Province Network",
         "source.geo.continent_name": "Asia",
         "source.geo.country_iso_code": "CN",
+        "source.geo.country_name": "China",
         "source.geo.location.lat": 31.0449,
         "source.geo.location.lon": 121.4012,
         "source.geo.region_iso_code": "CN-SH",
@@ -139,8 +147,8 @@
         "source.ip": "117.50.11.192",
         "source.port": 58914,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -163,8 +171,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "some_other_host.local",
@@ -176,9 +184,12 @@
         "observer.serial_number": "1234567890123457",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "some_other_host.local"
+        ],
         "related.ip": [
-            "77.61.185.101",
-            "172.16.68.20"
+            "172.16.68.20",
+            "77.61.185.101"
         ],
         "rule.category": "Web Application Attack",
         "rule.id": "53589",
@@ -205,13 +216,14 @@
         "source.as.organization.name": "KPN B.V.",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "NL",
+        "source.geo.country_name": "Netherlands",
         "source.geo.location.lat": 52.3824,
         "source.geo.location.lon": 4.8995,
         "source.ip": "77.61.185.101",
         "source.port": 59476,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -234,8 +246,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -247,6 +259,9 @@
         "observer.serial_number": "SFDemo-f64dd6be",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.0.0.168",
             "10.1.1.234"
@@ -275,8 +290,8 @@
         "source.ip": "10.0.0.168",
         "source.port": 28938,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     },
     {
@@ -299,8 +314,8 @@
         "event.severity": "4",
         "event.timezone": "-02:00",
         "event.type": [
-            "denied",
-            "connection"
+            "connection",
+            "denied"
         ],
         "fileset.name": "xg",
         "host.name": "firewall.localgroup.local",
@@ -312,6 +327,9 @@
         "observer.serial_number": "SFDemo-f64dd6be",
         "observer.type": "firewall",
         "observer.vendor": "Sophos",
+        "related.hosts": [
+            "firewall.localgroup.local"
+        ],
         "related.ip": [
             "10.0.1.31",
             "10.1.0.115"
@@ -340,8 +358,8 @@
         "source.ip": "10.0.1.31",
         "source.port": 40140,
         "tags": [
-            "sophos-xg",
-            "forwarded"
+            "forwarded",
+            "sophos-xg"
         ]
     }
 ]

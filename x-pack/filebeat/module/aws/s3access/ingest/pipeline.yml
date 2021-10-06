@@ -2,6 +2,12 @@ description: "Pipeline for s3 server access logs"
 
 processors:
   - set:
+      field: event.category
+      value: web
+  - append:
+      field: event.type
+      value: access
+  - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
   - grok:
@@ -9,7 +15,7 @@ processors:
       patterns:
         - >-
           %{BASE16NUM:aws.s3access.bucket_owner} %{HOSTNAME:aws.s3access.bucket} \[%{HTTPDATE:_temp_.s3access_time}\]
-          %{IP:aws.s3access.remote_ip} (?:-|%{S3REQUESTER:aws.s3access.requester}) %{S3REQUESTID:aws.s3access.request_id}
+          (?:-|%{IP:aws.s3access.remote_ip}) (?:-|%{S3REQUESTER:aws.s3access.requester}) %{S3REQUESTID:aws.s3access.request_id}
           %{S3OPERATION:aws.s3access.operation} (?:-|%{S3KEY:aws.s3access.key}) (?:-|\"%{DATA:aws.s3access.request_uri}\")
           %{NUMBER:aws.s3access.http_status:long} (?:-|%{WORD:aws.s3access.error_code}) (?:-|%{NUMBER:aws.s3access.bytes_sent:long})
           (?:-|%{NUMBER:aws.s3access.object_size:long}) (?:-|%{NUMBER:aws.s3access.total_time:long}) (?:-|%{NUMBER:aws.s3access.turn_around_time:long})
@@ -24,6 +30,23 @@ processors:
         S3ID: "[a-zA-Z0-9\\/_\\.\\-%+=]+"
         S3VERSION: "[a-zA-Z0-9.]+"
 
+  - grok:
+      field: aws.s3access.request_uri
+      ignore_failure: true
+      patterns:
+        - '%{NOTSPACE:http.request.method} %{NOTSPACE:_temp_.uri_orig} [hH][tT][tT][pP]/%{NOTSPACE:http.version}'
+
+  - grok:
+      field: aws.s3access.host_header
+      ignore_failure: true
+      patterns:
+        - '(s3[a-z-]*).%{NOTSPACE:cloud.region}.%{WORD}.%{WORD}'
+      if: ctx.aws?.s3access?.host_header != null
+
+  - uri_parts:
+      field: _temp_.uri_orig
+      ignore_failure: true
+      if: ctx?._temp_?.uri_orig != null
   - append:
       if: "ctx?.aws?.s3access?.bucket_owner != null"
       field: related.user
@@ -99,10 +122,25 @@ processors:
       field: event.outcome
       value: success
 
-  - set:
-      field: event.duration
-      value: "{{aws.s3access.total_time}}"
-      ignore_empty_value: true
+  - convert:
+      field: aws.s3access.bytes_sent
+      target_field: http.response.body.bytes
+      type: long
+      ignore_failure: true
+
+  - convert:
+      field: aws.s3access.total_time
+      target_field: event.duration
+      type: long
+      ignore_failure: true
+
+  - script:
+      lang: painless
+      if: ctx.event?.duration != null
+      params:
+        MS_TO_NS: 1000000
+      source: >-
+        ctx.event.duration *= params.MS_TO_NS;
 
   - set:
       field: http.request.referrer
@@ -138,13 +176,43 @@ processors:
       value: event
 
   #
+  # Save original message into event.original
+  #
+  - rename:
+      field: "message"
+      target_field: "event.original"
+
+  #
   # Remove temporary fields
   #
   - remove:
-      field:
-        - message
-        - _temp_
+      field: _temp_
       ignore_missing: true
+
+  - script:
+      lang: painless
+      description: This script processor iterates over the whole document to remove fields with null values.
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+          map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 
 on_failure:
   - set:

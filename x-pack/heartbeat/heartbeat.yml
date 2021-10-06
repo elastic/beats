@@ -22,6 +22,8 @@ heartbeat.config.monitors:
 # Configure monitors inline
 heartbeat.monitors:
 - type: http
+  # Set enabled to true (or delete the following line) to enable this example monitor
+  enabled: false
   # ID used to uniquely identify this monitor in elasticsearch even if the config changes
   id: my-monitor
   # Human readable display name for this service in Uptime UI and elsewhere
@@ -33,7 +35,7 @@ heartbeat.monitors:
   # Total test connection and data exchange timeout
   #timeout: 16s
   # Name of corresponding APM service, if Elastic APM is in use for the monitored service.
-  #service_name: my-apm-service-name
+  #service.name: my-apm-service-name
 
 # ======================= Elasticsearch template setting =======================
 
@@ -140,7 +142,7 @@ processors:
 
 # At debug level, you can selectively enable logging only for some components.
 # To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
+# "publisher", "service".
 #logging.selectors: ["*"]
 
 # ============================= X-Pack Monitoring ==============================

@@ -23,7 +23,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 0,
         "http.response.status_code": 460,
         "http.version": "1.1",
@@ -35,6 +34,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -44,8 +44,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da09932-2c342a443bfb96249aa50ed7",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da09932-2c342a443bfb96249aa50ed7",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:01:50.492Z",
@@ -71,7 +79,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -83,6 +90,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -92,8 +100,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da09954-2c342a443bfb96249aa50ed7",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da09954-2c342a443bfb96249aa50ed7",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:01:22.915Z",
@@ -119,7 +135,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -131,6 +146,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -140,8 +156,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da09938-d9c72660e247c36070017828",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da09938-d9c72660e247c36070017828",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:01:35.190Z",
@@ -167,7 +191,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -179,6 +202,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -188,8 +212,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da09945-0eaa8050df7d96f84806ded0",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da09945-0eaa8050df7d96f84806ded0",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:02:28.837Z",
@@ -215,7 +247,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -227,6 +258,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -236,8 +268,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da0997a-5add00b04bc8ae20ae96d9f0",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da0997a-5add00b04bc8ae20ae96d9f0",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:02:41.203Z",
@@ -263,7 +303,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -275,6 +314,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -284,8 +324,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da09987-cc391940b332434860dfa848",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da09987-cc391940b332434860dfa848",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:03:49.331Z",
@@ -311,7 +359,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 308,
         "http.response.status_code": 504,
         "http.version": "1.1",
@@ -323,6 +370,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -332,8 +380,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da099cb-3d3b17eb2b75373f4c0c36c5",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da099cb-3d3b17eb2b75373f4c0c36c5",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:55:09.308Z",
@@ -363,7 +419,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -375,6 +430,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -384,8 +440,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da0a5dd-4d9a423a0e9a782fe2f390af",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da0a5dd-4d9a423a0e9a782fe2f390af",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:55:11.354Z",
@@ -415,7 +479,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -427,6 +490,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -436,8 +500,16 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da0a5df-7d64cabe9955b4df9acc800a",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da0a5df-7d64cabe9955b4df9acc800a",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
     },
     {
         "@timestamp": "2019-10-11T15:55:11.987Z",
@@ -467,7 +539,6 @@
         "fileset.name": "elb",
         "http.request.body.bytes": 125,
         "http.request.method": "GET",
-        "http.request.referrer": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
         "http.response.body.bytes": 859,
         "http.response.status_code": 200,
         "http.version": "1.1",
@@ -479,6 +550,7 @@
         "source.geo.city_name": "Teruel",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "ES",
+        "source.geo.country_name": "Spain",
         "source.geo.location.lat": 40.3456,
         "source.geo.location.lon": -1.1065,
         "source.geo.region_iso_code": "ES-TE",
@@ -488,7 +560,72 @@
         "tags": [
             "forwarded"
         ],
-        "tracing.trace.id": "Root=1-5da0a5df-7c958e828ff43b63d0e0fac4",
-        "user_agent.original": "curl/7.58.0"
+        "trace.id": "Root=1-5da0a5df-7c958e828ff43b63d0e0fac4",
+        "url.domain": "filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com",
+        "url.original": "http://filebeat-aws-elb-test-12030537.eu-central-1.elb.amazonaws.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.58.0",
+        "user_agent.version": "7.58.0"
+    },
+    {
+        "@timestamp": "2018-07-02T22:23:00.186Z",
+        "aws.elb.action_executed": [
+            "forward",
+            "redirect"
+        ],
+        "aws.elb.backend.http.response.status_code": 200,
+        "aws.elb.backend.ip": "10.0.0.1",
+        "aws.elb.backend.port": "80",
+        "aws.elb.backend_processing_time.sec": 0.001,
+        "aws.elb.matched_rule_priority": "0",
+        "aws.elb.name": "app/my-loadbalancer/50dc6c495c0c9188",
+        "aws.elb.protocol": "http",
+        "aws.elb.request_processing_time.sec": 0.0,
+        "aws.elb.response_processing_time.sec": 0.0,
+        "aws.elb.target_group.arn": "arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067",
+        "aws.elb.target_port": [
+            "10.0.0.1:80"
+        ],
+        "aws.elb.target_status_code": [
+            "200"
+        ],
+        "aws.elb.trace_id": "Root=1-58337262-36d228ad5d99923122bbe354",
+        "aws.elb.type": "http",
+        "cloud.provider": "aws",
+        "event.category": "web",
+        "event.dataset": "aws.elb",
+        "event.end": "2018-07-02T22:23:00.186Z",
+        "event.kind": "event",
+        "event.module": "aws",
+        "event.outcome": "success",
+        "event.start": "2018-07-02T22:22:48.364000Z",
+        "fileset.name": "elb",
+        "http.request.body.bytes": 34,
+        "http.request.method": "GET",
+        "http.response.body.bytes": 366,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 4431,
+        "service.type": "aws",
+        "source.ip": "192.168.131.39",
+        "source.port": "2817",
+        "tags": [
+            "forwarded"
+        ],
+        "trace.id": "Root=1-58337262-36d228ad5d99923122bbe354",
+        "url.domain": "www.example.com",
+        "url.original": "http://www.example.com:80/",
+        "url.path": "/",
+        "url.port": 80,
+        "url.scheme": "http",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "curl",
+        "user_agent.original": "curl/7.46.0",
+        "user_agent.version": "7.46.0"
     }
 ]

@@ -83,8 +83,6 @@ type ProcessesWatcher struct {
 	impl processWatcherImpl
 }
 
-var ProcWatcher ProcessesWatcher
-
 func (proc *ProcessesWatcher) Init(config ProcsConfig) error {
 	return proc.initWithImpl(config, proc)
 }

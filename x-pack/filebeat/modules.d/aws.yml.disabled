@@ -8,6 +8,27 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
+    # Process CloudTrail logs
+    # default is true, set to false to skip Cloudtrail logs
+    # var.process_cloudtrail_logs: false
+
+    # Process CloudTrail Digest logs
+    # default true, set to false to skip CloudTrail Digest logs
+    # var.process_digest_logs: false
+
+    # Process CloudTrail Insight logs
+    # default true, set to false to skip CloudTrail Insight logs
+    # var.process_insight_logs: false
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -35,6 +56,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   cloudwatch:
     enabled: false
@@ -42,6 +69,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -69,6 +105,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   ec2:
     enabled: false
@@ -76,6 +118,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -103,6 +154,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   elb:
     enabled: false
@@ -110,6 +167,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -137,6 +203,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   s3access:
     enabled: false
@@ -144,6 +216,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -171,6 +252,12 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5
 
   vpcflow:
     enabled: false
@@ -178,6 +265,15 @@
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -205,3 +301,9 @@
 
     # AWS IAM Role to assume
     #var.role_arn: arn:aws:iam::123456789012:role/test-mb
+
+    # Enabling this option changes the service name from `s3` to `s3-fips` for connecting to the correct service endpoint.
+    #var.fips_enabled: false
+
+    # The maximum number of messages to return from SQS. Valid values: 1 to 10.
+    #var.max_number_of_messages: 5

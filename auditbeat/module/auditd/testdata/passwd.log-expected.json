@@ -1,0 +1,282 @@
+[
+  {
+    "auditd": {
+      "data": {
+        "acct": "bob",
+        "addr": "127.0.0.1",
+        "hostname": "ubuntu-bionic",
+        "op": "PAM:chauthtok",
+        "terminal": "pts/1"
+      },
+      "message_type": "user_chauthtok",
+      "result": "success",
+      "sequence": 797,
+      "session": "15",
+      "summary": {
+        "actor": {
+          "primary": "oldbob",
+          "secondary": "bob"
+        },
+        "how": "/usr/bin/passwd",
+        "object": {
+          "primary": "pts/1",
+          "secondary": "127.0.0.1",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "changed-password",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_CHAUTHTOK msg=audit(1610986912.458:797): pid=13107 uid=0 auid=1002 ses=15 msg='op=PAM:chauthtok acct=\"bob\" exe=\"/usr/bin/passwd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/1 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/bin/passwd",
+      "pid": 13107
+    },
+    "related": {
+      "user": [
+        "bob",
+        "oldbob",
+        "root"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1002",
+        "name": "oldbob"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1002",
+      "name": "oldbob",
+      "target": {
+        "id": "9999",
+        "name": "bob"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "addr": "127.0.0.1",
+        "hostname": "ubuntu-bionic",
+        "id": "1003",
+        "op": "changing",
+        "terminal": "pts/2"
+      },
+      "message_type": "user_chauthtok",
+      "result": "success",
+      "sequence": 805,
+      "session": "14",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "charlie"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/2",
+          "secondary": "127.0.0.1",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "changed-password",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_CHAUTHTOK msg=audit(1610987544.541:805): pid=13379 uid=0 auid=1000 ses=14 msg='op=changing comment id=1003 exe=\"/usr/sbin/usermod\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 13379
+    },
+    "related": {
+      "user": [
+        "charlie",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "target": {
+        "id": "1003",
+        "name": "charlie"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "hostname": "ubuntu-bionic",
+        "id": "1003",
+        "op": "changing",
+        "terminal": "pts/2"
+      },
+      "message_type": "user_chauthtok",
+      "result": "success",
+      "sequence": 810,
+      "session": "14",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "charlie"
+        },
+        "how": "/usr/sbin/usermod",
+        "object": {
+          "primary": "pts/2",
+          "secondary": "ubuntu-bionic",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "changed-password",
+      "category": [
+        "iam"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_CHAUTHTOK msg=audit(1610987708.643:810): pid=13519 uid=0 auid=1000 ses=14 msg='op=changing name id=1003 exe=\"/usr/sbin/usermod\" hostname=ubuntu-bionic addr=? terminal=pts/2 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "user",
+        "change"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/usermod",
+      "pid": 13519
+    },
+    "related": {
+      "user": [
+        "charlie",
+        "root",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "0",
+        "name": "root"
+      },
+      "id": "1000",
+      "name": "vagrant",
+      "target": {
+        "id": "1003",
+        "name": "charlie"
+      }
+    }
+  },
+  {
+    "auditd": {
+      "data": {
+        "acct": "bob",
+        "hostname": "ubuntu-bionic",
+        "op": "changing",
+        "terminal": "pts/2"
+      },
+      "message_type": "user_acct",
+      "result": "success",
+      "sequence": 815,
+      "session": "14",
+      "summary": {
+        "actor": {
+          "primary": "vagrant",
+          "secondary": "bob"
+        },
+        "how": "/usr/sbin/groupmod",
+        "object": {
+          "primary": "pts/2",
+          "secondary": "ubuntu-bionic",
+          "type": "user-session"
+        }
+      }
+    },
+    "event": {
+      "action": "was-authorized",
+      "category": [
+        "authentication"
+      ],
+      "kind": "event",
+      "original": [
+        "type=USER_ACCT msg=audit(1610988774.279:815): pid=13812 uid=0 auid=1000 ses=14 msg='op=changing /etc/group; group bob/1003, new name: bobby acct=\"bob\" exe=\"/usr/sbin/groupmod\" hostname=ubuntu-bionic addr=? terminal=pts/2 res=success'"
+      ],
+      "outcome": "success",
+      "type": [
+        "info"
+      ]
+    },
+    "process": {
+      "executable": "/usr/sbin/groupmod",
+      "pid": 13812
+    },
+    "related": {
+      "user": [
+        "bob",
+        "vagrant"
+      ]
+    },
+    "service": {
+      "type": "auditd"
+    },
+    "user": {
+      "audit": {
+        "id": "1000",
+        "name": "vagrant"
+      },
+      "effective": {
+        "id": "9999",
+        "name": "bob"
+      },
+      "id": "1000",
+      "name": "vagrant"
+    }
+  }
+]

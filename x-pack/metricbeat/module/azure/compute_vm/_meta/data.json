@@ -3,113 +3,124 @@
     "azure": {
         "compute_vm": {
             "cpu_credits_consumed": {
-                "avg": 0.01
+                "avg": 0.02
             },
             "cpu_credits_remaining": {
                 "avg": 288
             },
             "disk_read_bytes": {
-                "total": 4019543.24
+                "total": 3886082.75
             },
             "disk_read_operations_per_sec": {
-                "avg": 0.0605
+                "avg": 0.0665
             },
             "disk_write_bytes": {
-                "total": 16739967.27
+                "total": 14418893.74
             },
             "disk_write_operations_per_sec": {
-                "avg": 1.9525
+                "avg": 1.636
             },
             "inbound_flows": {
-                "avg": 31
+                "avg": 97.2
             },
             "inbound_flows_maximum_creation_rate": {
-                "avg": 0.8
+                "avg": 264
             },
             "network_in": {
-                "total": 1501534
+                "total": 1157992
             },
             "network_in_total": {
-                "total": 1806936
+                "total": 1211091
             },
             "network_out": {
-                "total": 1647640
+                "total": 1908414
             },
             "network_out_total": {
-                "total": 3633130
+                "total": 2340880
+            },
+            "os_disk_bandwidth_consumed_percentage": {
+                "avg": 0
+            },
+            "os_disk_iops_consumed_percentage": {
+                "avg": 0
+            },
+            "os_disk_max_burst_bandwidth": {
+                "avg": 170000000
+            },
+            "os_disk_max_burst_iops": {
+                "avg": 3500
             },
             "os_disk_queue_depth": {
                 "avg": 0
             },
             "os_disk_read_bytes_per_sec": {
-                "avg": 13398.475
+                "avg": 12953.607
             },
             "os_disk_read_operations_per_sec": {
-                "avg": 0.121
+                "avg": 0.133
+            },
+            "os_disk_target_bandwidth": {
+                "avg": 100000000
+            },
+            "os_disk_target_iops": {
+                "avg": 500
+            },
+            "os_disk_used_burst_bps_credits_percentage": {
+                "avg": 2
+            },
+            "os_disk_used_burst_io_credits_percentage": {
+                "avg": 0
             },
             "os_disk_write_bytes_per_sec": {
-                "avg": 55799.886
+                "avg": 48062.975
             },
             "os_disk_write_operations_per_sec": {
-                "avg": 3.905
-            },
-            "os_per_disk_qd": {
-                "avg": 0
-            },
-            "os_per_disk_read_bytes_per_sec": {
-                "avg": 13398.475
-            },
-            "os_per_disk_read_operations_per_sec": {
-                "avg": 0.121
-            },
-            "os_per_disk_write_bytes_per_sec": {
-                "avg": 55799.886
-            },
-            "os_per_disk_write_operations_per_sec": {
-                "avg": 3.905
+                "avg": 3.272
             },
             "outbound_flows": {
-                "avg": 31
+                "avg": 97.2
             },
             "outbound_flows_maximum_creation_rate": {
-                "avg": 0.8
-            },
-            "per_disk_qd": {
-                "avg": 0
-            },
-            "per_disk_read_bytes_per_sec": {
-                "avg": 0
-            },
-            "per_disk_read_operations_per_sec": {
-                "avg": 0
-            },
-            "per_disk_write_bytes_per_sec": {
-                "avg": 0
-            },
-            "per_disk_write_operations_per_sec": {
-                "avg": 0
+                "avg": 264
             },
             "percentage_cpu": {
-                "avg": 1.585
+                "avg": 2.548
             },
             "premium_os_disk_cache_read_hit": {
                 "avg": 100
             },
             "premium_os_disk_cache_read_miss": {
                 "avg": 0
+            },
+            "vm_cached_bandwidth_consumed_percentage": {
+                "avg": 0
+            },
+            "vm_cached_iops_consumed_percentage": {
+                "avg": 0
+            },
+            "vm_uncached_bandwidth_consumed_percentage": {
+                "avg": 0
+            },
+            "vm_uncached_iops_consumed_percentage": {
+                "avg": 0
             }
         },
         "namespace": "Microsoft.Compute/virtualMachines",
         "resource": {
             "group": "obs-test",
+            "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
+            "name": "perfmon-test",
             "type": "Microsoft.Compute/virtualMachines"
         },
         "subscription_id": "7657426d-c4c3-44ac-88a2-3b2cd59e6dba",
         "timegrain": "PT5M"
     },
     "cloud": {
+        "account": {
+            "id": "7657426d-c4c3-44ac-88a2-3b2cd59e6dba"
+        },
         "instance": {
-            "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
+            "id": "23d5541a-ad41-4bef-b217-1d992c51ae07",
             "name": "perfmon-test"
         },
         "machine": {
@@ -125,26 +136,26 @@
     },
     "host": {
         "cpu": {
-            "pct": 0.01585
+            "usage": 0.02548
         },
         "disk": {
             "read": {
-                "bytes": 4019543.24
+                "bytes": 3886082.75
             },
             "write": {
-                "bytes": 16739967.27
+                "bytes": 14418893.74
             }
         },
-        "id": "/subscriptions/7657426d-c4c3-44ac-88a2-3b2cd59e6dba/resourceGroups/obs-test/providers/Microsoft.Compute/virtualMachines/perfmon-test",
+        "id": "23d5541a-ad41-4bef-b217-1d992c51ae07",
         "name": "perfmon-test",
         "network": {
-            "in": {
-                "bytes": 1806936,
-                "packets": 1501534
+            "egress": {
+                "bytes": 2340880,
+                "packets": 1908414
             },
-            "out": {
-                "bytes": 3633130,
-                "packets": 1647640
+            "ingress": {
+                "bytes": 1211091,
+                "packets": 1157992
             }
         }
     },

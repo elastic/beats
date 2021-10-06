@@ -1,0 +1,21 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+# Multiline configuration for Oracle
+multiline.pattern: '^[A-Za-z]{3}\s+[A-Za-z]{3}\s+[0-9]{1,2}\s[0-9]{2}:[0-9]{2}:[0-9]{2}\s[0-9]{4}\s\S[0-9]{2}:[0-9]{2}'
+multiline.negate: true
+multiline.match: after
+multiline.timeout: 10
+exclude_lines: ['^Audit file']
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

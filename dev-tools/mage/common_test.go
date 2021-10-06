@@ -33,6 +33,8 @@ func TestParseVersion(t *testing.T) {
 		{"1.2.3-SNAPSHOT", 1, 2, 3},
 		{"1.2.3rc1", 1, 2, 3},
 		{"1.2", 1, 2, 0},
+		{"7.10.0", 7, 10, 0},
+		{"10.01.22", 10, 1, 22},
 	}
 
 	for _, tc := range tests {

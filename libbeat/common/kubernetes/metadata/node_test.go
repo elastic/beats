@@ -27,6 +27,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -34,6 +35,7 @@ import (
 )
 
 func TestNode_Generate(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	name := "obj"
 	tests := []struct {
@@ -56,21 +58,25 @@ func TestNode_Generate(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
-			output: common.MapStr{
+			output: common.MapStr{"kubernetes": common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
 				},
-			},
+			}},
 		},
 	}
 
 	cfg := common.NewConfig()
-	metagen := NewNodeMetadataGenerator(cfg, nil)
+	metagen := NewNodeMetadataGenerator(cfg, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -79,6 +85,7 @@ func TestNode_Generate(t *testing.T) {
 }
 
 func TestNode_GenerateFromName(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	uid := "005f3b90-4b9d-12f8-acf0-31020a840133"
 	name := "obj"
 	tests := []struct {
@@ -101,11 +108,15 @@ func TestNode_GenerateFromName(t *testing.T) {
 					Kind:       "Node",
 					APIVersion: "v1",
 				},
+				Status: v1.NodeStatus{
+					Addresses: []v1.NodeAddress{{Type: v1.NodeHostName, Address: "node1"}},
+				},
 			},
 			output: common.MapStr{
 				"node": common.MapStr{
-					"name": "obj",
-					"uid":  uid,
+					"name":     "obj",
+					"uid":      uid,
+					"hostname": "node1",
 				},
 				"labels": common.MapStr{
 					"foo": "bar",
@@ -118,7 +129,7 @@ func TestNode_GenerateFromName(t *testing.T) {
 		cfg := common.NewConfig()
 		nodes := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		nodes.Add(test.input)
-		metagen := NewNodeMetadataGenerator(cfg, nodes)
+		metagen := NewNodeMetadataGenerator(cfg, nodes, client)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)

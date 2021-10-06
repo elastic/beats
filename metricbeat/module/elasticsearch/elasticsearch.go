@@ -29,8 +29,6 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	s "github.com/elastic/beats/v7/libbeat/common/schema"
-	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
@@ -83,11 +81,15 @@ const ModuleName = "elasticsearch"
 
 // Info construct contains the data from the Elasticsearch / endpoint
 type Info struct {
-	ClusterName string `json:"cluster_name"`
-	ClusterID   string `json:"cluster_uuid"`
-	Version     struct {
-		Number *common.Version `json:"number"`
-	} `json:"version"`
+	ClusterName string  `json:"cluster_name"`
+	ClusterID   string  `json:"cluster_uuid"`
+	Version     Version `json:"version"`
+	Name        string  `json:"name"`
+}
+
+// Version contains the semver formatted version of ES
+type Version struct {
+	Number *common.Version `json:"number"`
 }
 
 // NodeInfo struct cotains data about the node.
@@ -119,14 +121,6 @@ type licenseWrapper struct {
 	License License `json:"license"`
 }
 
-var BulkStatsDict = c.Dict("bulk", s.Schema{
-	"total_operations":     c.Int("total_operations"),
-	"total_time_in_millis": c.Int("total_time_in_millis"),
-	"total_size_in_bytes":  c.Int("total_size_in_bytes"),
-	"avg_time_in_millis":   c.Int("avg_time_in_millis"),
-	"avg_size_in_bytes":    c.Int("avg_size_in_bytes"),
-}, c.DictOptional)
-
 // GetClusterID fetches cluster id for given nodeID.
 func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) {
 	// Check if cluster id already cached. If yes, return it.
@@ -143,14 +137,14 @@ func GetClusterID(http *helper.HTTP, uri string, nodeID string) (string, error) 
 	return info.ClusterID, nil
 }
 
-// IsMaster checks if the given node host is a master node.
+// isMaster checks if the given node host is a master node.
 //
 // The detection of the master is done in two steps:
 // * Fetch node name from /_nodes/_local/name
 // * Fetch current master name from cluster state /_cluster/state/master_node
 //
 // The two names are compared
-func IsMaster(http *helper.HTTP, uri string) (bool, error) {
+func isMaster(http *helper.HTTP, uri string) (bool, error) {
 
 	node, err := getNodeName(http, uri)
 	if err != nil {
@@ -334,7 +328,7 @@ func GetClusterSettings(http *helper.HTTP, resetURI string, includeDefaults bool
 }
 
 // GetStackUsage returns stack usage information.
-func GetStackUsage(http *helper.HTTP, resetURI string) (common.MapStr, error) {
+func GetStackUsage(http *helper.HTTP, resetURI string) (map[string]interface{}, error) {
 	content, err := fetchPath(http, resetURI, "_xpack/usage", "")
 	if err != nil {
 		return nil, err

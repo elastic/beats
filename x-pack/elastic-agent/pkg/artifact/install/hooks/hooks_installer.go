@@ -6,17 +6,16 @@ package hooks
 
 import (
 	"context"
-	"strings"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 )
 
 type embeddedInstaller interface {
-	Install(ctx context.Context, programName, version, installDir string) error
+	Install(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 type embeddedChecker interface {
-	Check(ctx context.Context, programName, version, installDir string) error
+	Check(ctx context.Context, spec program.Spec, version, installDir string) error
 }
 
 // InstallerChecker runs the PostInstallSteps after running the embedded installer
@@ -36,15 +35,9 @@ func NewInstallerChecker(i embeddedInstaller, c embeddedChecker) (*InstallerChec
 
 // Install performs installation of program in a specific version, then runs the
 // PostInstallSteps for the program if defined.
-func (i *InstallerChecker) Install(ctx context.Context, programName, version, installDir string) error {
-	if err := i.installer.Install(ctx, programName, version, installDir); err != nil {
+func (i *InstallerChecker) Install(ctx context.Context, spec program.Spec, version, installDir string) error {
+	if err := i.installer.Install(ctx, spec, version, installDir); err != nil {
 		return err
-	}
-
-	// post install hooks
-	spec, ok := program.SupportedMap[strings.ToLower(programName)]
-	if !ok {
-		return nil
 	}
 	if spec.PostInstallSteps != nil {
 		return spec.PostInstallSteps.Execute(ctx, installDir)
@@ -54,16 +47,10 @@ func (i *InstallerChecker) Install(ctx context.Context, programName, version, in
 
 // Check performs installation check of program to ensure that it is already installed, then
 // runs the InstallerCheckSteps to ensure that the installation is valid.
-func (i *InstallerChecker) Check(ctx context.Context, programName, version, installDir string) error {
-	err := i.checker.Check(ctx, programName, version, installDir)
+func (i *InstallerChecker) Check(ctx context.Context, spec program.Spec, version, installDir string) error {
+	err := i.checker.Check(ctx, spec, version, installDir)
 	if err != nil {
 		return err
-	}
-
-	// installer check steps
-	spec, ok := program.SupportedMap[strings.ToLower(programName)]
-	if !ok {
-		return nil
 	}
 	if spec.CheckInstallSteps != nil {
 		return spec.CheckInstallSteps.Execute(ctx, installDir)

@@ -134,12 +134,12 @@ ifdef::apm-server[]
 
 experimental::[]
 
-Communication between APM agents and APM Server now supports sending an
+Communication between APM agents and APM Server supports sending an
 <<api-key,API Key in the Authorization header>>.
 APM Server provides an `apikey` command that can create, verify, invalidate,
 and show information about API Keys for agent/server communication.
 Most operations require the `manage_api_key` cluster privilege,
-and you must ensure that `apm-server.api_key` or `output.elasticsearch` are configured appropriately.
+and you must ensure that either `apm-server.auth.api_key` or `output.elasticsearch` are configured appropriately.
 
 *SYNOPSIS*
 
@@ -156,18 +156,7 @@ Create an API Key with the specified privilege(s). No required flags.
 +
 The user requesting to create an API Key needs to have APM privileges used by the APM Server.
 A superuser, by default, has these privileges. For other users,
-you can create them. Create a role that is then assigned to the user:
-+
-["source","sh",subs="attributes"]
-----
-PUT /_security/role/apm-privileges {
-	"applications": [{
-	  "application": "apm",
-	  "privileges": ["sourcemap:write", "event:write", "config_agent:read"],
-	  "resources": ["*"]
-	}]
-}
-----
+you can create them. See <<privileges-api-key,create an API key user>> for required privileges.
 
 *`info`*::
 Query API Key(s). `--id` or `--name` required.
@@ -252,7 +241,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to deploy.  
+Specifies the name of the function to deploy.
 
 *FLAGS*
 
@@ -498,7 +487,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 [[package-command]]
 ==== `package` command
 
-{package-command-short-desc}. 
+{package-command-short-desc}.
 
 *SYNOPSIS*
 
@@ -513,7 +502,7 @@ ifeval::["{beatname_lc}"=="functionbeat"]
 Shows help for the `package` command.
 
 *`-o, --output`*::
-Specifies the full path pattern to use when creating the packages. 
+Specifies the full path pattern to use when creating the packages.
 
 {global-flags}
 
@@ -538,7 +527,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to remove.  
+Specifies the name of the function to remove.
 
 *FLAGS*
 
@@ -715,12 +704,10 @@ the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
 endif::[]
 
-ifeval::["{beatname_lc}"=="metricbeat"]
 *`--system.hostfs MOUNT_POINT`*::
 
-Specifies the mount point of the host's filesystem for use in monitoring a host
-from within a container.
-endif::[]
+Specifies the mount point of the host's filesystem for use in monitoring a host.
+
 
 ifeval::["{beatname_lc}"=="packetbeat"]
 *`-t`*::
@@ -769,7 +756,8 @@ necessary to analyze data for anomalies.
 endif::[]
 
 This command sets up the environment without actually running
-{beatname_uc} and ingesting data.
+{beatname_uc} and ingesting data. Specify optional flags to set up a subset of
+assets.
 
 *SYNOPSIS*
 
@@ -941,7 +929,7 @@ the credentials required by your cloud service provider.
 ----
 
 *`FUNCTION_NAME`*::
-Specifies the name of the function to update.  
+Specifies the name of the function to update.
 
 *FLAGS*
 
@@ -1023,7 +1011,7 @@ default config file, +{beatname_lc}.yml+, is used.
 Enables debugging for the specified selectors. For the selectors, you can
 specify a comma-separated
 list of components, or you can use `-d "*"` to enable debugging for all
-components. For example, `-d "publish"` displays all the "publish" related
+components. For example, `-d "publisher"` displays all the publisher-related
 messages.
 
 *`-e, --e`*::

@@ -4,6 +4,12 @@ import yaml
 
 from beat.beat import INTEGRATION_TESTS
 
+# Fail if the exported index pattern is larger than 10MiB
+# This is to avoid problems with Kibana when the payload
+# of the request to install the index pattern exceeds the
+# default limit.
+index_pattern_size_limit = 10 * 1024 * 1024
+
 
 class TestExportsMixin:
 
@@ -54,11 +60,12 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("index-pattern")
         js = json.loads(output)
-        assert "objects" in js
+        assert "attributes" in js
+        assert "index-pattern" == js["type"]
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_index_pattern_migration(self):
         """
@@ -66,11 +73,12 @@ class TestExportsMixin:
         """
         output = self.run_export_cmd("index-pattern", extra=['-E', 'migration.6_to_7.enabled=true'])
         js = json.loads(output)
-        assert "objects" in js
+        assert "attributes" in js
+        assert "index-pattern" == js["type"]
         size = len(output.encode('utf-8'))
-        assert size < 1024*1024, "Kibana index pattern must be less than 1MiB " \
-                                 "to keep the Beat setup request size below " \
-                                 "Kibana's server.maxPayloadBytes."
+        assert size < index_pattern_size_limit, "Kibana index pattern must be less than 10MiB " \
+            "to keep the Beat setup request size below " \
+            "Kibana's server.maxPayloadBytes."
 
     def test_export_config(self):
         """

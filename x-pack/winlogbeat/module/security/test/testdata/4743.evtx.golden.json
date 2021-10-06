@@ -3,8 +3,10 @@
     "@timestamp": "2019-12-18T16:25:21.5781833Z",
     "event": {
       "action": "deleted-computer-account",
-      "category": "iam",
-      "code": 4743,
+      "category": [
+        "iam"
+      ],
+      "code": "4743",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -49,7 +51,7 @@
         "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2902",
         "TargetUserName": "TESTCOMPUTEROBJ$"
       },
-      "event_id": 4743,
+      "event_id": "4743",
       "keywords": [
         "Audit Success"
       ],

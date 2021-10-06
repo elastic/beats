@@ -1,0 +1,214 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "lucene",
+                    "query": ""
+                }
+            }
+        },
+        "title": " Cache Hits, Misses [Metricbeat CoreDNS] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "Average coredns.stats.dns.cache.misses.count": "#E24D42",
+                    "Hits": "#9AC48A",
+                    "Misses": "#EA6460"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Hits",
+                        "field": "coredns.stats.dns.cache.hits.count"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 0,
+                        "timeRange": {
+                            "from": "now-30m",
+                            "to": "now"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Misses",
+                        "field": "coredns.stats.dns.cache.misses.count"
+                    },
+                    "schema": "metric",
+                    "type": "max"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "server",
+                        "field": "coredns.stats.server",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "split",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "isVislibVis": true,
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "row": true,
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Hits"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "normal",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-1"
+                    },
+                    {
+                        "data": {
+                            "id": "3",
+                            "label": "Misses"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "normal",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-2"
+                    }
+                ],
+                "times": [],
+                "type": "line",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "defaultYExtents": false,
+                            "mode": "normal",
+                            "setYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Hits"
+                        },
+                        "type": "value"
+                    },
+                    {
+                        "id": "ValueAxis-2",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "RightAxis-1",
+                        "position": "right",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Misses"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": " Cache Hits, Misses [Metricbeat CoreDNS] ECS",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "277fc650-67a9-11e9-a534-715561d0bf42",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:04.459Z",
+    "version": "WzM3MzMsMV0="
+}

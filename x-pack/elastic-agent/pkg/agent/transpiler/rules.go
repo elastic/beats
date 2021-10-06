@@ -14,6 +14,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 )
 
+// AgentInfo is an interface to get the agent info.
+type AgentInfo interface {
+	AgentID() string
+	Version() string
+	Snapshot() bool
+	Headers() map[string]string
+}
+
 // RuleList is a container that allow the same tree to be executed on multiple defined Rule.
 type RuleList struct {
 	Rules []Rule
@@ -21,15 +29,15 @@ type RuleList struct {
 
 // Rule defines a rule that can be Applied on the Tree.
 type Rule interface {
-	Apply(*AST) error
+	Apply(AgentInfo, *AST) error
 }
 
 // Apply applies a list of rules over the same tree and use the result of the previous execution
 // as the input of the next rule, will return early if any error is raise during the execution.
-func (r *RuleList) Apply(ast *AST) error {
+func (r *RuleList) Apply(agentInfo AgentInfo, ast *AST) error {
 	var err error
 	for _, rule := range r.Rules {
-		err = rule.Apply(ast)
+		err = rule.Apply(agentInfo, ast)
 		if err != nil {
 			return err
 		}
@@ -73,12 +81,20 @@ func (r *RuleList) MarshalYAML() (interface{}, error) {
 			name = "inject_index"
 		case *InjectStreamProcessorRule:
 			name = "inject_stream_processor"
+		case *InjectAgentInfoRule:
+			name = "inject_agent_info"
 		case *MakeArrayRule:
 			name = "make_array"
 		case *RemoveKeyRule:
 			name = "remove_key"
 		case *FixStreamRule:
 			name = "fix_stream"
+		case *InsertDefaultsRule:
+			name = "insert_defaults"
+		case *InjectHeadersRule:
+			name = "inject_headers"
+		case *InjectQueueRule:
+			name = "inject_queue"
 		default:
 			return nil, fmt.Errorf("unknown rule of type %T", rule)
 		}
@@ -154,12 +170,20 @@ func (r *RuleList) UnmarshalYAML(unmarshal func(interface{}) error) error {
 			r = &InjectIndexRule{}
 		case "inject_stream_processor":
 			r = &InjectStreamProcessorRule{}
+		case "inject_agent_info":
+			r = &InjectAgentInfoRule{}
 		case "make_array":
 			r = &MakeArrayRule{}
 		case "remove_key":
 			r = &RemoveKeyRule{}
 		case "fix_stream":
 			r = &FixStreamRule{}
+		case "insert_defaults":
+			r = &InsertDefaultsRule{}
+		case "inject_headers":
+			r = &InjectHeadersRule{}
+		case "inject_queue":
+			r = &InjectQueueRule{}
 		default:
 			return fmt.Errorf("unknown rule of type %s", name)
 		}
@@ -181,7 +205,12 @@ type SelectIntoRule struct {
 }
 
 // Apply applies select into rule.
-func (r *SelectIntoRule) Apply(ast *AST) error {
+func (r *SelectIntoRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to select data into configuration")
+		}
+	}()
 	target := &Dict{}
 
 	for _, selector := range r.Selectors {
@@ -214,7 +243,13 @@ type RemoveKeyRule struct {
 }
 
 // Apply applies remove key rule.
-func (r *RemoveKeyRule) Apply(ast *AST) error {
+func (r *RemoveKeyRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to remove key from configuration")
+		}
+	}()
+
 	sourceMap, ok := ast.root.(*Dict)
 	if !ok {
 		return nil
@@ -250,7 +285,13 @@ type MakeArrayRule struct {
 }
 
 // Apply applies make array rule.
-func (r *MakeArrayRule) Apply(ast *AST) error {
+func (r *MakeArrayRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to create Dictionary out of configuration")
+		}
+	}()
+
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		return nil
@@ -286,7 +327,13 @@ type CopyToListRule struct {
 }
 
 // Apply copies specified node into every item of the list.
-func (r *CopyToListRule) Apply(ast *AST) error {
+func (r *CopyToListRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy segment into configuration")
+		}
+	}()
+
 	sourceNode, found := Lookup(ast, r.Item)
 	if !found {
 		// nothing to copy
@@ -347,7 +394,13 @@ type CopyAllToListRule struct {
 }
 
 // Apply copies all nodes into every item of the list.
-func (r *CopyAllToListRule) Apply(ast *AST) error {
+func (r *CopyAllToListRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy all nodes into a list")
+		}
+	}()
+
 	// get list of nodes
 	astMap, err := ast.Map()
 	if err != nil {
@@ -370,7 +423,7 @@ func (r *CopyAllToListRule) Apply(ast *AST) error {
 			continue
 		}
 
-		if err := CopyToList(item, r.To, r.OnConflict).Apply(ast); err != nil {
+		if err := CopyToList(item, r.To, r.OnConflict).Apply(agentInfo, ast); err != nil {
 			return err
 		}
 	}
@@ -393,7 +446,13 @@ type FixStreamRule struct {
 }
 
 // Apply stream fixes.
-func (r *FixStreamRule) Apply(ast *AST) error {
+func (r *FixStreamRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to fix stream section of configuration")
+		}
+	}()
+
 	const defaultDataset = "generic"
 	const defaultNamespace = "default"
 
@@ -526,7 +585,13 @@ type InjectIndexRule struct {
 }
 
 // Apply injects index into input.
-func (r *InjectIndexRule) Apply(ast *AST) error {
+func (r *InjectIndexRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject index into configuration")
+		}
+	}()
+
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -583,7 +648,13 @@ type InjectStreamProcessorRule struct {
 }
 
 // Apply injects processor into input.
-func (r *InjectStreamProcessorRule) Apply(ast *AST) error {
+func (r *InjectStreamProcessorRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to add stream processor to configuration")
+		}
+	}()
+
 	inputsNode, found := Lookup(ast, "inputs")
 	if !found {
 		return nil
@@ -665,6 +736,78 @@ func InjectStreamProcessor(onMerge, streamType string) *InjectStreamProcessorRul
 	}
 }
 
+// InjectAgentInfoRule injects agent information into each rule.
+type InjectAgentInfoRule struct{}
+
+// Apply injects index into input.
+func (r *InjectAgentInfoRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject agent information into configuration")
+		}
+	}()
+
+	inputsNode, found := Lookup(ast, "inputs")
+	if !found {
+		return nil
+	}
+
+	inputsList, ok := inputsNode.Value().(*List)
+	if !ok {
+		return nil
+	}
+
+	for _, inputNode := range inputsList.value {
+		inputMap, ok := inputNode.(*Dict)
+		if !ok {
+			continue
+		}
+
+		// get processors node
+		processorsNode, found := inputMap.Find("processors")
+		if !found {
+			processorsNode = &Key{
+				name:  "processors",
+				value: &List{value: make([]Node, 0)},
+			}
+
+			inputMap.value = append(inputMap.value, processorsNode)
+		}
+
+		processorsList, ok := processorsNode.Value().(*List)
+		if !ok {
+			return errors.New("InjectAgentInfoRule: processors is not a list")
+		}
+
+		// elastic_agent
+		processorMap := &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "elastic_agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+			&Key{name: "version", value: &StrVal{value: agentInfo.Version()}},
+			&Key{name: "snapshot", value: &BoolVal{value: agentInfo.Snapshot()}},
+		}}})
+		addFieldsMap := &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+
+		// agent.id
+		processorMap = &Dict{value: make([]Node, 0)}
+		processorMap.value = append(processorMap.value, &Key{name: "target", value: &StrVal{value: "agent"}})
+		processorMap.value = append(processorMap.value, &Key{name: "fields", value: &Dict{value: []Node{
+			&Key{name: "id", value: &StrVal{value: agentInfo.AgentID()}},
+		}}})
+		addFieldsMap = &Dict{value: []Node{&Key{"add_fields", processorMap}}}
+		processorsList.value = mergeStrategy("").InjectItem(processorsList.value, addFieldsMap)
+	}
+
+	return nil
+}
+
+// InjectAgentInfo creates a InjectAgentInfoRule
+func InjectAgentInfo() *InjectAgentInfoRule {
+	return &InjectAgentInfoRule{}
+}
+
 // ExtractListItemRule extract items with specified name from a list of maps.
 // The result is store in a new array.
 // Example:
@@ -679,7 +822,13 @@ type ExtractListItemRule struct {
 }
 
 // Apply extracts items from array.
-func (r *ExtractListItemRule) Apply(ast *AST) error {
+func (r *ExtractListItemRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to extract items from configuration")
+		}
+	}()
+
 	node, found := Lookup(ast, r.Path)
 	if !found {
 		return nil
@@ -740,7 +889,13 @@ type RenameRule struct {
 
 // Apply renames the last items of a Selector to a new name and keep all the other values and will
 // return an error on failure.
-func (r *RenameRule) Apply(ast *AST) error {
+func (r *RenameRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to rename section of configuration")
+		}
+	}()
+
 	// Skip rename when node is not found.
 	node, ok := Lookup(ast, r.From)
 	if !ok {
@@ -773,7 +928,13 @@ func Copy(from, to Selector) *CopyRule {
 }
 
 // Apply copy a part of a tree into a new destination.
-func (r CopyRule) Apply(ast *AST) error {
+func (r CopyRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to copy section of configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.From)
 	// skip when the `from` node is not found.
 	if !ok {
@@ -800,7 +961,13 @@ func Translate(path Selector, mapper map[string]interface{}) *TranslateRule {
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateRule) Apply(ast *AST) error {
+func (r *TranslateRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to translate elements of configuration")
+		}
+	}()
+
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -873,7 +1040,13 @@ func TranslateWithRegexp(path Selector, re *regexp.Regexp, with string) *Transla
 }
 
 // Apply translates matching elements of a translation table for a specific selector.
-func (r *TranslateWithRegexpRule) Apply(ast *AST) error {
+func (r *TranslateWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to translate elements of configuration using regex")
+		}
+	}()
+
 	// Skip translate when node is not found.
 	node, ok := Lookup(ast, r.Path)
 	if !ok {
@@ -885,7 +1058,7 @@ func (r *TranslateWithRegexpRule) Apply(ast *AST) error {
 		return fmt.Errorf("cannot rename, invalid type expected 'Key' received '%T'", node)
 	}
 
-	candidate, ok := n.value.(Node).Value().(string)
+	candidate, ok := n.value.Value().(string)
 	if !ok {
 		return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 	}
@@ -914,7 +1087,13 @@ func Map(path Selector, rules ...Rule) *MapRule {
 }
 
 // Apply maps multiples rules over a subset of the tree.
-func (r *MapRule) Apply(ast *AST) error {
+func (r *MapRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to apply multiple rules on configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Path)
 	// Skip map  when node is not found.
 	if !ok {
@@ -931,15 +1110,35 @@ func (r *MapRule) Apply(ast *AST) error {
 
 	switch t := n.Value().(type) {
 	case *List:
-		return mapList(r, t)
+		l, err := mapList(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = l
+		return nil
 	case *Dict:
-		return mapDict(r, t)
+		d, err := mapDict(agentInfo, r, t)
+		if err != nil {
+			return err
+		}
+		n.value = d
+		return nil
 	case *Key:
 		switch t := n.Value().(type) {
 		case *List:
-			return mapList(r, t)
+			l, err := mapList(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = l
+			return nil
 		case *Dict:
-			return mapDict(r, t)
+			d, err := mapDict(agentInfo, r, t)
+			if err != nil {
+				return err
+			}
+			n.value = d
+			return nil
 		default:
 			return fmt.Errorf(
 				"cannot iterate over node, invalid type expected 'List' or 'Dict' received '%T'",
@@ -954,32 +1153,39 @@ func (r *MapRule) Apply(ast *AST) error {
 	)
 }
 
-func mapList(r *MapRule, l *List) error {
+func mapList(agentInfo AgentInfo, r *MapRule, l *List) (*List, error) {
 	values := l.Value().([]Node)
 
 	for idx, item := range values {
 		newAST := &AST{root: item}
 		for _, rule := range r.Rules {
-			err := rule.Apply(newAST)
+			err := rule.Apply(agentInfo, newAST)
 			if err != nil {
-				return err
+				return nil, err
 			}
 			values[idx] = newAST.root
 		}
 	}
-	return nil
+	return l, nil
 }
 
-func mapDict(r *MapRule, l *Dict) error {
+func mapDict(agentInfo AgentInfo, r *MapRule, l *Dict) (*Dict, error) {
 	newAST := &AST{root: l}
 	for _, rule := range r.Rules {
-		err := rule.Apply(newAST)
+		err := rule.Apply(agentInfo, newAST)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
 
-	return nil
+	n, ok := newAST.root.(*Dict)
+	if !ok {
+		return nil, fmt.Errorf(
+			"after applying rules from map, root is no longer a 'Dict' it is an invalid type of '%T'",
+			newAST.root,
+		)
+	}
+	return n, nil
 }
 
 // MarshalYAML marshal a MapRule into a YAML document.
@@ -1024,9 +1230,14 @@ func Filter(selectors ...Selector) *FilterRule {
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterRule) Apply(ast *AST) error {
+func (r *FilterRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter subset of configuration")
+		}
+	}()
+
 	mergedAST := &AST{root: &Dict{}}
-	var err error
 	for _, selector := range r.Selectors {
 		newAST, ok := Select(ast.Clone(), selector)
 		if !ok {
@@ -1054,7 +1265,13 @@ func FilterValues(selector Selector, key Selector, values ...interface{}) *Filte
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesRule) Apply(ast *AST) error {
+func (r *FilterValuesRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter section based on values from configuration")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {
@@ -1102,7 +1319,7 @@ func (r *FilterValuesRule) Apply(ast *AST) error {
 		}
 
 		for _, v := range r.Values {
-			if v == n.value.(Node).Value() {
+			if v == n.value.Value() {
 				newNodes = append(newNodes, item)
 				break
 			}
@@ -1167,7 +1384,13 @@ func (r *FilterValuesWithRegexpRule) UnmarshalYAML(unmarshal func(interface{}) e
 }
 
 // Apply filters a Tree based on list of selectors.
-func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
+func (r *FilterValuesWithRegexpRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to filter section of configuration using regex")
+		}
+	}()
+
 	node, ok := Lookup(ast, r.Selector)
 	// Skip map  when node is not found.
 	if !ok {
@@ -1214,7 +1437,7 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 			continue
 		}
 
-		candidate, ok := n.value.(Node).Value().(string)
+		candidate, ok := n.value.Value().(string)
 		if !ok {
 			return fmt.Errorf("cannot filter on value expected 'string' and received %T", candidate)
 		}
@@ -1227,6 +1450,240 @@ func (r *FilterValuesWithRegexpRule) Apply(ast *AST) error {
 	l.value = newNodes
 	n.value = l
 	return nil
+}
+
+// InsertDefaultsRule inserts selected paths into keys if they do not exist.
+//
+// In the case that an exiting key already exists then it is not inserted.
+type InsertDefaultsRule struct {
+	Selectors []Selector
+	Path      string
+}
+
+// Apply applies select into rule.
+func (r *InsertDefaultsRule) Apply(_ AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to select data into configuration")
+		}
+	}()
+
+	insertTo := ast.root
+	for _, part := range splitPath(r.Path) {
+		n, ok := insertTo.Find(part)
+		if !ok {
+			insertTo = nil
+			break
+		}
+		insertTo = n
+	}
+
+	// path completely missing; easy path is just to insert all selectors
+	if insertTo == nil {
+		target := &Dict{}
+		for _, selector := range r.Selectors {
+			lookupNode, ok := Lookup(ast.Clone(), selector)
+			if !ok {
+				continue
+			}
+			target.value = append(target.value, lookupNode.Clone())
+		}
+		if len(target.value) > 0 {
+			return Insert(ast, target, r.Path)
+		}
+		return nil
+	}
+
+	// path does exist, so we insert the keys only if they don't exist
+	for _, selector := range r.Selectors {
+		lookupNode, ok := Lookup(ast.Clone(), selector)
+		if !ok {
+			continue
+		}
+		switch lt := lookupNode.(type) {
+		case *Key:
+			_, ok := insertTo.Find(lt.name)
+			if !ok {
+				// doesn't exist; insert it
+				if err := Insert(ast, lt, r.Path); err != nil {
+					return err
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+// InsertDefaults creates a InsertDefaultsRule
+func InsertDefaults(path string, selectors ...Selector) *InsertDefaultsRule {
+	return &InsertDefaultsRule{
+		Selectors: selectors,
+		Path:      path,
+	}
+}
+
+// InjectQueueRule injects inferred queue parameters into program
+// configurations.
+type InjectQueueRule struct{}
+
+// InjectQueue creates a InjectQueueRule
+func InjectQueue() *InjectQueueRule {
+	return &InjectQueueRule{}
+}
+
+// Apply adds queue parameters to a program configuration based on the
+// output settings "worker" and "bulk_max_size".
+func (r *InjectQueueRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject queue parameters into configuration")
+		}
+	}()
+
+	outputNode, found := Lookup(ast, "output")
+	if !found {
+		return nil
+	}
+
+	outputDict, ok := outputNode.Value().(*Dict)
+	if !ok || len(outputDict.value) == 0 {
+		return nil
+	}
+	outputChild := outputDict.value[0]
+
+	// Initialize the bulk_max_size and worker parameters to the global defaults,
+	// then override them if there's an explicit setting.
+	bulkMaxSize := 50
+	worker := 1
+
+	if bulkMaxSizeNode, ok := outputChild.Find("bulk_max_size"); ok {
+		if bulkMaxSizeInt, ok := bulkMaxSizeNode.Value().(*IntVal); ok {
+			bulkMaxSize = bulkMaxSizeInt.value
+		}
+	}
+
+	if workerNode, ok := outputChild.Find("worker"); ok {
+		if workerInt, ok := workerNode.Value().(*IntVal); ok {
+			worker = workerInt.value
+		}
+	}
+
+	// Insert memory queue settings based on the output params.
+	queueNode := queueDictFromOutputSettings(bulkMaxSize, worker)
+	if err := Insert(ast, queueNode, "queue.mem"); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func queueDictFromOutputSettings(bulkMaxSize, worker int) Node {
+	events, minEvents := queueParamsFromOutputSettings(bulkMaxSize, worker)
+	dict := &Dict{
+		value: []Node{
+			&Key{
+				name:  "events",
+				value: &IntVal{value: events},
+			},
+			&Key{
+				name: "flush",
+				value: &Dict{
+					value: []Node{
+						&Key{
+							name:  "min_events",
+							value: &IntVal{value: minEvents},
+						},
+						&Key{
+							name:  "timeout",
+							value: &StrVal{value: "1s"},
+						},
+					},
+				},
+			},
+		},
+	}
+	return dict
+}
+
+// Given output settings, returns inferred values for queue.mem.events
+// and queue.mem.flush.min_events.
+// See https://github.com/elastic/beats/issues/26638.
+func queueParamsFromOutputSettings(bulkMaxSize, worker int) (int, int) {
+	// Create space in the queue for each worker to have a full batch in flight
+	// and another one pending, plus a correction factor so users with the
+	// default worker count of 1 aren't surprised by an unreasonably small queue.
+	// These formulas could and perhaps should be customized further based on
+	// the specific beats being called, but their default behavior is already to
+	// significantly reduce the queue size, so let's get some experience using
+	// these baselines before optimizing further.
+	events := bulkMaxSize * (2*worker + 5)
+	minEvents := bulkMaxSize
+	return events, minEvents
+}
+
+// InjectHeadersRule injects headers into output.
+type InjectHeadersRule struct{}
+
+// Apply injects headers into output.
+func (r *InjectHeadersRule) Apply(agentInfo AgentInfo, ast *AST) (err error) {
+	defer func() {
+		if err != nil {
+			err = errors.New(err, "failed to inject headers into configuration")
+		}
+	}()
+
+	headers := agentInfo.Headers()
+	if len(headers) == 0 {
+		return nil
+	}
+
+	outputNode, found := Lookup(ast, "output")
+	if !found {
+		return nil
+	}
+
+	elasticsearchNode, found := outputNode.Find("elasticsearch")
+	if found {
+		headersNode, found := elasticsearchNode.Find("headers")
+		if found {
+			headersDict, ok := headersNode.Value().(*Dict)
+			if !ok {
+				return errors.New("headers not a dictionary")
+			}
+
+			for k, v := range headers {
+				headersDict.value = append(headersDict.value, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+		} else {
+			nodes := make([]Node, 0, len(headers))
+			for k, v := range headers {
+				nodes = append(nodes, &Key{
+					name:  k,
+					value: &StrVal{value: v},
+				})
+			}
+			headersDict := NewDict(nodes)
+			elasticsearchDict, ok := elasticsearchNode.Value().(*Dict)
+			if !ok {
+				return errors.New("elasticsearch output is not a dictionary")
+			}
+			elasticsearchDict.value = append(elasticsearchDict.value, &Key{
+				name:  "headers",
+				value: headersDict,
+			})
+		}
+	}
+
+	return nil
+}
+
+// InjectHeaders creates a InjectHeadersRule
+func InjectHeaders() *InjectHeadersRule {
+	return &InjectHeadersRule{}
 }
 
 // NewRuleList returns a new list of rules to be executed.

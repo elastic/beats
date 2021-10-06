@@ -33,6 +33,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 )
@@ -50,7 +51,7 @@ type eventStore struct {
 }
 
 func (e *eventStore) publish(event beat.Event) {
-	publish.MarshalPacketbeatFields(&event, nil)
+	publish.MarshalPacketbeatFields(&event, nil, nil)
 	e.events = append(e.events, event)
 }
 
@@ -88,7 +89,7 @@ func httpModForTests(store *eventStore) *httpPlugin {
 		callback = store.publish
 	}
 
-	http, err := New(false, callback, common.NewConfig())
+	http, err := New(false, callback, procs.ProcessesWatcher{}, common.NewConfig())
 	if err != nil {
 		panic(err)
 	}
@@ -918,6 +919,36 @@ func TestHttpParser_RedactAuthorization(t *testing.T) {
 	proxyPattern, _ := regexp.Compile(`(?m)^[Pp]roxy-[Aa]uthorization:\*+`)
 	proxyObscured := proxyPattern.Match(msg)
 	assert.True(t, proxyObscured)
+}
+
+func TestExtractBasicAuthUser(t *testing.T) {
+	logp.TestingSetup(logp.WithSelectors("http", "httpdetailed"))
+
+	http := httpModForTests(nil)
+	http.parserConfig.sendHeaders = true
+	http.parserConfig.sendAllHeaders = true
+
+	data := []byte("POST /services/ObjectControl?ID=client0 HTTP/1.1\r\n" +
+		"User-Agent: Mozilla/4.0 (compatible; MSIE 6.0; MS Web Services Client Protocol 2.0.50727.5472)\r\n" +
+		"Content-Type: text/xml; charset=utf-8\r\n" +
+		"SOAPAction: \"\"\r\n" +
+		"Authorization: Basic ZHVtbXk6NmQlc1AwOC1XemZ3Cg\r\n" +
+		"Proxy-Authorization: Basic cHJveHk6MWM3MGRjM2JhZDIwCg==\r\n" +
+		"Host: production.example.com\r\n" +
+		"Content-Length: 0\r\n" +
+		"Expect: 100-continue\r\n" +
+		"Accept-Encoding: gzip\r\n" +
+		"X-Forwarded-For: 10.216.89.132\r\n" +
+		"\r\n")
+
+	st := &stream{data: data, message: new(message)}
+
+	ok, _ := testParseStream(http, st, 0)
+
+	username := extractBasicAuthUser(st.message.headers)
+
+	assert.True(t, ok)
+	assert.Equal(t, "dummy", username)
 }
 
 func TestHttpParser_RedactAuthorization_raw(t *testing.T) {
@@ -1793,6 +1824,57 @@ func TestHttpParser_hostHeader(t *testing.T) {
 			if test.port != 0 {
 				tcptuple.DstPort = test.port
 			}
+			packet := protos.Packet{Payload: []byte(request)}
+			private := protos.ProtocolData(&httpConnectionData{})
+			private = http.Parse(&packet, tcptuple, 1, private)
+			http.Expired(tcptuple, private)
+			trans := expectTransaction(t, &store)
+			if !assert.NotNil(t, trans) {
+				t.Fatal("nil transaction")
+			}
+			for field, expected := range test.expected {
+				actual, err := trans.GetValue(field)
+				assert.Equal(t, expected, actual, field)
+				if expected != nil {
+					assert.Nil(t, err, field)
+				} else {
+					assert.Equal(t, common.ErrKeyNotFound, err, field)
+				}
+			}
+		})
+	}
+}
+
+func TestHttpParser_Extension(t *testing.T) {
+	template := "HEAD %s HTTP/1.1\r\n" +
+		"Host: abc.com\r\n" +
+		"\r\n"
+	var store eventStore
+	http := httpModForTests(&store)
+	for _, test := range []struct {
+		title, path string
+		expected    common.MapStr
+	}{
+		{
+			title: "Zip Extension",
+			path:  "/files.zip",
+			expected: common.MapStr{
+				"url.full":      "http://abc.com/files.zip",
+				"url.extension": "zip",
+			},
+		},
+		{
+			title: "No Extension",
+			path:  "/files",
+			expected: common.MapStr{
+				"url.full":      "http://abc.com/files",
+				"url.extension": nil,
+			},
+		},
+	} {
+		t.Run(test.title, func(t *testing.T) {
+			request := fmt.Sprintf(template, test.path)
+			tcptuple := testCreateTCPTuple()
 			packet := protos.Packet{Payload: []byte(request)}
 			private := protos.ProtocolData(&httpConnectionData{})
 			private = http.Parse(&packet, tcptuple, 1, private)

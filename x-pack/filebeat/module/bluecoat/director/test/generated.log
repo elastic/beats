@@ -19,12 +19,14 @@ authd: : <<luptat.low> authd_signal_handler(), quam
 xinetd[6547]: Started working: onproide available services
 logrotate: : ALERT exited abnormally with tfug
 heartbeat: : <<urE.medium> Processing command: deny
+rsyslogd: : Warning: rehe
 sshd: : <<stiae.medium> error: Bind to port erc on amqu failed: unknown
 ntpd[4515]: ntpd emp-r aperia
 restorecond: : Reset file context run: vol
 logrotate: : ALERT exited abnormally with mporain
 heartbeat: : <<mpori.very-high> connect: atu
 cmd: : <<texp.medium> cmd starting adeseru
+cli[7108]: <<-uam.low> tmo@::fficiade:10.2.53.125 : CLI launched
 pm[7061]: <<ihilmo.very-high> ntpd will start in tlabo
 poller[795]: <<oluptate.low> Querying content system for job results.
 runner[6134]: <<edo.very-high> Processing command: allow
@@ -40,12 +42,15 @@ xinetd[5850]: Started working: rQu available services
 heartbeat: : <<boree.low> queips: undefined symbol: ncidi
 authd: : <<olor.very-high> authd_close(): npr
 anacron[6373]: Anacron 1.3962 started on epre
+cli[3979]: <<-iduntu.medium> temUt@avol752.www5.test : Processing command accept
 cmd: : <<amc.medium> cmd starting isiuta
 sshd[5227]: dutp(psaquaea:taevita): pam_putenv: ameiusm
 ccd: : <<olab.low> Device elitse6672.internal.localdomain: mquisno
 runner[1859]: <<tasnulap.high> Failed to exec umSe
 shutdown[6110]: shutting down itau
 sshd[2415]: PAM lorsita more authentication failure; dolore
+rsyslogd: : Warning: tio
+cli[802]: <<-gnaaliqu.very-high> velillu@::cteturad:10.18.204.87 : Processing a secure command...
 heartbeat: : <<reprehe.high> connect: inimveni
 authd: : <<litani.low> authd_close(): psumqu
 runner[2558]: <<icabo.high> Failed to exec edquiac
@@ -62,9 +67,11 @@ authd: : <<psaqua.medium> authd_signal_handler(), gnaal
 logrotate: : ALERT exited abnormally with voluptas
 ntpd[627]: ntpd exiting on signal orin
 restorecond: : Reset file context ecillu: mmodoc
+cli[1140]: <<-abore.high> modocon@ipsu3680.mail.test : Processing command: deny
 sshd: : bad username mquisn
 ntpd[1313]: ntpd derit-r orese
 ccd: : <<leumiur.medium> Device Communication Daemon online
+rsyslogd: : Warning: moles
 restorecond: : Reset file context olup: aco
 shutdown[609]: shutting down ser
 ntpd[2991]: ntpd orinrep-r quiavol
@@ -80,6 +87,7 @@ ccd: : <<umetMa.low> Device eleumiu2454.api.local: tat
 schedulerd: : <<lumqu.very-high> System time changed, recomputing job run times.
 xinetd[3450]: Started working: aconsequ available services
 authd: : <<sequat.high> handle_authd unknown message =utemvel
+rsyslogd: : Warning: iusm
 ntpd[16]: time reset stquido
 ccd: : <<aaliq.high> Device olu5333.www.domain: orumSe
 anacron[80]: Normal exit ici
@@ -90,11 +98,3 @@ logrotate: : ALERT exited abnormally with ntut
 poller[7151]: <<ess.high> Querying content system for job results.
 ntpd[2314]: ntpd litanim-r rQuisaut
 heartbeat: : <<metco.high> Processing command: block
-epmd: : epmd: got emp
-schedulerd: : <<risni.very-high> System time changed, recomputing job run times.
-dmd: : <<oremqu.medium> Health state for group "lab" changed from "llumq" to "tenim"
-pm[5899]: <<rnat.low> print_msg(), orem
-epmd: : epmd: epmd running inBC
-pm[2746]: <<oloree.very-high> print_msg(), ptate
-schedulerd: : <<atev.high> Executing Job "CSe" execution exerci
-auditd[6012]: Audit daemon rotating log files

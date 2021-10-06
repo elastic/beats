@@ -1,0 +1,64 @@
+[
+    {
+        "@timestamp": "2008-11-16T22:21:13.147Z",
+        "auditd.log.dev": "dm-0",
+        "auditd.log.ino": "284133",
+        "auditd.log.path": "/var/www/html/file1",
+        "auditd.log.scontext": "unconfined_u:system_r:httpd_t:s0",
+        "auditd.log.sequence": 96,
+        "auditd.log.tclass": "file",
+        "auditd.log.tcontext": "unconfined_u:object_r:samba_share_t:s0",
+        "event.action": "avc",
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=AVC msg=audit(1226874073.147:96): avc:  denied  { getattr } for  pid=2465 comm=\"httpd\" path=\"/var/www/html/file1\" dev=dm-0 ino=284133 scontext=unconfined_u:system_r:httpd_t:s0 tcontext=unconfined_u:object_r:samba_share_t:s0 tclass=file",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.name": "httpd",
+        "process.pid": 2465,
+        "service.type": "auditd"
+    },
+    {
+        "@timestamp": "2018-04-25T13:28:53.080Z",
+        "auditd.log.apparmor": "DENIED",
+        "auditd.log.denied_mask": "trace",
+        "auditd.log.operation": "ptrace",
+        "auditd.log.peer": "unconfined",
+        "auditd.log.profile": "docker-default",
+        "auditd.log.record_type": "AVC",
+        "auditd.log.requested_mask": "trace",
+        "auditd.log.sequence": 61207,
+        "event.action": [
+            "violated-apparmor-policy"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=AVC msg=audit(1524662933.080:61207): apparmor=\"DENIED\" operation=\"ptrace\" profile=\"docker-default\" pid=5571 comm=\"metricbeat\" requested_mask=\"trace\" denied_mask=\"trace\" peer=\"unconfined\"",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 241,
+        "process.name": "metricbeat",
+        "process.pid": 5571,
+        "service.type": "auditd"
+    },
+    {
+        "@timestamp": "2018-04-25T13:28:53.080Z",
+        "auditd.log.record_type": "AVC",
+        "auditd.log.sequence": 61207,
+        "auditd.log.seresult": "1",
+        "event.action": [
+            "violated-selinux-policy"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=AVC msg=audit(1524662933.080:61207): seresult=1",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 433,
+        "service.type": "auditd"
+    }
+]

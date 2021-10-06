@@ -11,9 +11,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/metricbeat/mb"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
@@ -22,12 +19,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
 )
 
 var (
 	regionName  = "us-west-1"
-	timestamp   = time.Now()
+	timestamp   = time.Date(2020, 10, 06, 00, 00, 00, 0, time.UTC)
 	accountID   = "123456789012"
 	accountName = "test"
 
@@ -1234,6 +1233,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1242,7 +1242,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -1260,6 +1266,7 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1277,6 +1284,7 @@ func (m *MockCloudWatchClientWithoutDim) ListMetricsRequest(input *cloudwatch.Li
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1285,7 +1293,13 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -1303,6 +1317,7 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1310,7 +1325,15 @@ func (m *MockCloudWatchClientWithoutDim) GetMetricDataRequest(input *cloudwatch.
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
 	return resourcegroupstaggingapi.GetResourcesRequest{
+		Input: input,
+		Copy:  m.GetResourcesRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:       "GetResources",
+				HTTPMethod: "POST",
+				HTTPPath:   "/",
+				Paginator:  nil,
+			},
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
 				PaginationToken: awssdk.String(""),
 				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
@@ -1326,6 +1349,7 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -1357,7 +1381,7 @@ func TestCreateEventsWithIdentifier(t *testing.T) {
 			Value: "test-ec2",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1399,7 +1423,7 @@ func TestCreateEventsWithoutIdentifier(t *testing.T) {
 	}
 
 	resourceTypeTagFilters := map[string][]aws.Tag{}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1447,7 +1471,7 @@ func TestCreateEventsWithTagsFilter(t *testing.T) {
 			Value: "foo",
 		},
 	}
-	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period)
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
 
 	events, err := m.createEvents(mockCloudwatchSvc, mockTaggingSvc, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
 	assert.NoError(t, err)
@@ -1466,9 +1490,9 @@ func TestInsertTags(t *testing.T) {
 	tagValue3 := "dev"
 
 	events := map[string]mb.Event{}
-	events[identifier1] = aws.InitEvent(regionName, accountName, accountID)
-	events[identifier2] = aws.InitEvent(regionName, accountName, accountID)
-	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID)
+	events[identifier1] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifier2] = aws.InitEvent(regionName, accountName, accountID, timestamp)
+	events[identifierContainsArn] = aws.InitEvent(regionName, accountName, accountID, timestamp)
 
 	resourceTagMap := map[string][]resourcegroupstaggingapi.Tag{}
 	resourceTagMap["test-s3-1"] = []resourcegroupstaggingapi.Tag{
@@ -1568,4 +1592,39 @@ func TestConfigDimensionValueContainsWildcard(t *testing.T) {
 			assert.Equal(t, c.expectedResult, result)
 		})
 	}
+}
+
+func TestCreateEventsTimestamp(t *testing.T) {
+	m := MetricSet{
+		logger:            logp.NewLogger("test"),
+		CloudwatchConfigs: []Config{{Statistic: []string{"Average"}}},
+		MetricSet:         &aws.MetricSet{Period: 5, AccountID: accountID},
+	}
+
+	listMetricWithStatsTotal := []metricsWithStatistics{
+		{
+			cloudwatch.Metric{
+				MetricName: awssdk.String("CPUUtilization"),
+				Namespace:  awssdk.String("AWS/EC2"),
+			},
+			[]string{"Average"},
+			nil,
+		},
+	}
+
+	resourceTypeTagFilters := map[string][]aws.Tag{}
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+
+	events, err := m.createEvents(&MockCloudWatchClientWithoutDim{}, &MockResourceGroupsTaggingClient{}, listMetricWithStatsTotal, resourceTypeTagFilters, regionName, startTime, endTime)
+	assert.NoError(t, err)
+	assert.Equal(t, timestamp, events[regionName+accountID+namespace].Timestamp)
+}
+
+func TestGetStartTimeEndTime(t *testing.T) {
+	m := MetricSet{}
+	m.CloudwatchConfigs = []Config{{Statistic: []string{"Average"}}}
+	m.MetricSet = &aws.MetricSet{Period: 5 * time.Minute}
+	m.logger = logp.NewLogger("test")
+	startTime, endTime := aws.GetStartTimeEndTime(m.MetricSet.Period, m.MetricSet.Latency)
+	assert.Equal(t, 5*time.Minute, endTime.Sub(startTime))
 }

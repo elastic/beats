@@ -1,0 +1,16 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
+  - decode_json_fields:
+      fields: [message]
+      target: kibana._audit_temp

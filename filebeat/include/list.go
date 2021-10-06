@@ -23,7 +23,6 @@ import (
 	// Import packages that need to register themselves.
 	_ "github.com/elastic/beats/v7/filebeat/input/container"
 	_ "github.com/elastic/beats/v7/filebeat/input/docker"
-	_ "github.com/elastic/beats/v7/filebeat/input/kafka"
 	_ "github.com/elastic/beats/v7/filebeat/input/log"
 	_ "github.com/elastic/beats/v7/filebeat/input/mqtt"
 	_ "github.com/elastic/beats/v7/filebeat/input/redis"
@@ -45,6 +44,7 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/module/nats"
 	_ "github.com/elastic/beats/v7/filebeat/module/nginx"
 	_ "github.com/elastic/beats/v7/filebeat/module/osquery"
+	_ "github.com/elastic/beats/v7/filebeat/module/pensando"
 	_ "github.com/elastic/beats/v7/filebeat/module/postgresql"
 	_ "github.com/elastic/beats/v7/filebeat/module/redis"
 	_ "github.com/elastic/beats/v7/filebeat/module/santa"

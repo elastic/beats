@@ -17,7 +17,6 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :discuss_forum: beats/{beatname_lc}
 :beat_default_index_prefix: {beatname_lc}
 :beat_kib_app: {kib} Metrics
-:has_central_config:
 :has_solutions:
 :has_docker_label_ex:
 :has_modules_command:
@@ -49,8 +48,6 @@ include::./configuring-howto.asciidoc[]
 
 include::{docdir}/howto/howto.asciidoc[]
 
-include::{libbeat-dir}/shared-central-management.asciidoc[]
-
 include::./modules.asciidoc[]
 
 include::./fields.asciidoc[]
@@ -65,4 +62,5 @@ include::./faq.asciidoc[]
 
 include::{libbeat-dir}/contributing-to-beats.asciidoc[]
 
-include::{libbeat-dir}/shared/redirects.asciidoc[]
+include::{libbeat-dir}/redirects.asciidoc[]
+

@@ -587,12 +587,20 @@ func (itr *EventMetadataIterator) Err() error {
 	return itr.lastErr
 }
 
+func typeCastError(expected, got interface{}) error {
+	return errors.Errorf("wrong type for property. expected:%T got:%T", expected, got)
+}
+
 func (itr *EventMetadataIterator) uint32Property(propertyID EvtEventMetadataPropertyID) (uint32, error) {
 	v, err := GetEventMetadataProperty(itr.currentEvent, propertyID)
 	if err != nil {
 		return 0, err
 	}
-	return v.(uint32), nil
+	value, ok := v.(uint32)
+	if !ok {
+		return value, typeCastError(value, v)
+	}
+	return value, nil
 }
 
 func (itr *EventMetadataIterator) uint64Property(propertyID EvtEventMetadataPropertyID) (uint64, error) {
@@ -600,7 +608,11 @@ func (itr *EventMetadataIterator) uint64Property(propertyID EvtEventMetadataProp
 	if err != nil {
 		return 0, err
 	}
-	return v.(uint64), nil
+	value, ok := v.(uint64)
+	if !ok {
+		return value, typeCastError(value, v)
+	}
+	return value, nil
 }
 
 func (itr *EventMetadataIterator) stringProperty(propertyID EvtEventMetadataPropertyID) (string, error) {
@@ -608,7 +620,11 @@ func (itr *EventMetadataIterator) stringProperty(propertyID EvtEventMetadataProp
 	if err != nil {
 		return "", err
 	}
-	return v.(string), nil
+	value, ok := v.(string)
+	if !ok {
+		return value, typeCastError(value, v)
+	}
+	return value, nil
 }
 
 func (itr *EventMetadataIterator) EventID() (uint32, error) {

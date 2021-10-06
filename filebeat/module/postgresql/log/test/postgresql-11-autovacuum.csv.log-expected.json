@@ -1,0 +1,31 @@
+[
+    {
+        "@timestamp": "2021-01-04T00:37:32.862Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "LOG",
+        "log.offset": 0,
+        "message": "automatic vacuum of table \"postgres.public.t\": index scans: 1\npages: 0 removed, 89 remain, 0 skipped due to pins, 0 skipped frozen\ntuples: 10000 removed, 10000 remain, 0 are dead but not yet removable, oldest xmin: 578\nbuffer usage: 316 hits, 2 misses, 4 dirtied\navg read rate: 0.569 MB/s, avg write rate: 1.138 MB/s\nsystem usage: CPU: user: 0.00 s, system: 0.00 s, elapsed: 0.02 s",
+        "postgresql.log.session_id": "5ff2634c.57",
+        "postgresql.log.session_start_time": "2021-01-04T00:37:32.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:37:32.862 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "4/43",
+        "process.pid": "87",
+        "service.type": "postgresql"
+    }
+]

@@ -45,10 +45,6 @@
       - name: sha1
         type: keyword
 
-      - name: filename
-        type: alias
-        path: file.path
-
       - name: tx_id
         type: long
 
@@ -67,31 +63,11 @@
       - name: md5
         type: keyword
 
-      - name: size
-        type: alias
-        path: file.size
-
     - name: icmp_type
       type: long
 
-    - name: dest_port
-      type: alias
-      path: destination.port
-
-    - name: src_port
-      type: alias
-      path: source.port
-
-    - name: proto
-      type: alias
-      path: network.transport
-
     - name: pcap_cnt
       type: long
-
-    - name: src_ip
-      type: alias
-      path: source.ip
 
     - name: dns
       type: group
@@ -129,56 +105,20 @@
       - name: status
         type: keyword
 
-    - name: dest_ip
-      type: alias
-      path: destination.ip
-
     - name: icmp_code
       type: long
 
     - name: http
       type: group
       fields:
-      - name: status
-        type: alias
-        path: http.response.status_code
-
       - name: redirect
         type: keyword
-
-      - name: http_user_agent
-        type: alias
-        path: user_agent.original
 
       - name: protocol
         type: keyword
 
-      - name: http_refer
-        type: alias
-        path: http.request.referrer
-
-      - name: url
-        type: alias
-        path: url.original
-
-      - name: hostname
-        type: alias
-        path: url.domain
-
-      - name: length
-        type: alias
-        path: http.response.body.bytes
-
-      - name: http_method
-        type: alias
-        path: http.request.method
-
       - name: http_content_type
         type: keyword
-
-    - name: timestamp
-      type: alias
-      path: '@timestamp'
 
     - name: in_iface
       type: keyword
@@ -186,12 +126,12 @@
     - name: alert
       type: group
       fields:
+      - name: metadata
+        type: flattened
+        description: Metadata about the alert.
+
       - name: category
         type: keyword
-
-      - name: severity
-        type: alias
-        path: event.severity
 
       - name: rev
         type: long
@@ -202,12 +142,58 @@
       - name: signature
         type: keyword
 
-      - name: action
-        type: alias
-        path: event.outcome
-
       - name: signature_id
         type: long
+      - name: protocols
+        type: keyword
+      - name: attack_target
+        type: keyword
+      - name: capec_id
+        type: keyword
+      - name: cwe_id
+        type: keyword
+      - name: malware
+        type: keyword
+      - name: cve
+        type: keyword
+      - name: cvss_v2_base
+        type: keyword
+      - name: cvss_v2_temporal
+        type: keyword
+      - name: cvss_v3_base
+        type: keyword
+      - name: cvss_v3_temporal
+        type: keyword
+      - name: priority
+        type: keyword
+      - name: hostile
+        type: keyword
+      - name: infected
+        type: keyword
+      - name: created_at
+        type: date
+      - name: updated_at
+        type: date
+      - name: classtype
+        type: keyword
+      - name: rule_source
+        type: keyword
+      - name: sid
+        type: keyword
+      - name: affected_product
+        type: keyword
+      - name: deployment
+        type: keyword
+      - name: former_category
+        type: keyword
+      - name: mitre_tool_id
+        type: keyword
+      - name: performance_impact
+        type: keyword
+      - name: signature_severity
+        type: keyword
+      - name: tag
+        type: keyword
 
     - name: ssh
       type: group
@@ -689,44 +675,17 @@
     - name: flow
       type: group
       fields:
-      - name: bytes_toclient
-        type: alias
-        path: destination.bytes
-
-      - name: start
-        type: alias
-        path: event.start
-
-      - name: pkts_toclient
-        type: alias
-        path: destination.packets
-
       - name: age
         type: long
 
       - name: state
         type: keyword
 
-      - name: bytes_toserver
-        type: alias
-        path: source.bytes
-
       - name: reason
         type: keyword
 
-      - name: pkts_toserver
-        type: alias
-        path: source.packets
-
-      - name: end
-        type: date
-
       - name: alerted
         type: boolean
-
-    - name: app_proto
-      type: alias
-      path: network.protocol
 
     - name: tx_id
       type: long

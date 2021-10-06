@@ -304,10 +304,9 @@ variables to dynamically switch between configurations.
 [float]
 ==== ingest/*.json
 
-The `ingest/` folder contains Elasticsearch
-{ref}/ingest.html[Ingest Node] pipeline configurations. The Ingest
-Node pipelines are responsible for parsing the log lines and doing other
-manipulations on the data.
+The `ingest/` folder contains {es} {ref}/ingest.html[ingest pipeline]
+configurations. Ingest pipelines are responsible for parsing the log lines and
+doing other manipulations on the data.
 
 The files in this folder are JSON or YAML documents representing
 {ref}/pipeline.html[pipeline definitions]. Just like with the `config/`
@@ -344,10 +343,10 @@ on_failure:
 ----
 
 From here, you would typically add processors to the `processors` array to do
-the actual parsing. For details on how to use ingest node processors, see the
-{ref}/ingest-processors.html[ingest node documentation]. In
+the actual parsing. For information about available ingest processors, see the
+{ref}/processors.html[processor reference documentation]. In
 particular, you will likely find the
-{ref}/grok-processor.html[Grok processor] to be useful for parsing.
+{ref}/grok-processor.html[grok processor] to be useful for parsing.
 Here is an example for parsing the Nginx access logs.
 
 [source,json]
@@ -486,6 +485,6 @@ locally for a specific module, using the following procedure under Filebeat dire
 
 . Run an Elasticsearch instance locally using docker: `docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.0.0-SNAPSHOT`
 . Create python env: `make python-env`
-. Source python env: `./build/python-env/bin/activate`
+. Source python env: `source ./build/python-env/bin/activate`
 . Create the testing binary: `make filebeat.test`
 . Run the test, ie: `GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=nginx pytest tests/system/test_modules.py`

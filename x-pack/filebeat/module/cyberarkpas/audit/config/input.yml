@@ -1,0 +1,32 @@
+{{ if eq .input "file" }}
+
+type: log
+paths:
+  {{ range $i, $path := .paths }}
+- {{$path}}
+  {{ end }}
+exclude_files: [".gz$"]
+
+{{ else }}
+
+type: {{.input}}
+host: "{{.syslog_host}}:{{.syslog_port}}"
+ssl: {{ .ssl | tojson }}
+
+{{ end }}
+
+tags:
+{{ if .preserve_original_event }}
+  - preserve_original_event
+{{ end }}
+{{ range $i, $tag := .tags }}
+  - {{$tag}}
+{{ end }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

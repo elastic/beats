@@ -16,7 +16,14 @@ import (
 )
 
 var (
-	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,139}$"
+	// We're appending the function name to the role name.
+	// Limiting this to 30 because, we're prefixing the role name
+	// with "functionbeat-lambda-"(20 chars) and suffixing with
+	// the region, the max of which is "ap-southeast-2" (14 chars)
+	// Length constraints for roleName in AWS is 64 characters max per
+	// https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateRole.html
+
+	functionPattern = "^[A-Za-z][A-Za-z0-9\\-]{0,30}$"
 	functionRE      = regexp.MustCompile(functionPattern)
 	configOverrides = common.MustNewConfigFrom(map[string]interface{}{
 		"path.data":              "/tmp",
@@ -103,7 +110,7 @@ type functionName string
 func (f *functionName) Unpack(s string) error {
 	if !functionRE.MatchString(s) {
 		return fmt.Errorf(
-			"invalid name: '%s', name must match [a-zA-Z0-9-] and be at most 140 characters",
+			"invalid name: '%s', name must match [a-zA-Z0-9-] and be at most 30 characters",
 			s,
 		)
 	}

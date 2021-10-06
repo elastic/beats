@@ -1,7 +1,7 @@
 [id="{beatname_lc}-template"]
 == Load the {es} index template
 
-{es} uses {ref}/indices-templates.html[index templates] to define:
+{es} uses {ref}/index-templates.html[index templates] to define:
 
 * Settings that control the behavior of your indices. The settings include the
 lifecycle policy used to manage indices as they grow and age.
@@ -47,6 +47,10 @@ If the template already exists, it’s not overwritten unless you configure
 [float]
 [[overwrite-template]]
 === Overwrite an existing index template
+
+WARNING: Do not enable this option for more than one instance of {beatname_uc}. If you start
+multiple instances at the same time, it can overload your {es} with too many
+template update requests.
 
 To overwrite a template that's already loaded into {es}, set:
 

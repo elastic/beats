@@ -14,13 +14,14 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "dnp3",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:E57Z1w3RrSdR+fi6rSZblbQVhzY=",
+        "network.direction": "external",
         "network.protocol": "dnp3",
         "network.transport": "tcp",
         "related.ip": [

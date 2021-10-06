@@ -16,6 +16,7 @@
 // under the License.
 
 // +build linux darwin windows
+// +build !integration
 
 package add_docker_metadata
 
@@ -32,25 +33,31 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 )
 
 func init() {
 	// Stub out the procfs.
-	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
+	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+
 		switch pid {
 		case 1000:
-			return map[string]string{
-				"cpu": "/docker/FABADA",
+			return cgroup.PathList{
+				V1: map[string]cgroup.ControllerPath{
+					"cpu": {ControllerPath: "/docker/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b", IsV2: false},
+				},
 			}, nil
 		case 2000:
-			return map[string]string{
-				"memory": "/user.slice",
+			return cgroup.PathList{
+				V1: map[string]cgroup.ControllerPath{
+					"memory": {ControllerPath: "/user.slice", IsV2: false},
+				},
 			}, nil
 		case 3000:
 			// Parser error (hopefully this never happens).
-			return nil, fmt.Errorf("cgroup parse failure")
+			return cgroup.PathList{}, fmt.Errorf("cgroup parse failure")
 		default:
-			return nil, os.ErrNotExist
+			return cgroup.PathList{}, os.ErrNotExist
 		}
 	}
 }
@@ -127,7 +134,7 @@ func TestMatchContainer(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
-			"container_id": &docker.Container{
+			"container_id": {
 				ID:    "container_id",
 				Image: "image",
 				Name:  "name",
@@ -175,7 +182,7 @@ func TestMatchContainerWithDedot(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
-			"container_id": &docker.Container{
+			"container_id": {
 				ID:    "container_id",
 				Image: "image",
 				Name:  "name",
@@ -218,8 +225,8 @@ func TestMatchSource(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
-			"FABADA": &docker.Container{
-				ID:    "FABADA",
+			"8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b": {
+				ID:    "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
@@ -235,7 +242,7 @@ func TestMatchSource(t *testing.T) {
 	case "windows":
 		inputSource = "C:\\ProgramData\\docker\\containers\\FABADA\\foo.log"
 	default:
-		inputSource = "/var/lib/docker/containers/FABADA/foo.log"
+		inputSource = "/var/lib/docker/containers/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b/foo.log"
 	}
 	input := common.MapStr{
 		"log": common.MapStr{
@@ -250,7 +257,7 @@ func TestMatchSource(t *testing.T) {
 
 	assert.EqualValues(t, common.MapStr{
 		"container": common.MapStr{
-			"id": "FABADA",
+			"id": "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
 			"image": common.MapStr{
 				"name": "image",
 			},
@@ -277,8 +284,8 @@ func TestDisableSource(t *testing.T) {
 
 	p, err := buildDockerMetadataProcessor(logp.L(), testConfig, MockWatcherFactory(
 		map[string]*docker.Container{
-			"FABADA": &docker.Container{
-				ID:    "FABADA",
+			"8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b": {
+				ID:    "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
@@ -290,7 +297,7 @@ func TestDisableSource(t *testing.T) {
 	assert.NoError(t, err, "initializing add_docker_metadata processor")
 
 	input := common.MapStr{
-		"source": "/var/lib/docker/containers/FABADA/foo.log",
+		"source": "/var/lib/docker/containers/8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b/foo.log",
 	}
 	result, err := p.Run(&beat.Event{Fields: input})
 	assert.NoError(t, err, "processing an event")
@@ -302,8 +309,8 @@ func TestDisableSource(t *testing.T) {
 func TestMatchPIDs(t *testing.T) {
 	p, err := buildDockerMetadataProcessor(logp.L(), common.NewConfig(), MockWatcherFactory(
 		map[string]*docker.Container{
-			"FABADA": &docker.Container{
-				ID:    "FABADA",
+			"8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b": {
+				ID:    "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
 				Image: "image",
 				Name:  "name",
 				Labels: map[string]string{
@@ -317,7 +324,7 @@ func TestMatchPIDs(t *testing.T) {
 
 	dockerMetadata := common.MapStr{
 		"container": common.MapStr{
-			"id": "FABADA",
+			"id": "8c147fdfab5a2608fe513d10294bf77cb502a231da9725093a155bd25cd1f14b",
 			"image": common.MapStr{
 				"name": "image",
 			},

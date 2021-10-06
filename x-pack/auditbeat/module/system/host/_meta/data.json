@@ -47,6 +47,7 @@
                 },
                 "timezone.name": "UTC",
                 "timezone.offset.sec": 0,
+                "type": "linux",
                 "uptime": 18661357350265
             }
         }

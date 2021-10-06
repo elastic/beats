@@ -55,6 +55,7 @@ type redisPlugin struct {
 	transactionTimeout time.Duration
 	queueConfig        MessageQueueConfig
 
+	watcher procs.ProcessesWatcher
 	results protos.Reporter
 }
 
@@ -75,6 +76,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
@@ -85,16 +87,17 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
-func (redis *redisPlugin) init(results protos.Reporter, config *redisConfig) error {
+func (redis *redisPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
+	redis.watcher = watcher
 	isDebug = logp.IsDebug("redis")
 
 	return nil
@@ -247,7 +250,7 @@ func (redis *redisPlugin) handleRedis(
 ) {
 	m.tcpTuple = *tcptuple
 	m.direction = dir
-	m.cmdlineTuple = procs.ProcWatcher.FindProcessesTupleTCP(tcptuple.IPPort())
+	m.cmdlineTuple = redis.watcher.FindProcessesTupleTCP(tcptuple.IPPort())
 
 	if m.isRequest {
 		// wait for response

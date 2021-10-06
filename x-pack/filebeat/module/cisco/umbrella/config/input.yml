@@ -1,0 +1,25 @@
+{{ if eq .input "aws-s3" }}
+
+type: aws-s3
+queue_url: {{ .queue_url }}
+access_key_id: {{ .access_key_id }}
+secret_access_key: {{ .secret_access_key }}
+visibility_timeout: {{ .visibility_timeout }}
+api_timeout: {{ .api_timeout }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+processors:
+- add_fields:
+    target: ''
+    fields:
+      ecs.version: 1.12.0

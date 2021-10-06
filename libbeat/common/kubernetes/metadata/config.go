@@ -21,15 +21,13 @@ import "github.com/elastic/beats/v7/libbeat/common"
 
 // Config declares supported configuration for metadata generation
 type Config struct {
+	KubeConfig         string   `config:"kube_config"`
 	IncludeLabels      []string `config:"include_labels"`
 	ExcludeLabels      []string `config:"exclude_labels"`
 	IncludeAnnotations []string `config:"include_annotations"`
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`
-
-	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
 // AddResourceMetadataConfig allows adding config for enriching additional resources
@@ -40,7 +38,6 @@ type AddResourceMetadataConfig struct {
 
 // InitDefaults initializes the defaults for the config.
 func (c *Config) InitDefaults() {
-	c.IncludeCreatorMetadata = true
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
 }
@@ -48,4 +45,14 @@ func (c *Config) InitDefaults() {
 // Unmarshal unpacks a Config into the metagen Config
 func (c *Config) Unmarshal(cfg *common.Config) error {
 	return cfg.Unpack(c)
+}
+
+func GetDefaultResourceMetadataConfig() *AddResourceMetadataConfig {
+	metaConfig := Config{}
+	metaConfig.InitDefaults()
+	metaCfg, _ := common.NewConfigFrom(&metaConfig)
+	return &AddResourceMetadataConfig{
+		Node:      metaCfg,
+		Namespace: metaCfg,
+	}
 }

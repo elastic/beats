@@ -11,7 +11,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -49,7 +48,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -87,7 +85,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -125,7 +122,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -163,7 +159,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -201,7 +196,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -239,7 +233,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -277,7 +270,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -315,7 +307,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -353,7 +344,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -391,7 +381,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -429,7 +418,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -467,7 +455,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -505,7 +492,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {
@@ -543,7 +529,6 @@
             "network_traffic",
             "network"
           ],
-          "created": "2017-02-14T11:09:59Z",
           "kind": "event"
         },
         "netflow": {

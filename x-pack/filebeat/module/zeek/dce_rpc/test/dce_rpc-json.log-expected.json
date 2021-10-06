@@ -14,18 +14,19 @@
         "event.module": "zeek",
         "event.type": [
             "connection",
-            "protocol",
-            "info"
+            "info",
+            "protocol"
         ],
         "fileset.name": "dce_rpc",
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:SJNAD5vtzZuhQjGtfaI8svTnyuw=",
+        "network.direction": "internal",
         "network.protocol": "dce_rpc",
         "network.transport": "tcp",
         "related.ip": [
-            "172.16.133.6",
-            "172.16.128.202"
+            "172.16.128.202",
+            "172.16.133.6"
         ],
         "service.type": "zeek",
         "source.address": "172.16.133.6",

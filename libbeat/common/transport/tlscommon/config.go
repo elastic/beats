@@ -19,20 +19,25 @@ package tlscommon
 
 import (
 	"crypto/tls"
+	"sync"
 
 	"github.com/joeshaw/multierror"
+
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 )
+
+var warnOnce sync.Once
 
 // Config defines the user configurable options in the yaml file.
 type Config struct {
 	Enabled          *bool                   `config:"enabled" yaml:"enabled,omitempty"`
 	VerificationMode TLSVerificationMode     `config:"verification_mode" yaml:"verification_mode"` // one of 'none', 'full'
 	Versions         []TLSVersion            `config:"supported_protocols" yaml:"supported_protocols,omitempty"`
-	CipherSuites     []tlsCipherSuite        `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
+	CipherSuites     []CipherSuite           `config:"cipher_suites" yaml:"cipher_suites,omitempty"`
 	CAs              []string                `config:"certificate_authorities" yaml:"certificate_authorities,omitempty"`
 	Certificate      CertificateConfig       `config:",inline" yaml:",inline"`
 	CurveTypes       []tlsCurveType          `config:"curve_types" yaml:"curve_types,omitempty"`
-	Renegotiation    tlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
+	Renegotiation    TlsRenegotiationSupport `config:"renegotiation" yaml:"renegotiation"`
 	CASha256         []string                `config:"ca_sha256" yaml:"ca_sha256,omitempty"`
 }
 
@@ -52,11 +57,6 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 				fail = append(fail, e)
 			}
 		}
-	}
-
-	var cipherSuites []uint16
-	for _, suite := range config.CipherSuites {
-		cipherSuites = append(cipherSuites, uint16(suite))
 	}
 
 	var curves []tls.CurveID
@@ -86,7 +86,7 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 		Verification:     config.VerificationMode,
 		Certificates:     certs,
 		RootCAs:          cas,
-		CipherSuites:     cipherSuites,
+		CipherSuites:     config.CipherSuites,
 		CurvePreferences: curves,
 		Renegotiation:    tls.RenegotiationSupport(config.Renegotiation),
 		CASha256:         config.CASha256,
@@ -96,6 +96,10 @@ func LoadTLSConfig(config *Config) (*TLSConfig, error) {
 // Validate values the TLSConfig struct making sure certificate sure we have both a certificate and
 // a key.
 func (c *Config) Validate() error {
+	warnOnce.Do(func() {
+		cfgwarn.Deprecate("8.0.0", "Treating the CommonName field on X.509 certificates as a host name when no Subject Alternative Names are present is going to be removed. Please update your certificates if needed.")
+	})
+
 	return c.Certificate.Validate()
 }
 

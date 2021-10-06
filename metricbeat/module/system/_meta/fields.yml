@@ -5,6 +5,31 @@
   short_config: true
   release: ga
   fields:
+    - name: process
+      type: group
+      description: >
+        Process metrics.
+      fields:
+        - name: state
+          type: keyword
+          description: >
+            The process state. For example: "running".
+        - name: cpu.pct
+          type: scaled_float
+          format: percent
+          description: >
+            The percentage of CPU time spent by the process since the last event.
+            This value is normalized by the number of CPU cores and it ranges
+            from 0 to 1.
+        - name: cpu.start_time
+          type: date
+          description: >
+            The time when the process was started.
+        - name: memory.pct
+          type: scaled_float
+          format: percent
+          description: >
+            The percentage of memory the process occupied in main memory (RAM).
     - name: system
       type: group
       description: >

@@ -1,0 +1,64 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - rename:
+      fields:
+        - {from: message, to: event.original}
+  - decode_json_fields:
+      fields: [event.original]
+      target: zeek.ntp
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: zeek.ntp.id.orig_h, to: source.address}
+        - {from: zeek.ntp.id.orig_h, to: source.ip, type: ip}
+        - {from: zeek.ntp.id.orig_p, to: source.port, type: long}
+        - {from: zeek.ntp.id.resp_h, to: destination.address}
+        - {from: zeek.ntp.id.resp_h, to: destination.ip, type: ip}
+        - {from: zeek.ntp.id.resp_p, to: destination.port, type: long}
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: zeek.ntp.uid
+          to: zeek.session_id
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - zeek.ntp.id.orig_h
+        - zeek.ntp.id.orig_p
+        - zeek.ntp.id.resp_h
+        - zeek.ntp.id.resp_p
+  - add_fields:
+      target: event
+      fields:
+        kind: event
+        category:
+          - network
+        type:
+          - connection
+          - protocol
+          - info
+  - add_fields:
+      target: network
+      fields:
+        protocol: ntp
+        transport: udp
+  - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

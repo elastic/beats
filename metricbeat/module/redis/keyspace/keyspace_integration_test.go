@@ -26,7 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
-	rd "github.com/garyburd/redigo/redis"
+	rd "github.com/gomodule/redigo/redis"
 	"github.com/stretchr/testify/assert"
 )
 

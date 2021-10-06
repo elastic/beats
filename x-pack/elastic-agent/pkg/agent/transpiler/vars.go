@@ -10,7 +10,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/elastic/go-ucfg"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/composable"
+
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 var varsRegex = regexp.MustCompile(`\${([\p{L}\d\s\\\-_|.'"]*)}`)
@@ -20,24 +22,33 @@ var ErrNoMatch = fmt.Errorf("no matching vars")
 
 // Vars is a context of variables that also contain a list of processors that go with the mapping.
 type Vars struct {
-	Mapping map[string]interface{}
+	tree                  *AST
+	processorsKey         string
+	processors            Processors
+	fetchContextProviders common.MapStr
+}
 
-	ProcessorsKey string
-	Processors    Processors
+// NewVars returns a new instance of vars.
+func NewVars(mapping map[string]interface{}, fetchContextProviders common.MapStr) (*Vars, error) {
+	return NewVarsWithProcessors(mapping, "", nil, fetchContextProviders)
+}
+
+// NewVarsWithProcessors returns a new instance of vars with attachment of processors.
+func NewVarsWithProcessors(mapping map[string]interface{}, processorKey string, processors Processors, fetchContextProviders common.MapStr) (*Vars, error) {
+	tree, err := NewAST(mapping)
+	if err != nil {
+		return nil, err
+	}
+	return &Vars{tree, processorKey, processors, fetchContextProviders}, nil
 }
 
 // Replace returns a new value based on variable replacement.
 func (v *Vars) Replace(value string) (Node, error) {
-	var processors []map[string]interface{}
-	c, err := ucfg.NewFrom(v.Mapping, ucfg.PathSep("."))
-	if err != nil {
-		return nil, err
-	}
+	var processors Processors
 	matchIdxs := varsRegex.FindAllSubmatchIndex([]byte(value), -1)
 	if !validBrackets(value, matchIdxs) {
 		return nil, fmt.Errorf("starting ${ is missing ending }")
 	}
-
 	result := ""
 	lastIndex := 0
 	for _, r := range matchIdxs {
@@ -53,27 +64,19 @@ func (v *Vars) Replace(value string) (Node, error) {
 					result += value[lastIndex:r[0]] + val.Value()
 					set = true
 				case *varString:
-					if r[i] == 0 && r[i+1] == len(value) {
-						// possible for complete replacement of object, because the variable
-						// is not inside of a string
-						child, err := c.Child(val.Value(), -1, ucfg.PathSep("."))
-						if err == nil {
-							ast, err := NewASTFromConfig(child)
-							if err == nil {
-								if v.ProcessorsKey != "" && varPrefixMatched(val.Value(), v.ProcessorsKey) {
-									processors = v.Processors
-								}
-								return attachProcessors(ast.root, processors), nil
-							}
+					node, ok := v.lookupNode(val.Value())
+					if ok {
+						node := nodeToValue(node)
+						if v.processorsKey != "" && varPrefixMatched(val.Value(), v.processorsKey) {
+							processors = v.processors
 						}
-					}
-					replace, err := c.String(val.Value(), -1, ucfg.PathSep("."))
-					if err == nil {
-						result += value[lastIndex:r[0]] + replace
+						if r[i] == 0 && r[i+1] == len(value) {
+							// possible for complete replacement of object, because the variable
+							// is not inside of a string
+							return attachProcessors(node, processors), nil
+						}
+						result += value[lastIndex:r[0]] + node.String()
 						set = true
-						if v.ProcessorsKey != "" && varPrefixMatched(val.Value(), v.ProcessorsKey) {
-							processors = v.Processors
-						}
 					}
 				}
 				if set {
@@ -87,6 +90,40 @@ func (v *Vars) Replace(value string) (Node, error) {
 		}
 	}
 	return NewStrValWithProcessors(result+value[lastIndex:], processors), nil
+}
+
+// Lookup returns the value from the vars.
+func (v *Vars) Lookup(name string) (interface{}, bool) {
+	// lookup in the AST tree
+	return v.tree.Lookup(name)
+}
+
+// lookupNode performs a lookup on the AST, but keeps the result as a `Node`.
+//
+// This is different from `Lookup` which returns the actual type, not the AST type.
+func (v *Vars) lookupNode(name string) (Node, bool) {
+	// check if the value can be retrieved from a FetchContextProvider
+	for providerName, provider := range v.fetchContextProviders {
+		if varPrefixMatched(name, providerName) {
+			fetchProvider := provider.(composable.FetchContextProvider)
+			fval, found := fetchProvider.Fetch(name)
+			if found {
+				return &StrVal{value: fval}, true
+			}
+			return &StrVal{value: ""}, false
+		}
+	}
+	// lookup in the AST tree
+	return Lookup(v.tree, name)
+}
+
+// nodeToValue ensures that the node is an actual value.
+func nodeToValue(node Node) Node {
+	switch n := node.(type) {
+	case *Key:
+		return n.value
+	}
+	return node
 }
 
 // validBrackets returns true when all starting {$ have a matching ending }.

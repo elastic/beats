@@ -60,6 +60,7 @@ type BrokerSettings struct {
 	TLS                      *tls.Config
 	Username, Password       string
 	Version                  kafka.Version
+	Sasl                     kafka.SaslConfig
 }
 
 type GroupDescription struct {
@@ -91,6 +92,7 @@ func NewBroker(host string, settings BrokerSettings) *Broker {
 		cfg.Net.SASL.Enable = true
 		cfg.Net.SASL.User = user
 		cfg.Net.SASL.Password = settings.Password
+		settings.Sasl.ConfigureSarama(cfg)
 	}
 	cfg.Version, _ = settings.Version.Get()
 
@@ -119,7 +121,7 @@ func (b *Broker) Connect() error {
 	c, err := getClusterWideClient(b.Addr(), b.cfg)
 	if err != nil {
 		closeBroker(b.broker)
-		return fmt.Errorf("Could not get cluster client for advertised broker with address %v", b.Addr())
+		return fmt.Errorf("getting cluster client for advertised broker with address %v: %w", b.Addr(), err)
 	}
 	b.client = c
 

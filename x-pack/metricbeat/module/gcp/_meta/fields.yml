@@ -1,0 +1,32 @@
+- key: gcp
+  title: 'Google Cloud Platform'
+  release: beta
+  description: >
+    GCP module
+  fields:
+    - name: gcp
+      type: group
+      fields:
+        - name: labels
+          type: object
+          description: >
+            GCP monitoring metrics labels
+          fields:
+            - name: user.*
+              type: object
+              object_type: keyword
+            - name: metadata.*
+              type: object
+              object_type: keyword
+            - name: metrics.*
+              type: object
+              object_type: keyword
+            - name: system.*
+              type: object
+              object_type: keyword
+        - name: "metrics.*.*.*.*"
+          type: object
+          object_type: double
+          object_type_mapping_type: "*"
+          description: >
+            Metrics that returned from Google Cloud API query.

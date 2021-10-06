@@ -26,18 +26,20 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-// ErrPluginDisabled is returned when the monitor plugin is marked as disabled.
-var ErrPluginDisabled = errors.New("Monitor not loaded, plugin is disabled")
+type ServiceFields struct {
+	Name string `config:"name"`
+}
 
 // StdMonitorFields represents the generic configuration options around a monitor plugin.
 type StdMonitorFields struct {
-	ID          string             `config:"id"`
-	Name        string             `config:"name"`
-	Type        string             `config:"type" validate:"required"`
-	Schedule    *schedule.Schedule `config:"schedule" validate:"required"`
-	Timeout     time.Duration      `config:"timeout"`
-	ServiceName string             `config:"service_name"`
-	Enabled     bool               `config:"enabled"`
+	ID                string             `config:"id"`
+	Name              string             `config:"name"`
+	Type              string             `config:"type" validate:"required"`
+	Schedule          *schedule.Schedule `config:"schedule" validate:"required"`
+	Timeout           time.Duration      `config:"timeout"`
+	Service           ServiceFields      `config:"service"`
+	LegacyServiceName string             `config:"service_name"`
+	Enabled           bool               `config:"enabled"`
 }
 
 func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
@@ -47,8 +49,12 @@ func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
 		return mpi, errors.Wrap(err, "error unpacking monitor plugin config")
 	}
 
-	if !mpi.Enabled {
-		return mpi, ErrPluginDisabled
+	// Use `service_name` if `service.name` is unspecified
+	// `service_name` was only document in the 7.10.0 release.
+	if mpi.LegacyServiceName != "" {
+		if mpi.Service.Name == "" {
+			mpi.Service.Name = mpi.LegacyServiceName
+		}
 	}
 
 	return mpi, nil

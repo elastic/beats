@@ -26,6 +26,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
@@ -65,17 +66,29 @@ func (b *dockerBuilder) Build() error {
 		return err
 	}
 
-	if err := b.prepareBuild(); err != nil {
-		return errors.Wrap(err, "failed to prepare build")
-	}
+	// We always have at least one default variant
+	variants := append([]string{""}, b.PackageSpec.Variants...)
+	for _, variant := range variants {
+		if err := b.prepareBuild(variant); err != nil {
+			return errors.Wrap(err, "failed to prepare build")
+		}
 
-	tag, err := b.dockerBuild()
-	if err != nil {
-		return errors.Wrap(err, "failed to build docker")
-	}
+		tag, err := b.dockerBuild(variant)
+		tries := 3
+		for err != nil && tries != 0 {
+			fmt.Println(">> Building docker images again (after 10 s)")
+			// This sleep is to avoid hitting the docker build issues when resources are not available.
+			time.Sleep(time.Second * 10)
+			tag, err = b.dockerBuild(variant)
+			tries -= 1
+		}
+		if err != nil {
+			return errors.Wrap(err, "failed to build docker")
+		}
 
-	if err := b.dockerSave(tag); err != nil {
-		return errors.Wrap(err, "failed to save docker as artifact")
+		if err := b.dockerSave(tag, variant); err != nil {
+			return errors.Wrap(err, "failed to save docker as artifact")
+		}
 	}
 
 	return nil
@@ -111,7 +124,7 @@ func (b *dockerBuilder) copyFiles() error {
 	return nil
 }
 
-func (b *dockerBuilder) prepareBuild() error {
+func (b *dockerBuilder) prepareBuild(variant string) error {
 	elasticBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
@@ -121,6 +134,7 @@ func (b *dockerBuilder) prepareBuild() error {
 	data := map[string]interface{}{
 		"ExposePorts": b.exposePorts(),
 		"ModulesDirs": b.modulesDirs(),
+		"Variant":     variant,
 	}
 
 	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
@@ -180,23 +194,34 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 	return nil
 }
 
-func (b *dockerBuilder) dockerBuild() (string, error) {
-	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
+func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
+	imageName := b.imageName
+	if variant != "" {
+		imageName = fmt.Sprintf("%s-%s", imageName, variant)
+	}
+	taggedImageName := fmt.Sprintf("%s:%s", imageName, b.Version)
 	if b.Snapshot {
-		tag = tag + "-SNAPSHOT"
+		taggedImageName = taggedImageName + "-SNAPSHOT"
 	}
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
-		tag = fmt.Sprintf("%s/%s", repository, tag)
+		taggedImageName = fmt.Sprintf("%s/%s", repository, taggedImageName)
 	}
-	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir)
+	return taggedImageName, sh.Run("docker", "build", "-t", taggedImageName, b.buildDir)
 }
 
-func (b *dockerBuilder) dockerSave(tag string) error {
+func (b *dockerBuilder) dockerSave(tag string, variant string) error {
+	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
+		err := os.MkdirAll(distributionsDir, 0750)
+		if err != nil {
+			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+		}
+	}
 	// Save the container as artifact
 	outputFile := b.OutputFile
 	if outputFile == "" {
 		outputTar, err := b.Expand(defaultBinaryName+".docker.tar.gz", map[string]interface{}{
-			"Name": b.imageName,
+			"Name":    b.imageName,
+			"Variant": variant,
 		})
 		if err != nil {
 			return err

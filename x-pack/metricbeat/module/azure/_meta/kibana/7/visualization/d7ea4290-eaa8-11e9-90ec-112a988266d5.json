@@ -1,0 +1,69 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "SQL Server Total Server Memory [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "azure.resource.type:\"Microsoft.Compute/virtualMachines\" "
+                },
+                "id": "94af6a00-eaa8-11e9-9269-d92e2d3f77fd",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "formatter": "bytes",
+                        "id": "94af6a01-eaa8-11e9-9269-d92e2d3f77fd",
+                        "label": "memory",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.compute_vm.sqlserver_memory_manager_total_server_memory.avg",
+                                "id": "94af6a02-eaa8-11e9-9269-d92e2d3f77fd",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "SQL Server Total Server Memory [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d7ea4290-eaa8-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:54.175Z",
+    "version": "WzM2MDYsMV0="
+}

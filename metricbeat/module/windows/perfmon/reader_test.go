@@ -29,9 +29,8 @@ import (
 
 func TestGetCounter(t *testing.T) {
 	reader := Reader{
-		query:    pdh.Query{},
-		executed: true,
-		log:      nil,
+		query: pdh.Query{},
+		log:   nil,
 		counters: []PerfCounter{
 			{
 				QueryField:   "datagrams_sent_per_sec",
@@ -157,4 +156,17 @@ func TestMapCounterPathLabel(t *testing.T) {
 	result = mapCounterPathLabel("metrics", "logicaldisk_avg._disk_sec_per_transfer", `RSC Coalesced Packet Bucket 5 (16To31)`)
 	assert.Equal(t, result, "metrics.logicaldisk_avg_disk_sec_per_transfer")
 
+}
+
+func TestIsWildcard(t *testing.T) {
+	queries := []string{"\\Process(chrome)\\% User Time", "\\Process(chrome#1)\\% User Time", "\\Process(svchost)\\% User Time"}
+	instance := "*"
+	result := isWildcard(queries, instance)
+	assert.True(t, result)
+	queries = []string{"\\Process(chrome)\\% User Time"}
+	result = isWildcard(queries, instance)
+	assert.True(t, result)
+	instance = "chrome"
+	result = isWildcard(queries, instance)
+	assert.False(t, result)
 }

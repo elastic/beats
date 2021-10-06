@@ -13,6 +13,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -22,9 +24,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
@@ -35,24 +39,23 @@ var (
 
 // Application encapsulates an application that is ran as a service by the system service manager.
 type Application struct {
-	bgContext    context.Context
-	id           string
-	name         string
-	pipelineID   string
-	logLevel     string
-	spec         app.Specifier
-	srv          *server.Server
-	srvState     *server.ApplicationState
-	limiter      *tokenbucket.Bucket
-	startContext context.Context
-	tag          app.Taggable
-	state        state.State
-	reporter     state.Reporter
+	bgContext  context.Context
+	id         string
+	name       string
+	pipelineID string
+	logLevel   string
+	desc       *app.Descriptor
+	srv        *server.Server
+	srvState   *server.ApplicationState
+	limiter    *tokenbucket.Bucket
+	state      state.State
+	reporter   state.Reporter
 
 	uid int
 	gid int
 
-	monitor monitoring.Monitor
+	monitor        monitoring.Monitor
+	statusReporter status.Reporter
 
 	processConfig *process.Config
 
@@ -70,14 +73,15 @@ func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
 	credsPort int,
-	spec app.Specifier,
+	desc *app.Descriptor,
 	srv *server.Server,
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Application, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Application, error) {
 
-	s := spec.Spec()
+	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
@@ -90,22 +94,31 @@ func NewApplication(
 		name:          appName,
 		pipelineID:    pipelineID,
 		logLevel:      logLevel,
-		spec:          spec,
+		desc:          desc,
 		srv:           srv,
 		processConfig: cfg.ProcessConfig,
 		logger:        logger,
 		limiter:       b,
-		reporter:      reporter,
-		monitor:       monitor,
-		uid:           uid,
-		gid:           gid,
-		credsPort:     credsPort,
+		state: state.State{
+			Status: state.Stopped,
+		},
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
+		credsPort:      credsPort,
+		statusReporter: statusController.RegisterApp(id, appName),
 	}, nil
 }
 
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// Spec returns the program spec of this app.
+func (a *Application) Spec() program.Spec {
+	return a.desc.Spec()
 }
 
 // State returns the application state.
@@ -126,14 +139,14 @@ func (a *Application) Started() bool {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
+func (a *Application) SetState(s state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg, payload)
+	a.setState(s, msg, payload)
 }
 
 // Start starts the application with a specified config.
-func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]interface{}) (err error) {
+func (a *Application) Start(ctx context.Context, _ app.Taggable, cfg map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
@@ -153,13 +166,16 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 	if a.srvState != nil {
 		a.setState(state.Starting, "Starting", nil)
 		a.srvState.SetStatus(proto.StateObserved_STARTING, a.state.Message, a.state.Payload)
-		a.srvState.UpdateConfig(string(cfgStr))
+		a.srvState.UpdateConfig(a.srvState.Config())
 	} else {
 		a.setState(state.Starting, "Starting", nil)
 		a.srvState, err = a.srv.Register(a, string(cfgStr))
 		if err != nil {
 			return err
 		}
+
+		// Set input types from the spec
+		a.srvState.SetInputTypes(a.desc.Spec().ActionInputTypes)
 	}
 
 	defer func() {
@@ -171,7 +187,7 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 		}
 	}()
 
-	if err := a.monitor.Prepare(a.name, a.pipelineID, a.uid, a.gid); err != nil {
+	if err := a.monitor.Prepare(a.desc.Spec(), a.pipelineID, a.uid, a.gid); err != nil {
 		return err
 	}
 
@@ -191,11 +207,12 @@ func (a *Application) Start(ctx context.Context, t app.Taggable, cfg map[string]
 }
 
 // Configure configures the application with the passed configuration.
-func (a *Application) Configure(_ context.Context, config map[string]interface{}) (err error) {
+func (a *Application) Configure(ctx context.Context, config map[string]interface{}) (err error) {
 	defer func() {
 		if err != nil {
 			// inject App metadata
 			err = errors.New(err, errors.M(errors.MetaKeyAppName, a.name), errors.M(errors.MetaKeyAppName, a.id))
+			a.statusReporter.Update(state.Degraded, err.Error(), nil)
 		}
 	}()
 
@@ -210,11 +227,24 @@ func (a *Application) Configure(_ context.Context, config map[string]interface{}
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
+
+	isRestartNeeded := plugin.IsRestartNeeded(a.logger, a.Spec(), a.srvState, config)
+
 	err = a.srvState.UpdateConfig(string(cfgStr))
 	if err != nil {
 		return errors.New(err, errors.TypeApplication)
 	}
-	return nil
+
+	if isRestartNeeded {
+		a.logger.Infof("initiating restart of '%s' due to config change", a.Name())
+		a.appLock.Unlock()
+		a.Stop()
+		err = a.Start(ctx, a.desc, config)
+		// lock back so it wont panic on deferred unlock
+		a.appLock.Lock()
+	}
+
+	return err
 }
 
 // Stop stops the current application.
@@ -273,41 +303,27 @@ func (a *Application) OnStatusChange(s *server.ApplicationState, status proto.St
 		return
 	}
 
-	a.setStateFromProto(status, msg, payload)
+	a.setState(state.FromProto(status), msg, payload)
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
-	var status state.Status
-	switch pstatus {
-	case proto.StateObserved_STARTING:
-		status = state.Starting
-	case proto.StateObserved_CONFIGURING:
-		status = state.Configuring
-	case proto.StateObserved_HEALTHY:
-		status = state.Running
-	case proto.StateObserved_DEGRADED:
-		status = state.Degraded
-	case proto.StateObserved_FAILED:
-		status = state.Failed
-	case proto.StateObserved_STOPPING:
-		status = state.Stopping
-	}
-	a.setState(status, msg, payload)
-}
+func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		if state.IsStateFiltered(msg, payload) {
+			return
+		}
 
-func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
-	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
-		a.state.Status = status
+		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
+		a.statusReporter.Update(s, msg, payload)
 	}
 }
 
 func (a *Application) cleanUp() {
-	a.monitor.Cleanup(a.name, a.pipelineID)
+	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
 }
 
 func (a *Application) startCredsListener() error {

@@ -24,8 +24,25 @@ processors:
         - {from: "message", to: "event.original"}
   - decode_cef:
       field: event.original
+{{ if .timezone }}
+      timezone: '{{ .timezone }}'
+{{ end }}
   - community_id:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.5.0
+        ecs.version: 1.12.0
+
+{{ if .external_zones }}
+  - add_fields:
+      target: _temp_
+      fields:
+        external_zones: {{ .external_zones | tojson }}
+{{ end }}
+
+{{ if .internal_zones }}
+  - add_fields:
+      target: _temp_
+      fields:
+        internal_zones: {{ .internal_zones | tojson }}
+{{ end }}

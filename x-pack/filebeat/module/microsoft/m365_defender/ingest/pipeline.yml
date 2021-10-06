@@ -1,0 +1,331 @@
+---
+description: Pipeline for parsing microsoft atp logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- remove:
+    field:
+      - message
+      - json.comments
+      - host
+    ignore_missing: true
+- remove:
+    field:
+      - json.alerts
+    ignore_missing: true
+    if: 'ctx?.json?.alerts == null || ctx?.json?.alerts instanceof List'
+
+#########################
+## ECS General Mapping ##
+#########################
+- script:
+    lang: painless
+    if: ctx?.json != null
+    source: |
+      void handleMap(Map map) {
+        for (def x : map.values()) {
+          if (x instanceof Map) {
+              handleMap(x);
+          } else if (x instanceof List) {
+              handleList(x);
+          }
+        }
+      map.values().removeIf(v -> v == null);
+      }
+      void handleList(List list) {
+        for (def x : list) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+        }
+      }
+      handleMap(ctx);
+
+- set:
+    field: cloud.provider
+    value: azure
+- set:
+    field: '@timestamp'
+    value: '{{json.lastUpdateTime}}'
+    if: ctx?.json?.lastUpdateTime != null
+- rename:
+    field: json.alerts.title
+    target_field: message
+    ignore_missing: true
+- rename:
+    field: json.incidentName
+    target_field: message
+    ignore_missing: true
+    if: ctx?.message == null
+
+#######################
+## ECS Event Mapping ##
+#######################
+- set:
+    field: event.kind
+    value: alert
+# Events returned from the API is always in UTC, so should never use anything else
+- set:
+    field: event.timezone
+    value: UTC
+- set:
+    field: event.action
+    value: '{{json.alerts.category}}'
+    if: ctx.json?.alerts?.category != null
+- set:
+    field: event.provider
+    value: '{{json.alerts.serviceSource}}'
+    if: ctx.json?.alerts?.serviceSource != null
+- set:
+    field: event.created
+    value: '{{json.createdTime}}'
+    if: ctx.json?.createdTime != null
+- append:
+    field: event.category
+    value: host
+- append:
+    field: event.category
+    value: malware
+    if: ctx.json?.determination == 'Malware'
+- append:
+    field: event.category
+    value: process
+    if: ctx.json?.entities?.entityType == 'Process'
+- append:
+    field: event.type
+    value: user
+    if: ctx.json?.entities?.entityType == 'User'
+- append:
+    field: event.type
+    value:
+      - creation
+      - start
+    if: ctx.json?.status == 'New'
+- append:
+    field: event.type
+    value: end
+    if: ctx.json?.status == 'Resolved'
+- rename:
+    field: json.alerts.alertId
+    target_field: event.id
+    ignore_missing: true
+- rename:
+    field: json.alerts.firstActivity
+    target_field: event.start
+    ignore_missing: true
+- rename:
+    field: json.alerts.lastActivity
+    target_field: event.end
+    ignore_missing: true
+- set:
+    field: event.severity
+    value: 0
+    if: ctx.json?.severity == 'Unspecified'
+- set:
+    field: event.severity
+    value: 1
+    if: ctx.json?.severity == 'Informational'
+- set:
+    field: event.severity
+    value: 2
+    if: ctx.json?.severity == 'Low'
+- set:
+    field: event.severity
+    value: 3
+    if: ctx.json?.severity == 'Medium'
+- set:
+    field: event.severity
+    value: 4
+    if: ctx.json?.severity == 'High'
+- script:
+    lang: painless
+    if: "ctx?.event?.start != null && ctx?.event?.end != null"
+    source: >
+      Instant eventstart = ZonedDateTime.parse(ctx?.event?.start).toInstant();
+      Instant eventend = ZonedDateTime.parse(ctx?.event?.end).toInstant();
+      ctx.event['duration'] = ChronoUnit.NANOS.between(eventstart, eventend);
+
+########################
+## ECS Threat Mapping ##
+########################
+- set:
+    field: threat.framework
+    value: MITRE ATT&CK
+    if: ctx?.json?.alerts?.category != null
+- rename:
+    field: json.alerts.category
+    target_field: threat.technique.name
+    ignore_missing: true
+- rename:
+    field: json.alerts.description
+    target_field: rule.description
+    ignore_missing: true
+    if: ctx?.json?.alerts != null && ctx.json?.alerts?.description.length() < 1020
+
+######################
+## ECS File Mapping ##
+######################
+- rename:
+    field: json.alerts.entities.fileName
+    target_field: file.name
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.sha256
+    target_field: file.hash.sha256
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.sha1
+    target_field: file.hash.sha1
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.filePath
+    target_field: file.path
+    ignore_missing: true
+
+#########################
+## ECS Process Mapping ##
+#########################
+- rename:
+    field: json.alerts.entities.processId
+    target_field: process.pid
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.processCommandLine
+    target_field: process.command_line
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.processCreationTime
+    target_field: process.start
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.parentProcessId
+    target_field: process.parent.pid
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.parentProcessCreationTime
+    target_field: process.parent.start
+    ignore_missing: true
+
+##########################
+## ECS Observer Mapping ##
+##########################
+- set:
+    field: observer.product
+    value: 365 Defender
+- set:
+    field: observer.vendor
+    value: Microsoft
+- rename:
+    field: json.alerts.serviceSource
+    target_field: observer.name
+    ignore_missing: true
+
+#####################
+## ECS URL Mapping ##
+#####################
+- rename:
+    field: json.alerts.entities.url
+    target_field: url.full
+    ignore_missing: true
+    if: ctx?.json?.alerts?.entities?.url != null
+- uri_parts:
+    field: url.full
+    ignore_failure: true
+    if: ctx?.url?.full != null
+######################
+## ECS User Mapping ##
+######################
+- rename:
+    field: json.alerts.entities.userPrincipalName
+    target_field: user.name
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.domainName
+    target_field: user.domain
+    ignore_missing: true
+- rename:
+    field: json.alerts.entities.aadUserId
+    target_field: user.id
+    ignore_missing: true
+
+##############################
+##   ECS host.user Mapping  ##
+## Deprecated since ECS 1.8 ##
+##############################
+- set:
+    field: host.user.name
+    value: '{{user.name}}'
+    ignore_empty_value: true
+- set:
+    field: host.user.domain
+    value: '{{user.domain}}'
+    ignore_empty_value: true
+- set:
+    field: host.user.id
+    value: '{{user.id}}'
+    ignore_empty_value: true
+
+#########################
+## ECS Related Mapping ##
+#########################
+- append:
+    field: related.ip
+    value: '{{json.alerts.entities.ipAddress}}'
+    if: ctx?.json?.alerts?.entities?.ipAddress != null
+- append:
+    field: related.user
+    value: '{{user.name}}'
+    if: ctx?.user?.name != null
+- append:
+    field: related.hash
+    value: '{{file.hash.sha1}}'
+    if: ctx?.file?.hash?.sha1 != null
+- append:
+    field: related.hash
+    value: '{{file.hash.sha256}}'
+    if: ctx?.file?.hash?.sha256 != null
+- append:
+    field: related.hosts
+    value: '{{host.hostname}}'
+    if: ctx?.host?.hostname != null
+
+#############
+## Cleanup ##
+#############
+- convert:
+    field: json.alerts.incidentId
+    type: string
+    ignore_missing: true
+- convert:
+    field: json.incidentId
+    type: string
+    ignore_missing: true
+- remove:
+    field: json.alerts.mitreTechniques
+    ignore_missing: true
+    if: 'ctx?.json?.alerts != null && ctx?.json?.alerts?.mitreTechniques.isEmpty()'
+- remove:
+    field: json.alerts.devices
+    ignore_missing: true
+    if: 'ctx?.json?.alerts != null && ctx?.json?.alerts?.devices.isEmpty()'
+- remove:
+    field: json.tags
+    ignore_missing: true
+    if: 'ctx?.json?.alerts != null && ctx?.json?.tags.isEmpty()'
+- remove:
+    ignore_missing: true
+    field:
+      - json.createdTime
+      - json.severity
+      - json.lastUpdateTime
+- rename:
+    field: json
+    target_field: microsoft.m365_defender
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{_ingest.on_failure_message}}'

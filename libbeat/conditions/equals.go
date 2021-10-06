@@ -23,14 +23,43 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-type equalsValue struct {
-	Int  uint64
-	Str  string
-	Bool bool
-}
-
 // Equals is a Condition for testing string equality.
 type Equals map[string]equalsValue
+
+type equalsValue func(interface{}) bool
+
+func equalsIntValue(i uint64) equalsValue {
+	logger := logp.L().Named(logName)
+	return func(value interface{}) bool {
+		if sValue, err := ExtractInt(value); err == nil {
+			return sValue == i
+		}
+		logger.Warnf("expected int but got type %T in equals condition.", value)
+		return false
+	}
+}
+
+func equalsStringValue(s string) equalsValue {
+	logger := logp.L().Named(logName)
+	return func(value interface{}) bool {
+		if sValue, err := ExtractString(value); err == nil {
+			return sValue == s
+		}
+		logger.Warnf("expected string but got type %T in equals condition.", value)
+		return false
+	}
+}
+
+func equalsBoolValue(b bool) equalsValue {
+	logger := logp.L().Named(logName)
+	return func(value interface{}) bool {
+		if sValue, err := ExtractBool(value); err == nil {
+			return sValue == b
+		}
+		logger.Warnf("expected bool but got type %T in equals condition.", value)
+		return false
+	}
+}
 
 // NewEqualsCondition builds a new Equals using the given configuration of string equality checks.
 func NewEqualsCondition(fields map[string]interface{}) (c Equals, err error) {
@@ -39,19 +68,19 @@ func NewEqualsCondition(fields map[string]interface{}) (c Equals, err error) {
 	for field, value := range fields {
 		uintValue, err := ExtractInt(value)
 		if err == nil {
-			c[field] = equalsValue{Int: uintValue}
+			c[field] = equalsIntValue(uintValue)
 			continue
 		}
 
 		sValue, err := ExtractString(value)
 		if err == nil {
-			c[field] = equalsValue{Str: sValue}
+			c[field] = equalsStringValue(sValue)
 			continue
 		}
 
 		bValue, err := ExtractBool(value)
 		if err == nil {
-			c[field] = equalsValue{Bool: bValue}
+			c[field] = equalsBoolValue(bValue)
 			continue
 		}
 
@@ -70,35 +99,9 @@ func (c Equals) Check(event ValuesMap) bool {
 			return false
 		}
 
-		intValue, err := ExtractInt(value)
-		if err == nil {
-			if intValue != equalValue.Int {
-				return false
-			}
-
-			continue
+		if !equalValue(value) {
+			return false
 		}
-
-		sValue, err := ExtractString(value)
-		if err == nil {
-			if sValue != equalValue.Str {
-				return false
-			}
-
-			continue
-		}
-
-		bValue, err := ExtractBool(value)
-		if err == nil {
-			if bValue != equalValue.Bool {
-				return false
-			}
-
-			continue
-		}
-
-		logp.L().Named(logName).Warnf("unexpected type %T in equals condition as it accepts only integers, strings, or booleans.", value)
-		return false
 	}
 
 	return true

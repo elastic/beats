@@ -1,0 +1,222 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/RDS
+        resource_type: rds
+        statistic: ["Average"]
+        name:
+          - BurstBalance
+          - CPUUtilization
+          - CPUCreditUsage
+          - CPUCreditBalance
+          - DatabaseConnections
+          - DiskQueueDepth
+          - FailedSQLServerAgentJobsCount
+          - FreeableMemory
+          - FreeStorageSpace
+          - MaximumUsedTransactionIDs
+          - OldestReplicationSlotLag
+          - ReadIOPS
+          - CommitThroughput
+          - DeleteThroughput
+          - DDLThroughput
+          - DMLThroughput
+          - InsertThroughput
+          - NetworkThroughput
+          - NetworkReceiveThroughput
+          - NetworkTransmitThroughput
+          - ReadThroughput
+          - SelectThroughput
+          - UpdateThroughput
+          - WriteThroughput
+          - CommitLatency
+          - DDLLatency
+          - DMLLatency
+          - InsertLatency
+          - ReadLatency
+          - SelectLatency
+          - UpdateLatency
+          - WriteLatency
+          - DeleteLatency
+          - ReplicaLag
+          - BinLogDiskUsage
+          - ReplicationSlotDiskUsage
+          - TransactionLogsDiskUsage
+          - SwapUsage
+          - TransactionLogsGeneration
+          - WriteIOPS
+          - Queries
+          - Deadlocks
+          - VolumeBytesUsed
+          - FreeLocalStorage
+          - ActiveTransactions
+          - BlockedTransactions
+          - LoginFailures
+          - AuroraBinlogReplicaLag
+          - AuroraGlobalDBReplicatedWriteIO
+          - AuroraGlobalDBDataTransferBytes
+          - AuroraGlobalDBReplicationLag
+          - AuroraReplicaLag
+          - AuroraReplicaLagMaximum
+          - AuroraReplicaLagMinimum
+          - BacktrackChangeRecordsCreationRate
+          - BacktrackChangeRecordsStored
+          - BacktrackWindowActual
+          - BacktrackWindowAlert
+          - BackupRetentionPeriodStorageUsed
+          - SnapshotStorageUsed
+          - BufferCacheHitRatio
+          - ResultSetCacheHitRatio
+          - EngineUptime
+          - VolumeReadIOPs
+          - VolumeWriteIOPs
+          - RDSToAuroraPostgreSQLReplicaLag
+          - TotalBackupStorageBilled
+          - AuroraVolumeBytesLeftTotal
+processors:
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "aws.rds.metrics.BurstBalance.avg"
+          to: "aws.rds.burst_balance.pct"
+        - from: "aws.rds.metrics.CPUUtilization.avg"
+          to: "aws.rds.cpu.total.pct"
+        - from: "aws.rds.metrics.CPUCreditUsage.avg"
+          to: "aws.rds.cpu.credit_usage"
+        - from: "aws.rds.metrics.CPUCreditBalance.avg"
+          to: "aws.rds.cpu.credit_balance"
+        - from: "aws.rds.metrics.DatabaseConnections.avg"
+          to: "aws.rds.database_connections"
+        - from: "aws.rds.metrics.DiskQueueDepth.avg"
+          to: "aws.rds.disk_queue_depth"
+        - from: "aws.rds.metrics.FailedSQLServerAgentJobsCount.avg"
+          to: "aws.rds.failed_sql_server_agent_jobs"
+        - from: "aws.rds.metrics.FreeableMemory.avg"
+          to: "aws.rds.freeable_memory.bytes"
+        - from: "aws.rds.metrics.FreeStorageSpace.avg"
+          to: "aws.rds.free_storage.bytes"
+        - from: "aws.rds.metrics.MaximumUsedTransactionIDs.avg"
+          to: "aws.rds.maximum_used_transaction_ids"
+        - from: "aws.rds.metrics.OldestReplicationSlotLag.avg"
+          to: "aws.rds.oldest_replication_slot_lag.mb"
+        - from: "aws.rds.metrics.ReadIOPS.avg"
+          to: "aws.rds.read_io.ops_per_sec"
+        - from: "aws.rds.metrics.CommitThroughput.avg"
+          to: "aws.rds.throughput.commit"
+        - from: "aws.rds.metrics.DeleteThroughput.avg"
+          to: "aws.rds.throughput.delete"
+        - from: "aws.rds.metrics.DDLThroughput.avg"
+          to: "aws.rds.throughput.ddl"
+        - from: "aws.rds.metrics.DMLThroughput.avg"
+          to: "aws.rds.throughput.dml"
+        - from: "aws.rds.metrics.InsertThroughput.avg"
+          to: "aws.rds.throughput.insert"
+        - from: "aws.rds.metrics.NetworkThroughput.avg"
+          to: "aws.rds.throughput.network"
+        - from: "aws.rds.metrics.NetworkReceiveThroughput.avg"
+          to: "aws.rds.throughput.network_receive"
+        - from: "aws.rds.metrics.NetworkTransmitThroughput.avg"
+          to: "aws.rds.throughput.network_transmit"
+        - from: "aws.rds.metrics.ReadThroughput.avg"
+          to: "aws.rds.throughput.read"
+        - from: "aws.rds.metrics.SelectThroughput.avg"
+          to: "aws.rds.throughput.select"
+        - from: "aws.rds.metrics.UpdateThroughput.avg"
+          to: "aws.rds.throughput.update"
+        - from: "aws.rds.metrics.WriteThroughput.avg"
+          to: "aws.rds.throughput.write"
+        - from: "aws.rds.metrics.CommitLatency.avg"
+          to: "aws.rds.latency.commit"
+        - from: "aws.rds.metrics.DDLLatency.avg"
+          to: "aws.rds.latency.ddl"
+        - from: "aws.rds.metrics.DMLLatency.avg"
+          to: "aws.rds.latency.dml"
+        - from: "aws.rds.metrics.InsertLatency.avg"
+          to: "aws.rds.latency.insert"
+        - from: "aws.rds.metrics.ReadLatency.avg"
+          to: "aws.rds.latency.read"
+        - from: "aws.rds.metrics.SelectLatency.avg"
+          to: "aws.rds.latency.select"
+        - from: "aws.rds.metrics.UpdateLatency.avg"
+          to: "aws.rds.latency.update"
+        - from: "aws.rds.metrics.WriteLatency.avg"
+          to: "aws.rds.latency.write"
+        - from: "aws.rds.metrics.DeleteLatency.avg"
+          to: "aws.rds.latency.delete"
+        - from: "aws.rds.metrics.ReplicaLag.avg"
+          to: "aws.rds.replica_lag.sec"
+        - from: "aws.rds.metrics.BinLogDiskUsage.avg"
+          to: "aws.rds.disk_usage.bin_log.bytes"
+        - from: "aws.rds.metrics.ReplicationSlotDiskUsage.avg"
+          to: "aws.rds.disk_usage.replication_slot.mb"
+        - from: "aws.rds.metrics.TransactionLogsDiskUsage.avg"
+          to: "aws.rds.disk_usage.transaction_logs.mb"
+        - from: "aws.rds.metrics.SwapUsage.avg"
+          to: "aws.rds.swap_usage.bytes"
+        - from: "aws.rds.metrics.TransactionLogsGeneration.avg"
+          to: "aws.rds.transaction_logs_generation"
+        - from: "aws.rds.metrics.WriteIOPS.avg"
+          to: "aws.rds.write_io.ops_per_sec"
+        - from: "aws.rds.metrics.Queries.avg"
+          to: "aws.rds.queries"
+        - from: "aws.rds.metrics.Deadlocks.avg"
+          to: "aws.rds.deadlocks"
+        - from: "aws.rds.metrics.VolumeBytesUsed.avg"
+          to: "aws.rds.volume_used.bytes"
+        - from: "aws.rds.metrics.FreeLocalStorage.avg"
+          to: "aws.rds.free_local_storage.bytes"
+        - from: "aws.rds.metrics.ActiveTransactions.avg"
+          to: "aws.rds.transactions.active"
+        - from: "aws.rds.metrics.BlockedTransactions.avg"
+          to: "aws.rds.transactions.blocked"
+        - from: "aws.rds.metrics.LoginFailures.avg"
+          to: "aws.rds.login_failures"
+        - from: "aws.rds.metrics.AuroraBinlogReplicaLag.avg"
+          to: "aws.rds.aurora_bin_log_replica_lag"
+        - from: "aws.rds.metrics.aurora_bin_log_replica_lag.avg"
+          to: "aws.rds.aurora_global_db.replicated_write_io.bytes"
+        - from: "aws.rds.metrics.AuroraGlobalDBDataTransferBytes.avg"
+          to: "aws.rds.aurora_global_db.data_transfer.bytes"
+        - from: "aws.rds.metrics.AuroraGlobalDBReplicationLag.avg"
+          to: "aws.rds.aurora_global_db.replication_lag.ms"
+        - from: "aws.rds.metrics.AuroraReplicaLag.avg"
+          to: "aws.rds.aurora_replica.lag.ms"
+        - from: "aws.rds.metrics.AuroraReplicaLagMaximum.avg"
+          to: "aws.rds.aurora_replica.lag_max.ms"
+        - from: "aws.rds.metrics.AuroraReplicaLagMinimum.avg"
+          to: "aws.rds.aurora_replica.lag_min.ms"
+        - from: "aws.rds.metrics.BacktrackChangeRecordsCreationRate.avg"
+          to: "aws.rds.backtrack_change_records.creation_rate"
+        - from: "aws.rds.metrics.BacktrackChangeRecordsStored.avg"
+          to: "aws.rds.backtrack_change_records.stored"
+        - from: "aws.rds.metrics.BacktrackWindowActual.avg"
+          to: "aws.rds.backtrack_window.actual"
+        - from: "aws.rds.metrics.BacktrackWindowAlert.avg"
+          to: "aws.rds.backtrack_window.alert"
+        - from: "aws.rds.metrics.BackupRetentionPeriodStorageUsed.avg"
+          to: "aws.rds.storage_used.backup_retention_period.bytes"
+        - from: "aws.rds.metrics.SnapshotStorageUsed.avg"
+          to: "aws.rds.storage_used.snapshot.bytes"
+        - from: "aws.rds.metrics.BufferCacheHitRatio.avg"
+          to: "aws.rds.cache_hit_ratio.buffer"
+        - from: "aws.rds.metrics.ResultSetCacheHitRatio.avg"
+          to: "aws.rds.cache_hit_ratio.result_set"
+        - from: "aws.rds.metrics.EngineUptime.avg"
+          to: "aws.rds.engine_uptime.sec"
+        - from: "aws.rds.metrics.VolumeReadIOPs.avg"
+          to: "aws.rds.volume.read.iops"
+        - from: "aws.rds.metrics.VolumeWriteIOPs.avg"
+          to: "aws.rds.volume.write.iops"
+        - from: "aws.rds.metrics.RDSToAuroraPostgreSQLReplicaLag.avg"
+          to: "aws.rds.rds_to_aurora_postgresql_replica_lag.sec"
+        - from: "aws.rds.metrics.TotalBackupStorageBilled.avg"
+          to: "aws.rds.backup_storage_billed_total.bytes"
+        - from: "aws.rds.metrics.AuroraVolumeBytesLeftTotal.avg"
+          to: "aws.rds.aurora_volume_left_total.bytes"
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.rds.metrics"

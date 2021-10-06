@@ -29,7 +29,6 @@
         "crowdstrike.event.PatternDispositionFlags.Rooting": false,
         "crowdstrike.event.PatternDispositionFlags.SensorOnly": false,
         "crowdstrike.event.PatternDispositionValue": 16,
-        "crowdstrike.event.ProcessEndTime": 0,
         "crowdstrike.event.ProcessId": 38684386611,
         "crowdstrike.event.ProcessStartTime": "2018-09-13T13:45:39.000Z",
         "crowdstrike.event.SHA256String": "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
@@ -74,7 +73,19 @@
         "process.executable": "C:\\Windows\\Explorer.EXE",
         "process.name": "explorer.exe",
         "process.pid": 38684386611,
-        "related.ip": "192.168.12.51",
+        "related.hash": [
+            "6a671b92a69755de6fd063fcbe4ba926d83b49f78c42dbaeed8cdb6bbc57576a",
+            "ac4c51eb24aa95b77f705ab159189e24"
+        ],
+        "related.hosts": [
+            "alice-laptop"
+        ],
+        "related.ip": [
+            "192.168.12.51"
+        ],
+        "related.user": [
+            "alice"
+        ],
         "rule.description": "Terminated a process related to the deletion of backups, which is often indicative of ransomware activity.",
         "rule.name": "Process Terminated",
         "service.type": "crowdstrike",
@@ -160,7 +171,9 @@
         ],
         "log.offset": 2579,
         "message": "quarantined_file_update",
-        "related.user": "Crowdstrike",
+        "related.user": [
+            "Crowdstrike"
+        ],
         "service.type": "crowdstrike",
         "tags": [
             "forwarded"

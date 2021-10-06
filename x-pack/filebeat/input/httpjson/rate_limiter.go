@@ -6,6 +6,7 @@ package httpjson
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -17,32 +18,31 @@ import (
 type rateLimiter struct {
 	log *logp.Logger
 
-	limit     string
-	reset     string
-	remaining string
+	limit     *valueTpl
+	reset     *valueTpl
+	remaining *valueTpl
 }
 
-func newRateLimiterFromConfig(config config, log *logp.Logger) *rateLimiter {
-	if config.RateLimit == nil {
+func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {
+	if config == nil {
 		return nil
 	}
 
 	return &rateLimiter{
 		log:       log,
-		limit:     config.RateLimit.Limit,
-		reset:     config.RateLimit.Reset,
-		remaining: config.RateLimit.Remaining,
+		limit:     config.Limit,
+		reset:     config.Reset,
+		remaining: config.Remaining,
 	}
 }
 
-func (r *rateLimiter) execute(ctx context.Context, f func(context.Context) (*http.Response, error)) (*http.Response, error) {
+func (r *rateLimiter) execute(ctx context.Context, f func() (*http.Response, error)) (*http.Response, error) {
 	for {
-		resp, err := f(ctx)
+		resp, err := f()
 		if err != nil {
 			return nil, err
 		}
 
-		header := resp.Header
 		if err != nil {
 			return nil, fmt.Errorf("failed to read http.response.body: %w", err)
 		}
@@ -55,15 +55,15 @@ func (r *rateLimiter) execute(ctx context.Context, f func(context.Context) (*htt
 			return nil, fmt.Errorf("http request was unsuccessful with a status code %d", resp.StatusCode)
 		}
 
-		if err := r.applyRateLimit(ctx, header); err != nil {
+		if err := r.applyRateLimit(ctx, resp); err != nil {
 			return nil, err
 		}
 	}
 }
 
 // applyRateLimit applies appropriate rate limit if specified in the HTTP Header of the response
-func (r *rateLimiter) applyRateLimit(ctx context.Context, header http.Header) error {
-	epoch, err := r.getRateLimit(header)
+func (r *rateLimiter) applyRateLimit(ctx context.Context, resp *http.Response) error {
+	epoch, err := r.getRateLimit(resp)
 	if err != nil {
 		return err
 	}
@@ -88,22 +88,26 @@ func (r *rateLimiter) applyRateLimit(ctx context.Context, header http.Header) er
 	}
 }
 
-// getRateLimit gets the rate limit value if specified in the HTTP Header of the response,
+// getRateLimit gets the rate limit value if specified in the response,
 // and returns an int64 value in seconds since unix epoch for rate limit reset time.
 // When there is a remaining rate limit quota, or when the rate limit reset time has expired, it
 // returns 0 for the epoch value.
-func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
+func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 	if r == nil {
 		return 0, nil
 	}
 
-	if r.remaining == "" {
+	if r.remaining == nil {
 		return 0, nil
 	}
 
-	remaining := header.Get(r.remaining)
+	tr := transformable{}
+	ctx := emptyTransformContext()
+	ctx.updateLastResponse(response{header: resp.Header.Clone()})
+
+	remaining, _ := r.remaining.Execute(ctx, tr, nil, r.log)
 	if remaining == "" {
-		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.remaining)
+		return 0, errors.New("remaining value is empty")
 	}
 	m, err := strconv.ParseInt(remaining, 10, 64)
 	if err != nil {
@@ -114,15 +118,22 @@ func (r *rateLimiter) getRateLimit(header http.Header) (int64, error) {
 		return 0, nil
 	}
 
-	reset := header.Get(r.reset)
-	if reset == "" {
-		return 0, fmt.Errorf("field %s does not exist in the HTTP Header, or is empty", r.reset)
+	if r.reset == nil {
+		r.log.Warn("reset rate limit is not set")
+		return 0, nil
 	}
+
+	reset, _ := r.reset.Execute(ctx, tr, nil, r.log)
+	if reset == "" {
+		return 0, errors.New("reset value is empty")
+	}
+
 	epoch, err := strconv.ParseInt(reset, 10, 64)
 	if err != nil {
 		return 0, fmt.Errorf("failed to parse rate-limit reset value: %w", err)
 	}
-	if time.Unix(epoch, 0).Sub(time.Now()) <= 0 {
+
+	if timeNow().Unix() > epoch {
 		return 0, nil
 	}
 

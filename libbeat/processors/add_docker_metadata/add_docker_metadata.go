@@ -22,19 +22,18 @@ package add_docker_metadata
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/pkg/errors"
-
-	"github.com/elastic/gosigar/cgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 )
@@ -156,7 +155,11 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	// Lookup CID using process cgroup membership data.
 	if cid == "" && len(d.pidFields) > 0 {
-		if id := d.lookupContainerIDByPID(event); id != "" {
+		id, err := d.lookupContainerIDByPID(event)
+		if err != nil {
+			return nil, errors.Wrap(err, "error reading container ID")
+		}
+		if id != "" {
 			cid = id
 			event.PutValue(dockerContainerIDKey, cid)
 		}
@@ -209,6 +212,21 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
+func (d *addDockerMetadata) Close() error {
+	if d.cgroups != nil {
+		d.cgroups.StopJanitor()
+	}
+	// Watcher can be nil if processor failed on creation
+	if d.watcher != nil {
+		d.watcher.Stop()
+	}
+	err := processors.Close(d.sourceProcessor)
+	if err != nil {
+		return errors.Wrap(err, "closing source processor of add_docker_metadata")
+	}
+	return nil
+}
+
 func (d *addDockerMetadata) String() string {
 	return fmt.Sprintf("%v=[match_fields=[%v] match_pids=[%v]]",
 		processorName, strings.Join(d.fields, ", "), strings.Join(d.pidFields, ", "))
@@ -216,8 +234,8 @@ func (d *addDockerMetadata) String() string {
 
 // lookupContainerIDByPID finds the container ID based on PID fields contained
 // in the event.
-func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) string {
-	var cgroups map[string]string
+func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, error) {
+	var cgroups cgroup.PathList
 	for _, field := range d.pidFields {
 		v, err := event.GetValue(field)
 		if err != nil {
@@ -246,11 +264,11 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) string {
 
 // getProcessCgroups returns a mapping of cgroup subsystem name to path. It
 // returns an error if it failed to retrieve the cgroup info.
-func (d *addDockerMetadata) getProcessCgroups(pid int) (map[string]string, error) {
+func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) {
 	// Initialize at time of first use.
 	lazyCgroupCacheInit(d)
 
-	cgroups, ok := d.cgroups.Get(pid).(map[string]string)
+	cgroups, ok := d.cgroups.Get(pid).(cgroup.PathList)
 	if ok {
 		d.log.Debugf("Using cached cgroups for pid=%v", pid)
 		return cgroups, nil
@@ -258,7 +276,7 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (map[string]string, error
 
 	cgroups, err := processCgroupPaths(d.hostFS, pid)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+		return cgroups, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
 	}
 
 	d.cgroups.Put(pid, cgroups)
@@ -266,15 +284,17 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (map[string]string, error
 }
 
 // getContainerIDFromCgroups checks all of the processes' paths to see if any
-// of them are associated with Docker. Docker uses /docker/<CID> when
-// naming cgroups and we use this to determine the container ID. If no container
-// ID is found then an empty string is returned.
-func getContainerIDFromCgroups(cgroups map[string]string) string {
-	for _, path := range cgroups {
-		if strings.HasPrefix(path, "/docker") {
-			return filepath.Base(path)
+// of them are associated with Docker. For cgroups V1, Docker uses /docker/<CID> when
+// naming cgroups and we use this to determine the container ID. For V2,
+// it's part of a more complex string.
+func getContainerIDFromCgroups(cgroups cgroup.PathList) (string, error) {
+	for _, path := range cgroups.Flatten() {
+		re := regexp.MustCompile(`[\w]{64}`)
+		rs := re.FindStringSubmatch(path.ControllerPath)
+		if rs != nil {
+			return rs[0], nil
 		}
 	}
 
-	return ""
+	return "", nil
 }

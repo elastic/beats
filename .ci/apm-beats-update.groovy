@@ -2,7 +2,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent none
+  agent { label 'master' }
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
@@ -31,7 +31,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -53,6 +53,7 @@ pipeline {
         Checkout the code and stash it, to use it on other stages.
         */
         stage('Checkout') {
+          options { skipDefaultCheckout() }
           steps {
             deleteDir()
             gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
@@ -85,10 +86,9 @@ pipeline {
               branch "v\\d?"
               tag "v\\d+\\.\\d+\\.\\d+*"
               allOf {
-                expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() }
+                expression { return env.BEATS_UPDATED != "false" || isCommentTrigger() || isUserTrigger() }
                 changeRequest()
               }
-
             }
           }
           steps {
@@ -126,6 +126,9 @@ def beatsUpdate() {
         git config --global --add remote.origin.fetch "+refs/pull/*/head:refs/remotes/origin/pr/*"
 
         go mod edit -replace github.com/elastic/beats/v7=\${GOPATH}/src/github.com/elastic/beats-local
+        go mod tidy
+        echo '{"name": "${GOPATH}/src/github.com/elastic/beats-local", "licenceType": "Elastic"}' >> \${GOPATH}/src/github.com/elastic/beats-local/dev-tools/notice/overrides.json
+
         make update
         git commit -a -m beats-update
 

@@ -32,9 +32,11 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
 )
 
@@ -45,11 +47,11 @@ const (
 	// winEventLogApiName is the name used to identify the Windows Event Log API
 	// as both an event type and an API.
 	winEventLogAPIName = "wineventlog"
-)
 
-var winEventLogConfigKeys = common.MakeStringSet(append(commonConfigKeys,
-	"batch_read_size", "ignore_older", "include_xml", "event_id", "forwarded",
-	"level", "provider", "no_more_events")...)
+	// eventLoggingAPIName is the name used to identify the Event Logging API
+	// as both an event type and an API.
+	eventLoggingAPIName = "eventlogging"
+)
 
 type winEventLogConfig struct {
 	ConfigCommon  `config:",inline"`
@@ -58,6 +60,7 @@ type winEventLogConfig struct {
 	Forwarded     *bool              `config:"forwarded"`
 	SimpleQuery   query              `config:",inline"`
 	NoMoreEvents  NoMoreEventsAction `config:"no_more_events"` // Action to take when no more events are available - wait or stop.
+	EventLanguage uint32             `config:"language"`
 }
 
 // NoMoreEventsAction defines what action for the reader to take when
@@ -316,14 +319,14 @@ func (l *winEventLog) eventHandles(maxRead int) ([]win.EvtHandle, int, error) {
 
 func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, error) {
 	includeXML := l.config.IncludeXML
-	e, err := sys.UnmarshalEventXML(x)
+	e, err := winevent.UnmarshalXML(x)
 	if err != nil {
 		e.RenderErr = append(e.RenderErr, err.Error())
 		// Add raw XML to event.original when decoding fails
 		includeXML = true
 	}
 
-	err = sys.PopulateAccount(&e.User)
+	err = winevent.PopulateAccount(&e.User)
 	if err != nil {
 		debugf("%s SID %s account lookup failed. %v", l.logPrefix,
 			e.User.Identifier, err)
@@ -362,11 +365,16 @@ func (l *winEventLog) buildRecordFromXML(x []byte, recoveredErr error) (Record, 
 	return r, nil
 }
 
+func newEventLogging(options *common.Config) (EventLog, error) {
+	cfgwarn.Deprecate("8.0.0", fmt.Sprintf("api %s is deprecated and %s will be used instead", eventLoggingAPIName, winEventLogAPIName))
+	return newWinEventLog(options)
+}
+
 // newWinEventLog creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
 func newWinEventLog(options *common.Config) (EventLog, error) {
 	c := defaultWinEventLogConfig
-	if err := readConfig(options, &c, winEventLogConfigKeys); err != nil {
+	if err := readConfig(options, &c); err != nil {
 		return nil, err
 	}
 
@@ -383,7 +391,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 
 	eventMetadataHandle := func(providerName, sourceName string) sys.MessageFiles {
 		mf := sys.MessageFiles{SourceName: sourceName}
-		h, err := win.OpenPublisherMetadata(0, sourceName, 0)
+		h, err := win.OpenPublisherMetadata(0, sourceName, c.EventLanguage)
 		if err != nil {
 			mf.Err = err
 			return mf
@@ -424,7 +432,7 @@ func newWinEventLog(options *common.Config) (EventLog, error) {
 		}
 	default:
 		l.render = func(event win.EvtHandle, out io.Writer) error {
-			return win.RenderEvent(event, 0, l.renderBuf, l.cache.get, out)
+			return win.RenderEvent(event, c.EventLanguage, l.renderBuf, l.cache.get, out)
 		}
 	}
 
@@ -447,5 +455,6 @@ func init() {
 	available, _ := win.IsAvailable()
 	if available {
 		Register(winEventLogAPIName, 0, newWinEventLog, win.Channels)
+		Register(eventLoggingAPIName, 1, newEventLogging, win.Channels)
 	}
 }

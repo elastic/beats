@@ -1,0 +1,22 @@
+when:
+    branches: true             ## for all the branches
+    changeset:                 ## when PR contains any of those entries in the changeset
+        - "^deploy/kubernetes/.*"
+        - "^libbeat/docs/version.asciidoc"
+    comments:                  ## when PR comment contains any of those entries
+        - "/test deploy/kubernetes"
+    labels:                    ## when PR labels matches any of those entries
+        - "kubernetes"
+    parameters:                ## when parameter was selected in the UI.
+        - "kubernetes"
+    tags: true                 ## for all the tags
+platform: "immutable && ubuntu-18" ## default label for all the stages
+stages:
+    lint:
+        make: |
+            make -C deploy/kubernetes all;
+            make check-no-changes;
+        stage: lint
+    k8sTest:
+        k8sTest: "v1.21.1,v1.20.7,v1.19.11,v1.18.19,v1.17.17,v1.14.10"
+        stage: mandatory

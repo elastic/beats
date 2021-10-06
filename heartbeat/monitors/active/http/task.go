@@ -41,16 +41,14 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 )
-
-var userAgent = useragent.UserAgent("Heartbeat")
 
 func newHTTPMonitorHostJob(
 	addr string,
 	config *Config,
-	transport *http.Transport,
+	transport http.RoundTripper,
 	enc contentEncoder,
 	body []byte,
 	validator multiValidator,
@@ -61,17 +59,15 @@ func newHTTPMonitorHostJob(
 		return nil, err
 	}
 
-	timeout := config.Timeout
-
 	return jobs.MakeSimpleJob(func(event *beat.Event) error {
 		var redirects []string
 		client := &http.Client{
 			// Trace visited URLs when redirects occur
 			CheckRedirect: makeCheckRedirect(config.MaxRedirects, &redirects),
 			Transport:     transport,
-			Timeout:       config.Timeout,
+			Timeout:       config.Transport.Timeout,
 		}
-		_, _, err := execPing(event, client, request, body, timeout, validator, config.Response)
+		_, _, err := execPing(event, client, request, body, config.Transport.Timeout, validator, config.Response)
 		if len(redirects) > 0 {
 			event.PutValue("http.response.redirects", redirects)
 		}
@@ -112,7 +108,7 @@ func createPingFactory(
 	body []byte,
 	validator multiValidator,
 ) func(*net.IPAddr) jobs.Job {
-	timeout := config.Timeout
+	timeout := config.Transport.Timeout
 	isTLS := request.URL.Scheme == "https"
 
 	return monitors.MakePingIPFactory(func(event *beat.Event, ip *net.IPAddr) error {
@@ -143,27 +139,28 @@ func createPingFactory(
 		// prevents following redirects in this case, we know that
 		// config.MaxRedirects must be zero to even be here
 		checkRedirect := makeCheckRedirect(0, nil)
+		transport := &SimpleTransport{
+			Dialer: dialer,
+			OnStartWrite: func() {
+				cbMutex.Lock()
+				writeStart = time.Now()
+				cbMutex.Unlock()
+			},
+			OnEndWrite: func() {
+				cbMutex.Lock()
+				writeEnd = time.Now()
+				cbMutex.Unlock()
+			},
+			OnStartRead: func() {
+				cbMutex.Lock()
+				readStart = time.Now()
+				cbMutex.Unlock()
+			},
+		}
 		client := &http.Client{
 			CheckRedirect: checkRedirect,
 			Timeout:       timeout,
-			Transport: &SimpleTransport{
-				Dialer: dialer,
-				OnStartWrite: func() {
-					cbMutex.Lock()
-					writeStart = time.Now()
-					cbMutex.Unlock()
-				},
-				OnEndWrite: func() {
-					cbMutex.Lock()
-					writeEnd = time.Now()
-					cbMutex.Unlock()
-				},
-				OnStartRead: func() {
-					cbMutex.Lock()
-					readStart = time.Now()
-					cbMutex.Unlock()
-				},
-			},
+			Transport:     httpcommon.HeaderRoundTripper(transport, map[string]string{"User-Agent": userAgent}),
 		}
 
 		_, end, err := execPing(event, client, request, body, timeout, validator, config.Response)
@@ -208,9 +205,6 @@ func buildRequest(addr string, config *Config, enc contentEncoder) (*http.Reques
 
 		request.Header.Add(k, v)
 	}
-	if ua := request.Header.Get("User-Agent"); ua == "" {
-		request.Header.Set("User-Agent", userAgent)
-	}
 
 	if enc != nil {
 		enc.AddHeaders(&request.Header)
@@ -249,11 +243,15 @@ func execPing(
 		return start, time.Now(), errReason
 	}
 
-	bodyFields, errReason := processBody(resp, responseConfig, validator)
+	bodyFields, mimeType, errReason := processBody(resp, responseConfig, validator)
 
 	responseFields := common.MapStr{
 		"status_code": resp.StatusCode,
 		"body":        bodyFields,
+	}
+
+	if mimeType != "" {
+		responseFields["mime_type"] = mimeType
 	}
 
 	if responseConfig.IncludeHeaders {
@@ -274,6 +272,14 @@ func execPing(
 
 	// Mark the end time as now, since we've finished downloading
 	end = time.Now()
+
+	// Enrich event with TLS information when available. This is useful when connecting to an HTTPS server through
+	// a proxy.
+	if resp.TLS != nil {
+		tlsFields := common.MapStr{}
+		tlsmeta.AddTLSMetadata(tlsFields, *resp.TLS, tlsmeta.UnknownTLSHandshakeDuration)
+		eventext.MergeEventFields(event, tlsFields)
+	}
 
 	// Add total HTTP RTT
 	eventext.MergeEventFields(event, common.MapStr{"http": common.MapStr{

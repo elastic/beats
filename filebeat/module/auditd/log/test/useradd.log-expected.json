@@ -1,0 +1,300 @@
+[
+    {
+        "@timestamp": "2021-01-17T17:12:33.686Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.id": "1004",
+        "auditd.log.op": "adding group to /etc/group",
+        "auditd.log.record_type": "ADD_GROUP",
+        "auditd.log.sequence": 584,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=ADD_GROUP msg=audit(1610903553.686:584): pid=2940 uid=0 auid=1000 ses=14 msg='op=adding group to /etc/group id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "creation",
+            "group"
+        ],
+        "fileset.name": "log",
+        "group.id": "1004",
+        "input.type": "log",
+        "log.offset": 0,
+        "process.executable": "/usr/sbin/groupadd",
+        "process.pid": 2940,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:33.710Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.id": "1004",
+        "auditd.log.op": "adding group to /etc/gshadow",
+        "auditd.log.record_type": "ADD_GROUP",
+        "auditd.log.sequence": 586,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=ADD_GROUP msg=audit(1610903553.710:586): pid=2940 uid=0 auid=1000 ses=14 msg='op=adding group to /etc/gshadow id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "creation",
+            "group"
+        ],
+        "fileset.name": "log",
+        "group.id": "1004",
+        "input.type": "log",
+        "log.offset": 212,
+        "process.executable": "/usr/sbin/groupadd",
+        "process.pid": 2940,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:33.710Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.id": "1004",
+        "auditd.log.record_type": "ADD_GROUP",
+        "auditd.log.sequence": 587,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-group-account-to"
+        ],
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=ADD_GROUP msg=audit(1610903553.710:587): pid=2940 uid=0 auid=1000 ses=14 msg='op= id=1004 exe=\"/usr/sbin/groupadd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "creation",
+            "group"
+        ],
+        "fileset.name": "log",
+        "group.id": "1004",
+        "input.type": "log",
+        "log.offset": 426,
+        "process.executable": "/usr/sbin/groupadd",
+        "process.pid": 2940,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:33.730Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.id": "1004",
+        "auditd.log.op": "adding user",
+        "auditd.log.record_type": "ADD_USER",
+        "auditd.log.sequence": 591,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "added-user-account"
+        ],
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=ADD_USER msg=audit(1610903553.730:591): pid=2945 uid=0 auid=1000 ses=14 msg='op=adding user id=1004 exe=\"/usr/sbin/useradd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "creation",
+            "user"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 612,
+        "process.executable": "/usr/sbin/useradd",
+        "process.pid": 2945,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.target.id": "1004",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:33.814Z",
+        "auditd.log.hostname": "localhost",
+        "auditd.log.record_type": "USER_ACCT",
+        "auditd.log.reset": "0",
+        "auditd.log.sequence": 593,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": [
+            "0",
+            "1004"
+        ],
+        "event.action": [
+            "was-authorized"
+        ],
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=USER_ACCT msg=audit(1610903553.814:593): pid=2948 uid=0 auid=1000 ses=14 msg='pam_tally2 uid=1004 reset=0 exe=\"/sbin/pam_tally2\" hostname=localhost addr=127.0.0.1 terminal=/dev/pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 807,
+        "process.executable": "/sbin/pam_tally2",
+        "process.pid": 2948,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.id": "1000",
+        "user.terminal": "/dev/pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:38.174Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.op": "PAM:chauthtok",
+        "auditd.log.record_type": "USER_CHAUTHTOK",
+        "auditd.log.sequence": 594,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "changed-password"
+        ],
+        "event.category": [
+            "iam"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=USER_CHAUTHTOK msg=audit(1610903558.174:594): pid=2953 uid=0 auid=1000 ses=14 msg='op=PAM:chauthtok acct=\"charlie\" exe=\"/usr/bin/passwd\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "change",
+            "user"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1008,
+        "process.executable": "/usr/bin/passwd",
+        "process.pid": 2953,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.id": "0",
+        "user.id": "1000",
+        "user.name": "charlie",
+        "user.target.name": "charlie",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:38.178Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.op": "PAM:authentication",
+        "auditd.log.record_type": "USER_AUTH",
+        "auditd.log.sequence": 595,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "authenticated"
+        ],
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=USER_AUTH msg=audit(1610903558.178:595): pid=2954 uid=0 auid=1000 ses=14 msg='op=PAM:authentication acct=\"root\" exe=\"/usr/bin/chfn\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1216,
+        "process.executable": "/usr/bin/chfn",
+        "process.pid": 2954,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "root",
+        "user.terminal": "pts/2"
+    },
+    {
+        "@timestamp": "2021-01-17T17:12:38.178Z",
+        "auditd.log.hostname": "ubuntu-bionic",
+        "auditd.log.op": "PAM:accounting",
+        "auditd.log.record_type": "USER_ACCT",
+        "auditd.log.sequence": 596,
+        "auditd.log.ses": "14",
+        "auditd.log.uid": "0",
+        "event.action": [
+            "was-authorized"
+        ],
+        "event.category": [
+            "authentication"
+        ],
+        "event.dataset": "auditd.log",
+        "event.kind": "event",
+        "event.module": "auditd",
+        "event.original": "type=USER_ACCT msg=audit(1610903558.178:596): pid=2954 uid=0 auid=1000 ses=14 msg='op=PAM:accounting acct=\"root\" exe=\"/usr/bin/chfn\" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'",
+        "event.outcome": "success",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.offset": 1419,
+        "process.executable": "/usr/bin/chfn",
+        "process.pid": 2954,
+        "service.type": "auditd",
+        "source.address": "127.0.0.1",
+        "source.ip": "127.0.0.1",
+        "user.audit.id": "1000",
+        "user.effective.name": "root",
+        "user.id": "1000",
+        "user.name": "root",
+        "user.terminal": "pts/2"
+    }
+]

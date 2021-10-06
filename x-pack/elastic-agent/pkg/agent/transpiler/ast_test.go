@@ -105,6 +105,7 @@ func TestAST(t *testing.T) {
 		"support integers": {
 			hashmap: map[string]interface{}{
 				"timeout": 12,
+				"zero":    int64(0),
 				"range":   []int{20, 30, 40},
 			},
 			ast: &AST{
@@ -121,6 +122,7 @@ func TestAST(t *testing.T) {
 							),
 						},
 						&Key{name: "timeout", value: &IntVal{value: 12}},
+						&Key{name: "zero", value: &IntVal{value: 0}},
 					},
 				},
 			},
@@ -373,6 +375,184 @@ func TestAST(t *testing.T) {
 			})
 		}
 	})
+}
+
+func TestInsert(t *testing.T) {
+	testcases := map[string]struct {
+		hashmap  map[string]interface{}
+		selector Selector
+		node     Node
+		expected *AST
+	}{
+		"insert root": {
+			selector: "inputs",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict([]Node{
+									NewKey("type", NewStrVal("test-key")),
+								}),
+							}),
+						},
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									&Key{name: "host", value: &StrVal{value: "demo.host.co"}},
+									&Key{name: "type", value: &StrVal{value: "elasticsearch"}},
+								}),
+						},
+					},
+				},
+			},
+		},
+		"insert sub key": {
+			selector: "outputs.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									&Key{name: "host", value: &StrVal{value: "demo.host.co"}},
+									&Key{name: "sub", value: NewList([]Node{
+										NewDict([]Node{
+											NewKey("type", NewStrVal("test-key")),
+										}),
+									})},
+									&Key{name: "type", value: &StrVal{value: "elasticsearch"}},
+								}),
+						},
+					},
+				},
+			},
+		},
+		"insert at index": {
+			selector: "inputs.0.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"inputs": []interface{}{
+					map[string]interface{}{
+						"type":         "log/docker",
+						"ignore_older": "20s",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList(
+								[]Node{
+									NewDict([]Node{
+										NewKey("ignore_older", NewStrVal("20s")),
+										NewKey("sub", NewList([]Node{
+											NewDict([]Node{
+												NewKey("type", NewStrVal("test-key")),
+											}),
+										})),
+										NewKey("type", NewStrVal("log/docker")),
+									}),
+								}),
+						},
+					},
+				},
+			},
+		},
+
+		"insert at index when array empty": {
+			selector: "inputs.0.sub",
+			node: NewList([]Node{
+				NewDict([]Node{
+					NewKey("type", NewStrVal("test-key")),
+				}),
+			}),
+			hashmap: map[string]interface{}{
+				"inputs": make([]interface{}, 0),
+				"outputs": map[string]interface{}{
+					"type": "elasticsearch",
+					"host": "demo.host.co",
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList(
+								[]Node{
+									NewDict(
+										[]Node{
+											NewKey("sub", NewList([]Node{
+												NewDict([]Node{
+													NewKey("type", NewStrVal("test-key")),
+												}),
+											})),
+										},
+									),
+								}),
+						},
+						&Key{
+							name: "outputs",
+							value: NewDict(
+								[]Node{
+									NewKey("host", &StrVal{value: "demo.host.co"}),
+									NewKey("type", &StrVal{value: "elasticsearch"}),
+								}),
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for name, test := range testcases {
+		t.Run(name, func(t *testing.T) {
+			ast, err := NewAST(test.hashmap)
+			require.NoError(t, err)
+
+			err = Insert(ast, test.node, test.selector)
+			require.NoError(t, err)
+
+			if !assert.True(t, reflect.DeepEqual(test.expected, ast)) {
+				t.Logf(
+					`received: %+v
+					 expected: %+v`, ast, test.expected)
+			}
+
+		})
+	}
 }
 
 func TestSelector(t *testing.T) {
@@ -696,98 +876,92 @@ func TestAST_Apply(t *testing.T) {
 	testcases := map[string]struct {
 		input    map[string]interface{}
 		expected *AST
-		vars     Vars
+		vars     *Vars
 		matchErr bool
 	}{
-		//"2 vars missing with default": {
-		//	input: map[string]interface{}{
-		//		"inputs": map[string]interface{}{
-		//			"type":  "log/docker",
-		//			"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing|'other'}"},
-		//		},
-		//	},
-		//	expected: &AST{
-		//		root: &Dict{
-		//			value: []Node{
-		//				&Key{
-		//					name: "inputs",
-		//					value: NewDict(
-		//						[]Node{
-		//							&Key{
-		//								name: "paths",
-		//								value: &List{
-		//									value: []Node{
-		//										&StrVal{value: "/var/log/value1"},
-		//										&StrVal{value: "/var/log/other"},
-		//									},
-		//								},
-		//							},
-		//							&Key{name: "type", value: &StrVal{value: "log/docker"}},
-		//						}),
-		//				},
-		//			},
-		//		},
-		//	},
-		//	vars: Vars{
-		//		Mapping: map[string]interface{}{
-		//			"var1": map[string]interface{}{
-		//				"key1": "value1",
-		//			},
-		//		},
-		//	},
-		//},
-		//"2 vars missing no default": {
-		//	input: map[string]interface{}{
-		//		"inputs": map[string]interface{}{
-		//			"type":  "log/docker",
-		//			"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing}"},
-		//		},
-		//	},
-		//	vars: Vars{
-		//		Mapping: map[string]interface{}{
-		//			"var1": map[string]interface{}{
-		//				"key1": "value1",
-		//			},
-		//		},
-		//	},
-		//	matchErr: true,
-		//},
-		//"vars not string": {
-		//	input: map[string]interface{}{
-		//		"inputs": map[string]interface{}{
-		//			"type":  "log/docker",
-		//			"paths": []string{"/var/log/${var1.key1}"},
-		//		},
-		//	},
-		//	expected: &AST{
-		//		root: &Dict{
-		//			value: []Node{
-		//				&Key{
-		//					name: "inputs",
-		//					value: NewDict(
-		//						[]Node{
-		//							&Key{
-		//								name: "paths",
-		//								value: &List{
-		//									value: []Node{
-		//										&StrVal{value: "/var/log/1"},
-		//									},
-		//								},
-		//							},
-		//							&Key{name: "type", value: &StrVal{value: "log/docker"}},
-		//						}),
-		//				},
-		//			},
-		//		},
-		//	},
-		//	vars: Vars{
-		//		Mapping: map[string]interface{}{
-		//			"var1": map[string]interface{}{
-		//				"key1": 1,
-		//			},
-		//		},
-		//	},
-		//},
+		"2 vars missing with default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing|'other'}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewDict(
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/value1"},
+												&StrVal{value: "/var/log/other"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": "value1",
+				},
+			}),
+		},
+		"2 vars missing no default": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}", "/var/log/${var1.missing}"},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": "value1",
+				},
+			}),
+			matchErr: true,
+		},
+		"vars not string": {
+			input: map[string]interface{}{
+				"inputs": map[string]interface{}{
+					"type":  "log/docker",
+					"paths": []string{"/var/log/${var1.key1}"},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewDict(
+								[]Node{
+									&Key{
+										name: "paths",
+										value: &List{
+											value: []Node{
+												&StrVal{value: "/var/log/1"},
+											},
+										},
+									},
+									&Key{name: "type", value: &StrVal{value: "log/docker"}},
+								}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"var1": map[string]interface{}{
+					"key1": 1,
+				},
+			}),
+		},
 		"vars replace with object": {
 			input: map[string]interface{}{
 				"inputs": map[string]interface{}{
@@ -850,16 +1024,355 @@ func TestAST_Apply(t *testing.T) {
 					},
 				},
 			},
-			vars: Vars{
-				Mapping: map[string]interface{}{
-					"host": map[string]interface{}{
-						"labels": []string{
-							"label1",
-							"label2",
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition false str removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "false",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
 						},
 					},
 				},
 			},
+		},
+		"condition false removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": false,
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition true string keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "true",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition true keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": true,
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+		},
+		"condition eval keeps dict in list w/o condition key": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "arrayContains(${host.labels}, 'label2')",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition eval removes dict from list": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":      "logfile",
+						"paths":     []string{"/var/log/other"},
+						"condition": "arrayContains(${host.labels}, 'missing')",
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
+		},
+		"condition eval removes dict from dict": {
+			input: map[string]interface{}{
+				"inputs": []map[string]interface{}{
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/syslog"},
+					},
+					{
+						"type":  "logfile",
+						"paths": []string{"/var/log/other"},
+						"nested": map[string]interface{}{
+							"removed":   "whole dict removed",
+							"condition": "arrayContains(${host.labels}, 'missing')",
+						},
+					},
+				},
+			},
+			expected: &AST{
+				root: &Dict{
+					value: []Node{
+						&Key{
+							name: "inputs",
+							value: NewList([]Node{
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/syslog"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+								NewDict(
+									[]Node{
+										&Key{
+											name: "paths",
+											value: &List{
+												value: []Node{
+													&StrVal{value: "/var/log/other"},
+												},
+											},
+										},
+										&Key{name: "type", value: &StrVal{value: "logfile"}},
+									}),
+							}),
+						},
+					},
+				},
+			},
+			vars: mustMakeVars(map[string]interface{}{
+				"host": map[string]interface{}{
+					"labels": []string{
+						"label1",
+						"label2",
+					},
+				},
+			}),
 		},
 	}
 
@@ -1280,4 +1793,56 @@ func TestHash(t *testing.T) {
 			assert.Equal(t, test.match, test.c1.HashStr() == test.c2.HashStr())
 		})
 	}
+}
+
+func TestLookupString(t *testing.T) {
+	t.Run("when the selector exist with a string value", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "/var/log/log1", s)
+		assert.True(t, ok)
+	})
+
+	t.Run("when the selector doesn't exist", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "Weee!", value: &StrVal{value: "/var/log/log1"}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
+
+	t.Run("when the node is not a StrVal will fail", func(t *testing.T) {
+		a := &AST{
+			root: &Dict{
+				value: []Node{
+					&Key{name: "inputs", value: &FloatVal{value: 4.2}},
+				},
+			},
+		}
+
+		s, ok := LookupString(a, "inputs")
+		assert.Equal(t, "", s)
+		assert.False(t, ok)
+	})
+}
+
+func mustMakeVars(mapping map[string]interface{}) *Vars {
+	v, err := NewVars(mapping, nil)
+	if err != nil {
+		panic(err)
+	}
+	return v
 }

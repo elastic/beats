@@ -1,0 +1,843 @@
+[
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Gateway"
+            },
+            "pilot_k8s_cfg_events": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Nodes"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "update",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Nodes"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "DestinationRule"
+            },
+            "pilot_k8s_cfg_events": {
+                "counter": 4,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "proxy"
+            },
+            "pilot_push_triggers": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "lds"
+            },
+            "pilot_xds_push_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.005,
+                        0.05500000000000001,
+                        0.55,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_xds_pushes": {
+                "counter": 9,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "svc"
+            },
+            "pilot_inbound_updates": {
+                "counter": 22,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "eds"
+            },
+            "pilot_inbound_updates": {
+                "counter": 54,
+                "rate": 0
+            },
+            "pilot_xds_push_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.005,
+                        0.05500000000000001,
+                        0.55,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_xds_pushes": {
+                "counter": 49,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "EnvoyFilter"
+            },
+            "pilot_k8s_cfg_events": {
+                "counter": 8,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "endpoint"
+            },
+            "pilot_push_triggers": {
+                "counter": 40,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "version": "1.7.1"
+            },
+            "pilot_xds": {
+                "value": 8
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Services"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 11,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "update",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Pods"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 61,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "update",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Endpoints"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 30,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "version": "1.7.1-4e26c697ce460dc8d3b25b25818fb0163ca16394-Clean"
+            },
+            "pilot_info": {
+                "value": 1
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Endpoints"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 12,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "VirtualService"
+            },
+            "pilot_k8s_cfg_events": {
+                "counter": 1,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "cds"
+            },
+            "pilot_xds_push_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.005,
+                        0.05500000000000001,
+                        0.55,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_xds_pushes": {
+                "counter": 9,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "add",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Pods"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 22,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "event": "updatesame",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "Endpoints"
+            },
+            "pilot_k8s_reg_events": {
+                "counter": 185,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "config"
+            },
+            "pilot_inbound_updates": {
+                "counter": 90,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "citadel_server_csr_count": {
+                "counter": 8,
+                "rate": 0
+            },
+            "citadel_server_root_cert_expiry_timestamp": {
+                "value": 1916309303
+            },
+            "citadel_server_success_cert_issuance_count": {
+                "counter": 8,
+                "rate": 0
+            },
+            "galley_validation_config_updates": {
+                "counter": 2,
+                "rate": 0
+            },
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio"
+            },
+            "pilot_conflict_inbound_listener": {
+                "value": 0
+            },
+            "pilot_conflict_outbound_listener_http_over_current_tcp": {
+                "value": 0
+            },
+            "pilot_conflict_outbound_listener_tcp_over_current_http": {
+                "value": 0
+            },
+            "pilot_conflict_outbound_listener_tcp_over_current_tcp": {
+                "value": 0
+            },
+            "pilot_destrule_subsets": {
+                "value": 0
+            },
+            "pilot_duplicate_envoy_clusters": {
+                "value": 0
+            },
+            "pilot_eds_no_instances": {
+                "value": 0
+            },
+            "pilot_endpoint_not_ready": {
+                "value": 0
+            },
+            "pilot_no_ip": {
+                "value": 0
+            },
+            "pilot_proxy_convergence_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.05,
+                        0.30000000000000004,
+                        0.75,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_proxy_queue_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.05,
+                        0.55,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_services": {
+                "value": 11
+            },
+            "pilot_virt_services": {
+                "value": 1
+            },
+            "pilot_vservice_dup_domain": {
+                "value": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "labels": {
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "type": "rds"
+            },
+            "pilot_xds_push_time": {
+                "histogram": {
+                    "counts": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ],
+                    "values": [
+                        0.005,
+                        0.05500000000000001,
+                        0.55,
+                        2,
+                        4,
+                        7.5,
+                        15,
+                        25,
+                        40
+                    ]
+                }
+            },
+            "pilot_xds_pushes": {
+                "counter": 9,
+                "rate": 0
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    },
+    {
+        "event": {
+            "dataset": "istio.istiod",
+            "duration": 115000,
+            "module": "istio"
+        },
+        "metricset": {
+            "name": "istiod",
+            "period": 10000
+        },
+        "prometheus": {
+            "galley_validation_failed": {
+                "counter": 1,
+                "rate": 0
+            },
+            "labels": {
+                "group": "networking.istio.io",
+                "instance": "127.0.0.1:51143",
+                "job": "istio",
+                "reason": "invalid_resource",
+                "resource": "gateways",
+                "version": "v1alpha3"
+            }
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "istio"
+        }
+    }
+]

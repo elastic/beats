@@ -5,13 +5,13 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
 	cf "github.com/aws/aws-sdk-go-v2/service/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/awslabs/goformation/v4/cloudformation/iam"
@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
 	fnaws "github.com/elastic/beats/v7/x-pack/functionbeat/provider/aws/aws"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const (
@@ -67,6 +68,12 @@ func (c *CLIManager) deployTemplate(update bool, name string) error {
 	}
 
 	c.log.Debugf("Using cloudformation template:\n%s", templateData.json)
+
+	_, err = c.awsCfg.Credentials.Retrieve(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+	}
+
 	svcCF := cf.New(c.awsCfg)
 
 	executer := executor.NewExecutor(c.log)
@@ -144,6 +151,11 @@ func (c *CLIManager) Remove(name string) error {
 	c.log.Debugf("Removing function: %s", name)
 	defer c.log.Debugf("Removal of function '%s' complete", name)
 
+	_, err := c.awsCfg.Credentials.Retrieve(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed to retrieve aws credentials, please check AWS credential in config: %+v", err)
+	}
+
 	svc := cf.New(c.awsCfg)
 	executer := executor.NewExecutor(c.log)
 	executer.Add(newOpDeleteCloudFormation(c.log, svc, c.stackName(name)))
@@ -199,15 +211,15 @@ func NewCLI(
 	cfg *common.Config,
 	provider provider.Provider,
 ) (provider.CLIManager, error) {
-	awsCfg, err := external.LoadDefaultAWSConfig()
-	if err != nil {
-		return nil, err
-	}
-
-	config := &fnaws.Config{}
+	config := fnaws.DefaultConfig()
 	if err := cfg.Unpack(config); err != nil {
 		return nil, err
 	}
+	awsCfg, err := awscommon.InitializeAWSConfig(config.Credentials)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get aws credentials, please check AWS credential in config: %+v", err)
+	}
+	awsCfg.Region = config.Region
 
 	builder, err := provider.TemplateBuilder()
 	if err != nil {

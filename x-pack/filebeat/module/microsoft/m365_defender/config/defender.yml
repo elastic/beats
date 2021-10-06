@@ -1,0 +1,59 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+
+interval: {{ .interval }}
+
+auth.oauth2: {{ .oauth2 | tojson }}
+
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+
+request.url: "https://api.security.microsoft.com/api/incidents"
+request.method: GET
+request.transforms:
+  - set:
+      target: "header.User-Agent"
+      value: "MdatpPartner-Elastic-Filebeat/1.0.0"
+  - set:
+      target: "url.params.$filter"
+      value: 'lastUpdateTime gt [[formatDate .cursor.lastUpdateTime "2006-01-02T15:04:05.9999999Z"]]'
+      default: 'lastUpdateTime gt [[formatDate (now (parseDuration "-55m")) "2006-01-02T15:04:05.9999999Z"]]'
+
+response.split:
+  target: body.value
+  split:
+    target: body.alerts
+    keep_parent: true
+    split:
+      target: body.alerts.entities
+      keep_parent: true
+
+cursor:
+  lastUpdateTime:
+    value: "[[.last_response.body.lastUpdateTime]]"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{ .tags | tojson }}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: json
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

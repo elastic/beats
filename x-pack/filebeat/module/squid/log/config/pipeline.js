@@ -131,7 +131,7 @@ var dup20 = match("MESSAGE#22:PUT:01", "nwparser.payload", "%{event_time_string}
 	dup12,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport->} [%{fld20->} %{fld21}] \"%{messageid->} %{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport->} [%{fld20->} %{fld21}] \"%{messageid->} %{p0}", processor_chain([
 	setc("header_id","0001"),
 	call({
 		dest: "nwparser.payload",
@@ -147,12 +147,12 @@ var hdr1 = match("HEADER#0:0001", "message", "%{hsaddr->} %{hsport->} [%{fld20->
 			constant("] \""),
 			field("messageid"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));
 
-var hdr2 = match("HEADER#1:0002", "message", "%{hevent_time_string->} %{hduration->} %{hsaddr->} %{haction}/%{hresultcode->} %{hsbytes->} %{messageid->} %{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0002", "message", "%{hevent_time_string->} %{hduration->} %{hsaddr->} %{haction}/%{hresultcode->} %{hsbytes->} %{messageid->} %{p0}", processor_chain([
 	setc("header_id","0002"),
 	call({
 		dest: "nwparser.payload",
@@ -172,7 +172,7 @@ var hdr2 = match("HEADER#1:0002", "message", "%{hevent_time_string->} %{hduratio
 			constant(" "),
 			field("messageid"),
 			constant(" "),
-			field("payload"),
+			field("p0"),
 		],
 	}),
 ]));

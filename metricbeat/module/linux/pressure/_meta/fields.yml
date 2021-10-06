@@ -1,0 +1,100 @@
+- name: pressure
+  type: group
+  release: beta
+  description: Linux pressure stall information metrics for cpu, memory, and io
+  fields:
+    - name: cpu.some.10.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on CPU over a ten second window.
+    - name: cpu.some.60.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on CPU over a sixty second window.
+    - name: cpu.some.300.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on CPU over a three hundred second window.
+    - name: cpu.some.total.time.us
+      type: long
+      description: >
+        The total absolute stall time (in microseconds) in which at least some tasks were stalled on CPU.
+    - name: memory.some.10.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on Memory over a ten second window.
+    - name: memory.some.60.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on Memory over a sixty second window.
+    - name: memory.some.300.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on Memory over a three hundred second window.
+    - name: memory.some.total.time.us
+      type: long
+      description: >
+        The total absolute stall time (in microseconds) in which at least some tasks were stalled on memory.
+    - name: memory.full.10.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a ten second window.
+    - name: memory.full.60.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a sixty second window.
+    - name: memory.full.300.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on memory simultaneously over a three hundred second window.
+    - name: memory.full.total.time.us
+      type: long
+      description: >
+        The total absolute stall time (in microseconds) in which in which all non-idle tasks were stalled on memory.
+    - name: io.some.10.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on io over a ten second window.
+    - name: io.some.60.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on io over a sixty second window.
+    - name: io.some.300.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which at least some tasks were stalled on io over a three hundred second window.
+    - name: io.some.total.time.us
+      type: long
+      description: >
+        The total absolute stall time (in microseconds) in which at least some tasks were stalled on io.
+    - name: io.full.10.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a ten second window.
+    - name: io.full.60.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a sixty second window.
+    - name: io.full.300.pct
+      type: float
+      format: percent
+      description: >
+        The average share of time in which in which all non-idle tasks were stalled on io simultaneously over a three hundred second window.
+    - name: io.full.total.time.us
+      type: long
+      description: >
+        The total absolute stall time (in microseconds) in which in which all non-idle tasks were stalled on io.

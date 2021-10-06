@@ -157,7 +157,9 @@ func (r *RunnerList) Has(hash uint64) bool {
 // HashConfig hashes a given common.Config
 func HashConfig(c *common.Config) (uint64, error) {
 	var config map[string]interface{}
-	c.Unpack(&config)
+	if err := c.Unpack(&config); err != nil {
+		return 0, err
+	}
 	return hashstructure.Hash(config, nil)
 }
 

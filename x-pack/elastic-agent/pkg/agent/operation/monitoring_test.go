@@ -6,11 +6,17 @@ package operation
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configrequest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/stateresolver"
@@ -23,10 +29,44 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/retry"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
+
+func TestExportedMetrics(t *testing.T) {
+	programName := "testing"
+	expectedMetricsName := "metric_name"
+	program.SupportedMap[programName] = program.Spec{ExprtedMetrics: []string{expectedMetricsName}}
+
+	exportedMetrics := normalizeHTTPCopyRules(programName)
+
+	exportedMetricFound := false
+	for _, kv := range exportedMetrics {
+		from, found := kv["from"]
+		if !found {
+			continue
+		}
+		to, found := kv["to"]
+		if !found {
+			continue
+		}
+
+		if to != expectedMetricsName {
+			continue
+		}
+		if from != fmt.Sprintf("http.agent.%s", expectedMetricsName) {
+			continue
+		}
+		exportedMetricFound = true
+		break
+	}
+
+	require.True(t, exportedMetricFound, "exported metric not found")
+	delete(program.SupportedMap, programName)
+}
 
 func TestGenerateSteps(t *testing.T) {
 	const sampleOutput = "sample-output"
+	const outputType = "logstash"
 
 	type testCase struct {
 		Name           string
@@ -46,8 +86,8 @@ func TestGenerateSteps(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.Name, func(t *testing.T) {
 			m := &testMonitor{monitorLogs: tc.Config.MonitorLogs, monitorMetrics: tc.Config.MonitorMetrics}
-			operator := getMonitorableTestOperator(t, "tests/scripts", m)
-			steps := operator.generateMonitoringSteps("8.0", sampleOutput)
+			operator := getMonitorableTestOperator(t, "tests/scripts", m, tc.Config)
+			steps := operator.generateMonitoringSteps("8.0", outputType, sampleOutput)
 			if actualSteps := len(steps); actualSteps != tc.ExpectedSteps {
 				t.Fatalf("invalid number of steps, expected %v, got %v", tc.ExpectedSteps, actualSteps)
 			}
@@ -57,13 +97,13 @@ func TestGenerateSteps(t *testing.T) {
 				// Filebeat step check
 				if s.ProgramSpec.Cmd == "filebeat" {
 					fbFound = true
-					checkStep(t, "filebeat", sampleOutput, s)
+					checkStep(t, "filebeat", outputType, sampleOutput, s)
 				}
 
 				// Metricbeat step check
 				if s.ProgramSpec.Cmd == "metricbeat" {
 					mbFound = true
-					checkStep(t, "metricbeat", sampleOutput, s)
+					checkStep(t, "metricbeat", outputType, sampleOutput, s)
 				}
 			}
 
@@ -78,7 +118,7 @@ func TestGenerateSteps(t *testing.T) {
 	}
 }
 
-func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s configrequest.Step) {
+func checkStep(t *testing.T, stepName string, outputType string, expectedOutput interface{}, s configrequest.Step) {
 	if meta := s.Meta[configrequest.MetaConfigKey]; meta != nil {
 		mapstr, ok := meta.(map[string]interface{})
 		if !ok {
@@ -90,13 +130,13 @@ func checkStep(t *testing.T, stepName string, expectedOutput interface{}, s conf
 			t.Fatalf("output not found for %s step", stepName)
 		}
 
-		if actualOutput := esOut["elasticsearch"]; actualOutput != expectedOutput {
+		if actualOutput := esOut[outputType]; actualOutput != expectedOutput {
 			t.Fatalf("output for %s step does not match. expected: %v, got %v", stepName, expectedOutput, actualOutput)
 		}
 	}
 }
 
-func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor) *Operator {
+func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.Monitor, mcfg *monitoringConfig.MonitoringConfig) *Operator {
 	cfg := &configuration.SettingsConfig{
 		RetryConfig: &retry.Config{
 			Enabled:      true,
@@ -109,9 +149,11 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 			InstallPath:     installPath,
 			OperatingSystem: "darwin",
 		},
+		MonitoringConfig: mcfg,
 	}
 
 	l := getLogger()
+	agentInfo, _ := info.NewAgentInfo(true)
 
 	fetcher := &DummyDownloader{}
 	verifier := &DummyVerifier{}
@@ -128,7 +170,7 @@ func getMonitorableTestOperator(t *testing.T, installPath string, m monitoring.M
 	}
 
 	ctx := context.Background()
-	operator, err := NewOperator(ctx, l, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m)
+	operator, err := NewOperator(ctx, l, agentInfo, "p1", cfg, fetcher, verifier, installer, uninstaller, stateResolver, srv, nil, m, status.NewController(l))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,6 +194,7 @@ func (*testMonitorableApp) Shutdown() {}
 func (*testMonitorableApp) Configure(_ context.Context, config map[string]interface{}) error {
 	return nil
 }
+func (*testMonitorableApp) Spec() program.Spec                                          { return program.Spec{} }
 func (*testMonitorableApp) State() state.State                                          { return state.State{} }
 func (*testMonitorableApp) SetState(_ state.Status, _ string, _ map[string]interface{}) {}
 func (a *testMonitorableApp) Monitor() monitoring.Monitor                               { return a.monitor }
@@ -165,20 +208,22 @@ type testMonitor struct {
 
 // EnrichArgs enriches arguments provided to application, in order to enable
 // monitoring
-func (b *testMonitor) EnrichArgs(_ string, _ string, args []string, _ bool) []string { return args }
+func (b *testMonitor) EnrichArgs(_ program.Spec, _ string, args []string, _ bool) []string {
+	return args
+}
 
 // Cleanup cleans up all drops.
-func (b *testMonitor) Cleanup(string, string) error { return nil }
+func (b *testMonitor) Cleanup(program.Spec, string) error { return nil }
 
 // Close closes the monitor.
 func (b *testMonitor) Close() {}
 
 // Prepare executes steps in order for monitoring to work correctly
-func (b *testMonitor) Prepare(string, string, int, int) error { return nil }
+func (b *testMonitor) Prepare(program.Spec, string, int, int) error { return nil }
 
 // LogPath describes a path where application stores logs. Empty if
 // application is not monitorable
-func (b *testMonitor) LogPath(string, string) string {
+func (b *testMonitor) LogPath(program.Spec, string) string {
 	if !b.monitorLogs {
 		return ""
 	}
@@ -187,7 +232,7 @@ func (b *testMonitor) LogPath(string, string) string {
 
 // MetricsPath describes a location where application exposes metrics
 // collectable by metricbeat.
-func (b *testMonitor) MetricsPath(string, string) string {
+func (b *testMonitor) MetricsPath(program.Spec, string) string {
 	if !b.monitorMetrics {
 		return ""
 	}
@@ -195,7 +240,7 @@ func (b *testMonitor) MetricsPath(string, string) string {
 }
 
 // MetricsPathPrefixed return metrics path prefixed with http+ prefix.
-func (b *testMonitor) MetricsPathPrefixed(string, string) string {
+func (b *testMonitor) MetricsPathPrefixed(program.Spec, string) string {
 	return "http+path"
 }
 
@@ -204,6 +249,9 @@ func (b *testMonitor) Reload(cfg *config.Config) error { return nil }
 
 // IsMonitoringEnabled returns true if monitoring is configured.
 func (b *testMonitor) IsMonitoringEnabled() bool { return b.monitorLogs || b.monitorMetrics }
+
+// MonitoringNamespace returns monitoring namespace configured.
+func (b *testMonitor) MonitoringNamespace() string { return "default" }
 
 // WatchLogs return true if monitoring is configured and monitoring logs is enabled.
 func (b *testMonitor) WatchLogs() bool { return b.monitorLogs }

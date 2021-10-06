@@ -4,7 +4,7 @@
 - module: microsoft
   # ATP configuration
   defender_atp:
-    enabled: true
+    enabled: false
     # How often the API should be polled
     #var.interval: 5m
 
@@ -13,11 +13,28 @@
 
     # Oauth Client Secret
     #var.oauth2.client.secret: ""
-   
+
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
+  m365_defender:
+    enabled: false
+    # How often the API should be polled
+    #var.interval: 5m
+
+    # Oauth Client ID
+    #var.oauth2.client.id: ""
+
+    # Oauth Client Secret
+    #var.oauth2.client.secret: ""
+
+    # Oauth Token URL, should include the tenant ID
+    #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
+    
+    # Related scopes, default should be included
+    #var.oauth2.scopes:
+    #  - "https://api.security.microsoft.com/.default"
   dhcp:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

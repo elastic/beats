@@ -1,0 +1,34 @@
+type: azure-eventhub
+{{ if .eventhub }}
+eventhub: {{ .eventhub }}
+storage_account_container: filebeat-platformlogs-{{ .eventhub }}
+{{ end }}
+
+{{ if .connection_string }}
+connection_string: {{ .connection_string }}
+{{ end }}
+
+{{ if .consumer_group }}
+consumer_group: {{ .consumer_group }}
+{{ end }}
+
+{{ if .storage_account }}
+storage_account: {{ .storage_account }}
+{{ end }}
+
+{{ if .storage_account_key }}
+storage_account_key: {{ .storage_account_key }}
+{{ end }}
+
+{{ if .resource_manager_endpoint }}
+resource_manager_endpoint: {{ .resource_manager_endpoint }}
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

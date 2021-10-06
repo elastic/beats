@@ -5,6 +5,7 @@ import sys
 import unittest
 
 
+@metricbeat.parameterized_with_supported_versions
 class Test(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['postgresql']
@@ -21,13 +22,10 @@ class Test(metricbeat.BaseTest):
 
     def get_hosts(self):
         username = "postgres"
+        password = os.getenv("POSTGRESQL_PASSWORD", default="postgres")
         host = self.compose_host()
         dsn = "postgres://{}?sslmode=disable".format(host)
-        return (
-            [dsn],
-            username,
-            os.getenv("POSTGRESQL_PASSWORD"),
-        )
+        return ([dsn], username, password)
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -52,9 +50,12 @@ class Test(metricbeat.BaseTest):
         self.common_checks(output)
 
         for evt in output:
-            assert "name" in evt["postgresql"]["activity"]["database"]
-            assert "oid" in evt["postgresql"]["activity"]["database"]
-            assert "state" in evt["postgresql"]["activity"]
+            if "database" in evt["postgresql"]["activity"]:
+                assert "name" in evt["postgresql"]["activity"]["database"]
+                assert "oid" in evt["postgresql"]["activity"]["database"]
+                assert "state" in evt["postgresql"]["activity"]
+            else:
+                assert "backend_type" in evt["postgresql"]["activity"]
 
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -112,3 +113,33 @@ class Test(metricbeat.BaseTest):
             assert "checkpoints" in evt["postgresql"]["bgwriter"]
             assert "buffers" in evt["postgresql"]["bgwriter"]
             assert "stats_reset" in evt["postgresql"]["bgwriter"]
+
+    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_statement(self):
+        """
+        PostgreSQL module outputs an event.
+        """
+        hosts, username, password = self.get_hosts()
+        self.render_config_template(modules=[{
+            "name": "postgresql",
+            "metricsets": ["statement"],
+            "hosts": hosts,
+            "username": username,
+            "password": password,
+            "period": "5s"
+        }])
+        proc = self.start_beat()
+        self.wait_until(lambda: self.output_lines() > 0)
+        proc.check_kill_and_wait()
+
+        output = self.read_output_json()
+        self.common_checks(output)
+
+        for evt in output:
+            statement = evt["postgresql"]["statement"]
+            assert "user" in statement
+            assert "database" in statement
+            assert "query" in statement
+            assert "ms" in statement["query"]["time"]["max"]
+            assert "ms" in statement["query"]["time"]["total"]

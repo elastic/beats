@@ -25,49 +25,51 @@ import (
 )
 
 func TestConfirm(t *testing.T) {
-	tests := []struct {
-		name   string
+	tests := map[string]struct {
 		input  string
+		prompt string
 		def    bool
 		result bool
 		error  bool
 	}{
-		{
-			name:   "Test default yes",
+		"Test default yes": {
 			input:  "\n",
+			prompt: "> [Y/n]:",
 			def:    true,
 			result: true,
 		},
-		{
-			name:   "Test default no",
+		"Test default no": {
 			input:  "\n",
+			prompt: "> [y/N]:",
 			def:    false,
 			result: false,
 		},
-		{
-			name:   "Test YeS",
+		"Test YeS": {
 			input:  "YeS\n",
+			prompt: "> [y/N]:",
 			def:    false,
 			result: true,
 		},
-		{
-			name:   "Test Y",
+		"Test Y": {
 			input:  "Y\n",
+			prompt: "> [y/N]:",
 			def:    false,
 			result: true,
 		},
-		{
-			name:   "Test No",
+		"Test No": {
 			input:  "No\n",
 			def:    true,
+			prompt: "> [Y/n]:",
 			result: false,
 		},
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			var buf strings.Builder
 			r := strings.NewReader(test.input)
-			result, err := confirm(r, "prompt", test.def)
+
+			result, err := confirm(r, &buf, ">", test.def)
 			assert.Equal(t, test.result, result)
 
 			if test.error {
@@ -75,6 +77,8 @@ func TestConfirm(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+
+			assert.Equal(t, test.prompt, buf.String())
 		})
 	}
 }

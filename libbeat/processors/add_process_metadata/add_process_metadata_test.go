@@ -18,9 +18,11 @@
 package add_process_metadata
 
 import (
+	"math"
 	"os"
 	"testing"
 	"time"
+	"unsafe"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -28,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 )
 
 func TestAddProcessMetadata(t *testing.T) {
@@ -48,6 +51,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "root",
+			userid:    "0",
 		},
 		3: {
 			name:  "systemd",
@@ -63,43 +68,53 @@ func TestAddProcessMetadata(t *testing.T) {
 			pid:       1,
 			ppid:      0,
 			startTime: startTime,
+			username:  "user",
+			userid:    "1001",
 		},
 	}
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
-		testMap := map[int]map[string]string{
+	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+
+		testMap := map[int]cgroup.PathList{
 			1: {
-				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				V1: map[string]cgroup.ControllerPath{
+
+					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"perf_event":   {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"freezer":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"pids":         {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"hugetlb":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"cpuacct":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"cpuset":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"net_cls":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"devices":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"memory":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"name=systemd": {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				},
 			},
 			2: {
-				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+				V1: map[string]cgroup.ControllerPath{
+
+					"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"perf_event":   {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"freezer":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"pids":         {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"hugetlb":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"cpuacct":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"cpuset":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"net_cls":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"devices":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"memory":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+					"name=systemd": {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				},
 			},
 		}
+
 		return testMap[pid], nil
 	}
 
@@ -134,6 +149,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "root",
+						"id":   "0",
+					},
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -215,6 +234,10 @@ func TestAddProcessMetadata(t *testing.T) {
 						"pid":        1,
 						"ppid":       0,
 						"start_time": startTime,
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
+						},
 					},
 					"container": common.MapStr{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -248,6 +271,10 @@ func TestAddProcessMetadata(t *testing.T) {
 							"TERM":       "linux",
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
+						},
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
 						},
 					},
 					"container": common.MapStr{
@@ -283,6 +310,10 @@ func TestAddProcessMetadata(t *testing.T) {
 							"TERM":       "linux",
 							"BOOT_IMAGE": "/boot/vmlinuz-4.11.8-300.fc26.x86_64",
 							"LANG":       "en_US.UTF-8",
+						},
+						"owner": common.MapStr{
+							"name": "root",
+							"id":   "0",
 						},
 					},
 				},
@@ -403,7 +434,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": "a",
 			},
-			err: errors.New("error applying add_process_metadata processor: cannot convert string field 'ppid' to an integer: strconv.Atoi: parsing \"a\": invalid syntax"),
+			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': error converting string to integer: strconv.Atoi: parsing \"a\": invalid syntax"),
 		},
 		{
 			description: "bad PID field type",
@@ -416,7 +447,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			expected: common.MapStr{
 				"ppid": false,
 			},
-			err: errors.New("error applying add_process_metadata processor: cannot parse field 'ppid' (not an integer or string)"),
+			err: errors.New("error applying add_process_metadata processor: cannot parse pid field 'ppid': not an integer or string, but bool"),
 		},
 		{
 			description: "process not found",
@@ -472,6 +503,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "root",
+						"id":   "0",
+					},
 				},
 				"container": common.MapStr{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -591,6 +626,10 @@ func TestAddProcessMetadata(t *testing.T) {
 					"pid":        1,
 					"ppid":       0,
 					"start_time": startTime,
+					"owner": common.MapStr{
+						"name": "user",
+						"id":   "1001",
+					},
 				},
 			},
 		},
@@ -644,6 +683,26 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "only user",
+			config: common.MapStr{
+				"match_pids":     []string{"ppid"},
+				"target":         "",
+				"include_fields": []string{"process.owner"},
+			},
+			event: common.MapStr{
+				"ppid": "1",
+			},
+			expected: common.MapStr{
+				"ppid": "1",
+				"process": common.MapStr{
+					"owner": common.MapStr{
+						"id":   "0",
+						"name": "root",
+					},
+				},
+			},
+		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
 			config, err := common.NewConfigFrom(test.config)
@@ -651,7 +710,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs)
+			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
 			if test.initErr == nil {
 				if err != nil {
 					t.Fatal(err)
@@ -687,24 +746,30 @@ func TestUsingCache(t *testing.T) {
 	selfPID := os.Getpid()
 
 	// mock of the cgroup processCgroupPaths
-	processCgroupPaths = func(_ string, pid int) (map[string]string, error) {
-		testMap := map[int]map[string]string{
-			selfPID: map[string]string{
-				"cpu":          "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_prio":     "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"blkio":        "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"perf_event":   "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"freezer":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"pids":         "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"hugetlb":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuacct":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"cpuset":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"net_cls":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"devices":      "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"memory":       "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
-				"name=systemd": "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
+	processCgroupPaths = func(_ string, pid int) (cgroup.PathList, error) {
+		testStruct := cgroup.PathList{
+			V1: map[string]cgroup.ControllerPath{
+
+				"cpu":          {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"net_prio":     {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"blkio":        {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"perf_event":   {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"freezer":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"pids":         {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"hugetlb":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"cpuacct":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"cpuset":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"net_cls":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"devices":      {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"memory":       {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
+				"name=systemd": {ControllerPath: "/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"},
 			},
 		}
+		testMap := map[int]cgroup.PathList{
+			selfPID: testStruct,
+		}
+
+		//testMap :=
 		return testMap[pid], nil
 	}
 
@@ -823,4 +888,173 @@ func TestBadProcess(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.NotNil(t, result.Fields)
 	assert.Equal(t, ev.Fields, result.Fields)
+}
+
+func TestPIDToInt(t *testing.T) {
+	const intIs64bit = unsafe.Sizeof(int(0)) == unsafe.Sizeof(int64(0))
+	for _, test := range []struct {
+		name string
+		pid  interface{}
+		fail bool
+	}{
+		{
+			name: "numeric string",
+			pid:  "1234",
+		},
+		{
+			name: "numeric string ignore octal",
+			pid:  "008",
+		},
+		{
+			name: "numeric string invalid hex",
+			pid:  "0x10",
+			fail: true,
+		},
+		{
+			name: "non-numeric string",
+			pid:  "abcd",
+			fail: true,
+		},
+		{
+			name: "int",
+			pid:  0,
+		},
+		{
+			name: "int min",
+			pid:  math.MaxInt32,
+		},
+		{
+			name: "int max",
+			pid:  math.MaxInt32,
+		},
+		{
+			name: "uint min",
+			pid:  uint(0),
+		},
+		{
+			name: "uint max",
+			pid:  uint(math.MaxUint32),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int8",
+			pid:  int8(0),
+		},
+		{
+			name: "int8 min",
+			pid:  int8(math.MinInt8),
+		},
+		{
+			name: "int8 max",
+			pid:  int8(math.MaxInt8),
+		},
+		{
+			name: "uint8 min",
+			pid:  uint8(0),
+		},
+		{
+			name: "uint8 max",
+			pid:  uint8(math.MaxUint8),
+		},
+		{
+			name: "int16",
+			pid:  int16(0),
+		},
+		{
+			name: "int16 min",
+			pid:  int16(math.MinInt16),
+		},
+		{
+			name: "int16 max",
+			pid:  int16(math.MaxInt16),
+		},
+		{
+			name: "uint16 min",
+			pid:  uint16(0),
+		},
+		{
+			name: "uint16 max",
+			pid:  uint16(math.MaxUint16),
+		},
+		{
+			name: "int32",
+			pid:  int32(0),
+		},
+		{
+			name: "int32 min",
+			pid:  int32(math.MinInt32),
+		},
+		{
+			name: "int32 max",
+			pid:  int32(math.MaxInt32),
+		},
+		{
+			name: "uint32 min",
+			pid:  uint32(0),
+		},
+		{
+			name: "uint32 max",
+			pid:  uint32(math.MaxUint32),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int64",
+			pid:  int64(0),
+			fail: false,
+		},
+		{
+			name: "int64 min",
+			pid:  int64(math.MinInt64),
+			fail: !intIs64bit,
+		},
+		{
+			name: "int64 max",
+			pid:  int64(math.MaxInt64),
+			fail: !intIs64bit,
+		},
+		{
+			name: "uint64 min",
+			pid:  uint64(0),
+			fail: false,
+		},
+		{
+			name: "uint64 max",
+			pid:  uint64(math.MaxUint64),
+			fail: true,
+		},
+		{
+			name: "uintptr",
+			pid:  uintptr(0),
+			fail: false,
+		},
+		{
+			name: "boolean",
+			pid:  false,
+			fail: true,
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := pidToInt(test.pid)
+			if test.fail {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func TestV2CID(t *testing.T) {
+	processCgroupPaths = func(_ string, _ int) (cgroup.PathList, error) {
+		testMap := cgroup.PathList{
+			V1: map[string]cgroup.ControllerPath{
+				"cpu": cgroup.ControllerPath{IsV2: true, ControllerPath: "system.slice/docker-2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805.scope"},
+			},
+		}
+		return testMap, nil
+	}
+	provider := newCidProvider("", []string{}, "", processCgroupPaths, nil)
+	result, err := provider.GetCid(1)
+	assert.NoError(t, err)
+	assert.Equal(t, "2dcbab615aebfa9313feffc5cfdacd381543cfa04c6be3f39ac656e55ef34805", result)
 }

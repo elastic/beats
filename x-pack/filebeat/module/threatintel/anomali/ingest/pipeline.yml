@@ -1,0 +1,152 @@
+description: Pipeline for parsing Anomali Threat Intel
+processors:
+  ####################
+  # Event ECS fields #
+  ####################
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.kind
+      value: enrichment
+  - set:
+      field: event.category
+      value: threat
+  - set:
+      field: event.type
+      value: indicator
+
+  ######################
+  # General ECS fields #
+  ######################
+  - rename:
+      field: json
+      target_field: threatintel.anomali
+      ignore_missing: true
+
+  #####################
+  # Threat ECS Fields #
+  #####################
+  ## File indicator operations
+  - date:
+      field: threatintel.anomali.created
+      formats:
+        - "yyyy-MM-dd'T'HH:mm:ssz"
+        - "yyyy-MM-dd'T'HH:mm:ssZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      if: "ctx?.threatintel?.anomali?.created != null"
+  - date:
+      field: threatintel.anomali.modified
+      target_field: threatintel.anomali.modified
+      formats:
+        - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      if: "ctx?.threatintel?.anomali?.modified != null"
+  - date:
+      field: threatintel.anomali.valid_from
+      target_field: threatintel.indicator.first_seen
+      formats:
+        - "yyyy-MM-dd'T'HH:mm:ss.Sz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSZ"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSz"
+        - "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      if: "ctx?.threatintel?.anomali?.valid_from != null"
+  - grok:
+      field: threatintel.anomali.pattern
+      patterns:
+        - "^\\[%{DATA:_tmp.threattype}:value%{SPACE}=%{SPACE}'%{DATA:_tmp.threatvalue}'\\]"
+  - rename:
+      field: _tmp.threattype
+      target_field: threatintel.indicator.type
+      ignore_missing: true
+  - rename:
+      field: _tmp.threatvalue
+      target_field: threatintel.indicator.ip
+      ignore_missing: true
+      if: "['ipv4-addr', 'ipv6-addr'].contains(ctx?.threatintel?.indicator?.type)"
+  - uri_parts:
+      field: _tmp.threatvalue
+      target_field: threatintel.indicator.url
+      keep_original: true
+      remove_if_successful: true
+      if: ctx?.threatintel?.indicator?.type == 'url'
+  - set:
+      field: threatintel.indicator.url.full
+      value: "{{{threatintel.indicator.url.original}}}"
+      ignore_empty_value: true
+  - rename:
+      field: _tmp.threatvalue
+      target_field: threatintel.indicator.email.address
+      ignore_missing: true
+      if: ctx?.threatintel?.indicator?.type == 'email-addr'
+  - rename:
+      field: _tmp.threatvalue
+      target_field: threatintel.indicator.url.domain
+      ignore_missing: true
+      if: ctx?.threatintel?.indicator?.type == 'domain-name'
+  - set:
+      field: threatintel.indicator.type
+      value: unknown
+      if: ctx?.threatintel?.indicator?.type == null
+  - foreach:
+      field: threatintel.anomali.labels
+      ignore_missing: true
+      processor:
+        append:
+          field: tags
+          value: "{{_ingest._value}}"
+          allow_duplicates: false
+  - grok:
+      field: threatintel.anomali.description
+      patterns:
+        - "^%{GREEDYDATA}Source: %{GREEDYDATA:threatintel.indicator.provider}"
+      ignore_missing: true
+      ignore_failure: true
+  ######################
+  # Cleanup processors #
+  ######################
+  - script:
+      lang: painless
+      if: ctx?.threatintel != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+        map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
+  - remove:
+      field:
+        - threatintel.anomali.created
+        - message
+        - _tmp
+      ignore_missing: true
+on_failure:
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

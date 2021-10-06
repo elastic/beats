@@ -65,7 +65,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 				logp.Warn("Failed to obtain hostname from `%s`: %s", hostname, err)
 				hostname = ""
 			}
-			return tls.Dial("tcp", addr.String(), tlsConfig.BuildModuleConfig(hostname))
+			return tls.Dial("tcp", addr.String(), tlsConfig.BuildModuleClientConfig(hostname))
 		}
 	}
 

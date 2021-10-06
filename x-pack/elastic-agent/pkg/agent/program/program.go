@@ -10,7 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/boolexp"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/eql"
 )
 
 // Program represents a program that must be started or must run.
@@ -47,7 +47,7 @@ func (p *Program) Configuration() map[string]interface{} {
 
 // Programs take a Tree representation of the main configuration and apply all the different
 // programs rules and generate individual configuration from the rules.
-func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
+func Programs(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) (map[string][]Program, error) {
 	grouped, err := groupByOutputs(singleConfig)
 	if err != nil {
 		return nil, errors.New(err, errors.TypeConfig, "fail to extract program configuration")
@@ -55,7 +55,7 @@ func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
 
 	groupedPrograms := make(map[string][]Program)
 	for k, config := range grouped {
-		programs, err := detectPrograms(config)
+		programs, err := DetectPrograms(agentInfo, config)
 		if err != nil {
 			return nil, errors.New(err, errors.TypeConfig, "fail to generate program configuration")
 		}
@@ -65,33 +65,18 @@ func Programs(singleConfig *transpiler.AST) (map[string][]Program, error) {
 	return groupedPrograms, nil
 }
 
-func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
+// DetectPrograms returns the list of programs detected from the provided configuration.
+func DetectPrograms(agentInfo transpiler.AgentInfo, singleConfig *transpiler.AST) ([]Program, error) {
 	programs := make([]Program, 0)
 	for _, spec := range Supported {
 		specificAST := singleConfig.Clone()
-		err := spec.Rules.Apply(specificAST)
+		ok, err := DetectProgram(spec, agentInfo, specificAST)
 		if err != nil {
 			return nil, err
 		}
-
-		if len(spec.When) == 0 {
-			return nil, ErrMissingWhen
-		}
-
-		expression, err := boolexp.New(spec.When, methodsEnv(specificAST))
-		if err != nil {
-			return nil, err
-		}
-
-		ok, err := expression.Eval(&varStoreAST{ast: specificAST})
-		if err != nil {
-			return nil, err
-		}
-
 		if !ok {
 			continue
 		}
-
 		program := Program{
 			Spec:   spec,
 			Config: specificAST,
@@ -99,7 +84,42 @@ func detectPrograms(singleConfig *transpiler.AST) ([]Program, error) {
 		programs = append(programs, program)
 	}
 	return programs, nil
+}
 
+// DetectProgram returns true or false if this program exists in the AST.
+//
+// Note `ast` is modified to match what the program expects. Should clone the AST before passing to
+// this function if you want to still have the original.
+func DetectProgram(spec Spec, info transpiler.AgentInfo, ast *transpiler.AST) (bool, error) {
+	if len(spec.Constraints) > 0 {
+		constraints, err := eql.New(spec.Constraints)
+		if err != nil {
+			return false, err
+		}
+		ok, err := constraints.Eval(ast)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, nil
+		}
+	}
+
+	err := spec.Rules.Apply(info, ast)
+	if err != nil {
+		return false, err
+	}
+
+	if len(spec.When) == 0 {
+		return false, ErrMissingWhen
+	}
+
+	expression, err := eql.New(spec.When)
+	if err != nil {
+		return false, err
+	}
+
+	return expression.Eval(ast)
 }
 
 // KnownProgramNames returns a list of runnable programs by the elastic-agent.
@@ -131,7 +151,7 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 	// Recreates multiple configuration grouped by the name of the outputs.
 	// Each configuration will be started into his own operator with the same name as the output.
-	grouped := make(map[string]map[string]interface{})
+	grouped := make(map[string]*outputType)
 
 	m, ok := normMap[outputsKey]
 	if !ok {
@@ -164,13 +184,21 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 
 		delete(outputsOptions, typeKey)
 
+		enabled, err := isEnabled(outputsOptions)
+		if err != nil {
+			return nil, err
+		}
+
 		// Propagate global configuration to each individual configuration.
 		clone := cloneMap(normMap)
 		delete(clone, outputsKey)
 		clone[outputKey] = map[string]interface{}{n: v}
 		clone[inputsKey] = make([]map[string]interface{}, 0)
 
-		grouped[k] = clone
+		grouped[k] = &outputType{
+			enabled: enabled,
+			config:  clone,
+		}
 	}
 
 	s, ok := normMap[inputsKey]
@@ -199,21 +227,24 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 			return nil, fmt.Errorf("unknown configuration output with name %s", targetName)
 		}
 
-		streams := config[inputsKey].([]map[string]interface{})
+		streams := config.config[inputsKey].([]map[string]interface{})
 		streams = append(streams, stream)
 
-		config[inputsKey] = streams
+		config.config[inputsKey] = streams
 		grouped[targetName] = config
 	}
 
 	transpiled := make(map[string]*transpiler.AST)
 
 	for name, group := range grouped {
-		if len(group[inputsKey].([]map[string]interface{})) == 0 {
+		if !group.enabled {
+			continue
+		}
+		if len(group.config[inputsKey].([]map[string]interface{})) == 0 {
 			continue
 		}
 
-		ast, err := transpiler.NewAST(group)
+		ast, err := transpiler.NewAST(group.config)
 		if err != nil {
 			return nil, errors.New(err, "fail to generate configuration for output name %s", name)
 		}
@@ -222,6 +253,22 @@ func groupByOutputs(single *transpiler.AST) (map[string]*transpiler.AST, error) 
 	}
 
 	return transpiled, nil
+}
+
+func isEnabled(m map[string]interface{}) (bool, error) {
+	const (
+		enabledKey = "enabled"
+	)
+
+	enabled, ok := m[enabledKey]
+	if !ok {
+		return true, nil
+	}
+	switch e := enabled.(type) {
+	case bool:
+		return e, nil
+	}
+	return false, fmt.Errorf("invalid type received for enabled %T and expecting a boolean", enabled)
 }
 
 func findOutputName(m map[string]interface{}) string {
@@ -250,4 +297,9 @@ func cloneMap(m map[string]interface{}) map[string]interface{} {
 	}
 
 	return newMap
+}
+
+type outputType struct {
+	enabled bool
+	config  map[string]interface{}
 }

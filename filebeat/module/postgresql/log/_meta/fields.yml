@@ -8,38 +8,113 @@
       description: >
         The timestamp from the log line.
     - name: core_id
+      type: alias
+      path: postgresql.log.session_line_number
+      description: >
+        Core id. (deprecated, there is no core_id in PostgreSQL logs, this is actually session_line_number).
+      deprecated: 8.0.0
+    - name: client_addr
+      example: "127.0.0.1"
+      description: >
+        Host where the connection originated from.
+    - name: client_port
+      example: "59700"
+      description: >
+        Port where the connection originated from.
+    - name: session_id
+      description: >
+        PostgreSQL session.
+      example: "5ff1dd98.22"
+    - name: session_line_number
       type: long
       description: >
-        Core id
+        Line number inside a session. (%l in `log_line_prefix`).
     - name: database
-      example: "mydb"
+      example: "postgres"
       description: >
-        Name of database
+        Name of database.
     - name: query
       example: "SELECT * FROM users;"
       description: >
-        Query statement.
+        Query statement. In the case of CSV parse, look at command_tag to get more context.
     - name: query_step
       example: "parse"
       description: >
-        Statement step when using extended query protocol (one of statement, parse, bind or execute)
+        Statement step when using extended query protocol (one of statement, parse, bind or execute).
     - name: query_name
       example: "pdo_stmt_00000001"
       description: >
         Name given to a query when using extended query protocol. If it is "<unnamed>", or not present,
         this field is ignored.
+    - name: command_tag
+      example: "SELECT"
+      description: >
+        Type of session's current command.
+        The complete list can be found at: src/include/tcop/cmdtaglist.h
+    - name: session_start_time
+      type: date
+      description: >
+        Time when this session started.
+    - name: virtual_transaction_id
+      description: >
+        Backend local transaction id.
+    - name: transaction_id
+      type: long
+      description: >
+        The id of current transaction.
+    - name: sql_state_code
+      # This code is not a number.
+      type: keyword
+      description: >
+        State code returned by Postgres (if any).
+        See also https://www.postgresql.org/docs/current/errcodes-appendix.html
+    - name: detail
+      description: >
+        More information about the message, parameters in case of a parametrized query.
+        e.g. 'Role \"user\" does not exist.', 'parameters: $1 = 42', etc.
+    - name: hint
+      description: >
+        A possible solution to solve an error.
+    - name: internal_query
+      description: >
+        Internal query that led to the error (if any).
+    - name: internal_query_pos
+      type: long
+      description: >
+        Character count of the internal query (if any).
+    - name: context
+      description: >
+        Error context.
+    - name: query_pos
+      type: long
+      description: >
+        Character count of the error position (if any).
+    - name: location
+      description: >
+        Location of the error in the PostgreSQL source code (if log_error_verbosity is set to verbose).
+    - name: application_name
+      description: >
+        Name of the application of this event. It is defined by the client.
+    - name: backend_type
+      example: "client backend"
+      description: >
+        Type of backend of this event.
+        Possible types are autovacuum launcher, autovacuum worker, logical replication launcher,
+        logical replication worker, parallel worker, background writer, client backend, checkpointer,
+        startup, walreceiver, walsender and walwriter.
+        In addition, background workers registered by extensions may have additional types.
 
     - name: error.code
-      type: long
-      description: Error code returned by Postgres (if any)
+      type: alias
+      path: postgresql.log.sql_state_code
+      description: >
+        Error code returned by Postgres (if any).
+        Deprecated: errors can have letters. Use sql_state_code instead.
+      deprecated: 8.0.0
 
     - name: timezone
       type: alias
       path: event.timezone
-      migration: true
-    - name: thread_id
-      type: alias
-      path: process.pid
       migration: true
     - name: user
       type: alias
@@ -47,6 +122,9 @@
       migration: true
     - name: level
       type: alias
+      example: "LOG"
+      description: >
+        Valid values are DEBUG5, DEBUG4, DEBUG3, DEBUG2, DEBUG1, INFO, NOTICE, WARNING, ERROR, LOG, FATAL, and PANIC.
       path: log.level
       migration: true
     - name: message

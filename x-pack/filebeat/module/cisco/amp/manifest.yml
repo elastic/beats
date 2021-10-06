@@ -1,0 +1,25 @@
+module_version: 1.0
+
+var:
+  - name: input
+    default: httpjson
+  - name: url
+    default: https://api.amp.cisco.com/v1/events?offset=0&limit=300
+  - name: tags
+    default: [cisco-amp, forwarded]
+  - name: ssl
+  - name: request_timeout
+    default: 60s
+  - name: limit
+    default: 100
+  - name: client_id
+  - name: api_key
+  - name: first_interval
+    default: 24h
+  - name: interval
+    default: 60m
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

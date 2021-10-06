@@ -1,0 +1,67 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-apm",
+            "name": "elastic-apm"
+        },
+        "instance": {
+            "id": "4281532529829668842",
+            "name": "synthetics-service"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "instance": {
+                "disk": {
+                    "read_bytes_count": {
+                        "value": 0
+                    },
+                    "read_ops_count": {
+                        "value": 0
+                    },
+                    "write_bytes_count": {
+                        "value": 0
+                    },
+                    "write_ops_count": {
+                        "value": 0
+                    }
+                }
+            }
+        },
+        "labels": {
+            "metrics": {
+                "device_name": "synthetics-service",
+                "device_type": "permanent",
+                "storage_type": "pd-balanced"
+            }
+        }
+    },
+    "host": {
+        "disk": {
+            "read": {
+                "bytes": 0
+            },
+            "write": {
+                "bytes": 0
+            }
+        },
+        "id": "4281532529829668842",
+        "name": "synthetics-service"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

@@ -29,21 +29,21 @@ import (
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
 )
 
 func TestTranslateSID(t *testing.T) {
 	var tests = []struct {
 		SID         string
 		Account     string
-		AccountType sys.SIDType
+		AccountType winevent.SIDType
 		Domain      string
 		Assert      func(*testing.T, *beat.Event, error)
 	}{
 		{SID: "S-1-5-7", Domain: "NT AUTHORITY", Account: "ANONYMOUS LOGON"},
 		{SID: "S-1-0-0", Account: "NULL SID"},
 		{SID: "S-1-1-0", Account: "Everyone"},
-		{SID: "S-1-5-32-544", Domain: "BUILTIN", Account: "Administrators", AccountType: sys.SidTypeAlias},
+		{SID: "S-1-5-32-544", Domain: "BUILTIN", Account: "Administrators", AccountType: winevent.SidTypeAlias},
 		{SID: "S-1-5-113", Domain: "NT AUTHORITY", Account: "Local Account"},
 		{SID: "", Assert: assertInvalidSID},
 		{SID: "Not a SID", Assert: assertInvalidSID},

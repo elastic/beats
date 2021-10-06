@@ -109,12 +109,12 @@ class Proc(object):
         try:
             self.proc.terminate()
             self.proc.kill()
-        except:
+        except BaseException:
             pass
         # Ensure the output is closed.
         try:
             self.output.close()
-        except:
+        except BaseException:
             pass
 
 
@@ -180,7 +180,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         proc = self.start_beat(cmd=cmd, config=config, output=output,
                                logging_args=logging_args,
                                extra_args=extra_args, env=env)
-        if exit_code != None:
+        if exit_code is not None:
             return proc.check_wait(exit_code)
 
         return proc.wait()
@@ -276,7 +276,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 try:
                     jsons.append(self.flatten_object(json.loads(
                         line, object_pairs_hook=self.json_raise_on_duplicates), []))
-                except:
+                except BaseException:
                     print("Fail to load the json {}".format(line))
                     raise
 
@@ -342,7 +342,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                 os.unlink(self.build_path + "last_run")
             os.symlink(self.build_path + "run/{}".format(self.id()),
                        self.build_path + "last_run")
-        except:
+        except BaseException:
             # symlink is best effort and can fail when
             # running tests in parallel
             pass
@@ -409,7 +409,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
         """
         Returns the number of appearances of the given string in the log file
         """
-        is_regexp = type(msg) == REGEXP_TYPE
+        is_regexp = isinstance(msg, REGEXP_TYPE)
 
         counter = 0
         if ignore_case:
@@ -741,27 +741,29 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Assert that the module explicitly sets the ECS version field.
         """
         def get_config_paths(modules_path, module, fileset):
-            pathname = os.path.abspath(modules_path +
-                                       "/" +
-                                       module +
-                                       "/" +
-                                       fileset +
-                                       "/" +
-                                       "config/*.yml")
-            return glob.glob(pathname)
+            fileset_path = os.path.abspath(modules_path +
+                                           "/" +
+                                           module +
+                                           "/" +
+                                           fileset +
+                                           "/")
+            paths = []
+            for x in ["config/*.yml", "ingest/*.yml", "ingest/*.json"]:
+                pathname = os.path.join(fileset_path, x)
+                paths.extend(glob.glob(pathname))
+
+            return paths
 
         def is_ecs_version_set(path):
             # parsing the yml file would be better but go templates in
             # the file make that difficult
             with open(path) as fhandle:
                 for line in fhandle:
-                    if re.search("ecs\.version", line):
+                    if re.search(r"ecs\.version", line):
                         return True
             return False
 
-        errors = []
         for cfg_path in get_config_paths(self.modules_path, module, fileset):
-            if not is_ecs_version_set(cfg_path):
-                errors.append("{}".format(cfg_path))
-        if len(errors) > 0:
-            raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))
+            if is_ecs_version_set(cfg_path):
+                return
+        raise Exception("{}/{} ecs.version not explicitly set in config or pipeline".format(module, fileset))

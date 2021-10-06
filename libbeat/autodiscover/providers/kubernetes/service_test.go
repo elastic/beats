@@ -26,6 +26,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -232,6 +233,7 @@ func TestGenerateHints_Service(t *testing.T) {
 }
 
 func TestEmitEvent_Service(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
 	name := "metricbeat"
 	namespace := "default"
 	clusterIP := "192.168.0.1"
@@ -279,7 +281,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"host":     "192.168.0.1",
 				"id":       uid,
 				"provider": UUID,
-				"port":     8080,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
 						"name": "metricbeat",
@@ -366,7 +367,6 @@ func TestEmitEvent_Service(t *testing.T) {
 				"stop":     true,
 				"host":     "",
 				"id":       uid,
-				"port":     8080,
 				"provider": UUID,
 				"kubernetes": common.MapStr{
 					"service": common.MapStr{
@@ -397,7 +397,7 @@ func TestEmitEvent_Service(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil)
+			metaGen := metadata.NewServiceMetadataGenerator(common.NewConfig(), nil, nil, client)
 
 			p := &Provider{
 				config:    defaultConfig(),

@@ -1,0 +1,53 @@
+- name: anomali
+  type: group
+  description: >
+    Fields for Anomali Threat Intel
+  fields:
+  - name: id
+    type: keyword
+    description: >
+      The ID of the indicator.
+  - name: name
+    type: keyword
+    description: >
+      The name of the indicator.
+  - name: pattern
+    type: keyword
+    description: >
+      The pattern ID of the indicator.
+  - name: valid_from
+    type: date
+    description: >
+      When the indicator was first found or is considered valid.
+  - name: modified
+    type: date
+    description: >
+      When the indicator was last modified
+  - name: labels
+    type: keyword
+    description: >
+      The labels related to the indicator
+  - name: indicator
+    type: keyword
+    description: >
+      The value of the indicator, for example if the type is domain, this would be the value.
+  - name: description
+    type: keyword
+    description: >
+      A description of the indicator.
+  - name: title
+    type: keyword
+    description: >
+      Title describing the indicator.
+  - name: content
+    type: keyword
+    description: >
+      Extra text or descriptive content related to the indicator.
+  - name: type
+    type: keyword
+    description: >
+      The indicator type, can for example be "domain, email, FileHash-SHA256".
+  - name: object_marking_refs
+    type: keyword
+    description: >
+      The STIX reference object.

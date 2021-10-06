@@ -1,13 +1,15 @@
 # coding=utf-8
 
-from filebeat import BaseTest
-import os
-import codecs
-import time
 import base64
+import codecs
 import io
+import os
+import platform
 import re
+import time
 import unittest
+
+from filebeat import BaseTest
 from parameterized import parameterized
 
 """
@@ -17,6 +19,7 @@ Test Harvesters
 
 class Test(BaseTest):
 
+    @unittest.skipIf(platform.system() == 'Windows', 'Flaky test: https://github.com/elastic/beats/issues/22613')
     def test_close_renamed(self):
         """
         Checks that a file is closed when its renamed / rotated
@@ -367,7 +370,7 @@ class Test(BaseTest):
         # Wait until harvester is closed
         self.wait_until(
             lambda: self.log_contains(
-                "Stopping harvester for file"),
+                "Stopping harvester."),
             max_timeout=15)
 
         # Write 1 line -> truncation

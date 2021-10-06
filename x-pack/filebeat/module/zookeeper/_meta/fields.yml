@@ -1,0 +1,10 @@
+- key: zookeeper
+  title: "ZooKeeper"
+  release: beta
+  description: >
+    ZooKeeper Module
+  fields:
+    - name: zookeeper
+      type: group
+      description: >
+      fields:

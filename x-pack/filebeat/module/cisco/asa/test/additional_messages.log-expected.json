@@ -31,18 +31,24 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 0,
+        "network.community_id": "1:Fw2gM6G3TtQ3pHWsZKBU6LW96pQ=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "net",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.5.4",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -86,18 +92,24 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 162,
+        "network.community_id": "1:IVpSg0ysDmubwwgwjXBIZ47C7h0=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "net",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.5.4",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -110,6 +122,8 @@
         ]
     },
     {
+        "cisco.asa.icmp_code": 3,
+        "cisco.asa.icmp_type": 3,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
@@ -140,9 +154,13 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "10.10.10.10",
             "192.168.2.2",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -163,12 +181,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T17:51:17.000-02:00",
+        "event.end": "2021-05-05T17:51:17.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-609002: Teardown local-host net:192.168.2.2 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T19:51:17.000Z",
+        "event.start": "2021-05-05T19:51:17.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -179,11 +197,14 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 466,
-        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2"
         ],
@@ -218,11 +239,14 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 557,
-        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "192.168.2.2"
         ],
@@ -235,6 +259,8 @@
         ]
     },
     {
+        "cisco.asa.icmp_code": 1,
+        "cisco.asa.icmp_type": 3,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
@@ -265,9 +291,13 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "10.10.10.10",
             "192.168.2.2",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -310,16 +340,23 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 770,
-        "network.transport": "tcp flow",
+        "network.community_id": "1:fZKugXq2jG4PzddJfuy6XDBSNb4=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
         "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.5.4",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -362,14 +399,18 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 932,
+        "network.community_id": "1:RAjPAJDWj8kCZQnmEJzqMl9E6h8=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "net",
+        "observer.egress.interface.name": "fw109",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw109",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.192.18.4",
             "10.192.70.66"
@@ -398,9 +439,11 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-7-710005: UDP request discarded from 192.168.2.2/68 to fw111:10.10.10.10/67",
+        "event.outcome": "failure",
         "event.severity": 7,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
@@ -408,16 +451,20 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1119,
+        "network.community_id": "1:7GE6gaRtd6w4KEJWhDLHwfgp1Do=",
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -457,15 +504,18 @@
         "log.level": "informational",
         "log.offset": 1223,
         "network.protocol": "ftp",
-        "observer.egress.interface.name": "net",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.192.18.4"
+            "10.192.18.4",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -501,6 +551,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -531,11 +584,14 @@
         "log.offset": 1492,
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -543,9 +599,10 @@
         ]
     },
     {
+        "cisco.asa.icmp_code": 0,
+        "cisco.asa.icmp_type": 8,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302021",
-        "cisco.asa.source_username": "type",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
         "event.action": "flow-expiration",
@@ -568,15 +625,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 1722,
+        "network.community_id": "1:adLbp2MSbpgtKlYEN938sSARKPs=",
         "network.iana_number": 1,
         "network.transport": "icmp",
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -610,11 +672,14 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1859,
-        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10"
         ],
@@ -636,12 +701,12 @@
         "event.code": 609002,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:24:31.000-02:00",
+        "event.end": "2021-05-05T18:24:31.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-609002: Teardown local-host identity:10.10.10.10 duration 0:00:00",
         "event.severity": 7,
-        "event.start": "2020-05-05T20:24:31.000Z",
+        "event.start": "2021-05-05T20:24:31.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -652,11 +717,14 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 1930,
-        "observer.egress.interface.name": "identity",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "identity",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10"
         ],
@@ -699,9 +767,13 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "10.10.10.10",
             "10.192.46.90",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.192.46.90",
@@ -713,6 +785,8 @@
         ]
     },
     {
+        "cisco.asa.icmp_code": 3,
+        "cisco.asa.icmp_type": 3,
         "cisco.asa.mapped_source_ip": "8.8.8.8",
         "cisco.asa.message_id": "302020",
         "destination.address": "10.10.10.10",
@@ -743,9 +817,13 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "10.10.10.10",
             "192.168.2.2",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -771,12 +849,13 @@
         "event.code": 302014,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302014: Teardown TCP connection 2960892904 for out111:10.10.10.10/443 to fw111:192.168.2.2/55225 duration 0:00:00 bytes 0 TCP Reset-I",
+        "event.reason": "TCP Reset-I",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -788,14 +867,18 @@
         "log.level": "informational",
         "log.offset": 2298,
         "network.bytes": 0,
+        "network.community_id": "1:4wndP8OTPk0tlCwv5mj9vURDLQ0=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "out111",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "out111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -841,18 +924,23 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2462,
+        "network.community_id": "1:N0ZlFq5yxkndvN9h3uigv6XgVms=",
         "network.direction": "outbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "intfacename",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "net",
+        "observer.ingress.interface.name": "intfacename",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "10.10.10.10",
             "192.168.2.2",
-            "10.10.10.10"
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -866,7 +954,7 @@
     },
     {
         "cisco.asa.destination_interface": "out111",
-        "cisco.asa.message_id": "302012",
+        "cisco.asa.message_id": "305012",
         "cisco.asa.source_interface": "fw111",
         "destination.address": "192.168.2.2",
         "destination.ip": "192.168.2.2",
@@ -875,15 +963,15 @@
         "event.category": [
             "network"
         ],
-        "event.code": 302012,
+        "event.code": 305012,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-05-05T18:29:32.000-02:00",
+        "event.end": "2021-05-05T18:29:32.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
+        "event.original": "%ASA-6-305012: Teardown dynamic UDP translation from fw111:10.10.10.10/54230 to out111:192.168.2.2/54230 duration 0:00:00",
         "event.severity": 6,
-        "event.start": "2020-05-05T20:29:32.000Z",
+        "event.start": "2021-05-05T20:29:32.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -894,14 +982,18 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2623,
+        "network.community_id": "1:PyQWTuzAdzYav2//+TQFcJTt2os=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "fw111",
+        "observer.egress.interface.name": "out111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "out111",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -930,25 +1022,29 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-313004: Denied ICMP type=0, from laddr 10.10.10.10 on interface fw502 to 192.168.2.2: no matching session",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 2768,
+        "network.community_id": "1:adLbp2MSbpgtKlYEN938sSARKPs=",
         "network.iana_number": 1,
         "network.transport": "icmp",
-        "observer.egress.interface.name": "fw502",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw502",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -987,14 +1083,18 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 2904,
+        "network.community_id": "1:hoENwaIuofrQAf7gW+y4f0XXbxc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "fw111",
+        "observer.egress.interface.name": "out111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "out111",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1023,29 +1123,33 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106001: Inbound TCP connection denied from 192.168.2.2/43803 to 10.10.10.10/14322 flags SYN  on interface out111",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 3029,
+        "network.community_id": "1:+xI89PlchTpu6dxTMHpkmkd99Ns=",
         "network.direction": "inbound",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "out111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "out111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1067,6 +1171,7 @@
         "destination.geo.city_name": "Thousand Oaks",
         "destination.geo.continent_name": "North America",
         "destination.geo.country_iso_code": "US",
+        "destination.geo.country_name": "United States",
         "destination.geo.location.lat": 34.197,
         "destination.geo.location.lon": -118.8199,
         "destination.geo.region_iso_code": "US-CA",
@@ -1080,12 +1185,12 @@
         "event.code": 302016,
         "event.dataset": "cisco.asa",
         "event.duration": 124000000000,
-        "event.end": "2020-05-05T18:40:50.000-02:00",
+        "event.end": "2021-05-05T18:40:50.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-302016: Teardown UDP connection 1671727 for intfacename:10.10.10.10/161 to net:192.186.2.2/53356 duration 0:02:04 bytes 64585",
         "event.severity": 2,
-        "event.start": "2020-05-05T20:38:46.000Z",
+        "event.start": "2021-05-05T20:38:46.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -1097,14 +1202,18 @@
         "log.level": "critical",
         "log.offset": 3172,
         "network.bytes": 64585,
+        "network.community_id": "1:eOIoJBMMmanddR7cRZ0I9vTVI7o=",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "intfacename",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "net",
+        "observer.ingress.interface.name": "intfacename",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.186.2.2"
@@ -1150,18 +1259,24 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 3328,
+        "network.community_id": "1:QsMj86uzy+H1c1pPwrevpSOTh6Q=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "intfacename",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "net",
+        "observer.ingress.interface.name": "intfacename",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.8.4",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -1205,18 +1320,24 @@
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 3491,
+        "network.community_id": "1:QsMj86uzy+H1c1pPwrevpSOTh6Q=",
         "network.direction": "outbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "intfacename",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "net",
+        "observer.ingress.interface.name": "intfacename",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
-            "192.168.2.2"
+            "192.168.2.2",
+            "8.8.8.4",
+            "8.8.8.8"
         ],
         "service.type": "cisco",
         "source.address": "10.10.10.10",
@@ -1245,26 +1366,30 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src fw111:10.10.10.10/64388 dst out111:192.168.2.2/443 by access-group \"out1111_access_out\" [0x47e21ef4, 0x47e21ef4]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 3654,
+        "network.community_id": "1:mPK7q/c5ZVhrh2fX6Uqp5314u3M=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "fw111",
+        "observer.egress.interface.name": "out111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "out111",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1292,12 +1417,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106021: Deny TCP reverse path check from 192.168.2.2 to 10.10.10.10 on interface fw111",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -1306,14 +1431,17 @@
         "log.offset": 3818,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1338,29 +1466,33 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-2-106006: Deny inbound UDP from 192.168.2.2/65020 to 10.10.10.10/65020 on interface fw111",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 2,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "critical",
         "log.offset": 3935,
+        "network.community_id": "1:CQXm0MA6TgkTzvcatvgQvikqqes=",
         "network.direction": "inbound",
         "network.iana_number": 17,
         "network.transport": "udp",
-        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1386,10 +1518,11 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/53089 to 10.10.10.10/443 flags FIN PSH ACK  on interface out111",
-        "event.outcome": "tcp",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
@@ -1397,15 +1530,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4053,
-        "network.transport": "(no",
-        "observer.egress.interface.name": "out111",
+        "network.community_id": "1:CctaOB5wLrJrIATPwYjXODlSpRk=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "out111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1431,10 +1569,11 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/17127 to 10.10.10.10/443 flags PSH ACK  on interface out111",
-        "event.outcome": "tcp",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
@@ -1442,15 +1581,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4197,
-        "network.transport": "(no",
-        "observer.egress.interface.name": "out111",
+        "network.community_id": "1:ghA7Jv5D0sCP4HhHb948hjqh3H4=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "out111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1476,10 +1620,11 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106015: Deny TCP (no connection) from 192.168.2.2/24223 to 10.10.10.10/443 flags RST  on interface fw111",
-        "event.outcome": "tcp",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
@@ -1487,15 +1632,20 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4337,
-        "network.transport": "(no",
-        "observer.egress.interface.name": "fw111",
+        "network.community_id": "1:daEI7UiyuAFNVP1xsUsb/AHJ/1I=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1507,17 +1657,178 @@
         ]
     },
     {
+        "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw1111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built director stub TCP connection for fw1111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4472,
+        "network.community_id": "1:1Rjth0DOphFZyLUBP572S4VdEu0=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw1111",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built forwarder  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.168.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4631,
+        "network.community_id": "1:1Rjth0DOphFZyLUBP572S4VdEu0=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
+        "cisco.asa.message_id": "302022",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.1682.2.2",
+        "destination.domain": "192.1682.2.2",
+        "destination.port": 10051,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302022,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-302022: Built backup  stub TCP connection for fw111:10.10.10.10/38540 (8.8.8.5/38540) to net:192.1682.2.2/10051 (8.8.8.8/10051)",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 4791,
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "192.1682.2.2",
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10"
+        ],
+        "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 38540,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "net",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "fw111",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 10051,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for fw111:10.10.10.10/39210 to net:192.168.2.2/10051 duration 0:00:00 forwarded bytes 0 Cluster flow with CLU closed on owner",
+        "event.reason": "Cluster flow with CLU closed on owner",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1527,28 +1838,53 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 4949,
+        "network.bytes": 0,
+        "network.community_id": "1:A692g/lxHLbLsT0d0M1RFfiHIs0=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 39210,
         "tags": [
             "cisco-asa",
             "forwarded"
         ]
     },
     {
+        "cisco.asa.destination_interface": "unknown",
         "cisco.asa.message_id": "302023",
+        "cisco.asa.source_interface": "net",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 39222,
         "event.action": "firewall-rule",
         "event.category": [
             "network"
         ],
         "event.code": 302023,
         "event.dataset": "cisco.asa",
+        "event.duration": 0,
+        "event.end": "2021-05-05T19:02:58.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302023: Teardown stub TCP connection for net:10.10.10.10/10051 to unknown:192.168.2.2/39222 duration 0:00:00 forwarded bytes 0 Forwarding or redirect flow removed to create director or backup flow",
+        "event.reason": "Forwarding or redirect flow removed to create director or backup flow",
         "event.severity": 6,
+        "event.start": "2021-05-05T21:02:58.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -1558,11 +1894,27 @@
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5142,
+        "network.bytes": 0,
+        "network.community_id": "1:pcILvYGm5J7rxuqU5/TRGZGGe3E=",
+        "network.iana_number": 6,
+        "network.transport": "tcp",
+        "observer.egress.interface.name": "unknown",
         "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "10.10.10.10",
+            "192.168.2.2"
+        ],
         "service.type": "cisco",
+        "source.address": "10.10.10.10",
+        "source.ip": "10.10.10.10",
+        "source.port": 10051,
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -1595,6 +1947,12 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.user": [
+            "aaaa"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1628,6 +1986,12 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.user": [
+            "aaaa"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1651,29 +2015,33 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list fw111_out permitted tcp ptaaac/192.168.2.2(62157) -> fw111/10.10.10.10(3452) hit-cnt 1 first hit [0x38ff326b, 0x00000000]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5571,
+        "network.community_id": "1:XgYjYk8hbPPlEnBcHqCD172wQQE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "ptaaac",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "ptaaac",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1701,29 +2069,33 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-106100: access-list fw111_out permitted tcp net/192.168.2.2(49033) -> fw111/10.10.10.10(6007) hit-cnt 2 300-second interval [0x38ff326b, 0x00000000]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "informational",
         "log.offset": 5743,
+        "network.community_id": "1:a99mceIcFv0NTz6Aw/+bwE1TnPA=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "net",
+        "observer.egress.interface.name": "fw111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "fw111",
+        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "192.168.2.2",
-            "10.10.10.10"
+            "10.10.10.10",
+            "192.168.2.2"
         ],
         "service.type": "cisco",
         "source.address": "192.168.2.2",
@@ -1759,6 +2131,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1790,6 +2165,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1811,9 +2189,11 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-7-710005: UDP request discarded from 10.10.10.10/1985 to net:192.168.2.2/1985",
+        "event.outcome": "failure",
         "event.severity": 7,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
@@ -1821,13 +2201,17 @@
         "input.type": "log",
         "log.level": "debug",
         "log.offset": 6256,
+        "network.community_id": "1:pXZbIlTv2J4XdRhqORC4IQqpKKg=",
         "network.iana_number": 17,
         "network.transport": "udp",
+        "observer.egress.interface.name": "net",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "net",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -1866,6 +2250,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1897,6 +2284,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -1907,7 +2297,7 @@
         "cisco.asa.destination_interface": "fw111",
         "cisco.asa.message_id": "106014",
         "cisco.asa.source_interface": "fw111",
-        "destination.address": "10.10.10.10(type",
+        "destination.address": "10.10.10.10",
         "destination.ip": "10.10.10.10",
         "event.action": "firewall-rule",
         "event.category": [
@@ -1918,18 +2308,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-106014: Deny inbound icmp src fw111:10.10.10.10 dst fw111:10.10.10.10(type 8, code 0)",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 6722,
+        "network.community_id": "1:4MHSMLtBw+4q7Wke3ztBRVwtgt0=",
         "network.direction": "inbound",
         "network.iana_number": 1,
         "network.transport": "icmp",
@@ -1939,8 +2330,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -1983,6 +2376,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -2005,18 +2401,19 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-106010: Deny inbound sctp src fw111:10.10.10.10/5114 dst fw111:10.10.10.10/2",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
         "log.offset": 7071,
+        "network.community_id": "1:frDwW4LN1XFwCsYClx5AmXSlEBE=",
         "network.direction": "inbound",
         "network.transport": "sctp",
         "observer.egress.interface.name": "fw111",
@@ -2025,8 +2422,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.10.10.10",
             "10.10.10.10"
         ],
         "service.type": "cisco",
@@ -2064,14 +2463,18 @@
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 7178,
+        "network.community_id": "1:gZP3lWRSgL55d5cZvFu18yXen5M=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "fw111",
+        "observer.egress.interface.name": "out111",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "out111",
+        "observer.ingress.interface.name": "fw111",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.10",
             "192.168.2.2"
@@ -2098,12 +2501,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.20.30.40 Accessed URL 10.20.30.40:http://10.20.30.40/",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2114,8 +2517,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2125,7 +2530,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.message_id": "304001",
@@ -2140,12 +2548,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.20.30.40 Accessed URL someuser@10.20.30.40:http://10.20.30.40/IOFUHSIU98[0]",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2156,8 +2564,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2167,7 +2577,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/IOFUHSIU98[0]"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/IOFUHSIU98[0]",
+        "url.path": "/IOFUHSIU98[0]",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.message_id": "304001",
@@ -2182,12 +2595,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.20.30.40 Accessed JAVA URL 10.20.30.40:http://10.20.30.40/some/longer/url-asd-er9789870[0]_=23",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2198,8 +2611,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2209,7 +2624,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/some/longer/url-asd-er9789870[0]_=23"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/some/longer/url-asd-er9789870[0]_=23",
+        "url.path": "/some/longer/url-asd-er9789870[0]_=23",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.message_id": "304001",
@@ -2224,12 +2642,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-304001: 10.20.30.40 Accessed JAVA URL someuser@10.20.30.40:http://10.20.30.40/",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2240,8 +2658,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "10.20.30.40",
             "10.20.30.40"
         ],
         "service.type": "cisco",
@@ -2251,7 +2671,10 @@
             "cisco-asa",
             "forwarded"
         ],
-        "url.original": "http://10.20.30.40/"
+        "url.domain": "10.20.30.40",
+        "url.original": "http://10.20.30.40/",
+        "url.path": "/",
+        "url.scheme": "http"
     },
     {
         "cisco.asa.connection_id": "2751765169",
@@ -2264,6 +2687,7 @@
         "destination.geo.city_name": "Clermont-Ferrand",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "FR",
+        "destination.geo.country_name": "France",
         "destination.geo.location.lat": 45.7838,
         "destination.geo.location.lon": 3.0966,
         "destination.geo.region_iso_code": "FR-63",
@@ -2277,12 +2701,13 @@
         "event.code": 302304,
         "event.dataset": "cisco.asa",
         "event.duration": 3602000000000,
-        "event.end": "2020-04-27T04:12:23.000-02:00",
+        "event.end": "2021-04-27T04:12:23.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-302304: Teardown TCP state-bypass connection 2751765169 from server.deflan:1.2.3.4/54242 to server.deflan:2.3.4.5/9101 duration 1:00:02 bytes 245 Connection timeout",
+        "event.reason": "Connection timeout",
         "event.severity": 6,
-        "event.start": "2020-04-27T05:12:21.000Z",
+        "event.start": "2021-04-27T05:12:21.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "connection",
@@ -2294,6 +2719,7 @@
         "log.level": "informational",
         "log.offset": 7808,
         "network.bytes": 245,
+        "network.community_id": "1:GUlUhGicslkTpg27XLqbp4L0H68=",
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "server.deflan",
@@ -2302,6 +2728,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "1.2.3.4",
             "2.3.4.5"
@@ -2311,6 +2740,7 @@
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
         "source.geo.location.lat": 55.7527,
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
@@ -2339,26 +2769,30 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-106023: Deny tcp src outside:10.10.10.2/56444 dst srv:192.168.2.2/51635(testhostname.domain) by access-group \"global_access_1\"",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
         "log.offset": 8003,
+        "network.community_id": "1:B0rqhFg9+Gx1GmU4JRhiyO3+xmE=",
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "outside",
+        "observer.egress.interface.name": "srv",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "srv",
+        "observer.ingress.interface.name": "outside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.10.2",
             "192.168.2.2"
@@ -2383,6 +2817,7 @@
         "destination.geo.city_name": "Riga",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "LV",
+        "destination.geo.country_name": "Latvia",
         "destination.geo.location.lat": 56.9496,
         "destination.geo.location.lon": 24.0978,
         "destination.geo.region_iso_code": "LV-RIX",
@@ -2398,12 +2833,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-5-106100: access-list testrulename denied tcp insideintf/somedomainname.local(27218) -> OUTSIDE/195.122.12.242(53) hit-cnt 1 first hit [0x16847359, 0x00000000]",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2412,12 +2847,16 @@
         "log.offset": 8160,
         "network.iana_number": 6,
         "network.transport": "tcp",
-        "observer.egress.interface.name": "insideintf",
+        "observer.egress.interface.name": "OUTSIDE",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.ingress.interface.name": "insideintf",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01",
+            "somedomainname.local"
+        ],
         "related.ip": [
             "195.122.12.242"
         ],
@@ -2445,6 +2884,7 @@
         "event.severity": 5,
         "event.timezone": "-02:00",
         "event.type": [
+            "allowed",
             "info"
         ],
         "fileset.name": "asa",
@@ -2456,6 +2896,10 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "console",
+            "dev01"
+        ],
         "service.type": "cisco",
         "source.address": "console",
         "source.domain": "console",
@@ -2491,8 +2935,14 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "enable_15"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2530,6 +2980,12 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.user": [
+            "enable_15"
+        ],
         "service.type": "cisco",
         "tags": [
             "cisco-asa",
@@ -2550,12 +3006,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-605004: Login denied from 10.10.1.212/51923 to FCD-FS-LAN:10.10.1.254/https for user \"*****\"",
-        "event.outcome": "deny",
+        "event.outcome": "failure",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "denied"
+            "denied",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2563,14 +3019,20 @@
         "log.level": "informational",
         "log.offset": 8623,
         "network.protocol": "https",
+        "observer.egress.interface.name": "FCD-FS-LAN",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "FCD-FS-LAN",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.1.212",
             "10.10.1.254"
+        ],
+        "related.user": [
+            "*****"
         ],
         "service.type": "cisco",
         "source.address": "10.10.1.212",
@@ -2609,8 +3071,14 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2634,12 +3102,12 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-6-605005: Login permitted from 10.10.0.87/6651 to FCD-FS-LAN:10.10.1.254/ssh for user \"admin\"",
-        "event.outcome": "allow",
+        "event.outcome": "success",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
-            "info",
-            "allowed"
+            "allowed",
+            "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
@@ -2647,14 +3115,20 @@
         "log.level": "informational",
         "log.offset": 8849,
         "network.protocol": "ssh",
+        "observer.egress.interface.name": "FCD-FS-LAN",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "FCD-FS-LAN",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87",
             "10.10.1.254"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2693,8 +3167,14 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "10.10.0.87"
+        ],
+        "related.user": [
+            "admin"
         ],
         "service.type": "cisco",
         "source.address": "10.10.0.87",
@@ -2729,6 +3209,9 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "91.240.17.178"
         ],
@@ -2739,6 +3222,7 @@
         "source.geo.city_name": "London",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
         "source.geo.location.lat": 51.5888,
         "source.geo.location.lon": -0.0247,
         "source.geo.region_iso_code": "GB-ENG",
@@ -2758,6 +3242,7 @@
         "destination.geo.city_name": "London",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5888,
         "destination.geo.location.lon": -0.0247,
         "destination.geo.region_iso_code": "GB-ENG",
@@ -2770,12 +3255,12 @@
         "event.code": 113019,
         "event.dataset": "cisco.asa",
         "event.duration": 0,
-        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.end": "2021-04-27T02:03:03.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
         "event.severity": 4,
-        "event.start": "2020-04-27T04:03:03.000Z",
+        "event.start": "2021-04-27T04:03:03.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -2789,7 +3274,13 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
+            "91.240.17.178"
+        ],
+        "related.user": [
             "91.240.17.178"
         ],
         "service.type": "cisco",
@@ -2801,8 +3292,9 @@
         ]
     },
     {
-        "cisco.asa.assigned_ip": "8.8.4.4",
+        "cisco.asa.assigned_ip": "192.168.50.5",
         "cisco.asa.message_id": "722051",
+        "cisco.asa.webvpn.group_name": "VPN5Policy",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -2811,7 +3303,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-4-722051: Group some-policy User testuser IP 8.8.8.8 IPv4 Address 8.8.4.4 IPv6 address 2001:4860:4860::8888 assigned to session",
+        "event.original": "%ASA-4-722051: Group <VPN5Policy> User <john> IP <192.168.50.3> IPv4 Address <192.168.50.5> IPv6 address <::> assigned to session",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2826,8 +3318,59 @@
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.50.3"
+        ],
+        "related.user": [
+            "john"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.168.50.3",
+        "source.ip": "192.168.50.3",
+        "source.user.name": "john",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "716002",
+        "cisco.asa.webvpn.group_name": "another-policy",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 716002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.",
+        "event.reason": "User Requested",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 9680,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "8.8.8.8"
+        ],
+        "related.user": [
+            "testuser"
         ],
         "service.type": "cisco",
         "source.address": "8.8.8.8",
@@ -2835,6 +3378,7 @@
         "source.as.organization.name": "Google LLC",
         "source.geo.continent_name": "North America",
         "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
         "source.geo.location.lat": 37.751,
         "source.geo.location.lon": -97.822,
         "source.ip": "8.8.8.8",
@@ -2846,6 +3390,7 @@
     },
     {
         "cisco.asa.message_id": "716002",
+        "cisco.asa.webvpn.group_name": "another-policy",
         "event.action": "firewall-rule",
         "event.category": [
             "network"
@@ -2854,7 +3399,8 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-716002: Group another-policy User testuser IP 8.8.8.8 WebVPN session terminated: User Requested.",
+        "event.original": "%ASA-6-716002: Group another-policy User alice IP 192.168.50.1 WebVPN session terminated: Idle timeout.",
+        "event.reason": "Idle timeout",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -2864,24 +3410,24 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "informational",
-        "log.offset": 9683,
+        "log.offset": 9807,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
-            "8.8.8.8"
+            "192.168.50.1"
+        ],
+        "related.user": [
+            "alice"
         ],
         "service.type": "cisco",
-        "source.address": "8.8.8.8",
-        "source.as.number": 15169,
-        "source.as.organization.name": "Google LLC",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
-        "source.ip": "8.8.8.8",
-        "source.user.name": "testuser",
+        "source.address": "192.168.50.1",
+        "source.ip": "192.168.50.1",
+        "source.user.name": "alice",
         "tags": [
             "cisco-asa",
             "forwarded"
@@ -2896,6 +3442,7 @@
         "destination.geo.city_name": "Stoke Newington",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "GB",
+        "destination.geo.country_name": "United Kingdom",
         "destination.geo.location.lat": 51.5638,
         "destination.geo.location.lon": -0.0765,
         "destination.geo.region_iso_code": "GB-HCK",
@@ -2911,23 +3458,29 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-3-710003: TCP access denied by ACL from 104.46.88.19/6370 to outside:195.74.114.34/23",
+        "event.outcome": "failure",
         "event.severity": 3,
         "event.timezone": "-02:00",
         "event.type": [
+            "denied",
             "info"
         ],
         "fileset.name": "asa",
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "error",
-        "log.offset": 9810,
+        "log.offset": 9934,
+        "network.community_id": "1:9NRUY+1nxDxjlLBwQoakpBYA9sc=",
         "network.iana_number": 6,
         "network.transport": "tcp",
+        "observer.egress.interface.name": "outside",
         "observer.hostname": "dev01",
-        "observer.ingress.interface.name": "outside",
         "observer.product": "asa",
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
         "related.ip": [
             "104.46.88.19",
             "195.74.114.34"
@@ -2939,12 +3492,1128 @@
         "source.geo.city_name": "Dublin",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "IE",
+        "source.geo.country_name": "Ireland",
         "source.geo.location.lat": 53.3338,
         "source.geo.location.lon": -6.2488,
         "source.geo.region_iso_code": "IE-L",
         "source.geo.region_name": "Leinster",
         "source.ip": "104.46.88.19",
         "source.port": 6370,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "destinationInterfaceName",
+        "cisco.asa.message_id": "434004",
+        "cisco.asa.source_interface": "sourceInterfaceName",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 123123,
+        "event.action": "bypass",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 434004,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-434004: SFR requested ASA to bypass further packet redirection and process TCP flow from sourceInterfaceName:91.240.17.178/8888 to destinationInterfaceName:192.168.2.2/123123 locally",
+        "event.outcome": "unknown",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "change",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 10048,
+        "network.protocol": "tcp",
+        "observer.egress.interface.name": "destinationInterfaceName",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "sourceInterfaceName",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "source.port": 8888,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "destinationInterfaceName",
+        "cisco.asa.message_id": "434002",
+        "cisco.asa.source_interface": "sourceInterfaceName",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 514514,
+        "event.action": "drop",
+        "event.code": 434002,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-434002: SFR requested to drop TCP packet from sourceInterfaceName:91.240.17.138/8888 to destinationInterfaceName:192.168.2.2/514514",
+        "event.outcome": "unknown",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 10266,
+        "network.protocol": "tcp",
+        "observer.egress.interface.name": "destinationInterfaceName",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "sourceInterfaceName",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.138"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.138",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.138",
+        "source.port": 8888,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "110002",
+        "cisco.asa.source_interface": "sourceInterfaceName",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 123412,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 110002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-110002: Failed to locate egress interface for TCP from sourceInterfaceName:91.240.17.178/7777 to 192.168.2.2/123412",
+        "event.outcome": "failure",
+        "event.reason": "Failed to locate egress interface",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 10433,
+        "network.protocol": "tcp",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "sourceInterfaceName",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "source.port": 7777,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "destinationInterfaceName",
+        "cisco.asa.message_id": "419002",
+        "cisco.asa.source_interface": "sourceInterfaceName",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 514514,
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 419002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-419002: Duplicate TCP SYN from sourceInterfaceName:91.240.17.178/7777 to destinationInterfaceName:192.168.2.2/514514 with different initial sequence number",
+        "event.reason": "Duplicate TCP SYN with different initial sequence number",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 10584,
+        "network.protocol": "tcp",
+        "observer.egress.interface.name": "destinationInterfaceName",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "sourceInterfaceName",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "source.port": 7777,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "602303",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "event.action": "created",
+        "event.code": 602303,
+        "event.dataset": "cisco.asa",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602303: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been created.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 10775,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
+        "cisco.asa.message_id": "602304",
+        "cisco.asa.tunnel_type": "LAN-to-LAN",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "event.action": "deleted",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 602304,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xF81283) between 91.240.17.178 and 192.168.2.2 (user= admin) has been deleted.",
+        "event.outcome": "success",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "deletion",
+            "info",
+            "user"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 10937,
+        "network.direction": "outbound",
+        "network.type": "ipsec",
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
+        "cisco.asa.message_id": "750002",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 7777,
+        "event.action": "connection-started",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 750002,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-750002: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Received a IKE_INIT_SA request",
+        "event.reason": "Received a IKE_INIT_SA request",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "start"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 11099,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "source.port": 7777,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
+        "cisco.asa.message_id": "750003",
+        "destination.address": "192.168.2.2",
+        "destination.ip": "192.168.2.2",
+        "destination.port": 7777,
+        "event.action": "error",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 750003,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-750003: Local:91.240.17.178:7777 Remote:192.168.2.2:7777 Username:admin Negotiation aborted due to ERROR: Failed to locate an item in the database",
+        "event.reason": "Negotiation aborted due to Failed to locate an item in the database",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 11237,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.168.2.2",
+            "91.240.17.178"
+        ],
+        "related.user": [
+            "admin"
+        ],
+        "service.type": "cisco",
+        "source.address": "91.240.17.178",
+        "source.as.number": 201126,
+        "source.as.organization.name": "CDW Ltd",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5888,
+        "source.geo.location.lon": -0.0247,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "91.240.17.178",
+        "source.port": 7777,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "admin"
+    },
+    {
+        "cisco.asa.message_id": "713120",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713120,
+        "event.dataset": "cisco.asa",
+        "event.id": "bbe383e88",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-713120: Group = 100.60.140.10, IP = 192.128.1.1, PHASE 2 COMPLETED (msgid=bbe383e88)",
+        "event.outcome": "success",
+        "event.reason": "PHASE 2 COMPLETED",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "allowed",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 11419,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.128.1.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.128.1.1",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "192.128.1.1",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713202",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713202,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-713202: IP = 192.64.157.61, Duplicate first packet detected. Ignoring packet.",
+        "event.reason": "Duplicate first packet detected",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 11539,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.64.157.61"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.64.157.61",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "192.64.157.61",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713905",
+        "event.action": "error",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713905,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-713905: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!",
+        "event.outcome": "failure",
+        "event.reason": "All IPSec SA proposals found unacceptable!",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "error"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 11652,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.128.1.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.128.1.1",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "192.128.1.1",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713904",
+        "event.action": "error",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713904,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-713904: All IPSec SA proposals found unacceptable!",
+        "event.outcome": "failure",
+        "event.reason": "All IPSec SA proposals found unacceptable!",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "error"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 11779,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713903",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713903,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-713903: IP = 192.128.1.1, All IPSec SA proposals found unacceptable!",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 11865,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713902",
+        "event.action": "error",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713902,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-713902: Group = 100.60.140.10, All IPSec SA proposals found unacceptable!",
+        "event.outcome": "failure",
+        "event.reason": "All IPSec SA proposals found unacceptable!",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "error"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 11969,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.message_id": "713901",
+        "event.action": "error",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713901,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-6-713901: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!",
+        "event.outcome": "failure",
+        "event.reason": "All IPSec SA proposals found unacceptable!",
+        "event.severity": 6,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "error"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "informational",
+        "log.offset": 12078,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "192.128.1.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "192.128.1.1",
+        "source.geo.continent_name": "North America",
+        "source.geo.country_iso_code": "US",
+        "source.geo.country_name": "United States",
+        "source.geo.location.lat": 37.751,
+        "source.geo.location.lon": -97.822,
+        "source.ip": "192.128.1.1",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "inside",
+        "cisco.asa.message_id": "106023",
+        "cisco.asa.rule_name": "inbound",
+        "cisco.asa.source_interface": "outside",
+        "destination.address": "172.31.98.44",
+        "destination.ip": "172.31.98.44",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106023,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-106023: Deny protocol 47 src outside:100.66.124.24 dst inside:172.31.98.44 by access-group \"inbound\"",
+        "event.outcome": "failure",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12205,
+        "network.community_id": "1:Uo11LCySQ1S0c9jtHZVIb4Pm/2k=",
+        "network.iana_number": 47,
+        "observer.egress.interface.name": "inside",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "outside",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "100.66.124.24",
+            "172.31.98.44"
+        ],
+        "service.type": "cisco",
+        "source.address": "100.66.124.24",
+        "source.ip": "100.66.124.24",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.destination_interface": "OUTSIDE",
+        "cisco.asa.message_id": "106023",
+        "cisco.asa.rule_name": "OUTSIDE_in",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "destination.address": "fe00:afa0::1",
+        "destination.ip": "fe00:afa0::1",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 106023,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-106023: Deny icmp src OUTSIDE:2a05:d016:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group \"OUTSIDE_in\"",
+        "event.outcome": "failure",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "denied",
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12341,
+        "network.community_id": "1:VA3lwFPBuRus2kxMs1BexFp+gp4=",
+        "network.iana_number": 1,
+        "network.transport": "icmp",
+        "observer.egress.interface.name": "OUTSIDE",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+            "fe00:afa0::1"
+        ],
+        "service.type": "cisco",
+        "source.address": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+        "source.as.number": 16509,
+        "source.as.organization.name": "Amazon.com, Inc.",
+        "source.geo.city_name": "Stockholm",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "SE",
+        "source.geo.country_name": "Sweden",
+        "source.geo.location.lat": 59.3333,
+        "source.geo.location.lon": 18.05,
+        "source.geo.region_iso_code": "SE-AB",
+        "source.geo.region_name": "Stockholm",
+        "source.ip": "2a05:d016:add:4002:91f2:a9b2:e09a:6fc6",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.connection_id": "123364823",
+        "cisco.asa.destination_interface": "identity",
+        "cisco.asa.message_id": "302016",
+        "cisco.asa.source_interface": "OUTSIDE",
+        "destination.address": "85.0.0.1",
+        "destination.as.number": 3303,
+        "destination.as.organization.name": "Bluewin",
+        "destination.geo.city_name": "Kolliken",
+        "destination.geo.continent_name": "Europe",
+        "destination.geo.country_iso_code": "CH",
+        "destination.geo.country_name": "Switzerland",
+        "destination.geo.location.lat": 47.3388,
+        "destination.geo.location.lon": 8.0264,
+        "destination.geo.region_iso_code": "CH-AG",
+        "destination.geo.region_name": "Aargau",
+        "destination.ip": "85.0.0.1",
+        "destination.port": 500,
+        "event.action": "flow-expiration",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 302016,
+        "event.dataset": "cisco.asa",
+        "event.duration": 332660000000000,
+        "event.end": "2020-04-27T02:03:03.000-02:00",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-302016: Teardown UDP connection 123364823 for OUTSIDE:82.0.0.1/500 to identity:85.0.0.1/500 duration 92:24:20 bytes 4671944",
+        "event.severity": 4,
+        "event.start": "2020-04-23T07:38:43.000Z",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "connection",
+            "end"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12518,
+        "network.bytes": 4671944,
+        "network.community_id": "1:rwM9yFUsWh6N2utKviU7S94dS9U=",
+        "network.iana_number": 17,
+        "network.transport": "udp",
+        "observer.egress.interface.name": "identity",
+        "observer.hostname": "dev01",
+        "observer.ingress.interface.name": "OUTSIDE",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "82.0.0.1",
+            "85.0.0.1"
+        ],
+        "service.type": "cisco",
+        "source.address": "82.0.0.1",
+        "source.as.number": 5089,
+        "source.as.organization.name": "Virgin Media Limited",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.4964,
+        "source.geo.location.lon": -0.1224,
+        "source.ip": "82.0.0.1",
+        "source.port": 500,
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "4",
+        "cisco.asa.burst.configured_rate": "8",
+        "cisco.asa.burst.cumulative_count": "19269",
+        "cisco.asa.burst.current_rate": "0",
+        "cisco.asa.burst.id": "rate-2",
+        "cisco.asa.burst.object": "Scanning",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [ Scanning] drop rate-2 exceeded. Current burst rate is 0 per second, max configured rate is 8; Current average rate is 5 per second, max configured rate is 4; Cumulative total count is 19269",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12677,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "6018",
+        "cisco.asa.burst.current_rate": "0",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "192.168.0.1",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [   192.168.0.1] drop rate-1 exceeded. Current burst rate is 0 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 6018",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 12907,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "20",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "12466",
+        "cisco.asa.burst.current_rate": "8",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "Port-5432 5432",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [     Port-5432 5432] drop rate-1 exceeded. Current burst rate is 8 per second, max configured rate is 10; Current average rate is 20 per second, max configured rate is 5; Cumulative total count is 12466",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 13142,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ]
+    },
+    {
+        "cisco.asa.burst.avg_rate": "5",
+        "cisco.asa.burst.configured_avg_rate": "5",
+        "cisco.asa.burst.configured_rate": "10",
+        "cisco.asa.burst.cumulative_count": "3054",
+        "cisco.asa.burst.current_rate": "63",
+        "cisco.asa.burst.id": "rate-1",
+        "cisco.asa.burst.object": "RDP 3389",
+        "cisco.asa.message_id": "733100",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 733100,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-4-733100: [           RDP 3389] drop rate-1 exceeded. Current burst rate is 63 per second, max configured rate is 10; Current average rate is 5 per second, max configured rate is 5; Cumulative total count is 3054",
+        "event.severity": 4,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "warning",
+        "log.offset": 13384,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "service.type": "cisco",
         "tags": [
             "cisco-asa",
             "forwarded"

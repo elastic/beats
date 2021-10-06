@@ -7,7 +7,7 @@
 
 The `add_kubernetes_metadata` processor annotates each event with relevant
 metadata based on which Kubernetes pod the event originated from.
-At startup it detects an `in_cluster` environment and caches the
+At startup, it detects an `in_cluster` environment and caches the
 Kubernetes-related metadata. Events are only annotated if a valid configuration
 is detected. If it's not able to detect a valid Kubernetes configuration,
 the events are not annotated with Kubernetes-related metadata.
@@ -19,20 +19,22 @@ Each event is annotated with:
 * Namespace
 * Labels
 
-The `add_kubernetes_metadata` processor has two basic building blocks which are:
+In addition, the node and namespace metadata are added to the pod metadata.
+
+The `add_kubernetes_metadata` processor has two basic building blocks:
 
 * Indexers
 * Matchers
 
-Indexers use pods metadata to create unique identifiers for each one of the
-pods, these identifiers help to correlate the metadata of the observed pods with
+Indexers use pod metadata to create unique identifiers for each one of the
+pods. These identifiers help to correlate the metadata of the observed pods with
 actual events. For example, the `ip_port` indexer can take a Kubernetes pod and
 create identifiers for it based on all its `pod_ip:container_port` combinations.
 
 Matchers use information in events to construct lookup keys that match the
 identifiers created by the indexers. For example, when the `fields` matcher takes
 `["metricset.host"]` as a lookup field, it would construct a lookup key with the
-value of the field `metricset.host`. When one of this lookup keys match with one
+value of the field `metricset.host`. When one of these lookup keys matches with one
 of the identifiers, the event is enriched with the metadata of the identified
 pod.
 
@@ -113,12 +115,28 @@ The `add_kubernetes_metadata` processor has the following configuration settings
 `host`:: (Optional) Specify the node to scope {beatname_lc} to in case it
 cannot be accurately detected, as when running {beatname_lc} in host network
 mode.
+`scope`:: (Optional) Specify if the processor should have visibility at the node level or at the entire cluster
+level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
+`add_resource_metadata`:: (Optional) Specify labels and annotations filters for the extra metadata coming from node and namespace.
+ `add_resource_metadata` can be done for `node` or `namespace`. By default all labels are included
+while annotations are not. These settings are useful when storing labels and annotations
+that require special handling to avoid overloading the storage output. The enrichment of `node` or `namespace` metadata
+can be individually disabled by setting `enabled: false`.
+Example:
+
+["source","yaml",subs="attributes"]
+-------------------------------------------------------------------------------------
+      add_resource_metadata:
+        namespace:
+          include_labels: ["namespacelabel1"]
+        node:
+          include_labels: ["nodelabel2"]
+          include_annotations: ["nodeannotation1"]
+-------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
-`default_indexers.enabled`:: (Optional) Enable/Disable default pod indexers, in
-case you want to specify your own.
-`default_matchers.enabled`:: (Optional) Enable/Disable default pod matchers, in
-case you want to specify your own.
+`default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
+`default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.

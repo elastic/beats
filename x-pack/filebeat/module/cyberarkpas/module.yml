@@ -1,0 +1,3 @@
+dashboards:
+  - id: eb12ef60-96f6-11eb-bbf8-d77aef8ad7a6
+    file: Filebeat-cyberarkpas-audit.json

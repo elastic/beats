@@ -1,9 +1,11 @@
 import os
 import os.path
 import pytest
+import json
 import re
 import requests
 import semver
+import shutil
 import subprocess
 import unittest
 
@@ -217,7 +219,7 @@ class Test(BaseTest):
         version = self.get_version()
         kibana_semver = semver.VersionInfo.parse(version)
         exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
-                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
+                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.ndjson")
 
         with open(exported_dashboard_path) as f:
             content = f.read()
@@ -265,13 +267,51 @@ class Test(BaseTest):
 
         assert p.returncode == 0
 
-        assert os.path.isfile("output.json") is True
+        assert os.path.isfile("output.ndjson") is True
 
-        with open('output.json') as f:
+        with open('output.ndjson') as f:
             content = f.read()
             assert "Metricbeat-system-overview" in content
 
-        os.remove("output.json")
+        os.remove("output.ndjson")
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.tag('integration')
+    def test_dev_tool_export_dashboard_by_id_to_folder(self):
+        """
+        Test dev-tools/cmd/dashboards exports dashboard and removes unsupported characters
+        and separates each asset into a file under the appropriate folder
+        """
+
+        self.test_load_dashboard()
+
+        folder_name = "my-system"
+        path = os.path.normpath(self.beat_path + "/../dev-tools/cmd/dashboards/export_dashboards.go")
+        command = path + " -kibana http://" + self.get_kibana_host() + ":" + self.get_kibana_port()
+        command = "go run " + command + " -dashboard Metricbeat-system-overview -folder " + folder_name
+
+        p = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        content, err = p.communicate()
+        print(content, err)
+
+        assert p.returncode == 0
+
+        assert os.path.isfile("output.ndjson") is False
+        assert os.path.isdir(folder_name) is True
+
+        kibana_semver = semver.VersionInfo.parse(self.get_version())
+        assets_root = os.path.join(folder_name, "_meta", "kibana", str(kibana_semver.major))
+        assert os.path.isdir(assets_root) is True
+        assert os.path.isdir(os.path.join(assets_root, "dashboard")) is True
+        assert os.path.isdir(os.path.join(assets_root, "visualization")) is True
+
+        with open(os.path.join(assets_root, "dashboard", "Metricbeat-system-overview.json")) as dashboard_file:
+            dashboard = json.load(dashboard_file)
+            for reference in dashboard["references"]:
+                reference_path = os.path.join(assets_root, reference["type"], reference["id"]+".json")
+                assert os.path.isfile(reference_path)
+
+        shutil.rmtree(folder_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -312,13 +352,13 @@ class Test(BaseTest):
 
         assert p.returncode == 0
 
-        assert os.path.isfile("output.json") is True
+        assert os.path.isfile("output.ndjson") is True
 
-        with open('output.json') as f:
+        with open('output.ndjson') as f:
             content = f.read()
             assert "Metricbeat-system-overview" in content
 
-        os.remove("output.json")
+        os.remove("output.ndjson")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -342,7 +382,7 @@ class Test(BaseTest):
         version = self.get_version()
         kibana_semver = semver.VersionInfo.parse(version)
         exported_dashboard_path = os.path.join(self.beat_path, "tests", "files", "_meta",
-                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.json")
+                                               "kibana", str(kibana_semver.major), "dashboard", "Metricbeat-system-test-overview.ndjson")
 
         with open(exported_dashboard_path) as f:
             content = f.read()

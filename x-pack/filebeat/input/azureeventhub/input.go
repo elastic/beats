@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -80,7 +81,7 @@ func NewInput(
 
 	in := &azureInput{
 		config:       config,
-		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", config.ConnectionString),
+		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString)),
 		context:      inputContext,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
@@ -234,4 +235,18 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 		}
 	}
 	return messages
+}
+
+// Strip connection string to remove sensitive information
+// A connection string should look like this:
+// Endpoint=sb://dummynamespace.servicebus.windows.net/;SharedAccessKeyName=DummyAccessKeyName;SharedAccessKey=5dOntTRytoC24opYThisAsit3is2B+OGY1US/fuL3ly=
+// This code will remove everything after ';' so key information is stripped
+func stripConnectionString(c string) string {
+	if parts := strings.SplitN(c, ";", 2); len(parts) == 2 {
+		return parts[0]
+	}
+
+	// We actually expect the string to have the documented format
+	// if we reach here something is wrong, so let's stay on the safe side
+	return "(redacted)"
 }

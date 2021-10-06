@@ -112,7 +112,7 @@ func EnsureUp(t testing.TB, service string, options ...UpOption) HostInfo {
 	// Get host information
 	host, err := compose.HostInformation(service)
 	if err != nil {
-		t.Fatalf("getting host for %s", service)
+		t.Fatalf("getting host for %s: %v", service, err)
 	}
 
 	return host

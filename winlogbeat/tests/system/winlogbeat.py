@@ -2,6 +2,7 @@ import hashlib
 import os
 import platform
 import sys
+import time
 import yaml
 
 if sys.platform.startswith("win"):
@@ -75,8 +76,17 @@ class WriteReadTest(BaseTest):
         if level is None:
             level = win32evtlog.EVENTLOG_INFORMATION_TYPE
 
-        win32evtlogutil.ReportEvent(source, eventID,
-                                    eventType=level, strings=[message], sid=sid)
+        # Retry on exception for up to 10 sec.
+        t = time.monotonic()
+        while True:
+            try:
+                win32evtlogutil.ReportEvent(source, eventID,
+                                            eventType=level, strings=[message], sid=sid)
+                break
+            except:
+                if time.monotonic() - t < 10:
+                    continue
+                raise
 
     def get_sid(self):
         if self.sid is None:
@@ -125,25 +135,26 @@ class WriteReadTest(BaseTest):
 
         return event_logs
 
-    def assert_common_fields(self, evt, msg=None, eventID=10, sid=None,
+    def assert_common_fields(self, evt, msg=None, eventID="10", sid=None,
                              level="information", extra=None):
 
         assert host_name(evt["winlog.computer_name"]).lower() == host_name(platform.node()).lower()
         assert "winlog.record_id" in evt
-        self.assertDictContainsSubset({
+        expected = {
             "winlog.event_id": eventID,
             "event.code": eventID,
             "log.level": level.lower(),
             "winlog.channel": self.providerName,
             "winlog.provider_name": self.applicationName,
             "winlog.api": self.api,
-        }, evt)
+        }
+        assert expected.items() <= evt.items()
 
         if msg is None:
             assert "message" not in evt
         else:
             self.assertEqual(evt["message"], msg)
-            self.assertDictContainsSubset({"winlog.event_data.param1": msg}, evt)
+            self.assertEqual(msg, evt.get("winlog.event_data.param1"))
 
         if sid is None:
             self.assertEqual(evt["winlog.user.identifier"], self.get_sid_string())
@@ -157,7 +168,7 @@ class WriteReadTest(BaseTest):
             assert "winlog.user.type" not in evt
 
         if extra is not None:
-            self.assertDictContainsSubset(extra, evt)
+            assert extra.items() <= evt.items()
 
 
 def host_name(fqdn):

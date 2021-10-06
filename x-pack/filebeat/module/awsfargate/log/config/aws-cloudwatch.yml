@@ -1,0 +1,63 @@
+type: aws-cloudwatch
+
+{{ if .log_group_arn }}
+log_group_arn: {{ .log_group_arn }}
+{{ end }}
+
+{{ if .log_group_name }}
+log_group_name: {{ .log_group_name }}
+{{ end }}
+
+{{ if .region_name }}
+region_name: {{ .region_name }}
+{{ end }}
+
+{{ if .start_position }}
+start_position: {{ .start_position }}
+{{ end }}
+
+{{ if .scan_frequency }}
+scan_frequency: {{ .scan_frequency }}
+{{ end }}
+
+{{ if .api_timeout }}
+api_timeout: {{ .api_timeout }}
+{{ end }}
+
+{{ if .api_sleep }}
+api_sleep: {{ .api_sleep }}
+{{ end }}
+
+{{ if .credential_profile_name }}
+credential_profile_name: {{ .credential_profile_name }}
+{{ end }}
+
+{{ if .shared_credential_file }}
+shared_credential_file: {{ .shared_credential_file }}
+{{ end }}
+
+{{ if .endpoint }}
+endpoint: {{ .endpoint }}
+{{ end }}
+
+{{ if .access_key_id }}
+access_key_id: {{ .access_key_id }}
+{{ end }}
+
+{{ if .secret_access_key }}
+secret_access_key: {{ .secret_access_key }}
+{{ end }}
+
+{{ if .session_token }}
+session_token: {{ .session_token }}
+{{ end }}
+
+{{ if .role_arn }}
+role_arn: {{ .role_arn }}
+{{ end }}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

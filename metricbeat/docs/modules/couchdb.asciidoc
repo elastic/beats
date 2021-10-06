@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: couchdb
+
 [[metricbeat-module-couchdb]]
 == CouchDB module
 
@@ -40,6 +42,9 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:5984"]
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
+It also supports the options described in <<module-http-config-options>>.
 
 [float]
 === Metricsets

@@ -1,6 +1,6 @@
 - key: azure
   title: "Azure"
-  release: beta
+  release: ga
   description: >
     Azure Module
   fields:

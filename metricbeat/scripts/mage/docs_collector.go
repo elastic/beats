@@ -158,7 +158,7 @@ func getDefaultMetricsets() (map[string][]string, error) {
 			return nil, err
 		}
 		for k, v := range msetMap {
-			masterMap[k] = v
+			masterMap[k] = append(masterMap[k], v...)
 		}
 	}
 

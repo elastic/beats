@@ -12,6 +12,9 @@ var:
     default: 9003
   - name: input
     default: syslog
+  - name: internal_zones
+  - name: external_zones
+  - name: timezone
 
 ingest_pipeline:
   - ingest/pipeline.yml

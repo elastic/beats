@@ -4,7 +4,7 @@
 - module: azure
   # All logs
   activitylogs:
-    enabled: true
+    enabled: false
     var:
       # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
       eventhub: "insights-operational-logs"
@@ -16,6 +16,16 @@
       storage_account: ""
       # the storage account key, this key will be used to authorize access to data in your storage account
       storage_account_key: ""
+
+  platformlogs:
+    enabled: false
+  #  var:
+  #    eventhub: ""
+  #    consumer_group: "$Default"
+  #    connection_string: ""
+  #    storage_account: ""
+  #    storage_account_key: ""
+
 
   auditlogs:
     enabled: false

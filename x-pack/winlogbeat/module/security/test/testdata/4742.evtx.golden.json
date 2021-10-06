@@ -3,8 +3,10 @@
     "@timestamp": "2019-12-18T16:22:12.3425087Z",
     "event": {
       "action": "changed-computer-account",
-      "category": "iam",
-      "code": 4742,
+      "category": [
+        "iam"
+      ],
+      "code": "4742",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -75,7 +77,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "-"
       },
-      "event_id": 4742,
+      "event_id": "4742",
       "keywords": [
         "Audit Success"
       ],

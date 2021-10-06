@@ -3,15 +3,17 @@
     "@timestamp": "2019-10-08T10:20:34.0535453Z",
     "event": {
       "action": "group-membership-enumerated",
-      "category": "iam",
-      "code": 4798,
+      "category": [
+        "iam"
+      ],
+      "code": "4798",
       "kind": "event",
       "module": "security",
       "outcome": "success",
       "provider": "Microsoft-Windows-Security-Auditing",
       "type": [
-        "info",
-        "user"
+        "user",
+        "info"
       ]
     },
     "host": {
@@ -47,7 +49,7 @@
         "TargetSid": "S-1-5-21-101361758-2486510592-3018839910-1005",
         "TargetUserName": "elastictest1"
       },
-      "event_id": 4798,
+      "event_id": "4798",
       "keywords": [
         "Audit Success"
       ],

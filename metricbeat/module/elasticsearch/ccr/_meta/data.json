@@ -1,39 +1,127 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "elasticsearch": {
         "ccr": {
+            "auto_follow": {
+                "failed": {
+                    "follow_indices": {
+                        "count": 0
+                    },
+                    "remote_cluster_state_requests": {
+                        "count": 0
+                    }
+                },
+                "success": {
+                    "follow_indices": {
+                        "count": 1
+                    }
+                }
+            },
+            "bytes_read": 32768,
             "follower": {
-                "global_checkpoint": -1,
-                "index": "my_index_f",
-                "operations_written": 0,
+                "global_checkpoint": 768,
+                "index": "follower_index",
+                "max_seq_no": 896,
+                "operations": {
+                    "read": {
+                        "count": 896
+                    }
+                },
+                "operations_written": 832,
+                "settings_version": 2,
                 "shard": {
                     "number": 0
                 },
                 "time_since_last_read": {
-                    "ms": 42294
+                    "ms": 8
                 }
             },
             "leader": {
-                "index": "my_index",
-                "max_seq_no": -1
+                "global_checkpoint": 1024,
+                "index": "leader_index",
+                "max_seq_no": 1536
+            },
+            "read_exceptions": [
+                {
+                    "exception": {
+                        "reason": "my_reason",
+                        "type": "my_warn"
+                    },
+                    "from_seq_no": 1234,
+                    "retries": 5
+                },
+                {
+                    "exception": {
+                        "reason": "my_reason",
+                        "type": "my_warn"
+                    },
+                    "from_seq_no": 1234,
+                    "retries": 5
+                }
+            ],
+            "requests": {
+                "failed": {
+                    "read": {
+                        "count": 0
+                    },
+                    "write": {
+                        "count": 0
+                    }
+                },
+                "outstanding": {
+                    "read": {
+                        "count": 8
+                    },
+                    "write": {
+                        "count": 2
+                    }
+                },
+                "successful": {
+                    "read": {
+                        "count": 32
+                    },
+                    "write": {
+                        "count": 16
+                    }
+                }
+            },
+            "total_time": {
+                "read": {
+                    "ms": 32768,
+                    "remote_exec": {
+                        "ms": 16384
+                    }
+                },
+                "write": {
+                    "ms": 16384
+                }
+            },
+            "write_buffer": {
+                "operation": {
+                    "count": 64
+                },
+                "size": {
+                    "bytes": 1536
+                }
             }
         },
         "cluster": {
-            "id": "3LbUkLkURz--FR-YO0wLNA",
-            "name": "es1"
+            "id": "8l_zoGznQRmtoX9iSC-goA",
+            "name": "docker-cluster"
         }
     },
+    "event": {
+        "dataset": "elasticsearch.ccr",
+        "duration": 115000,
+        "module": "elasticsearch"
+    },
     "metricset": {
-        "host": "127.0.0.1:9200",
-        "module": "elasticsearch",
         "name": "ccr",
-        "rtt": 115
+        "period": 10000
     },
     "service": {
-        "name": "elasticsearch"
+        "address": "127.0.0.1:37735",
+        "name": "elasticsearch",
+        "type": "elasticsearch"
     }
 }

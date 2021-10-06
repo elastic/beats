@@ -18,7 +18,7 @@ class Test(BaseTest):
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after"
         )
@@ -126,7 +126,7 @@ connection <0.23893.109>, channel 3 - soft error:
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after",
             max_lines=3
@@ -165,7 +165,7 @@ connection <0.23893.109>, channel 3 - soft error:
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after",
         )
@@ -210,7 +210,7 @@ connection <0.23893.109>, channel 3 - soft error:
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after",
             max_bytes=60
@@ -247,7 +247,7 @@ connection <0.23893.109>, channel 3 - soft error:
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after",
             close_timeout="2s",
@@ -303,7 +303,7 @@ connection <0.23893.109>, channel 3 - soft error:
             path=os.path.abspath(self.working_dir) + "/log/*",
             multiline=True,
             multiline_type="pattern",
-            pattern="^\[",
+            pattern=r"^\[",
             negate="true",
             match="after",
             close_timeout="2s",

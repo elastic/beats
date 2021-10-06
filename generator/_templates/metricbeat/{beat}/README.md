@@ -8,7 +8,7 @@
 To get started run the following command. This command should only be run once.
 
 ```
-make setup
+make update
 ```
 
 It will ask you for the module and metricset name. Insert the name accordingly.
@@ -64,7 +64,6 @@ git commit -m "Add the LICENSE"
 git add .gitignore
 git commit -m "Add git settings"
 git add .
-git reset -- .travis.yml
 git commit -m "Add {beat}"
 ```
 

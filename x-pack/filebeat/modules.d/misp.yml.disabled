@@ -1,20 +1,19 @@
 # Module: misp
 # Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-misp.html
 
+# Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
+
 - module: misp
   threat:
-    enabled: true
+    enabled: false
     # API key to access MISP
     #var.api_key
 
     # Array object in MISP response
-    #var.json_objects_array
+    #var.http_request_body.limit: 1000
 
     # URL of the MISP REST API
     #var.url
-   
+
     # You can also pass SSL options. For example:
-    #var.ssl: |-
-    #  {
-    #    verification_mode: none
-    #  }
+    #var.ssl.verification_mode: none

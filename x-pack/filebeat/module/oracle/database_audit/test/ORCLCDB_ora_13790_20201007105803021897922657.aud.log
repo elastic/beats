@@ -1,0 +1,183 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_ora_13790_20201007105803021897922657.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 35
+Unix process pid: 13790, image: oracle@testlab.local (TNS V1-V3)
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '261'
+ACTION :[7] 'CONNECT'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[3] '100'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '500'
+ACTION :[246] 'select sys_context('userenv', 'con_id'), sys_context('userenv', 'cdb_name'), sys_context('userenv', 'con_name'), case when sys_context('userenv', 'is_application_root') = 'YES' then 1 else 0 end into :pdbid, :cdbname, :pdbname, :approot from dual'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '380'
+ACTION :[126] 'select decode(upper(value), 'TRUE', 1, 0)   into :parmvalue   from v$parameter  where lower(name) = '_pdb_name_case_sensitive''
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '308'
+ACTION :[54] 'begin dbms_backup_restore.set_charset('AL32UTF8');end;'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '47'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '341'
+ACTION :[88] 'select distinct my.sid, sex.serial from v$mystat my, x$ksusex sex where sex.sid = my.sid'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '355'
+ACTION :[101] 'select instance_name, instance_number,         decode(parallel, 'YES', 1, 0) parallel from v$instance'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '355'
+ACTION :[101] 'select instance_name, instance_number,         decode(parallel, 'YES', 1, 0) parallel from v$instance'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '341'
+ACTION :[88] 'select distinct my.sid, sex.serial from v$mystat my, x$ksusex sex where sex.sid = my.sid'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '355'
+ACTION :[101] 'select instance_name, instance_number,         decode(parallel, 'YES', 1, 0) parallel from v$instance'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '355'
+ACTION :[101] 'select instance_name, instance_number,         decode(parallel, 'YES', 1, 0) parallel from v$instance'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '308'
+ACTION :[54] 'alter session set remote_dependencies_mode = signature'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[2] '42'
+
+Wed Oct  7 10:58:03 2020 -04:00
+LENGTH : '386'
+ACTION :[132] 'select decode(open_mode, 'MOUNTED', 0, 'READ WRITE', 1, 'READ ONLY', 1, 'READ ONLY WITH APPLY', 1, 0) into :isdbopen from v$database'
+DATABASE USER:[1] '/'
+PRIVILEGE :[6] 'SYSDBA'
+CLIENT USER:[6] 'oracle'
+CLIENT TERMINAL:[5] 'pts/0'
+STATUS:[1] '0'
+DBID:[8] '39496799'
+SESSIONID:[10] '4294967295'
+USERHOST:[13] 'testlab.local'
+CLIENT ADDRESS:[0] ''
+ACTION NUMBER:[1] '3'
+

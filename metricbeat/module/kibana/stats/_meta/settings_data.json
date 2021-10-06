@@ -1,0 +1,55 @@
+{
+    "@timestamp": "2020-10-02T16:14:24.034Z",
+    "@metadata": {
+        "beat": "metricbeat",
+        "type": "_doc",
+        "version": "8.0.0"
+    },
+    "kibana": {
+        "stats": {
+            "settings": {
+                "version": "8.0.0",
+                "index": ".kibana",
+                "port": 5601,
+                "transport_address": "0:5601",
+                "locale": "en",
+                "snapshot": true,
+                "status": "green",
+                "uuid": "0b55ab2a-5fdc-4097-9a46-a3d35e2c1dbf",
+                "name": "kibana",
+                "host": "0"
+            },
+            "elasticsearch": {
+                "cluster": {
+                    "id": "AcU_Ce_aS5W4NvGYNinnxg"
+                }
+            }
+        }
+    },
+    "ecs": {
+        "version": "1.5.0"
+    },
+    "host": {
+        "name": "mcastro"
+    },
+    "agent": {
+        "version": "8.0.0",
+        "ephemeral_id": "38dd3436-2a1a-449f-8f43-b8d78c358b22",
+        "id": "803dfdba-e638-4590-a2de-80cb1cebe78d",
+        "name": "mcastro",
+        "type": "metricbeat"
+    },
+    "event": {
+        "duration": 338628448,
+        "dataset": "kibana.stats",
+        "module": "kibana"
+    },
+    "metricset": {
+        "period": 10000,
+        "name": "stats"
+    },
+    "service": {
+        "address": "localhost:5601",
+        "type": "kibana"
+    }
+}

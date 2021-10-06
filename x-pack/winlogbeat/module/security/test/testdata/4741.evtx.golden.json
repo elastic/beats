@@ -3,8 +3,10 @@
     "@timestamp": "2019-12-18T16:22:12.3112534Z",
     "event": {
       "action": "added-computer-account",
-      "category": "iam",
-      "code": 4741,
+      "category": [
+        "iam"
+      ],
+      "code": "4741",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -77,7 +79,7 @@
         "UserPrincipalName": "-",
         "UserWorkstations": "-"
       },
-      "event_id": 4741,
+      "event_id": "4741",
       "keywords": [
         "Audit Success"
       ],

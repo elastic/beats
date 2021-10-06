@@ -1,0 +1,25 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "event": {
+        "dataset": "postgresql.activity",
+        "duration": 115000,
+        "module": "postgresql"
+    },
+    "metricset": {
+        "name": "activity",
+        "period": 10000
+    },
+    "postgresql": {
+        "activity": {
+            "backend_start": "2021-03-05T18:39:18.347Z",
+            "backend_type": "logical replication launcher",
+            "pid": 81,
+            "wait_event": "LogicalLauncherMain",
+            "wait_event_type": "Activity"
+        }
+    },
+    "service": {
+        "address": "192.168.128.2:5432",
+        "type": "postgresql"
+    }
+}

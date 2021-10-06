@@ -15,8 +15,10 @@ var:
   - name: timeout
   - name: custom_definitions
   - name: detect_sequence_reset
+    default: true
   - name: tags
     default: [forwarded]
+  - name: internal_networks
 ingest_pipeline: ingest/pipeline.yml
 input: config/netflow.yml
 

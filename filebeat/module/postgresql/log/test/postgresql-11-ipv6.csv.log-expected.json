@@ -1,0 +1,36 @@
+[
+    {
+        "@timestamp": "2021-01-03T17:45:17.612Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "error"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "FATAL",
+        "log.offset": 0,
+        "message": "role \"jose.villanova\" does not exist",
+        "postgresql.log.client_addr": "::1",
+        "postgresql.log.client_port": 16790,
+        "postgresql.log.command_tag": "startup",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "5ff202ad.4fec",
+        "postgresql.log.session_start_time": "2021-01-03T17:45:17.000Z",
+        "postgresql.log.sql_state_code": "28000",
+        "postgresql.log.timestamp": "2021-01-03 17:45:17.612 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/15493200",
+        "process.pid": "20460",
+        "related.user": [
+            "jose.villanova"
+        ],
+        "service.type": "postgresql",
+        "user.name": "jose.villanova"
+    }
+]

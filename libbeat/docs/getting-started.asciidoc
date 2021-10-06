@@ -13,5 +13,5 @@ Each Beat is a separately installable product. To learn how to get started, see:
 * {winlogbeat-ref}/winlogbeat-installation-configuration.html[Winlogbeat]
 
 If you're planning to use the {metrics-app} or the {logs-app} in {kib},
-also see the {metrics-guide}[Metrics Monitoring Guide]
-and the {logs-guide}[Logs Monitoring Guide].
+see {observability-guide}/analyze-metrics.html[Analyze metrics]
+and {observability-guide}/monitor-logs.html[Monitor logs].

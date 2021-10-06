@@ -1,0 +1,4 @@
+type=USER_CHAUTHTOK msg=audit(1610986912.458:797): pid=13107 uid=0 auid=1002 ses=15 msg='op=PAM:chauthtok acct="bob" exe="/usr/bin/passwd" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/1 res=success'
+type=USER_CHAUTHTOK msg=audit(1610987544.541:805): pid=13379 uid=0 auid=1000 ses=14 msg='op=changing comment id=1003 exe="/usr/sbin/usermod" hostname=ubuntu-bionic addr=127.0.0.1 terminal=pts/2 res=success'
+type=USER_CHAUTHTOK msg=audit(1610987708.643:810): pid=13519 uid=0 auid=1000 ses=14 msg='op=changing name id=1003 exe="/usr/sbin/usermod" hostname=ubuntu-bionic addr=? terminal=pts/2 res=success'
+type=USER_ACCT msg=audit(1610988774.279:815): pid=13812 uid=0 auid=1000 ses=14 msg='op=changing /etc/group; group bob/1003, new name: bobby acct="bob" exe="/usr/sbin/groupmod" hostname=ubuntu-bionic addr=? terminal=pts/2 res=success'

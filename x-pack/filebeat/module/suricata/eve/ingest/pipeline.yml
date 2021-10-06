@@ -5,23 +5,172 @@ processors:
   - set:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
-  - set:
-      value: "{{suricata.eve.http.http_method}}"
-      field: http.request.method
-      if: "ctx?.suricata?.eve?.http?.http_method != null"
+
   - rename:
-      field: suricata.eve.http.status
-      target_field: http.response.status_code
+      field: suricata.eve.ether.dest_mac
+      target_field: destination.mac
       ignore_missing: true
-  - append:
-      if: ctx.suricata?.eve?.http?.hostname != null
-      value: '{{suricata.eve.http.hostname}}'
-      field: destination.domain
-  - remove:
-      field: suricata.eve.http.hostname
+  - rename:
+      field: suricata.eve.ether.src_mac
+      target_field: source.mac
+      ignore_missing: true
+
+  # Handle the different Suricata event types.
+  - lowercase:
+      field: suricata.eve.event_type
+      ignore_missing: true
+  - script:
+      tag: suricata_ecs_categorize
+      lang: painless
       ignore_failure: true
+      params:
+        alert:
+          kind: alert
+          category:
+            - network
+            - intrusion_detection
+        dns:
+          type:
+            - protocol
+          network_protocol: dns
+        flow:
+          type:
+            - connection
+        ftp:
+          type:
+            - protocol
+          network_protocol: ftp
+        ftp_data:
+          type:
+            - protocol
+          network_protocol: ftp
+        http:
+          category:
+            - network
+            - web
+          type:
+            - access
+            - protocol
+          network_protocol: http
+        http2:
+          category:
+            - network
+            - web
+          type:
+            - access
+            - protocol
+          network_protocol: http
+        mqtt:
+          type:
+            - protocol
+          network_protocol: mqtt
+        smb:
+          type:
+            - protocol
+          network_protocol: smb
+        ssh:
+          type:
+            - protocol
+          network_protocol: ssh
+        stats:
+          kind: metric
+        tftp:
+          type:
+            - protocol
+          network_protocol: tftp
+        tls:
+          type:
+            - protocol
+          network_protocol: tls
+        rdp:
+          type:
+            - protocol
+          network_protocol: rdp
+        rfb: # RFB (Remote Framebuffer Protocol)
+          type:
+            - protocol
+          network_protocol: rdp
+
+      source: |
+        ctx.event.kind = 'event';
+        ctx.event.category = ['network'];
+        def type_params = params.get(ctx?.suricata?.eve?.event_type);
+        if (type_params == null) {
+            return;
+        }
+        type_params.forEach((k, v) -> {
+            if ('network_protocol' == k) {
+                if (ctx.network == null) {
+                    ctx.network = ['protocol': v];
+                } else {
+                    ctx.network.protocol = v;
+                }
+            } else if (v instanceof List) {
+                ctx.event[k] = new ArrayList(v);
+            } else {
+                ctx.event[k] = v;
+            }
+        });
+
+  ## Anomaly and Alert
+  - lowercase:
+      field: suricata.eve.app_proto
+      ignore_missing: true
+  - set:
+      if: ctx?.suricata?.eve?.app_proto == "ftp-data"
+      field: network.protocol
+      value: ftp
+  - set:
+      if: >-
+        ctx?.suricata?.eve?.app_proto != "failed" &&
+        ctx?.suricata?.eve?.app_proto != "template" &&
+        ctx?.suricata?.eve?.app_proto != "template-rust"
+      field: network.protocol
+      value: '{{suricata.eve.app_proto}}'
+      ignore_empty_value: true
+  ## HTTP
+  - set:
+      if: >-
+        ctx?.suricata?.eve?.event_type == "http" &&
+        ctx?.suricata?.eve?.http?.status != null &&
+        ctx?.suricata?.eve?.http?.status < 400
+      field: event.outcome
+      value: success
+  - set:
+      if: >-
+        ctx?.suricata?.eve?.event_type == "http" &&
+        ctx?.suricata?.eve?.http?.status != null &&
+        ctx?.suricata?.eve?.http?.status >= 400
+      field: event.outcome
+      value: failure
+  ## DNS
+  - pipeline:
+      if: >-
+        ctx?.network?.protocol == "dns"
+      name: '{< IngestPipeline "dns" >}'
+  ## TLS
+  - pipeline:
+      if: ctx?.network?.protocol == "tls"
+      name: '{< IngestPipeline "tls" >}'
+  ## HTTP
+  - pipeline:
+      if: >-
+        ctx?.network?.protocol == "http"
+      name: '{< IngestPipeline "http" >}'
+  ## Flow
+  - append:
+      if: ctx?.suricata?.eve?.flow?.state == "new"
+      field: event.type
+      value:
+        - start
+  - append:
+      if: ctx?.suricata?.eve?.flow?.state == "closed"
+      field: event.type
+      value:
+        - end
   - script:
       lang: painless
+      tag: suricata_deduplicate_dest_domain
       source: >
         def domain = ctx.destination?.domain;
         if (domain instanceof Collection) {
@@ -32,32 +181,6 @@ processors:
           ctx.destination.domain = domain;
         }
       ignore_failure: true
-  - set:
-      if: "ctx?.network?.protocol == 'http'"
-      field: url.domain
-      value: '{{destination.domain}}'
-      ignore_empty_value: true
-  - grok:
-      field: suricata.eve.http.url
-      patterns:
-        - '%{PATH:url.path}(?:\?%{QUERY:url.query})?(?:#%{ANY:url.fragment})?'
-      ignore_missing: true
-      pattern_definitions:
-        PATH: '[^?#]*'
-        QUERY: '[^#]*'
-        ANY: '.*'
-  - rename:
-      field: suricata.eve.http.url
-      target_field: url.original
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.http.http_refer
-      target_field: http.request.referrer
-      ignore_missing: true
-  - rename:
-      field: suricata.eve.http.length
-      target_field: http.response.body.bytes
-      ignore_missing: true
   - rename:
       field: suricata.eve.fileinfo.filename
       target_field: file.path
@@ -69,6 +192,7 @@ processors:
   - lowercase:
       field: network.transport
       ignore_missing: true
+  # Suricata alert and metadata
   - convert:
       field: suricata.eve.alert.category
       target_field: message
@@ -87,19 +211,145 @@ processors:
       value: "{{suricata.eve.alert.signature}}"
       ignore_empty_value: true
   - set:
+      if:  ctx?.suricata?.eve?.alert?.action == 'blocked'
       field: suricata.eve.alert.action
       value: denied
-      if:  "ctx?.suricata?.eve?.alert?.action == 'blocked'"
   - append:
+      if: ctx?.suricata?.eve?.alert?.action != null
       field: event.type
       value: "{{suricata.eve.alert.action}}"
-      if: "ctx?.suricata?.eve?.alert?.action != null"
   - remove:
       field: suricata.eve.alert.action
       ignore_failure: true
   - rename:
       field: suricata.eve.alert.severity
       target_field: event.severity
+      ignore_missing: true
+  # All defined keys for metadata is moved out, leaving the metadata field as flattened for any custom fields introduced
+  # by suricata rules, to prevent the defined keys to be set as flattened type:
+  # https://better-schema.readthedocs.io/en/latest/schema.html#defined-keys
+  - rename:
+      field: suricata.eve.alert.metadata.protocols
+      target_field: suricata.eve.alert.protocols
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.attack_target
+      target_field: suricata.eve.alert.attack_target
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.capec_id
+      target_field: suricata.eve.alert.capec_id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cwe_id
+      target_field: suricata.eve.alert.cwe_id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.malware
+      target_field: suricata.eve.alert.malware
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cve
+      target_field: suricata.eve.alert.cve
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v2_base
+      target_field: suricata.eve.alert.cvss_v2_base
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v2_temporal
+      target_field: suricata.eve.alert.cvss_v2_temporal
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v3_base
+      target_field: suricata.eve.alert.cvss_v3_base
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.cvss_v3_temporal
+      target_field: suricata.eve.alert.cvss_v3_temporal
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.priority
+      target_field: suricata.eve.alert.priority
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.hostile
+      target_field: suricata.eve.alert.hostile
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.infected
+      target_field: suricata.eve.alert.infected
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.created_at
+      target_field: _tmp_.created_at
+      ignore_missing: true
+  - join:
+      field: _tmp_.created_at
+      description: Converts date field to string
+      separator: ","
+      if: ctx._tmp_?.created_at != null
+  - date:
+      field: _tmp_.created_at
+      target_field: suricata.eve.alert.created_at
+      formats:
+        - yyyy-MM-dd
+        - yyyy_MM_dd
+      if: ctx._tmp_?.created_at != null
+      ignore_failure: true
+  - rename:
+      field: suricata.eve.alert.metadata.updated_at
+      target_field: _tmp_.updated_at
+      ignore_missing: true
+  - join:
+      field: _tmp_.updated_at
+      description: Converts date field to string
+      separator: ","
+      if: ctx._tmp_?.updated_at != null
+  - date:
+      field: _tmp_.updated_at
+      target_field: suricata.eve.alert.updated_at
+      formats:
+        - yyyy-MM-dd
+        - yyyy_MM_dd
+      if: ctx._tmp_?.updated_at != null
+      ignore_failure: true
+  - rename:
+      field: suricata.eve.alert.metadata.filename
+      target_field: file.name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.classtype
+      target_field: suricata.eve.alert.classtype
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.rule_source
+      target_field: suricata.eve.alert.rule_source
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.sid
+      target_field: suricata.eve.alert.sid
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_attack
+      target_field: threat.tactic.id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_tactic_id
+      target_field: threat.tactic.id
+      ignore_missing: true
+      if: ctx.threat?.tactic?.id == null
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_tactic_name
+      target_field: threat.tactic.name
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_technique_id
+      target_field: threat.technique.id
+      ignore_missing: true
+  - rename:
+      field: suricata.eve.alert.metadata.mitre_technique_id
+      target_field: threat.technique.name
       ignore_missing: true
   - rename:
       field: suricata.eve.flow.pkts_toclient
@@ -118,6 +368,7 @@ processors:
       target_field: source.bytes
       ignore_missing: true
   - script:
+      tag: suricata_network_bytes_packets
       lang: painless
       source: >
         long getOrZero(def map, def key) {
@@ -153,6 +404,7 @@ processors:
         - ISO8601
       ignore_failure: true
   - script:
+      tag: suricata_event_duration
       lang: painless
       source: >
         Instant ins(def d) {
@@ -174,16 +426,13 @@ processors:
       field: suricata.eve.proto
       target_field: network.transport
       ignore_missing: true
-  - user_agent:
-      field: suricata.eve.http.http_user_agent
-      ignore_missing: true
   - geoip:
-      if: ctx.source?.geo == null
+      if: ctx?.source?.geo == null
       field: source.ip
       target_field: source.geo
       ignore_missing: true
   - geoip:
-      if: ctx.destination?.geo == null
+      if: ctx?.destination?.geo == null
       field: destination.ip
       target_field: destination.geo
       ignore_missing: true
@@ -219,21 +468,21 @@ processors:
       field: destination.as.organization_name
       target_field: destination.as.organization.name
       ignore_missing: true
-  - uppercase:
-      field: tls.server.hash.sha1
-      ignore_missing: true
-  - split:
-      field: tls.server.hash.sha1
-      separator: ":"
-      ignore_missing: true
-  - join:
-      field: tls.server.hash.sha1
-      separator: ""
-      ignore_failure: true
   - append:
-      field: related.hash
-      value: "{{tls.server.hash.sha1}}"
-      if: "ctx?.tls?.server?.hash?.sha1 != null"
+      if: ctx?.url?.domain != null && ctx.url.domain != ''
+      field: related.hosts
+      value: '{{url.domain}}'
+      allow_duplicates: false
+  - append:
+      if: ctx?.source?.ip != null
+      field: related.ip
+      value: '{{source.ip}}'
+      allow_duplicates: false
+  - append:
+      if: ctx?.destination?.ip != null
+      field: related.ip
+      value: '{{destination.ip}}'
+      allow_duplicates: false
   - remove:
       field:
         - suricata.eve.app_proto
@@ -241,8 +490,39 @@ processors:
         - suricata.eve.flow.start
         - suricata.eve.http.http_method
         - suricata.eve.http.http_user_agent
+        - _tmp_
       ignore_missing: true
 on_failure:
-  - set:
+  - append:
       field: error.message
-      value: '{{ _ingest.on_failure_message }}'
+      value: >-
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}
+  - remove:
+      field:
+        # Remove all alias fields to ensure indexing succeeds.
+        - suricata.eve.alert.action
+        - suricata.eve.alert.severity
+        - suricata.eve.app_proto
+        - suricata.eve.dest_ip
+        - suricata.eve.dest_port
+        - suricata.eve.fileinfo.filename
+        - suricata.eve.fileinfo.size
+        - suricata.eve.flow.bytes_toclient
+        - suricata.eve.flow.bytes_toserver
+        - suricata.eve.flow.pkts_toclient
+        - suricata.eve.flow.pkts_toserver
+        - suricata.eve.flow.start
+        - suricata.eve.http.hostname
+        - suricata.eve.http.http_method
+        - suricata.eve.http.http_refer
+        - suricata.eve.http.http_user_agent
+        - suricata.eve.http.length
+        - suricata.eve.http.status
+        - suricata.eve.http.url
+        - suricata.eve.proto
+        - suricata.eve.src_ip
+        - suricata.eve.src_port
+        - _tmp_
+      ignore_missing: true

@@ -22,19 +22,30 @@ func init() {
 }
 
 type Module interface {
+	mb.Module
 	RunCounterReporter(mb.PushReporterV2)
 	RunContainerReporter(mb.PushReporterV2)
 	RunValueReporter(mb.PushReporterV2)
 }
 
 func newModule(base mb.BaseModule) (mb.Module, error) {
+	factory := func(cfg *cfcommon.Config, name string, log *logp.Logger) CloudfoundryHub {
+		return &HubAdapter{cfcommon.NewHub(cfg, name, log)}
+	}
+	return NewModuleWithHubFactory(base, factory)
+}
+
+type hubFactory func(cfg *cfcommon.Config, name string, log *logp.Logger) CloudfoundryHub
+
+// NewModuleWithHubFactory initializes a module with a hub created with a hub factory
+func NewModuleWithHubFactory(base mb.BaseModule, hubFactory hubFactory) (mb.Module, error) {
 	var cfg cfcommon.Config
 	if err := base.UnpackConfig(&cfg); err != nil {
 		return nil, err
 	}
 
 	log := logp.NewLogger("cloudfoundry")
-	hub := cfcommon.NewHub(&cfg, "metricbeat", log)
+	hub := hubFactory(&cfg, "metricbeat", log)
 
 	switch cfg.Version {
 	case cfcommon.ConsumerVersionV1:

@@ -79,6 +79,9 @@ metricbeat.modules:
   period: 10s
   processes: ['.*']
 
+  # Configure the mount point of the host’s filesystem for use in monitoring a host from within a container
+  #system.hostfs: "/hostfs"
+
   # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages","normalized_percentages"]  # The other available option is ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
@@ -232,6 +235,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -329,7 +333,13 @@ metricbeat.modules:
 - module: haproxy
   metricsets: ["info", "stat"]
   period: 10s
+  # TCP socket, UNIX socket, or HTTP address where HAProxy stats are reported
+  # TCP socket
   hosts: ["tcp://127.0.0.1:14567"]
+  # UNIX socket
+  #hosts: ["unix:///path/to/haproxy.sock"]
+  # Stats page
+  #hosts: ["http://127.0.0.1:14567"]
   username : "admin"
   password : "admin"
   enabled: true
@@ -420,9 +430,16 @@ metricbeat.modules:
   # Client Certificate Key
   #ssl.key: "/etc/pki/client/cert.key"
 
+  # Client Certificate Passphrase (in case your Client Certificate Key is encrypted)
+  #ssl.key_passphrase: "yourKeyPassphrase"
+
   # SASL authentication
   #username: ""
   #password: ""
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
 # Metrics collected from a Kafka broker using Jolokia
 #- module: kafka
@@ -495,6 +512,7 @@ metricbeat.modules:
     - state_statefulset
     - state_pod
     - state_container
+    - state_job
     - state_cronjob
     - state_resourcequota
     - state_service
@@ -572,8 +590,11 @@ metricbeat.modules:
   period: 10s
   metricsets:
     - "pageinfo"
+    - "memory"
     # - ksm
     # - conntrack
+    # - iostat
+    # - pressure
   enabled: true
   #hostfs: /hostfs
 
@@ -669,13 +690,21 @@ metricbeat.modules:
 
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
-  metricsets: ["connections", "routes", "stats", "subscriptions"]
+  metricsets:
+    - "connections"
+    - "routes"
+    - "stats"
+    - "subscriptions"
+    #- "connection"
+    #- "route"
   period: 10s
   hosts: ["localhost:8222"]
   #stats.metrics_path: "/varz"
   #connections.metrics_path: "/connz"
   #routes.metrics_path: "/routez"
   #subscriptions.metrics_path: "/subsz"
+  #connection.metrics_path: "/connz"
+  #route.metrics_path: "/routez"
 
 #-------------------------------- Nginx Module --------------------------------
 - module: nginx
@@ -688,6 +717,19 @@ metricbeat.modules:
 
   # Path to server status. Default nginx_status
   server_status_path: "nginx_status"
+
+#----------------------------- Openmetrics Module -----------------------------
+- module: openmetrics
+  metricsets: ['collector']
+  period: 10s
+  hosts: ['localhost:9090']
+
+  # This module uses the Prometheus collector metricset, all
+  # the options for this metricset are also available here.
+  metrics_path: /metrics
+  metrics_filters:
+    include: []
+    exclude: []
 
 #------------------------------- PHP_FPM Module -------------------------------
 - module: php_fpm
@@ -711,6 +753,10 @@ metricbeat.modules:
 
     # Stats about every PostgreSQL process
     - activity
+
+    # Stats about every statement executed in the server. It requires the
+    # `pg_stats_statement` library to be configured in the server.
+    #- statement
 
   period: 10s
 
@@ -929,10 +975,45 @@ metricbeat.modules:
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
 
+  # The disk queue stores incoming events on disk until the output is
+  # ready for them. This allows a higher event limit than the memory-only
+  # queue and lets pending events persist through a restart.
+  #disk:
+    # The directory path to store the queue's data.
+    #path: "${path.data}/diskqueue"
+
+    # The maximum space the queue should occupy on disk. Depending on
+    # input settings, events that exceed this limit are delayed or discarded.
+    #max_size: 10GB
+
+    # The maximum size of a single queue data file. Data in the queue is
+    # stored in smaller segments that are deleted after all their events
+    # have been processed.
+    #segment_size: 1GB
+
+    # The number of events to read from disk to memory while waiting for
+    # the output to request them.
+    #read_ahead: 512
+
+    # The number of events to accept from inputs while waiting for them
+    # to be written to disk. If event data arrives faster than it
+    # can be written to disk, this setting prevents it from overflowing
+    # main memory.
+    #write_ahead: 2048
+
+    # The duration to wait before retrying when the queue encounters a disk
+    # write error.
+    #retry_interval: 1s
+
+    # The maximum length of time to wait before retrying on a disk write
+    # error. If the queue encounters repeated errors, it will double the
+    # length of its retry interval each time, up to this maximum.
+    #max_retry_interval: 30s
+
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
@@ -1211,7 +1292,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -1259,6 +1340,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1321,6 +1406,7 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:
@@ -1386,6 +1472,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1477,6 +1567,10 @@ output.elasticsearch:
   # Authentication details. Password is required if username is set.
   #username: ''
   #password: ''
+
+  # SASL authentication mechanism used. Can be one of PLAIN, SCRAM-SHA-256 or SCRAM-SHA-512.
+  # Defaults to PLAIN when `username` and `password` are configured.
+  #sasl.mechanism: ''
 
   # Kafka version Metricbeat is assumed to run against. Defaults to the "1.0.0".
   #version: '1.0.0'
@@ -1579,6 +1673,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1645,6 +1743,10 @@ output.elasticsearch:
 
   # Kerberos realm.
   #kerberos.realm: ELASTIC
+
+  # Enables Kerberos FAST authentication. This may
+  # conflict with certain Active Directory configurations.
+  #kerberos.enable_krb5_fast: false
 
 # -------------------------------- Redis Output --------------------------------
 #output.redis:
@@ -1735,6 +1837,10 @@ output.elasticsearch:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -1811,7 +1917,9 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
+  # Configure automatic file rotation on every startup. The default is true.
+  #rotate_on_startup: true
 # ------------------------------- Console Output -------------------------------
 #output.console:
   # Boolean flag to enable or disable the output module.
@@ -1910,6 +2018,11 @@ output.elasticsearch:
 # Set to false to disable template loading.
 #setup.template.enabled: true
 
+# Select the kind of index template. From Elasticsearch 7.8, it is possible to
+# use component templates. Available options: legacy, component, index.
+# By default metricbeat uses the legacy index templates.
+#setup.template.type: legacy
+
 # Template name. By default the template name is "metricbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.
 #setup.template.name: "metricbeat-%{[agent.version]}"
@@ -1938,6 +2051,8 @@ output.elasticsearch:
 #setup.template.json.name: ""
 
 # Overwrite existing template
+# Do not enable this option for more than one instance of metricbeat as it might
+# overload your Elasticsearch with too many update requests.
 #setup.template.overwrite: false
 
 # Elasticsearch template settings
@@ -2024,6 +2139,10 @@ setup.kibana:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This
@@ -2077,7 +2196,7 @@ setup.kibana:
 #logging.level: info
 
 # Enable debug output for selected components. To enable all selectors use ["*"]
-# Other available selectors are "beat", "publish", "service"
+# Other available selectors are "beat", "publisher", "service"
 # Multiple selectors can be chained.
 #logging.selectors: [ ]
 
@@ -2098,6 +2217,11 @@ setup.kibana:
 
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
+
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.
@@ -2131,6 +2255,11 @@ logging.files:
   # Rotate existing logs on startup rather than appending to the existing
   # file. Defaults to true.
   # rotateonstartup: true
+
+  # Rotated files are either suffixed with a number e.g. metricbeat.1 when
+  # renamed during rotation. Or when set to date, the date is added to
+  # the end of the file. On rotation a new file is created, older files are untouched.
+  #suffix: count
 
 # Set to true to log messages in JSON format.
 #logging.json: false
@@ -2221,6 +2350,10 @@ logging.files:
   # * full, which verifies that the provided certificate is signed by a trusted
   # authority (CA) and also verifies that the server's hostname (or IP address)
   # matches the names identified within the certificate.
+  # * strict, which verifies that the provided certificate is signed by a trusted
+  # authority (CA) and also verifies that the server's hostname (or IP address)
+  # matches the names identified within the certificate. If the Subject Alternative
+  # Name is empty, it returns an error.
   # * certificate, which verifies that the provided certificate is signed by a
   # trusted authority (CA), but does not perform any hostname verification.
   #  * none, which performs no verification of the server's certificate. This

@@ -26,11 +26,13 @@ import (
 	"syscall"
 	"unsafe"
 
+	"golang.org/x/sys/windows"
+
 	"github.com/pkg/errors"
 )
 
 var (
-	instanceNameRegexp = regexp.MustCompile(`.*?\((.*?)\).*`)
+	instanceNameRegexp = regexp.MustCompile(`(\(.+\))\\`)
 	objectNameRegexp   = regexp.MustCompile(`(?:^\\\\[^\\]+\\|^\\)([^\\]+)`)
 )
 
@@ -86,7 +88,7 @@ func (q *Query) AddCounter(counterPath string, instance string, format string, w
 	var instanceName string
 	// Extract the instance name from the counterPath.
 	if instance == "" || wildcard {
-		instanceName, err = MatchInstanceName(counterPath)
+		instanceName, err = matchInstanceName(counterPath)
 		if err != nil {
 			return err
 		}
@@ -172,6 +174,11 @@ func (q *Query) CollectData() error {
 	return PdhCollectQueryData(q.Handle)
 }
 
+// CollectData collects the value for all counters in the query.
+func (q *Query) CollectDataEx(interval uint32, event windows.Handle) error {
+	return PdhCollectQueryDataEx(q.Handle, interval, event)
+}
+
 // GetFormattedCounterValues returns an array of formatted values for a query.
 func (q *Query) GetFormattedCounterValues() (map[string][]CounterValue, error) {
 	if q.Counters == nil || len(q.Counters) == 0 {
@@ -209,23 +216,37 @@ func (q *Query) ExpandWildCardPath(wildCardPath string) ([]string, error) {
 
 	// PdhExpandWildCardPath will not return the counter paths for windows 32 bit systems but PdhExpandCounterPath will.
 	if runtime.GOARCH == "386" {
-		expdPaths, err = PdhExpandCounterPath(utfPath)
+		if expdPaths, err = PdhExpandCounterPath(utfPath); err != nil {
+			return nil, err
+		}
+		if expdPaths == nil {
+			return nil, errors.New("no counter paths found")
+		}
+		return UTF16ToStringArray(expdPaths), nil
 	} else {
-		expdPaths, err = PdhExpandWildCardPath(utfPath)
-		// rarely the PdhExpandWildCardPathW will not retrieve the expanded buffer size initially so the next call will encounter the PDH_MORE_DATA error since the specified size on the input is still less than
-		// the required size. If this is the case we will fallback on the PdhExpandCounterPathW api since it looks to act in a more stable manner. The PdhExpandCounterPathW api does come with some limitations but will
-		// satisfy most cases and return valid paths.
-		if err == PDH_MORE_DATA {
-			expdPaths, err = PdhExpandCounterPath(utfPath)
+		if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
+			if err == PDH_MORE_DATA {
+				if expdPaths, err = PdhExpandWildCardPath(utfPath); err != nil {
+					return nil, err
+				}
+			} else {
+				return nil, err
+			}
+		}
+		paths := UTF16ToStringArray(expdPaths)
+		// in several cases ExpandWildCardPath win32 api seems to return initial wildcard without any errors, adding some waiting time between the 2 ExpandWildCardPath api calls seems to be succesfull but that will delay data retrieval
+		// A call is triggered again
+		if len(paths) == 1 && strings.Contains(paths[0], "*") && paths[0] == wildCardPath {
+			expdPaths, err = PdhExpandWildCardPath(utfPath)
+			if err == nil {
+				return paths, err
+			}
+		} else {
+			return paths, err
 		}
 	}
-	if err != nil {
-		return nil, err
-	}
-	if expdPaths == nil {
-		return nil, errors.New("no counter paths found")
-	}
-	return UTF16ToStringArray(expdPaths), nil
+
+	return nil, PdhErrno(syscall.ERROR_NOT_FOUND)
 }
 
 // Close closes the query and all of its counters.
@@ -233,16 +254,48 @@ func (q *Query) Close() error {
 	return PdhCloseQuery(q.Handle)
 }
 
-// MatchInstanceName will check first for instance and then for any objects names.
-func MatchInstanceName(counterPath string) (string, error) {
+// matchInstanceName will check first for instance and then for any objects names.
+func matchInstanceName(counterPath string) (string, error) {
 	matches := instanceNameRegexp.FindStringSubmatch(counterPath)
-	if len(matches) != 2 {
-		matches = objectNameRegexp.FindStringSubmatch(counterPath)
+	if len(matches) == 2 {
+		return returnLastInstance(matches[1]), nil
 	}
+	matches = objectNameRegexp.FindStringSubmatch(counterPath)
 	if len(matches) == 2 {
 		return matches[1], nil
 	}
 	return "", errors.New("query doesn't contain an instance name. In this case you have to define 'instance_name'")
+}
+
+// returnLastInstance will return the content from the last parentheses, this covers cases as `\WF (System.Workflow) 4.0.0.0(*)\Workflows Created`.
+func returnLastInstance(match string) string {
+	var openedParanth int
+	var innerMatch string
+	var matches []string
+	runeMatch := []rune(match)
+	for i := 0; i < len(runeMatch); i++ {
+		char := string(runeMatch[i])
+
+		// check if string ends between parentheses
+		if char == ")" {
+			openedParanth -= 1
+		}
+		if openedParanth > 0 {
+			innerMatch += char
+		}
+		if openedParanth == 0 && innerMatch != "" {
+			matches = append(matches, innerMatch)
+			innerMatch = ""
+		}
+		// check if string starts between parentheses
+		if char == "(" {
+			openedParanth += 1
+		}
+	}
+	if len(matches) > 0 {
+		return matches[len(matches)-1]
+	}
+	return match
 }
 
 // getCounterValue will retrieve the counter value based on the format applied in the config options

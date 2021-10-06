@@ -30,9 +30,11 @@ import (
 
 func TestGroupToEvents(t *testing.T) {
 	reader := Reader{
-		query:    pdh.Query{},
-		executed: true,
-		log:      nil,
+		config: Config{
+			GroupMeasurements: true,
+		},
+		query: pdh.Query{},
+		log:   nil,
 		counters: []PerfCounter{
 			{
 				QueryField:   "datagrams_sent_per_sec",
@@ -41,6 +43,26 @@ func TestGroupToEvents(t *testing.T) {
 				ObjectName:   "UDPv4",
 				ObjectField:  "object",
 				ChildQueries: []string{`\UDPv4\Datagrams Sent/sec`},
+			},
+			{
+				QueryField:    "%_processor_time",
+				QueryName:     `\Processor Information(_Total)\% Processor Time`,
+				Format:        "float",
+				ObjectName:    "Processor Information",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\Processor Information(_Total)\% Processor Time`},
+			},
+			{
+				QueryField:    "current_disk_queue_length",
+				QueryName:     `\PhysicalDisk(_Total)\Current Disk Queue Length`,
+				Format:        "float",
+				ObjectName:    "PhysicalDisk",
+				ObjectField:   "object",
+				InstanceName:  "_Total",
+				InstanceField: "instance",
+				ChildQueries:  []string{`\PhysicalDisk(_Total)\Current Disk Queue Length`},
 			},
 		},
 	}
@@ -52,30 +74,82 @@ func TestGroupToEvents(t *testing.T) {
 				Err:         pdh.CounterValueError{},
 			},
 		},
+		`\Processor Information(_Total)\% Processor Time`: {
+			{
+				Instance:    "_Total",
+				Measurement: 11,
+			},
+		},
+		`\PhysicalDisk(_Total)\Current Disk Queue Length`: {
+			{
+				Instance:    "_Total",
+				Measurement: 20,
+			},
+		},
 	}
+
 	events := reader.groupToEvents(counters)
 	assert.NotNil(t, events)
-	assert.Equal(t, len(events), 1)
-	ok, err := events[0].MetricSetFields.HasKey("datagrams_sent_per_sec")
-	assert.NoError(t, err)
-	assert.True(t, ok)
-	ok, err = events[0].MetricSetFields.HasKey("object")
-	assert.NoError(t, err)
-	assert.True(t, ok)
-	val, err := events[0].MetricSetFields.GetValue("datagrams_sent_per_sec")
-	assert.NoError(t, err)
-	assert.Equal(t, val, 23)
-	val, err = events[0].MetricSetFields.GetValue("object")
-	assert.NoError(t, err)
-	assert.Equal(t, val, "UDPv4")
+	assert.Equal(t, 3, len(events))
 
+	for _, event := range events {
+		ok, err := event.MetricSetFields.HasKey("datagrams_sent_per_sec")
+		if ok {
+			assert.NoError(t, err)
+			assert.True(t, ok)
+			ok, err = event.MetricSetFields.HasKey("object")
+			assert.NoError(t, err)
+			assert.True(t, ok)
+
+			val, err := event.MetricSetFields.GetValue("datagrams_sent_per_sec")
+			assert.NoError(t, err)
+			assert.Equal(t, val, 23)
+
+			val, err = event.MetricSetFields.GetValue("object")
+			assert.NoError(t, err)
+			assert.Equal(t, val, "UDPv4")
+		} else {
+			ok, err := event.MetricSetFields.HasKey("%_processor_time")
+			if ok {
+				assert.NoError(t, err)
+				assert.True(t, ok)
+
+				ok, err = event.MetricSetFields.HasKey("object")
+				assert.NoError(t, err)
+				assert.True(t, ok)
+
+				val, err := event.MetricSetFields.GetValue("%_processor_time")
+				assert.NoError(t, err)
+				assert.Equal(t, val, 11)
+
+				val, err = event.MetricSetFields.GetValue("object")
+				assert.NoError(t, err)
+				assert.Equal(t, val, "Processor Information")
+			} else {
+				ok, err = event.MetricSetFields.HasKey("current_disk_queue_length")
+				assert.NoError(t, err)
+				assert.True(t, ok)
+
+				ok, err = event.MetricSetFields.HasKey("object")
+				assert.NoError(t, err)
+				assert.True(t, ok)
+
+				val, err := event.MetricSetFields.GetValue("current_disk_queue_length")
+				assert.NoError(t, err)
+				assert.Equal(t, val, 20)
+
+				val, err = event.MetricSetFields.GetValue("object")
+				assert.NoError(t, err)
+				assert.Equal(t, val, "PhysicalDisk")
+			}
+		}
+	}
 }
 
 func TestGroupToSingleEvent(t *testing.T) {
 	reader := Reader{
-		query:    pdh.Query{},
-		executed: true,
-		log:      nil,
+		query: pdh.Query{},
+		log:   nil,
 		config: Config{
 			GroupAllCountersTo: "processor_count",
 		},
@@ -159,9 +233,13 @@ func TestGroupToSingleEvent(t *testing.T) {
 
 func TestMatchesParentProcess(t *testing.T) {
 	ok, val := matchesParentProcess("svchost")
-	assert.False(t, ok)
+	assert.True(t, ok)
 	assert.Equal(t, val, "svchost")
 	ok, val = matchesParentProcess("svchost#54")
 	assert.True(t, ok)
 	assert.Equal(t, val, "svchost")
+
+	ok, val = matchesParentProcess("svchost (test) another #54")
+	assert.True(t, ok)
+	assert.Equal(t, val, "svchost (test) another #54")
 }

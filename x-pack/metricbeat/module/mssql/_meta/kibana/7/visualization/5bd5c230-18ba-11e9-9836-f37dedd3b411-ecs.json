@@ -1,0 +1,145 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Lock Waits/sec [Metricbeat MSSQL] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "legendOpen": false
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "",
+                        "field": "mssql.performance.lock_waits_per_sec"
+                    },
+                    "schema": "metric",
+                    "type": "avg"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": true,
+                    "style": {
+                        "color": "#eee"
+                    },
+                    "valueAxis": "ValueAxis-1"
+                },
+                "isVislibVis": true,
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Average mssql.performance.lock_waits_per_sec"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "mode": "normal",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "times": [],
+                "type": "line",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": ""
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Lock Waits/sec [Metricbeat MSSQL] ECS",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5bd5c230-18ba-11e9-9836-f37dedd3b411-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:41.416Z",
+    "version": "WzQwNTUsMV0="
+}

@@ -176,11 +176,18 @@ func PythonTest(params PythonTestArgs) error {
 // Use `MODULE=module` to run only tests for `module`.
 func PythonTestForModule(params PythonTestArgs) error {
 	if module := EnvOr("MODULE", ""); module != "" {
+		fmt.Println(">> Single module selected for testing: ", module)
 		params.Files = []string{
 			fmt.Sprintf("module/%s/test_*.py", module),
 			fmt.Sprintf("module/%s/*/test_*.py", module),
+
+			// Run always the base tests, that include tests for module dashboards.
+			"tests/system/test*_base.py",
 		}
+		fmt.Println("Test files: ", params.Files)
 		params.TestName += "-" + module
+	} else {
+		fmt.Println(">> Running tests for all modules, you can use MODULE=foo to scope it down to a single module...")
 	}
 	return PythonTest(params)
 }
@@ -191,6 +198,12 @@ func PythonTestForModule(params PythonTestArgs) error {
 func PythonVirtualenv() (string, error) {
 	pythonVirtualenvLock.Lock()
 	defer pythonVirtualenvLock.Unlock()
+
+	// When upgrading pip we might run into an error with the cryptography package
+	// (pip dependency) will not compile if no recent rust development environment is available.
+	// We set `CRYPTOGRAPHY_DONT_BUILD_RUST=1`, to disable the need for python.
+	// See: https://github.com/pyca/cryptography/issues/5771
+	os.Setenv("CRYPTOGRAPHY_DONT_BUILD_RUST", "1")
 
 	// Determine the location of the virtualenv.
 	ve, err := pythonVirtualenvPath()

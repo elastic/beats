@@ -12,12 +12,38 @@ import (
 	libbeatVersion "github.com/elastic/beats/v7/libbeat/version"
 )
 
+const (
+	hashLen = 6
+)
+
 // snapshot is a flag marking build as a snapshot.
 var snapshot = ""
+
+// allowEmptyPgp is used as a debug flag and allows working
+// without valid pgp
+var allowEmptyPgp string
+
+// allowUpgrade is used as a debug flag and allows working
+// with upgrade without requiring Agent to be installed correctly
+var allowUpgrade string
+
+// TrimCommit trims commit up to 6 characters.
+func TrimCommit(commit string) string {
+	hash := commit
+	if len(hash) > hashLen {
+		hash = hash[:hashLen]
+	}
+	return hash
+}
 
 // Commit returns the current build hash or unknown if it was not injected in the build process.
 func Commit() string {
 	return libbeatVersion.Commit()
+}
+
+// ShortCommit returns commit up to 6 characters.
+func ShortCommit() string {
+	return TrimCommit(Commit())
 }
 
 // BuildTime returns the build time of the binaries.
@@ -54,8 +80,8 @@ func Info() VersionInfo {
 	}
 }
 
-// String returns the string format for the version informaiton.
-func (v *VersionInfo) String() string {
+// String returns the string format for the version information.
+func (v VersionInfo) String() string {
 	var sb strings.Builder
 
 	sb.WriteString(v.Version)

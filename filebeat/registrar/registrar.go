@@ -175,6 +175,7 @@ func (r *Registrar) Run() {
 			// flush timeout configured. Only update internal state and track pending
 			// updates to be written to registry.
 			r.onEvents(states)
+			r.gcStates()
 			if flushC == nil && len(states) > 0 {
 				timer = time.NewTimer(r.flushTimeout)
 				flushC = timer.C
@@ -197,14 +198,12 @@ func (r *Registrar) commitStateUpdates() {
 	statesCurrent.Set(int64(len(states)))
 
 	registryWrites.Inc()
-
-	r.log.Debugf("Registry file updated. %d active states.", len(states))
-	registrySuccess.Inc()
-
 	if err := writeStates(r.store, states); err != nil {
 		r.log.Errorf("Error writing registrar state to statestore: %v", err)
 		registryFails.Inc()
 	}
+	r.log.Debugf("Registry file updated. %d active states.", len(states))
+	registrySuccess.Inc()
 
 	if r.out != nil {
 		r.out.Published(r.bufferedStateUpdates)

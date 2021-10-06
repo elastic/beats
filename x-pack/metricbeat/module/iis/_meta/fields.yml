@@ -2,7 +2,7 @@
   title: "IIS"
   description: >
     iis module
-  release: beta
+  release: ga
 
   fields:
     - name: iis

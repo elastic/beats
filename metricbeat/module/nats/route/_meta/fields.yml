@@ -1,0 +1,54 @@
+- name: route
+  type: group
+  description: >
+    Contains nats route related metrics
+  release: ga
+  fields:
+    - name: subscriptions
+      type: integer
+      description: >
+        The number of subscriptions in this connection
+    - name: remote_id
+      type: keyword
+      description: >
+        The remote id on which the route is connected to
+    - name: pending_size
+      type: long
+      description: >
+        The number of pending routes
+    - name: port
+      type: integer
+      description: >
+        The port of the route
+    - name: ip
+      type: ip
+      description: >
+        The ip of the route
+    - name: in
+      type: group
+      description: >
+        The amount of incoming data
+      fields:
+        - name: messages
+          type: long
+          description: >
+            The amount of incoming messages
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of incoming bytes
+    - name: out
+      type: group
+      description: >
+        The amount of outgoing data
+      fields:
+        - name: messages
+          type: long
+          description: >
+            The amount of outgoing messages
+        - name: bytes
+          type: long
+          format: bytes
+          description: >
+            The amount of outgoing bytes

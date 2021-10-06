@@ -43,6 +43,7 @@ class Test(BaseTest):
         """
         self.render_config_template(
             http_include_body_for=["x-www-form-urlencoded", "text/html"],
+            include_mime=True
         )
         self.run_packetbeat(pcap="http_post.pcap",
                             debug_selectors=["http", "httpdetailed"])
@@ -58,6 +59,8 @@ class Test(BaseTest):
 
         assert len(o["http.request.body.content"]) > 0
         assert len(o["http.response.body.content"]) > 0
+        assert o["http.request.mime_type"] == "text/plain; charset=utf-8"
+        assert o["http.response.mime_type"] == "text/html; charset=utf-8"
 
         assert "request" not in o
         assert "response" not in o

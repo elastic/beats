@@ -54,7 +54,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+	awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 		AccessKeyID:     config.AWSConfig.AccessKeyID,
 		SecretAccessKey: config.AWSConfig.SecretAccessKey,
 		SessionToken:    config.AWSConfig.SessionToken,
@@ -63,8 +63,6 @@ func AutodiscoverBuilder(
 
 	// Construct MetricSet with a full regions list if there is no region specified.
 	if config.Regions == nil {
-		// set default region to make initial aws api call
-		awsCfg.Region = "us-west-1"
 		svcEC2 := ec2.New(awscommon.EnrichAWSConfigWithEndpoint(
 			config.AWSConfig.Endpoint, "ec2", awsCfg.Region, awsCfg))
 
@@ -78,7 +76,7 @@ func AutodiscoverBuilder(
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,

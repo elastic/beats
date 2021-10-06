@@ -1,0 +1,120 @@
+description: Pipeline for parsing Zoom account webhooks
+processors:
+- append:
+    field: event.category
+    value: iam
+- append:
+    field: event.category
+    value: configuration
+    if: "['account.settings_updated'].contains(ctx?.event?.action)"
+- append:
+    field: event.type
+    value: user
+- append:
+    field: event.type
+    value: creation
+    if: ctx?.event?.action == 'account.created'
+- append:
+    field: event.type
+    value: change
+    if: "['account.updated', 'account.settings_updated', 'account.disassociated'].contains(ctx?.event?.action)"
+- rename:
+    field: zoom.account_id
+    target_field: zoom.master_account_id
+    ignore_missing: true
+- rename:
+    field: zoom.object.id
+    target_field: zoom.sub_account_id
+    ignore_missing: true
+- date:
+    field: zoom.time_stamp
+    target_field: '@timestamp'
+    formats:
+    - UNIX_MS
+    if: ctx?.zoom?.time_stamp != null
+    ignore_failure: true
+- rename:
+    field: zoom.object
+    target_field: zoom.account
+    ignore_missing: true
+#
+# set user.target from account.owner_* fields (create / delete account).
+#
+- set:
+    field: user.target.id
+    value: '{{zoom.account.owner_id}}'
+    ignore_empty_value: true
+- set:
+    field: user.target.email
+    value: '{{zoom.account.owner_email}}'
+    ignore_empty_value: true
+
+#
+# set user.target from old_values.account_* fields (updated account).
+#
+- set:
+    field: user.target.id
+    value: '{{zoom.old_values.id}}'
+    if: 'ctx.zoom?.old_values?.id != null'
+- set:
+    field: user.target.email
+    value: '{{zoom.old_values.account_email}}'
+    if: 'ctx.zoom?.old_values?.account_email != null'
+- set:
+    field: user.target.full_name
+    value: '{{zoom.old_values.account_name}}'
+    if: 'ctx.zoom?.old_values?.account_name != null'
+- set:
+    field: user.target.name
+    value: '{{zoom.old_values.account_alias}}'
+    if: 'ctx.zoom?.old_values?.account_alias != null'
+
+#
+# set user.changes from account.account_* fields (updated account).
+#
+- set:
+    field: user.changes.id
+    value: '{{zoom.account.id}}'
+    if: 'ctx.zoom?.account?.id != null && ctx.zoom?.old_values?.id != ctx.zoom?.account?.id'
+- set:
+    field: user.changes.email
+    value: '{{zoom.account.account_email}}'
+    if: 'ctx.zoom?.account?.account_email != null && ctx.zoom?.old_values?.account_email != ctx.zoom?.account?.account_email'
+- set:
+    field: user.changes.full_name
+    value: '{{zoom.account.account_name}}'
+    if: 'ctx.zoom?.account?.account_name != null && ctx.zoom?.old_values?.account_name != ctx.zoom?.account?.account_name'
+- set:
+    field: user.changes.name
+    value: '{{zoom.account.account_alias}}'
+    if: 'ctx.zoom?.account?.account_alias != null && ctx.zoom?.old_values?.account_alias != ctx.zoom?.account?.account_alias'
+
+#
+# Append to related.user array
+#
+- append:
+    field: related.user
+    value: "{{zoom.account.owner_id}}"
+    allow_duplicates: false
+    if: ctx.zoom?.account?.owner_id != null
+- append:
+    field: related.user
+    value: "{{user.target.id}}"
+    allow_duplicates: false
+    if: ctx.user?.target?.id != null
+- append:
+    field: related.user
+    value: "{{user.changes.id}}"
+    allow_duplicates: false
+    if: ctx.user?.changes?.id != null
+
+#
+# Cleanup
+#
+- remove:
+    field: zoom.time_stamp
+    ignore_missing: true
+on_failure:
+- set:
+    field: error.message
+    value: '{{ _ingest.on_failure_message }}'

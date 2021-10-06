@@ -156,7 +156,7 @@ class TestCommands(metricbeat.BaseTest):
                 self.log_contains("ERROR error fetching status"),
                 self.log_contains("ERROR timeout waiting for an event"),
             ))
-        except:
+        except BaseException:
             # Print log to help debugging this if error message changes
             print(self.get_log())
             raise

@@ -8,10 +8,9 @@
 The `copy_fields` processor copies a field to another one.
 
 `fields`:: List of `from` and `to` pairs to copy from and to.
-`fail_on_error`:: (Optional) If set to true, in case of an error the changes to
-the event are reverted, and the original event is returned. If set to `false`,
-processing continues also if an error happens. Default is `true`.
-`ignore_missing`:: (Optional) Whether to ignore events that lack the source
+`fail_on_error`:: (Optional) If set to `true` and an error occurs, the changes are reverted and the original is returned. If set to `false`,
+processing continues if an error occurs. Default is `true`.
+`ignore_missing`:: (Optional) Indicates whether to ignore events that lack the source
                    field. The default is `false`, which will fail processing of
                    an event if a field is missing.
 

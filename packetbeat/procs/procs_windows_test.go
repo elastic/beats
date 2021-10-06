@@ -33,6 +33,7 @@ func TestParseTableRaw(t *testing.T) {
 	IPv4 := extractTCPRowOwnerPID
 	IPv6 := extractTCP6RowOwnerPID
 
+	pid := uint32(0xCCCCCCCC)
 	for idx, testCase := range []struct {
 		name     string
 		factory  extractorFactory
@@ -52,7 +53,7 @@ func TestParseTableRaw(t *testing.T) {
 			"01000000" +
 				"77777777AAAAAAAA12340000BBBBBBBBFFFF0000CCCCCCCC",
 			[]portProcMapping{
-				{endpoint: endpoint{address: "170.170.170.170", port: 0x1234}, pid: 0xCCCCCCCC},
+				{endpoint: endpoint{address: "170.170.170.170", port: 0x1234}, pid: int(pid)},
 			}, false},
 		{"Two entries (IPv6)", IPv6,
 			"02000000" +

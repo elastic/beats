@@ -18,38 +18,47 @@
 package kibana
 
 import (
-	"time"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
-	Protocol string            `config:"protocol" yaml:"protocol,omitempty"`
-	Host     string            `config:"host" yaml:"host,omitempty"`
-	Path     string            `config:"path" yaml:"path,omitempty"`
-	SpaceID  string            `config:"space.id" yaml:"space.id,omitempty"`
-	Username string            `config:"username" yaml:"username,omitempty"`
-	Password string            `config:"password" yaml:"password,omitempty"`
-	TLS      *tlscommon.Config `config:"ssl" yaml:"ssl"`
-	Timeout  time.Duration     `config:"timeout" yaml:"timeout"`
+	Protocol string `config:"protocol" yaml:"protocol,omitempty"`
+	Host     string `config:"host" yaml:"host,omitempty"`
+	Path     string `config:"path" yaml:"path,omitempty"`
+	SpaceID  string `config:"space.id" yaml:"space.id,omitempty"`
+	Username string `config:"username" yaml:"username,omitempty"`
+	Password string `config:"password" yaml:"password,omitempty"`
+	APIKey   string `config:"api_key" yaml:"api_key,omitempty"`
 
 	// Headers holds headers to include in every request sent to Kibana.
 	Headers map[string]string `config:"headers" yaml:"headers,omitempty"`
 
 	IgnoreVersion bool
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
 }
 
 // DefaultClientConfig connects to a locally running kibana over HTTP
 func DefaultClientConfig() ClientConfig {
 	return ClientConfig{
-		Protocol: "http",
-		Host:     "localhost:5601",
-		Path:     "",
-		SpaceID:  "",
-		Username: "",
-		Password: "",
-		Timeout:  90 * time.Second,
-		TLS:      nil,
+		Protocol:  "http",
+		Host:      "localhost:5601",
+		Path:      "",
+		SpaceID:   "",
+		Username:  "",
+		Password:  "",
+		APIKey:    "",
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
 	}
+}
+
+func (c *ClientConfig) Validate() error {
+	if c.APIKey != "" && (c.Username != "" || c.Password != "") {
+		return fmt.Errorf("cannot set both api_key and username/password")
+	}
+
+	return nil
 }

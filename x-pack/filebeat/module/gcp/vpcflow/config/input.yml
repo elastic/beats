@@ -1,0 +1,40 @@
+{{ if eq .input "gcp-pubsub" }}
+
+type: gcp-pubsub
+project_id: {{ .project_id }}
+topic: {{ .topic }}
+subscription.name: {{ .subscription_name }}
+{{ if .credentials_file }}
+credentials_file: {{ .credentials_file }}
+{{ end }}
+{{ if .credentials_json }}
+credentials_json: {{ .credentials_json }}
+{{ end }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - script:
+      lang: javascript
+      id: gcp_vpcflow_script
+      file: ${path.home}/module/gcp/vpcflow/config/pipeline.js
+      params:
+        keep_original_message: {{ .keep_original_message }}
+        {{ if .internal_networks }}
+        internal_networks: {{ .internal_networks | tojson }}
+        {{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

@@ -61,7 +61,7 @@ For a description of each field in the module, see the
 """
 
         # Write module docs
-        docs_path = os.path.join(os.path.abspath("docs"), "modules",  module + ".asciidoc")
+        docs_path = os.path.join(os.path.abspath("docs"), "modules", module + ".asciidoc")
         with open(docs_path, 'w', encoding='utf_8') as f:
             f.write(module_file)
 

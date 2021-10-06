@@ -1,0 +1,64 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "7206859884978665190",
+            "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-c",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.compute",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "compute": {
+            "firewall": {
+                "dropped_bytes_count": {
+                    "value": 409
+                },
+                "dropped_packets_count": {
+                    "value": 7
+                }
+            },
+            "instance": {
+                "cpu": {
+                    "reserved_cores": {
+                        "value": 4
+                    },
+                    "usage_time": {
+                        "value": 20.02221798910068
+                    },
+                    "utilization": {
+                        "value": 0.0834259082879195
+                    }
+                },
+                "uptime": {
+                    "value": 60
+                }
+            }
+        },
+        "labels": {}
+    },
+    "host": {
+        "cpu": {
+            "usage": 0.0834259082879195
+        },
+        "id": "7206859884978665190",
+        "name": "gke-apm-ci-k8s-cluster-pool-2-e8852348-rt8n"
+    },
+    "metricset": {
+        "name": "compute",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

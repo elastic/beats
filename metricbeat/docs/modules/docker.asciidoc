@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: docker
+
 [[metricbeat-module-docker]]
 == Docker module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module fetches metrics from https://www.docker.com/[Docker] containers. The default metricsets are: `container`, `cpu`, `diskio`, `healthcheck`, `info`, `memory` and `network`. The `image` metricset is not enabled by default.
 
@@ -44,6 +50,7 @@ metricbeat.modules:
     #- "image"
     - "memory"
     - "network"
+    #- "network_summary"
   hosts: ["unix:///var/run/docker.sock"]
   period: 10s
   enabled: true
@@ -60,6 +67,8 @@ metricbeat.modules:
     #certificate:           "/etc/pki/client/cert.pem"
     #key:                   "/etc/pki/client/cert.key"
 ----
+
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 
 [float]
 === Metricsets
@@ -84,6 +93,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-docker-network,network>>
 
+* <<metricbeat-metricset-docker-network_summary,network_summary>>
+
 include::docker/container.asciidoc[]
 
 include::docker/cpu.asciidoc[]
@@ -101,4 +112,6 @@ include::docker/info.asciidoc[]
 include::docker/memory.asciidoc[]
 
 include::docker/network.asciidoc[]
+
+include::docker/network_summary.asciidoc[]
 

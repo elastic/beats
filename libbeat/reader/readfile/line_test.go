@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/text/transform"
 
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -218,10 +219,10 @@ func testReadLineLengths(t *testing.T, lineLengths []int) {
 		lines = append(lines, inputLine)
 	}
 
-	testReadLines(t, lines)
+	testReadLines(t, lines, false)
 }
 
-func testReadLines(t *testing.T, inputLines [][]byte) {
+func testReadLines(t *testing.T, inputLines [][]byte, eofOnLastRead bool) {
 	var inputStream []byte
 	for _, line := range inputLines {
 		inputStream = append(inputStream, line...)
@@ -229,8 +230,14 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 
 	// initialize reader
 	buffer := bytes.NewBuffer(inputStream)
-	codec, _ := encoding.Plain(buffer)
-	reader, err := NewLineReader(ioutil.NopCloser(buffer), Config{codec, buffer.Len(), LineFeed, unlimited})
+
+	var r io.Reader = buffer
+	if eofOnLastRead {
+		r = &eofWithNonZeroNumberOfBytesReader{buf: buffer}
+	}
+
+	codec, _ := encoding.Plain(r)
+	reader, err := NewLineReader(ioutil.NopCloser(r), Config{codec, buffer.Len(), LineFeed, unlimited})
 	if err != nil {
 		t.Fatalf("Error initializing reader: %v", err)
 	}
@@ -254,7 +261,7 @@ func testReadLines(t *testing.T, inputLines [][]byte) {
 }
 
 func testReadLine(t *testing.T, line []byte) {
-	testReadLines(t, [][]byte{line})
+	testReadLines(t, [][]byte{line}, false)
 }
 
 func randomInt(r *rand.Rand, min, max int) int {
@@ -389,4 +396,66 @@ func TestMaxBytesLimit(t *testing.T) {
 			t.Fatalf("lines do not match, expected: %s got: %s", line, s)
 		}
 	}
+}
+
+// test_exceed_buffer from test_harvester.py
+func TestBufferSize(t *testing.T) {
+	lines := []string{
+		"first line is too long\n",
+		"second line is too long\n",
+		"third line too long\n",
+		"OK\n",
+	}
+
+	codecFactory, _ := encoding.FindEncoding("")
+	codec, _ := codecFactory(bytes.NewBuffer(nil))
+	bufferSize := 10
+
+	in := ioutil.NopCloser(strings.NewReader(strings.Join(lines, "")))
+	reader, err := NewLineReader(in, Config{codec, bufferSize, AutoLineTerminator, 1024})
+	if err != nil {
+		t.Fatal("failed to initialize reader:", err)
+	}
+
+	for i := 0; i < len(lines); i++ {
+		b, n, err := reader.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			} else {
+				t.Fatal("unexpected error:", err)
+			}
+		}
+
+		require.Equal(t, n, len(lines[i]))
+		require.Equal(t, string(b[:n]), lines[i])
+	}
+}
+
+// eofWithNonZeroNumberOfBytesReader is an io.Reader implementation that at the
+// end of the stream returns a non-zero number of bytes with io.EOF. This is
+// allowed under the io.Reader interface contract and must be handled by the
+// line reader.
+type eofWithNonZeroNumberOfBytesReader struct {
+	buf *bytes.Buffer
+}
+
+func (r *eofWithNonZeroNumberOfBytesReader) Read(d []byte) (int, error) {
+	n, err := r.buf.Read(d)
+	if err != nil {
+		return n, err
+	}
+
+	// As per the io.Reader contract:
+	//   "a Reader returning a non-zero number of bytes at the end of the input
+	//   stream may return either err == EOF or err == nil."
+	if r.buf.Len() == 0 {
+		return n, io.EOF
+	}
+	return n, nil
+}
+
+// Verify handling of the io.Reader returning n > 0 with io.EOF.
+func TestReadWithNonZeroNumberOfBytesAndEOF(t *testing.T) {
+	testReadLines(t, [][]byte{[]byte("Hello world!\n")}, true)
 }

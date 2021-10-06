@@ -1,0 +1,110 @@
+[
+    {
+        "@timestamp": "2021-01-04T00:17:53.742Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 6589000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 0,
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42608,
+        "postgresql.log.command_tag": "ALTER SYSTEM",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.session_id": "5ff25ea4.36",
+        "postgresql.log.session_start_time": "2021-01-04T00:17:40.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:17:53.742 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/0",
+        "process.pid": "54",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:18:01.055Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 177,
+        "message": "select pg_reload_conf();",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42608,
+        "postgresql.log.command_tag": "idle",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25ea4.36",
+        "postgresql.log.session_start_time": "2021-01-04T00:17:40.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:18:01.055 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/39",
+        "process.pid": "54",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    },
+    {
+        "@timestamp": "2021-01-04T00:18:04.650Z",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "postgresql.log",
+        "event.duration": 148472000,
+        "event.kind": "event",
+        "event.module": "postgresql",
+        "event.timezone": "UTC",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "LOG",
+        "log.offset": 364,
+        "message": "select generate_series(1, 1000000);",
+        "postgresql.log.application_name": "psql",
+        "postgresql.log.client_addr": "172.24.0.1",
+        "postgresql.log.client_port": 42608,
+        "postgresql.log.command_tag": "SELECT",
+        "postgresql.log.database": "postgres",
+        "postgresql.log.query_step": "statement",
+        "postgresql.log.session_id": "5ff25ea4.36",
+        "postgresql.log.session_start_time": "2021-01-04T00:17:40.000Z",
+        "postgresql.log.sql_state_code": "00000",
+        "postgresql.log.timestamp": "2021-01-04 00:18:04.650 UTC",
+        "postgresql.log.transaction_id": 0,
+        "postgresql.log.virtual_transaction_id": "3/0",
+        "process.pid": "54",
+        "related.user": [
+            "postgres"
+        ],
+        "service.type": "postgresql",
+        "user.name": "postgres"
+    }
+]

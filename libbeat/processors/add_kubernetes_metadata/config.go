@@ -18,14 +18,17 @@
 package add_kubernetes_metadata
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 )
 
 type kubeAnnotatorConfig struct {
 	KubeConfig string        `config:"kube_config"`
 	Host       string        `config:"host"`
+	Scope      string        `config:"scope"`
 	Namespace  string        `config:"namespace"`
 	SyncPeriod time.Duration `config:"sync_period"`
 	// Annotations are kept after pod is removed, until they haven't been accessed
@@ -35,6 +38,8 @@ type kubeAnnotatorConfig struct {
 	Matchers        PluginConfig  `config:"matchers"`
 	DefaultMatchers Enabled       `config:"default_matchers"`
 	DefaultIndexers Enabled       `config:"default_indexers"`
+
+	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
 type Enabled struct {
@@ -49,5 +54,18 @@ func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
 		CleanupTimeout:  60 * time.Second,
 		DefaultMatchers: Enabled{true},
 		DefaultIndexers: Enabled{true},
+		Scope:           "node",
 	}
+}
+
+func (k *kubeAnnotatorConfig) Validate() error {
+	if k.Scope != "node" && k.Scope != "cluster" {
+		return fmt.Errorf("invalid scope %s, valid values include `cluster`, `node`", k.Scope)
+	}
+
+	if k.Scope == "cluster" {
+		k.Host = ""
+	}
+
+	return nil
 }

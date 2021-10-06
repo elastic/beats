@@ -26,6 +26,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -42,22 +43,50 @@ func load(t *testing.T, from interface{}) *common.Config {
 
 func TestNewModuleRegistry(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
+
+	falseVar := false
 
 	configs := []*ModuleConfig{
-		&ModuleConfig{Module: "nginx"},
-		&ModuleConfig{Module: "mysql"},
-		&ModuleConfig{Module: "system"},
-		&ModuleConfig{Module: "auditd"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"access": {},
+				"error":  {},
+				"ingress_controller": {
+					Enabled: &falseVar,
+				},
+			},
+		},
+		{
+			Module: "mysql",
+			Filesets: map[string]*FilesetConfig{
+				"slowlog": {},
+				"error":   {},
+			},
+		},
+		{
+			Module: "system",
+			Filesets: map[string]*FilesetConfig{
+				"syslog": {},
+				"auth":   {},
+			},
+		},
+		{
+			Module: "auditd",
+			Filesets: map[string]*FilesetConfig{
+				"log": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error", "ingress_controller"},
+		"nginx":  {"access", "error"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
@@ -77,14 +106,14 @@ func TestNewModuleRegistry(t *testing.T) {
 	for module, filesets := range reg.registry {
 		for name, fileset := range filesets {
 			cfg, err := fileset.getInputConfig()
-			assert.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
+			require.NoError(t, err, fmt.Sprintf("module: %s, fileset: %s", module, name))
 
 			moduleName, err := cfg.String("_module_name", -1)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, module, moduleName)
 
 			filesetName, err := cfg.String("_fileset_name", -1)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, name, filesetName)
 		}
 	}
@@ -92,12 +121,12 @@ func TestNewModuleRegistry(t *testing.T) {
 
 func TestNewModuleRegistryConfig(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	falseVar := false
 
 	configs := []*ModuleConfig{
-		&ModuleConfig{
+		{
 			Module: "nginx",
 			Filesets: map[string]*FilesetConfig{
 				"access": {
@@ -110,29 +139,30 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 				},
 			},
 		},
-		&ModuleConfig{
+		{
 			Module:  "mysql",
 			Enabled: &falseVar,
 		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
 	nginxAccess := reg.registry["nginx"]["access"]
-	assert.NotNil(t, nginxAccess)
-	assert.Equal(t, []interface{}{"/hello/test"}, nginxAccess.vars["paths"])
+	if assert.NotNil(t, nginxAccess) {
+		assert.Equal(t, []interface{}{"/hello/test"}, nginxAccess.vars["paths"])
+	}
 
 	assert.NotContains(t, reg.registry["nginx"], "error")
 }
 
 func TestMovedModule(t *testing.T) {
 	modulesPath, err := filepath.Abs("./test/moved_module")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	configs := []*ModuleConfig{
-		&ModuleConfig{
+		{
 			Module: "old",
 			Filesets: map[string]*FilesetConfig{
 				"test": {},
@@ -141,7 +171,7 @@ func TestMovedModule(t *testing.T) {
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
 
@@ -232,7 +262,7 @@ func TestApplyOverrides(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := applyOverrides(&test.fcfg, test.module, test.fileset, test.overrides)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, &test.expected, result)
 		})
 	}
@@ -251,15 +281,15 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 			configs: []*ModuleConfig{},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
 			expected: []*ModuleConfig{
-				&ModuleConfig{Module: "moduleA"},
-				&ModuleConfig{Module: "moduleB"},
-				&ModuleConfig{Module: "moduleC"},
+				{Module: "moduleA"},
+				{Module: "moduleB"},
+				{Module: "moduleC"},
 			},
 		},
 		{
 			name: "eliminate a duplicate, no override",
 			configs: []*ModuleConfig{
-				&ModuleConfig{
+				{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -272,7 +302,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
 			expected: []*ModuleConfig{
-				&ModuleConfig{
+				{
 					Module: "moduleB",
 					Filesets: map[string]*FilesetConfig{
 						"fileset": {
@@ -282,14 +312,14 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				&ModuleConfig{Module: "moduleA"},
-				&ModuleConfig{Module: "moduleC"},
+				{Module: "moduleA"},
+				{Module: "moduleC"},
 			},
 		},
 		{
 			name: "disabled config",
 			configs: []*ModuleConfig{
-				&ModuleConfig{
+				{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -303,7 +333,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 			},
 			modules: []string{"moduleA", "moduleB", "moduleC"},
 			expected: []*ModuleConfig{
-				&ModuleConfig{
+				{
 					Module:  "moduleB",
 					Enabled: &falseVar,
 					Filesets: map[string]*FilesetConfig{
@@ -314,9 +344,9 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 						},
 					},
 				},
-				&ModuleConfig{Module: "moduleA"},
-				&ModuleConfig{Module: "moduleB"},
-				&ModuleConfig{Module: "moduleC"},
+				{Module: "moduleA"},
+				{Module: "moduleB"},
+				{Module: "moduleC"},
 			},
 		},
 	}
@@ -324,7 +354,7 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := appendWithoutDuplicates(test.configs, test.modules)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, test.expected, result)
 		})
 	}
@@ -372,12 +402,25 @@ func TestMcfgFromConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "empty fileset (nil)",
+			config: load(t, map[string]interface{}{
+				"module": "nginx",
+				"error":  nil,
+			}),
+			expected: ModuleConfig{
+				Module: "nginx",
+				Filesets: map[string]*FilesetConfig{
+					"error": {},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			result, err := mcfgFromConfig(test.config)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, test.expected.Module, result.Module)
 			assert.Equal(t, len(test.expected.Filesets), len(result.Filesets))
 			for name, fileset := range test.expected.Filesets {
@@ -397,12 +440,12 @@ func TestMissingModuleFolder(t *testing.T) {
 	}
 
 	reg, err := NewModuleRegistry(configs, beat.Info{Version: "5.2.0"}, true)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
 	// this should return an empty list, but no error
 	inputs, err := reg.GetInputConfigs()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	assert.Equal(t, 0, len(inputs))
 }
 
@@ -415,19 +458,19 @@ func TestInterpretError(t *testing.T) {
 		{
 			Test:  "other plugin not installed",
 			Input: `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,
-			Output: "This module requires an Elasticsearch plugin that provides the hello_test processor. " +
+			Output: "this module requires an Elasticsearch plugin that provides the hello_test processor. " +
 				"Please visit the Elasticsearch documentation for instructions on how to install this plugin. " +
 				"Response body: " + `{"error":{"root_cause":[{"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}}],"type":"parse_exception","reason":"No processor type exists with name [hello_test]","header":{"processor_type":"hello_test"}},"status":400}`,
 		},
 		{
 			Test:   "Elasticsearch 2.4",
 			Input:  `{"error":{"root_cause":[{"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"}],"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"},"status":400}`,
-			Output: `The Ingest Node functionality seems to be missing from Elasticsearch. The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":{"root_cause":[{"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"}],"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"},"status":400}`,
+			Output: `the Ingest Node functionality seems to be missing from Elasticsearch. The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":{"root_cause":[{"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"}],"type":"invalid_index_name_exception","reason":"Invalid index name [_ingest], must not start with '_'","index":"_ingest"},"status":400}`,
 		},
 		{
 			Test:   "Elasticsearch 1.7",
 			Input:  `{"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
-			Output: `The Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
+			Output: `the Filebeat modules require Elasticsearch >= 5.0. This is the response I got from Elasticsearch: {"error":"InvalidIndexNameException[[_ingest] Invalid index name [_ingest], must not start with '_']","status":400}`,
 		},
 		{
 			Test:   "bad json",
@@ -448,4 +491,133 @@ func TestInterpretError(t *testing.T) {
 			assert.Equal(t, errResult.Error(), test.Output, test.Test)
 		})
 	}
+}
+
+func TestEnableFilesetsFromOverrides(t *testing.T) {
+	tests := []struct {
+		Name      string
+		Cfg       []*ModuleConfig
+		Overrides *ModuleOverrides
+		Expected  []*ModuleConfig
+	}{
+		{
+			Name: "add fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"baz": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+						"baz": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "defined fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "disabled module",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "nil overrides",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: nil,
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "no modules",
+			Cfg:  nil,
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			enableFilesetsFromOverrides(test.Cfg, test.Overrides)
+			assert.Equal(t, test.Expected, test.Cfg)
+		})
+	}
+
 }

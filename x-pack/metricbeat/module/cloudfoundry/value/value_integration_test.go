@@ -49,5 +49,6 @@ func TestData(t *testing.T) {
 	require.NotEmpty(t, events)
 
 	beatEvent := mbtest.StandardizeEvent(ms, events[0])
+	mtest.CleanFields(beatEvent)
 	mbtest.WriteEventToDataJSON(t, beatEvent, "")
 }

@@ -1,0 +1,37 @@
+{{ if eq .input "http_endpoint" }}
+
+type: http_endpoint
+listen_address: {{ .listen_address }}
+listen_port: {{ .listen_port }}
+{{ if .url }}url: {{ .url}}{{ end }}
+prefix: {{ .prefix }}
+basic_auth: {{ .basic_auth }}
+username: {{ .username }}
+password: {{ .password }}
+content_type: "{{ .content_type }}"
+secret: {{ .secret | tojson }}
+ssl: {{ .ssl | tojson }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: zoom
+  - add_locale: ~
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

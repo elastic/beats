@@ -28,9 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 )
 
 type kafkaInputConfig struct {
@@ -53,6 +53,7 @@ type kafkaInputConfig struct {
 	Username                 string            `config:"username"`
 	Password                 string            `config:"password"`
 	ExpandEventListFromField string            `config:"expand_event_list_from_field"`
+	Parsers                  parser.Config     `config:",inline"`
 }
 
 type kafkaFetch struct {
@@ -177,7 +178,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	}
 	if tls != nil {
 		k.Net.TLS.Enable = true
-		k.Net.TLS.Config = tls.BuildModuleConfig("")
+		k.Net.TLS.Config = tls.BuildModuleClientConfig("")
 	}
 
 	if config.Kerberos.IsEnabled() {
@@ -193,6 +194,7 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 			Username:           config.Kerberos.Username,
 			Password:           config.Kerberos.Password,
 			Realm:              config.Kerberos.Realm,
+			DisablePAFXFAST:    !config.Kerberos.EnableFAST,
 		}
 	}
 
@@ -214,7 +216,6 @@ func newSaramaConfig(config kafkaInputConfig) (*sarama.Config, error) {
 	)
 
 	if err := k.Validate(); err != nil {
-		logp.Err("Invalid kafka configuration: %v", err)
 		return nil, err
 	}
 	return k, nil

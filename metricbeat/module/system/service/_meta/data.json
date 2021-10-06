@@ -10,32 +10,28 @@
         "period": 10000
     },
     "process": {
-        "pid": 811
+        "exit_code": 0,
+        "pid": 259
     },
     "service": {
         "type": "system"
     },
     "system": {
         "service": {
+            "exec_code": "exited",
             "load_state": "loaded",
-            "name": "NetworkManager.service",
-            "resources": {
-                "memory": {
-                    "usage": {
-                        "bytes": 15646720
-                    }
-                },
-                "tasks": {
-                    "count": 4
-                }
-            },
-            "state": "active",
-            "state_since": "2019-10-18T21:24:57.581561-07:00",
-            "sub_state": "running"
+            "name": "dracut-pre-udev.service",
+            "state": "inactive",
+            "state_since": "2020-08-26T18:05:23.525244-07:00",
+            "sub_state": "dead",
+            "unit_file": {
+                "state": "static",
+                "vendor_preset": "disabled"
+            }
         }
     },
     "systemd": {
-        "fragment_path": "/usr/lib/systemd/system/NetworkManager.service",
-        "unit": "NetworkManager.service"
+        "fragment_path": "/usr/lib/dracut/modules.d/98dracut-systemd/dracut-pre-udev.service",
+        "unit": "dracut-pre-udev.service"
     }
 }

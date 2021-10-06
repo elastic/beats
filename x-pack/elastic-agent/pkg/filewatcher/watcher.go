@@ -50,7 +50,7 @@ type Watch struct {
 func New(log *logger.Logger, f Comparer) (*Watch, error) {
 	var err error
 	if log == nil {
-		log, err = logger.New("watcher")
+		log, err = logger.New("watcher", false)
 		if err != nil {
 			return nil, err
 		}

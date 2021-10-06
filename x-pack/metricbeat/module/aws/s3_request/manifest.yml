@@ -1,0 +1,68 @@
+default: true
+input:
+  module: aws
+  metricset: cloudwatch
+  defaults:
+    metrics:
+      - namespace: AWS/S3
+        statistic: ["Average"]
+        name:
+          - AllRequests
+          - GetRequests
+          - PutRequests
+          - DeleteRequests
+          - HeadRequests
+          - PostRequests
+          - SelectRequests
+          - SelectScannedBytes
+          - SelectReturnedBytes
+          - ListRequests
+          - BytesDownloaded
+          - BytesUploaded
+          - 4xxErrors
+          - 5xxErrors
+          - FirstByteLatency
+          - TotalRequestLatency
+
+processors:
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: "aws.s3.metrics.AllRequests.avg"
+          to: "aws.s3_request.requests.total"
+        - from: "aws.s3.metrics.GetRequests.avg"
+          to: "aws.s3_request.requests.get"
+        - from: "aws.s3.metrics.PutRequests.avg"
+          to: "aws.s3_request.requests.put"
+        - from: "aws.s3.metrics.DeleteRequests.avg"
+          to: "aws.s3_request.requests.delete"
+        - from: "aws.s3.metrics.HeadRequests.avg"
+          to: "aws.s3_request.requests.head"
+        - from: "aws.s3.metrics.PostRequests.avg"
+          to: "aws.s3_request.requests.post"
+        - from: "aws.s3.metrics.SelectRequests.avg"
+          to: "aws.s3_request.requests.select"
+        - from: "aws.s3.metrics.SelectScannedBytes.avg"
+          to: "aws.s3_request.requests.select_scanned.bytes"
+        - from: "aws.s3.metrics.SelectReturnedBytes.avg"
+          to: "aws.s3_request.requests.select_returned.bytes"
+        - from: "aws.s3.metrics.ListRequests.avg"
+          to: "aws.s3_request.requests.list"
+        - from: "aws.s3.metrics.BytesDownloaded.avg"
+          to: "aws.s3_request.downloaded.bytes"
+        - from: "aws.s3.metrics.BytesUploaded.avg"
+          to: "aws.s3_request.uploaded.bytes"
+        - from: "aws.s3.metrics.4xxErrors.avg"
+          to: "aws.s3_request.errors.4xx"
+        - from: "aws.s3.metrics.5xxErrors.avg"
+          to: "aws.s3_request.errors.5xx"
+        - from: "aws.s3.metrics.FirstByteLatency.avg"
+          to: "aws.s3_request.latency.first_byte.ms"
+        - from: "aws.s3.metrics.TotalRequestLatency.avg"
+          to: "aws.s3_request.latency.total_request.ms"
+        - from: "aws.dimensions.BucketName"
+          to: "aws.s3.bucket.name"
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - "aws.s3.metrics"

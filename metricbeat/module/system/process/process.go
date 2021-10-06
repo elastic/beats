@@ -21,17 +21,19 @@ package process
 
 import (
 	"fmt"
+	"os"
 	"runtime"
 
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
 	"github.com/elastic/beats/v7/libbeat/metric/system/process"
+	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/system"
-	"github.com/elastic/gosigar/cgroup"
 )
 
 var debugf = logp.MakeDebug("system.process")
@@ -46,9 +48,10 @@ func init() {
 // MetricSet that fetches process metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	stats  *process.Stats
-	cgroup *cgroup.Reader
-	perCPU bool
+	stats   *process.Stats
+	cgroup  *cgroup.Reader
+	perCPU  bool
+	IsAgent bool
 }
 
 // New creates and returns a new MetricSet.
@@ -58,41 +61,49 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, err
 	}
 
+	systemModule, ok := base.Module().(*system.Module)
+	if !ok {
+		return nil, fmt.Errorf("unexpected module type")
+	}
+
+	enableCgroups := false
+	if runtime.GOOS == "linux" {
+		if config.Cgroups == nil || *config.Cgroups {
+			enableCgroups = true
+			debugf("process cgroup data collection is enabled, using hostfs='%v'", paths.Paths.Hostfs)
+		}
+	}
+
 	m := &MetricSet{
 		BaseMetricSet: base,
 		stats: &process.Stats{
-			Procs:        config.Procs,
-			EnvWhitelist: config.EnvWhitelist,
-			CpuTicks:     config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
-			CacheCmdLine: config.CacheCmdLine,
-			IncludeTop:   config.IncludeTop,
+			Procs:         config.Procs,
+			EnvWhitelist:  config.EnvWhitelist,
+			CPUTicks:      config.IncludeCPUTicks || (config.CPUTicks != nil && *config.CPUTicks),
+			CacheCmdLine:  config.CacheCmdLine,
+			IncludeTop:    config.IncludeTop,
+			EnableCgroups: enableCgroups,
+			CgroupOpts: cgroup.ReaderOptions{
+				RootfsMountpoint:  paths.Paths.Hostfs,
+				IgnoreRootCgroups: true,
+			},
 		},
-		perCPU: config.IncludePerCPU,
+		perCPU:  config.IncludePerCPU,
+		IsAgent: systemModule.IsAgent,
 	}
+
+	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
+	if len(paths.Paths.Hostfs) < 2 {
+		override, isset := os.LookupEnv("LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE")
+		if isset {
+			m.stats.CgroupOpts.CgroupsHierarchyOverride = override
+		}
+	}
+
 	err := m.stats.Init()
 	if err != nil {
 		return nil, err
 	}
-
-	if runtime.GOOS == "linux" {
-		systemModule, ok := base.Module().(*system.Module)
-		if !ok {
-			return nil, fmt.Errorf("unexpected module type")
-		}
-
-		if config.Cgroups == nil || *config.Cgroups {
-			debugf("process cgroup data collection is enabled, using hostfs='%v'", systemModule.HostFS)
-			m.cgroup, err = cgroup.NewReader(systemModule.HostFS, true)
-			if err != nil {
-				if err == cgroup.ErrCgroupsMissing {
-					logp.Warn("cgroup data collection will be disabled: %v", err)
-				} else {
-					return nil, errors.Wrap(err, "error initializing cgroup reader")
-				}
-			}
-		}
-	}
-
 	return m, nil
 }
 
@@ -102,25 +113,6 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	procs, err := m.stats.Get()
 	if err != nil {
 		return errors.Wrap(err, "process stats")
-	}
-
-	if m.cgroup != nil {
-		for _, proc := range procs {
-			pid, ok := proc["pid"].(int)
-			if !ok {
-				debugf("error converting pid to int for proc %+v", proc)
-				continue
-			}
-			stats, err := m.cgroup.GetStatsForProcess(pid)
-			if err != nil {
-				debugf("error getting cgroups stats for pid=%d, %v", pid, err)
-				continue
-			}
-
-			if statsMap := cgroupStatsToMap(stats, m.perCPU); statsMap != nil {
-				proc["cgroup"] = statsMap
-			}
-		}
 	}
 
 	for _, proc := range procs {
@@ -136,6 +128,25 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			},
 		}
 
+		if m.stats.EnableCgroups && !m.perCPU {
+			proc.Delete("cgroup.cpuacct.percpu")
+		}
+
+		// Duplicate system.process.cmdline with ECS name process.command_line
+		rootFields = getAndCopy(proc, "cmdline", rootFields, "process.command_line")
+
+		// Duplicate system.process.state with process.state
+		rootFields = getAndCopy(proc, "state", rootFields, "process.state")
+
+		// Duplicate system.process.cpu.start_time with process.cpu.start_time
+		rootFields = getAndCopy(proc, "cpu.start_time", rootFields, "process.cpu.start_time")
+
+		// Duplicate system.process.cpu.total.norm.pct with process.cpu.pct
+		rootFields = getAndCopy(proc, "cpu.total.norm.pct", rootFields, "process.cpu.pct")
+
+		// Duplicate system.process.memory.rss.pct with process.memory.pct
+		rootFields = getAndCopy(proc, "memory.rss.pct", rootFields, "process.memory.pct")
+
 		if cwd := getAndRemove(proc, "cwd"); cwd != nil {
 			rootFields.Put("process.working_directory", cwd)
 		}
@@ -146,6 +157,11 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 		if args := getAndRemove(proc, "args"); args != nil {
 			rootFields.Put("process.args", args)
+		}
+
+		// "share" is unavailable on Windows.
+		if runtime.GOOS == "windows" {
+			proc.Delete("memory.share")
 		}
 
 		e := mb.Event{
@@ -167,4 +183,14 @@ func getAndRemove(from common.MapStr, field string) interface{} {
 		return v
 	}
 	return nil
+}
+
+func getAndCopy(from common.MapStr, field string, to common.MapStr, toField string) common.MapStr {
+	v, err := from.GetValue(field)
+	if err != nil {
+		return to
+	}
+
+	_, err = to.Put(toField, v)
+	return to
 }

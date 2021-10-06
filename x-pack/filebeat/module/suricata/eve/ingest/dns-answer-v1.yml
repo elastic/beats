@@ -1,0 +1,43 @@
+---
+description: Pipeline for Suricata DNS answers v1
+
+# Suricata DNS v1 events contain a single answer. Multiple events are created
+# to represent all of the answers.
+processors:
+  - script:
+      lang: painless
+      tag: suricata_dns_answer_v1
+      source: |
+        def name = ctx?.suricata?.eve?.dns?.rrname;
+        def data = ctx?.suricata?.eve?.dns?.rdata;
+        def type = ctx?.suricata?.eve?.dns?.rrtype;
+        def ttl = ctx?.suricata?.eve?.dns?.ttl;
+
+        def answer = [:];
+        if (name != null) {
+            answer["name"] = name;
+        }
+        if (data != null) {
+            answer["data"] = data;
+        }
+        if (type != null) {
+            answer["type"] = type;
+        }
+        if (ttl != null) {
+            answer["ttl"] = ttl;
+        }
+        if (!answer.isEmpty()) {
+            ctx.dns.answers = [answer];
+        }
+
+        if (type == "A" || type == "AAAA") {
+            ctx.dns.resolved_ip = [data];
+        }
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in DNS v1 pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}

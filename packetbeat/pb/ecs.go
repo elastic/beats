@@ -54,7 +54,11 @@ type ecsRelated struct {
 	User []string `ecs:"user"`
 	// overridden because this needs to be an array
 	Hash []string `ecs:"hash"`
+	// overridden because this needs to be an array
+	Hosts []string `ecs:"hosts"`
 
 	// for de-dup
-	ipSet map[string]struct{}
+	ipSet   map[string]struct{}
+	userSet map[string]struct{}
+	hostSet map[string]struct{}
 }

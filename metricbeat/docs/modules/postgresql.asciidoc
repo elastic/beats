@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: postgresql
+
 [[metricbeat-module-postgresql]]
 == PostgreSQL module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.
@@ -61,7 +67,7 @@ precedence over those specified in the `username` and `password` config options.
 [float]
 === Compatibility
 
-This module was tested with PostgreSQL 9.5.3 and is expected to work with all
+This module was tested with PostgreSQL 9, 10, 11, 12 and 13. It is expected to work with all
 versions >= 9.
 
 
@@ -85,6 +91,10 @@ metricbeat.modules:
 
     # Stats about every PostgreSQL process
     - activity
+
+    # Stats about every statement executed in the server. It requires the
+    # `pg_stats_statement` library to be configured in the server.
+    #- statement
 
   period: 10s
 

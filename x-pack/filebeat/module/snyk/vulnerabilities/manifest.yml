@@ -1,0 +1,75 @@
+module_version: 1.0
+
+var:
+  - name: tags
+    default: [snyk-vulnerabilities, forwarded]
+  - name: input
+    default: httpjson
+  - name: first_interval
+    default: "24h"
+  - name: interval
+    default: 24h
+  - name: url
+    default: https://snyk.io/api/v1/reporting/issues/?page=1&perPage=10&sortBy=issueTitle&order=asc&groupBy=issue
+  - name: api_token
+  - name: ssl
+  - name: orgs
+  - name: included_severity
+    default:
+      - critical
+      - high
+      - medium
+      - low
+  - name: exploit_maturity
+    default:
+      - mature
+      - proof-of-concept
+      - no-known-exploit
+      - no-data
+  - name: types
+    default:
+      - vuln
+      - license
+      - configuration
+  - name: languages
+    default:
+      - javascript
+      - ruby
+      - java
+      - scala
+      - python
+      - golang
+      - php
+      - dotnet
+      - swift-objective-c
+      - elixir
+      - docker
+      - terraform
+      - kubernetes
+      - helm
+      - cloudformation
+  - name: identifier
+    default: ""
+  - name: ignored
+    default: false
+  - name: patched
+    default: false
+  - name: fixable
+    default: false
+  - name: is_fixed
+    default: false
+  - name: is_upgradeable
+    default: false
+  - name: is_patchable
+    default: false
+  - name: is_pinnable
+    default: false
+  - name: min_priority_score
+    default: 0
+  - name: max_priority_score
+    default: 1000
+  - name: proxy_url
+
+ingest_pipeline:
+  - ingest/pipeline.yml
+input: config/config.yml

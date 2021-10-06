@@ -6,19 +6,21 @@ package httpjson
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
-	"github.com/hashicorp/go-retryablehttp"
+	retryablehttp "github.com/hashicorp/go-retryablehttp"
 	"go.uber.org/zap"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -41,9 +43,9 @@ type retryLogger struct {
 	log *logp.Logger
 }
 
-func newRetryLogger() *retryLogger {
+func newRetryLogger(log *logp.Logger) *retryLogger {
 	return &retryLogger{
-		log: logp.NewLogger("httpjson.retryablehttp", zap.AddCallerSkip(1)),
+		log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1)),
 	}
 }
 
@@ -63,150 +65,161 @@ func (log *retryLogger) Warn(format string, args ...interface{}) {
 	log.log.Warnf(format, args...)
 }
 
-type httpJSONInput struct {
-	config    config
-	tlsConfig *tlscommon.TLSConfig
-}
-
-func Plugin() v2.Plugin {
+func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    NewInputManager(log, store),
 	}
 }
 
-func configure(cfg *common.Config) (stateless.Input, error) {
-	conf := defaultConfig()
-	if err := cfg.Unpack(&conf); err != nil {
-		return nil, err
-	}
-
-	return newHTTPJSONInput(conf)
-}
-
-func newHTTPJSONInput(config config) (*httpJSONInput, error) {
-	if err := config.Validate(); err != nil {
-		return nil, err
-	}
-
-	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
-	if err != nil {
-		return nil, err
-	}
-
-	return &httpJSONInput{
-		config:    config,
-		tlsConfig: tlsConfig,
-	}, nil
-}
-
-func (*httpJSONInput) Name() string { return inputName }
-
-func (in *httpJSONInput) Test(v2.TestContext) error {
+func test(url *url.URL) error {
 	port := func() string {
-		if in.config.URL.Port() != "" {
-			return in.config.URL.Port()
+		if url.Port() != "" {
+			return url.Port()
 		}
-		switch in.config.URL.Scheme {
+		switch url.Scheme {
 		case "https":
 			return "443"
 		}
 		return "80"
 	}()
 
-	_, err := net.DialTimeout("tcp", net.JoinHostPort(in.config.URL.Hostname(), port), time.Second)
+	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
 	if err != nil {
-		return fmt.Errorf("url %q is unreachable", in.config.URL)
+		return fmt.Errorf("url %q is unreachable", url)
 	}
 
 	return nil
 }
 
-// Run starts the input and blocks until it ends the execution.
-// It will return on context cancellation, any other error will be retried.
-func (in *httpJSONInput) Run(ctx v2.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.With("url", in.config.URL)
+func run(
+	ctx v2.Context,
+	config config,
+	publisher inputcursor.Publisher,
+	cursor *inputcursor.Cursor,
+) error {
+	log := ctx.Logger.With("input_url", config.Request.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	httpClient, err := in.newHTTPClient(stdCtx)
+	httpClient, err := newHTTPClient(stdCtx, config, log)
 	if err != nil {
 		return err
 	}
 
-	dateCursor := newDateCursorFromConfig(in.config, log)
+	requestFactory := newRequestFactory(config.Request, config.Auth, log)
+	pagination := newPagination(config, httpClient, log)
+	responseProcessor := newResponseProcessor(config.Response, pagination, log)
+	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
 
-	rateLimiter := newRateLimiterFromConfig(in.config, log)
+	trCtx := emptyTransformContext()
+	trCtx.cursor = newCursor(config.Cursor, log)
+	trCtx.cursor.load(cursor)
 
-	pagination := newPaginationFromConfig(in.config)
+	doFunc := func() error {
+		log.Info("Process another repeated request.")
 
-	requester := newRequester(
-		in.config,
-		rateLimiter,
-		dateCursor,
-		pagination,
-		httpClient,
-		log,
-	)
+		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+			log.Errorf("Error while processing http request: %v", err)
+		}
 
-	// TODO: disallow passing interval = 0 as a mean to run once.
-	if in.config.Interval == 0 {
-		return requester.processHTTPRequest(stdCtx, publisher)
+		if stdCtx.Err() != nil {
+			return err
+		}
+
+		return nil
 	}
 
-	err = timed.Periodic(stdCtx, in.config.Interval, func() error {
-		log.Info("Process another repeated request.")
-		if err := requester.processHTTPRequest(stdCtx, publisher); err != nil {
-			log.Error(err)
-		}
-		return nil
-	})
+	// we trigger the first call immediately,
+	// then we schedule it on the given interval using timed.Periodic
+	if err = doFunc(); err == nil {
+		err = timed.Periodic(stdCtx, config.Interval, doFunc)
+	}
 
-	log.Infof("Context done: %v", err)
+	log.Infof("Input stopped because context was cancelled with: %v", err)
 
 	return nil
 }
 
-func (in *httpJSONInput) newHTTPClient(ctx context.Context) (*http.Client, error) {
+func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
 	// Make retryable HTTP client
+	netHTTPClient, err := config.Request.Transport.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithKeepaliveSettings{Disable: true},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
+
 	client := &retryablehttp.Client{
-		HTTPClient: &http.Client{
-			Transport: &http.Transport{
-				DialContext: (&net.Dialer{
-					Timeout: in.config.HTTPClientTimeout,
-				}).DialContext,
-				TLSClientConfig:   in.tlsConfig.ToConfig(),
-				DisableKeepAlives: true,
-			},
-			Timeout: in.config.HTTPClientTimeout,
-		},
-		Logger:       newRetryLogger(),
-		RetryWaitMin: in.config.RetryWaitMin,
-		RetryWaitMax: in.config.RetryWaitMax,
-		RetryMax:     in.config.RetryMax,
+		HTTPClient:   netHTTPClient,
+		Logger:       newRetryLogger(log),
+		RetryWaitMin: config.Request.Retry.getWaitMin(),
+		RetryWaitMax: config.Request.Retry.getWaitMax(),
+		RetryMax:     config.Request.Retry.getMaxAttempts(),
 		CheckRetry:   retryablehttp.DefaultRetryPolicy,
 		Backoff:      retryablehttp.DefaultBackoff,
 	}
 
-	if in.config.OAuth2.IsEnabled() {
-		return in.config.OAuth2.Client(ctx, client.StandardClient())
+	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
+
+	if config.Auth.OAuth2.isEnabled() {
+		authClient, err := config.Auth.OAuth2.client(ctx, client.StandardClient())
+		if err != nil {
+			return nil, err
+		}
+		return &httpClient{client: authClient, limiter: limiter}, nil
 	}
 
-	return client.StandardClient(), nil
+	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
 }
 
-func makeEvent(body string) beat.Event {
+func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
+	return func(req *http.Request, via []*http.Request) error {
+		log.Debug("http client: checking redirect")
+		if len(via) >= config.RedirectMaxRedirects {
+			log.Debug("http client: max redirects exceeded")
+			return fmt.Errorf("stopped after %d redirects", config.RedirectMaxRedirects)
+		}
+
+		if !config.RedirectForwardHeaders || len(via) == 0 {
+			log.Debugf("http client: nothing to do while checking redirects - forward_headers: %v, via: %#v", config.RedirectForwardHeaders, via)
+			return nil
+		}
+
+		prev := via[len(via)-1] // previous request to get headers from
+
+		log.Debugf("http client: forwarding headers from previous request: %#v", prev.Header)
+		req.Header = prev.Header.Clone()
+
+		for _, k := range config.RedirectHeadersBanList {
+			log.Debugf("http client: ban header %v", k)
+			req.Header.Del(k)
+		}
+
+		return nil
+	}
+}
+
+func makeEvent(body common.MapStr) (beat.Event, error) {
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return beat.Event{}, err
+	}
+	now := timeNow()
 	fields := common.MapStr{
 		"event": common.MapStr{
-			"created": time.Now().UTC(),
+			"created": now,
 		},
-		"message": body,
+		"message": string(bodyBytes),
 	}
 
 	return beat.Event{
-		Timestamp: time.Now().UTC(),
+		Timestamp: now,
 		Fields:    fields,
-	}
+	}, nil
 }

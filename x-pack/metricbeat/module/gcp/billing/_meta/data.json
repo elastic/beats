@@ -1,0 +1,29 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud.account.id": "01475F-5B1080-1137E7",
+    "cloud.project.id": "elastic-bi",
+    "cloud.project.name": "elastic-containerlib-prod",
+    "cloud.provider": "gcp",
+    "event": {
+        "dataset": "gcp.billing",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "billing": {
+            "billing_account_id": "01475F-5B1080-1137E7",
+            "cost_type": "regular",
+            "invoice_month": "202106",
+            "project_id": "containerlib-prod-12763",
+            "project_name": "elastic-containerlib-prod",
+            "total": 4717.170681
+        }
+    },
+    "metricset": {
+        "name": "billing",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

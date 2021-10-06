@@ -1,0 +1,244 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Scheduler end to end scheduling duration [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": "0",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(63,112,2,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Under 16ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.16000",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "2a21d690-9c9d-11e9-8174-4589c2c40897",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(138,223,24,1)",
+                        "fill": "0.4",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "a0344a80-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "Under 512ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.512000",
+                                "id": "a0347190-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "a0347190-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "9a865d10-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(174,161,255,1)",
+                        "fill": "0.3",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "c456c780-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "Under 1024ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.1024000",
+                                "id": "c456c781-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "c456c781-9ca1-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "a77cd850-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(115,216,255,1)",
+                        "fill": "0.2",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "127a9810-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "Under 4096ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.4096000",
+                                "id": "127a9811-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "127a9811-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "b48a0fe0-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,196,0,1)",
+                        "fill": "0.1",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "6a2ba130-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "Under 8192ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.8192000",
+                                "id": "6a2ba131-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "6a2ba131-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "c727fe00-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(209,119,103,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "f93a66e0-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "Under 16384ms",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.16384000",
+                                "id": "f93a66e1-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "f93a66e1-9ca2-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "ce42d700-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "0",
+                        "formatter": "number",
+                        "hidden": false,
+                        "id": "310452c0-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                        "label": "All",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "kubernetes.scheduler.scheduling.e2e.duration.us.bucket.+Inf",
+                                "id": "310452c1-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "310452c1-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "id": "e0692420-9ca3-11e9-9b2f-4dae0cc2bdf1",
+                                "type": "derivative",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Scheduler end to end scheduling duration [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d9fc1b80-9c9c-11e9-94fd-c91206cd5249",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:39.447Z",
+    "version": "WzQwMzksMV0="
+}

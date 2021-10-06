@@ -114,7 +114,7 @@ input {
   beats {
     port => 5044
   }
-}}
+}
 
 output {
   if [@metadata][_id] {

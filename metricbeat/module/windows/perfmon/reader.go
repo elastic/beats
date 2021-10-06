@@ -23,11 +23,16 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
+
+	"math/rand"
+
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -44,7 +49,6 @@ const (
 // Reader will contain the config options
 type Reader struct {
 	query    pdh.Query    // PDH Query
-	executed bool         // Indicates if the query has been executed.
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
@@ -73,78 +77,23 @@ func NewReader(config Config) (*Reader, error) {
 		config: config,
 	}
 	r.mapCounters(config)
-	for i, counter := range r.counters {
-		r.counters[i].ChildQueries = []string{}
-		childQueries, err := query.GetCounterPaths(counter.QueryName)
-		if err != nil {
-			if config.IgnoreNECounters {
-				switch err {
-				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
-					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
-					r.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.QueryName)
-					continue
-				}
-			} else {
-				query.Close()
-				return nil, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
-			}
-		}
-		// check if the pdhexpandcounterpath/pdhexpandwildcardpath functions have expanded the counter successfully.
-		if len(childQueries) == 0 || (len(childQueries) == 1 && strings.Contains(childQueries[0], "*")) {
-			// covering cases when PdhExpandWildCardPathW returns no counter paths or is unable to expand and the ignore_non_existent_counters flag is set
-			if config.IgnoreNECounters {
-				r.log.Infow("Ignoring non existent counter", "initial query", counter.QueryName,
-					logp.Namespace("perfmon"), "expanded query", childQueries)
-				continue
-			}
-			return nil, errors.Errorf(`failed to expand counter (query="%v"), no error returned`, counter.QueryName)
-		}
-		for _, v := range childQueries {
-			if err := query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
-				return nil, errors.Wrapf(err, `failed to add counter (query="%v")`, counter.QueryName)
-			}
-			r.counters[i].ChildQueries = append(r.counters[i].ChildQueries, v)
-		}
+	_, err := r.getCounterPaths()
+	if err != nil {
+		return nil, err
 	}
 	return r, nil
 }
 
 // RefreshCounterPaths will recheck for any new instances and add them to the counter list
 func (re *Reader) RefreshCounterPaths() error {
-	var newCounters []string
-	for i, counter := range re.counters {
-		re.counters[i].ChildQueries = []string{}
-		childQueries, err := re.query.GetCounterPaths(counter.QueryName)
-		if err != nil {
-			if re.config.IgnoreNECounters {
-				switch err {
-				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
-					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
-					re.log.Infow("Ignoring non existent counter", "error", err,
-						logp.Namespace("perfmon"), "query", counter.QueryName)
-					continue
-				}
-			} else {
-				return errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
-			}
-		}
-		newCounters = append(newCounters, childQueries...)
-		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
-		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
-			for _, v := range childQueries {
-				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, len(childQueries) > 1); err != nil {
-					return errors.Wrapf(err, "failed to add counter (query='%v')", counter.QueryName)
-				}
-				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
-			}
-		}
+	newCounters, err := re.getCounterPaths()
+	if err != nil {
+		return errors.Wrap(err, "failed retrieving counter paths")
 	}
-	err := re.query.RemoveUnusedCounters(newCounters)
+	err = re.query.RemoveUnusedCounters(newCounters)
 	if err != nil {
 		return errors.Wrap(err, "failed removing unused counter values")
 	}
-
 	return nil
 }
 
@@ -163,7 +112,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	}
 
 	// Get the values.
-	values, err := re.query.GetFormattedCounterValues()
+	values, err := re.getValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
@@ -175,13 +124,85 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	} else {
 		events = re.groupToEvents(values)
 	}
-	re.executed = true
 	return events, nil
+}
+
+func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
+	var val map[string][]pdh.CounterValue
+	rand.Seed(time.Now().UnixNano())
+	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
+	event, err := windows.CreateEvent(nil, 0, 0, title)
+	if err != nil {
+		return nil, err
+	}
+	defer windows.CloseHandle(event)
+	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
+	if err != nil {
+		return nil, err
+	}
+	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	if err != nil {
+		return nil, err
+	}
+	switch waitFor {
+	case windows.WAIT_OBJECT_0:
+		val, err = re.query.GetFormattedCounterValues()
+		if err != nil {
+			return nil, err
+		}
+	case windows.WAIT_FAILED:
+		return nil, errors.New("WaitForSingleObject has failed")
+	default:
+		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
+	}
+	return val, err
+}
+
+func randSeq(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // Close will close the PDH query for now.
 func (re *Reader) Close() error {
 	return re.query.Close()
+}
+
+// getCounterPaths func will process the counter paths based on the configuration options entered
+func (re *Reader) getCounterPaths() ([]string, error) {
+	var newCounters []string
+	for i, counter := range re.counters {
+		re.counters[i].ChildQueries = []string{}
+		childQueries, err := re.query.GetCounterPaths(counter.QueryName)
+		if err != nil {
+			if re.config.IgnoreNECounters {
+				switch err {
+				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
+					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
+					re.log.Infow("Ignoring non existent counter", "error", err,
+						logp.Namespace("perfmon"), "query", counter.QueryName)
+					continue
+				}
+			} else {
+				return newCounters, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
+			}
+		}
+		newCounters = append(newCounters, childQueries...)
+		// there are cases when the ExpandWildCardPath will retrieve a successful status but not an expanded query so we need to check for the size of the list
+		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
+			for _, v := range childQueries {
+				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, isWildcard(childQueries, counter.InstanceName)); err != nil {
+					return newCounters, errors.Wrapf(err, "failed to add counter (query='%v')", counter.QueryName)
+				}
+				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
+			}
+		}
+	}
+	return newCounters, nil
 }
 
 func (re *Reader) getCounter(query string) (bool, PerfCounter) {
@@ -309,4 +330,15 @@ func replaceUpperCase(src string) string {
 		}
 		return newStr
 	})
+}
+
+// isWildcard function checks if users has configured a wildcard inside the instance configuration option and if the wildcard has been resulted in a valid number of queries
+func isWildcard(queries []string, instance string) bool {
+	if len(queries) > 1 {
+		return true
+	}
+	if len(queries) == 1 && strings.Contains(instance, "*") {
+		return true
+	}
+	return false
 }

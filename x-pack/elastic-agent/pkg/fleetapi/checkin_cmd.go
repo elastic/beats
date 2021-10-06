@@ -15,17 +15,20 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/fleetapi/client"
 )
 
-const checkingPath = "/api/ingest_manager/fleet/agents/%s/checkin"
+const checkingPath = "/api/fleet/agents/%s/checkin"
 
 // CheckinRequest consists of multiple events reported to fleet ui.
 type CheckinRequest struct {
+	Status   string              `json:"status"`
+	AckToken string              `json:"ack_token,omitempty"`
 	Events   []SerializableEvent `json:"events"`
 	Metadata *info.ECSMeta       `json:"local_metadata,omitempty"`
 }
 
-// SerializableEvent is a representation of the event to be send to the Fleet API via the checkin
+// SerializableEvent is a representation of the event to be send to the Fleet Server API via the checkin
 // endpoint, we are liberal into what we accept to be send you only need a type and be able to be
 // serialized into JSON.
 type SerializableEvent interface {
@@ -48,7 +51,8 @@ func (e *CheckinRequest) Validate() error {
 // CheckinResponse is the response send back from the server which contains all the action that
 // need to be executed or proxy to running processes.
 type CheckinResponse struct {
-	Actions Actions `json:"actions"`
+	AckToken string  `json:"ack_token"`
+	Actions  Actions `json:"actions"`
 }
 
 // Validate validates the response send from the server.
@@ -58,7 +62,7 @@ func (e *CheckinResponse) Validate() error {
 
 // CheckinCmd is a fleet API command.
 type CheckinCmd struct {
-	client clienter
+	client client.Sender
 	info   agentInfo
 }
 
@@ -67,14 +71,14 @@ type agentInfo interface {
 }
 
 // NewCheckinCmd creates a new api command.
-func NewCheckinCmd(info agentInfo, client clienter) *CheckinCmd {
+func NewCheckinCmd(info agentInfo, client client.Sender) *CheckinCmd {
 	return &CheckinCmd{
 		client: client,
 		info:   info,
 	}
 }
 
-// Execute enroll the Agent in the Fleet.
+// Execute enroll the Agent in the Fleet Server.
 func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinResponse, error) {
 	if err := r.Validate(); err != nil {
 		return nil, err
@@ -91,17 +95,20 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 	resp, err := e.client.Send(ctx, "POST", cp, nil, nil, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, errors.New(err,
-			"fail to checkin to fleet",
+			"fail to checkin to fleet-server",
 			errors.TypeNetwork,
 			errors.M(errors.MetaKeyURI, cp))
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, extract(resp.Body)
+		return nil, client.ExtractError(resp.Body)
 	}
 
-	rs, _ := ioutil.ReadAll(resp.Body)
+	rs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.New(err, "failed to read checkin response")
+	}
 
 	checkinResponse := &CheckinResponse{}
 	decoder := json.NewDecoder(bytes.NewReader(rs))

@@ -1,0 +1,45 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "cloud": {
+        "account": {
+            "id": "elastic-observability",
+            "name": "elastic-observability"
+        },
+        "instance": {
+            "id": "4049989596327614796",
+            "name": "nchaulet-loadtest-horde-master"
+        },
+        "machine": {
+            "type": "n1-standard-8"
+        },
+        "provider": "gcp"
+    },
+    "cloud.availability_zone": "us-central1-a",
+    "cloud.region": "us-central1",
+    "event": {
+        "dataset": "gcp.metrics",
+        "duration": 115000,
+        "module": "gcp"
+    },
+    "gcp": {
+        "labels": {},
+        "metrics": {
+            "instance": {
+                "uptime_total": {
+                    "value": 791820
+                }
+            }
+        }
+    },
+    "host": {
+        "id": "4049989596327614796",
+        "name": "nchaulet-loadtest-horde-master"
+    },
+    "metricset": {
+        "name": "metrics",
+        "period": 10000
+    },
+    "service": {
+        "type": "gcp"
+    }
+}

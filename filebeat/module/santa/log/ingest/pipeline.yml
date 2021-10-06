@@ -89,6 +89,10 @@ processors:
     field: related.hash
     value: "{{process.hash.sha256}}"
     if: "ctx?.process?.hash != null"
+- set:
+    field: file.x509.issuer.common_name
+    value: "{{santa.certificate.common_name}}"
+    ignore_empty_value: true
 on_failure:
 - set:
     field: error.message

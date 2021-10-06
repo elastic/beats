@@ -11,22 +11,13 @@ outputs:
 inputs:
   - type: system/metrics
 
-    # The only two requirement are that it has only characters allowed in an Elasticsearch index name
-    # Index names must meet the following criteria:
-    #   Lowercase only
-    #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-    #   Cannot start with -, _, +
-    #   Cannot be . or ..
+    # Namespace name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
+    # For index naming restrictions, see https://www.elastic.co/guide/en/elasticsearch/reference/current/indices-create-index.html#indices-create-api-path-params
     data_stream.namespace: default
     use_output: default
     streams:
       - metricset: cpu
-        # The only two requirement are that it has only characters allowed in an Elasticsearch index name
-        # Index names must meet the following criteria:
-        #   Lowercase only
-        #   Cannot include \, /, *, ?, ", <, >, |, ` ` (space character), ,, #
-        #   Cannot start with -, _, +
-        #   Cannot be . or ..
+        # Dataset name must conform to the naming conventions for Elasticsearch indices, cannot contain dashes (-), and cannot exceed 100 bytes
         data_stream.dataset: system.cpu
       - metricset: memory
         data_stream.dataset: system.memory
@@ -111,6 +102,15 @@ inputs:
 #   logs: false
 #   # enables metrics monitoring
 #   metrics: false
+#   # exposes agent metrics using http, by default sockets and named pipes are used
+#   http:
+#       # enables http endpoint
+#       enabled: false
+#       # The HTTP endpoint will bind to this hostname, IP address, unix socket or named pipe.
+#       # When using IP addresses, it is recommended to only use localhost.
+#       host: localhost
+#       # Port on which the HTTP endpoint will bind. Default is 0 meaning feature is disabled.
+#       port: 6791
 
 # # Allow fleet to reload his configuration locally on disk.
 # # Notes: Only specific process configuration will be reloaded.
@@ -149,7 +149,8 @@ agent.logging.to_stderr: true
 # If enabled, Elastic-Agent periodically logs its internal metrics that have changed
 # in the last period. For each metric that changed, the delta from the value at
 # the beginning of the period is logged. Also, the total values for
-# all non-zero internal metrics are logged on shutdown. The default is true.
+# all non-zero internal metrics are logged on shutdown. This setting is also passed
+# to beats running under the agent. The default is true.
 #agent.logging.metrics.enabled: true
 
 # The period after which to log the internal metrics. The default is 30s.

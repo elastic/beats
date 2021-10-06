@@ -18,6 +18,7 @@
 package cursor
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -26,7 +27,6 @@ import (
 
 	"github.com/elastic/go-concert/unison"
 
-	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -120,7 +120,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
-	err := group.Go(func(canceler unison.Canceler) error {
+	err := group.Go(func(canceler context.Context) error {
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()
@@ -145,7 +145,7 @@ func (cim *InputManager) shutdown() {
 
 // Create builds a new v2.Input using the provided Configure function.
 // The Input will run a go-routine per source that has been configured.
-func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
+func (cim *InputManager) Create(config *common.Config) (v2.Input, error) {
 	if err := cim.init(); err != nil {
 		return nil, err
 	}
@@ -180,7 +180,7 @@ func (cim *InputManager) Create(config *common.Config) (input.Input, error) {
 
 // Lock locks a key for exclusive access and returns an resource that can be used to modify
 // the cursor state and unlock the key.
-func (cim *InputManager) lock(ctx input.Context, key string) (*resource, error) {
+func (cim *InputManager) lock(ctx v2.Context, key string) (*resource, error) {
 	resource := cim.store.Get(key)
 	err := lockResource(ctx.Logger, resource, ctx.Cancelation)
 	if err != nil {
@@ -190,7 +190,7 @@ func (cim *InputManager) lock(ctx input.Context, key string) (*resource, error) 
 	return resource, nil
 }
 
-func lockResource(log *logp.Logger, resource *resource, canceler input.Canceler) error {
+func lockResource(log *logp.Logger, resource *resource, canceler v2.Canceler) error {
 	if !resource.lock.TryLock() {
 		log.Infof("Resource '%v' currently in use, waiting...", resource.key)
 		err := resource.lock.LockContext(canceler)

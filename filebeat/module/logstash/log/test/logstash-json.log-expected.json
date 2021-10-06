@@ -59,5 +59,26 @@
         "logstash.log.thread": "Api Webserver",
         "message": "Successfully started Logstash API endpoint",
         "service.type": "logstash"
+    },
+    {
+        "@timestamp": "2021-02-08T23:38:04.046Z",
+        "event.dataset": "logstash.log",
+        "event.kind": "event",
+        "event.module": "logstash",
+        "event.type": "info",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.level": "WARN",
+        "log.offset": 745,
+        "logstash.log.log_event.action": [
+            "update",
+            "{_index=filebeat-foo-2021.02, _type=_doc, _id=foo-1234abcd-96c6-4828-bcd4-51d33a156431, retry_on_conflict=1}",
+            "{metaClass={metaClass={metaClass={response={update={_index=filebeat-foo-2021.02, _type=_doc, _id=foo-1234abcd-96c6-4828-bcd4-51d33a156431, error={reason=failed to parse field [bar] of type [long] in document with id 'foo-1234abcd-96c6-4828-bcd4-51d33a156431'. Preview of field's value: 'ABCDEFGHIJ', caused_by={reason=For input string: \"ABCDEFGHIJ\", type=illegal_argument_exception}, type=mapper_parsing_exception}, status=400}}, action=[\"update\", {:_id=>\"foo-1234abcd-96c6-4828-bcd4-51d33a156431\", :_index=>\"filebeat-foo-2021.02\", :routing=>nil, :_type=>\"_doc\", :retry_on_conflict=>1}, #<LogStash::Event:0x51b7cd8e>]}}}}"
+        ],
+        "logstash.log.log_event.status": 400,
+        "logstash.log.module": "logstash.outputs.elasticsearch",
+        "logstash.log.thread": "[foo]>worker1",
+        "message": "Could not index event to Elasticsearch.",
+        "service.type": "logstash"
     }
 ]

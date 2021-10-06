@@ -31,12 +31,24 @@ import (
 
 var (
 	schema = s.Schema{
+		"cgroup":     c.Ifc("beat.cgroup"),
+		"system":     c.Ifc("system"),
+		"apm_server": c.Ifc("apm-server"),
+		"cpu":        c.Ifc("beat.cpu"),
+		"info":       c.Ifc("beat.info"),
 		"uptime": c.Dict("beat.info.uptime", s.Schema{
 			"ms": c.Int("ms"),
 		}),
 		"runtime": c.Dict("beat.runtime", s.Schema{
 			"goroutines": c.Int("goroutines"),
 		}, c.DictOptional),
+		"handles": c.Dict("beat.handles", s.Schema{
+			"limit": c.Dict("limit", s.Schema{
+				"hard": c.Int("hard"),
+				"soft": c.Int("soft"),
+			}),
+			"open": c.Int("open"),
+		}),
 		"libbeat": c.Dict("libbeat", s.Schema{
 			"output": c.Dict("output", s.Schema{
 				"type": c.Str("type"),
@@ -59,13 +71,49 @@ var (
 					"errors": c.Int("errors"),
 				}),
 			}),
+			"pipeline": c.Dict("pipeline", s.Schema{
+				"clients": c.Int("clients"),
+				"queue": c.Dict("queue", s.Schema{
+					"acked": c.Int("acked"),
+				}),
+				"events": c.Dict("events", s.Schema{
+					"active":    c.Int("active"),
+					"dropped":   c.Int("dropped"),
+					"failed":    c.Int("failed"),
+					"filtered":  c.Int("filtered"),
+					"published": c.Int("published"),
+					"retry":     c.Int("retry"),
+					"total":     c.Int("total"),
+				}),
+			}),
+			"config": c.Dict("config.module", s.Schema{
+				"running": c.Int("running"),
+				"starts":  c.Int("starts"),
+				"stops":   c.Int("stops"),
+			}),
+		}),
+		"state": c.Dict("metricbeat.beat.state", s.Schema{
+			"events":   c.Int("events"),
+			"failures": c.Int("failures"),
+			"success":  c.Int("success"),
+		}),
+		"memstats": c.Dict("beat.memstats", s.Schema{
+			"gc_next": c.Int("gc_next"),
+			"memory": s.Object{
+				"alloc": c.Int("memory_alloc"),
+				"total": c.Int("memory_total"),
+			},
+			"rss": c.Int("rss"),
 		}),
 	}
 )
 
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
-	var event mb.Event
-	event.RootFields = common.MapStr{}
+	event := mb.Event{
+		RootFields:      common.MapStr{},
+		ModuleFields:    common.MapStr{},
+		MetricSetFields: common.MapStr{},
+	}
 	event.RootFields.Put("service.name", beat.ModuleName)
 
 	event.ModuleFields = common.MapStr{}
@@ -78,10 +126,14 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte) error {
 		return errors.Wrap(err, "failure parsing Beat's Stats API response")
 	}
 
-	event.MetricSetFields, err = schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure to apply stats schema")
-	}
+	event.MetricSetFields, _ = schema.Apply(data)
+	event.MetricSetFields.Put("beat", common.MapStr{
+		"name":    info.Name,
+		"host":    info.Hostname,
+		"type":    info.Beat,
+		"uuid":    info.UUID,
+		"version": info.Version,
+	})
 
 	r.Event(event)
 	return nil

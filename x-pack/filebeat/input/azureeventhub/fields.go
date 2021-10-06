@@ -17,7 +17,7 @@ func init() {
 }
 
 // AssetAzureeventhub returns asset data.
-// This is the base64 encoded gzipped contents of input/azureeventhub.
+// This is the base64 encoded zlib format compressed contents of input/azureeventhub.
 func AssetAzureeventhub() string {
 	return "eJyckkGOnEAMRfec4mtWiUTnACwiRZFygskaGcqANeBiqlyDOqePivQwEKKWOt5h8/2fXP+CF75WoF8p8IXfWG1ITQGY2MgVno6DpwJwHNsgs4nXCl8LAPghPLqIwD0FJ9rDBsa3rMSqxJAaiHY+TJR1XwqgWzXVqr9AaeJ/UOSy68wV+uDTfOs47iiNVq8rKnQ0Rt5GJ7j/Bcy1h9yD+q6LbFv7HXL02u+aB5jngTH7KPkLvgPpzXoRG0RBmCmY7N0//CK/JtaWa01Tw+Fh49H30tK47cGfPZkjX+IAkhsbCqIFpun445CaMyLra+LErjaZ+AToyPgeYJ6D1CGrS4ji5/P3MtsuA+sekuJmBdEj1b0T/pWqD7QXvi4+uHt0ecPpBBCNRtry2av1GtPEod6n9iHHN+EFn6KRcbnFpoQPt+h9fo+QmoTDu/wOAAD//4sFMfo="
 }

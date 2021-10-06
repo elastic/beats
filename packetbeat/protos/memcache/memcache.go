@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 
+	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 )
@@ -38,6 +39,7 @@ import (
 type memcache struct {
 	ports   protos.PortsConfig
 	results protos.Reporter
+	watcher procs.ProcessesWatcher
 	config  parserConfig
 
 	udpMemcache
@@ -131,6 +133,7 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
+	watcher procs.ProcessesWatcher,
 	cfg *common.Config,
 ) (protos.Plugin, error) {
 	p := &memcache{}
@@ -141,14 +144,14 @@ func New(
 		}
 	}
 
-	if err := p.init(results, &config); err != nil {
+	if err := p.init(results, watcher, &config); err != nil {
 		return nil, err
 	}
 	return p, nil
 }
 
 // Called to initialize the Plugin
-func (mc *memcache) init(results protos.Reporter, config *memcacheConfig) error {
+func (mc *memcache) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *memcacheConfig) error {
 	debug("init memcache plugin")
 
 	mc.handler = mc
@@ -158,6 +161,7 @@ func (mc *memcache) init(results protos.Reporter, config *memcacheConfig) error 
 
 	mc.udpConnections = make(map[common.HashableIPPortTuple]*udpConnection)
 	mc.results = results
+	mc.watcher = watcher
 	return nil
 }
 

@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -80,17 +81,11 @@ func Fields() error {
 
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, Config, Imports)
+	mg.SerialDeps(Fields, FieldDocs, Config)
 }
 
-// Imports generates an include/list.go file containing
-// a import statement for each module and dataset.
-func Imports() error {
-	options := devtools.DefaultIncludeListOptions()
-	options.ModuleDirs = []string{"monitors"}
-	options.Outfile = "monitors/defaults/default.go"
-	options.Pkg = "defaults"
-	return devtools.GenerateIncludeListGo(options)
+func FieldDocs() error {
+	return devtools.Docs.FieldDocs("fields.yml")
 }
 
 // Config generates both the short/reference/docker configs.

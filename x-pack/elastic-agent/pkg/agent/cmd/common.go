@@ -7,39 +7,23 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 
 	// import logp flags
 	_ "github.com/elastic/beats/v7/libbeat/logp/configure"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/basecmd"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
 )
 
-const (
-	defaultConfig = "elastic-agent.yml"
-	hashLen       = 6
-	commitFile    = ".elastic-agent.active.commit"
-)
-
-type globalFlags struct {
-	PathConfigFile string
-}
-
-// Config returns path which identifies configuration file.
-func (f *globalFlags) Config() string {
-	if len(f.PathConfigFile) == 0 || f.PathConfigFile == defaultConfig {
-		return filepath.Join(paths.Config(), defaultConfig)
-	}
-	return f.PathConfigFile
+func troubleshootMessage() string {
+	v := strings.Split(release.Version(), ".")
+	version := strings.Join(v[:2], ".")
+	return fmt.Sprintf("For help, please see our troubleshooting guide at https://www.elastic.co/guide/en/fleet/%s/fleet-troubleshooting.html", version)
 }
 
 // NewCommand returns the default command for the agent.
@@ -53,14 +37,15 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 		Use: "elastic-agent [subcommand]",
 	}
 
-	flags := &globalFlags{}
-
 	// path flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.home.unversioned"))
+	cmd.PersistentFlags().MarkHidden("path.home.unversioned") // hidden used internally by container subcommand
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.config"))
-	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.data"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("c"))
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.logs"))
-	cmd.PersistentFlags().StringVarP(&flags.PathConfigFile, "c", "c", defaultConfig, `Configuration file, relative to path.config`)
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.downloads"))
+	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("path.install"))
 
 	// logging flags
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("v"))
@@ -69,69 +54,24 @@ func NewCommandWithArgs(args []string, streams *cli.IOStreams) *cobra.Command {
 	cmd.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("environment"))
 
 	// sub-commands
-	run := newRunCommandWithArgs(flags, args, streams)
+	run := newRunCommandWithArgs(args, streams)
 	cmd.AddCommand(basecmd.NewDefaultCommandsWithArgs(args, streams)...)
 	cmd.AddCommand(run)
-	cmd.AddCommand(newEnrollCommandWithArgs(flags, args, streams))
-	cmd.AddCommand(newInspectCommandWithArgs(flags, args, streams))
+	cmd.AddCommand(newInstallCommandWithArgs(args, streams))
+	cmd.AddCommand(newUninstallCommandWithArgs(args, streams))
+	cmd.AddCommand(newUpgradeCommandWithArgs(args, streams))
+	cmd.AddCommand(newEnrollCommandWithArgs(args, streams))
+	cmd.AddCommand(newInspectCommandWithArgs(args, streams))
+	cmd.AddCommand(newWatchCommandWithArgs(args, streams))
+	cmd.AddCommand(newContainerCommand(args, streams))
+	cmd.AddCommand(newStatusCommand(args, streams))
 
 	// windows special hidden sub-command (only added on windows)
-	reexec := newReExecWindowsCommand(flags, args, streams)
+	reexec := newReExecWindowsCommand(args, streams)
 	if reexec != nil {
 		cmd.AddCommand(reexec)
 	}
-	cmd.PersistentPreRunE = preRunCheck(flags)
 	cmd.Run = run.Run
 
 	return cmd
-}
-
-func hashedDirName(filecontent []byte) string {
-	s := strings.TrimSpace(string(filecontent))
-	if len(s) == 0 {
-		return "elastic-agent"
-	}
-
-	s = smallHash(s)
-
-	return fmt.Sprintf("elastic-agent-%s", s)
-}
-
-func smallHash(hash string) string {
-	if len(hash) > hashLen {
-		hash = hash[:hashLen]
-	}
-
-	return hash
-}
-
-func generatePaths(dir, origExec string) error {
-	pathsCfg := map[string]interface{}{
-		"path.data":         paths.Data(),
-		"path.home":         dir,
-		"path.config":       paths.Config(),
-		"path.service_name": origExec,
-	}
-
-	pathsCfgPath := filepath.Join(paths.Data(), "paths.yml")
-	pathsContent, err := yaml.Marshal(pathsCfg)
-	if err != nil {
-		return err
-	}
-
-	if err := ioutil.WriteFile(pathsCfgPath, pathsContent, 0740); err != nil {
-		return err
-	}
-
-	if runtime.GOOS == "windows" {
-		// due to two binaries we need to do a path dance
-		// as versioned binary will look for path inside it's own directory
-		versionedPath := filepath.Join(dir, "data", "paths.yml")
-		if err := os.MkdirAll(filepath.Dir(versionedPath), 0700); err != nil {
-			return err
-		}
-		return os.Symlink(pathsCfgPath, versionedPath)
-	}
-
-	return nil
 }

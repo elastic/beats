@@ -23,6 +23,7 @@ import (
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/filebeat/harvester"
+	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 )
 
@@ -30,7 +31,8 @@ type config struct {
 	tcp.Config                `config:",inline"`
 	harvester.ForwarderConfig `config:",inline"`
 
-	LineDelimiter string `config:"line_delimiter" validate:"nonzero"`
+	LineDelimiter string                `config:"line_delimiter" validate:"nonzero"`
+	Framing       streaming.FramingType `config:"framing"`
 }
 
 var defaultConfig = config{

@@ -217,14 +217,6 @@ func mustHaveModule(ms MetricSet, base BaseMetricSet) error {
 // of them.
 func mustImplementFetcher(ms MetricSet) error {
 	var ifcs []string
-	if _, ok := ms.(EventFetcher); ok {
-		ifcs = append(ifcs, "EventFetcher")
-	}
-
-	if _, ok := ms.(EventsFetcher); ok {
-		ifcs = append(ifcs, "EventsFetcher")
-	}
-
 	if _, ok := ms.(ReportingMetricSet); ok {
 		ifcs = append(ifcs, "ReportingMetricSet")
 	}
@@ -256,7 +248,7 @@ func mustImplementFetcher(ms MetricSet) error {
 	switch len(ifcs) {
 	case 0:
 		return fmt.Errorf("MetricSet '%s/%s' does not implement an event "+
-			"producing interface (EventFetcher, EventsFetcher, "+
+			"producing interface ("+
 			"ReportingMetricSet, ReportingMetricSetV2, ReportingMetricSetV2Error, ReportingMetricSetV2WithContext"+
 			"PushMetricSet, PushMetricSetV2, or PushMetricSetV2WithContext)",
 			ms.Module().Name(), ms.Name())

@@ -1,0 +1,14 @@
+# Module: mysqlenterprise
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-mysqlenterprise.html
+
+- module: mysqlenterprise
+  audit:
+    enabled: false
+
+    # Sets the input type. Currently only supports file
+    #var.input: file
+
+    # Set paths for the log files when file input is used.
+    # Should only be used together with file input
+    # var.paths:
+    #  - /home/user/mysqlauditlogs/audit.*.log

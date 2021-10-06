@@ -1,0 +1,58 @@
+{{ if eq .input "http_endpoint" }}
+
+type: http_endpoint
+enabled: true
+
+listen_address: {{ .listen_address }}
+listen_port: {{ .listen_port }}
+prefix: json
+content_type: application/x-ndjson
+
+{{ if .secret }}
+hmac:
+  header: X-Filebeat-Signature
+  key: {{ .secret }}
+  type: sha256
+  prefix: sha256=
+{{ end }}
+
+{{ if .ssl_certificate }}
+ssl:
+  enabled: true
+  certificate: {{ .ssl_certificate }}
+  key: {{ .ssl_key }}
+  verification_mode: none
+{{ end }}
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+json.add_error_key: true
+{{ end }}
+
+tags: {{.tags | tojson}}
+
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0
+  - fingerprint:
+      fields:
+        - event.dataset
+        - json.id
+      target_field: '@metadata._id'
+      encoding: base64
+  - script:
+      lang: javascript
+      id: my_filter
+      source: >
+        function process(event) {
+            event.Put("@metadata.op_type", "index");
+        }
+

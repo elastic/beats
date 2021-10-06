@@ -1,0 +1,57 @@
+type: log
+paths:
+{{ range $i, $path := .paths }}
+ - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - rename:
+      fields:
+        - {from: message, to: event.original}
+  - decode_json_fields:
+      fields: [event.original]
+      target: zeek.signature
+  - convert:
+      ignore_missing: true
+      fields:
+        - {from: zeek.signature.src_addr, to: source.address}
+        - {from: zeek.signature.src_addr, to: source.ip, type: ip}
+        - {from: zeek.signature.src_port, to: source.port, type: long}
+        - {from: zeek.signature.dst_addr, to: destination.address}
+        - {from: zeek.signature.dst_addr, to: destination.ip, type: ip}
+        - {from: zeek.signature.dst_port, to: destination.port, type: long}
+  - rename:
+      ignore_missing: true
+      fields:
+        - from: zeek.signature.uid
+          to: zeek.session_id
+        - from: zeek.signature.sig_id
+          to: rule.id
+        - from: zeek.signature.event_msg
+          to: rule.description
+  - drop_fields:
+      ignore_missing: true
+      fields:
+        - zeek.signature.src_addr
+        - zeek.signature.src_port
+        - zeek.signature.dst_addr
+        - zeek.signature.dst_port
+  - add_fields:
+      target: event
+      fields:
+        kind: alert
+  - community_id:
+{{ if .internal_networks }}
+  - add_network_direction:
+      source: source.ip
+      destination: destination.ip
+      target: network.direction
+      internal_networks: {{ .internal_networks | tojson }}
+{{ end }}
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.12.0

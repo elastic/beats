@@ -5,6 +5,7 @@
 package program
 
 import (
+	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -17,10 +18,12 @@ import (
 	"github.com/stretchr/testify/require"
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filters"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/internal/yamltest"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/transpiler"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+)
+
+var (
+	generateFlag = flag.Bool("generate", false, "Write golden files")
 )
 
 func TestGroupBy(t *testing.T) {
@@ -382,15 +385,16 @@ func TestConfiguration(t *testing.T) {
 	testcases := map[string]struct {
 		programs []string
 		expected int
+		empty    bool
 		err      bool
 	}{
-		"single_config": {
-			programs: []string{"filebeat", "heartbeat", "metricbeat", "endpoint"},
-			expected: 4,
+		"namespace": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
 		},
-		"constraints_config": {
-			programs: []string{"filebeat"},
-			expected: 1,
+		"single_config": {
+			programs: []string{"filebeat", "fleet-server", "heartbeat", "metricbeat", "endpoint", "packetbeat"},
+			expected: 6,
 		},
 		// "audit_config": {
 		// 	programs: []string{"auditbeat"},
@@ -400,6 +404,10 @@ func TestConfiguration(t *testing.T) {
 		// 	programs: []string{"journalbeat"},
 		// 	expected: 1,
 		// },
+		"fleet_server": {
+			programs: []string{"fleet-server"},
+			expected: 1,
+		},
 		"synthetics_config": {
 			programs: []string{"heartbeat"},
 			expected: 1,
@@ -416,7 +424,7 @@ func TestConfiguration(t *testing.T) {
 			expected: 1,
 		},
 		"enabled_output_false": {
-			expected: 0,
+			empty: true,
 		},
 		"endpoint_basic": {
 			programs: []string{"endpoint"},
@@ -428,9 +436,11 @@ func TestConfiguration(t *testing.T) {
 		"endpoint_unknown_output": {
 			expected: 0,
 		},
+		"endpoint_arm": {
+			expected: 0,
+		},
 	}
 
-	l, _ := logger.New("")
 	for name, test := range testcases {
 		t.Run(name, func(t *testing.T) {
 			singleConfig, err := ioutil.ReadFile(filepath.Join("testdata", name+".yml"))
@@ -443,14 +453,16 @@ func TestConfiguration(t *testing.T) {
 			ast, err := transpiler.NewAST(m)
 			require.NoError(t, err)
 
-			filters.ConstraintFilter(l, ast)
-
-			programs, err := Programs(ast)
+			programs, err := Programs(&fakeAgentInfo{}, ast)
 			if test.err {
 				require.Error(t, err)
 				return
 			}
 			require.NoError(t, err)
+			if test.empty {
+				require.Equal(t, 0, len(programs))
+				return
+			}
 
 			require.Equal(t, 1, len(programs))
 
@@ -480,5 +492,100 @@ func TestConfiguration(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestUseCases(t *testing.T) {
+	defer os.Remove("fleet.yml")
+
+	useCasesPath := filepath.Join("testdata", "usecases")
+	useCases, err := filepath.Glob(filepath.Join(useCasesPath, "*.yml"))
+	require.NoError(t, err)
+
+	generatedFilesDir := filepath.Join(useCasesPath, "generated")
+
+	// Cleanup all generated files to make sure not having any left overs
+	if *generateFlag {
+		err := os.RemoveAll(generatedFilesDir)
+		require.NoError(t, err)
+	}
+
+	for _, usecase := range useCases {
+		t.Run(usecase, func(t *testing.T) {
+
+			useCaseName := strings.TrimSuffix(filepath.Base(usecase), ".yml")
+			singleConfig, err := ioutil.ReadFile(usecase)
+			require.NoError(t, err)
+
+			var m map[string]interface{}
+			err = yaml.Unmarshal(singleConfig, &m)
+			require.NoError(t, err)
+
+			ast, err := transpiler.NewAST(m)
+			require.NoError(t, err)
+
+			programs, err := Programs(&fakeAgentInfo{}, ast)
+			require.NoError(t, err)
+
+			require.Equal(t, 1, len(programs))
+
+			defPrograms, ok := programs["default"]
+			require.True(t, ok)
+
+			for _, program := range defPrograms {
+				generatedPath := filepath.Join(
+					useCasesPath, "generated",
+					useCaseName+"."+strings.ToLower(program.Spec.Cmd)+".golden.yml",
+				)
+
+				compareMap := &transpiler.MapVisitor{}
+				program.Config.Accept(compareMap)
+
+				// Generate new golden file for programm
+				if *generateFlag {
+					d, err := yaml.Marshal(&compareMap.Content)
+					require.NoError(t, err)
+
+					err = os.MkdirAll(generatedFilesDir, 0755)
+					require.NoError(t, err)
+					err = ioutil.WriteFile(generatedPath, d, 0644)
+					require.NoError(t, err)
+				}
+
+				programConfig, err := ioutil.ReadFile(generatedPath)
+				require.NoError(t, err)
+
+				var m map[string]interface{}
+				err = yamltest.FromYAML(programConfig, &m)
+				require.NoError(t, errors.Wrap(err, program.Cmd()))
+
+				if !assert.True(t, cmp.Equal(m, compareMap.Content)) {
+					diff := cmp.Diff(m, compareMap.Content)
+					if diff != "" {
+						t.Errorf("%s-%s mismatch (-want +got):\n%s", usecase, program.Spec.Name, diff)
+					}
+				}
+			}
+		})
+	}
+}
+
+type fakeAgentInfo struct{}
+
+func (*fakeAgentInfo) AgentID() string {
+	return "agent-id"
+}
+
+func (*fakeAgentInfo) Version() string {
+	return "8.0.0"
+}
+
+func (*fakeAgentInfo) Snapshot() bool {
+	return false
+}
+
+func (*fakeAgentInfo) Headers() map[string]string {
+	return map[string]string{
+		"h1": "test-header",
 	}
 }

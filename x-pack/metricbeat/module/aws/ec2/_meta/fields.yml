@@ -76,19 +76,19 @@
       type: scaled_float
       description: >
         Bytes written per second to all instance store volumes available to the instance.
-    - name: diskio.read.ops
+    - name: diskio.read.count
       type: long
       description: >
         Total completed read operations from all instance store volumes available to the instance in collection period.
-    - name: diskio.read.ops_per_sec
+    - name: diskio.read.count_per_sec
       type: long
       description: >
         Completed read operations per second from all instance store volumes available to the instance in a specified period of time.
-    - name: diskio.write.ops
+    - name: diskio.write.count
       type: long
       description: >
         Total completed write operations to all instance store volumes available to the instance in collection period.
-    - name: diskio.write.ops_per_sec
+    - name: diskio.write.count_per_sec
       type: long
       description: >
         Completed write operations per second to all instance store volumes available to the instance in a specified period of time.

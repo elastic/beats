@@ -30,13 +30,15 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // Parser is generated from a ragel state machine using the following command:
-//go:generate ragel -Z -G2 parser.rl -o parser.go
-//go:generate goimports -l -w parser.go
+//go:generate ragel -Z -G2 parser/rfc3164_parser.rl -o rfc3164_parser.go
+//go:generate ragel -Z -G2 parser/rfc5424_parser.rl -o rfc5424_parser.go
+//go:generate ragel -Z -G2 parser/format_check.rl -o format_check.go
+//go:generate goimports -l -w rfc3164_parser.go
+//go:generate goimports -l -w rfc5424_parser.go
 
 // Severity and Facility are derived from the priority, theses are the human readable terms
 // defined in https://tools.ietf.org/html/rfc3164#section-4.1.1.
@@ -108,8 +110,6 @@ func NewInput(
 	outlet channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
-	cfgwarn.Experimental("Syslog input type is used")
-
 	log := logp.NewLogger("syslog")
 
 	out, err := outlet.Connect(cfg)
@@ -123,11 +123,7 @@ func NewInput(
 	}
 
 	forwarder := harvester.NewForwarder(out)
-	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		ev := parseAndCreateEvent(data, metadata, time.Local, log)
-		forwarder.Send(ev)
-	}
-
+	cb := GetCbByConfig(config, forwarder, log)
 	server, err := factory(cb, config.Protocol)
 	if err != nil {
 		return nil, err
@@ -178,6 +174,35 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
+func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger) inputsource.NetworkFunc {
+	switch cfg.Format {
+
+	case syslogFormatRFC5424:
+		return func(data []byte, metadata inputsource.NetworkMetadata) {
+			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
+			forwarder.Send(ev)
+		}
+
+	case syslogFormatAuto:
+		return func(data []byte, metadata inputsource.NetworkMetadata) {
+			var ev beat.Event
+			if IsRFC5424Format(data) {
+				ev = parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
+			} else {
+				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
+			}
+			forwarder.Send(ev)
+		}
+	case syslogFormatRFC3164:
+		break
+	}
+
+	return func(data []byte, metadata inputsource.NetworkMetadata) {
+		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
+		forwarder.Send(ev)
+	}
+}
+
 func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
@@ -219,6 +244,27 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 		}
 	}
 
+	// RFC5424
+	if ev.AppName() != "" {
+		process["name"] = ev.AppName()
+	}
+
+	if ev.ProcID() != "" {
+		process["entity_id"] = ev.ProcID()
+	}
+
+	if ev.MsgID() != "" {
+		syslog["msgid"] = ev.MsgID()
+	}
+
+	if ev.Version() != -1 {
+		syslog["version"] = ev.Version()
+	}
+
+	if ev.data != nil && len(ev.data) > 0 {
+		syslog["data"] = ev.data
+	}
+
 	f["syslog"] = syslog
 	f["event"] = event
 	if len(process) > 0 {
@@ -232,16 +278,28 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	return newBeatEvent(ev.Timestamp(timezone), metadata, f)
 }
 
-func parseAndCreateEvent(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
+func parseAndCreateEvent3164(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	ev := newEvent()
-	Parse(data, ev)
+	ParserRFC3164(data, ev)
 	if !ev.IsValid() {
 		log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
 		return newBeatEvent(time.Now(), metadata, common.MapStr{
 			"message": string(data),
 		})
 	}
-	return createEvent(ev, metadata, time.Local, log)
+	return createEvent(ev, metadata, timezone, log)
+}
+
+func parseAndCreateEvent5424(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
+	ev := newEvent()
+	ParserRFC5424(data, ev)
+	if !ev.IsValid() {
+		log.Errorw("can't parse event as syslog rfc5424", "message", string(data))
+		return newBeatEvent(time.Now(), metadata, common.MapStr{
+			"message": string(data),
+		})
+	}
+	return createEvent(ev, metadata, timezone, log)
 }
 
 func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields common.MapStr) beat.Event {

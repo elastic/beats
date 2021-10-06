@@ -1,0 +1,110 @@
+description: Pipeline for parsing Abuse.ch URL Threat Intel
+processors:
+  ####################
+  # Event ECS fields #
+  ####################
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.kind
+      value: enrichment
+  - set:
+      field: event.category
+      value: threat
+  - set:
+      field: event.type
+      value: indicator
+
+  ######################
+  # General ECS fields #
+  ######################
+  - rename:
+      field: json
+      target_field: threatintel.abuseurl
+      ignore_missing: true
+
+  #####################
+  # Threat ECS Fields #
+  #####################
+  - set:
+      field: threatintel.indicator.type
+      value: url
+  - date:
+      field: threatintel.abuseurl.date_added
+      target_field: threatintel.indicator.first_seen
+      formats:
+        - "yyyy-MM-dd HH:mm:ss z"
+        - "yyyy-MM-dd HH:mm:ss Z"
+      if: "ctx?.threatintel?.abuseurl?.date_added != null"
+  - uri_parts:
+      field: threatintel.abuseurl.url
+      target_field: threatintel.indicator.url
+      keep_original: true
+      remove_if_successful: true
+  - set:
+      field: threatintel.indicator.url.full
+      value: "{{{threatintel.indicator.url.original}}}"
+      ignore_empty_value: true
+  - rename:
+      field: threatintel.abuseurl.urlhaus_reference
+      target_field: threatintel.indicator.reference
+      ignore_missing: true
+
+  # Host can be both IP addresses and domain names
+  - grok:
+      field: threatintel.abuseurl.host
+      patterns:
+        - "(?:%{IP:threatintel.indicator.ip}|%{GREEDYDATA:threatintel.indicator.url.domain})"
+      ignore_failure: true
+  - rename:
+      field: threatintel.abuseurl.reporter
+      target_field: threatintel.indicator.provider
+      ignore_missing: true
+
+  ######################
+  # Cleanup processors #
+  ######################
+  - set:
+      field: threatintel.indicator.type
+      value: unknown
+      if: ctx?.threatintel?.indicator?.type == null
+  - convert:
+      field: threatintel.abuseurl.larted
+      type: boolean
+      ignore_missing: true
+  - script:
+      lang: painless
+      if: ctx?.threatintel != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+        map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
+  - remove:
+      field:
+        - threatintel.abuseurl.date_added
+        - threatintel.abuseurl.url
+        - threatintel.abuseurl.host
+        - message
+      ignore_missing: true
+on_failure:
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

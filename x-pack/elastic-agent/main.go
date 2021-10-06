@@ -10,11 +10,17 @@ import (
 	"os"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/cmd/platformcheck"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/cmd"
 )
 
 // Setups and Runs agent.
 func main() {
+	if err := platformcheck.CheckNativePlatformCompat(); err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to initialize: %v\n", err)
+		os.Exit(1)
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	command := cmd.NewCommand()
 	if err := command.Execute(); err != nil {

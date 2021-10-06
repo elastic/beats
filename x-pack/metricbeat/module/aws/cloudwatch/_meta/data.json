@@ -5,51 +5,199 @@
             "namespace": "AWS/RDS"
         },
         "dimensions": {
-            "EngineName": "mariadb"
+            "DBClusterIdentifier": "database-1",
+            "Role": "READER"
         },
         "rds": {
             "metrics": {
-                "BinLogDiskUsage": {
-                    "avg": 2803,
+                "AbortedClients": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 3007,
-                    "min": 2752,
-                    "sum": 14015
-                },
-                "CPUCreditBalance": {
-                    "avg": 144,
-                    "count": 1,
-                    "max": 144,
-                    "min": 144,
-                    "sum": 144
-                },
-                "CPUCreditUsage": {
-                    "avg": 0.062006,
-                    "count": 1,
-                    "max": 0.062006,
-                    "min": 0.062006,
-                    "sum": 0.062006
-                },
-                "CPUSurplusCreditBalance": {
-                    "avg": 0,
-                    "count": 1,
                     "max": 0,
                     "min": 0,
                     "sum": 0
                 },
-                "CPUSurplusCreditsCharged": {
+                "ActiveTransactions": {
                     "avg": 0,
-                    "count": 1,
+                    "count": 5,
                     "max": 0,
                     "min": 0,
                     "sum": 0
+                },
+                "AuroraBinlogReplicaLag": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "AuroraReplicaLag": {
+                    "avg": 18.4158,
+                    "count": 5,
+                    "max": 23.787,
+                    "min": 10.634,
+                    "sum": 92.07900000000001
+                },
+                "AuroraVolumeBytesLeftTotal": {
+                    "avg": 70007366615040,
+                    "count": 5,
+                    "max": 70007366615040,
+                    "min": 70007366615040,
+                    "sum": 350036833075200
+                },
+                "Aurora_pq_request_attempted": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_executed": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_failed": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_in_progress": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_below_min_rows": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_few_pages_outside_buffer_pool": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_long_trx": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_pq_high_buffer_pool_pct": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_small_table": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_not_chosen_unsupported_access": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "Aurora_pq_request_throttled": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "BlockedTransactions": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "BufferCacheHitRatio": {
+                    "avg": 100,
+                    "count": 5,
+                    "max": 100,
+                    "min": 100,
+                    "sum": 500
                 },
                 "CPUUtilization": {
-                    "avg": 1.2662313605690698,
+                    "avg": 6.051666111792592,
                     "count": 5,
-                    "max": 1.66666666666667,
-                    "min": 1.01694915255224,
-                    "sum": 6.331156802845349
+                    "max": 6.216563057282379,
+                    "min": 5.808333333333334,
+                    "sum": 30.25833055896296
+                },
+                "CommitLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "CommitThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "ConnectionAttempts": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DDLLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DDLThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DMLLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DMLThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
                 },
                 "DatabaseConnections": {
                     "avg": 0,
@@ -58,47 +206,117 @@
                     "min": 0,
                     "sum": 0
                 },
-                "DiskQueueDepth": {
-                    "avg": 0.00009332666777759262,
+                "Deadlocks": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 0.0002666666666666667,
+                    "max": 0,
                     "min": 0,
-                    "sum": 0.0004666333388879631
+                    "sum": 0
                 },
-                "FreeStorageSpace": {
-                    "avg": 20402470912,
+                "DeleteLatency": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 20402470912,
-                    "min": 20402470912,
-                    "sum": 102012354560
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "DeleteThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "EBSByteBalance%": {
+                    "avg": 99,
+                    "count": 1,
+                    "max": 99,
+                    "min": 99,
+                    "sum": 99
+                },
+                "EBSIOBalance%": {
+                    "avg": 99,
+                    "count": 1,
+                    "max": 99,
+                    "min": 99,
+                    "sum": 99
+                },
+                "EngineUptime": {
+                    "avg": 20800826,
+                    "count": 5,
+                    "max": 20800946,
+                    "min": 20800706,
+                    "sum": 104004130
+                },
+                "FreeLocalStorage": {
+                    "avg": 29682751078.4,
+                    "count": 5,
+                    "max": 29682819072,
+                    "min": 29682675712,
+                    "sum": 148413755392
                 },
                 "FreeableMemory": {
-                    "avg": 446488576,
+                    "avg": 4639068160,
                     "count": 5,
-                    "max": 446668800,
-                    "min": 446275584,
-                    "sum": 2232442880
+                    "max": 4639838208,
+                    "min": 4638638080,
+                    "sum": 23195340800
+                },
+                "InsertLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "InsertThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "LoginFailures": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
                 },
                 "NetworkReceiveThroughput": {
-                    "avg": 407.83898884048796,
+                    "avg": 0.8399323667305664,
                     "count": 5,
-                    "max": 499.9416676388727,
-                    "min": 354.27742870952153,
-                    "sum": 2039.1949442024397
+                    "max": 1.399556807011113,
+                    "min": 0.6999533364442371,
+                    "sum": 4.199661833652832
+                },
+                "NetworkThroughput": {
+                    "avg": 1.6798647334611327,
+                    "count": 5,
+                    "max": 2.799113614022226,
+                    "min": 1.3999066728884741,
+                    "sum": 8.399323667305664
                 },
                 "NetworkTransmitThroughput": {
-                    "avg": 2667.0383202542657,
+                    "avg": 0.8399323667305664,
                     "count": 5,
-                    "max": 3228.9489909846857,
-                    "min": 2274.512091465142,
-                    "sum": 13335.191601271328
+                    "max": 1.399556807011113,
+                    "min": 0.6999533364442371,
+                    "sum": 4.199661833652832
                 },
-                "ReadIOPS": {
-                    "avg": 0.2333294445092582,
+                "NumBinaryLogFiles": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 1.166647222546291,
+                    "max": 0,
                     "min": 0,
-                    "sum": 1.166647222546291
+                    "sum": 0
+                },
+                "Queries": {
+                    "avg": 6.3836833181909265,
+                    "count": 5,
+                    "max": 6.53289780681288,
+                    "min": 6.184260972479205,
+                    "sum": 31.91841659095463
                 },
                 "ReadLatency": {
                     "avg": 0,
@@ -107,51 +325,79 @@
                     "min": 0,
                     "sum": 0
                 },
-                "ReadThroughput": {
-                    "avg": 136.53333333333333,
+                "ResultSetCacheHitRatio": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 682.6666666666666,
+                    "max": 0,
                     "min": 0,
-                    "sum": 682.6666666666666
+                    "sum": 0
                 },
-                "SwapUsage": {
-                    "avg": 5287936,
+                "RollbackSegmentHistoryListLength": {
+                    "avg": 0,
                     "count": 5,
-                    "max": 5287936,
-                    "min": 5287936,
-                    "sum": 26439680
-                },
-                "WriteIOPS": {
-                    "avg": 0.27999083424342597,
-                    "count": 5,
-                    "max": 0.6999883335277746,
+                    "max": 0,
                     "min": 0,
-                    "sum": 1.39995417121713
+                    "sum": 0
+                },
+                "RowLockTime": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "SelectLatency": {
+                    "avg": 0.2519199153394592,
+                    "count": 5,
+                    "max": 0.2609050632911392,
+                    "min": 0.24367924528301885,
+                    "sum": 1.2595995766972958
+                },
+                "SelectThroughput": {
+                    "avg": 2.6002296989354514,
+                    "count": 5,
+                    "max": 2.650618477644784,
+                    "min": 2.5335866920025336,
+                    "sum": 13.001148494677256
+                },
+                "SumBinaryLogSize": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "UpdateLatency": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
+                },
+                "UpdateThroughput": {
+                    "avg": 0,
+                    "count": 5,
+                    "max": 0,
+                    "min": 0,
+                    "sum": 0
                 },
                 "WriteLatency": {
-                    "avg": 0.00009062937062937063,
+                    "avg": 0,
                     "count": 5,
-                    "max": 0.0003076923076923077,
+                    "max": 0,
                     "min": 0,
-                    "sum": 0.00045314685314685316
-                },
-                "WriteThroughput": {
-                    "avg": 2621.2741374938682,
-                    "count": 5,
-                    "max": 7441.066666666667,
-                    "min": 0,
-                    "sum": 13106.370687469342
+                    "sum": 0
                 }
             }
         }
     },
     "cloud": {
         "account": {
-            "id": "627959692251",
-            "name": "elastic-test"
+            "id": "428152502467",
+            "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "ap-southeast-1"
+        "region": "eu-west-1"
     },
     "event": {
         "dataset": "aws.cloudwatch",

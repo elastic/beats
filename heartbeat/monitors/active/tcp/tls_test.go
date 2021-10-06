@@ -20,11 +20,13 @@ package tcp
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"math/bits"
 	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -44,6 +46,9 @@ import (
 
 // Tests that we can check a TLS connection with a cert for a SAN IP
 func TestTLSSANIPConnection(t *testing.T) {
+	if runtime.GOOS == "windows" && bits.UintSize == 32 {
+		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
+	}
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()
 
@@ -184,17 +189,17 @@ func testTLSTCPCheck(t *testing.T, host string, port uint16, certFileName string
 	})
 	require.NoError(t, err)
 
-	jobs, endpoints, err := createWithResolver(config, resolver)
+	p, err := createWithResolver(config, resolver)
 	require.NoError(t, err)
 
 	sched := schedule.MustParse("@every 1s")
-	job := wrappers.WrapCommon(jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "tcp", Schedule: sched, Timeout: 1})[0]
 
 	event := &beat.Event{}
 	_, err = job(event)
 	require.NoError(t, err)
 
-	require.Equal(t, 1, endpoints)
+	require.Equal(t, 1, p.Endpoints)
 
 	return event
 }

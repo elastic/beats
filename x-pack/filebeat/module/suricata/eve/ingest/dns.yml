@@ -1,0 +1,97 @@
+---
+description: Pipeline for Suricata DNS Events
+
+processors:
+  - set:
+      field: dns.id
+      value: '{{suricata.eve.dns.id}}'
+      ignore_empty_value: true
+  - set:
+      field: dns.response_code
+      value: '{{suricata.eve.dns.rcode}}'
+      ignore_empty_value: true
+  - set:
+      field: dns.type
+      value: '{{suricata.eve.dns.type}}'
+      ignore_empty_value: true
+  - set:
+      # V2 events always include the query data.
+      if: >-
+        ctx?.dns?.type == "query" ||
+        ctx?.suricata?.eve?.dns?.version == 2
+      field: dns.question.name
+      value: '{{suricata.eve.dns.rrname}}'
+      ignore_empty_value: true
+  - set:
+      # V2 events always include the query data.
+      if: >-
+        ctx?.dns?.type == "query" ||
+        ctx?.suricata?.eve?.dns?.version == 2
+      field: dns.question.type
+      value: '{{suricata.eve.dns.rrtype}}'
+      ignore_empty_value: true
+  - pipeline:
+      if: >-
+        ctx?.dns?.type == "answer" &&
+        ctx?.suricata?.eve?.dns?.version == null
+      name: '{< IngestPipeline "dns-answer-v1" >}'
+  - pipeline:
+      if: >-
+        ctx?.dns?.type == "answer" &&
+        ctx?.suricata?.eve?.dns?.version == 2
+      name: '{< IngestPipeline "dns-answer-v2" >}'
+  - foreach:
+      field: dns.resolved_ip
+      ignore_missing: true
+      processor:
+        append:
+          field: related.ip
+          value:
+            - '{{_ingest._value}}'
+          allow_duplicates: false
+  - script:
+      if: ctx?.dns?.question?.registered_domain != null
+      tag: suricata_dns_top_level_domain
+      lang: painless
+      source: |
+        def rd = ctx.dns.question.registered_domain;
+        def firstDot = rd.indexOf(".");
+        if (firstDot == -1) {
+            return;
+        }
+        ctx.dns.question.top_level_domain = rd.substring(firstDot + 1);
+  - append:
+      if: ctx?.suricata?.eve?.dns?.aa == true
+      field: dns.header_flags
+      value: AA
+  - append:
+      if: ctx?.suricata?.eve?.dns?.tc == true
+      field: dns.header_flags
+      value: TC
+  - append:
+      if: ctx?.suricata?.eve?.dns?.rd == true
+      field: dns.header_flags
+      value: RD
+  - append:
+      if: ctx?.suricata?.eve?.dns?.ra == true
+      field: dns.header_flags
+      value: RA
+  - remove:
+      field:
+        - suricata.eve.dns.aa
+        - suricata.eve.dns.tc
+        - suricata.eve.dns.rd
+        - suricata.eve.dns.ra
+        - suricata.eve.dns.qr
+        - suricata.eve.dns.version
+        - suricata.eve.dns.flags
+        - suricata.eve.dns.grouped
+      ignore_missing: true
+on_failure:
+  - append:
+      field: error.message
+      value: >-
+        error in DNS pipeline:
+        error in [{{_ingest.on_failure_processor_type}}] processor{{#_ingest.on_failure_processor_tag}}
+        with tag [{{_ingest.on_failure_processor_tag }}]{{/_ingest.on_failure_processor_tag}}
+        {{ _ingest.on_failure_message }}

@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: cloudfoundry
+
 [[metricbeat-module-cloudfoundry]]
 [role="xpack"]
 == Cloudfoundry module
@@ -16,6 +18,22 @@ The Cloud Foundry module connects to Cloud Foundry loggregator to gather contain
 The cloudfoundry module metrics are numerical values that describe some aspect of a system at a particular point in time. They are collected when pushed from the loggregator and are identified with a timestamp, a name, a value, and one or more defining labels.
 
 The cloudfoundry module mericsets are `container`, `counter` and `value`.
+
+[float]
+=== Dashboards
+
+The Cloud Foundry module includes some dashboards.
+
+The overview dashboard can be used to visualize the current status of your Cloud
+Foundry deployments.
+
+image::./images/metricbeat-cloudfoundry-overview.png[]
+
+The platform health dashboard includes visualizations that help diagnosting
+issues related to the applications deployed in Cloud Foundry.
+
+image::./images/metricbeat-cloudfoundry-platform-health.png[]
+
 
 [float]
 === Module-specific configuration notes
@@ -101,7 +119,7 @@ Client Secret to authenticate with Cloud Foundry. Default: "".
 === `shard_id`
 
 Shard ID for connection to the RLP Gateway. Use the same ID across multiple {beatname_lc} to shard the load of events
-from the RLP Gateway. Default: "(generated UUID)".
+from the RLP Gateway.
 
 [float]
 ==== `version`
@@ -136,6 +154,7 @@ metricbeat.modules:
   rlp_address: '${CLOUDFOUNDRY_RLP_ADDRESS:""}'
   client_id: '${CLOUDFOUNDRY_CLIENT_ID:""}'
   client_secret: '${CLOUDFOUNDRY_CLIENT_SECRET:""}'
+  shard_id: metricbeat
   version: v1
 ----
 

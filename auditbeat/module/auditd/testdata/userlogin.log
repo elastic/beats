@@ -1,0 +1,4 @@
+type=USER_LOGIN msg=audit(1553501549.148:110544844): user pid=374 uid=0 auid=4294967295 ses=4294967295 msg='op=login acct="(unknown)" exe="/usr/sbin/sshd" hostname=localhost addr=1.2.3.4 terminal=ssh res=failed'
+type=USER_LOGIN msg=audit(1553452002.231:110276965): user pid=10318 uid=0 auid=700 ses=5388 msg='op=login id=700 exe="/usr/sbin/sshd" hostname=1.2.3.4 addr=1.2.3.4 terminal=/dev/pts/0 res=success'
+type=USER_AUTH msg=audit(1552714590.571:21114): pid=11312 uid=0 auid=0 ses=62 msg='op=PAM:authentication acct="bob" exe="/bin/su" hostname=localhost addr=127.0.0.1 terminal=/dev/pts/0 res=success'
+type=CRED_ACQ msg=audit(1553557236.015:4088825): pid=9033 uid=0 auid=1001 ses=352 msg='op=PAM:setcred acct="bob" exe="/usr/sbin/sshd" hostname=localhost addr=127.0.0.1 terminal=ssh res=success'

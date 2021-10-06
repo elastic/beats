@@ -1,0 +1,161 @@
+description: Pipeline for parsing MISP Threat Intel
+processors:
+  ####################
+  # Event ECS fields #
+  ####################
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.kind
+      value: enrichment
+  - set:
+      field: event.category
+      value: threat
+  - set:
+      field: event.type
+      value: indicator
+
+  ######################
+  # General ECS fields #
+  ######################
+  - rename:
+      field: json
+      target_field: threatintel.otx
+      ignore_missing: true
+
+  #####################
+  # Threat ECS Fields #
+  #####################
+  ## File indicator operations
+  - set:
+      field: threatintel.indicator.type
+      value: file
+      if: "ctx.threatintel?.otx?.type.startsWith('FileHash') || ctx.threatintel?.otx?.type == 'filepath'"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.file.hash.md5
+      ignore_missing: true
+      if: "ctx.threatintel?.otx?.type == 'FileHash-MD5'"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.file.hash.sha1
+      ignore_missing: true
+      if: "ctx.threatintel?.otx?.type == 'FileHash-SHA1'"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.file.hash.sha256
+      ignore_missing: true
+      if: "ctx.threatintel?.otx?.type == 'FileHash-SHA256'"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.file.hash.pehash
+      ignore_missing: true
+      if: "ctx.threatintel?.otx?.type == 'FileHash-PEHASH'"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.file.hash.imphash
+      ignore_missing: true
+      if: "ctx.threatintel?.otx?.type == 'FileHash-IMPHASH'"
+
+  ## IP indicator operations
+  - set:
+      field: threatintel.indicator.type
+      value: ipv4-addr
+      if: ctx.threatintel?.otx?.type == 'IPv4'
+  - set:
+      field: threatintel.indicator.type
+      value: ipv6-addr
+      if: ctx.threatintel?.otx?.type == 'IPv6'
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.ip
+      ignore_missing: true
+      if: "ctx?.threatintel?.indicator?.type != null && ['ipv4-addr', 'ipv6-addr'].contains(ctx?.threatintel?.indicator?.type)"
+
+  ## URL indicator operations
+  - set:
+      field: threatintel.indicator.type
+      value: url
+      if: "ctx?.threatintel?.indicator?.type == null && ['URL', 'URI'].contains(ctx.threatintel?.otx?.type)"
+  - uri_parts:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.url
+      keep_original: true
+      remove_if_successful: true
+      if: ctx?.threatintel?.indicator?.type == 'url'
+  - set:
+      field: threatintel.indicator.url.full
+      value: "{{{threatintel.indicator.url.original}}}"
+      ignore_empty_value: true
+      if: "ctx?.threatintel?.otx?.type == 'URL'"
+
+  ## Email indicator operations
+  - set:
+      field: threatintel.indicator.type
+      value: email-addr
+      if: ctx?.threatintel?.otx?.type == 'email'
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.email.address
+      ignore_missing: true
+      if: "ctx?.threatintel?.indicator?.type == 'email-addr'"
+
+  ## Domain indicator operations
+  - set:
+      field: threatintel.indicator.type
+      value: domain-name
+      if: "ctx?.threatintel?.indicator?.type == null && ['domain', 'hostname'].contains(ctx.threatintel?.otx?.type)"
+  - rename:
+      field: threatintel.otx.indicator
+      target_field: threatintel.indicator.url.domain
+      ignore_missing: true
+      if: "ctx?.threatintel?.indicator?.type == 'domain-name' && ctx.threatintel?.indicator?.url?.domain == null"
+
+  ######################
+  # Cleanup processors #
+  ######################
+  - set:
+      field: threatintel.indicator.type
+      value: unknown
+      if: ctx?.threatintel?.indicator?.type == null
+  - script:
+      lang: painless
+      if: ctx?.threatintel != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
+            if (x instanceof Map) {
+                handleMap(x);
+            } else if (x instanceof List) {
+                handleList(x);
+            }
+          }
+        map.values().removeIf(v -> v == null);
+        }
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
+  - remove:
+      field:
+        - threatintel.otx.content
+      ignore_missing: true
+      if: ctx?.threatintel?.otx?.content == ""
+  - remove:
+      field:
+        - threatintel.otx.type
+        - threatintel.otx.id
+        - message
+      ignore_missing: true
+      if: ctx?.threatintel?.indicator?.type != null
+on_failure:
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

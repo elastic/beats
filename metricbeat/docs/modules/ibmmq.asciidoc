@@ -2,6 +2,8 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: ibmmq
+
 [[metricbeat-module-ibmmq]]
 [role="xpack"]
 == IBM MQ module
@@ -57,6 +59,7 @@ metricbeat.modules:
   metrics_path: /metrics
 ----
 
+This module supports TLS connections when using `ssl` config field, as described in <<configuration-ssl>>.
 It also supports the options described in <<module-http-config-options>>.
 
 [float]

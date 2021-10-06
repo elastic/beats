@@ -24,9 +24,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
 )
 
 func TestData(t *testing.T) {
+	if !*flags.DataFlag {
+		t.Skip("Flaky test: https://github.com/elastic/beats/issues/22612")
+	}
+
 	service := compose.EnsureUpWithTimeout(t, 120, "ceph-api")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))

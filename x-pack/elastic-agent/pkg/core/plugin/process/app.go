@@ -16,18 +16,21 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/tokenbucket"
 )
 
 var (
 	// ErrAppNotRunning is returned when configuration is performed on not running application.
 	ErrAppNotRunning = errors.New("application is not running", errors.TypeApplication)
+	procExitTimeout  = 10 * time.Second
 )
 
 // Application encapsulates a concrete application ran by elastic-agent e.g Beat.
@@ -37,7 +40,7 @@ type Application struct {
 	name         string
 	pipelineID   string
 	logLevel     string
-	spec         app.Specifier
+	desc         *app.Descriptor
 	srv          *server.Server
 	srvState     *server.ApplicationState
 	limiter      *tokenbucket.Bucket
@@ -45,17 +48,21 @@ type Application struct {
 	tag          app.Taggable
 	state        state.State
 	reporter     state.Reporter
+	watchClosers map[int]context.CancelFunc
 
 	uid int
 	gid int
 
-	monitor monitoring.Monitor
+	monitor        monitoring.Monitor
+	statusReporter status.Reporter
 
 	processConfig *process.Config
 
 	logger *logger.Logger
 
-	appLock sync.Mutex
+	appLock          sync.Mutex
+	restartCanceller context.CancelFunc
+	restartConfig    map[string]interface{}
 }
 
 // ArgsDecorator decorates arguments before calling an application
@@ -66,14 +73,15 @@ type ArgsDecorator func([]string) []string
 func NewApplication(
 	ctx context.Context,
 	id, appName, pipelineID, logLevel string,
-	spec app.Specifier,
+	desc *app.Descriptor,
 	srv *server.Server,
 	cfg *configuration.SettingsConfig,
 	logger *logger.Logger,
 	reporter state.Reporter,
-	monitor monitoring.Monitor) (*Application, error) {
+	monitor monitoring.Monitor,
+	statusController status.Controller) (*Application, error) {
 
-	s := spec.Spec()
+	s := desc.ProcessSpec()
 	uid, gid, err := s.UserGroup()
 	if err != nil {
 		return nil, err
@@ -86,21 +94,31 @@ func NewApplication(
 		name:          appName,
 		pipelineID:    pipelineID,
 		logLevel:      logLevel,
-		spec:          spec,
+		desc:          desc,
 		srv:           srv,
 		processConfig: cfg.ProcessConfig,
 		logger:        logger,
 		limiter:       b,
-		reporter:      reporter,
-		monitor:       monitor,
-		uid:           uid,
-		gid:           gid,
+		state: state.State{
+			Status: state.Stopped,
+		},
+		reporter:       reporter,
+		monitor:        monitor,
+		uid:            uid,
+		gid:            gid,
+		statusReporter: statusController.RegisterApp(id, appName),
+		watchClosers:   make(map[int]context.CancelFunc),
 	}, nil
 }
 
 // Monitor returns monitoring handler of this app.
 func (a *Application) Monitor() monitoring.Monitor {
 	return a.monitor
+}
+
+// Spec returns the program spec of this app.
+func (a *Application) Spec() program.Spec {
+	return a.desc.Spec()
 }
 
 // State returns the application state.
@@ -117,7 +135,7 @@ func (a *Application) Name() string {
 
 // Started returns true if the application is started.
 func (a *Application) Started() bool {
-	return a.state.Status != state.Stopped
+	return a.state.Status != state.Stopped && a.state.Status != state.Crashed && a.state.Status != state.Failed
 }
 
 // Stop stops the current application.
@@ -131,12 +149,9 @@ func (a *Application) Stop() {
 		return
 	}
 
-	stopSig := os.Interrupt
 	if srvState != nil {
-		if err := srvState.Stop(a.processConfig.StopTimeout); err != nil {
-			// kill the process if stop through GRPC doesn't work
-			stopSig = os.Kill
-		}
+		// signal stop through GRPC, wait and kill is performed later in gracefulKill
+		srvState.Stop(a.processConfig.StopTimeout)
 	}
 
 	a.appLock.Lock()
@@ -144,10 +159,10 @@ func (a *Application) Stop() {
 
 	a.srvState = nil
 	if a.state.ProcessInfo != nil {
-		if err := a.state.ProcessInfo.Process.Signal(stopSig); err == nil {
-			// no error on signal, so wait for it to stop
-			_, _ = a.state.ProcessInfo.Process.Wait()
-		}
+		// stop and clean watcher
+		a.stopWatcher(a.state.ProcessInfo)
+		a.gracefulKill(a.state.ProcessInfo)
+
 		a.state.ProcessInfo = nil
 
 		// cleanup drops
@@ -163,10 +178,10 @@ func (a *Application) Shutdown() {
 }
 
 // SetState sets the status of the application.
-func (a *Application) SetState(status state.Status, msg string, payload map[string]interface{}) {
+func (a *Application) SetState(s state.Status, msg string, payload map[string]interface{}) {
 	a.appLock.Lock()
 	defer a.appLock.Unlock()
-	a.setState(status, msg, payload)
+	a.setState(s, msg, payload)
 }
 
 func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.Info, cfg map[string]interface{}) {
@@ -177,32 +192,50 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		case ps := <-a.waitProc(proc.Process):
 			procState = ps
 		case <-a.bgContext.Done():
-			a.Stop()
+			return
+		case <-ctx.Done():
+			// closer called
 			return
 		}
 
 		a.appLock.Lock()
+		defer a.appLock.Unlock()
 		if a.state.ProcessInfo != proc {
 			// already another process started, another watcher is watching instead
-			a.appLock.Unlock()
+			a.gracefulKill(proc)
 			return
 		}
+
+		// stop the watcher
+		a.stopWatcher(a.state.ProcessInfo)
+
+		// was already stopped by Stop, do not restart
+		if a.state.Status == state.Stopped {
+			return
+		}
+
 		a.state.ProcessInfo = nil
 		srvState := a.srvState
 
 		if srvState == nil || srvState.Expected() == proto.StateExpected_STOPPING {
-			a.appLock.Unlock()
 			return
 		}
 
 		msg := fmt.Sprintf("exited with code: %d", procState.ExitCode())
-		a.setState(state.Crashed, msg, nil)
+		a.setState(state.Restarting, msg, nil)
 
-		// it was a crash, cleanup anything required
-		go a.cleanUp()
-		a.start(ctx, p, cfg)
-		a.appLock.Unlock()
+		// it was a crash
+		a.start(ctx, p, cfg, true)
 	}()
+}
+
+func (a *Application) stopWatcher(procInfo *process.Info) {
+	if procInfo != nil {
+		if closer, ok := a.watchClosers[procInfo.PID]; ok {
+			closer()
+			delete(a.watchClosers, procInfo.PID)
+		}
+	}
 }
 
 func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
@@ -221,36 +254,56 @@ func (a *Application) waitProc(proc *os.Process) <-chan *os.ProcessState {
 	return resChan
 }
 
-func (a *Application) setStateFromProto(pstatus proto.StateObserved_Status, msg string, payload map[string]interface{}) {
-	var status state.Status
-	switch pstatus {
-	case proto.StateObserved_STARTING:
-		status = state.Starting
-	case proto.StateObserved_CONFIGURING:
-		status = state.Configuring
-	case proto.StateObserved_HEALTHY:
-		status = state.Running
-	case proto.StateObserved_DEGRADED:
-		status = state.Degraded
-	case proto.StateObserved_FAILED:
-		status = state.Failed
-	case proto.StateObserved_STOPPING:
-		status = state.Stopping
-	}
-	a.setState(status, msg, payload)
-}
+func (a *Application) setState(s state.Status, msg string, payload map[string]interface{}) {
+	if a.state.Status != s || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
+		if state.IsStateFiltered(msg, payload) {
+			return
+		}
 
-func (a *Application) setState(status state.Status, msg string, payload map[string]interface{}) {
-	if a.state.Status != status || a.state.Message != msg || !reflect.DeepEqual(a.state.Payload, payload) {
-		a.state.Status = status
+		a.state.Status = s
 		a.state.Message = msg
 		a.state.Payload = payload
 		if a.reporter != nil {
 			go a.reporter.OnStateChange(a.id, a.name, a.state)
 		}
+		a.statusReporter.Update(s, msg, payload)
 	}
 }
 
 func (a *Application) cleanUp() {
-	a.monitor.Cleanup(a.name, a.pipelineID)
+	a.monitor.Cleanup(a.desc.Spec(), a.pipelineID)
+}
+
+func (a *Application) gracefulKill(proc *process.Info) {
+	if proc == nil || proc.Process == nil {
+		return
+	}
+
+	// send stop signal to request stop
+	proc.Stop()
+
+	var wg sync.WaitGroup
+	doneChan := make(chan struct{})
+	wg.Add(1)
+	go func() {
+		wg.Done()
+
+		if _, err := proc.Process.Wait(); err != nil {
+			// process is not a child - some OSs requires process to be child
+			a.externalProcess(proc.Process)
+		}
+		close(doneChan)
+	}()
+
+	// wait for awaiter
+	wg.Wait()
+
+	// kill in case it's still running after timeout
+	t := time.NewTimer(procExitTimeout)
+	defer t.Stop()
+	select {
+	case <-doneChan:
+	case <-t.C:
+		_ = proc.Process.Kill()
+	}
 }

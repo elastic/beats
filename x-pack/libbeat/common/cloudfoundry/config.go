@@ -5,14 +5,11 @@
 package cloudfoundry
 
 import (
-	"crypto/tls"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/gofrs/uuid"
-
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 const (
@@ -28,38 +25,32 @@ type Config struct {
 	ClientID     string `config:"client_id" validate:"required"`
 	ClientSecret string `config:"client_secret" validate:"required"`
 
-	// TLS configuration for the client
-	TLS *tlscommon.Config `config:"ssl"`
-
 	// Override URLs returned from the CF client
-	APIAddress     string `config:"api_address"`
+	APIAddress     string `config:"api_address" validate:"required"`
 	DopplerAddress string `config:"doppler_address"`
 	UaaAddress     string `config:"uaa_address"`
 	RlpAddress     string `config:"rlp_address"`
 
 	// ShardID when retrieving events from loggregator, sharing this ID across
 	// multiple filebeats will shard the load of receiving and sending events.
-	ShardID string `config:"shard_id"`
+	ShardID string `config:"shard_id" validate:"required"`
 
 	// Maximum amount of time to cache application objects from CF client.
 	CacheDuration time.Duration `config:"cache_duration"`
 
 	// Time to wait before retrying to get application info in case of error.
 	CacheRetryDelay time.Duration `config:"cache_retry_delay"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 // InitDefaults initialize the defaults for the configuration.
 func (c *Config) InitDefaults() {
-	// If not provided by the user; subscription ID should be a unique string to avoid clustering by default.
-	// Default to using a UUID4 string.
-	uuid, err := uuid.NewV4()
-	if err != nil {
-		panic(err)
-	}
-	c.ShardID = uuid.String()
 	c.CacheDuration = 120 * time.Second
 	c.CacheRetryDelay = 20 * time.Second
 	c.Version = ConsumerVersionV1
+
+	c.Transport = httpcommon.DefaultHTTPTransportSettings()
 }
 
 func (c *Config) Validate() error {
@@ -68,15 +59,6 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("not supported version %v, expected one of %s", c.Version, strings.Join(supportedVersions, ", "))
 	}
 	return nil
-}
-
-// TLSConfig returns the TLS configuration.
-func (c *Config) TLSConfig() (*tls.Config, error) {
-	tls, err := tlscommon.LoadTLSConfig(c.TLS)
-	if err != nil {
-		return nil, err
-	}
-	return tls.ToConfig(), nil
 }
 
 func anyOf(elems []string, s string) bool {

@@ -79,10 +79,7 @@ func TestMapMetric(t *testing.T) {
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
 		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
 		assert.NoError(t, err)
-		assert.Equal(t, metrics[0].Resource.Id, "123")
-		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
-		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
-		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity", "BytesRead"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
@@ -100,10 +97,7 @@ func TestMapMetric(t *testing.T) {
 		assert.NoError(t, err)
 
 		assert.True(t, len(metrics) > 0)
-		assert.Equal(t, metrics[0].Resource.Id, "123")
-		assert.Equal(t, metrics[0].Resource.Name, "resourceName")
-		assert.Equal(t, metrics[0].Resource.Type, "resourceType")
-		assert.Equal(t, metrics[0].Resource.Location, "resourceLocation")
+		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "namespace")
 		assert.Equal(t, metrics[0].Names, []string{"TotalRequests", "Capacity"})
 		assert.Equal(t, metrics[0].Aggregations, "Average")
@@ -114,7 +108,7 @@ func TestMapMetric(t *testing.T) {
 
 func TestFilterSConfiguredMetrics(t *testing.T) {
 	selectedRange := []string{"TotalRequests", "Capacity", "CPUUsage"}
-	intersection, difference := filterSConfiguredMetrics(selectedRange, *MockMetricDefinitions())
+	intersection, difference := filterConfiguredMetrics(selectedRange, *MockMetricDefinitions())
 	assert.Equal(t, intersection, []string{"TotalRequests", "Capacity"})
 	assert.Equal(t, difference, []string{"CPUUsage"})
 }
@@ -144,7 +138,6 @@ func TestIntersections(t *testing.T) {
 	intersection, difference = intersections(firstStr, sercondStr)
 	assert.Equal(t, len(intersection), 0)
 	assert.Equal(t, difference, []string{"test4", "test5"})
-
 }
 
 func TestGetMetricDefinitionsByNames(t *testing.T) {
