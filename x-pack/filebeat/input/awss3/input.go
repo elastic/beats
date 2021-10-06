@@ -269,5 +269,5 @@ func getRegionForBucketARN(ctx context.Context, s3Client *s3.Client, bucketARN s
 		return "", err
 	}
 
-	return string(resp.LocationConstraint), nil
+	return string(s3.NormalizeBucketLocation(resp.LocationConstraint)), nil
 }
