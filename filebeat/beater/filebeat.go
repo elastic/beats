@@ -58,9 +58,9 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
 	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
 var (

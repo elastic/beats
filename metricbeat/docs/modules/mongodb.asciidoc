@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: mongodb
+
 [[metricbeat-module-mongodb]]
 == MongoDB module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches metrics from https://www.mongodb.com[MongoDB]
 servers.

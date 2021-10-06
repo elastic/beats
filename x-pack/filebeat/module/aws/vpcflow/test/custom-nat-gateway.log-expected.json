@@ -24,7 +24,8 @@
         "source.address": "10.0.1.5",
         "source.ip": "10.0.1.5",
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     },
     {
@@ -54,7 +55,8 @@
         "source.address": "10.0.1.5",
         "source.ip": "10.0.1.5",
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     }
 ]

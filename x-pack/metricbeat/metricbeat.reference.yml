@@ -513,6 +513,15 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
+#--------------------------- Enterprisesearch Module ---------------------------
+- module: enterprisesearch
+  metricsets: ["health", "stats"]
+  enabled: true
+  period: 10s
+  hosts: ["http://localhost:3002"]
+  username: elastic
+  password: changeme
+
 #------------------------------ Envoyproxy Module ------------------------------
 - module: envoyproxy
   metricsets: ["server"]
@@ -1813,7 +1822,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "metricbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
