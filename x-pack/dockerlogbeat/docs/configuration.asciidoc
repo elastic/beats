@@ -100,7 +100,7 @@ you can use API keys to secure communication with {es}.
 
 |`pipeline`
 |
-|A format string value that specifies the ingest node pipeline to write events to.
+|A format string value that specifies the {es} ingest pipeline to write events to.
 
 |`timeout`
 |`90`

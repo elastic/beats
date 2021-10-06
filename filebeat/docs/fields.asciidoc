@@ -27522,16 +27522,6 @@ coredns fields after normalization
 
 
 
-*`coredns.id`*::
-+
---
-id of the DNS transaction
-
-
-type: keyword
-
---
-
 *`coredns.query.size`*::
 +
 --
@@ -27544,56 +27534,6 @@ format: bytes
 
 --
 
-*`coredns.query.class`*::
-+
---
-DNS query class
-
-
-type: keyword
-
---
-
-*`coredns.query.name`*::
-+
---
-DNS query name
-
-
-type: keyword
-
---
-
-*`coredns.query.type`*::
-+
---
-DNS query type
-
-
-type: keyword
-
---
-
-*`coredns.response.code`*::
-+
---
-DNS response code
-
-
-type: keyword
-
---
-
-*`coredns.response.flags`*::
-+
---
-DNS response flags
-
-
-type: keyword
-
---
-
 *`coredns.response.size`*::
 +
 --
@@ -27603,16 +27543,6 @@ size of the DNS response
 type: integer
 
 format: bytes
-
---
-
-*`coredns.dnssec_ok`*::
-+
---
-dnssec flag
-
-
-type: boolean
 
 --
 

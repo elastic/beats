@@ -23,6 +23,11 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/data/elastic-agent-{{ commit_s
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
+{{- if contains .image_name "-cloud" }}
+    mkdir -p /opt/filebeat /opt/metricbeat && \
+    tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/metricbeat-*.tar.gz -C /opt/metricbeat --strip-components=1 && \
+    tar xf {{ $beatHome }}/data/elastic-agent-*/downloads/filebeat-*.tar.gz -C /opt/filebeat --strip-components=1 && \
+{{- end }}
     true
 
 FROM {{ .from }}
@@ -41,7 +46,6 @@ RUN case $(arch) in aarch64) YUM_FLAGS="-x bind-license";; esac; \
         yum install -y epel-release &&  \
         yum update -y $YUM_FLAGS && \
         yum install -y jq && \
-        
         yum clean all && \
         exit_code=0 && break || exit_code=$? && echo "yum error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -134,11 +138,25 @@ RUN mkdir /licenses
 COPY --from=home {{ $beatHome }}/LICENSE.txt /licenses
 COPY --from=home {{ $beatHome }}/NOTICE.txt /licenses
 
-{{- if ne .user "root" }}
+{{- if contains .image_name "-cloud" }}
+COPY --from=home /opt /opt
+{{- end }}
+
+{{- if eq .user "root" }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+{{- end }}
+{{- else }}
 RUN groupadd --gid 1000 {{ .BeatName }}
 RUN useradd -M --uid 1000 --gid 1000 --groups 0 --home {{ $beatHome }} {{ .user }}
 {{- if (and (eq .Variant "complete") (not (contains .from "ubi-minimal")))  }}
 RUN chown {{ .user }} $NODE_PATH
+{{- end }}
+{{- if contains .image_name "-cloud" }}
+# Generate folder for a stub command that will be overwritten at runtime
+RUN mkdir /app
+RUN chown {{ .user }} /app
 {{- end }}
 {{- end }}
 USER {{ .user }}
@@ -172,7 +190,6 @@ RUN cd {{$beatHome}}/.node \
 {{- end }}
 
 
-
 {{- range $i, $port := .ExposePorts }}
 EXPOSE {{ $port }}
 {{- end }}
@@ -183,4 +200,13 @@ EXPOSE {{ $port }}
 ENV LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE=/
 
 WORKDIR {{ $beatHome }}
+
+{{- if contains .image_name "-cloud" }}
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD ["/app/apm.sh"]
+# Generate a stub command that will be overwritten at runtime
+RUN echo -e '#!/bin/sh\nexec /usr/local/bin/docker-entrypoint' > /app/apm.sh && \
+    chmod 0555 /app/apm.sh
+{{- else }}
 ENTRYPOINT ["/usr/bin/tini", "--", "/usr/local/bin/docker-entrypoint"]
+{{- end }}
