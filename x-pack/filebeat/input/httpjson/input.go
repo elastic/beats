@@ -39,6 +39,8 @@ var (
 	timeNow = time.Now
 )
 
+// retryLogger provides a shim for a *logp.Logger to be used by
+// go-retryablehttp as a retryablehttp.LeveledLogger.
 type retryLogger struct {
 	log *logp.Logger
 }
@@ -49,20 +51,20 @@ func newRetryLogger(log *logp.Logger) *retryLogger {
 	}
 }
 
-func (log *retryLogger) Error(format string, args ...interface{}) {
-	log.log.Errorf(format, args...)
+func (log *retryLogger) Error(msg string, keysAndValues ...interface{}) {
+	log.log.Errorw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Info(format string, args ...interface{}) {
-	log.log.Infof(format, args...)
+func (log *retryLogger) Info(msg string, keysAndValues ...interface{}) {
+	log.log.Infow(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Debug(format string, args ...interface{}) {
-	log.log.Debugf(format, args...)
+func (log *retryLogger) Debug(msg string, keysAndValues ...interface{}) {
+	log.log.Debugw(msg, keysAndValues...)
 }
 
-func (log *retryLogger) Warn(format string, args ...interface{}) {
-	log.log.Warnf(format, args...)
+func (log *retryLogger) Warn(msg string, keysAndValues ...interface{}) {
+	log.log.Warnw(msg, keysAndValues...)
 }
 
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
