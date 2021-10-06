@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build integration
-// +build azure
+//go:build integration && azure
+// +build integration,azure
 
 package container_instance
 
