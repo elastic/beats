@@ -1,5 +1,5 @@
 - key: enterprisesearch
-  title: "enterprisesearch"
+  title: "Enterprise Search"
   release: beta
   settings: ["ssl", "http"]
   description: >
