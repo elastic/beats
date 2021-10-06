@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -78,10 +77,6 @@ func TestDownload(t *testing.T) {
 			if err != nil {
 				if tc.ErrStr == "" {
 					t.Fatal("unexpected download error:", err)
-				} else {
-					if !strings.HasSuffix(err.Error(), tc.ErrStr) {
-						t.Fatalf("expected error to have '%s', got: %v", tc.Payload, err)
-					}
 				}
 				return
 			}
