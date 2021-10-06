@@ -115,7 +115,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated config option default_region from aws module. {pull}28120[28120]
-- Rename storage to storage_account metricset in the azure module for consistency. {pull}28120[28120]
+- Rename storage to storage_account metricset in the azure module for consistency. {pull}28284[28284]
 
 *Packetbeat*
 

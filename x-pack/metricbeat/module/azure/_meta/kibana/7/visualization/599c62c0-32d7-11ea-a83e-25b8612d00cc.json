@@ -57,7 +57,7 @@
                         "line_width": 2,
                         "metrics": [
                             {
-                                "field": "azure.storage.egress.total",
+                                "field": "azure.storage_account.egress.total",
                                 "id": "f0edf191-32d5-11ea-b19d-fb5049b980ca",
                                 "type": "max"
                             }

@@ -63,7 +63,7 @@
                         "line_width": 2,
                         "metrics": [
                             {
-                                "field": "azure.storage.availability.avg",
+                                "field": "azure.storage_account.availability.avg",
                                 "id": "0e91b812-32e2-11ea-a93d-dd20c62559b3",
                                 "type": "avg"
                             }

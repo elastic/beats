@@ -30,11 +30,11 @@
                         "fill": 0.5,
                         "formatter": "number",
                         "id": "c9fd8ce0-32e8-11ea-84f4-e9593f8ba8f6",
-                        "label": "avg(azure.storage.transactions.total)",
+                        "label": "avg(azure.storage_account.transactions.total)",
                         "line_width": "1",
                         "metrics": [
                             {
-                                "field": "azure.storage.transactions.total",
+                                "field": "azure.storage_account.transactions.total",
                                 "id": "c9fd8ce1-32e8-11ea-84f4-e9593f8ba8f6",
                                 "type": "max"
                             }

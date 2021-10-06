@@ -117,9 +117,9 @@ This metricset will collect metrics from the virtual machine scalesets, these me
 so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
 
 [float]
-=== `storage`
+=== `storage_account`
 This metricset will collect metrics from the storage accounts, these metrics will have a timegrain every 5 minutes,
-so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
+so the `period` for `storage_account` metricset  should be `300s` or multiples of `300s`.
 
 [float]
 === `container_instance`
@@ -209,7 +209,7 @@ metricbeat.modules:
 
 - module: azure
   metricsets:
-  - storage
+  - storage_account
   enabled: true
   period: 300s
   client_id: '${AZURE_CLIENT_ID:""}'
@@ -311,7 +311,7 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-azure-monitor,monitor>>
 
-* <<metricbeat-metricset-azure-storage,storage>>
+* <<metricbeat-metricset-azure-storage_account,storage_account>>
 
 include::azure/app_insights.asciidoc[]
 
@@ -333,5 +333,5 @@ include::azure/database_account.asciidoc[]
 
 include::azure/monitor.asciidoc[]
 
-include::azure/storage.asciidoc[]
+include::azure/storage_account.asciidoc[]
 

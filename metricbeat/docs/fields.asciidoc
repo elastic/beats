@@ -6197,7 +6197,7 @@ type: object
 monitor
 
 
-*`azure.storage.*.*`*::
+*`azure.storage_account.*.*`*::
 +
 --
 storage account

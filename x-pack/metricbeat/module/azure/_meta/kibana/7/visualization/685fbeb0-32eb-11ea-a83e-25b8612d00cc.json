@@ -34,7 +34,7 @@
                         "line_width": "1",
                         "metrics": [
                             {
-                                "field": "azure.storage.success_e2elatency.avg",
+                                "field": "azure.storage_account.success_e2elatency.avg",
                                 "id": "da4459b2-32ea-11ea-be35-cb10be813609",
                                 "type": "avg"
                             }

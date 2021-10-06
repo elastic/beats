@@ -48,7 +48,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-azure-container_service,container_service>>   
 |<<metricbeat-metricset-azure-database_account,database_account>>   
 |<<metricbeat-metricset-azure-monitor,monitor>>   
-|<<metricbeat-metricset-azure-storage,storage>>   
+|<<metricbeat-metricset-azure-storage_account,storage_account>>   
 |<<metricbeat-module-beat,Beat>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .2+| .2+|  |<<metricbeat-metricset-beat-state,state>>   
 |<<metricbeat-metricset-beat-stats,stats>>   

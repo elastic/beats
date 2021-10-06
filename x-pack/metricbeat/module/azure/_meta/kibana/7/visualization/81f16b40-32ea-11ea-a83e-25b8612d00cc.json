@@ -34,7 +34,7 @@
                         "line_width": "1",
                         "metrics": [
                             {
-                                "field": "azure.storage.success_server_latency.avg",
+                                "field": "azure.storage_account.success_server_latency.avg",
                                 "id": "e9a40232-32e9-11ea-bda2-69435df36a5c",
                                 "type": "avg"
                             }
