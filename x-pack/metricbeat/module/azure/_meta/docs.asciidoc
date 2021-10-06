@@ -107,9 +107,9 @@ This metricset will collect metrics from the virtual machine scalesets, these me
 so the `period` for `compute_vm_scaleset` metricset  should be `300s` or multiples of `300s`.
 
 [float]
-=== `storage`
+=== `storage_account`
 This metricset will collect metrics from the storage accounts, these metrics will have a timegrain every 5 minutes,
-so the `period` for `storage` metricset  should be `300s` or multiples of `300s`.
+so the `period` for `storage_account` metricset  should be `300s` or multiples of `300s`.
 
 [float]
 === `container_instance`

@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package storage
+package storage_account
 
 import (
 	"fmt"
@@ -19,7 +19,7 @@ var (
 	missingResourcesConfig = common.MapStr{
 		"module":          "azure",
 		"period":          "60s",
-		"metricsets":      []string{"storage"},
+		"metricsets":      []string{"storage_account"},
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",
@@ -29,7 +29,7 @@ var (
 	resourceConfig = common.MapStr{
 		"module":          "azure",
 		"period":          "60s",
-		"metricsets":      []string{"storage"},
+		"metricsets":      []string{"storage_account"},
 		"client_secret":   "unique identifier",
 		"client_id":       "unique identifier",
 		"subscription_id": "unique identifier",

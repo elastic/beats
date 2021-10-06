@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package storage
+package storage_account
 
 import (
 	"fmt"
@@ -23,7 +23,7 @@ var (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.MustAddMetricSet("azure", "storage", New)
+	mb.Registry.MustAddMetricSet("azure", "storage_account", New)
 }
 
 // MetricSet holds any configuration or state information. It must implement

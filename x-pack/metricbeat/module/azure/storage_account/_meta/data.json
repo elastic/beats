@@ -29,12 +29,12 @@
         "region": "westeurope"
     },
     "event": {
-        "dataset": "azure.storage",
+        "dataset": "azure.storage_account",
         "duration": 115000,
         "module": "azure"
     },
     "metricset": {
-        "name": "storage",
+        "name": "storage_account",
         "period": 10000
     },
     "service": {

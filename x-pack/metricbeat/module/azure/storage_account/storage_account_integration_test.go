@@ -5,7 +5,7 @@
 // +build integration
 // +build azure
 
-package storage
+package storage_account
 
 import (
 	"testing"
@@ -18,7 +18,7 @@ import (
 )
 
 func TestFetchMetricset(t *testing.T) {
-	config := test.GetConfig(t, "storage")
+	config := test.GetConfig(t, "storage_account")
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
 	events, errs := mbtest.ReportingFetchV2Error(metricSet)
 	if len(errs) > 0 {
@@ -29,7 +29,7 @@ func TestFetchMetricset(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	config := test.GetConfig(t, "storage")
+	config := test.GetConfig(t, "storage_account")
 	metricSet := mbtest.NewFetcher(t, config)
 	metricSet.WriteEvents(t, "/")
 }

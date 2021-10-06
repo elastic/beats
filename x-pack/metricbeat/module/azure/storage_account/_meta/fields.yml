@@ -1,4 +1,4 @@
-- name: storage.*.*
+- name: storage_account.*.*
   release: ga
   type: object
   object_type: float

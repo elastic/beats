@@ -41,7 +41,7 @@
 
 #- module: azure
 #  metricsets:
-#  - storage
+#  - storage_account
 #  enabled: true
 #  period: 300s
 #  client_id: '${AZURE_CLIENT_ID:""}'
