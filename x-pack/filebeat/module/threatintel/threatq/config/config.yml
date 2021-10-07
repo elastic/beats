@@ -1,0 +1,64 @@
+{{ if eq .input "httpjson" }}
+
+type: httpjson
+config_version: "2"
+interval: {{ .interval }}
+
+auth.oauth2:
+  client.id: {{ .client_id }}
+  client.secret: {{ .client_secret }}
+  token_url: {{ .token_url }}
+request.method: GET
+{{ if .ssl }}
+  - request.ssl: {{ .ssl | tojson }}
+{{ end }}
+request.url: {{ .host }}api/indicators/query/hash/{{ .data_collection_id }}?sort=%2Bupdated_at&limit=1000
+request.transforms:
+  - set:
+      target: url.params.cursorMark
+      value: '[[.cursor.cursor_mark]]'
+      default: "*"
+cursor:
+  cursor_mark:
+    ignore_empty_value: true
+    value: '[[.last_response.body.nextCursorMark]]'
+response.request_body_on_pagination: true
+
+response.split:
+  target: body.data
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - decode_json_fields:
+      fields: [message]
+      target: json
+      process_array: true
+      max_depth: 5
+      overwrite_keys: true
+      add_error_key: true
+  - fingerprint:
+      fields: ["json.id"]
+      target_field: "@metadata._id"
+  - add_fields:
+      target: ''
+      fields:
+        ecs.version: 1.10.0
+  - timestamp:
+      field: json.created_at
+      layouts:
+        - '2006-01-02 15:04:05'
+      test:
+        - '2021-06-17 13:55:02'

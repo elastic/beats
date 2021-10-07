@@ -169,3 +169,28 @@
 
     # Set your API Token.
     var.api_token: "<RF_TOKEN>"
+
+  threatq:
+    enabled: true
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for ThreatQ ThreatLibrary API calls.
+    # Remember to put a slash at the end of the host URL
+    var.host: https://www.threatq.com/
+
+    # Oauth 2.0 Access Token URL
+    var.token_url: https://www.threatq.com/api/token
+
+    # Oauth 2.0 Client ID
+    var.client_id: "INSERT_CLIENT_ID"
+
+    # Oauth 2.0 Client Secret
+    var.client_secret: "INSERT_CLIENT_SECRET"
+
+    # The interval to poll the API for updates
+    var.interval: 1m
+
+    # The ID for the ThreatQ smart data collection
+    var.data_collection_id: "INSERT_THREATQ_DATA_COLLECTION_ID"
