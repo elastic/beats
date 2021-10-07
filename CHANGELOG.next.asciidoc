@@ -871,6 +871,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move openmetrics module to oss. {pull}26561[26561]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 - Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
+- Preliminary AIX support {pull}27954[27954]
 
 *Packetbeat*
 
