@@ -420,6 +420,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make aws-cloudwatch input GA. {pull}28161[28161]
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
+- Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
 
 
 *Heartbeat*
