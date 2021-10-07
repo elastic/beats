@@ -43,6 +43,20 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
+- Fix parsing of Elasticsearch node name by `elasticsearch/slowlog` fileset. {pull}14547[14547]
+- threatintel module: Changed the type of `threatintel.indicator.first_seen` from `keyword` to `date`. {pull}26765[26765]
+- Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
+- Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
+- Rename `log.path` to `log.file.path` in filestream to be consistent with `log` input and ECS. {pull}27761[27761]
+- Removes old module aliases for `googlecloud` (moved to gcp) and `apache2` (moved to apache). {pull}27919[27919]
+- Removes old module name aliases (gsuite) and removing old cyberark module in favor of the new cyberarkpas{pull}27915[27915]
+- Only filesets that are explicitly configured will be enabled. {issue}17256[17256] {pull}27526[27526]
+- All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
+- Remove deprecated fields in Kafka module. {pull}27938[27938]
+- Remove deprecated fields in coredns module. {pull}28196[28196]
+- Remove old `httpjson` config implementation. {pull}28054[28054]
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
