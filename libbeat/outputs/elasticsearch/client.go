@@ -311,10 +311,11 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 	opType := events.GetOpType(*event)
 
 	meta := eslegclient.BulkMeta{
-		Index:    index,
-		DocType:  eventType,
-		Pipeline: pipeline,
-		ID:       id,
+		Index:        index,
+		DocType:      eventType,
+		Pipeline:     pipeline,
+		ID:           id,
+		RequireAlias: true,
 	}
 
 	if opType == events.OpTypeDelete {
