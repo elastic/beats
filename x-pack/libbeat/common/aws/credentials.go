@@ -15,7 +15,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sts"
 	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -28,7 +27,6 @@ type ConfigAWS struct {
 	SharedCredentialFile string   `config:"shared_credential_file"`
 	Endpoint             string   `config:"endpoint"`
 	RoleArn              string   `config:"role_arn"`
-	AWSPartition         string   `config:"aws_partition"` // Deprecated.
 	ProxyUrl             *url.URL `config:"proxy_url"`
 }
 
@@ -147,12 +145,4 @@ func EnrichAWSConfigWithEndpoint(endpoint string, serviceName string, regionName
 		}
 	}
 	return awsConfig
-}
-
-// Validate checks for deprecated config option
-func (c ConfigAWS) Validate() error {
-	if c.AWSPartition != "" {
-		cfgwarn.Deprecate("8.0.0", "aws_partition is deprecated. Please use endpoint instead.")
-	}
-	return nil
 }
