@@ -75,6 +75,8 @@ function.
 +
 See <<configuration-{beatname_lc}-options>> for more examples.
 
+--
+
 include::{libbeat-dir}/shared/config-check.asciidoc[]
 
 [float]
