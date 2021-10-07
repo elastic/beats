@@ -7,6 +7,7 @@ RUN \
          python3-pip \
          python3-venv \
          librpm-dev \
+         iproute2 \
       && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install --upgrade pip==20.1.1
