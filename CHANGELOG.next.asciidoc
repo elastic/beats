@@ -307,6 +307,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
 - sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
 - Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
+- Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 
 *Heartbeat*
