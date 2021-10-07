@@ -69,7 +69,7 @@ SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", 
                               "actual.used.pct"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
-                                "actual.used.pct"]
+                                "actual.used.pct", "hugepages", "page_stats"]
 
 SYSTEM_NETWORK_FIELDS = ["name", "out.bytes", "in.bytes", "out.packets",
                          "in.packets", "in.error", "out.error", "in.dropped", "out.dropped"]
