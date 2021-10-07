@@ -328,14 +328,16 @@ def tagAndPush(Map args = [:]) {
   }
 
   variants.each { variant ->
+    // cloud docker images are stored in the private docker namespace.
+    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
     tags.each { tag ->
       // TODO:
       // For backward compatibility let's ensure we tag only for amd64, then E2E can benefit from until
       // they support the versioning with the architecture
       if ("${arch}" == "amd64") {
-        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}")
+        doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}", sourceNamespace: sourceNamespace)
       }
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
     }
   }
 }
@@ -343,6 +345,7 @@ def tagAndPush(Map args = [:]) {
 /**
 * @param beatName name of the Beat
 * @param variant name of the variant used to build the docker image name
+* @param sourceNamespace namespace to be used as source for the docker tag command
 * @param sourceTag tag to be used as source for the docker tag command, usually under the 'beats' namespace
 * @param targetTag tag to be used as target for the docker tag command, usually under the 'observability-ci' namespace
 */
@@ -351,7 +354,8 @@ def doTagAndPush(Map args = [:]) {
   def variant = args.variant
   def sourceTag = args.sourceTag
   def targetTag = args.targetTag
-  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def sourceNamespace = args.sourceNamespace
+  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
   def iterations = 0
   retryWithSleep(retries: 3, seconds: 5, backoff: true) {
