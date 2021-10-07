@@ -103,10 +103,6 @@
     type: boolean
     description: >
       If the Organization Community was local or synced from a remote source.
-  - name: event_creator_email
-    type: keyword
-    description: >
-      The email of the creator of the event.
   - name: attribute.id
     type: keyword
     description: >

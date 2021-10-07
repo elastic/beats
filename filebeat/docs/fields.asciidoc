@@ -151003,16 +151003,6 @@ type: boolean
 
 --
 
-*`threatintel.misp.event_creator_email`*::
-+
---
-The email of the creator of the event.
-
-
-type: keyword
-
---
-
 *`threatintel.misp.attribute.id`*::
 +
 --

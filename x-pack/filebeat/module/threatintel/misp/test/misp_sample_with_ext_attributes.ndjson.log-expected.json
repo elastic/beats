@@ -35,7 +35,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3631",
         "threatintel.misp.info": "Test event 1 just atrributes",
@@ -51,7 +50,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8ca56ae9-3747-4172-93d2-808da1a4eaf3"
+        "threatintel.misp.uuid": "8ca56ae9-3747-4172-93d2-808da1a4eaf3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T09:20:36.000Z",
@@ -89,7 +92,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3632",
         "threatintel.misp.info": "Test event 2 just more atrributes",
@@ -105,7 +107,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 2,
-        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763"
+        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T09:20:36.000Z",
@@ -143,7 +149,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3632",
         "threatintel.misp.info": "Test event 2 just more atrributes",
@@ -159,7 +164,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 2,
-        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763"
+        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T09:20:36.000Z",
@@ -197,7 +206,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3632",
         "threatintel.misp.info": "Test event 2 just more atrributes",
@@ -213,7 +221,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 2,
-        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763"
+        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T09:20:36.000Z",
@@ -251,7 +263,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3632",
         "threatintel.misp.info": "Test event 2 just more atrributes",
@@ -267,7 +278,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 2,
-        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763"
+        "threatintel.misp.uuid": "efbca287-edb5-4ad7-b8e4-fe9da514a763",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:22:12.000Z",
@@ -320,7 +335,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3633",
         "threatintel.misp.info": "Test event 3 objects and attributes",
@@ -336,7 +350,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3"
+        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:22:12.000Z",
@@ -389,7 +407,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3633",
         "threatintel.misp.info": "Test event 3 objects and attributes",
@@ -405,7 +422,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3"
+        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:22:12.000Z",
@@ -458,7 +479,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3633",
         "threatintel.misp.info": "Test event 3 objects and attributes",
@@ -474,7 +494,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3"
+        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:22:12.000Z",
@@ -527,7 +551,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3633",
         "threatintel.misp.info": "Test event 3 objects and attributes",
@@ -543,7 +566,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3"
+        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:22:12.000Z",
@@ -596,7 +623,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3633",
         "threatintel.misp.info": "Test event 3 objects and attributes",
@@ -612,7 +638,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3"
+        "threatintel.misp.uuid": "4edb20c7-8175-484d-bdcd-fce6872c1ef3",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:09:30.000Z",
@@ -651,7 +681,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3634",
         "threatintel.misp.info": "Test event 4 with object",
@@ -667,7 +696,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 3,
-        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d"
+        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:09:30.000Z",
@@ -706,7 +739,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3634",
         "threatintel.misp.info": "Test event 4 with object",
@@ -722,7 +754,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 3,
-        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d"
+        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:09:30.000Z",
@@ -761,7 +797,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3634",
         "threatintel.misp.info": "Test event 4 with object",
@@ -777,7 +812,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 3,
-        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d"
+        "threatintel.misp.uuid": "d98a8418-9f90-4b50-a623-6921ca5b356d",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:19:39.000Z",
@@ -816,7 +855,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3635",
         "threatintel.misp.info": "Test event 5 with an object",
@@ -832,7 +870,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e"
+        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:19:39.000Z",
@@ -871,7 +913,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3635",
         "threatintel.misp.info": "Test event 5 with an object",
@@ -887,7 +928,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e"
+        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:19:39.000Z",
@@ -926,7 +971,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3635",
         "threatintel.misp.info": "Test event 5 with an object",
@@ -942,7 +986,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e"
+        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:19:39.000Z",
@@ -981,7 +1029,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3635",
         "threatintel.misp.info": "Test event 5 with an object",
@@ -997,7 +1044,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e"
+        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-21T10:19:39.000Z",
@@ -1036,7 +1087,6 @@
         "threatintel.misp.date": "2021-05-21",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "1",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3635",
         "threatintel.misp.info": "Test event 5 with an object",
@@ -1052,7 +1102,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e"
+        "threatintel.misp.uuid": "8b8786f1-07f2-4bfc-a3f0-e63c22fcc25e",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1105,7 +1159,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1121,7 +1174,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1174,7 +1231,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1190,7 +1246,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1243,7 +1303,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1259,7 +1318,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1312,7 +1375,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1328,7 +1390,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1381,7 +1447,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1397,7 +1462,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1450,7 +1519,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1466,7 +1534,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1519,7 +1591,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1535,7 +1606,11 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     },
     {
         "@timestamp": "2021-05-28T11:19:41.000Z",
@@ -1588,7 +1663,6 @@
         "threatintel.misp.date": "2021-05-28",
         "threatintel.misp.disable_correlation": false,
         "threatintel.misp.distribution": "0",
-        "threatintel.misp.event_creator_email": "admin@admin.test",
         "threatintel.misp.extends_uuid": "",
         "threatintel.misp.id": "3636",
         "threatintel.misp.info": "Test event 6 with multiple objects and multiple attributes",
@@ -1604,6 +1678,10 @@
         "threatintel.misp.published": false,
         "threatintel.misp.sharing_group_id": "0",
         "threatintel.misp.threat_level_id": 1,
-        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df"
+        "threatintel.misp.uuid": "81aea1d1-bb23-4bcd-9b0c-496e9ce028df",
+        "user.email": "admin@admin.test",
+        "user.roles": [
+            "reporting_user"
+        ]
     }
 ]

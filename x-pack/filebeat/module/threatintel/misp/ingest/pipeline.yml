@@ -247,6 +247,14 @@ processors:
       target_field: threatintel.indicator.email.address
       ignore_missing: true
       if: ctx?.threatintel?.indicator?.type == 'email-addr'
+  - rename:
+      field: threatintel.misp.event_creator_email
+      target_field: user.email
+      ignore_missing: true
+  - append:
+      field: user.roles
+      value: "reporting_user"
+      if: ctx?.user?.email != null
 
   ## MAC Address indicator operations
   - set:
