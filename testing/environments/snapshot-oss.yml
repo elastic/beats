@@ -29,7 +29,7 @@ services:
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:7.16.0-76e5f71e-SNAPSHOT
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status | grep -q 'Looking good'"]
+      test: ["CMD-SHELL", "curl -s http://localhost:5601/api/status?v8format=true | grep -q '\"overall\":{\"level\":\"available\"'"]
       retries: 600
       interval: 1s
 
