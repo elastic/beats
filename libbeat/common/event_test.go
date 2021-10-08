@@ -267,7 +267,7 @@ func TestNormalizeValue(t *testing.T) {
 	}
 
 	checkDelta := func(t *testing.T, a, b interface{}) {
-		assert.InDelta(t, a, float64(b.(Float)), 0.000001)
+		assert.InDelta(t, a, b, 0.000001)
 	}
 
 	var nilStringPtr *string

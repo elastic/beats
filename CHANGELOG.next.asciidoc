@@ -91,6 +91,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - All filesets are disabled in the default configuration. {issue}17256[17256] {pull}27762[27762]
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
+- Remove old `httpjson` config implementation. {pull}28054[28054]
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
@@ -208,6 +210,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Periodic metrics in logs will now report `libbeat.output.events.active` and `beat.memstats.rss`
   as gauges (rather than counters). {pull}22877[22877]
 - Beats dashboards use custom index when `setup.dashboards.index` is set. {issue}21232[21232] {pull}27901[27901]
+- Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
 
 *Auditbeat*
 
@@ -305,6 +308,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
 - Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
 - sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
+- Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
+- Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 
 *Heartbeat*
 
@@ -421,6 +426,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
+- Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 
 *Functionbeat*
 
@@ -511,6 +517,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
+- Update cloud.google.com/go library. {pull}28229[28229]
+- Upgrade k8s.io/client-go library. {pull}28228[28228]
 
 *Auditbeat*
 
@@ -737,6 +745,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make aws-cloudwatch input GA. {pull}28161[28161]
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
+- Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
 
 *Heartbeat*
 
