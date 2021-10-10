@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Packetbeat*
 
+- Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
 
 *Winlogbeat*
 
