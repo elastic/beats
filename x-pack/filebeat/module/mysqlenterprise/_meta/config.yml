@@ -1,6 +1,6 @@
 - module: mysqlenterprise
   audit:
-    enabled: true
+    enabled: false
 
     # Sets the input type. Currently only supports file
     #var.input: file

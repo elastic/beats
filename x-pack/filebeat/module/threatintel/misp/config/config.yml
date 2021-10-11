@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.method: POST
@@ -34,12 +33,20 @@ response.split:
   target: body.response
   split:
     target: body.Event.Attribute
+    ignore_empty_value: true
     keep_parent: true
+    split:
+      target: body.Event.Object
+      keep_parent: true
+      split:
+        target: body.Event.Object.Attribute
+        keep_parent: true
 response.request_body_on_pagination: true
 response.pagination:
 - set:
     target: body.page
     value: '[[add .last_response.page 1]]'
+    fail_on_template_error: true
 cursor:
   timestamp:
     value: '[[.last_event.Event.timestamp]]'
@@ -62,8 +69,14 @@ publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
 processors:
   - decode_json_fields:
       fields: [message]
-      document_id: Event.Attribute.uuid
       target: json
+  - fingerprint:
+      fields:
+        - json.Event.Attribute.uuid
+        - json.Event.Object.Attribute.uuid
+      ignore_missing: true
+      target_field: "@metadata._id"
+      encoding: base64
   - script:
       lang: javascript
       id: my_filter
@@ -74,4 +87,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0

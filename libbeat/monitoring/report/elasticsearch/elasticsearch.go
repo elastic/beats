@@ -127,7 +127,7 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *common.Config) 
 
 	var clients []outputs.NetworkClient
 	for _, host := range hosts {
-		client, err := makeClient(host, params, &config)
+		client, err := makeClient(host, params, &config, beat.Beat)
 		if err != nil {
 			return nil, err
 		}
@@ -291,7 +291,7 @@ func (r *reporter) snapshotLoop(namespace, prefix string, period time.Duration, 
 	}
 }
 
-func makeClient(host string, params map[string]string, config *config) (outputs.NetworkClient, error) {
+func makeClient(host string, params map[string]string, config *config, beatname string) (outputs.NetworkClient, error) {
 	url, err := common.MakeURL(config.Protocol, "", host, 9200)
 	if err != nil {
 		return nil, err
@@ -299,6 +299,7 @@ func makeClient(host string, params map[string]string, config *config) (outputs.
 
 	esClient, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              url,
+		Beatname:         beatname,
 		Username:         config.Username,
 		Password:         config.Password,
 		APIKey:           config.APIKey,

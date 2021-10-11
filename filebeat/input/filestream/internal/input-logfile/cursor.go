@@ -20,12 +20,11 @@ package input_logfile
 // Cursor allows the input to check if cursor status has been stored
 // in the past and unpack the status into a custom structure.
 type Cursor struct {
-	store    *store
 	resource *resource
 }
 
-func makeCursor(store *store, res *resource) Cursor {
-	return Cursor{store: store, resource: res}
+func makeCursor(res *resource) Cursor {
+	return Cursor{resource: res}
 }
 
 // IsNew returns true if no cursor information has been stored

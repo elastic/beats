@@ -24,11 +24,14 @@ processors:
         - {from: "message", to: "event.original"}
   - decode_cef:
       field: event.original
+{{ if .timezone }}
+      timezone: '{{ .timezone }}'
+{{ end }}
   - community_id:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0
 
 {{ if .external_zones }}
   - add_fields:

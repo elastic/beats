@@ -61,6 +61,9 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
 - Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
+- Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
+- Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
+- Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 
 ==== Added
 
@@ -116,4 +119,10 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update Go version to 1.15.12. {pull}25629[25629]
 - Update Go version to 1.16.4. {issue}25346[25346] {pull}25671[25671]
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
+- Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
+- Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
+
+==== Deprecated
+
+- Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]

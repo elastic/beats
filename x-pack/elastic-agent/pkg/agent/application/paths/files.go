@@ -11,25 +11,37 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/filelock"
 )
 
-// defaultAgentConfigFile is a name of file used to store agent information
+// defaultAgentCapabilitiesFile is a name of file used to store agent capabilities
 const defaultAgentCapabilitiesFile = "capabilities.yml"
-const defaultAgentConfigFile = "fleet.yml"
+
+// defaultAgentFleetFile is a name of file used to store agent information
+const defaultAgentFleetFile = "fleet.yml"
+
+// defaultAgentEnrollFile is a name of file used to enroll agent on first-start
+const defaultAgentEnrollFile = "enroll.yml"
 
 // defaultAgentActionStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentActionStoreFile = "action_store.yml"
+
+// defaultAgentStateStoreFile is the file that will contains the action that can be replayed after restart.
 const defaultAgentStateStoreFile = "state.yml"
 
 // AgentConfigFile is a name of file used to store agent information
 func AgentConfigFile() string {
-	return filepath.Join(Config(), defaultAgentConfigFile)
+	return filepath.Join(Config(), defaultAgentFleetFile)
 }
 
 // AgentConfigFileLock is a locker for agent config file updates.
 func AgentConfigFileLock() *filelock.AppLocker {
 	return filelock.NewAppLocker(
 		Config(),
-		fmt.Sprintf("%s.lock", defaultAgentConfigFile),
+		fmt.Sprintf("%s.lock", defaultAgentFleetFile),
 	)
+}
+
+// AgentEnrollFile is a name of file used to enroll agent on first-start
+func AgentEnrollFile() string {
+	return filepath.Join(Config(), defaultAgentEnrollFile)
 }
 
 // AgentCapabilitiesPath is a name of file used to store agent capabilities

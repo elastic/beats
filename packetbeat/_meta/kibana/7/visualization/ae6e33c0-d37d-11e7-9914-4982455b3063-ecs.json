@@ -1,0 +1,28 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        },
+        "savedSearchRefName": "search_0",
+        "title": "TLS Server Public Key Size [Packetbeat] ECS",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"Public Key Size\",\"field\":\"tls.detailed.server_certificate.public_key_size\",\"order\":\"desc\",\"orderBy\":\"1\",\"size\":5},\"schema\":\"segment\",\"type\":\"terms\"}],\"params\":{\"addLegend\":true,\"addTooltip\":true,\"isDonut\":true,\"legendPosition\":\"right\",\"type\":\"pie\",\"palette\":{\"type\":\"palette\",\"name\":\"kibana_palette\"},\"distinctColors\":true},\"title\":\"Server Public Key Size ECS\",\"type\":\"pie\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ae6e33c0-d37d-11e7-9914-4982455b3063-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8f0ff590-d37d-11e7-9914-4982455b3063-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyMzgsMV0="
+}

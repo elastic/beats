@@ -21,6 +21,7 @@ import (
 // Config expose the configuration option the AWS provider.
 type Config struct {
 	DeployBucket bucket              `config:"deploy_bucket" validate:"nonzero,required"`
+	Region       string              `config:"region"`
 	Credentials  awscommon.ConfigAWS `config:",inline"`
 }
 
@@ -34,7 +35,7 @@ func DefaultConfig() *Config {
 
 func (c *Config) Validate() error {
 	if c.Credentials.Endpoint == "" {
-		return fmt.Errorf("functionbeat.providers.aws.enpoint cannot be empty")
+		return fmt.Errorf("functionbeat.providers.aws.endpoint cannot be empty")
 	}
 	return nil
 }

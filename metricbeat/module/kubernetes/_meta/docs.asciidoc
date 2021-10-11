@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 As one of the main pieces provided for Kubernetes monitoring, this module is capable of fetching metrics from several components:
 
 - https://kubernetes.io/docs/reference/command-line-tools-reference/kubelet/[kubelet]
