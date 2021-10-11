@@ -132,7 +132,7 @@
     var.listen_port: 8080
 
     # Secret key to authenticate requests from the SDK.
-    var.secret: '<Add your secret here>'
+    var.secret: "<Add your secret here>"
 
     # Uncomment the following and set the absolute paths
     # to the server SSL certificate and private key to
@@ -174,7 +174,7 @@
     var.api_token: "<RF_TOKEN>"
 
   threatq:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data
     var.input: httpjson

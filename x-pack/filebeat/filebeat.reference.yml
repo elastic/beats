@@ -2121,7 +2121,7 @@ filebeat.modules:
     var.listen_port: 8080
 
     # Secret key to authenticate requests from the SDK.
-    var.secret: '<Add your secret here>'
+    var.secret: "<Add your secret here>"
 
     # Uncomment the following and set the absolute paths
     # to the server SSL certificate and private key to
@@ -2161,6 +2161,31 @@ filebeat.modules:
 
     # Set your API Token.
     var.api_token: "<RF_TOKEN>"
+
+  threatq:
+    enabled: false
+
+    # Input used for ingesting threat intel data
+    var.input: httpjson
+
+    # The URL used for ThreatQ ThreatLibrary API calls.
+    # Remember to put a slash at the end of the host URL
+    var.host: https://www.threatq.com/
+
+    # Oauth 2.0 Access Token URL
+    var.token_url: https://www.threatq.com/api/token
+
+    # Oauth 2.0 Client ID
+    var.client_id: "INSERT_CLIENT_ID"
+
+    # Oauth 2.0 Client Secret
+    var.client_secret: "INSERT_CLIENT_SECRET"
+
+    # The interval to poll the API for updates
+    var.interval: 1m
+
+    # The ID for the ThreatQ smart data collection
+    var.data_collection_id: "INSERT_THREATQ_DATA_COLLECTION_ID"
 
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
