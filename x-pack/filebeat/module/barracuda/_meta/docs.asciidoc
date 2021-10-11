@@ -28,7 +28,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "barracudawaf" devic
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 
@@ -73,7 +73,7 @@ NOTE: This was converted from RSA NetWitness log parser XML "barracudasf" device
 
 *`var.input`*::
 
-The input from which messages are read. One of `file`, `tcp` or `udp`.
+The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
 
 *`var.syslog_host`*::
 
