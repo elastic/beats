@@ -17153,11 +17153,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.0.0-20210614182718-04defd469f4e
+Version: v0.0.0-20210805182204-aaa1db679c0d
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20210614182718-04defd469f4e/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.0.0-20210805182204-aaa1db679c0d/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17264,11 +17264,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20210630005230-0f9fa26af87c
+Version: v0.0.0-20210809222454-d867a43fc93e
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20210630005230-0f9fa26af87c/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20210809222454-d867a43fc93e/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -17375,11 +17375,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/tools
-Version: v0.0.0-20200602230032-c00d67ef29d0
+Version: v0.1.6
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.0.0-20200602230032-c00d67ef29d0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/tools@v0.1.6/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
