@@ -38,6 +38,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
+
+	filelibbeat "github.com/elastic/beats/v7/libbeat/common/file"
 )
 
 const (
@@ -299,6 +301,7 @@ func (p *Input) removeState(logger *logp.Logger, state file.State) {
 func (p *Input) getFiles() map[string]os.FileInfo {
 	logger := p.logger
 	paths := map[string]os.FileInfo{}
+	uniqFileID := map[string]os.FileInfo{}
 
 	for _, path := range p.config.Paths {
 		matches, err := filepath.Glob(path)
@@ -307,7 +310,6 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			continue
 		}
 
-	OUTER:
 		// Check any matched files to see if we need to start a harvester
 		for _, file := range matches {
 
@@ -345,12 +347,12 @@ func (p *Input) getFiles() map[string]os.FileInfo {
 			// If symlink is enabled, it is checked that original is not part of same input
 			// It original is harvested by other input, states will potentially overwrite each other
 			if p.config.Symlinks {
-				for _, finfo := range paths {
-					if os.SameFile(finfo, fileInfo) {
-						logger.Infof("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
-						continue OUTER
-					}
+				fileID := filelibbeat.GetOSState(fileInfo).String()
+				if finfo, exists := uniqFileID[fileID]; exists {
+					logger.Infof("Same file found as symlink and original. Skipping file: %s (as it same as %s)", file, finfo.Name())
+					continue
 				}
+				uniqFileID[fileID] = fileInfo
 			}
 
 			paths[file] = fileInfo
