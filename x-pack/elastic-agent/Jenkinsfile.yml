@@ -97,7 +97,8 @@ stages:
         packaging-linux: "mage package"
         e2e:
             enabled: true
-            entrypoint: 'fleet-test.sh'
+            job: 'e2e-tests/e2e-testing-mbp'
+            suite: 'fleet'
         stage: packaging
     packaging-arm:
         packaging-arm: "mage package"

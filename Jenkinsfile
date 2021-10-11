@@ -514,15 +514,26 @@ def getBeatsName(baseDir) {
   return baseDir.replace('x-pack/', '')
 }
 
+
+/**
+* This method runs the end 2 end testing
+*/
+def e2e(Map args = [:]) {
+  if (!args.e2e?.get('enabled', false)) { return }
+  if (args.e2e.get('entrypoint', '')?.trim()) {
+    e2e_with_entrypoint(args)
+  } else {
+    e2e_with_job(args)
+  }
+}
+
 /**
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
 */
-def e2e(Map args = [:]) {
-  def enabled = args.e2e?.get('enabled', false)
+def e2e_with_entrypoint(Map args = [:]) {
   def entrypoint = args.e2e?.get('entrypoint')
   def dockerLogFile = "docker_logs_${entrypoint}.log"
-  if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -545,6 +556,35 @@ def e2e(Map args = [:]) {
       }
     }
   }
+}
+
+/**
+* This method triggers the end 2 end testing job.
+*/
+def e2e_with_job(Map args = [:]) {
+  def jobName = args.e2e?.get('job')
+  def testSuite = args.e2e?.get('suite', '')
+  def notifyContext = "e2e-${args.context}"
+  def e2eTestsPipeline = "${jobName}/${isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"}"
+
+  def parameters = [
+    booleanParam(name: 'forceSkipGitChecks', value: true),
+    booleanParam(name: 'forceSkipPresubmit', value: true),
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'BEAT_VERSION', value: "${env.VERSION}-SNAPSHOT"),
+    string(name: 'runTestsSuites', value: testSuite),
+    string(name: 'GITHUB_CHECK_NAME', value: notifyContext),
+    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+  ]
+
+  build(job: "${e2eTestsPipeline}",
+    parameters: parameters,
+    propagate: false,
+    wait: false
+  )
+
+  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 /**
