@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build linux,cgo
+//go:build linux && cgo
+// +build linux,cgo
 
 package instance
 

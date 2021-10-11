@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // skipping tests on windows 32 bit versions, not supported
+//go:build !integration && !windows && !386
 // +build !integration,!windows,!386
 
 package status
