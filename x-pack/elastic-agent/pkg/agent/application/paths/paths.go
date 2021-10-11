@@ -2,8 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// +build !darwin
-// +build !windows
+//go:build !darwin && !windows
+// +build !darwin,!windows
 
 package paths
 

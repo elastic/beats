@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !linux && !freebsd && !openbsd && !netbsd && !windows && !darwin
 // +build !linux,!freebsd,!openbsd,!netbsd,!windows,!darwin
 
 package file_integrity

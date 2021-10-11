@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build go1.13
 // +build go1.13
 
 package tlscommon
