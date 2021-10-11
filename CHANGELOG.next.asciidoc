@@ -316,6 +316,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
+- Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
 
 *Heartbeat*
 
