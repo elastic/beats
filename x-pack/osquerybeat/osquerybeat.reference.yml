@@ -6,11 +6,9 @@ osquerybeat:
 #  inputs:
 #    - type: osquery
 #      streams:
-#        - id: "E169F085-AC8B-48AF-9355-D2977030CE24"
-#          query: "select * from users"
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"
-#          interval: 1m
+#          interval: 60
 
 # ============================== Process Security ==============================
 # Disable seccomp system call filtering on Linux.
@@ -60,14 +58,14 @@ seccomp.enabled: false
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-  
+
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-    
+
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -98,8 +96,8 @@ seccomp.enabled: false
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
@@ -378,7 +376,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "osquerybeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -919,6 +917,11 @@ setup.kibana:
 
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
+
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.

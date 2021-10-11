@@ -102,7 +102,7 @@ func TestRunCmd(t *testing.T) {
 
 	stdinStr := "MY_STDIN"
 
-	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil)
+	mpx, err := runCmd(context.TODO(), cmd, &stdinStr, nil, FilterJourneyConfig{})
 	require.NoError(t, err)
 
 	var synthEvents []*SynthEvent

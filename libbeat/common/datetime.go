@@ -61,7 +61,7 @@ func ParseTime(timespec string) (Time, error) {
 }
 
 func (t Time) String() string {
-	return time.Time(t).Format(TsLayout)
+	return time.Time(t).UTC().Format(TsLayout)
 }
 
 // MustParseTime is a convenience equivalent of the ParseTime function

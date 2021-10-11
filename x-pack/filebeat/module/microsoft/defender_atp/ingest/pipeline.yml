@@ -45,10 +45,11 @@ processors:
 - set:
     field: cloud.provider
     value: azure
-- set:
-    field: '@timestamp'
-    value: '{{json.alertUpdateTime}}'
-    if: ctx.json?.alertUpdateTime != null
+- date:
+    field: json.lastUpdateTime
+    formats:
+      - ISO8601
+    if: ctx.json?.lastUpdateTime != null
 - rename:
     field: json.aadTenantId
     target_field: cloud.account.id

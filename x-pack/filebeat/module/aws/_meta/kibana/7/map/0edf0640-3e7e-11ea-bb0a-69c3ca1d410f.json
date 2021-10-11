@@ -1,0 +1,173 @@
+{
+    "attributes": {
+        "description": "",
+        "layerListJSON": [
+            {
+                "alpha": 1,
+                "id": "19047c4c-18d7-4aec-b0ce-98de2828244d",
+                "label": "Hits",
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "isAutoSelect": true,
+                    "type": "EMS_TMS"
+                },
+                "style": {},
+                "type": "VECTOR_TILE",
+                "visible": true
+            },
+            {
+                "alpha": 0.75,
+                "id": "1d457cd4-01be-4f96-95fd-af4ac535ebea",
+                "label": null,
+                "maxZoom": 24,
+                "minZoom": 0,
+                "sourceDescriptor": {
+                    "applyGlobalQuery": true,
+                    "geoField": "source.geo.location",
+                    "id": "1e82f50f-424a-4718-905b-ad45db14db62",
+                    "indexPatternRefName": "layer_1_source_index_pattern",
+                    "requestType": "point",
+                    "resolution": "COARSE",
+                    "type": "ES_GEO_GRID"
+                },
+                "style": {
+                    "properties": {
+                        "fillColor": {
+                            "options": {
+                                "color": "Blues",
+                                "field": {
+                                    "label": "count",
+                                    "name": "doc_count",
+                                    "origin": "source"
+                                },
+                                "fieldMetaOptions": {
+                                    "isEnabled": false,
+                                    "sigma": 3
+                                }
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "icon": {
+                            "options": {
+                                "value": "airfield"
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconOrientation": {
+                            "options": {
+                                "orientation": 0
+                            },
+                            "type": "STATIC"
+                        },
+                        "iconSize": {
+                            "options": {
+                                "field": {
+                                    "label": "count",
+                                    "name": "doc_count",
+                                    "origin": "source"
+                                },
+                                "fieldMetaOptions": {
+                                    "isEnabled": false,
+                                    "sigma": 3
+                                },
+                                "maxSize": 32,
+                                "minSize": 4
+                            },
+                            "type": "DYNAMIC"
+                        },
+                        "lineColor": {
+                            "options": {
+                                "color": "#167a6d"
+                            },
+                            "type": "STATIC"
+                        },
+                        "lineWidth": {
+                            "options": {
+                                "size": 1
+                            },
+                            "type": "STATIC"
+                        },
+                        "symbolizeAs": {
+                            "options": {
+                                "value": "circle"
+                            }
+                        }
+                    },
+                    "type": "VECTOR"
+                },
+                "type": "VECTOR",
+                "visible": true
+            }
+        ],
+        "mapStateJSON": {
+            "center": {
+                "lat": 50.97903,
+                "lon": 13.666
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "filebeat-*",
+                        "key": "fileset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "elb"
+                        },
+                        "type": "phrase",
+                        "value": "elb"
+                    },
+                    "query": {
+                        "match": {
+                            "fileset.name": {
+                                "query": "elb",
+                                "type": "phrase"
+                            }
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "refreshConfig": {
+                "interval": 0,
+                "isPaused": false
+            },
+            "settings": {
+                "autoFitToDataBounds": false
+            },
+            "timeFilters": {
+                "from": "now-15m",
+                "to": "now"
+            },
+            "zoom": 3.9
+        },
+        "title": "ELB Requests Geolocation [Filebeat AWS] ECS",
+        "uiStateJSON": {
+            "isLayerTOCOpen": true,
+            "openTOCDetails": []
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0edf0640-3e7e-11ea-bb0a-69c3ca1d410f",
+    "migrationVersion": {
+        "map": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "map",
+    "updated_at": "2021-08-04T16:33:58.419Z",
+    "version": "WzQzNjAsMV0="
+}

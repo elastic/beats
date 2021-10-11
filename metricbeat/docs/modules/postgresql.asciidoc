@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: postgresql
+
 [[metricbeat-module-postgresql]]
 == PostgreSQL module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches metrics from
 https://www.postgresql.org/[PostgreSQL] servers.

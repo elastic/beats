@@ -1,7 +1,6 @@
 {{ if eq .input "httpjson" }}
 
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 
 request.method: POST
@@ -59,4 +58,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0

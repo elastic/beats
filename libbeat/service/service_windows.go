@@ -29,13 +29,15 @@ import (
 )
 
 type beatService struct {
-	stopCallback func()
-	done         chan struct{}
+	stopCallback    func()
+	done            chan struct{}
+	executeFinished chan struct{}
 }
 
 var serviceInstance = &beatService{
-	stopCallback: nil,
-	done:         make(chan struct{}, 0),
+	stopCallback:    nil,
+	done:            make(chan struct{}, 0),
+	executeFinished: make(chan struct{}, 0),
 }
 
 // Execute runs the beat service with the arguments and manages changes that
@@ -85,6 +87,8 @@ const couldNotConnect syscall.Errno = 1063
 // stopCallback function is called when the Stop/Shutdown
 // request is received.
 func ProcessWindowsControlEvents(stopCallback func()) {
+	defer close(serviceInstance.executeFinished)
+
 	isInteractive, err := svc.IsAnInteractiveSession()
 	if err != nil {
 		logp.Err("IsAnInteractiveSession: %v", err)
@@ -124,4 +128,18 @@ func ProcessWindowsControlEvents(stopCallback func()) {
 	}
 
 	logp.Err("Windows service setup failed: %+v", err)
+}
+
+// WaitExecutionDone returns only after stop was reported to service manager.
+// If response is not retrieved within 500 millisecond wait is aborted.
+func WaitExecutionDone() {
+	if isWinService, err := svc.IsWindowsService(); err != nil || !isWinService {
+		// not a service, don't wait
+		return
+	}
+
+	select {
+	case <-serviceInstance.executeFinished:
+	case <-time.After(500 * time.Millisecond):
+	}
 }

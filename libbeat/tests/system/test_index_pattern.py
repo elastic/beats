@@ -18,4 +18,4 @@ class Test(BaseTest):
             config="mockbeat.yml")
 
         assert exit_code == 0
-        assert self.log_contains('"objects": [')
+        assert self.log_contains('"type": "index-pattern"')

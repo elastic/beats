@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -20,7 +21,6 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/warn"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -33,7 +33,7 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 		Long:  "This will enroll the Agent into Fleet.",
 		Run: func(c *cobra.Command, args []string) {
 			if err := enroll(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
@@ -69,6 +69,27 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().StringP("proxy-url", "", "", "Configures the proxy url")
 	cmd.Flags().BoolP("proxy-disabled", "", false, "Disable proxy support including environment variables")
 	cmd.Flags().StringSliceP("proxy-header", "", []string{}, "Proxy headers used with CONNECT request")
+	cmd.Flags().BoolP("delay-enroll", "", false, "Delays enrollment to occur on first start of the Elastic Agent service")
+}
+
+func validateEnrollFlags(cmd *cobra.Command) error {
+	ca, _ := cmd.Flags().GetString("certificate-authorities")
+	if ca != "" && !filepath.IsAbs(ca) {
+		return errors.New("--certificate-authorities must be provided as an absolute path", errors.M("path", ca), errors.TypeConfig)
+	}
+	esCa, _ := cmd.Flags().GetString("fleet-server-es-ca")
+	if esCa != "" && !filepath.IsAbs(esCa) {
+		return errors.New("--fleet-server-es-ca must be provided as an absolute path", errors.M("path", esCa), errors.TypeConfig)
+	}
+	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
+	if fCert != "" && !filepath.IsAbs(fCert) {
+		return errors.New("--fleet-server-cert must be provided as an absolute path", errors.M("path", fCert), errors.TypeConfig)
+	}
+	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
+	if fCertKey != "" && !filepath.IsAbs(fCertKey) {
+		return errors.New("--fleet-server-cert-key must be provided as an absolute path", errors.M("path", fCertKey), errors.TypeConfig)
+	}
+	return nil
 }
 
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
@@ -95,6 +116,7 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 	fProxyURL, _ := cmd.Flags().GetString("proxy-url")
 	fProxyDisabled, _ := cmd.Flags().GetBool("proxy-disabled")
 	fProxyHeaders, _ := cmd.Flags().GetStringSlice("proxy-header")
+	delayEnroll, _ := cmd.Flags().GetBool("delay-enroll")
 
 	args := []string{}
 	if url != "" {
@@ -175,14 +197,20 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, k+"="+v)
 	}
 
+	if delayEnroll {
+		args = append(args, "--delay-enroll")
+	}
+
 	return args
 }
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
-	fromInstall, _ := cmd.Flags().GetBool("from-install")
-	if !fromInstall {
-		warn.PrintNotGA(streams.Out)
+	err := validateEnrollFlags(cmd)
+	if err != nil {
+		return err
 	}
+
+	fromInstall, _ := cmd.Flags().GetBool("from-install")
 
 	pathConfigFile := paths.ConfigFile()
 	rawConfig, err := config.LoadFile(pathConfigFile)
@@ -248,9 +276,10 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
 	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
 	fInsecure, _ := cmd.Flags().GetBool("fleet-server-insecure-http")
-	fProxyURL, _ := cmd.Flags().GetString("proxy-url")
-	fProxyDisabled, _ := cmd.Flags().GetBool("proxy-disabled")
-	fProxyHeaders, _ := cmd.Flags().GetStringSlice("proxy-header")
+	proxyURL, _ := cmd.Flags().GetString("proxy-url")
+	proxyDisabled, _ := cmd.Flags().GetBool("proxy-disabled")
+	proxyHeaders, _ := cmd.Flags().GetStringSlice("proxy-header")
+	delayEnroll, _ := cmd.Flags().GetBool("delay-enroll")
 
 	caStr, _ := cmd.Flags().GetString("certificate-authorities")
 	CAs := cli.StringToSlice(caStr)
@@ -260,7 +289,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 	ctx := handleSignal(context.Background())
 
 	options := enrollCmdOption{
-		ID:                   "", // TODO(ph), This should not be an empty string, will clarify in a new PR.
 		EnrollAPIKey:         enrollmentToken,
 		URL:                  url,
 		CAs:                  CAs,
@@ -268,6 +296,11 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		Insecure:             insecure,
 		UserProvidedMetadata: make(map[string]interface{}),
 		Staging:              staging,
+		FixPermissions:       fromInstall,
+		ProxyURL:             proxyURL,
+		ProxyDisabled:        proxyDisabled,
+		ProxyHeaders:         mapFromEnvList(proxyHeaders),
+		DelayEnroll:          delayEnroll,
 		FleetServer: enrollCmdFleetServerOption{
 			ConnStr:         fServer,
 			ElasticsearchCA: fElasticSearchCA,
@@ -280,9 +313,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			Insecure:        fInsecure,
 			SpawnAgent:      !fromInstall,
 			Headers:         mapFromEnvList(fHeaders),
-			ProxyURL:        fProxyURL,
-			ProxyDisabled:   fProxyDisabled,
-			ProxyHeaders:    mapFromEnvList(fProxyHeaders),
 		},
 	}
 
@@ -296,11 +326,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	err = c.Execute(ctx)
-	if err == nil {
-		fmt.Fprintln(streams.Out, "Successfully enrolled the Elastic Agent.")
-	}
-	return err
+	return c.Execute(ctx, streams)
 }
 
 func handleSignal(ctx context.Context) context.Context {

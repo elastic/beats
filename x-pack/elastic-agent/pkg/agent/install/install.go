@@ -71,6 +71,15 @@ func Install(cfgFile string) error {
 		return err
 	}
 
+	// fix permissions
+	err = FixPermissions()
+	if err != nil {
+		return errors.New(
+			err,
+			"failed to perform permission changes",
+			errors.M("destination", paths.InstallPath))
+	}
+
 	// install service
 	svc, err := newService()
 	if err != nil {
@@ -118,6 +127,11 @@ func StopService() error {
 			errors.M("service", paths.ServiceName))
 	}
 	return nil
+}
+
+// FixPermissions fixes the permissions on the installed system.
+func FixPermissions() error {
+	return fixPermissions()
 }
 
 // findDirectory returns the directory to copy into the installation location.
