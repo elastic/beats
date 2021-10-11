@@ -4269,6 +4269,57 @@
         ]
     },
     {
+        "cisco.asa.message_id": "713049",
+        "event.action": "firewall-rule",
+        "event.category": [
+            "network"
+        ],
+        "event.code": 713049,
+        "event.dataset": "cisco.asa",
+        "event.kind": "event",
+        "event.module": "cisco",
+        "event.original": "%ASA-5-713049: Group = 100.60.140.10, Username = test_user, IP = 1.2.3.4, Security negotiation complete for User (test_user) Responder, Inbound SPI = 0x0000000, Outbound SPI = 0x0000000",
+        "event.severity": 5,
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "asa",
+        "host.hostname": "dev01",
+        "input.type": "log",
+        "log.level": "notification",
+        "log.offset": 12205,
+        "observer.hostname": "dev01",
+        "observer.product": "asa",
+        "observer.type": "firewall",
+        "observer.vendor": "Cisco",
+        "related.hosts": [
+            "dev01"
+        ],
+        "related.ip": [
+            "1.2.3.4"
+        ],
+        "related.user": [
+            "test_user"
+        ],
+        "service.type": "cisco",
+        "source.address": "1.2.3.4",
+        "source.geo.city_name": "Moscow",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
+        "source.geo.location.lat": 55.7527,
+        "source.geo.location.lon": 37.6172,
+        "source.geo.region_iso_code": "RU-MOW",
+        "source.geo.region_name": "Moscow",
+        "source.ip": "1.2.3.4",
+        "tags": [
+            "cisco-asa",
+            "forwarded"
+        ],
+        "user.name": "test_user"
+    },
+    {
         "cisco.asa.destination_interface": "inside",
         "cisco.asa.message_id": "106023",
         "cisco.asa.rule_name": "inbound",
@@ -4295,7 +4346,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 12205,
+        "log.offset": 12414,
         "network.community_id": "1:Uo11LCySQ1S0c9jtHZVIb4Pm/2k=",
         "network.iana_number": 47,
         "observer.egress.interface.name": "inside",
@@ -4346,7 +4397,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 12341,
+        "log.offset": 12550,
         "network.community_id": "1:VA3lwFPBuRus2kxMs1BexFp+gp4=",
         "network.iana_number": 1,
         "network.transport": "icmp",
@@ -4421,7 +4472,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 12518,
+        "log.offset": 12727,
         "network.bytes": 4671944,
         "network.community_id": "1:rwM9yFUsWh6N2utKviU7S94dS9U=",
         "network.iana_number": 17,
@@ -4482,7 +4533,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 12677,
+        "log.offset": 12886,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -4523,7 +4574,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 12907,
+        "log.offset": 13116,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -4564,7 +4615,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 13142,
+        "log.offset": 13351,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
@@ -4605,7 +4656,7 @@
         "host.hostname": "dev01",
         "input.type": "log",
         "log.level": "warning",
-        "log.offset": 13384,
+        "log.offset": 13593,
         "observer.hostname": "dev01",
         "observer.product": "asa",
         "observer.type": "firewall",
