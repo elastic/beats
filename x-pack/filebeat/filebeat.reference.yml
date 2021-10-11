@@ -2187,6 +2187,12 @@ filebeat.modules:
     # The ID for the ThreatQ smart data collection
     var.data_collection_id: "INSERT_THREATQ_DATA_COLLECTION_ID"
 
+    # The URL of the proxy if used
+    #var.proxy_url: http://proxy:8000
+
+    # Customize the HTTP timeout configured for the API requests
+    #var.http_client_timeout: 30s
+
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:

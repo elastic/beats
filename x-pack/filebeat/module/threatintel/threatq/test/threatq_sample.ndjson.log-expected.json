@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -45,11 +45,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.44.202.220",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -94,11 +93,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.94.155.176",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -143,11 +141,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.42.81.68",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:41.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -186,11 +183,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:02.000Z",
         "threatintel.threatq.indicator_value": "37.17.250.101",
         "threatintel.threatq.published_at": "2020-09-11T14:35:41.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -235,11 +231,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.94.129.203",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -284,11 +279,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.216.117.22",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -333,11 +327,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.80.70.115",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -382,11 +375,10 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.65.79.99",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     },
     {
-        "@timestamp": "2020-09-11T14:35:51.000Z",
+        "@timestamp": "2020-11-15T00:00:02.000Z",
         "event.category": "threat",
         "event.dataset": "threatintel.threatq",
         "event.kind": "enrichment",
@@ -431,7 +423,6 @@
         "threatintel.threatq.expires_calculated_at": "2020-10-15T14:40:03.000Z",
         "threatintel.threatq.indicator_value": "69.199.22.46",
         "threatintel.threatq.published_at": "2020-09-11T14:35:51.000Z",
-        "threatintel.threatq.status": "Expired",
-        "threatintel.threatq.updated_at": "2020-11-15T00:00:02.000Z"
+        "threatintel.threatq.status": "Expired"
     }
 ]

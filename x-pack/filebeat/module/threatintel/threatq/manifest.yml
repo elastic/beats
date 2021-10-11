@@ -12,6 +12,8 @@ var:
   - name: client_secret
   - name: host
     default: "https://www.threatq.com/"
+  - name: proxy_url
+  - name: http_client_timeout
   - name: tags
     default: [threatintel-threatq, forwarded]
 

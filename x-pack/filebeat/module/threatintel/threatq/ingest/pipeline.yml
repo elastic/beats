@@ -1,268 +1,287 @@
 description: Pipeline for parsing ThreatQ Threat Intel
 processors:
+  ####################
+  # Event ECS fields #
+  ####################
+  - set:
+      field: event.ingested
+      value: "{{_ingest.timestamp}}"
+  - set:
+      field: event.kind
+      value: enrichment
+  - set:
+      field: event.category
+      value: threat
+  - set:
+      field: event.type
+      value: indicator
 
-####################
-# Event ECS fields #
-####################
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- set:
-    field: event.kind
-    value: enrichment
-- set:
-    field: event.category
-    value: threat
-- set:
-    field: event.type
-    value: indicator
+  ###############
+  # Parse dates #
+  ###############
+  - date:
+      target_field: "@timestamp"
+      field: "json.updated_at"
+      formats:
+        - "yyyy-MM-dd HH:mm:ss"
+      if: "ctx.json.updated_at != null"
+      ignore_failure: true
+  - date:
+      target_field: "threatintel.threatq.created_at"
+      field: "json.created_at"
+      formats:
+        - "yyyy-MM-dd HH:mm:ss"
+      if: "ctx.json.created_at != null"
+      ignore_failure: true
+  - date:
+      target_field: "threatintel.threatq.expires_at"
+      field: "json.expires_at"
+      formats:
+        - "yyyy-MM-dd HH:mm:ss"
+      if: "ctx.json.expires_at != null"
+      ignore_failure: true
+  - date:
+      target_field: "threatintel.threatq.expires_calculated_at"
+      field: "json.expires_calculated_at"
+      formats:
+        - "yyyy-MM-dd HH:mm:ss"
+      if: "ctx.json.expires_calculated_at != null"
+      ignore_failure: true
+  - date:
+      target_field: "threatintel.threatq.published_at"
+      field: "json.published_at"
+      formats:
+        - "yyyy-MM-dd HH:mm:ss"
+      if: "ctx.json.published_at != null"
+      ignore_failure: true
 
-######################
-# General ECS fields #
-######################
+  #####################
+  # Threat ECS Fields #
+  #####################
+  - rename:
+      field: json.type.name
+      target_field: threatintel.indicator.type
+      ignore_missing: true
+  - rename:
+      field: json.description
+      target_field: threatintel.indicator.description
+      ignore_missing: true
+  - convert:
+      field: json.score
+      target_field: threatintel.indicator.confidence
+      type: integer
+      on_failure:
+        - append:
+            field: error.message
+            value: "Cannot convert json.score to integer: {{{ _ingest.on_failure_message }}}"
+  - rename:
+      field: json.status.name
+      target_field: threatintel.threatq.status
+      ignore_missing: true
+  - rename:
+      field: json.value
+      target_field: threatintel.threatq.indicator_value
+      ignore_missing: true
 
-###############
-# Parse dates #
-###############
-- date:
-    target_field: "threatintel.threatq.updated_at"
-    field: "json.updated_at"
-    formats: 
-      - "yyyy-MM-dd HH:mm:ss"
-    if: 'ctx.json.updated_at != null'
-    ignore_failure: true
-- date:
-    target_field: "threatintel.threatq.created_at"
-    field: "json.created_at"
-    formats: 
-      - "yyyy-MM-dd HH:mm:ss"
-    if: 'ctx.json.created_at != null'
-    ignore_failure: true
-- date:
-    target_field: "threatintel.threatq.expires_at"
-    field: "json.expires_at"
-    formats: 
-      - "yyyy-MM-dd HH:mm:ss"
-    if: 'ctx.json.expires_at != null'
-    ignore_failure: true
-- date:
-    target_field: "threatintel.threatq.expires_calculated_at"
-    field: "json.expires_calculated_at"
-    formats: 
-      - "yyyy-MM-dd HH:mm:ss"
-    if: 'ctx.json.expires_calculated_at != null'
-    ignore_failure: true
-- date:
-    target_field: "threatintel.threatq.published_at"
-    field: "json.published_at"
-    formats: 
-      - "yyyy-MM-dd HH:mm:ss"
-    if: 'ctx.json.published_at != null'
-    ignore_failure: true
+  #########################################
+  # Map indicator types and values to ECS #
+  #########################################
 
-#####################
-# Threat ECS Fields #
-#####################
-- rename:
-    field: json.type.name
-    target_field: threatintel.indicator.type
-    ignore_missing: true
-- rename:
-    field: json.description
-    target_field: threatintel.indicator.description
-    ignore_missing: true
-- convert:
-    field: json.score
-    target_field: threatintel.indicator.confidence
-    type: integer
-    on_failure:
-      - append:
-          field: error.message
-          value: 'Cannot convert json.score to integer: {{{ _ingest.on_failure_message }}}'
-- rename:
-    field: json.status.name
-    target_field: threatintel.threatq.status
-    ignore_missing: true
-- rename:
-    field: json.value
-    target_field: threatintel.threatq.indicator_value
-    ignore_missing: true
+  # Indicator type: Email Address
+  - set:
+      field: threatintel.indicator.email.address
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'Email Address'"
+  - set:
+      field: threatintel.indicator.type
+      value: email-addr
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'Email Address'"
 
-#########################################
-# Map indicator types and values to ECS #
-#########################################
+  # Indicator type: FQDN
+  - set:
+      field: threatintel.indicator.domain
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'FQDN'"
+  - set:
+      field: threatintel.indicator.type
+      value: domain-name
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'FQDN'"
 
-# Indicator type: Email Address
-- set:
-    field: threatintel.indicator.email.address
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'Email Address'"
-- set:
-    field: threatintel.indicator.type
-    value: email-addr
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'Email Address'"
+  # Indicator type: IP Address
+  - set:
+      field: threatintel.indicator.ip
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IP Address'"
+  - set:
+      field: threatintel.indicator.type
+      value: ipv4-addr
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IP Address'"
 
-# Indicator type: FQDN
-- set:
-    field: threatintel.indicator.domain
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'FQDN'"
-- set:
-    field: threatintel.indicator.type
-    value: domain-name
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'FQDN'"
+  # Indicator type: IPv6 Address
+  - set:
+      field: threatintel.indicator.domain
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IPv6 Address'"
+  - set:
+      field: threatintel.indicator.type
+      value: ipv6-addr
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IPv6 Address'"
 
-# Indicator type: IP Address
-- set:
-    field: threatintel.indicator.ip
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IP Address'"
-- set:
-    field: threatintel.indicator.type
-    value: ipv4-addr
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IP Address'"
+  # Indicator type: MD5
+  - set:
+      field: threatintel.indicator.file.hash.md5
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'MD5'"
+  - set:
+      field: threatintel.indicator.type
+      value: file
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'MD5'"
 
-# Indicator type: IPv6 Address
-- set:
-    field: threatintel.indicator.domain
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IPv6 Address'"
-- set:
-    field: threatintel.indicator.type
-    value: ipv6-addr
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'IPv6 Address'"
+  # Indicator type: SHA-1
+  - set:
+      field: threatintel.indicator.file.hash.sha1
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-1'"
+  - set:
+      field: threatintel.indicator.type
+      value: file
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-1'"
 
-# Indicator type: MD5
-- set:
-    field: threatintel.indicator.file.hash.md5
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'MD5'"
+  # Indicator type: SHA-256
+  - set:
+      field: threatintel.indicator.file.hash.sha256
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-256'"
+  - set:
+      field: threatintel.indicator.type
+      value: file
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-256'"
 
-# Indicator type: SHA-1
-- set:
-    field: threatintel.indicator.file.hash.sha1
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-1'"
+  # Indicator type: SHA-512
+  - set:
+      field: threatintel.indicator.file.hash.sha512
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-512'"
+  - set:
+      field: threatintel.indicator.type
+      value: file
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-512'"
 
-# Indicator type: SHA-256
-- set:
-    field: threatintel.indicator.file.hash.sha256
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-256'"
+  # Indicator type: URL
+  - set:
+      field: threatintel.indicator.url.full
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'URL'"
+  - set:
+      field: threatintel.indicator.type
+      value: url
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'URL'"
 
-# Indicator type: SHA-512
-- set:
-    field: threatintel.indicator.file.hash.sha512
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'SHA-512'"
+  # Indicator type: x509 Serial
+  - set:
+      field: threatintel.indicator.x509.serial_number
+      value: "{{threatintel.threatq.indicator_value}}"
+      if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'x509 Serial'"
 
-# Indicator type: URL
-- set:
-    field: threatintel.indicator.url.full
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'URL'"
+  ###################################
+  # Map indicator providers and TLP #
+  ###################################
+  - foreach:
+      description: Append threat intel sources
+      field: json.sources
+      ignore_missing: true
+      processor:
+        append:
+          field: threatintel.indicator.provider
+          value: "{{{ _ingest._value.name }}}"
+  - foreach:
+      description: Append threat intel source TLP values
+      field: json.sources
+      ignore_missing: true
+      processor:
+        append:
+          field: threatintel.indicator.marking.tlp
+          value: "{{{ _ingest._value.tlp_name }}}"
 
-# Indicator type: x509 Serial
-- set:
-    field: threatintel.indicator.x509.serial_number
-    value: '{{threatintel.threatq.indicator_value}}'
-    if: "ctx?.threatintel?.indicator?.type != null && ctx?.threatintel?.indicator?.type == 'x509 Serial'"
+  ############################
+  # Map indicator attributes #
+  ############################
+  - foreach:
+      description: Change attribute names to lowercase
+      field: json.attributes
+      ignore_missing: true
+      processor:
+        lowercase:
+          field: "_ingest._value.name"
+  - foreach:
+      description: Replaces spaces with underscore in attribute names
+      field: json.attributes
+      ignore_missing: true
+      processor:
+        gsub:
+          field: "_ingest._value.name"
+          pattern: " "
+          replacement: "_"
+  - foreach:
+      description: Append attributes
+      field: json.attributes
+      ignore_missing: true
+      processor:
+        append:
+          field: threatintel.threatq.attributes.{{{ _ingest._value.name }}}
+          value: "{{{ _ingest._value.value }}}"
 
-###################################
-# Map indicator providers and TLP #
-###################################
-- foreach:
-    description: Append threat intel sources
-    field: json.sources
-    ignore_missing: true
-    processor:
-      append:
-        field: threatintel.indicator.provider
-        value: '{{{ _ingest._value.name }}}'
-- foreach:
-    description: Append threat intel source TLP values
-    field: json.sources
-    ignore_missing: true
-    processor:
-      append:
-        field: threatintel.indicator.marking.tlp
-        value: '{{{ _ingest._value.tlp_name }}}'
-    
-############################
-# Map indicator attributes #
-############################
-- foreach:
-    description: Change attribute names to lowercase
-    field: json.attributes
-    ignore_missing: true
-    processor:
-      lowercase:
-        field: '_ingest._value.name'
-- foreach:
-    description: Replaces spaces with underscore in attribute names
-    field: json.attributes
-    ignore_missing: true
-    processor:
-      gsub:
-        field: '_ingest._value.name'
-        pattern: ' '
-        replacement: '_'
-- foreach:
-    description: Append attributes
-    field: json.attributes
-    ignore_missing: true
-    processor:
-      append:
-        field: threatintel.threatq.attributes.{{{ _ingest._value.name }}}
-        value: '{{{ _ingest._value.value }}}'
+  #############################
+  # Map indicator adversaries #
+  #############################
+  - foreach:
+      field: json.adversaries
+      ignore_missing: true
+      processor:
+        append:
+          field: threatintel.threatq.adversaries
+          value: "{{{ _ingest._value.name }}}"
 
-
-#############################
-# Map indicator adversaries #
-#############################
-- foreach:
-    field: json.adversaries
-    ignore_missing: true
-    processor:
-      append:
-        field: threatintel.threatq.adversaries
-        value: '{{{ _ingest._value.name }}}'
-
-######################
-# Cleanup processors #
-######################
-- script:
-    lang: painless
-    if: ctx?.threatintel != null
-    source: |
-      void handleMap(Map map) {
-        for (def x : map.values()) {
-          if (x instanceof Map) {
-              handleMap(x);
-          } else if (x instanceof List) {
-              handleList(x);
-          }
-        }
-      map.values().removeIf(v -> v == null);
-      }
-      void handleList(List list) {
-        for (def x : list) {
+  ######################
+  # Cleanup processors #
+  ######################
+  # Setting indicator type to unknown if it does not match anything
+  - set:
+      field: threatintel.indicator.type
+      value: unknown
+      if: ctx?.threatintel?.indicator?.type == null
+  - script:
+      lang: painless
+      if: ctx?.threatintel != null
+      source: |
+        void handleMap(Map map) {
+          for (def x : map.values()) {
             if (x instanceof Map) {
                 handleMap(x);
             } else if (x instanceof List) {
                 handleList(x);
             }
+          }
+        map.values().removeIf(v -> v == null);
         }
-      }
-      handleMap(ctx);
+        void handleList(List list) {
+          for (def x : list) {
+              if (x instanceof Map) {
+                  handleMap(x);
+              } else if (x instanceof List) {
+                  handleList(x);
+              }
+          }
+        }
+        handleMap(ctx);
 
-# Removing fields not needed anymore, either because its copied somewhere else, or is not relevant to this event
-- remove:
-    field:
-    - json
-    - message
-    ignore_missing: true
+  # Removing fields not needed anymore, either because its copied somewhere else, or is not relevant to this event
+  - remove:
+      field:
+        - json
+        - message
+      ignore_missing: true
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: "{{ _ingest.on_failure_message }}"

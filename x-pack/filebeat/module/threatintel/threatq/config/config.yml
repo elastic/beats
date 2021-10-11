@@ -10,10 +10,22 @@ auth.oauth2:
   token_url: {{ .token_url }}
 request.method: GET
 {{ if .ssl }}
-  - request.ssl: {{ .ssl | tojson }}
+request.ssl: {{ .ssl | tojson }}
 {{ end }}
-request.url: {{ .host }}api/indicators/query/hash/{{ .data_collection_id }}?sort=%2Bupdated_at&limit=1000
+{{ if .proxy_url }}
+request.proxy_url: {{ .proxy_url }}
+{{ end }}
+{{ if .http_client_timeout }}
+request.timeout: {{ .http_client_timeout }}
+{{ end }}
+request.url: "{{ .host }}api/indicators/query/hash/{{ .data_collection_id }}"
 request.transforms:
+  - set:
+      target: url.params.sort
+      value: updated_at
+  - set:
+      target: url.params.limit
+      value: 100
   - set:
       target: url.params.cursorMark
       value: '[[.cursor.cursor_mark]]'
@@ -50,15 +62,10 @@ processors:
       overwrite_keys: true
       add_error_key: true
   - fingerprint:
-      fields: ["json.id"]
+      fields: ["json.id", "json.indicator_id"]
       target_field: "@metadata._id"
+      ignore_missing: true
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
-  - timestamp:
-      field: json.created_at
-      layouts:
-        - '2006-01-02 15:04:05'
-      test:
-        - '2021-06-17 13:55:02'
+        ecs.version: 1.12.0
