@@ -163,3 +163,63 @@
     type: keyword
     description: >
       The value of the attribute, depending on the type like "url, sha1, email-src".
+  - name: context.attribute.id
+    type: keyword
+    description: >
+      The ID of the secondary attribute related to the event object.
+  - name: context.attribute.type
+    type: keyword
+    description: >
+      The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
+  - name: context.attribute.category
+    type: keyword
+    description: >
+      The category of the secondary attribute related to the event object. For example "Network Activity".
+  - name: context.attribute.to_ids
+    type: boolean
+    description: >
+      If the secondary attribute should be automatically synced with an IDS.
+  - name: context.attribute.uuid
+    type: keyword
+    description: >
+      The UUID of the secondary attribute related to the event.
+  - name: context.attribute.event_id
+    type: keyword
+    description: >
+      The local event ID of the secondary attribute related to the event.
+  - name: context.attribute.distribution
+    type: long
+    description: >
+      How the secondary attribute has been distributed, represented by integer numbers.
+  - name: context.attribute.timestamp
+    type: date
+    description: >
+      The timestamp in which the secondary attribute was attached to the event object.
+  - name: context.attribute.comment
+    type: keyword
+    description: >
+      Comments made to the secondary attribute itself.
+  - name: context.attribute.sharing_group_id
+    type: keyword
+    description: >
+      The group ID of the sharing group related to the specific secondary attribute.
+  - name: context.attribute.deleted
+    type: boolean
+    description: >
+      If the secondary attribute has been removed from the event object.
+  - name: context.attribute.disable_correlation
+    type: boolean
+    description: >
+      If correlation has been enabled on the secondary attribute related to the event object.
+  - name: context.attribute.object_id
+    type: keyword
+    description: >
+      The ID of the Object in which the secondary attribute is attached.
+  - name: context.attribute.object_relation
+    type: keyword
+    description: >
+      The type of relation the secondary attribute has with the event object itself.
+  - name: context.attribute.value
+    type: keyword
+    description: >
+      The value of the attribute, depending on the type like "url, sha1, email-src".
