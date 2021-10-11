@@ -24,6 +24,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields from kubernetes module {pull}28046[28046]
 - Remove deprecated config option aws_partition. {pull}28120[28120]
 - Improve stats API {pull}27963[27963]
+- Update kubernetes.namespace from keyword to group field and add name, labels, annotations, uuid as its fields {pull}27917[27917]
 
 *Auditbeat*
 
