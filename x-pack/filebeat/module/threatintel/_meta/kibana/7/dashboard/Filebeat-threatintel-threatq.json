@@ -1,10 +1,194 @@
-{"attributes":{"fieldAttrs":"{\"threatintel.indicator.marking.tlp\":{\"count\":1},\"threatintel.indicator.provider\":{\"count\":1},\"threatq.indicator_value\":{\"count\":1},\"threatintel.indicator.type\":{\"count\":1},\"threatintel.threatq.indicator_value\":{\"count\":1}}","fieldFormatMap":"{\"client.bytes\":{\"id\":\"bytes\"},\"client.nat.port\":{\"id\":\"string\"},\"client.port\":{\"id\":\"string\"},\"coredns.query.size\":{\"id\":\"bytes\"},\"coredns.response.size\":{\"id\":\"bytes\"},\"destination.bytes\":{\"id\":\"bytes\"},\"destination.nat.port\":{\"id\":\"string\"},\"destination.port\":{\"id\":\"string\"},\"envoyproxy.upstream_service_time\":{\"id\":\"duration\",\"params\":{\"inputFormat\":\"nanoseconds\"}},\"event.duration\":{\"id\":\"duration\",\"params\":{\"inputFormat\":\"nanoseconds\",\"outputFormat\":\"asMilliseconds\",\"outputPrecision\":1}},\"event.sequence\":{\"id\":\"string\"},\"event.severity\":{\"id\":\"string\"},\"http.request.body.bytes\":{\"id\":\"bytes\"},\"http.request.bytes\":{\"id\":\"bytes\"},\"http.response.body.bytes\":{\"id\":\"bytes\"},\"http.response.bytes\":{\"id\":\"bytes\"},\"http.response.status_code\":{\"id\":\"string\"},\"log.syslog.facility.code\":{\"id\":\"string\"},\"log.syslog.priority\":{\"id\":\"string\"},\"misp.malware.kill_chain_phases\":{\"id\":\"string\"},\"misp.threat_indicator.kill_chain_phases\":{\"id\":\"string\"},\"misp.threat_indicator.mitre_tactic\":{\"id\":\"string\"},\"misp.threat_indicator.mitre_technique\":{\"id\":\"string\"},\"misp.threat_indicator.severity\":{\"id\":\"string\"},\"mysql.slowlog.bytes_received\":{\"id\":\"bytes\"},\"mysql.slowlog.bytes_sent\":{\"id\":\"bytes\"},\"mysql.slowlog.innodb.io_r_bytes\":{\"id\":\"bytes\"},\"mysql.slowlog.tmp_table_sizes\":{\"id\":\"bytes\"},\"nats.log.msg.bytes\":{\"id\":\"bytes\"},\"network.bytes\":{\"id\":\"bytes\"},\"nginx.ingress_controller.http.request.length\":{\"id\":\"bytes\"},\"nginx.ingress_controller.http.request.time\":{\"id\":\"duration\"},\"nginx.ingress_controller.upstream.response.length\":{\"id\":\"bytes\"},\"nginx.ingress_controller.upstream.response.time\":{\"id\":\"duration\"},\"package.size\":{\"id\":\"string\"},\"process.parent.pgid\":{\"id\":\"string\"},\"process.parent.pid\":{\"id\":\"string\"},\"process.parent.ppid\":{\"id\":\"string\"},\"process.parent.thread.id\":{\"id\":\"string\"},\"process.pgid\":{\"id\":\"string\"},\"process.pid\":{\"id\":\"string\"},\"process.ppid\":{\"id\":\"string\"},\"process.thread.id\":{\"id\":\"string\"},\"server.bytes\":{\"id\":\"bytes\"},\"server.nat.port\":{\"id\":\"string\"},\"server.port\":{\"id\":\"string\"},\"source.bytes\":{\"id\":\"bytes\"},\"source.nat.port\":{\"id\":\"string\"},\"source.port\":{\"id\":\"string\"},\"suricata.eve.alert.severity\":{\"id\":\"string\"},\"suricata.eve.dest_port\":{\"id\":\"string\"},\"suricata.eve.flow.bytes_toclient\":{\"id\":\"bytes\"},\"suricata.eve.flow.bytes_toserver\":{\"id\":\"bytes\"},\"suricata.eve.src_port\":{\"id\":\"string\"},\"threatintel.indicator.url.port\":{\"id\":\"string\"},\"url.port\":{\"id\":\"string\"}}","fields":"[]","runtimeFieldMap":"{}","timeFieldName":"@timestamp","title":"filebeat-*"},"coreMigrationVersion":"7.13.2","id":"filebeat-*","migrationVersion":{"index-pattern":"7.11.0"},"references":[],"type":"index-pattern","updated_at":"2021-08-17T15:48:12.879Z","version":"WzE0MjU4LDdd"}
-{"attributes":{"color":"#a548ae","description":"Tag for indicators ingested by the Threat Intel Filebeat module.","name":"threat intel"},"coreMigrationVersion":"7.13.2","id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","references":[],"type":"tag","updated_at":"2021-08-05T19:01:08.747Z","version":"WzEyNDQ3LDdd"}
-{"attributes":{"description":"This is a pie chart that visualizes the distribution of TLP values.","kibanaSavedObjectMeta":{"searchSourceJSON":"{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},"title":"ThreatQ Indicator TLP Distribution [Filebeat Threat Intel]","uiStateJSON":"{}","version":1,"visState":"{\"title\":\"ThreatQ Indicator TLP Distribution [Filebeat Threat Intel]\",\"type\":\"pie\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"threatintel.indicator.marking.tlp\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":10,\"otherBucket\":true,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\"},\"schema\":\"segment\"}],\"params\":{\"type\":\"pie\",\"addTooltip\":true,\"addLegend\":true,\"legendPosition\":\"right\",\"isDonut\":true,\"labels\":{\"show\":false,\"values\":true,\"last_level\":true,\"truncate\":100}}}"},"coreMigrationVersion":"7.13.2","id":"a911a8b0-ff77-11eb-acb2-2960a7069ed1","migrationVersion":{"visualization":"7.13.1"},"references":[{"id":"filebeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"visualization","updated_at":"2021-08-17T16:24:56.763Z","version":"WzE0OTc5LDdd"}
-{"attributes":{"description":"This is a datatable of Adversaries with the most number of links to indicators.","kibanaSavedObjectMeta":{"searchSourceJSON":"{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},"title":"ThreatQ Most Linked Adversaries Datatable [Filebeat Threat Intel]","uiStateJSON":"{}","version":1,"visState":"{\"title\":\"ThreatQ Most Linked Adversaries Datatable [Filebeat Threat Intel]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"threatintel.threatq.adversaries\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":100,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Most Linked Adversaries\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"showTotal\":false,\"showToolbar\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"},"coreMigrationVersion":"7.13.2","id":"5d395d80-ff71-11eb-acb2-2960a7069ed1","migrationVersion":{"visualization":"7.13.1"},"references":[{"id":"filebeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"visualization","updated_at":"2021-08-17T16:32:48.681Z","version":"WzE1Mjc0LDdd"}
-{"attributes":{"description":"This is a datatable for the most recently created indicators","kibanaSavedObjectMeta":{"searchSourceJSON":"{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},"title":"ThreatQ Recently Created Indicators Datatable [Filebeat Threat Intel]","uiStateJSON":"{}","version":1,"visState":"{\"title\":\"ThreatQ Recently Created Indicators Datatable [Filebeat Threat Intel]\",\"type\":\"table\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"max\",\"params\":{\"field\":\"@timestamp\",\"customLabel\":\"Last Modified\"},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"threatintel.indicator.type\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":100,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Indicator Type\"},\"schema\":\"bucket\"},{\"id\":\"3\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"threatintel.threatq.indicator_value\",\"orderBy\":\"1\",\"order\":\"desc\",\"size\":1,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Indicator Value\"},\"schema\":\"bucket\"}],\"params\":{\"perPage\":10,\"showPartialRows\":false,\"showMetricsAtAllLevels\":false,\"showTotal\":false,\"showToolbar\":false,\"totalFunc\":\"sum\",\"percentageCol\":\"\"}}"},"coreMigrationVersion":"7.13.2","id":"5eb61d00-ff72-11eb-acb2-2960a7069ed1","migrationVersion":{"visualization":"7.13.1"},"references":[{"id":"filebeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"visualization","updated_at":"2021-08-17T16:32:45.480Z","version":"WzE1MjcwLDdd"}
-{"attributes":{"description":"This is a timeline of the number of indicators created broken down by their indicator type.","state":{"datasourceStates":{"indexpattern":{"layers":{"b1380bee-020c-420b-91c0-cde04cbd0ac9":{"columnOrder":["73cdbb81-57ca-4474-a86c-bca60a527d29","931c70a2-8f37-4c91-9cab-cac91c472ea8","89f18519-9360-4d37-ae52-134604ac6cfc"],"columns":{"73cdbb81-57ca-4474-a86c-bca60a527d29":{"dataType":"string","isBucketed":true,"label":"Top values of threatintel.indicator.type","operationType":"terms","params":{"missingBucket":false,"orderBy":{"columnId":"89f18519-9360-4d37-ae52-134604ac6cfc","type":"column"},"orderDirection":"desc","otherBucket":true,"size":15},"scale":"ordinal","sourceField":"threatintel.indicator.type"},"89f18519-9360-4d37-ae52-134604ac6cfc":{"customLabel":true,"dataType":"number","filter":{"language":"kuery","query":""},"isBucketed":false,"label":"Number of Indicators Created","operationType":"count","scale":"ratio","sourceField":"Records"},"931c70a2-8f37-4c91-9cab-cac91c472ea8":{"customLabel":true,"dataType":"date","isBucketed":true,"label":"Date Created","operationType":"date_histogram","params":{"interval":"auto"},"scale":"interval","sourceField":"@timestamp"}},"incompleteColumns":{}}}}},"filters":[],"query":{"language":"kuery","query":""},"visualization":{"layers":[{"accessors":["89f18519-9360-4d37-ae52-134604ac6cfc"],"layerId":"b1380bee-020c-420b-91c0-cde04cbd0ac9","position":"top","seriesType":"bar_stacked","showGridlines":false,"splitAccessor":"73cdbb81-57ca-4474-a86c-bca60a527d29","xAccessor":"931c70a2-8f37-4c91-9cab-cac91c472ea8"}],"legend":{"isVisible":true,"position":"right"},"preferredSeriesType":"bar_stacked","title":"Empty XY chart","valueLabels":"hide"}},"title":"ThreatQ Indicator Created Timeline [Filebeat Threat Intel]","visualizationType":"lnsXY"},"coreMigrationVersion":"7.13.2","id":"cf4b4e40-ff69-11eb-acb2-2960a7069ed1","migrationVersion":{"lens":"7.13.1"},"references":[{"id":"filebeat-*","name":"indexpattern-datasource-current-indexpattern","type":"index-pattern"},{"id":"filebeat-*","name":"indexpattern-datasource-layer-b1380bee-020c-420b-91c0-cde04cbd0ac9","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"lens","updated_at":"2021-08-17T14:45:47.940Z","version":"WzE0MTA0LDdd"}
-{"attributes":{"description":"This is a pie chart displaying the top sources/providers of indicators.","state":{"datasourceStates":{"indexpattern":{"layers":{"55450fa9-7fdf-4ea5-a0db-b68c202d5d39":{"columnOrder":["018f5a03-1498-427b-a0c0-37650af1868e","11576d1f-5400-4a71-bf04-681099e755d5"],"columns":{"018f5a03-1498-427b-a0c0-37650af1868e":{"customLabel":true,"dataType":"string","isBucketed":true,"label":"Top Indicator Sources","operationType":"terms","params":{"missingBucket":false,"orderBy":{"columnId":"11576d1f-5400-4a71-bf04-681099e755d5","type":"column"},"orderDirection":"desc","otherBucket":true,"size":5},"scale":"ordinal","sourceField":"threatintel.indicator.provider"},"11576d1f-5400-4a71-bf04-681099e755d5":{"dataType":"number","isBucketed":false,"label":"Count of records","operationType":"count","scale":"ratio","sourceField":"Records"}},"incompleteColumns":{}}}}},"filters":[],"query":{"language":"kuery","query":""},"visualization":{"layers":[{"categoryDisplay":"default","groups":["018f5a03-1498-427b-a0c0-37650af1868e"],"layerId":"55450fa9-7fdf-4ea5-a0db-b68c202d5d39","legendDisplay":"default","metric":"11576d1f-5400-4a71-bf04-681099e755d5","nestedLegend":false,"numberDisplay":"percent"}],"shape":"pie"}},"title":"ThreatQ Top Indicator Providers [Filebeat Threat Intel]","visualizationType":"lnsPie"},"coreMigrationVersion":"7.13.2","id":"028175a0-ff74-11eb-acb2-2960a7069ed1","migrationVersion":{"lens":"7.13.1"},"references":[{"id":"filebeat-*","name":"indexpattern-datasource-current-indexpattern","type":"index-pattern"},{"id":"filebeat-*","name":"indexpattern-datasource-layer-55450fa9-7fdf-4ea5-a0db-b68c202d5d39","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"lens","updated_at":"2021-08-17T15:58:48.826Z","version":"WzE0NDg4LDdd"}
-{"attributes":{"description":"This horizontal bar chart displays the distribution of indicator confidence values.","kibanaSavedObjectMeta":{"searchSourceJSON":"{\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filter\":[],\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"},"title":"ThreatQ Indicator Confidence Distribution [Filebeat Threat Intel]","uiStateJSON":"{}","version":1,"visState":"{\"title\":\"ThreatQ Indicator Confidence Distribution [Filebeat Threat Intel]\",\"type\":\"horizontal_bar\",\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"count\",\"params\":{},\"schema\":\"metric\"},{\"id\":\"2\",\"enabled\":true,\"type\":\"terms\",\"params\":{\"field\":\"threatintel.indicator.confidence\",\"orderBy\":\"_key\",\"order\":\"desc\",\"size\":10,\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"customLabel\":\"Confidence\"},\"schema\":\"segment\"}],\"params\":{\"type\":\"histogram\",\"grid\":{\"categoryLines\":false},\"categoryAxes\":[{\"id\":\"CategoryAxis-1\",\"type\":\"category\",\"position\":\"left\",\"show\":true,\"scale\":{\"type\":\"linear\"},\"labels\":{\"show\":true,\"rotate\":0,\"filter\":false,\"truncate\":200},\"title\":{},\"style\":{}}],\"valueAxes\":[{\"id\":\"ValueAxis-1\",\"name\":\"LeftAxis-1\",\"type\":\"value\",\"position\":\"bottom\",\"show\":true,\"scale\":{\"type\":\"linear\",\"mode\":\"normal\"},\"labels\":{\"show\":true,\"rotate\":75,\"filter\":true,\"truncate\":100},\"title\":{\"text\":\"Count\"},\"style\":{}}],\"seriesParams\":[{\"show\":true,\"type\":\"histogram\",\"mode\":\"normal\",\"data\":{\"label\":\"Count\",\"id\":\"1\"},\"interpolate\":\"linear\",\"valueAxis\":\"ValueAxis-1\",\"drawLinesBetweenPoints\":true,\"lineWidth\":2,\"showCircles\":true}],\"addTooltip\":true,\"detailedTooltip\":true,\"palette\":{\"type\":\"palette\",\"name\":\"default\"},\"addLegend\":true,\"legendPosition\":\"right\",\"times\":[],\"addTimeMarker\":false,\"labels\":{},\"radiusRatio\":0,\"thresholdLine\":{\"show\":false,\"value\":10,\"width\":1,\"style\":\"full\",\"color\":\"#E7664C\"}}}"},"coreMigrationVersion":"7.13.2","id":"302d0850-ff7b-11eb-acb2-2960a7069ed1","migrationVersion":{"visualization":"7.13.1"},"references":[{"id":"filebeat-*","name":"kibanaSavedObjectMeta.searchSourceJSON.index","type":"index-pattern"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"visualization","updated_at":"2021-08-17T16:51:05.665Z","version":"WzE1NzU1LDdd"}
-{"attributes":{"description":"This dashboard showcases various visualizations for ThreatQ data","hits":0,"kibanaSavedObjectMeta":{"searchSourceJSON":"{\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"filter\":[]}"},"optionsJSON":"{\"hidePanelTitles\":false,\"useMargins\":true}","panelsJSON":"[{\"version\":\"7.13.2\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":15,\"w\":24,\"h\":15,\"i\":\"f5981005-7afc-4ee5-8fef-e8f17464b985\"},\"panelIndex\":\"f5981005-7afc-4ee5-8fef-e8f17464b985\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_f5981005-7afc-4ee5-8fef-e8f17464b985\"},{\"version\":\"7.13.2\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":0,\"w\":24,\"h\":15,\"i\":\"59e852ab-fa7b-4759-9f2f-8298cfb28f39\"},\"panelIndex\":\"59e852ab-fa7b-4759-9f2f-8298cfb28f39\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39\"},{\"version\":\"7.13.2\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":0,\"w\":24,\"h\":15,\"i\":\"444e9a99-323f-47ec-8d87-281cbff693b2\"},\"panelIndex\":\"444e9a99-323f-47ec-8d87-281cbff693b2\",\"embeddableConfig\":{\"enhancements\":{},\"vis\":null,\"table\":null},\"panelRefName\":\"panel_444e9a99-323f-47ec-8d87-281cbff693b2\"},{\"version\":\"7.13.2\",\"type\":\"lens\",\"gridData\":{\"x\":24,\"y\":15,\"w\":24,\"h\":15,\"i\":\"54b3a1cd-07f7-471e-9fbe-540cfeaab23a\"},\"panelIndex\":\"54b3a1cd-07f7-471e-9fbe-540cfeaab23a\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a\"},{\"version\":\"7.13.2\",\"type\":\"lens\",\"gridData\":{\"x\":0,\"y\":30,\"w\":24,\"h\":15,\"i\":\"61810a64-070a-4a1e-bccf-f69e4f1474b5\"},\"panelIndex\":\"61810a64-070a-4a1e-bccf-f69e4f1474b5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_61810a64-070a-4a1e-bccf-f69e4f1474b5\"},{\"version\":\"7.13.2\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":30,\"w\":24,\"h\":15,\"i\":\"36c7a051-69e0-48d8-997a-9fbc0f648362\"},\"panelIndex\":\"36c7a051-69e0-48d8-997a-9fbc0f648362\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_36c7a051-69e0-48d8-997a-9fbc0f648362\"}]","timeRestore":false,"title":"[Filebeat Threat Intel] ThreatQ","version":1},"coreMigrationVersion":"7.13.2","id":"3b605720-ff78-11eb-acb2-2960a7069ed1","migrationVersion":{"dashboard":"7.13.1"},"references":[{"id":"a911a8b0-ff77-11eb-acb2-2960a7069ed1","name":"f5981005-7afc-4ee5-8fef-e8f17464b985:panel_f5981005-7afc-4ee5-8fef-e8f17464b985","type":"visualization"},{"id":"5d395d80-ff71-11eb-acb2-2960a7069ed1","name":"59e852ab-fa7b-4759-9f2f-8298cfb28f39:panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39","type":"visualization"},{"id":"5eb61d00-ff72-11eb-acb2-2960a7069ed1","name":"444e9a99-323f-47ec-8d87-281cbff693b2:panel_444e9a99-323f-47ec-8d87-281cbff693b2","type":"visualization"},{"id":"cf4b4e40-ff69-11eb-acb2-2960a7069ed1","name":"54b3a1cd-07f7-471e-9fbe-540cfeaab23a:panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a","type":"lens"},{"id":"028175a0-ff74-11eb-acb2-2960a7069ed1","name":"61810a64-070a-4a1e-bccf-f69e4f1474b5:panel_61810a64-070a-4a1e-bccf-f69e4f1474b5","type":"lens"},{"id":"302d0850-ff7b-11eb-acb2-2960a7069ed1","name":"36c7a051-69e0-48d8-997a-9fbc0f648362:panel_36c7a051-69e0-48d8-997a-9fbc0f648362","type":"visualization"},{"id":"d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","name":"tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f","type":"tag"}],"type":"dashboard","updated_at":"2021-08-17T16:51:39.888Z","version":"WzE1Nzc4LDdd"}
-{"exportedCount":9,"missingRefCount":0,"missingReferences":[]}
+{
+    "attributes": {
+        "description": "This dashboard showcases various visualizations for ThreatQ data",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "threatintel.threatq"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "threatintel.threatq"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f5981005-7afc-4ee5-8fef-e8f17464b985",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "f5981005-7afc-4ee5-8fef-e8f17464b985",
+                "panelRefName": "panel_f5981005-7afc-4ee5-8fef-e8f17464b985",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                "panelRefName": "panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": null,
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "444e9a99-323f-47ec-8d87-281cbff693b2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "444e9a99-323f-47ec-8d87-281cbff693b2",
+                "panelRefName": "panel_444e9a99-323f-47ec-8d87-281cbff693b2",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                "panelRefName": "panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                "panelRefName": "panel_61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "36c7a051-69e0-48d8-997a-9fbc0f648362",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "36c7a051-69e0-48d8-997a-9fbc0f648362",
+                "panelRefName": "panel_36c7a051-69e0-48d8-997a-9fbc0f648362",
+                "type": "visualization",
+                "version": "7.15.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] ThreatQ",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "3b605720-ff78-11eb-acb2-2960a7069ed1",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "a911a8b0-ff77-11eb-acb2-2960a7069ed1",
+            "name": "f5981005-7afc-4ee5-8fef-e8f17464b985:panel_f5981005-7afc-4ee5-8fef-e8f17464b985",
+            "type": "visualization"
+        },
+        {
+            "id": "5d395d80-ff71-11eb-acb2-2960a7069ed1",
+            "name": "59e852ab-fa7b-4759-9f2f-8298cfb28f39:panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+            "type": "visualization"
+        },
+        {
+            "id": "5eb61d00-ff72-11eb-acb2-2960a7069ed1",
+            "name": "444e9a99-323f-47ec-8d87-281cbff693b2:panel_444e9a99-323f-47ec-8d87-281cbff693b2",
+            "type": "visualization"
+        },
+        {
+            "id": "cf4b4e40-ff69-11eb-acb2-2960a7069ed1",
+            "name": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a:panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+            "type": "lens"
+        },
+        {
+            "id": "028175a0-ff74-11eb-acb2-2960a7069ed1",
+            "name": "61810a64-070a-4a1e-bccf-f69e4f1474b5:panel_61810a64-070a-4a1e-bccf-f69e4f1474b5",
+            "type": "lens"
+        },
+        {
+            "id": "302d0850-ff7b-11eb-acb2-2960a7069ed1",
+            "name": "36c7a051-69e0-48d8-997a-9fbc0f648362:panel_36c7a051-69e0-48d8-997a-9fbc0f648362",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-10-11T08:07:31.696Z",
+    "version": "WzYyMywxXQ=="
+}

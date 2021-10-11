@@ -4,10 +4,10 @@
         "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
         "name": "threat intel"
     },
-    "coreMigrationVersion": "8.0.0",
+    "coreMigrationVersion": "7.15.0",
     "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
     "references": [],
     "type": "tag",
-    "updated_at": "2021-08-04T16:34:33.127Z",
-    "version": "WzQ2NzksMV0="
+    "updated_at": "2021-10-11T08:02:55.512Z",
+    "version": "WzUyNCwxXQ=="
 }
