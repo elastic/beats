@@ -7,7 +7,7 @@
     },
     "kubernetes": {
         "daemonset": {
-            "name": "kube-proxy",
+            "name": "kindnet",
             "replicas": {
                 "available": 1,
                 "desired": 1,
@@ -15,7 +15,9 @@
                 "unavailable": 0
             }
         },
-        "namespace": "kube-system"
+        "namespace": {
+            "name": "kube-system"
+        }
     },
     "metricset": {
         "name": "state_daemonset",
