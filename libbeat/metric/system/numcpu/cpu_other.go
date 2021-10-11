@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !linux && !freebsd && !openbsd && !windows
 // +build !linux,!freebsd,!openbsd,!windows
 
 package numcpu
