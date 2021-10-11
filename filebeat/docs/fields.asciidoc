@@ -151745,6 +151745,103 @@ type: long
 
 --
 
+[float]
+=== threatq
+
+Fields for ThreatQ Threat Library
+
+
+
+*`threatintel.threatq.updated_at`*::
++
+--
+Last modification time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.created_at`*::
++
+--
+Object creation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_at`*::
++
+--
+Expiration time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_calculated_at`*::
++
+--
+Expiration calculation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.published_at`*::
++
+--
+Object publication time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.status`*::
++
+--
+Object status within the Threat Library
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.indicator_value`*::
++
+--
+Original indicator value
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.adversaries`*::
++
+--
+Adversaries that are linked to the object
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.attributes`*::
++
+--
+These provide additional context about an object
+
+
+type: flattened
+
+--
+
 [[exported-fields-tomcat]]
 == Apache Tomcat fields
 
