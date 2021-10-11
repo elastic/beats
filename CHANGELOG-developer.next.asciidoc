@@ -122,6 +122,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
+- Update Go version to 1.17.1. {pull}27543[27543]
 
 ==== Deprecated
 

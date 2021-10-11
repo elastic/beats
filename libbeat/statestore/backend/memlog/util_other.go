@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris
 // +build linux dragonfly freebsd netbsd openbsd solaris
 
 package memlog

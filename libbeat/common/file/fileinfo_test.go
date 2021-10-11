@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !windows && !openbsd
 // +build !windows,!openbsd
 
 // Test for openbsd are excluded here as info.GID() returns 0 instead of the actual value
