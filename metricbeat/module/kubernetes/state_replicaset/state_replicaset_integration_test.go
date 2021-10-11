@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration && linux
 // +build integration,linux
 
 package state_replicaset
