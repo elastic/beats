@@ -11,7 +11,6 @@ import (
 	"github.com/Azure/go-autorest/autorest/date"
 
 	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
-	//"github.com/Azure/go-autorest/autorest/date"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
