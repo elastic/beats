@@ -3931,7 +3931,7 @@ type: long
 
 --
 
-*`aws.rds.read_io.ops_per_sec`*::
+*`aws.rds.read.iops`*::
 +
 --
 The average number of disk read I/O operations per second.
@@ -3975,7 +3975,7 @@ type: long
 
 --
 
-*`aws.rds.write_io.ops_per_sec`*::
+*`aws.rds.write.iops`*::
 +
 --
 The average number of disk write I/O operations per second.
