@@ -151,6 +151,19 @@ pull_request_rules:
   - name: backport patches to 7.15 branch
     conditions:
       - merged
+      - label=backport-v7.16.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.15"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.15 branch
+    conditions:
+      - merged
       - label=backport-v7.15.0
     actions:
       backport:
