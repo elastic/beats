@@ -4296,11 +4296,28 @@
         "related.hosts": [
             "dev01"
         ],
+        "related.ip": [
+            "1.2.3.4"
+        ],
+        "related.user": [
+            "test_user"
+        ],
         "service.type": "cisco",
+        "source.address": "1.2.3.4",
+        "source.geo.city_name": "Moscow",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "RU",
+        "source.geo.country_name": "Russia",
+        "source.geo.location.lat": 55.7527,
+        "source.geo.location.lon": 37.6172,
+        "source.geo.region_iso_code": "RU-MOW",
+        "source.geo.region_name": "Moscow",
+        "source.ip": "1.2.3.4",
         "tags": [
             "cisco-asa",
             "forwarded"
-        ]
+        ],
+        "user.name": "test_user"
     },
     {
         "cisco.asa.destination_interface": "inside",
