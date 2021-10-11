@@ -368,6 +368,11 @@ func drainSQS(t *testing.T, tfConfig terraformOutputData) {
 	t.Logf("Drained %d SQS messages.", deletedCount)
 }
 
+func TestGetBucketNameFromARN(t *testing.T) {
+	bucketName := getBucketNameFromARN("arn:aws:s3:::my_corporate_bucket")
+	assert.Equal("my_corporate_bucket", bucketName)
+}
+
 func TestGetRegionForBucketARN(t *testing.T) {
 	logp.TestingSetup()
 
@@ -381,7 +386,7 @@ func TestGetRegionForBucketARN(t *testing.T) {
 
 	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
 
-	regionName, err := getRegionForBucketARN(context.Background(), s3Client, tfConfig.BucketName)
+	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }
 
@@ -432,4 +437,10 @@ func TestPaginatorListPrefix(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, objects)
+
+func TestGetProviderFromDomain(t *testing.T) {
+	assert.Equal("aws", getProviderFromDomain("", ""))
+	assert.Equal("aws", getProviderFromDomain("c2s.ic.gov", ""))
+	assert.Equal("abc", getProviderFromDomain("abc.com", "abc"))
+	assert.Equal("xyz", getProviderFromDomain("oraclecloud.com", "xyz"))
 }

@@ -105,6 +105,7 @@ type s3ObjectProcessor struct {
 	readerConfig *readerConfig    // Config about how to process the object.
 	s3Obj        s3EventV2        // S3 object information.
 	s3ObjHash    string
+	s3RequestURL string
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 }
@@ -169,6 +170,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
 	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
+	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -218,7 +220,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		evt := p.createEvent(string(data), offset)
 		p.publish(p.acker, &evt)
 	}
 
@@ -257,7 +259,8 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		}
 
 		data, _ := item.MarshalJSON()
-		evt := createEvent(string(data), offset+arrayOffset, p.s3Obj, objHash, p.s3Metadata)
+		p.s3ObjHash = objHash
+		evt := p.createEvent(string(data), offset+arrayOffset)
 		p.publish(p.acker, &evt)
 	}
 
@@ -301,7 +304,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 			return fmt.Errorf("error reading message: %w", err)
 		}
 
-		event := createEvent(string(message.Content), offset, p.s3Obj, p.s3ObjHash, p.s3Metadata)
+		event := p.createEvent(string(message.Content), offset)
 		event.Fields.DeepUpdate(message.Fields)
 		offset += int64(message.Bytes)
 		p.publish(p.acker, &event)
@@ -317,7 +320,7 @@ func (p *s3ObjectProcessor) publish(ack *eventACKTracker, event *beat.Event) {
 	p.publisher.Publish(*event)
 }
 
-func createEvent(message string, offset int64, obj s3EventV2, objectHash string, meta map[string]interface{}) beat.Event {
+func (p *s3ObjectProcessor) createEvent(message string, offset int64) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields: common.MapStr{
@@ -325,29 +328,29 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 			"log": common.MapStr{
 				"offset": offset,
 				"file": common.MapStr{
-					"path": constructObjectURL(obj),
+					"path": p.s3RequestURL,
 				},
 			},
 			"aws": common.MapStr{
 				"s3": common.MapStr{
 					"bucket": common.MapStr{
-						"name": obj.S3.Bucket.Name,
-						"arn":  obj.S3.Bucket.ARN},
+						"name": p.s3Obj.S3.Bucket.Name,
+						"arn":  p.s3Obj.S3.Bucket.ARN},
 					"object": common.MapStr{
-						"key": obj.S3.Object.Key,
+						"key": p.s3Obj.S3.Object.Key,
 					},
 				},
 			},
 			"cloud": common.MapStr{
-				"provider": "aws",
-				"region":   obj.AWSRegion,
+				"provider": p.s3Obj.Provider,
+				"region":   p.s3Obj.AWSRegion,
 			},
 		},
 	}
-	event.SetID(objectID(objectHash, offset))
+	event.SetID(objectID(p.s3ObjHash, offset))
 
-	if len(meta) > 0 {
-		event.Fields.Put("aws.s3.metadata", meta)
+	if len(p.s3Metadata) > 0 {
+		event.Fields.Put("aws.s3.metadata", p.s3Metadata)
 	}
 
 	return event
@@ -355,10 +358,6 @@ func createEvent(message string, offset int64, obj s3EventV2, objectHash string,
 
 func objectID(objectHash string, offset int64) string {
 	return fmt.Sprintf("%s-%012d", objectHash, offset)
-}
-
-func constructObjectURL(obj s3EventV2) string {
-	return "https://" + obj.S3.Bucket.Name + ".s3." + obj.AWSRegion + ".amazonaws.com/" + obj.S3.Object.Key
 }
 
 // s3ObjectHash returns a short sha256 hash of the bucket arn + object key name.
