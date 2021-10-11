@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: kubebeat-demo
+  name: kubebeat-demo
+spec:
+  containers:
+  - image: kubebeat
+    name: kubebeat-demo
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
