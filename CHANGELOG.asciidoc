@@ -3,6 +3,137 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.15.1]]
+=== Beats version 7.15.1
+https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
+
+*Heartbeat*
+
+*Journalbeat*
+
+
+
+*Metricbeat*
+
+- Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+- Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
+- sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+
+*Heartbeat*
+
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Journalbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+*Journalbeat*
+
+
+
+
+
+
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
 https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
