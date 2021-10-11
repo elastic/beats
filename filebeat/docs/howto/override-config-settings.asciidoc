@@ -37,7 +37,7 @@ logging.files:
   path: /var/log/filebeat
   name: filebeat
   keepfiles: 7
-  permissions: 0644
+  permissions: 0640
 ----
 
 To override the logging level and send logging output to standard error instead
