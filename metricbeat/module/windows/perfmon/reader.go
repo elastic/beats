@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -23,11 +24,16 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
 	"github.com/pkg/errors"
+
+	"math/rand"
+
+	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -44,7 +50,6 @@ const (
 // Reader will contain the config options
 type Reader struct {
 	query    pdh.Query    // PDH Query
-	executed bool         // Indicates if the query has been executed.
 	log      *logp.Logger //
 	config   Config       // Metricset configuration
 	counters []PerfCounter
@@ -108,7 +113,7 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	}
 
 	// Get the values.
-	values, err := re.query.GetFormattedCounterValues()
+	values, err := re.getValues()
 	if err != nil {
 		return nil, errors.Wrap(err, "failed formatting counter values")
 	}
@@ -120,8 +125,47 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	} else {
 		events = re.groupToEvents(values)
 	}
-	re.executed = true
 	return events, nil
+}
+
+func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
+	var val map[string][]pdh.CounterValue
+	rand.Seed(time.Now().UnixNano())
+	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
+	event, err := windows.CreateEvent(nil, 0, 0, title)
+	if err != nil {
+		return nil, err
+	}
+	defer windows.CloseHandle(event)
+	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
+	if err != nil {
+		return nil, err
+	}
+	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
+	if err != nil {
+		return nil, err
+	}
+	switch waitFor {
+	case windows.WAIT_OBJECT_0:
+		val, err = re.query.GetFormattedCounterValues()
+		if err != nil {
+			return nil, err
+		}
+	case windows.WAIT_FAILED:
+		return nil, errors.New("WaitForSingleObject has failed")
+	default:
+		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
+	}
+	return val, err
+}
+
+func randSeq(n int) string {
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // Close will close the PDH query for now.

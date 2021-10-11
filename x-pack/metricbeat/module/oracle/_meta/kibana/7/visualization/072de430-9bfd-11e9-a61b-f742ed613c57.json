@@ -1,0 +1,93 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Ratio of used space in data files [Metricbeat Oracle]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "bar_color_rules": [
+                    {
+                        "id": "da9fa430-9bfc-11e9-baad-815beb8da1b5"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(204,204,204,1)",
+                        "fill": 0.5,
+                        "formatter": "percent",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Ratio of used space in data files",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "oracle.tablespace.data_file.size.max.bytes",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "oracle.tablespace.data_file.size.bytes",
+                                "id": "c0f200a0-9bfc-11e9-baad-815beb8da1b5",
+                                "type": "avg"
+                            },
+                            {
+                                "id": "c8289f00-9bfc-11e9-baad-815beb8da1b5",
+                                "script": "params.used / params.max",
+                                "type": "math",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "c9a63e50-9bfc-11e9-baad-815beb8da1b5",
+                                        "name": "max"
+                                    },
+                                    {
+                                        "field": "c0f200a0-9bfc-11e9-baad-815beb8da1b5",
+                                        "id": "cddc46e0-9bfc-11e9-baad-815beb8da1b5",
+                                        "name": "used"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "stacked",
+                        "terms_field": "oracle.tablespace.data_file.name",
+                        "terms_order_by": "c0f200a0-9bfc-11e9-baad-815beb8da1b5"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Ratio of used space in data files [Metricbeat Oracle]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "072de430-9bfd-11e9-a61b-f742ed613c57",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:20.355Z",
+    "version": "WzMyODEsMV0="
+}

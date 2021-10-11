@@ -5,6 +5,8 @@
 
 == Azure module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The azure module retrieves different types of log data from Azure.
 There are several requirements before using the module since the logs will actually be read from azure event hubs.
 
@@ -42,35 +44,35 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
       storage_account_key: ""
       resource_manager_endpoint: ""
 
-   platformlogs:
-     enabled: false
-     var:
-       eventhub: ""
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  platformlogs:
+    enabled: false
+    var:
+      eventhub: ""
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
-   auditlogs:
-     enabled: false
-     var:
-       eventhub: "insights-logs-auditlogs"
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  auditlogs:
+    enabled: false
+    var:
+      eventhub: "insights-logs-auditlogs"
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
-   signinlogs:
-     enabled: false
-     var:
-       eventhub: "insights-logs-signinlogs"
-       consumer_group: "$Default"
-       connection_string: ""
-       storage_account: ""
-       storage_account_key: ""
-       resource_manager_endpoint: ""
+  signinlogs:
+    enabled: false
+    var:
+      eventhub: "insights-logs-signinlogs"
+      consumer_group: "$Default"
+      connection_string: ""
+      storage_account: ""
+      storage_account_key: ""
+      resource_manager_endpoint: ""
 
 ----
 
@@ -78,7 +80,7 @@ Will retrieve azure Active Directory audit logs. The audit logs provide traceabi
 `eventhub` ::
   _string_
 Is the fully managed, real-time data ingestion service.
-Default value `insights-operational-logs`.
+Default value of `insights-operational-logs` for activitylogs, `insights-logs-auditlogs` for auditlogs, and `insights-logs-signinlogs` for signinlogs. It is recommended to use a separate eventhub for each log type as the field mappings of each log type are different.
 
 `consumer_group` ::
 _string_
@@ -114,15 +116,10 @@ include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
 
+
 [float]
 === Dashboards
 
 The azure module comes with several predefined dashboards for general cloud overview, user activity and alerts. For example:
 
 image::./images/filebeat-azure-overview.png[]
-
-
-
-
-
-

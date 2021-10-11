@@ -15,11 +15,14 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
 
 import (
+	"time"
+
 	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -29,11 +32,13 @@ var allowedFormats = []string{"float", "large", "long"}
 
 // Config for the windows perfmon metricset.
 type Config struct {
-	IgnoreNECounters   bool      `config:"perfmon.ignore_non_existent_counters"`
-	GroupMeasurements  bool      `config:"perfmon.group_measurements_by_instance"`
-	Counters           []Counter `config:"perfmon.counters"`
-	Queries            []Query   `config:"perfmon.queries"`
-	GroupAllCountersTo string    `config:"perfmon.group_all_counter"`
+	Period                  time.Duration `config:"period" validate:"required"`
+	IgnoreNECounters        bool          `config:"perfmon.ignore_non_existent_counters"`
+	GroupMeasurements       bool          `config:"perfmon.group_measurements_by_instance"`
+	RefreshWildcardCounters bool          `config:"perfmon.refresh_wildcard_counters"`
+	Counters                []Counter     `config:"perfmon.counters"`
+	Queries                 []Query       `config:"perfmon.queries"`
+	GroupAllCountersTo      string        `config:"perfmon.group_all_counter"`
 }
 
 // Counter for the perfmon counters (old implementation deprecated).

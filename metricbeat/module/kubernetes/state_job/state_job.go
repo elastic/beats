@@ -65,7 +65,7 @@ var (
 		Labels: map[string]p.LabelMap{
 			// Jobs are uniquely identified by the combination of name and namespace.
 			"job_name":  p.KeyLabel("name"),
-			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
 			// Add owner information provided by the "kube_job_owner" InfoMetric.
 			"owner_kind":          p.Label("owner.kind"),
 			"owner_name":          p.Label("owner.name"),
@@ -77,9 +77,9 @@ var (
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
 func init() {
-	if err := mb.Registry.AddMetricSet("kubernetes", "state_job", New, hostParser); err != nil {
-		panic(err)
-	}
+	mb.Registry.MustAddMetricSet("kubernetes", "state_job", New,
+		mb.WithHostParser(hostParser),
+	)
 }
 
 // MetricSet type defines all fields of the MetricSet

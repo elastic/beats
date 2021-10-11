@@ -1,0 +1,212 @@
+{
+    "attributes": {
+        "description": "Kubernetes Scheduler metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "kubernetes.scheduler"
+                            },
+                            "type": "phrase",
+                            "value": "kubernetes.scheduler"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "kubernetes.scheduler",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "1",
+                    "w": 14,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "2",
+                    "w": 11,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "3",
+                    "w": 23,
+                    "x": 25,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "5",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 14
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Scheduler",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f5ab5510-9c94-11e9-94fd-c91206cd5249",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "bcb194a0-9bf8-11e9-9dc8-fd27291d427f",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "826d80c0-9c97-11e9-94fd-c91206cd5249",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "15bd4420-9c9b-11e9-94fd-c91206cd5249",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "d9fc1b80-9c9c-11e9-94fd-c91206cd5249",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "95595810-9ca8-11e9-94fd-c91206cd5249",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "382ace30-9d98-11e9-b2ae-49acc4cbcea9",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "84d9b200-9d98-11e9-b2ae-49acc4cbcea9",
+            "name": "7:panel_7",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:39.447Z",
+    "version": "WzQwMzUsMV0="
+}

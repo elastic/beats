@@ -1,6 +1,5 @@
 {{ if eq .input "httpjson" }}
 type: httpjson
-config_version: "2"
 interval: {{ .interval }}
 auth.oauth2.provider: google
 auth.oauth2.google.jwt_file: {{ .jwt_file }}
@@ -49,7 +48,7 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.10.0
+        ecs.version: 1.12.0
   - script:
       lang: javascript
       id: gworkspace-common

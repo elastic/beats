@@ -54,7 +54,7 @@ func AutodiscoverBuilder(
 		return nil, err
 	}
 
-	awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+	awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 		AccessKeyID:     config.AWSConfig.AccessKeyID,
 		SecretAccessKey: config.AWSConfig.SecretAccessKey,
 		SessionToken:    config.AWSConfig.SessionToken,
@@ -76,7 +76,7 @@ func AutodiscoverBuilder(
 
 	var clients []elasticloadbalancingv2iface.ClientAPI
 	for _, region := range config.Regions {
-		awsCfg, err := awscommon.GetAWSCredentials(awscommon.ConfigAWS{
+		awsCfg, err := awscommon.InitializeAWSConfig(awscommon.ConfigAWS{
 			AccessKeyID:     config.AWSConfig.AccessKeyID,
 			SecretAccessKey: config.AWSConfig.SecretAccessKey,
 			SessionToken:    config.AWSConfig.SessionToken,

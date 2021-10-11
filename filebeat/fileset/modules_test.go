@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package fileset
@@ -45,11 +46,39 @@ func TestNewModuleRegistry(t *testing.T) {
 	modulesPath, err := filepath.Abs("../module")
 	require.NoError(t, err)
 
+	falseVar := false
+
 	configs := []*ModuleConfig{
-		{Module: "nginx"},
-		{Module: "mysql"},
-		{Module: "system"},
-		{Module: "auditd"},
+		{
+			Module: "nginx",
+			Filesets: map[string]*FilesetConfig{
+				"access": {},
+				"error":  {},
+				"ingress_controller": {
+					Enabled: &falseVar,
+				},
+			},
+		},
+		{
+			Module: "mysql",
+			Filesets: map[string]*FilesetConfig{
+				"slowlog": {},
+				"error":   {},
+			},
+		},
+		{
+			Module: "system",
+			Filesets: map[string]*FilesetConfig{
+				"syslog": {},
+				"auth":   {},
+			},
+		},
+		{
+			Module: "auditd",
+			Filesets: map[string]*FilesetConfig{
+				"log": {},
+			},
+		},
 	}
 
 	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
@@ -58,7 +87,7 @@ func TestNewModuleRegistry(t *testing.T) {
 
 	expectedModules := map[string][]string{
 		"auditd": {"log"},
-		"nginx":  {"access", "error", "ingress_controller"},
+		"nginx":  {"access", "error"},
 		"mysql":  {"slowlog", "error"},
 		"system": {"syslog", "auth"},
 	}
@@ -374,6 +403,19 @@ func TestMcfgFromConfig(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "empty fileset (nil)",
+			config: load(t, map[string]interface{}{
+				"module": "nginx",
+				"error":  nil,
+			}),
+			expected: ModuleConfig{
+				Module: "nginx",
+				Filesets: map[string]*FilesetConfig{
+					"error": {},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -450,4 +492,133 @@ func TestInterpretError(t *testing.T) {
 			assert.Equal(t, errResult.Error(), test.Output, test.Test)
 		})
 	}
+}
+
+func TestEnableFilesetsFromOverrides(t *testing.T) {
+	tests := []struct {
+		Name      string
+		Cfg       []*ModuleConfig
+		Overrides *ModuleOverrides
+		Expected  []*ModuleConfig
+	}{
+		{
+			Name: "add fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"baz": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+						"baz": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "defined fileset",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"foo": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {
+							Var: map[string]interface{}{
+								"a": "b",
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			Name: "disabled module",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "nil overrides",
+			Cfg: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+			Overrides: nil,
+			Expected: []*ModuleConfig{
+				{
+					Module: "foo",
+					Filesets: map[string]*FilesetConfig{
+						"bar": {},
+					},
+				},
+			},
+		},
+		{
+			Name: "no modules",
+			Cfg:  nil,
+			Overrides: &ModuleOverrides{
+				"other": {
+					"bar": nil,
+				},
+			},
+			Expected: nil,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.Name, func(t *testing.T) {
+			enableFilesetsFromOverrides(test.Cfg, test.Overrides)
+			assert.Equal(t, test.Expected, test.Cfg)
+		})
+	}
+
 }

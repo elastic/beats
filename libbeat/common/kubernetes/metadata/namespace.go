@@ -70,8 +70,7 @@ func (n *namespace) GenerateK8s(obj kubernetes.Resource, opts ...FieldOptions) c
 	}
 
 	meta := n.resource.GenerateK8s(resource, obj, opts...)
-	// TODO: remove this call when moving to 8.0
-	meta = flattenMetadata(meta)
+	meta = unifyResourceMetadata(meta)
 
 	// TODO: Add extra fields in here if need be
 	return meta
@@ -95,34 +94,51 @@ func (n *namespace) GenerateFromName(name string, opts ...FieldOptions) common.M
 	return nil
 }
 
-func flattenMetadata(in common.MapStr) common.MapStr {
-	out := common.MapStr{}
-	rawFields, err := in.GetValue(resource)
-	if err != nil {
-		return nil
-	}
-
-	fields, ok := rawFields.(common.MapStr)
+// unifyResourceMetadata moves all the resource's metadata (labels, annotations)
+// under the resource field
+// example input:
+// 				"kubernetes": common.MapStr{
+//					"labels": common.MapStr{
+//						"foo": "bar",
+//					},
+//					"annotations": common.MapStr{
+//						"spam": "baz",
+//					},
+//					"namespace": common.MapStr{
+//						"name": name,
+//						"uid":  uid,
+//					},
+//				},
+// example output:
+// 				"kubernetes": common.MapStr{
+//					"namespace": common.MapStr{
+//						"name": name,
+//						"uid":  uid,
+//						"labels": common.MapStr{
+//							"foo": "bar",
+//						},
+//						"annotations": common.MapStr{
+//							"spam": "baz",
+//						},
+//					},
+//				},
+func unifyResourceMetadata(in common.MapStr) common.MapStr {
+	resourceValues, ok := in[resource].(common.MapStr)
 	if !ok {
-		return nil
+		return in
 	}
-	for k, v := range fields {
-		if k == "name" {
-			out[resource] = v
-		} else {
-			out[resource+"_"+k] = v
+	populateFromKeys := []string{"labels", "annotations"}
+	for _, key := range populateFromKeys {
+		rawValues, err := in.GetValue(key)
+		if err != nil {
+			continue
+		}
+		values, ok := rawValues.(common.MapStr)
+		if ok {
+			resourceValues.Put(key, values)
+			in.Delete(key)
 		}
 	}
 
-	rawLabels, err := in.GetValue("labels")
-	if err != nil {
-		return out
-	}
-	labels, ok := rawLabels.(common.MapStr)
-	if !ok {
-		return out
-	}
-	out[resource+"_labels"] = labels
-
-	return out
+	return in
 }

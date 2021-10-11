@@ -63,7 +63,7 @@ Abuse.ch URL Threat Intel is mapped to the following ECS fields.
 [options="header"]
 |==============================================================
 | URL Threat Intel Fields    | ECS Fields
-| url                        | threat.indicator.url.full
+| url                        | threatintel.indicator.url.full
 | date_added                 | @timestamp
 | host                       | threatintel.indicator.ip/domain
 |==============================================================
@@ -468,7 +468,7 @@ Anomali ThreatStream fields are mapped to the following ECS fields:
 | date_first  | threatintel.indicator.first_seen
 | date_last   | threatintel.indicator.last_seen
 | detail      | tags
-| domain      | threatintel.indicator.domain
+| domain      | threatintel.indicator.url.domain
 | email       | threatintel.indicator.email.address
 | itype<<a,[1]>> | threatintel.indicator.type
 | lat         | threatintel.indicator.geo.location.lat
@@ -604,15 +604,22 @@ image::./images/filebeat-threatintel-alienvault-otx.png[]
 Overview of the information provided by the AlienVault OTX feed.
 
 [role="screenshot"]
-image::./images/filebeat-threatintel-anomali-limo.png[]
+image::./images/filebeat-threatintel-anomali.png[]
 
 [float]
-Overview of the information provided by the Anomali Limo feed.
+Overview of the information provided by the Anomali Limo and
+Anomali ThreatStream feeds.
 
 [role="screenshot"]
 image::./images/filebeat-threatintel-misp.png[]
 
 [float]
 Overview of the information provided by the MISP feed.
+
+[role="screenshot"]
+image::./images/filebeat-threatintel-recordedfuture.png[]
+
+[float]
+Overview of the information provided by the Recorded Future feed.
 
 :modulename!:

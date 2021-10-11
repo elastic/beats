@@ -4,6 +4,9 @@ var:
   - name: input
     default: aws-s3
   - name: queue_url
+  - name: bucket_arn
+  - name: number_of_workers
+  - name: bucket_list_interval
   - name: shared_credential_file
   - name: credential_profile_name
   - name: visibility_timeout
@@ -14,8 +17,9 @@ var:
   - name: session_token
   - name: role_arn
   - name: tags
-    default: [forwarded]
+    default: [forwarded, preserve_original_event]
   - name: fips_enabled
+  - name: proxy_url
   - name: max_number_of_messages
 
 ingest_pipeline: ingest/pipeline.yml

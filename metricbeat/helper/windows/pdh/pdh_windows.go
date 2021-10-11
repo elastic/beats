@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package pdh
@@ -34,6 +35,7 @@ import (
 //sys _PdhAddCounter(query PdhQueryHandle, counterPath string, userData uintptr, counter *PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhAddCounterW
 //sys _PdhRemoveCounter(counter PdhCounterHandle) (errcode error) [failretval!=0] = pdh.PdhRemoveCounter
 //sys _PdhCollectQueryData(query PdhQueryHandle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryData
+//sys _PdhCollectQueryDataEx(query PdhQueryHandle, interval uint32, event windows.Handle) (errcode error) [failretval!=0] = pdh.PdhCollectQueryDataEx
 //sys _PdhGetFormattedCounterValueDouble(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueDouble) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLarge(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLarge) (errcode error) [failretval!=0] = pdh.PdhGetFormattedCounterValue
 //sys _PdhGetFormattedCounterValueLong(counter PdhCounterHandle, format PdhCounterFormat, counterType *uint32, value *PdhCounterValueLong) (errcode error) [failretval!=0]= pdh.PdhGetFormattedCounterValue
@@ -156,6 +158,14 @@ func PdhCollectQueryData(query PdhQueryHandle) error {
 	return nil
 }
 
+// PdhCollectQueryDataEx collects the current raw data value for all counters in the specified query.
+func PdhCollectQueryDataEx(query PdhQueryHandle, interval uint32, event windows.Handle) error {
+	if err := _PdhCollectQueryDataEx(query, interval, event); err != nil {
+		return PdhErrno(err.(syscall.Errno))
+	}
+	return nil
+}
+
 // PdhGetFormattedCounterValueDouble computes a displayable double value for the specified counter.
 func PdhGetFormattedCounterValueDouble(counter PdhCounterHandle) (uint32, *PdhCounterValueDouble, error) {
 	var counterType uint32
@@ -197,12 +207,12 @@ func PdhExpandWildCardPath(utfPath *uint16) ([]uint16, error) {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
 		expandPaths := make([]uint16, bufferSize)
-		if err := _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
+		if err = _PdhExpandWildCardPath(nil, utfPath, &expandPaths[0], &bufferSize); err != nil {
 			return nil, PdhErrno(err.(syscall.Errno))
 		}
-		return expandPaths, nil
+		return expandPaths, err
 	}
-	return nil, nil
+	return nil, PdhErrno(syscall.ERROR_NOT_FOUND)
 }
 
 // PdhExpandCounterPath returns counter paths that match the given counter path, for 32 bit windows.

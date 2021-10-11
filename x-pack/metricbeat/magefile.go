@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -238,7 +239,7 @@ func PythonIntegTest(ctx context.Context) error {
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"
 		}
-		return devtools.PythonTest(args)
+		return devtools.PythonTestForModule(args)
 	})
 }
 

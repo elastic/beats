@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows || nacl || plan9
 // +build windows nacl plan9
 
 package logp

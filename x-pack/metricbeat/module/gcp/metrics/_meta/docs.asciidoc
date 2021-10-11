@@ -16,12 +16,6 @@ call.
 [float]
 == Metricset config and parameters
 
-* *metric_types*: Required, a list of metric type strings, or a list of metric
-type prefixes. For example, `instance/cpu` is the prefix for metric type
-`instance/cpu/usage_time`, `instance/cpu/utilization` etc Each call of the
-`ListTimeSeries` API can return any number of time series from a single metric
-type. Metric type is to used for identifying a specific time series.
-
 * *aligner*: A single string with which aggregation operation need to be applied
 onto time series data for ListTimeSeries API. If it's not given, default aligner
 is `ALIGN_NONE`. Google Cloud also supports `ALIGN_DELTA`, `ALIGN_RATE`,
@@ -29,6 +23,27 @@ is `ALIGN_NONE`. Google Cloud also supports `ALIGN_DELTA`, `ALIGN_RATE`,
 Please see
 https://cloud.google.com/monitoring/api/ref_v3/rpc/google.monitoring.v3#aligner[Aggregation Aligner]
 for the full list of aligners.
+
+* *metric_types*: Required, a list of metric type strings, or a list of metric
+type prefixes. For example, `instance/cpu` is the prefix for metric type
+`instance/cpu/usage_time`, `instance/cpu/utilization` etc Each call of the
+`ListTimeSeries` API can return any number of time series from a single metric
+type. Metric type is to used for identifying a specific time series.
+
+* *service*: Required, the name of the service for related metrics. This should
+be a valid Google Cloud service name. Service names may be viewed from the
+corresponding page from https://cloud.google.com/monitoring/api/metrics[GCP Metrics list documentation].
+The `service` field is used to compute the GCP Metric prefix, unless
+`service_metric_prefix` is set.
+
+* *service_metric_prefix*: A string containing the full Metric prefix as
+specified in the GCP documentation.
+All metrics from GCP Monitoring API require a prefix. When
+`service_metric_prefix` is empty, the prefix default to a value computed using
+the `service` value: `<service>.googleapis.com/`. This default works for any
+services under "Google Cloud metrics", but does not work for other services
+(`kubernetes` aka GKE for example).
+This option allow to override the default and specify an arbitrary metric prefix.
 
 [float]
 === Example Configuration
@@ -43,7 +58,7 @@ given aggregation aligner applied for each metric type.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -76,7 +91,7 @@ ignored.
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -110,7 +125,7 @@ every minute with no aggregation. The metric types in `compute` service with
 +
 [source,yaml]
 ----
-- module: googlecloud
+- module: gcp
   metricsets:
     - metrics
   zone: "europe-west1-c"
@@ -123,4 +138,28 @@ every minute with no aggregation. The metric types in `compute` service with
       service: compute
       metric_types:
         - "instance/cpu"
+----
+
+* `metrics` metricset is enabled to collect metrics from all zones under
+`europe-west1-c` region in `elastic-observability` project. One set of metrics
+will be collected: core usage time for containers in GCP GKE.
+Note that the is required to use `service_metric_prefix` to override the default
+metric prefix, as for GKE metrics the required prefix is `kubernetes.io/`
+
++
+[source,yaml]
+----
+- module: gcp
+  metricsets:
+    - metrics
+  zone: "europe-west1-c"
+  project_id: elastic-observability
+  credentials_file_path: "your JSON credentials file path"
+  exclude_labels: false
+  period: 1m
+  metrics:
+    - service: gke
+      service_metric_prefix: kubernetes.io/
+      metric_types:
+        - "container/cpu/core_usage_time"
 ----

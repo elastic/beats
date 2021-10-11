@@ -663,6 +663,22 @@ func TestParserRFC3164Syslog(t *testing.T) {
 				second:   25,
 			},
 		},
+		{
+			title: "non-compliant rfc3164 date with leading 0",
+			log:   []byte("<123>Sep 01 02:03:04 hostname: message"),
+			syslog: event{
+				priority: 123,
+				message:  "message",
+				hostname: "hostname",
+				program:  "",
+				pid:      -1,
+				month:    9,
+				day:      1,
+				hour:     2,
+				minute:   3,
+				second:   4,
+			},
+		},
 	}
 
 	for _, test := range tests {

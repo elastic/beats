@@ -251,14 +251,14 @@ func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 		err := fetcher.Fetch(reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
-			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 		}
 	case mb.ReportingMetricSetV2WithContext:
 		reporter.StartFetchTimer()
 		err := fetcher.Fetch(ctx, reporter.V2())
 		if err != nil {
 			reporter.V2().Error(err)
-			logp.Info("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
+			logp.Err("Error fetching data for metricset %s.%s: %s", msw.module.Name(), msw.Name(), err)
 		}
 	default:
 		panic(fmt.Sprintf("unexpected fetcher type for %v", msw))

@@ -15,25 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package kafka
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"testing"
 	"time"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/logp"
+	beattest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 
 	"github.com/Shopify/sarama"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
@@ -44,41 +47,6 @@ const (
 	kafkaDefaultHost = "kafka"
 	kafkaDefaultPort = "9092"
 )
-
-type eventInfo struct {
-	events []beat.Event
-}
-
-type eventCapturer struct {
-	closed    bool
-	c         chan struct{}
-	closeOnce sync.Once
-	events    chan beat.Event
-}
-
-func NewEventCapturer(events chan beat.Event) channel.Outleter {
-	return &eventCapturer{
-		c:      make(chan struct{}),
-		events: events,
-	}
-}
-
-func (o *eventCapturer) OnEvent(event beat.Event) bool {
-	o.events <- event
-	return true
-}
-
-func (o *eventCapturer) Close() error {
-	o.closeOnce.Do(func() {
-		o.closed = true
-		close(o.c)
-	})
-	return nil
-}
-
-func (o *eventCapturer) Done() <-chan struct{} {
-	return o.c
-}
 
 type testMessage struct {
 	message string
@@ -93,12 +61,7 @@ func recordHeader(key, value string) sarama.RecordHeader {
 }
 
 func TestInput(t *testing.T) {
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
-	context := input.Context{
-		Done:     make(chan struct{}),
-		BeatDone: make(chan struct{}),
-	}
+	testTopic := createTestTopicName()
 
 	// Send test messages to the topic for the input to read.
 	messages := []testMessage{
@@ -129,22 +92,10 @@ func TestInput(t *testing.T) {
 		"wait_close": 0,
 	})
 
-	// Route input events through our capturer instead of sending through ES.
-	events := make(chan beat.Event, 100)
-	defer close(events)
-	capturer := NewEventCapturer(events)
-	defer capturer.Close()
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
-		return channel.SubOutlet(capturer), nil
-	})
-
-	input, err := NewInput(config, connector, context)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Run the input and wait for finalization
-	input.Run()
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	for range messages {
@@ -169,7 +120,7 @@ func TestInput(t *testing.T) {
 
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
-	close(context.Done)
+	cancel()
 	didClose := make(chan struct{})
 	go func() {
 		input.Wait()
@@ -184,12 +135,7 @@ func TestInput(t *testing.T) {
 }
 
 func TestInputWithMultipleEvents(t *testing.T) {
-	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
-	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
-	context := input.Context{
-		Done:     make(chan struct{}),
-		BeatDone: make(chan struct{}),
-	}
+	testTopic := createTestTopicName()
 
 	// Send test messages to the topic for the input to read.
 	message := testMessage{
@@ -209,22 +155,10 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		"expand_event_list_from_field": "records",
 	})
 
-	// Route input events through our capturer instead of sending through ES.
-	events := make(chan beat.Event, 100)
-	defer close(events)
-	capturer := NewEventCapturer(events)
-	defer capturer.Close()
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
-		return channel.SubOutlet(capturer), nil
-	})
-
-	input, err := NewInput(config, connector, context)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Run the input and wait for finalization
-	input.Run()
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
 
 	timeout := time.After(30 * time.Second)
 	select {
@@ -240,9 +174,9 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		t.Fatal("timeout waiting for incoming events")
 	}
 
+	cancel()
 	// Close the done channel and make sure the beat shuts down in a reasonable
 	// amount of time.
-	close(context.Done)
 	didClose := make(chan struct{})
 	go func() {
 		input.Wait()
@@ -254,6 +188,171 @@ func TestInputWithMultipleEvents(t *testing.T) {
 		t.Fatal("timeout waiting for beat to shut down")
 	case <-didClose:
 	}
+}
+
+func TestInputWithJsonPayload(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test message to the topic for the input to read.
+	message := testMessage{
+		message: "{\"val\":\"val1\"}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":      getTestKafkaHost(),
+		"topics":     []string{testTopic},
+		"group_id":   "filebeat",
+		"wait_close": 0,
+		"parsers": []common.MapStr{
+			{
+				"ndjson": common.MapStr{
+					"target": "",
+				},
+			},
+		},
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	select {
+	case event := <-events:
+		text, err := event.Fields.GetValue("val")
+		if err != nil {
+			t.Fatal(err)
+		}
+		msgs := []string{"val1"}
+		assert.Contains(t, msgs, text)
+		checkMatchingHeaders(t, event, message.headers)
+	case <-timeout:
+		t.Fatal("timeout waiting for incoming events")
+	}
+
+	cancel()
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func TestInputWithJsonPayloadAndMultipleEvents(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":                        getTestKafkaHost(),
+		"topics":                       []string{testTopic},
+		"group_id":                     "filebeat",
+		"wait_close":                   0,
+		"expand_event_list_from_field": "records",
+		"parsers": []common.MapStr{
+			{
+				"ndjson": common.MapStr{
+					"target": "",
+				},
+			},
+		},
+	})
+
+	client := beattest.NewChanClient(100)
+	defer client.Close()
+	events := client.Channel
+	input, cancel := run(t, config, client)
+
+	timeout := time.After(30 * time.Second)
+	for i := 0; i < 2; i++ {
+		select {
+		case event := <-events:
+			text, err := event.Fields.GetValue("val")
+			if err != nil {
+				t.Fatal(err)
+			}
+			msgs := []string{"val1", "val2"}
+			assert.Contains(t, msgs, text)
+			checkMatchingHeaders(t, event, message.headers)
+		case <-timeout:
+			t.Fatal("timeout waiting for incoming events")
+		}
+	}
+
+	cancel()
+	// Close the done channel and make sure the beat shuts down in a reasonable
+	// amount of time.
+	didClose := make(chan struct{})
+	go func() {
+		input.Wait()
+		close(didClose)
+	}()
+
+	select {
+	case <-time.After(30 * time.Second):
+		t.Fatal("timeout waiting for beat to shut down")
+	case <-didClose:
+	}
+}
+
+func TestTest(t *testing.T) {
+	testTopic := createTestTopicName()
+
+	// Send test messages to the topic for the input to read.
+	message := testMessage{
+		message: "{\"records\": [{\"val\":\"val1\"}, {\"val\":\"val2\"}]}",
+		headers: []sarama.RecordHeader{
+			recordHeader("X-Test-Header", "test header value"),
+		},
+	}
+	writeToKafkaTopic(t, testTopic, message.message, message.headers, time.Second*20)
+
+	// Setup the input config
+	config := common.MustNewConfigFrom(common.MapStr{
+		"hosts":    getTestKafkaHost(),
+		"topics":   []string{testTopic},
+		"group_id": "filebeat",
+	})
+
+	inp, err := Plugin().Manager.Create(config)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = inp.Test(v2.TestContext{
+		Logger: logp.NewLogger("kafka_test"),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func createTestTopicName() string {
+	id := strconv.Itoa(rand.New(rand.NewSource(int64(time.Now().Nanosecond()))).Int())
+	testTopic := fmt.Sprintf("Filebeat-TestInput-%s", id)
+	return testTopic
 }
 
 func findMessage(t *testing.T, text string, msgs []testMessage) *testMessage {
@@ -274,23 +373,19 @@ func checkMatchingHeaders(
 ) {
 	kafka, err := event.Fields.GetValue("kafka")
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	kafkaMap, ok := kafka.(common.MapStr)
 	if !ok {
-		t.Error("event.Fields.kafka isn't MapStr")
-		return
+		t.Fatal("event.Fields.kafka isn't MapStr")
 	}
 	headers, err := kafkaMap.GetValue("headers")
 	if err != nil {
-		t.Error(err)
-		return
+		t.Fatal(err)
 	}
 	headerArray, ok := headers.([]string)
 	if !ok {
-		t.Error("event.Fields.kafka.headers isn't a []string")
-		return
+		t.Fatal("event.Fields.kafka.headers isn't a []string")
 	}
 	assert.Equal(t, len(expected), len(headerArray))
 	for i := 0; i < len(expected); i++ {
@@ -356,4 +451,28 @@ func writeToKafkaTopic(
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func run(t *testing.T, cfg *common.Config, client *beattest.ChanClient) (*kafkaInput, func()) {
+	inp, err := Plugin().Manager.Create(cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := newV2Context()
+	t.Cleanup(cancel)
+
+	pipeline := beattest.ConstClient(client)
+	input := inp.(*kafkaInput)
+	go input.Run(ctx, pipeline)
+	return input, cancel
+}
+
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("kafka_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
 }

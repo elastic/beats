@@ -1,0 +1,36 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Navigation [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "[Overview](#/dashboard/04b595b0-c1fc-11ea-8a94-61b423d19ae7) | [SQL](#/dashboard/3975ad70-c761-11ea-8a94-61b423d19ae7)\n",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation [Metricbeat CockroachDB]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d4177d60-75e2-11eb-b955-29bfd5c9e2dd",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MDksMV0="
+}

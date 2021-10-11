@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package instance
@@ -78,18 +79,35 @@ func TestInitKibanaConfig(t *testing.T) {
 	assert.Equal(t, "testidx", b.Info.IndexPrefix)
 	assert.Equal(t, "0.9", b.Info.Version)
 
-	cfg, err := cfgfile.Load("../test/filebeat_test.yml", nil)
+	const configPath = "../test/filebeat_test.yml"
+
+	// Ensure that the config has owner-exclusive write permissions.
+	// This is necessary on some systems which have a default umask
+	// of 0o002, meaning that files are checked out by git with mode
+	// 0o664. This would cause cfgfile.Load to fail.
+	err = os.Chmod(configPath, 0o644)
+	assert.NoError(t, err)
+
+	cfg, err := cfgfile.Load(configPath, nil)
+	assert.NoError(t, err)
 	err = cfg.Unpack(&b.Config)
 	assert.NoError(t, err)
 
 	kibanaConfig := InitKibanaConfig(b.Config)
 	username, err := kibanaConfig.String("username", -1)
+	assert.NoError(t, err)
 	password, err := kibanaConfig.String("password", -1)
+	assert.NoError(t, err)
+	api_key, err := kibanaConfig.String("api_key", -1)
+	assert.NoError(t, err)
 	protocol, err := kibanaConfig.String("protocol", -1)
+	assert.NoError(t, err)
 	host, err := kibanaConfig.String("host", -1)
+	assert.NoError(t, err)
 
 	assert.Equal(t, "elastic-test-username", username)
 	assert.Equal(t, "elastic-test-password", password)
+	assert.Equal(t, "elastic-test-api-key", api_key)
 	assert.Equal(t, "https", protocol)
 	assert.Equal(t, "127.0.0.1:5601", host)
 }
