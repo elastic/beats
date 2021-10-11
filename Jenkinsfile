@@ -459,14 +459,16 @@ def tagAndPush(Map args = [:]) {
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
 
-  // only add complete variant for the elastic-agent
   if(beatName == 'elastic-agent'){
-      variants.add("-complete")
+    variants.add("-complete")
+    variants.add("-cloud")
   }
 
   variants.each { variant ->
+    // cloud docker images are stored in the private docker namespace.
+    def sourceNamespace = variant.equals('-cloud') ? 'beats-ci' : 'beats'
     tags.each { tag ->
-      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}")
+      doTagAndPush(beatName: beatName, variant: variant, sourceTag: libbetaVer, targetTag: "${tag}-${arch}", sourceNamespace: sourceNamespace)
     }
   }
 }
@@ -482,7 +484,8 @@ def doTagAndPush(Map args = [:]) {
   def variant = args.variant
   def sourceTag = args.sourceTag
   def targetTag = args.targetTag
-  def sourceName = "${DOCKER_REGISTRY}/beats/${beatName}${variant}:${sourceTag}"
+  def sourceNamespace = args.sourceNamespace
+  def sourceName = "${DOCKER_REGISTRY}/${sourceNamespace}/${beatName}${variant}:${sourceTag}"
   def targetName = "${DOCKER_REGISTRY}/observability-ci/${beatName}${variant}:${targetTag}"
 
   def iterations = 0

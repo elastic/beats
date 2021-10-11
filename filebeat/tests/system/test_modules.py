@@ -274,7 +274,6 @@ def clean_keys(obj):
         "symantec.endpointprotection",
         "system.auth",
         "system.syslog",
-        "microsoft.defender_atp",
         "crowdstrike.falcon_endpoint",
         "crowdstrike.falcon_audit",
         "zoom.webhook",
