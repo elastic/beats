@@ -2646,7 +2646,7 @@ filebeat.inputs:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -2829,7 +2829,7 @@ filebeat.inputs:
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
   #line_terminator: auto
 
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -3611,7 +3611,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path

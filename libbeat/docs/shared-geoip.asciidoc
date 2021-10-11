@@ -30,7 +30,7 @@ endif::no-output-logstash[]
 
 To configure {beatname_uc} and the `geoip` processor:
 
-1. Define an ingest node pipeline that uses one or more `geoip` processors to
+1. Define an ingest pipeline that uses one or more `geoip` processors to
 add location information to the event. For example, you can use the Console in
 {kib} to create the following pipeline:
 +

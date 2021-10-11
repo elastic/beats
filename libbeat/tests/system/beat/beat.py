@@ -741,14 +741,18 @@ class TestCase(unittest.TestCase, ComposeMixin):
         Assert that the module explicitly sets the ECS version field.
         """
         def get_config_paths(modules_path, module, fileset):
-            pathname = os.path.abspath(modules_path +
-                                       "/" +
-                                       module +
-                                       "/" +
-                                       fileset +
-                                       "/" +
-                                       "config/*.yml")
-            return glob.glob(pathname)
+            fileset_path = os.path.abspath(modules_path +
+                                           "/" +
+                                           module +
+                                           "/" +
+                                           fileset +
+                                           "/")
+            paths = []
+            for x in ["config/*.yml", "ingest/*.yml", "ingest/*.json"]:
+                pathname = os.path.join(fileset_path, x)
+                paths.extend(glob.glob(pathname))
+
+            return paths
 
         def is_ecs_version_set(path):
             # parsing the yml file would be better but go templates in
@@ -759,9 +763,7 @@ class TestCase(unittest.TestCase, ComposeMixin):
                         return True
             return False
 
-        errors = []
         for cfg_path in get_config_paths(self.modules_path, module, fileset):
-            if not is_ecs_version_set(cfg_path):
-                errors.append("{}".format(cfg_path))
-        if len(errors) > 0:
-            raise Exception("{}/{} ecs.version not explicitly set in:\n{}".format(module, fileset, '\n'.join(errors)))
+            if is_ecs_version_set(cfg_path):
+                return
+        raise Exception("{}/{} ecs.version not explicitly set in config or pipeline".format(module, fileset))

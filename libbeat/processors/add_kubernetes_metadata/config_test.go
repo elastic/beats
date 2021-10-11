@@ -15,41 +15,48 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build linux
-
-package memory
+package add_kubernetes_metadata
 
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/libbeat/common"
 )
 
-func TestFetch(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	events, errs := mbtest.ReportingFetchV2Error(f)
-
-	assert.Empty(t, errs)
-	if !assert.NotEmpty(t, events) {
-		t.FailNow()
+func TestConfigValidate(t *testing.T) {
+	tests := []struct {
+		cfg   map[string]interface{}
+		error bool
+	}{
+		{
+			cfg: map[string]interface{}{
+				"scope": "foo",
+			},
+			error: true,
+		},
+		{
+			cfg: map[string]interface{}{
+				"scope": "cluster",
+			},
+			error: false,
+		},
+		{
+			cfg:   map[string]interface{}{},
+			error: false,
+		},
 	}
-	t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
-		events[0].BeatEvent("linux", "memory").Fields.StringToPrint())
-}
 
-func TestData(t *testing.T) {
-	f := mbtest.NewReportingMetricSetV2Error(t, getConfig())
-	err := mbtest.WriteEventsReporterV2Error(f, t, ".")
-	if err != nil {
-		t.Fatal("write", err)
-	}
-}
+	for _, test := range tests {
+		cfg := common.MustNewConfigFrom(test.cfg)
+		c := defaultKubernetesAnnotatorConfig()
 
-func getConfig() map[string]interface{} {
-	return map[string]interface{}{
-		"module":     "linux",
-		"metricsets": []string{"memory"},
+		err := cfg.Unpack(&c)
+		if test.error {
+			require.NotNil(t, err)
+		} else {
+			require.Nil(t, err)
+		}
 	}
 }

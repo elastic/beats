@@ -5,6 +5,7 @@
 package osqd
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"io"
@@ -12,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -24,7 +26,8 @@ import (
 )
 
 const (
-	osqueryDName = "osqueryd"
+	osqueryDName               = "osqueryd"
+	osqueryDarwinAppBundlePath = "osquery.app/Contents/MacOS"
 )
 
 const (
@@ -261,8 +264,9 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 
 	// Write the autoload file
 	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
-	if err := ioutil.WriteFile(extensionAutoloadPath, []byte(extensionPath), 0644); err != nil {
-		return nil, errors.Wrap(err, "failed write osquery extension autoload file")
+	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to prepare extensions autoload file")
 	}
 
 	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
@@ -282,6 +286,60 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	}
 
 	return func() {}, nil
+}
+
+func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
+	ok, err := fileutil.FileExists(extensionAutoloadPath)
+	if err != nil {
+		return errors.Wrapf(err, "failed to check osquery.autoload file exists")
+	}
+
+	rewrite := false
+
+	if ok {
+		log.Debugf("Extensions autoload file %s exists, verify the first extension is ours", extensionAutoloadPath)
+		err = verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath)
+		if err != nil {
+			log.Debugf("Extensions autoload file %v verification failed, err: %v, create a new one", extensionAutoloadPath, err)
+			rewrite = true
+		}
+	} else {
+		log.Debugf("Extensions autoload file %s doesn't exists, create a new one", extensionAutoloadPath)
+		rewrite = true
+	}
+
+	if rewrite {
+		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0644); err != nil {
+			return errors.Wrap(err, "failed write osquery extension autoload file")
+		}
+	}
+	return nil
+}
+
+func verifyAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string) error {
+	f, err := os.Open(extensionAutoloadPath)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+	for i := 0; scanner.Scan(); i++ {
+		line := scanner.Text()
+		if i == 0 {
+			// Check that the first line is the mandatory extension
+			if line != mandatoryExtensionPath {
+				return errors.New("extentsions autoload file is missing mandatory extension in the first line of the file")
+			}
+		}
+
+		// Check that the line contains the valid path that exists
+		_, err := os.Stat(line)
+		if err != nil {
+			return err
+		}
+	}
+
+	return scanner.Err()
 }
 
 func (q *OSQueryD) prepareBinPath() error {
@@ -351,6 +409,10 @@ func (q *OSQueryD) isVerbose() bool {
 }
 
 func osquerydPath(dir string) string {
+	if runtime.GOOS == "darwin" {
+		return filepath.Join(dir, osqueryDarwinAppBundlePath, osquerydFilename())
+
+	}
 	return filepath.Join(dir, osquerydFilename())
 }
 
