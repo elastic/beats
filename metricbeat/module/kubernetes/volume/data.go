@@ -40,7 +40,9 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 		for _, volume := range pod.Volume {
 			volumeEvent := common.MapStr{
 				mb.ModuleDataKey: common.MapStr{
-					"namespace": pod.PodRef.Namespace,
+					"namespace": common.MapStr{
+						"name": pod.PodRef.Namespace,
+					},
 					"node": common.MapStr{
 						"name": node.NodeName,
 					},

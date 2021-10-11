@@ -15,8 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-// +build !integration
-// +build windows
+//go:build !integration && windows
+// +build !integration,windows
 
 package diskio
 
