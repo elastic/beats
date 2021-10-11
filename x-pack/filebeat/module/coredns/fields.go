@@ -19,5 +19,5 @@ func init() {
 // AssetCoredns returns asset data.
 // This is the base64 encoded zlib format compressed contents of module/coredns.
 func AssetCoredns() string {
-	return "eJy00kFugzAQheE9p3gXSA7Aopt22256gMqxB2LF8VCPUeWcvrIhBCFQpKKyikb4/8YKB1wo1dAcyHipgGijoxqv08CQ6GC7aNnXeKkA4J1N7wgNB5yVN876Fo5bQRfY9JoMTmmWbCw5I3U5eoBXV5qD+Ympoxpt4L4bJytqfsZjYxKqiRTgOVyVszeV3x5fnZsP1ZqpNJAXSj8cHtMNFrAG3CCeCW8fn4hBeVG6eAviu6eQjmJvtKCsj9RSmKZN3jrWOKVI8nyBXJyvUJx1XDsl8teLTm0MmVUh/94PlMpqPyf390tl0Q8kHXuho2azi7iHUEJbSuNUu+uvmJihtOX8//d2p5YrGC9C+osvC/7E7Ej559AQKPerqt8AAAD//23BSVQ="
+	return "eJy8zjFS9DAMBeA+p3gX2P8ALv4GWmg4gTd+znrwWkZWCu/pGbMhZBhoUflGep9OeGV3mEUZSpsAS5bp8LAHgW3WVC1Jcfg/AcCThDUTURQXX0JOZUGWpaGqhHVmwLkfKmNiDs19nJ5Q/JVHcIz1SodFZa1b8oM6ZjvbKuGjUVFErz6nmx/b2+rR/FLfVmr/19KNe+OdTsW4UPc0jkpzOHdj29NfngJGIyTCLsTj88vdmb7hylalNP6B/0lN7wEAAP//HDeN8A=="
 }

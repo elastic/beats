@@ -33,6 +33,11 @@ import (
 
 var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
 
+// Float is a float64 wrapper that implements the encoding/json Marshaler
+// interface to add a decimal point to all float values.
+//
+// Deprecated: This type should no longer be used and the Marshaler interface
+// is not consulted while marshaling to JSON in libbeat outputs.
 type Float float64
 
 // EventConverter is used to convert MapStr objects for publishing
@@ -208,10 +213,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		}
 		return tmp, nil
 
-	case float64:
-		return Float(value.(float64)), nil
-	case float32:
-		return Float(value.(float32)), nil
+	case float32, float64:
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:
@@ -238,7 +240,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 			return v.Uint() &^ (1 << 63), nil
 		case reflect.Float32, reflect.Float64:
-			return Float(v.Float()), nil
+			return v.Float(), nil
 		case reflect.Complex64, reflect.Complex128:
 			return v.Complex(), nil
 		case reflect.String:

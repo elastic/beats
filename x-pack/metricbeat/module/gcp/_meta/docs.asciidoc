@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches monitoring metrics from Google Cloud Platform using
 https://cloud.google.com/monitoring/api/metrics_gcp[Stackdriver Monitoring API] for Google Cloud Platform services.
 
