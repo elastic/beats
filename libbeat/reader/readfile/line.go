@@ -162,6 +162,7 @@ func (r *LineReader) advance() error {
 			for idx != -1 && idx > r.maxBytes {
 				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, idx)
 				err = r.inBuffer.Advance(idx + len(r.nl))
+				r.byteCount += idx + len(r.nl)
 				r.inBuffer.Reset()
 				r.inOffset = 0
 				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
@@ -175,6 +176,7 @@ func (r *LineReader) advance() error {
 					return err
 				}
 				r.logger.Warnf("Exceeded %d max bytes in line limit, skipped %d bytes line", r.maxBytes, skipped)
+				r.byteCount += skipped
 				idx = r.inBuffer.IndexFrom(r.inOffset, r.nl)
 			}
 		}
