@@ -67,7 +67,9 @@ func TestResource_Generate(t *testing.T) {
 					"labels": common.MapStr{
 						"foo": "bar",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 				},
 			},
 		},
@@ -106,7 +108,9 @@ func TestResource_Generate(t *testing.T) {
 					"labels": common.MapStr{
 						"foo": "bar",
 					},
-					"namespace": "default",
+					"namespace": common.MapStr{
+						"name": "default",
+					},
 					"deployment": common.MapStr{
 						"name": "owner",
 					},
