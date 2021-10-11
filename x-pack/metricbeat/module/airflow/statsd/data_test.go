@@ -36,6 +36,7 @@ func getConfig() map[string]interface{} {
 		"host":       STATSD_HOST,
 		"port":       STATSD_PORT,
 		"period":     "100ms",
+		"ttl":        "0s",
 	}
 }
 

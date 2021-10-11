@@ -19,6 +19,7 @@ package beat
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -64,6 +65,12 @@ type Beat struct {
 	//      pipeline and ML jobs.
 	Config *BeatConfig // Common Beat configuration data.
 
+	// OutputConfigReloader may be set by a Creator to watch for output config changes.
+	//
+	// This reloader is called in addition to libbeat's internal output reloader, which
+	// is responsible for reconfiguring Publisher.
+	OutputConfigReloader reload.Reloadable
+
 	BeatConfig *common.Config // The beat's own configuration section
 
 	Fields []byte // Data from fields.yml
@@ -83,7 +90,7 @@ type BeatConfig struct {
 
 // SetupMLCallback can be used by the Beat to register MachineLearning configurations
 // for the enabled modules.
-type SetupMLCallback func(*Beat, *common.Config) error
+type SetupMLCallback func(*Beat, bool, *common.Config) error
 
 // OverwritePipelinesCallback can be used by the Beat to register Ingest pipeline loader
 // for the enabled modules.

@@ -392,6 +392,11 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 
 // LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
 func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
+	if !mlimporter.IsCompatible(esClient) {
+		logp.Info("Skipping loading machine learning jobs because of Elasticsearch version is too new.\nIt must be 7.x for setting up ML using Beats. Please use the Machine Learning UI in Kibana.")
+		return nil
+	}
+
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
 		return errors.Errorf("error checking if xpack is available: %v", err)
@@ -417,6 +422,11 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 
 // SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
 func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
+	if !mlimporter.IsCompatible(esClient) {
+		logp.Info("Skipping loading machine learning jobs because of Elasticsearch version is too new.\nIt must be 7.x for setting up it using Beats. Please use the Machine Learning UI in Kibana.")
+		return nil
+	}
+
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
 		return errors.Errorf("Error checking if xpack is available: %v", err)

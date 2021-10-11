@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	mlimporter "github.com/elastic/beats/v7/libbeat/ml-importer"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -60,9 +61,9 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
 	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
 var (
@@ -160,8 +161,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 
 	// register `setup` callback for ML jobs
-	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
-		return fb.loadModulesML(b, kibanaConfig)
+	b.SetupMLCallback = func(b *beat.Beat, fromFlag bool, kibanaConfig *common.Config) error {
+		return fb.loadModulesML(b, fromFlag, kibanaConfig)
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -223,7 +224,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	return err
 }
 
-func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
+func (fb *Filebeat) loadModulesML(b *beat.Beat, fromFlag bool, kibanaConfig *common.Config) error {
 	var errs multierror.Errors
 
 	logp.Debug("machine-learning", "Setting up ML jobs for modules")
@@ -261,7 +262,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		return errors.Errorf("Error creating Kibana client: %v", err)
 	}
 
-	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient); err != nil {
+	if err := setupMLBasedOnVersion(fb.moduleRegistry, fromFlag, esClient, kibanaClient); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -287,17 +288,23 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 				continue
 			}
 
-			if err := setupMLBasedOnVersion(set, esClient, kibanaClient); err != nil {
+			if err := setupMLBasedOnVersion(set, fromFlag, esClient, kibanaClient); err != nil {
 				errs = append(errs, err)
 			}
 
 		}
 	}
+	if len(errs) == 0 {
+		fmt.Println("Loaded machine learning job configurations")
+	}
 
 	return errs.Err()
 }
 
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, fromFlag bool, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
+	if !mlimporter.IsCompatible(esClient) && fromFlag {
+		return fmt.Errorf("Machine learning jobs are not loaded because Elasticsearch version is too new. It must be 7.x for setting up ML using Beats. Use the Machine learning UI in Kibana.")
+	}
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
 	}

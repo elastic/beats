@@ -40,6 +40,9 @@ var (
 	kibanaGetModuleURL    = "/api/ml/modules/get_module/%s"
 	kibanaRecognizeURL    = "/api/ml/modules/recognize/%s"
 	kibanaSetupModuleURL  = "/api/ml/modules/setup/%s"
+
+	// ML assets are not loaded to ES 8.0.0 or newer.
+	incompatibleSince = common.MustNewVersion("8.0.0")
 )
 
 // MLConfig contains the required configuration for loading one job and the associated
@@ -175,6 +178,13 @@ func ImportMachineLearningJob(esClient MLLoader, cfg *MLConfig) error {
 	}
 
 	return nil
+}
+
+// IsCompatible checks if the version of Elasticsearch is supported.
+// Beats does not load ML assets to 8.0 or newer.
+func IsCompatible(esClient MLLoader) bool {
+	esVersion := esClient.GetVersion()
+	return esVersion.LessThan(incompatibleSince)
 }
 
 // HaveXpackML checks whether X-pack is installed and has Machine Learning enabled.

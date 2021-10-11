@@ -32,6 +32,7 @@ var (
 	minVersionHistogram               = common.MustNewVersion("7.6.0")
 	minVersionWildcard                = common.MustNewVersion("7.9.0")
 	minVersionExplicitDynamicTemplate = common.MustNewVersion("7.13.0")
+	minVersionMatchOnlyText           = common.MustNewVersion("7.14.0")
 )
 
 // Processor struct to process fields to template
@@ -87,6 +88,13 @@ func (p *Processor) Process(fields mapping.Fields, state *fieldState, output com
 			indexMapping = p.integer(&field)
 		case "text":
 			indexMapping = p.text(&field)
+		case "match_only_text":
+			noMatchOnlyText := p.EsVersion.LessThan(minVersionMatchOnlyText)
+			if !p.ElasticLicensed || noMatchOnlyText {
+				indexMapping = p.text(&field)
+			} else {
+				indexMapping = p.matchOnlyText(&field)
+			}
 		case "wildcard":
 			noWildcards := p.EsVersion.LessThan(minVersionWildcard)
 			if !p.ElasticLicensed || noWildcards {
@@ -324,6 +332,28 @@ func (p *Processor) text(f *mapping.Field) common.MapStr {
 			properties["norms"] = false
 		}
 	}
+
+	if f.Analyzer != "" {
+		properties["analyzer"] = f.Analyzer
+	}
+
+	if f.SearchAnalyzer != "" {
+		properties["search_analyzer"] = f.SearchAnalyzer
+	}
+
+	if len(f.MultiFields) > 0 {
+		fields := common.MapStr{}
+		p.Process(f.MultiFields, nil, fields)
+		properties["fields"] = fields
+	}
+
+	return properties
+}
+
+func (p *Processor) matchOnlyText(f *mapping.Field) common.MapStr {
+	properties := p.getDefaultProperties(f)
+
+	properties["type"] = "match_only_text"
 
 	if f.Analyzer != "" {
 		properties["analyzer"] = f.Analyzer

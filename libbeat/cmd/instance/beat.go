@@ -508,6 +508,7 @@ type SetupSettings struct {
 	Template bool
 	//Deprecated: use IndexManagementKey instead
 	ILMPolicy bool
+	SetupAll  bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -573,11 +574,12 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		if setup.MachineLearning && b.SetupMLCallback != nil {
 			cfgwarn.Deprecate("8.0.0", "Setting up ML using %v is going to be removed. Please use the ML app to setup jobs.", strings.Title(b.Info.Beat))
 			fmt.Println("Setting up ML using setup --machine-learning is going to be removed in 8.0.0. Please use the ML app instead.\nSee more: https://www.elastic.co/guide/en/machine-learning/current/index.html")
-			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
+			fmt.Println("It is not possble to load ML jobs into an Elasticsearch 8.0.0 or newer using the Beat.")
+
+			err = b.SetupMLCallback(&b.Beat, !setup.SetupAll, b.Config.Kibana)
 			if err != nil {
 				return err
 			}
-			fmt.Println("Loaded machine learning job configurations")
 		}
 
 		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
@@ -875,6 +877,11 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+		if b.OutputConfigReloader != nil {
+			if err := b.OutputConfigReloader.Reload(config); err != nil {
+				return err
+			}
+		}
 		return outReloader.Reload(config, b.createOutput)
 	})
 }
