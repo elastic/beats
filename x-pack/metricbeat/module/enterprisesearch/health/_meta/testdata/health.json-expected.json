@@ -1,6 +1,7 @@
 [
     {
         "enterprisesearch": {
+            "cluster_uuid": "MTD6fXYGTZylTMoW5AG5JA",
             "health": {
                 "cluster_uuid": "MTD6fXYGTZylTMoW5AG5JA",
                 "crawler": {

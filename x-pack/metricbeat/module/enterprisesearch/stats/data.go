@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
 var (
@@ -88,13 +89,20 @@ var (
 	}
 )
 
-func eventMapping(input []byte) (common.MapStr, error) {
+func eventMapping(report mb.ReporterV2, input []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(input, &data)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	var errs multierror.Errors
+
+	// All events need to have a cluster_uuid to work with Stack Monitoring
+	event := mb.Event{
+		ModuleFields:    common.MapStr{},
+		MetricSetFields: common.MapStr{},
+	}
+	event.ModuleFields.Put("cluster_uuid", data["cluster_uuid"])
 
 	// Get queues information
 	queues, ok := data["queues"].(map[string]interface{})
@@ -111,9 +119,12 @@ func eventMapping(input []byte) (common.MapStr, error) {
 		errs = append(errs, errors.New("queues is not a map"))
 	}
 
-	dataFields, err := schema.Apply(data)
+	event.MetricSetFields, err = schema.Apply(data)
 	if err != nil {
 		errs = append(errs, errors.Wrap(err, "failure to apply stats schema"))
+	} else {
+		report.Event(event)
 	}
-	return dataFields, errs.Err()
+
+	return errs.Err()
 }

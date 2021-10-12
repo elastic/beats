@@ -1,6 +1,7 @@
 [
     {
         "enterprisesearch": {
+            "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
             "stats": {
                 "cluster_uuid": "s7QHFAuAQmqeqnGZmAqXIA",
                 "connectors": {
