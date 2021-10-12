@@ -31099,6 +31099,15 @@ Enterprise Search module
 
 
 
+*`enterprisesearch.cluster_uuid`*::
++
+--
+Cluster UUID for the Elasticsearch cluster used as the data store for Enterprise Search.
+
+type: keyword
+
+--
+
 [float]
 === health
 
@@ -31889,6 +31898,51 @@ type: long
 +
 --
 Total number of jobs waiting in the failed queue.
+
+type: long
+
+--
+
+[float]
+=== product_usage
+
+Aggregate product usage statistics for the Enterprise Search deployment.
+
+
+[float]
+=== app_search
+
+App Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.app_search.total_engines`*::
++
+--
+Current number of App Search engines within the deployment.
+
+type: long
+
+--
+
+[float]
+=== workplace_search
+
+Workplace Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_org_sources`*::
++
+--
+Current number of Workplace Search org-wide content sources within the deployment.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_private_sources`*::
++
+--
+Current number of Workplace Search private content sources within the deployment.
 
 type: long
 
