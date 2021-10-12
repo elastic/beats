@@ -1,0 +1,95 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Lambda Top Throttles [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "fbf0eac0-28d0-11ea-8789-f72e3366fb25"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f679afa0-28d0-11ea-8789-f72e3366fb25"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "3eabbde0-28d1-11ea-8789-f72e3366fb25"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "ca2e4c60-28cd-11ea-822d-3ba2c0089081",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#3185FC",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "ca2e4c61-28cd-11ea-822d-3ba2c0089081",
+                        "label": "avg(aws.metrics.Duration.avg)",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "aws.lambda.metrics.Duration.avg",
+                                "id": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "4",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "aws.dimensions.FunctionName",
+                        "terms_order_by": "ca2e4c62-28cd-11ea-822d-3ba2c0089081",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Lambda Top Throttles [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "915bcd50-28d1-11ea-ba6c-49a884eb104f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:31.702Z",
+    "version": "WzMzNzksMV0="
+}

@@ -15,6 +15,7 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/info"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
@@ -30,7 +31,7 @@ type Application interface {
 }
 
 type reexecManager interface {
-	ReExec(argOverrides ...string)
+	ReExec(callback reexec.ShutdownCallbackFn, argOverrides ...string)
 }
 
 type upgraderControl interface {
@@ -73,7 +74,7 @@ func createApplication(
 
 	if configuration.IsStandalone(cfg.Fleet) {
 		log.Info("Agent is managed locally")
-		return newLocal(ctx, log, pathConfigFile, rawConfig, reexec, statusCtrl, uc, agentInfo)
+		return newLocal(ctx, log, paths.ConfigFile(), rawConfig, reexec, statusCtrl, uc, agentInfo)
 	}
 
 	// not in standalone; both modes require reading the fleet.yml configuration file

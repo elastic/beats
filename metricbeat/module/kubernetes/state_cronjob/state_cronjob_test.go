@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package state_cronjob
@@ -35,6 +36,10 @@ func TestEventMapping(t *testing.T) {
 			{
 				MetricsFile:  "../_meta/test/ksm.v1.8.0",
 				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
+			},
+			{
+				MetricsFile:  "../_meta/test/ksm.v2.0.0",
+				ExpectedFile: "./_meta/test/ksm.v2.0.0.expected",
 			},
 		},
 	)

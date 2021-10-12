@@ -10,7 +10,6 @@ This section describes the minimum privileges or roles required to deploy
 functions to your cloud provider:
 
 * <<iam-permissions-aws>>
-* <<iam-permissions-gcp>>
 
 
 [[iam-permissions-aws]]
@@ -130,17 +129,3 @@ function that reads from SQS queues or Kinesis data streams.
     ]
 }
 ----
-
-[[iam-permissions-gcp]]
-===== Roles required by Google Cloud Platform
-
-The following roles are required to deploy Cloud Functions to Google Cloud
-Platform:
-
-// tag::gcp-roles-deployment[] 
-* Cloud Functions Developer
-* Cloud Functions Service Agent
-* Service Account User
-* Storage Admin
-* Storage Object Admin
-// end::gcp-roles-deployment[] 

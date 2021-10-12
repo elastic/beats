@@ -41,7 +41,7 @@ filebeat.modules:
 - module: activemq
   # Audit logs
   audit:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -49,7 +49,7 @@ filebeat.modules:
 
   # Application logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -101,6 +101,15 @@ filebeat.modules:
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
 
     # Process CloudTrail logs
     # default is true, set to false to skip Cloudtrail logs
@@ -154,6 +163,15 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -193,6 +211,15 @@ filebeat.modules:
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
 
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
@@ -234,6 +261,15 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -273,6 +309,15 @@ filebeat.modules:
 
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
+
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
 
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
@@ -314,6 +359,15 @@ filebeat.modules:
     # AWS SQS queue url
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
 
+    # AWS S3 bucket arn
+    #var.bucket_arn: 'arn:aws:s3:::mybucket'
+
+    # Bucket list interval on S3 bucket
+    #var.bucket_list_interval: 300s
+
+    # Number of workers on S3 bucket
+    #var.number_of_workers: 5
+
     # Filename of AWS credential file
     # If not set "$HOME/.aws/credentials" is used on Linux/Mac
     # "%UserProfile%\.aws\credentials" is used on Windows
@@ -347,65 +401,6 @@ filebeat.modules:
 
     # The maximum number of messages to return from SQS. Valid values: 1 to 10.
     #var.max_number_of_messages: 5
-
-- module: aws
-  fargate:
-    enabled: false
-
-    # Filename of AWS credential file
-    # If not set "$HOME/.aws/credentials" is used on Linux/Mac
-    # "%UserProfile%\.aws\credentials" is used on Windows
-    #var.shared_credential_file: /etc/filebeat/aws_credentials
-
-    # Profile name for aws credential
-    # If not set the default profile is used
-    #var.credential_profile_name: fb-aws
-
-    # Use access_key_id, secret_access_key and/or session_token instead of shared credential file
-    #var.access_key_id: access_key_id
-    #var.secret_access_key: secret_access_key
-    #var.session_token: session_token
-
-    # The duration that the received messages are hidden from ReceiveMessage request
-    # Default to be 300s
-    #var.visibility_timeout: 300s
-
-    # Maximum duration before AWS API request will be interrupted
-    # Default to be 120s
-    #var.api_timeout: 120s
-
-    # Custom endpoint used to access AWS APIs
-    #var.endpoint: amazonaws.com
-
-    # AWS IAM Role to assume
-    #var.role_arn: arn:aws:iam::123456789012:role/test-mb
-
-    # ARN of the log group to collect logs from
-    #var.log_group_arn: arn:aws:logs:us-east-1:123456789012:log-group:test:*
-
-    # Name of the log group to collect logs from
-    #var.log_group_name: /ecs/test-log-group
-
-    # Region that the specified log group belongs to
-    #var.region_name: us-east-1
-
-    # A list of strings of log streams names that Filebeat collect log events from
-    #var.log_streams: ["/ecs/test-log-group/test-log-stream"]
-
-    # A string to filter the results to include only log events from log streams that have names starting with this prefix
-    #var.log_stream_prefix: /ecs/test-log-group/
-
-    # Specify if Filebeat should read log files from the beginning or from the end
-    # Default start_position is beginning
-    #var.start_position: beginning
-
-    # How often Filebeat checks for new log events from the specified log group
-    # Default scan_frequency is 1 minute
-    #var.scan_frequency: 1m
-
-    # Time used to sleep between AWS FilterLogEvents API calls inside the same collection period
-    # Default api_sleep is 200 ms
-    #var.api_sleep: 200ms
 
 #----------------------------- AWS Fargate Module -----------------------------
 - module: awsfargate
@@ -467,7 +462,7 @@ filebeat.modules:
 - module: azure
   # All logs
   activitylogs:
-    enabled: true
+    enabled: false
     var:
       # eventhub name containing the activity logs, overwrite he default value if the logs are exported in a different eventhub
       eventhub: "insights-operational-logs"
@@ -510,7 +505,7 @@ filebeat.modules:
 #------------------ Barracuda Web Application Firewall Module ------------------
 - module: barracuda
   waf:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -529,7 +524,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   spamfirewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -550,7 +545,7 @@ filebeat.modules:
 #-------------------------- Blue Coat Director Module --------------------------
 - module: bluecoat
   director:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -571,7 +566,7 @@ filebeat.modules:
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
   log:
-    enabled: true
+    enabled: false
     var:
       syslog_host: localhost
       syslog_port: 9003
@@ -587,7 +582,7 @@ filebeat.modules:
 #------------------------------ Checkpoint Module ------------------------------
 - module: checkpoint
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -610,7 +605,7 @@ filebeat.modules:
 #-------------------------------- Cisco Module --------------------------------
 - module: cisco
   asa:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -636,7 +631,7 @@ filebeat.modules:
     #var.external_zones: [ "External" ]
 
   ftd:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -662,7 +657,7 @@ filebeat.modules:
     #var.external_zones: [ "External" ]
 
   ios:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input: syslog
@@ -679,7 +674,7 @@ filebeat.modules:
     #var.paths:
 
   nexus:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -698,7 +693,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   meraki:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -717,7 +712,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   umbrella:
-    enabled: true
+    enabled: false
 
     #var.input: aws-s3
     # AWS SQS queue url
@@ -732,7 +727,7 @@ filebeat.modules:
     #var.api_timeout: 120s
 
   amp:
-    enabled: true
+    enabled: false
 
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
@@ -752,7 +747,7 @@ filebeat.modules:
 - module: coredns
   # Fileset for native deployment
   log: 
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -762,39 +757,16 @@ filebeat.modules:
 - module: crowdstrike
   
   falcon:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#------------------------------ Cyber-Ark Module ------------------------------
-# The cyberark module is deprecated and will be removed in future releases.
-# Please use the Cyberark Privileged Account Security (cyberarkpas) module instead.
-- module: cyberark
-  corepas:
-    enabled: true
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9527
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #----------------------------- CyberArk PAS Module -----------------------------
 - module: cyberarkpas
   audit:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp (default), udp, or file.
     #
@@ -820,7 +792,7 @@ filebeat.modules:
 #---------------------------- CylanceProtect Module ----------------------------
 - module: cylance
   protect:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -842,32 +814,32 @@ filebeat.modules:
 - module: elasticsearch
   # Server log
   server:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   gc:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   audit:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   slowlog:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
   deprecation:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
@@ -876,7 +848,7 @@ filebeat.modules:
 - module: envoyproxy
   # Fileset for native deployment
   log: 
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -885,7 +857,7 @@ filebeat.modules:
 #--------------------- Big-IP Access Policy Manager Module ---------------------
 - module: f5
   bigipapm:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -904,7 +876,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   bigipafm:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -925,7 +897,7 @@ filebeat.modules:
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp, udp (default) or file.
     #var.input: udp
@@ -948,7 +920,7 @@ filebeat.modules:
     #var.external_interfaces: [ "WAN" ]
 
   clientendpoint:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -967,7 +939,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   fortimail:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -986,7 +958,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   fortimanager:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1007,7 +979,7 @@ filebeat.modules:
 #--------------------- Google Cloud Platform (GCP) Module ---------------------
 - module: gcp
   vpcflow:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -1035,7 +1007,7 @@ filebeat.modules:
     #var.internal_networks: [ "private" ]
 
   firewall:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -1062,7 +1034,7 @@ filebeat.modules:
     #var.internal_networks: [ "private" ]
 
   audit:
-    enabled: true
+    enabled: false
 
     # Google Cloud project ID.
     var.project_id: my-gcp-project-id
@@ -1082,7 +1054,7 @@ filebeat.modules:
 #--------------------------- Google_workspace Module ---------------------------
 - module: google_workspace
   saml:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1090,7 +1062,7 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
   user_accounts:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1098,7 +1070,7 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
   login:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1106,7 +1078,7 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
   admin:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1114,7 +1086,7 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
   drive:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1122,7 +1094,7 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
   groups:
-    enabled: true
+    enabled: false
     # var.jwt_file: credentials.json
     # var.delegated_account: admin@example.com
     # var.initial_interval: 24h
@@ -1130,121 +1102,12 @@ filebeat.modules:
     # var.user_key: all
     # var.interval: 2h
 
-
-#----------------------------- Googlecloud Module -----------------------------
-# googlecloud module is deprecated, please use gcp instead
-- module: gcp
-  vpcflow:
-    enabled: true
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing VPC flow logs. Stackdriver must be
-    # configured to use this topic as a sink for VPC flow logs.
-    var.topic: gcp-vpc-flowlogs
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-vpc-flowlogs-sub
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-  firewall:
-    enabled: true
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
-    # configured to use this topic as a sink for firewall logs.
-    var.topic: gcp-vpc-firewall
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-firewall-sub
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-  audit:
-    enabled: true
-
-    # Google Cloud project ID.
-    var.project_id: my-gcp-project-id
-
-    # Google Pub/Sub topic containing firewall logs. Stackdriver must be
-    # configured to use this topic as a sink for firewall logs.
-    var.topic: gcp-vpc-audit
-
-    # Google Pub/Sub subscription for the topic. Filebeat will create this
-    # subscription if it does not exist.
-    var.subscription_name: filebeat-gcp-audit
-
-    # Credentials file for the service account with authorization to read from
-    # the subscription.
-    var.credentials_file: ${path.config}/gcp-service-account-xyz.json
-
-#-------------------------------- Gsuite Module --------------------------------
-# Gsuite module is deprecated and will be removed in future releases. Please use Google Workspace module instead.
-- module: gsuite
-  saml:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  user_accounts:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  login:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  admin:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  drive:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
-  groups:
-    enabled: true
-    # var.jwt_file: credentials.json
-    # var.delegated_account: admin@example.com
-    # var.initial_interval: 24h
-    # var.http_client_timeout: 60s
-    # var.user_key: all
-    # var.interval: 2h
 
 #------------------------------- HAProxy Module -------------------------------
 - module: haproxy
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input:
@@ -1257,7 +1120,7 @@ filebeat.modules:
 - module: ibmmq
   # All logs
   errorlog:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1330,7 +1193,7 @@ filebeat.modules:
 #------------------------- Imperva SecureSphere Module -------------------------
 - module: imperva
   securesphere:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1351,7 +1214,7 @@ filebeat.modules:
 #---------------------------- Infoblox NIOS Module ----------------------------
 - module: infoblox
   nios:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1372,7 +1235,7 @@ filebeat.modules:
 #------------------------------- Iptables Module -------------------------------
 - module: iptables
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input:
@@ -1384,7 +1247,7 @@ filebeat.modules:
 #---------------------------- Juniper JUNOS Module ----------------------------
 - module: juniper
   junos:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1403,7 +1266,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   netscreen:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1422,7 +1285,7 @@ filebeat.modules:
     # var.tz_offset: local
 
   srx:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp, udp (default) or file.
     #var.input: udp
@@ -1438,7 +1301,7 @@ filebeat.modules:
 - module: kafka
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for Kafka. If left empty,
     # Filebeat will look under /opt.
@@ -1452,7 +1315,7 @@ filebeat.modules:
 - module: kibana
   # Server logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1460,7 +1323,7 @@ filebeat.modules:
 
   # Audit logs
   audit:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1488,7 +1351,7 @@ filebeat.modules:
 - module: microsoft
   # ATP configuration
   defender_atp:
-    enabled: true
+    enabled: false
     # How often the API should be polled
     #var.interval: 5m
 
@@ -1501,7 +1364,7 @@ filebeat.modules:
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/token"
   m365_defender:
-    enabled: true
+    enabled: false
     # How often the API should be polled
     #var.interval: 5m
 
@@ -1518,7 +1381,7 @@ filebeat.modules:
     #var.oauth2.scopes:
     #  - "https://api.security.microsoft.com/.default"
   dhcp:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1541,7 +1404,7 @@ filebeat.modules:
 
 - module: misp
   threat:
-    enabled: true
+    enabled: false
     # API key to access MISP
     #var.api_key
 
@@ -1572,7 +1435,7 @@ filebeat.modules:
 - module: mssql
   # Fileset for native deployment
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1607,7 +1470,7 @@ filebeat.modules:
 #--------------------------- MySQL Enterprise Module ---------------------------
 - module: mysqlenterprise
   audit:
-    enabled: true
+    enabled: false
 
     # Sets the input type. Currently only supports file
     #var.input: file
@@ -1621,7 +1484,7 @@ filebeat.modules:
 - module: nats
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1630,7 +1493,7 @@ filebeat.modules:
 #------------------------------- NetFlow Module -------------------------------
 - module: netflow
   log:
-    enabled: true
+    enabled: false
     var:
       netflow_host: localhost
       netflow_port: 2055
@@ -1643,7 +1506,7 @@ filebeat.modules:
 #-------------------------- Arbor Peakflow SP Module --------------------------
 - module: netscout
   sightline:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1698,7 +1561,7 @@ filebeat.modules:
 #------------------------------ Office 365 Module ------------------------------
 - module: o365
   audit:
-    enabled: true
+    enabled: false
 
     # Set the application_id (also known as client ID):
     var.application_id: "<MyApplicationID>"
@@ -1745,7 +1608,7 @@ filebeat.modules:
 #--------------------------------- Okta Module ---------------------------------
 - module: okta
   system:
-    enabled: true
+    enabled: false
     # You must configure the URL with your Okta domain and provide an
     # API token to access the logs API.
     #var.url: https://yourOktaDomain/api/v1/logs
@@ -1754,7 +1617,7 @@ filebeat.modules:
 #-------------------------------- Oracle Module --------------------------------
 - module: oracle
   database_audit:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog or file (default).
     #var.input: file
@@ -1764,9 +1627,9 @@ filebeat.modules:
     #var.paths: ["/home/user/oracleauditlogs/*.aud"]
 
 #------------------------------- Osquery Module -------------------------------
-- module: osquery
-  result:
-    enabled: true
+#- module: osquery
+  #result:
+    #enabled: true
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1780,7 +1643,7 @@ filebeat.modules:
 #--------------------------------- Panw Module ---------------------------------
 - module: panw
   panos:
-    enabled: true
+    enabled: false
 
     # Set which input to use between syslog (default) or file.
     #var.input:
@@ -1802,7 +1665,7 @@ filebeat.modules:
 - module: pensando
 # Firewall logs
   dfw:
-    enabled: true
+    enabled: false
     var.syslog_host: 0.0.0.0
     var.syslog_port: 9001
 
@@ -1827,7 +1690,7 @@ filebeat.modules:
 #---------------------- Proofpoint Email Security Module ----------------------
 - module: proofpoint
   emailsecurity:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1849,7 +1712,7 @@ filebeat.modules:
 - module: rabbitmq
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -1858,7 +1721,7 @@ filebeat.modules:
 #-------------------------- Radware DefensePro Module --------------------------
 - module: radware
   defensepro:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1899,7 +1762,7 @@ filebeat.modules:
 #----------------------------- Google Santa Module -----------------------------
 - module: santa
   log:
-    enabled: true
+    enabled: false
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the the default path.
     #var.paths:
@@ -1907,7 +1770,7 @@ filebeat.modules:
 #--------------------------- Snort/Sourcefire Module ---------------------------
 - module: snort
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -1928,8 +1791,7 @@ filebeat.modules:
 #--------------------------------- Snyk Module ---------------------------------
 - module: snyk
   audit:
-    enabled: true
-
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
     #
@@ -1939,19 +1801,15 @@ filebeat.modules:
     # The ID related to the audit_type. If audit type is group, then this value should be
     # the group ID and if it is organization it should be the organization ID to collect from.
     #var.audit_id: 1235432-asdfdf-2341234-asdgjhg
-
     # How often the API should be polled, defaults to 1 hour.
     #var.interval: 1h
     # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
     #var.first_interval: 24h
-
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
-
     # Event filtering.
     # All configuration items below is OPTIONAL and the default options will be overwritten
     # for each entry that is not commented out.
-
     # Will return only logs for this specific project.
     #var.project_id: ""
     # User public ID. Will fetch only audit logs originated from this user's actions.
@@ -1962,34 +1820,27 @@ filebeat.modules:
     #var.email_address: ""
 
   vulnerabilities:
-    enabled: true
-
+    enabled: false
     # Set which input to use between httpjson (default) or file.
     #var.input: httpjson
-
     # How often the API should be polled. Data from the Snyk API is automatically updated
     # once per day, so the default interval is 24 hours.
     #var.interval: 24h
-
     # How far to look back the first time the module starts up. (Only works with full days, 24 hours, 48 hours etc).
     #var.first_interval: 24h
-
     # The API token that is created for a specific user, found in the Snyk management dashboard.
     #var.api_token:
-
     # The list of org IDs to filter the results by.
     # One organization ID per line, starting with a - sign
     #var.orgs:
     #  - 12354-asdfdf-123543-asdsdfg
     #  - 76554-jhggfd-654342-hgrfasd
-
-
     # Event filtering.
     # All configuration items below is OPTIONAL and the default options will be overwritten
     # for each entry that is not commented out.
-
     # The severity levels of issues to filter the results by.
     #var.included_severity:
+    #  - critical
     #  - high
     #  - medium
     #  - low
@@ -2005,6 +1856,7 @@ filebeat.modules:
     #var.types:
     #  - vuln
     #  - license
+    #  - configuration
     #
     # The type of languages to filter the results by.
     #var.languages:
@@ -2016,8 +1868,13 @@ filebeat.modules:
     #  - golang
     #  - php
     #  - dotnet
-    #  - swift
+    #  - swift-objective-c
+    #  - elixir
     #  - docker
+    #  - terraform
+    #  - kubernetes
+    #  - helm
+    #  - cloudformation
     #
     # Search term to filter issue name by, or an exact CVE or CWE.
     #var.identifier:
@@ -2035,11 +1892,10 @@ filebeat.modules:
     #var.min_priority_score: 0
     #var.max_priority_score: 1000
 
-
 #----------------------------- Sonicwall-FW Module -----------------------------
 - module: sonicwall
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -2060,7 +1916,7 @@ filebeat.modules:
 #-------------------------------- Sophos Module --------------------------------
 - module: sophos
   xg:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp, udp (default) or file.
     #var.input: udp
@@ -2084,7 +1940,7 @@ filebeat.modules:
 
 
   utm:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -2105,7 +1961,7 @@ filebeat.modules:
 #-------------------------------- Squid Module --------------------------------
 - module: squid
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -2127,7 +1983,7 @@ filebeat.modules:
 - module: suricata
   # All logs
   eve:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -2136,7 +1992,7 @@ filebeat.modules:
 #----------------------------- Threatintel Module -----------------------------
 - module: threatintel
   abuseurl:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -2148,7 +2004,7 @@ filebeat.modules:
     var.interval: 10m
 
   abusemalware:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -2160,7 +2016,7 @@ filebeat.modules:
     var.interval: 10m
 
   malwarebazaar:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data.
     var.input: httpjson
@@ -2172,7 +2028,7 @@ filebeat.modules:
     var.interval: 10m
 
   misp:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data, defaults to JSON.
     var.input: httpjson
@@ -2201,7 +2057,7 @@ filebeat.modules:
     var.interval: 5m
 
   otx:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data
     var.input: httpjson
@@ -2228,7 +2084,7 @@ filebeat.modules:
     var.interval: 5m
 
   anomali:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data
     var.input: httpjson
@@ -2250,7 +2106,7 @@ filebeat.modules:
     var.interval: 5m
 
   anomalithreatstream:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data
     var.input: http_endpoint
@@ -2275,7 +2131,7 @@ filebeat.modules:
     # var.ssl_key: path/to/ssl_key.pem
 
   recordedfuture:
-    enabled: true
+    enabled: false
 
     # Input used for ingesting threat intel data
     var.input: httpjson
@@ -2309,7 +2165,7 @@ filebeat.modules:
 #---------------------------- Apache Tomcat Module ----------------------------
 - module: tomcat
   log:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -2345,83 +2201,83 @@ filebeat.modules:
 #--------------------------------- Zeek Module ---------------------------------
 - module: zeek
   capture_loss:
-    enabled: true
+    enabled: false
   connection:
-    enabled: true
+    enabled: false
   dce_rpc:
-    enabled: true
+    enabled: false
   dhcp:
-    enabled: true
+    enabled: false
   dnp3:
-    enabled: true
+    enabled: false
   dns:
-    enabled: true
+    enabled: false
   dpd:
-    enabled: true
+    enabled: false
   files:
-    enabled: true
+    enabled: false
   ftp:
-    enabled: true
+    enabled: false
   http:
-    enabled: true
+    enabled: false
   intel:
-    enabled: true
+    enabled: false
   irc:
-    enabled: true
+    enabled: false
   kerberos:
-    enabled: true
+    enabled: false
   modbus:
-    enabled: true
+    enabled: false
   mysql:
-    enabled: true
+    enabled: false
   notice:
-    enabled: true
+    enabled: false
   ntp:
-    enabled: true
+    enabled: false
   ntlm:
-    enabled: true
+    enabled: false
   ocsp:
-    enabled: true
+    enabled: false
   pe:
-    enabled: true
+    enabled: false
   radius:
-    enabled: true
+    enabled: false
   rdp:
-    enabled: true
+    enabled: false
   rfb:
-    enabled: true
+    enabled: false
   signature:
-    enabled: true
+    enabled: false
   sip:
-    enabled: true
+    enabled: false
   smb_cmd:
-    enabled: true
+    enabled: false
   smb_files:
-    enabled: true
+    enabled: false
   smb_mapping:
-    enabled: true
+    enabled: false
   smtp:
-    enabled: true
+    enabled: false
   snmp:
-    enabled: true
+    enabled: false
   socks:
-    enabled: true
+    enabled: false
   ssh:
-    enabled: true
+    enabled: false
   ssl:
-    enabled: true
+    enabled: false
   stats:
-    enabled: true
+    enabled: false
   syslog:
-    enabled: true
+    enabled: false
   traceroute:
-    enabled: true
+    enabled: false
   tunnel:
-    enabled: true
+    enabled: false
   weird:
-    enabled: true
+    enabled: false
   x509:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -2431,14 +2287,14 @@ filebeat.modules:
 - module: zookeeper
   # All logs
   audit:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
   # All logs
   log:
-    enabled: true
+    enabled: false
 
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
@@ -2447,7 +2303,7 @@ filebeat.modules:
 #--------------------------------- Zoom Module ---------------------------------
 - module: zoom
   webhook:
-    enabled: true
+    enabled: false
 
     # The type of input to use
     #var.input: http_endpoint
@@ -2468,7 +2324,7 @@ filebeat.modules:
 #----------------------------- Zscaler NSS Module -----------------------------
 - module: zscaler
   zia:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -2658,7 +2514,7 @@ filebeat.inputs:
   # this can mean that the first entries of a new file are skipped.
   #tail_files: false
 
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -2841,7 +2697,7 @@ filebeat.inputs:
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator.
   #line_terminator: auto
 
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -3117,15 +2973,28 @@ filebeat.inputs:
   #session_token: '${AWS_SESSION_TOKEN:"”}'
   #credential_profile_name: test-aws-s3-input
 
-  # Queue url (required) to receive queue messages from
+  # SQS queue URL to receive messages from (required).
   #queue_url: "https://sqs.us-east-1.amazonaws.com/1234/test-aws-s3-logs-queue"
 
-  # The duration (in seconds) that the received messages are hidden from subsequent
-  # retrieve requests after being retrieved by a ReceiveMessage request.
-  #visibility_timeout: 300
+  # Maximum number of SQS messages that can be inflight at any time.
+  #max_number_of_messages: 5
+
+  # Maximum duration of an AWS API call (excluding S3 GetObject calls).
+  #api_timeout: 120s
+
+  # Duration that received SQS messages are hidden from subsequent
+  # requests after being retrieved by a ReceiveMessage request.
+  #visibility_timeout: 300s
 
   # List of S3 object metadata keys to include in events.
   #include_s3_metadata: []
+
+  # The max number of times an SQS message should be received (retried) before deleting it.
+  #sqs.max_receive_count: 5
+
+  # Maximum duration for which the SQS ReceiveMessage call waits for a message
+  # to arrive in the queue before returning.
+  #sqs.wait_time: 20s
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input
@@ -3292,14 +3161,14 @@ filebeat.inputs:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-  
+
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-    
+
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -3330,8 +3199,8 @@ filebeat.inputs:
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
@@ -3610,7 +3479,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "filebeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -4535,6 +4404,11 @@ setup.kibana:
 
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
+
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.

@@ -19,7 +19,9 @@ import (
 // 	type: logs
 //   query: select * from usb_devices
 
-const DefaultStreamIndex = "logs-osquery_manager.result-default"
+const DefaultNamespace = "default"
+
+const datastreamPrefix = "logs-osquery_manager.result-"
 
 type StreamConfig struct {
 	ID         string                 `config:"id"`
@@ -30,11 +32,24 @@ type StreamConfig struct {
 	ECSMapping map[string]interface{} `config:"ecs_mapping"` // ECS mapping definition where the key is the source field in osquery result and the value is the destination fields in ECS
 }
 
+type DatastreamConfig struct {
+	Namespace string `config:"namespace"`
+}
+
 type InputConfig struct {
 	Name       string                  `config:"name"`
 	Type       string                  `config:"type"`
-	Streams    []StreamConfig          `config:"streams"`
+	Datastream DatastreamConfig        `config:"data_stream"` // Datastream configuration
 	Processors processors.PluginConfig `config:"processors"`
+
+	// Full Osquery configuration
+	Osquery *OsqueryConfig `config:"osquery"`
+
+	// Deprecated
+	Streams   []StreamConfig `config:"streams"`
+	Platform  string         `config:"iplatform"` // restrict all queries to a given platform, default is 'all' platforms; you may use commas to set multiple platforms
+	Version   string         `config:"iversion"`  // only run the queries with osquery versions greater than or equal-to this version string
+	Discovery []string       `config:"discovery"` // a list of discovery queries https://osquery.readthedocs.io/en/stable/deployment/configuration/#discovery-queries
 }
 
 type Config struct {
@@ -42,3 +57,21 @@ type Config struct {
 }
 
 var DefaultConfig = Config{}
+
+func Datastream(namespace string) string {
+	if namespace == "" {
+		namespace = DefaultNamespace
+	}
+	return datastreamPrefix + namespace
+}
+
+// GetOsqueryOptions Returns options from the first input if available
+func GetOsqueryOptions(inputs []InputConfig) map[string]interface{} {
+	if len(inputs) == 0 {
+		return nil
+	}
+	if inputs[0].Osquery == nil {
+		return nil
+	}
+	return inputs[0].Osquery.Options
+}

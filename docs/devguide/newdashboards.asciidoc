@@ -132,20 +132,14 @@ See <<import-dashboard-options>> for a description of the `setup.dashboards` con
 [[import-dashboards-for-development]]
 ==== Import Dashboards for Development
 
-You can make use of the Makefile from the Beat GitHub repository to import the
-dashboards. If Elasticsearch is running on localhost, then you can run the following command from the Beat repository:
+You can make use of the Magefile from the Beat GitHub repository to import the
+dashboards. If Kibana is running on localhost, then you can run the following command
+from the root of the Beat:
 
 [source,shell]
 --------------------------------
-make import-dashboards
+mage dashboards
 --------------------------------
-
-If Elasticsearch is running on a different host, then you can use the `ES_URL` variable:
-
-[source,shell]
--------------------------------
-ES_URL="http://192.168.3.206:9200" make import-dashboards
--------------------------------
 
 [[import-dashboard-options]]
 ==== Kibana dashboards configuration
@@ -225,17 +219,28 @@ make update
 
 To export all the dashboards for any Elastic Beat or any community Beat, including any new or modified dashboards and all dependencies such as
 visualizations, searches, you can use the Go script `export_dashboards.go` from
-https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools] for exporting Kibana 6.0 dashboards or later, and the Python script `export_5x_dashboards.py`
-for exporting Kibana 5.x dashboards. See the dev-tools
-https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
+https://github.com/elastic/beats/tree/master/dev-tools/cmd/dashboards[dev-tools].  
+See the dev-tools https://github.com/elastic/beats/tree/master/dev-tools/README.md[readme] for more info.
 
 Alternatively, if the scripts above are not available, you can use your Beat binary to export Kibana 6.0 dashboards or later.
 
-==== Exporting Kibana 6.0 dashboards and newer
+==== Exporting from Kibana 6.0 to 7.14
 
-The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana 6.0 dashboards and newer. You might need to export a single dashboard or all the dashboards available for a module or Beat.
+The `dev-tools/cmd/export_dashboards.go` script helps you export your customized Kibana dashboards until the v7.14.x release.
+You might need to export a single dashboard or all the dashboards available for a module or Beat.
 
 It is also possible to use a Beat binary to export.
+
+==== Exporting from Kibana 7.15 or newer
+
+From 7.15, your Beats version must be the same as your Kibana version
+to make sure the export API required is available.
+
+===== Migrate legacy dashboards made with Kibana 7.14 or older
+
+After you updated your Kibana instance to at least 7.15, you have to
+export your dashboards again with either `export_dashboards.go` tool or
+with your Beat.
 
 ===== Export a single Kibana dashboard
 
@@ -248,11 +253,11 @@ MODULE=redis ID=AV4REOpp5NkDleZmzKkE mage exportDashboard
 
 [source,shell]
 ---------------
-./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b >> Filebeat-redis.json
+./filebeat export dashboard -id 7fea2930-478e-11e7-b1f0-cb29bac6bf8b -folder module/redis
 ---------------
 
-This generates a `AV4REOpp5NkDleZmzKkE.json` file inside dashboard directory in the redis module.
-It contains all dependencies like visualizations and searches.
+This generates an appropriate folder under module/redis for the dashboard, separating assets into dashboards, searches, vizualizations, etc.
+Each exported file is a JSON and their names are the IDs of the assets.
 
 NOTE: The dashboard ID is available in the dashboard URL. For example, in case the dashboard URL is
 `app/kibana#/dashboard/AV4REOpp5NkDleZmzKkE?_g=()&_a=(description:'Overview%2...`, the dashboard ID is `AV4REOpp5NkDleZmzKkE`.
@@ -268,23 +273,23 @@ Below, it's an example of the `module.yml` file for the system module in Metricb
 ---------------
 dashboards:
 - id: Metricbeat-system-overview
-  file: Metricbeat-system-overview.json
+  file: Metricbeat-system-overview.ndjson
 
 - id: 79ffd6e0-faa0-11e6-947f-177f697178b8
-  file: Metricbeat-host-overview.json
+  file: Metricbeat-host-overview.ndjson
 
 - id: CPU-slash-Memory-per-container
-  file: Metricbeat-containers-overview.json
+  file: Metricbeat-containers-overview.ndjson
 ---------------
 
 
-Each dashboard is defined by an `id` and the name of json `file` where the dashboard is saved locally.
+Each dashboard is defined by an `id` and the name of ndjson `file` where the dashboard is saved locally.
 
 By passing the yml file to the `export_dashboards.go` script or to the Beat, you can export all the dashboards defined:
 
 [source,shell]
 -------------------
-go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml
+go run dev-tools/cmd/dashboards/export_dashboards.go -yml filebeat/module/system/module.yml -folder dashboards
 -------------------
 
 [source,shell]

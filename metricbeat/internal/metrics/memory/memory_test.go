@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration && (darwin || freebsd || linux || openbsd || windows)
 // +build !integration
 // +build darwin freebsd linux openbsd windows
 
@@ -26,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/metricbeat/internal/metrics"
+	"github.com/elastic/beats/v7/libbeat/opt"
 )
 
 func TestGetMemory(t *testing.T) {
@@ -73,15 +74,15 @@ func TestGetSwap(t *testing.T) {
 
 func TestMemPercentage(t *testing.T) {
 	m := Memory{
-		Total: metrics.OptUintWith(7),
-		Used:  UsedMemStats{Bytes: metrics.OptUintWith(5)},
-		Free:  metrics.OptUintWith(2),
+		Total: opt.UintWith(7),
+		Used:  UsedMemStats{Bytes: opt.UintWith(5)},
+		Free:  opt.UintWith(2),
 	}
 	m.fillPercentages()
 	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.7143)
 
 	m = Memory{
-		Total: metrics.OptUintWith(0),
+		Total: opt.UintWith(0),
 	}
 	m.fillPercentages()
 	assert.Equal(t, m.Used.Pct.ValueOr(0), 0.0)
@@ -89,10 +90,10 @@ func TestMemPercentage(t *testing.T) {
 
 func TestActualMemPercentage(t *testing.T) {
 	m := Memory{
-		Total: metrics.OptUintWith(7),
+		Total: opt.UintWith(7),
 		Actual: ActualMemoryMetrics{
-			Used: UsedMemStats{Bytes: metrics.OptUintWith(5)},
-			Free: metrics.OptUintWith(2),
+			Used: UsedMemStats{Bytes: opt.UintWith(5)},
+			Free: opt.UintWith(2),
 		},
 	}
 

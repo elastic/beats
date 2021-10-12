@@ -2,7 +2,8 @@ projects:
     - "auditbeat"
     - "deploy/kubernetes"
     - "filebeat"
-    - "generator"
+# temporarly disable generator tests: https://github.com/elastic/beats/issues/28361
+#    - "generator"
     - "heartbeat"
     - "journalbeat"
     - "libbeat"

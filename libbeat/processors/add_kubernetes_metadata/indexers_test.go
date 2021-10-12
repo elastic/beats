@@ -73,7 +73,9 @@ func TestPodIndexer(t *testing.T) {
 			"labels": common.MapStr{
 				"labelkey": "labelvalue",
 			},
-			"namespace": "testns",
+			"namespace": common.MapStr{
+				"name": "testns",
+			},
 			"node": common.MapStr{
 				"name": "testnode",
 			},
@@ -125,7 +127,9 @@ func TestPodUIDIndexer(t *testing.T) {
 				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 				"ip":   "127.0.0.5",
 			},
-			"namespace": "testns",
+			"namespace": common.MapStr{
+				"name": "testns",
+			},
 			"node": common.MapStr{
 				"name": "testnode",
 			},
@@ -183,7 +187,9 @@ func TestContainerIndexer(t *testing.T) {
 				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 				"ip":   "127.0.0.5",
 			},
-			"namespace": "testns",
+			"namespace": common.MapStr{
+				"name": "testns",
+			},
 			"node": common.MapStr{
 				"name": "testnode",
 			},
@@ -431,7 +437,9 @@ func TestIpPortIndexer(t *testing.T) {
 				"uid":  "005f3b90-4b9d-12f8-acf0-31020a840133",
 				"ip":   "1.2.3.4",
 			},
-			"namespace": "testns",
+			"namespace": common.MapStr{
+				"name": "testns",
+			},
 			"node": common.MapStr{
 				"name": "testnode",
 			},

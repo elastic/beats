@@ -1,0 +1,151 @@
+{
+    "attributes": {
+        "description": "Filebeat AWS VPC Flow Log Overview Dashboard",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "c802177f-038c-4a35-a82d-0fa42c857d02",
+                    "w": 18,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "c802177f-038c-4a35-a82d-0fa42c857d02",
+                "panelRefName": "panel_c802177f-038c-4a35-a82d-0fa42c857d02",
+                "title": "S3 Bucket Filter",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "isLayerTOCOpen": true,
+                    "mapCenter": {
+                        "lat": 12.09237,
+                        "lon": 60.11722,
+                        "zoom": 0.47
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "380eed85-225b-4d5d-88bc-1c70a3643ddb",
+                    "w": 30,
+                    "x": 18,
+                    "y": 0
+                },
+                "panelIndex": "380eed85-225b-4d5d-88bc-1c70a3643ddb",
+                "panelRefName": "panel_380eed85-225b-4d5d-88bc-1c70a3643ddb",
+                "title": "VPC Flow Action Geo Location",
+                "type": "map",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3dde08df-2d7e-464e-825d-03179e43e175",
+                    "w": 18,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "3dde08df-2d7e-464e-825d-03179e43e175",
+                "panelRefName": "panel_3dde08df-2d7e-464e-825d-03179e43e175",
+                "title": "VPC Flow Top IP Addresses",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "f7c6de04-c771-47ff-a32d-00a7940e414a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "f7c6de04-c771-47ff-a32d-00a7940e414a",
+                "panelRefName": "panel_f7c6de04-c771-47ff-a32d-00a7940e414a",
+                "title": "VPC Flow Total Requests",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "b4dbbe72-0dc0-428b-b21e-91c6cc82745c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "b4dbbe72-0dc0-428b-b21e-91c6cc82745c",
+                "panelRefName": "panel_b4dbbe72-0dc0-428b-b21e-91c6cc82745c",
+                "title": "VPC Flow Reject Logs",
+                "type": "search",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat AWS] VPC Flow Log Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "15503340-4488-11ea-ad63-791a5dc86f10",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "247e2990-4699-11ea-ad63-791a5dc86f10",
+            "name": "c802177f-038c-4a35-a82d-0fa42c857d02:panel_c802177f-038c-4a35-a82d-0fa42c857d02",
+            "type": "visualization"
+        },
+        {
+            "id": "513a3d70-4482-11ea-ad63-791a5dc86f10",
+            "name": "380eed85-225b-4d5d-88bc-1c70a3643ddb:panel_380eed85-225b-4d5d-88bc-1c70a3643ddb",
+            "type": "map"
+        },
+        {
+            "id": "75853f20-4484-11ea-ad63-791a5dc86f10",
+            "name": "3dde08df-2d7e-464e-825d-03179e43e175:panel_3dde08df-2d7e-464e-825d-03179e43e175",
+            "type": "visualization"
+        },
+        {
+            "id": "bad8c910-4485-11ea-ad63-791a5dc86f10",
+            "name": "f7c6de04-c771-47ff-a32d-00a7940e414a:panel_f7c6de04-c771-47ff-a32d-00a7940e414a",
+            "type": "visualization"
+        },
+        {
+            "id": "c1aee600-4487-11ea-ad63-791a5dc86f10",
+            "name": "b4dbbe72-0dc0-428b-b21e-91c6cc82745c:panel_b4dbbe72-0dc0-428b-b21e-91c6cc82745c",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:00.470Z",
+    "version": "WzQzNzMsMV0="
+}

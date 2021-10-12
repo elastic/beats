@@ -8,7 +8,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/kolide/osquery-go/plugin/logger"
+	"github.com/osquery/osquery-go/plugin/logger"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -35,15 +35,19 @@ const osqueryLogMessageFieldsCount = 6
 
 type osqLogSeverity int
 
+// The severity levels are taken from osquery source
+// https://github.com/osquery/osquery/blob/master/osquery/core/plugins/logger.h#L39
+//  enum StatusLogSeverity {
+// 	  O_INFO = 0,
+// 	  O_WARNING = 1,
+// 	  O_ERROR = 2,
+// 	  O_FATAL = 3,
+//  };
 const (
-	severityEmerg osqLogSeverity = iota
-	severityAlert
-	severityCrit
-	severityErr
-	severityWarn
-	severityNotice
-	severityInfo
-	severityDebug
+	severityInfo osqLogSeverity = iota
+	severityWarning
+	severityError
+	severityFatal
 )
 
 func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
@@ -65,14 +69,12 @@ func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
 	args = append(args, m.UnixTime)
 
 	switch osqLogSeverity(m.Severity) {
-	case severityEmerg, severityAlert, severityCrit:
+	case severityError, severityFatal:
 		log.Errorw(m.Message, args...)
-	case severityWarn, severityNotice:
+	case severityWarning:
 		log.Warnw(m.Message, args...)
 	case severityInfo:
 		log.Infow(m.Message, args...)
-	case severityDebug:
-		log.Debugw(m.Message, args...)
 	default:
 		log.Debugw(m.Message, args...)
 	}

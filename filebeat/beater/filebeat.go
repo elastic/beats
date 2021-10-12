@@ -58,9 +58,9 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
 	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
 var (
@@ -113,6 +113,19 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 	if !moduleRegistry.Empty() {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
+		for _, mod := range moduleRegistry.ModuleNames() {
+			if mod == "" {
+				continue
+			}
+			filesets, err := moduleRegistry.ModuleConfiguredFilesets(mod)
+			if err != nil {
+				logp.Err("Failed listing filesets for module %s", mod)
+				continue
+			}
+			if len(filesets) == 0 {
+				logp.Warn("Module %s is enabled but has no enabled filesets", mod)
+			}
+		}
 	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
@@ -174,7 +187,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
@@ -428,7 +441,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}

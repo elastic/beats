@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"syscall"
@@ -32,7 +33,7 @@ func newEnrollCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command
 		Long:  "This will enroll the Agent into Fleet.",
 		Run: func(c *cobra.Command, args []string) {
 			if err := enroll(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
@@ -69,6 +70,26 @@ func addEnrollFlags(cmd *cobra.Command) {
 	cmd.Flags().BoolP("proxy-disabled", "", false, "Disable proxy support including environment variables")
 	cmd.Flags().StringSliceP("proxy-header", "", []string{}, "Proxy headers used with CONNECT request")
 	cmd.Flags().BoolP("delay-enroll", "", false, "Delays enrollment to occur on first start of the Elastic Agent service")
+}
+
+func validateEnrollFlags(cmd *cobra.Command) error {
+	ca, _ := cmd.Flags().GetString("certificate-authorities")
+	if ca != "" && !filepath.IsAbs(ca) {
+		return errors.New("--certificate-authorities must be provided as an absolute path", errors.M("path", ca), errors.TypeConfig)
+	}
+	esCa, _ := cmd.Flags().GetString("fleet-server-es-ca")
+	if esCa != "" && !filepath.IsAbs(esCa) {
+		return errors.New("--fleet-server-es-ca must be provided as an absolute path", errors.M("path", esCa), errors.TypeConfig)
+	}
+	fCert, _ := cmd.Flags().GetString("fleet-server-cert")
+	if fCert != "" && !filepath.IsAbs(fCert) {
+		return errors.New("--fleet-server-cert must be provided as an absolute path", errors.M("path", fCert), errors.TypeConfig)
+	}
+	fCertKey, _ := cmd.Flags().GetString("fleet-server-cert-key")
+	if fCertKey != "" && !filepath.IsAbs(fCertKey) {
+		return errors.New("--fleet-server-cert-key must be provided as an absolute path", errors.M("path", fCertKey), errors.TypeConfig)
+	}
+	return nil
 }
 
 func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string {
@@ -184,6 +205,11 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 }
 
 func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
+	err := validateEnrollFlags(cmd)
+	if err != nil {
+		return err
+	}
+
 	fromInstall, _ := cmd.Flags().GetBool("from-install")
 
 	pathConfigFile := paths.ConfigFile()

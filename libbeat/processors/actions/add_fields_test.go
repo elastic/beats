@@ -113,5 +113,12 @@ func TestAddFields(t *testing.T) {
 				`{add_fields: {target: "", fields: {a.change: b}}}`,
 			),
 		},
+		"add fields to nil event": {
+			event: nil,
+			want: common.MapStr{
+				"fields": common.MapStr{"field": "test"},
+			},
+			cfg: single(`{add_fields: {fields: {field: test}}}`),
+		},
 	})
 }

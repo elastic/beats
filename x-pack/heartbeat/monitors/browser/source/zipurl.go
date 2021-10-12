@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 type ZipURLSource struct {
@@ -23,12 +25,24 @@ type ZipURLSource struct {
 	Password string `config:"password" json:"password"`
 	Retries  int    `config:"retries" default:"3" json:"retries"`
 	BaseSource
-	// Etag from last successful fetch
-	etag            string
 	TargetDirectory string `config:"target_directory" json:"target_directory"`
+
+	// Etag from last successful fetch
+	etag string
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline" yaml:",inline"`
+
+	httpClient *http.Client
 }
 
 var ErrNoEtag = fmt.Errorf("No ETag header in zip file response. Heartbeat requires an etag to efficiently cache downloaded code")
+
+func (z *ZipURLSource) Validate() (err error) {
+	if z.httpClient == nil {
+		z.httpClient, _ = z.Transport.Client()
+	}
+	return err
+}
 
 func (z *ZipURLSource) Fetch() error {
 	changed, err := checkIfChanged(z)
@@ -181,6 +195,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
+
 	req, err := http.NewRequest(method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)
@@ -188,7 +203,7 @@ func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
 	if z.Username != "" && z.Password != "" {
 		req.SetBasicAuth(z.Username, z.Password)
 	}
-	return http.DefaultClient.Do(req)
+	return z.httpClient.Do(req)
 }
 
 func download(z *ZipURLSource, tf *os.File) (etag string, err error) {

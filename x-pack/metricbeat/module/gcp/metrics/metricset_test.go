@@ -34,11 +34,52 @@ func Test_metricsConfig_AddPrefixTo(t *testing.T) {
 			fields: fakeMetricsConfig[2],
 			want:   "foobar/" + metric,
 		},
+		{
+			name:   "service metric prefix override (w/ dot)",
+			fields: metricsConfig{"billing", "foo.bar/", []string{}, ""},
+			want:   "foo.bar/" + metric,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := tt.fields.AddPrefixTo(metric); got != tt.want {
 				t.Errorf("metricsConfig.AddPrefixTo(%s) = %v, want %v", metric, got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_metricsConfig_RemovePrefixFrom(t *testing.T) {
+	metric := "awesome/metric"
+	tests := []struct {
+		name   string
+		fields metricsConfig
+		metric string
+		want   string
+	}{
+		{
+			name:   "only service name",
+			fields: fakeMetricsConfig[0],
+			metric: "billing.googleapis.com/" + metric,
+			want:   metric,
+		},
+		{
+			name:   "service metric prefix override",
+			fields: fakeMetricsConfig[1],
+			metric: "foobar/" + metric,
+			want:   metric,
+		},
+		{
+			name:   "service metric prefix override (without trailing /)",
+			fields: fakeMetricsConfig[2],
+			metric: "foobar/" + metric,
+			want:   metric,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := tt.fields.RemovePrefixFrom(metric); got != tt.want {
+				t.Errorf("metricsConfig.RemovePrefixFrom(%s) = %v, want %v", metric, got, tt.want)
 			}
 		})
 	}

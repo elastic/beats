@@ -7,6 +7,8 @@
 
 experimental[]
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for F5 network device's logs. It includes the following
 filesets for receiving logs over syslog or read from a file:
 

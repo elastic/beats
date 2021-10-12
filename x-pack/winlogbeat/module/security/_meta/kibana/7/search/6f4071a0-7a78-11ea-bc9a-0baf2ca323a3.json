@@ -1,0 +1,89 @@
+{
+    "attributes": {
+        "columns": [
+            "user.name",
+            "source.domain",
+            "source.ip",
+            "winlog.logon.id",
+            "event.action"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4778",
+                                "4779"
+                            ],
+                            "type": "phrases",
+                            "value": "4778, 4779"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4778"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4779"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Remote Interactive Connections and Disconnections [Winlogbeat Security]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "6f4071a0-7a78-11ea-bc9a-0baf2ca323a3",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-11T13:18:58.346Z",
+    "version": "WzIyNzUsMl0="
+}

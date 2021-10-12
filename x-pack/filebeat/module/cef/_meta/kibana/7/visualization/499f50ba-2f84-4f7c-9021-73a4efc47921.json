@@ -1,0 +1,168 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Outcome [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "2fddda5e-d6fc-4581-bbb7-574e1017ae8f"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "bar_color": null,
+                        "id": "23db5bf6-f787-474e-86ab-76362432e984",
+                        "value": 0
+                    }
+                ],
+                "drilldown_url": "",
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceType:\"Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "3ed9a6b9-fd2e-4e0d-bd83-7ad467b3c8a4"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "ec53a1d3-213c-4b0f-a074-5005a84cdb83",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(211,49,21,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "lucene",
+                            "query": "(cef.extensions.categoryDeviceGroup:\"/Firewall\" OR cef.extensions.categoryDeviceGroup:\"/IDS/Network\" OR cef.extensions.categoryDeviceGroup:\"/VPN\") AND _exists_:cef.extensions.categoryOutcome"
+                        },
+                        "formatter": "number",
+                        "id": "04c44192-1112-4515-a8d9-e9e13215aecf",
+                        "label": "Events",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "id": "c5dbb050-fc10-4a0d-abe0-bc093db6cf0e",
+                                "type": "count"
+                            },
+                            {
+                                "alpha": 0.3,
+                                "beta": 0.1,
+                                "field": "c5dbb050-fc10-4a0d-abe0-bc093db6cf0e",
+                                "gamma": 0.3,
+                                "id": "c43af7e6-3f06-48a4-a7c3-7ba8bd6214f9",
+                                "model_type": "simple",
+                                "multiplicative": false,
+                                "period": 1,
+                                "type": "moving_average",
+                                "window": "10"
+                            }
+                        ],
+                        "point_size": "0",
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(254,146,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
+                                },
+                                "id": "4c7aac7d-2749-41b6-8136-40dc8636a7e7",
+                                "label": "Firewall"
+                            }
+                        ],
+                        "split_mode": "filter",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "observer.hostname",
+                        "terms_order_by": null
+                    },
+                    {
+                        "axis_position": "left",
+                        "chart_type": "bar",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": "1",
+                        "formatter": "number",
+                        "id": "29d6131a-5143-4a64-b597-9538692f0269",
+                        "label": "Moving Average by Event Outcome",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "dc74afdf-64ad-47d6-bbed-114e09d12255",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(104,188,0,0.35)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Success\""
+                                },
+                                "id": "cb1ae397-13a0-4b6f-a848-bcdc96870f05",
+                                "label": "Success"
+                            },
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Failure\""
+                                },
+                                "id": "ef021c15-1b95-4334-bc3c-e2950e9b0f6f",
+                                "label": "Failure"
+                            },
+                            {
+                                "color": "rgba(0,156,224,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "cef.extensions.categoryOutcome:\"/Attempt\""
+                                },
+                                "id": "2ff1e859-b178-4824-a0f2-69a115932b98",
+                                "label": "Attempt"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "stacked",
+                        "terms_field": "cef.extensions.categoryOutcome",
+                        "terms_size": "3"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Outcome [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "499f50ba-2f84-4f7c-9021-73a4efc47921",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:39.286Z",
+    "version": "WzQ3NDksMV0="
+}

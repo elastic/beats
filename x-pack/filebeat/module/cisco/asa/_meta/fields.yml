@@ -187,3 +187,21 @@
     default_field: false
     description: >
       The WebVPN group name the user belongs to
+
+  - name: termination_initiator
+    type: keyword
+    default_field: false
+    description: >
+      Interface name of the side that initiated the teardown
+
+  - name: tunnel_type
+    type: keyword
+    default_field: false
+    description: >
+      SA type (remote access or L2L)
+
+  - name: session_type
+    type: keyword
+    default_field: false
+    description: >
+      Session type (for example, IPsec or UDP)

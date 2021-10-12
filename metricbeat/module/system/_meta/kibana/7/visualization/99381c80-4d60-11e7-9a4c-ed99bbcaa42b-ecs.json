@@ -1,0 +1,69 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Interfaces by Incoming traffic [Metricbeat System] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "44596d40-4d60-11e7-9a4c-ed99bbcaa42b"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "42ceae90-4d60-11e7-9a4c-ed99bbcaa42b",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "bytes",
+                        "id": "42ced5a0-4d60-11e7-9a4c-ed99bbcaa42b",
+                        "label": "Interfaces by Incoming traffic",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "system.network.in.bytes",
+                                "id": "42ced5a1-4d60-11e7-9a4c-ed99bbcaa42b",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "system.network.name",
+                        "terms_order_by": "42ced5a1-4d60-11e7-9a4c-ed99bbcaa42b"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Interfaces by Incoming traffic [Metricbeat System] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "99381c80-4d60-11e7-9a4c-ed99bbcaa42b-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:24.050Z",
+    "version": "WzM4NzEsMV0="
+}
