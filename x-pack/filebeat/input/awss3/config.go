@@ -115,10 +115,6 @@ func (c *config) Validate() error {
 	if c.PathStyle && c.AWSConfig.Endpoint == "" {
 		return errors.New("Cannot use path style when using AWS native S3 services")
 	}
-	if c.ProviderOverride != "" && c.AWSConfig.Endpoint != "" {
-		logp.NewLogger(inputName).Warnf("provider should be set when using a non AWS S3 bucket.  By default `cloud.provider: aws`")
-		return nil
-	}
 	if c.ProviderOverride != "" && c.AWSConfig.Endpoint == "" {
 		return errors.New("Cannot override provider when using AWS native S3 services")
 	}

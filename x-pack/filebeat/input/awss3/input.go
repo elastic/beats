@@ -319,12 +319,10 @@ func getProviderFromDomain(endpoint string, ProviderOverride string) string {
 
 	parsedEndpoint, _ := url.Parse(endpoint)
 	domain := parsedEndpoint.Hostname()
-	// logp.NewLogger(inputName).Warnf("Domain: %s", domain)
 	for key, provider := range providers {
 		if strings.HasSuffix(domain, key) {
-			// logp.NewLogger(inputName).Warnf("%s - %s - %s", domain, key, provider)
 			return provider
 		}
 	}
-	return "aws"
+	return "unknown"
 }
