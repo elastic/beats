@@ -229,8 +229,8 @@ func (m *FileReaderManager) cleanup() {
 
 //FileHarvester:
 type FileHarvester struct {
-	config  config
-	state   file.State
+	config config
+	state  file.State
 
 	runOnce sync.Once
 
@@ -243,6 +243,8 @@ type FileHarvester struct {
 	reader          reader.Reader
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
+
+	readerDone sync.WaitGroup
 
 	//harvester
 	forwarders     map[uuid.UUID]*ReuseHarvester
@@ -288,7 +290,7 @@ func (h *FileHarvester) AddForwarder(reuseReader *ReuseHarvester) error {
 	}
 
 	//add forwarder
-	go func() {h.forwarder <- reuseReader}()
+	go func() { h.forwarder <- reuseReader }()
 
 	// start to read file
 	h.runOnce.Do(func() {
@@ -314,7 +316,7 @@ func (h *FileHarvester) Run() {
 	L:
 		for {
 			select {
-			case  rr := <-h.forwarder:
+			case rr := <-h.forwarder:
 				logp.Info("forwarder(%s) cannot join. now exit. file:%s", rr.HarvesterID, h.state.Source)
 				continue
 			default:
@@ -352,6 +354,9 @@ func (h *FileHarvester) Run() {
 				h.state.Offset = offset
 				logp.Info("reload file offset to (%d) success. file:%s", offset, h.state.Source)
 
+				// until reader close, only one reader can running
+				h.readerDone.Wait()
+
 				// read file
 				go h.loopRead()
 			}
@@ -362,9 +367,11 @@ func (h *FileHarvester) Run() {
 // loopRead: loop read file, then forward to receive
 func (h *FileHarvester) loopRead() {
 	defer func() {
+		h.readerDone.Done()
 		logp.Info("loop Read quit. because file(%s) is close.", h.state.Source)
 	}()
 
+	h.readerDone.Add(1)
 	for {
 		select {
 		case <-h.done:
