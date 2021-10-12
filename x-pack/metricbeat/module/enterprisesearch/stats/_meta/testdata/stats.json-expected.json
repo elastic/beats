@@ -77,6 +77,15 @@
                         "5xx": 5
                     }
                 },
+                "product_usage": {
+                    "app_search": {
+                        "total_engines": 1
+                    },
+                    "workplace_search": {
+                        "total_org_sources": 2,
+                        "total_private_sources": 3
+                    }
+                },
                 "queues": {
                     "engine_destroyer": {
                         "count": 1

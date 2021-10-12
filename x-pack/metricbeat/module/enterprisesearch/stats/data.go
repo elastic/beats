@@ -86,6 +86,16 @@ var (
 				}),
 			}),
 		}),
+
+		"product_usage": c.Dict("product_usage", s.Schema{
+			"app_search": c.Dict("app_search", s.Schema{
+				"total_engines": c.Int("total_engines"),
+			}),
+			"workplace_search": c.Dict("workplace_search", s.Schema{
+				"total_org_sources":     c.Int("total_org_sources"),
+				"total_private_sources": c.Int("total_private_sources"),
+			}),
+		}),
 	}
 )
 

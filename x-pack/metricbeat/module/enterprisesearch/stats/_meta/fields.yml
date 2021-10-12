@@ -22,7 +22,7 @@
             - name: working
               type: long
               description: Number of connectors jobs currently being processed.
-            
+
             - name: job_types
               type: group
               description: Breakdown of connectors jobs by types.
@@ -222,7 +222,7 @@
         - name: engine_destroyer.count
           type: long
           description: Total number of jobs processed via the engine_destroyer queue since the start of the instance.
-          
+
         - name: mailer.count
           type: long
           description: Total number of jobs processed via the mailer queue since the start of the instance.
@@ -230,7 +230,31 @@
         - name: process_crawl.count
           type: long
           description: Total number of jobs processed via the process_crawl queue since the start of the instance.
-          
+
         - name: failed.count
           type: long
           description: Total number of jobs waiting in the failed queue.
+
+    - name: product_usage
+      type: group
+      description: Aggregate product usage statistics for the Enterprise Search deployment.
+      fields:
+        - name: app_search
+          type: group
+          description: App Search product usage statistics.
+          fields:
+          - name: total_engines
+            type: long
+            description: Current number of App Search engines within the deployment.
+
+        - name: workplace_search
+          type: group
+          description: Workplace Search product usage statistics.
+          fields:
+            - name: total_org_sources
+              type: long
+              description: Current number of Workplace Search org-wide content sources within the deployment.
+
+            - name: total_private_sources
+              type: long
+              description: Current number of Workplace Search private content sources within the deployment.
