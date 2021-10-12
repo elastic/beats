@@ -454,6 +454,7 @@ shared:
     <<: *agent_docker_spec
     extra_vars:
       image_name: '{{.BeatName}}-cloud'
+      repository: 'docker.elastic.co/beats-ci'
 
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
@@ -1018,9 +1019,9 @@ specs:
       arch: amd64
       types: [docker]
       spec:
+        <<: *elastic_docker_spec
         <<: *agent_docker_spec
         <<: *agent_docker_cloud_spec
-        <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
@@ -1057,9 +1058,9 @@ specs:
       arch: arm64
       types: [docker]
       spec:
+        <<: *elastic_docker_spec
         <<: *agent_docker_arm_spec
         <<: *agent_docker_cloud_spec
-        <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
         files:
           '{{.BeatName}}{{.BinaryExt}}':
