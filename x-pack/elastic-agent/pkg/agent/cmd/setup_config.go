@@ -43,6 +43,7 @@ type elasticsearchConfig struct {
 	Username     string `config:"username"`
 	Password     string `config:"password"`
 	ServiceToken string `config:"service_token"`
+	Insecure     bool   `config:"insecure"`
 }
 
 type kibanaConfig struct {
@@ -92,6 +93,7 @@ func defaultAccessConfig() (setupConfig, error) {
 				Password:     envWithDefault("changeme", "FLEET_SERVER_ELASTICSEARCH_PASSWORD", "ELASTICSEARCH_PASSWORD"),
 				ServiceToken: envWithDefault("", "FLEET_SERVER_SERVICE_TOKEN"),
 				CA:           envWithDefault("", "FLEET_SERVER_ELASTICSEARCH_CA", "ELASTICSEARCH_CA"),
+				Insecure:     envBool("FLEET_SERVER_ELASTICSEARCH_INSECURE"),
 			},
 			Enable:       envBool("FLEET_SERVER_ENABLE"),
 			Host:         envWithDefault("", "FLEET_SERVER_HOST"),
