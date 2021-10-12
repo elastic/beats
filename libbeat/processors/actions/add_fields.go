@@ -73,11 +73,13 @@ func NewAddFields(fields common.MapStr, shared bool, overwrite bool) processors.
 
 func (af *addFields) Run(event *beat.Event) (*beat.Event, error) {
 	fields := af.fields
-	if af.shared {
+	if af.shared || event.Fields == nil {
 		fields = fields.Clone()
 	}
 
-	if af.overwrite {
+	if event.Fields == nil {
+		event.Fields = fields
+	} else if af.overwrite {
 		event.Fields.DeepUpdate(fields)
 	} else {
 		event.Fields.DeepUpdateNoOverwrite(fields)

@@ -5,6 +5,7 @@
 package mage
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -121,7 +122,7 @@ func checkCacheAndFetch(osarch distro.OSArch, spec distro.Spec) (fetched bool, e
 		log.Printf("Hash mismatch, expected: %s, got: %s.", specHash, fileHash)
 	}
 
-	fileHash, err = fetch.Download(url, fp)
+	fileHash, err = fetch.Download(context.Background(), url, fp)
 	if err != nil {
 		log.Printf("File %s fetch failed, err: %v", url, err)
 		return
