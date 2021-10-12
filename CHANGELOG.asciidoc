@@ -16,7 +16,7 @@ https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
 
 *Metricbeat*
 
-- Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
+- Add support for kube-state-metrics v2.0.0. {pull}27552[27552]
 
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
