@@ -1,5 +1,6 @@
 [
     {
+        "@timestamp": "2020-07-03T15:15:39.130Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "c5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -53,6 +54,7 @@
         "threat.technique.name": "Malware"
     },
     {
+        "@timestamp": "2020-06-30T15:29:44.773Z",
         "cloud.account.id": "123543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "543bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -123,6 +125,7 @@
         "user.name": "administrator1"
     },
     {
+        "@timestamp": "2020-06-30T15:29:44.773Z",
         "cloud.account.id": "43521344-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "53425a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
@@ -184,6 +187,7 @@
         "user.name": "administrator1"
     },
     {
+        "@timestamp": "2020-06-30T11:13:12.900Z",
         "cloud.account.id": "1234543-d66c-4c7e-9e30-40034eb7c6f3",
         "cloud.instance.id": "t4563234bc5a964f417c11f6277d5bf9489f0d",
         "cloud.provider": "azure",
