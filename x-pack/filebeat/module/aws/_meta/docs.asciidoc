@@ -45,6 +45,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -62,6 +63,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -79,6 +81,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -96,6 +99,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -113,6 +117,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -130,6 +135,7 @@ Example config:
     enabled: false
     #var.queue_url: https://sqs.myregion.amazonaws.com/123456/myqueue
     #var.bucket_arn: 'arn:aws:s3:::mybucket'
+    #var.bucket_list_prefix: 'prefix'
     #var.bucket_list_interval: 300s
     #var.number_of_workers: 5
     #var.shared_credential_file: /etc/filebeat/aws_credentials
@@ -172,6 +178,10 @@ Use to vertically scale the input.
 *`var.bucket_list_interval`*::
 
 Wait interval between completion of a list request to the S3 bucket and beginning of the next one. Default to be 120 seconds.
+
+*`var.bucket_list_prefix`*::
+
+Prefix to apply for the list request to the S3 bucket. Default empty.
 
 *`var.endpoint`*::
 

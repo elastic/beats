@@ -66,7 +66,7 @@ type s3Getter interface {
 }
 
 type s3Lister interface {
-	ListObjectsPaginator(bucket string) s3Pager
+	ListObjectsPaginator(bucket, prefix string) s3Pager
 }
 
 type s3Pager interface {
@@ -204,9 +204,10 @@ func (a *awsS3API) GetObject(ctx context.Context, bucket, key string) (*s3.GetOb
 	return resp, nil
 }
 
-func (a *awsS3API) ListObjectsPaginator(bucket string) s3Pager {
+func (a *awsS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	req := a.client.ListObjectsRequest(&s3.ListObjectsInput{
 		Bucket: awssdk.String(bucket),
+		Prefix: awssdk.String(prefix),
 	})
 
 	pager := s3.NewListObjectsPaginator(req)
