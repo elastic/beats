@@ -56,4 +56,7 @@
     description: Count of packets sent over the network
   - name: instance.uptime.value
     type: long
-    description: How long the VM has been running, in seconds
+    description: Number of seconds the VM has been running.
+  - name: instance.uptime_total.value
+    type: long
+    description: Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
