@@ -7,6 +7,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -16,6 +17,12 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 )
+
+var diagOutputs = map[string]outputter{
+	"human": humanDiagnosticsOutput,
+	"json":  jsonOutput,
+	"yaml":  yamlOutput,
+}
 
 func newDiagnosticsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
@@ -29,6 +36,8 @@ func newDiagnosticsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 			}
 		},
 	}
+
+	cmd.Flags().String("output", "human", "Output the diagnostics information in either human, json, or yaml (default: human)")
 
 	return cmd
 }
@@ -45,6 +54,12 @@ func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) er
 		return err
 	}
 
+	output, _ := cmd.Flags().GetString("output")
+	outputFunc, ok := diagOutputs[output]
+	if !ok {
+		return fmt.Errorf("unsupported output: %s", output)
+	}
+
 	ctx := handleSignal(context.Background())
 	innerCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
@@ -58,8 +73,7 @@ func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) er
 		return fmt.Errorf("failed to communicate with Elastic Agent daemon: %s", err)
 	}
 
-	fmt.Fprintf(streams.Out, "%+v\n", diag)
-	return nil
+	return outputFunc(streams.Out, diag)
 }
 
 func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
@@ -84,4 +98,17 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 	diag.AgentVersion = version
 
 	return diag, nil
+}
+
+func humanDiagnosticsOutput(w io.Writer, obj interface{}) error {
+	diag, ok := obj.(DiagnosticsInfo)
+	if !ok {
+		return fmt.Errorf("unable to cast %T as DiagnosticsInfo")
+	}
+	return outputDiagnostics(w, diag)
+}
+
+func outputDiagnostics(w io.Writer, d DiagnosticsInfo) error {
+	fmt.Fprintf(w, "%#v\n", d)
+	return nil
 }
