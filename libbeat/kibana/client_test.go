@@ -96,6 +96,26 @@ func TestSuccess(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestServiceToken(t *testing.T) {
+	serviceToken := "fakeservicetoken"
+
+	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{}`))
+
+		assert.Equal(t, "Bearer "+serviceToken, r.Header.Get("Authorization"))
+	}))
+	defer kibanaTs.Close()
+
+	conn := Connection{
+		URL:          kibanaTs.URL,
+		HTTP:         http.DefaultClient,
+		ServiceToken: serviceToken,
+	}
+	code, _, err := conn.Request(http.MethodPost, "", url.Values{}, http.Header{"foo": []string{"bar"}}, nil)
+	assert.Equal(t, http.StatusOK, code)
+	assert.NoError(t, err)
+}
+
 func TestNewKibanaClient(t *testing.T) {
 	var requests []*http.Request
 	kibanaTs := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

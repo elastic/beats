@@ -51,7 +51,7 @@ var (
 
 		Labels: map[string]p.LabelMap{
 			"replicaset": p.KeyLabel("name"),
-			"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+			"namespace":  p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
 		},
 	}
 )

@@ -25,13 +25,14 @@ import (
 
 // ClientConfig to connect to Kibana
 type ClientConfig struct {
-	Protocol string `config:"protocol" yaml:"protocol,omitempty"`
-	Host     string `config:"host" yaml:"host,omitempty"`
-	Path     string `config:"path" yaml:"path,omitempty"`
-	SpaceID  string `config:"space.id" yaml:"space.id,omitempty"`
-	Username string `config:"username" yaml:"username,omitempty"`
-	Password string `config:"password" yaml:"password,omitempty"`
-	APIKey   string `config:"api_key" yaml:"api_key,omitempty"`
+	Protocol     string `config:"protocol" yaml:"protocol,omitempty"`
+	Host         string `config:"host" yaml:"host,omitempty"`
+	Path         string `config:"path" yaml:"path,omitempty"`
+	SpaceID      string `config:"space.id" yaml:"space.id,omitempty"`
+	Username     string `config:"username" yaml:"username,omitempty"`
+	Password     string `config:"password" yaml:"password,omitempty"`
+	APIKey       string `config:"api_key" yaml:"api_key,omitempty"`
+	ServiceToken string `config:"service_token" yaml:"service_token,omitempty"`
 
 	// Headers holds headers to include in every request sent to Kibana.
 	Headers map[string]string `config:"headers" yaml:"headers,omitempty"`
@@ -44,14 +45,15 @@ type ClientConfig struct {
 // DefaultClientConfig connects to a locally running kibana over HTTP
 func DefaultClientConfig() ClientConfig {
 	return ClientConfig{
-		Protocol:  "http",
-		Host:      "localhost:5601",
-		Path:      "",
-		SpaceID:   "",
-		Username:  "",
-		Password:  "",
-		APIKey:    "",
-		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		Protocol:     "http",
+		Host:         "localhost:5601",
+		Path:         "",
+		SpaceID:      "",
+		Username:     "",
+		Password:     "",
+		APIKey:       "",
+		ServiceToken: "",
+		Transport:    httpcommon.DefaultHTTPTransportSettings(),
 	}
 }
 
