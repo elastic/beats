@@ -50,7 +50,10 @@ func testProcessors(t *testing.T, cases map[string]testCase) {
 				}
 			}
 
-			current := &beat.Event{Fields: test.event.Clone()}
+			current := &beat.Event{}
+			if test.event != nil {
+				current.Fields = test.event.Clone()
+			}
 			for i, processor := range ps {
 				var err error
 				current, err = processor.Run(current)
