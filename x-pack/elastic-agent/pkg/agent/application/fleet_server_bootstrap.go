@@ -108,7 +108,7 @@ func newFleetServerBootstrap(
 		agentInfo,
 		router,
 		&pipeline.ConfigModifiers{
-			Filters: []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectInsecureOutput(cfg.Fleet), modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
+			Filters: []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectFleet(rawConfig, sysInfo.Info(), agentInfo)},
 		},
 	)
 	if err != nil {

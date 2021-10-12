@@ -73,17 +73,18 @@ type enrollCmd struct {
 
 // enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type enrollCmdFleetServerOption struct {
-	ConnStr         string
-	ElasticsearchCA string
-	ServiceToken    string
-	PolicyID        string
-	Host            string
-	Port            uint16
-	Cert            string
-	CertKey         string
-	Insecure        bool
-	SpawnAgent      bool
-	Headers         map[string]string
+	ConnStr               string
+	ElasticsearchCA       string
+	ElasticsearchInsecure bool
+	ServiceToken          string
+	PolicyID              string
+	Host                  string
+	Port                  uint16
+	Cert                  string
+	CertKey               string
+	Insecure              bool
+	SpawnAgent            bool
+	Headers               map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.
@@ -304,7 +305,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.ProxyURL,
 		c.options.ProxyDisabled,
 		c.options.ProxyHeaders,
-		c.options.Insecure,
+		c.options.FleetServer.ElasticsearchInsecure,
 	)
 	if err != nil {
 		return "", err
@@ -499,7 +500,7 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
 			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
-			c.options.Insecure,
+			c.options.FleetServer.ElasticsearchInsecure,
 		)
 		if err != nil {
 			return err

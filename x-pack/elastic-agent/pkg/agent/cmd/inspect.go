@@ -260,15 +260,10 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 		return nil, err
 	}
 
-	configuration, err := configuration.NewFromConfig(cfg)
-	if err != nil {
-		return nil, err
-	}
-
 	composableWaiter := newWaitForCompose(composableCtrl)
 	configModifiers := &pipeline.ConfigModifiers{
 		Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},
-		Filters:    []pipeline.FilterFunc{filters.StreamChecker, modifiers.InjectInsecureOutput(configuration.Fleet)},
+		Filters:    []pipeline.FilterFunc{filters.StreamChecker},
 	}
 
 	if !isStandalone {
