@@ -39,6 +39,10 @@ func InitModule() error {
 	if err != nil {
 		return errors.Wrap(err, "error adding replaced modules to go.mod")
 	}
+	err = gotool.Mod.Download()
+	if err != nil {
+		return errors.Wrap(err, "error downloading deps")
+	}
 	return gotool.Mod.Tidy()
 }
 
