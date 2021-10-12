@@ -3235,6 +3235,7 @@
     },
     {
         "cisco.asa.message_id": "113019",
+        "cisco.asa.session_type": "LAN-to-LAN",
         "destination.address": "91.240.17.178",
         "destination.as.number": 201126,
         "destination.as.organization.name": "CDW Ltd",
@@ -3254,13 +3255,14 @@
         ],
         "event.code": 113019,
         "event.dataset": "cisco.asa",
-        "event.duration": 0,
+        "event.duration": 1936000000000,
         "event.end": "2021-04-27T02:03:03.000-02:00",
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%ASA-4-113019: Group = 91.240.17.178, Username = 91.240.17.178, IP = 91.240.17.178, Session disconnected. Session Type: LAN-to-LAN, Duration: 0h:32m:16s, Bytes xmt: 297103, Bytes rcv: 1216163, Reason: User Requested",
+        "event.reason": "User Requested",
         "event.severity": 4,
-        "event.start": "2021-04-27T04:03:03.000Z",
+        "event.start": "2021-04-27T03:30:47.000Z",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
@@ -3285,6 +3287,7 @@
         ],
         "service.type": "cisco",
         "source.bytes": 297103,
+        "source.user.group.name": "91.240.17.178",
         "source.user.name": "91.240.17.178",
         "tags": [
             "cisco-asa",
