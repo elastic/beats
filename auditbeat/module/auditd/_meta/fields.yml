@@ -858,7 +858,8 @@
     type: group
     description: >
       The geoip fields are defined as a convenience in case you decide to
-      enrich the data using a geoip filter in Logstash or Ingest Node.
+      enrich the data using a geoip filter in Logstash or an Elasticsearch geoip
+      ingest processor.
     fields:
       - name: continent_name
         type: keyword

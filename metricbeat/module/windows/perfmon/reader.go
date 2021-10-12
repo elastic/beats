@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build windows
 // +build windows
 
 package perfmon
@@ -218,18 +219,6 @@ func (re *Reader) getCounter(query string) (bool, PerfCounter) {
 
 func (re *Reader) mapCounters(config Config) {
 	re.counters = []PerfCounter{}
-	if len(config.Counters) > 0 {
-		for _, counter := range config.Counters {
-			re.counters = append(re.counters, PerfCounter{
-				InstanceField: counter.InstanceLabel,
-				InstanceName:  counter.InstanceName,
-				QueryField:    counter.MeasurementLabel,
-				QueryName:     counter.Query,
-				Format:        counter.Format,
-				ChildQueries:  nil,
-			})
-		}
-	}
 	if len(config.Queries) > 0 {
 		for _, query := range config.Queries {
 			for _, counter := range query.Counters {

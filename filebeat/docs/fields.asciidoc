@@ -21577,6 +21577,16 @@ type: keyword
 
 --
 
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -27522,16 +27532,6 @@ coredns fields after normalization
 
 
 
-*`coredns.id`*::
-+
---
-id of the DNS transaction
-
-
-type: keyword
-
---
-
 *`coredns.query.size`*::
 +
 --
@@ -27544,56 +27544,6 @@ format: bytes
 
 --
 
-*`coredns.query.class`*::
-+
---
-DNS query class
-
-
-type: keyword
-
---
-
-*`coredns.query.name`*::
-+
---
-DNS query name
-
-
-type: keyword
-
---
-
-*`coredns.query.type`*::
-+
---
-DNS query type
-
-
-type: keyword
-
---
-
-*`coredns.response.code`*::
-+
---
-DNS response code
-
-
-type: keyword
-
---
-
-*`coredns.response.flags`*::
-+
---
-DNS response flags
-
-
-type: keyword
-
---
-
 *`coredns.response.size`*::
 +
 --
@@ -27603,16 +27553,6 @@ size of the DNS response
 type: integer
 
 format: bytes
-
---
-
-*`coredns.dnssec_ok`*::
-+
---
-dnssec flag
-
-
-type: boolean
 
 --
 
@@ -85791,13 +85731,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 
@@ -151429,6 +151400,156 @@ type: keyword
 --
 
 *`threatintel.misp.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.id`*::
++
+--
+The ID of the secondary attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.type`*::
++
+--
+The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.category`*::
++
+--
+The category of the secondary attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.to_ids`*::
++
+--
+If the secondary attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.uuid`*::
++
+--
+The UUID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.event_id`*::
++
+--
+The local event ID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.distribution`*::
++
+--
+How the secondary attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.context.attribute.timestamp`*::
++
+--
+The timestamp in which the secondary attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.context.attribute.comment`*::
++
+--
+Comments made to the secondary attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific secondary attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.deleted`*::
++
+--
+If the secondary attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the secondary attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.object_id`*::
++
+--
+The ID of the Object in which the secondary attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.object_relation`*::
++
+--
+The type of relation the secondary attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.value`*::
 +
 --
 The value of the attribute, depending on the type like "url, sha1, email-src".

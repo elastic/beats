@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build darwin || freebsd || aix || openbsd || windows
 // +build darwin freebsd aix openbsd windows
 
 package memory
