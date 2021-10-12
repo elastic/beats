@@ -75,8 +75,13 @@ func NewLineReader(input io.ReadCloser, config Config) (*LineReader, error) {
 	}, nil
 }
 
-// Next reads the next line until the new line character
-func (r *LineReader) Next() ([]byte, int, error) {
+// Next reads the next line until the new line character.  The return
+// value b is the byte slice that contains the next line.  The return
+// value n is the number of bytes that were consumed from the
+// underlying reader to read the next line.  If the LineReader is
+// configured with maxBytes n may be larger than the length of b due
+// to skipped lines.
+func (r *LineReader) Next() (b []byte, n int, err error) {
 	// This loop is need in case advance detects an line ending which turns out
 	// not to be one when decoded. If that is the case, reading continues.
 	for {
