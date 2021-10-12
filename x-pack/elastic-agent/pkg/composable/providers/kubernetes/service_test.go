@@ -61,8 +61,10 @@ func TestGenerateServiceData(t *testing.T) {
 			"name": service.GetName(),
 			"ip":   service.Spec.ClusterIP,
 		},
-		"namespace_annotations": common.MapStr{
-			"nsa": "nsb",
+		"namespace": common.MapStr{
+			"annotations": common.MapStr{
+				"nsa": "nsb",
+			},
 		},
 		"annotations": common.MapStr{
 			"baz": "ban",
