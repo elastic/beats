@@ -41,6 +41,7 @@ type s3ObjectPayload struct {
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
+	listPrefix           string
 	region               string
 	bucketPollInterval   time.Duration
 	workerSem            *sem
@@ -61,6 +62,7 @@ func newS3Poller(log *logp.Logger,
 	states *states,
 	store *statestore.Store,
 	bucket string,
+	listPrefix string,
 	awsRegion string,
 	numberOfWorkers int,
 	bucketPollInterval time.Duration) *s3Poller {
@@ -70,6 +72,7 @@ func newS3Poller(log *logp.Logger,
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
 		bucket:               bucket,
+		listPrefix:           listPrefix,
 		region:               awsRegion,
 		bucketPollInterval:   bucketPollInterval,
 		workerSem:            newSem(numberOfWorkers),
@@ -142,7 +145,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	bucketMetadata := strings.Split(p.bucket, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 
-	paginator := p.s3.ListObjectsPaginator(bucketName)
+	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
 	for paginator.Next(ctx) {
 		listingID, err := uuid.NewV4()
 		if err != nil {
