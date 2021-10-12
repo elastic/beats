@@ -53,9 +53,9 @@ type ApplicationStatus struct {
 	Payload map[string]interface{}
 }
 
-// BeatMeta is the running version and ID inforation for a running beat.
-type BeatMeta struct {
-	Beat               string
+// ProcMeta is the running version and ID information for a running process.
+type ProcMeta struct {
+	Process            string
 	Name               string
 	Hostname           string
 	ID                 string
@@ -93,8 +93,8 @@ type Client interface {
 	Restart(ctx context.Context) error
 	// Upgrade triggers upgrade of the current running daemon.
 	Upgrade(ctx context.Context, version string, sourceURI string) (string, error)
-	// BeatMeta gathers running beat meta-data.
-	BeatMeta(ctx context.Context) ([]BeatMeta, error)
+	// ProcMeta gathers running process meta-data.
+	ProcMeta(ctx context.Context) ([]ProcMeta, error)
 }
 
 // client manages the state and communication to the Elastic Agent.
@@ -206,33 +206,33 @@ func (c *client) Upgrade(ctx context.Context, version string, sourceURI string) 
 	return res.Version, nil
 }
 
-// BeatMeta gathers running beat metadata.
-func (c *client) BeatMeta(ctx context.Context) ([]BeatMeta, error) {
-	bv, err := c.client.BeatMeta(ctx, &proto.Empty{})
+// ProcMeta gathers running beat metadata.
+func (c *client) ProcMeta(ctx context.Context) ([]ProcMeta, error) {
+	resp, err := c.client.ProcMeta(ctx, &proto.Empty{})
 	if err != nil {
 		return nil, err
 	}
-	beatMeta := []BeatMeta{}
+	procMeta := []ProcMeta{}
 
-	for _, bm := range bv.Beats {
-		meta := BeatMeta{
-			Beat:               bm.Beat,
-			Name:               bm.Name,
-			Hostname:           bm.Hostname,
-			ID:                 bm.Id,
-			EphemeralID:        bm.EphemeralId,
-			Version:            bm.Version,
-			BuildCommit:        bm.BuildCommit,
-			Username:           bm.Username,
-			UserID:             bm.UserId,
-			UserGID:            bm.UserGid,
-			BinaryArchitecture: bm.Architecture,
-			RouteKey:           bm.RouteKey,
-			ElasticLicensed:    bm.ElasticLicensed,
-			Error:              bm.Error,
+	for _, proc := range resp.Procs {
+		meta := ProcMeta{
+			Process:            proc.Process,
+			Name:               proc.Name,
+			Hostname:           proc.Hostname,
+			ID:                 proc.Id,
+			EphemeralID:        proc.EphemeralId,
+			Version:            proc.Version,
+			BuildCommit:        proc.BuildCommit,
+			Username:           proc.Username,
+			UserID:             proc.UserId,
+			UserGID:            proc.UserGid,
+			BinaryArchitecture: proc.Architecture,
+			RouteKey:           proc.RouteKey,
+			ElasticLicensed:    proc.ElasticLicensed,
+			Error:              proc.Error,
 		}
-		if bm.BuildTime != "" {
-			ts, err := time.Parse(time.RFC3339, bm.BuildTime)
+		if proc.BuildTime != "" {
+			ts, err := time.Parse(time.RFC3339, proc.BuildTime)
 			if err != nil {
 				if meta.Error != "" {
 					meta.Error += ", " + err.Error()
@@ -243,7 +243,7 @@ func (c *client) BeatMeta(ctx context.Context) ([]BeatMeta, error) {
 				meta.BuildTime = ts
 			}
 		}
-		beatMeta = append(beatMeta, meta)
+		procMeta = append(procMeta, meta)
 	}
-	return beatMeta, nil
+	return procMeta, nil
 }

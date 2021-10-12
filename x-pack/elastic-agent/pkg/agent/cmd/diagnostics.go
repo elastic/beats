@@ -35,7 +35,7 @@ func newDiagnosticsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 
 // DiagnosticsInfo a struct to track all inforation related to diagnostics for the agent.
 type DiagnosticsInfo struct {
-	BeatMeta     []client.BeatMeta
+	ProcMeta     []client.ProcMeta
 	AgentVersion client.Version
 }
 
@@ -71,11 +71,11 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 	}
 	defer daemon.Disconnect()
 
-	bv, err := daemon.BeatMeta(ctx)
+	bv, err := daemon.ProcMeta(ctx)
 	if err != nil {
 		return DiagnosticsInfo{}, err
 	}
-	diag.BeatMeta = bv
+	diag.ProcMeta = bv
 
 	version, err := daemon.Version(ctx)
 	if err != nil {

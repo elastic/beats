@@ -184,14 +184,14 @@ type BeatInfo struct {
 	ElasticLicensed bool   `json:"elastic_licensed"`
 }
 
-// BeatMeta returns version and beat inforation for all running beats.
-func (s *Server) BeatMeta(ctx context.Context, _ *proto.Empty) (*proto.BeatMetaResponse, error) {
+// ProcMeta returns version and beat inforation for all running processes.
+func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaResponse, error) {
 	if s.routeFn == nil {
 		return nil, errors.New("route function is nil")
 	}
 
-	resp := &proto.BeatMetaResponse{
-		Beats: []*proto.BeatMeta{},
+	resp := &proto.ProcMetaResponse{
+		Procs: []*proto.ProcMeta{},
 	}
 
 	routes := s.routeFn()
@@ -210,7 +210,7 @@ func (s *Server) BeatMeta(ctx context.Context, _ *proto.Empty) (*proto.BeatMetaR
 		specs := sp.Specs()
 
 		for n, spec := range specs {
-			beatMeta := &proto.BeatMeta{
+			procMeta := &proto.ProcMeta{
 				Name:     n,
 				RouteKey: rk,
 			}
@@ -235,13 +235,13 @@ func (s *Server) BeatMeta(ctx context.Context, _ *proto.Empty) (*proto.BeatMetaR
 
 			res, err := client.Get("http://" + endpoint + "/")
 			if err != nil {
-				beatMeta.Error = err.Error()
-				resp.Beats = append(resp.Beats, beatMeta)
+				procMeta.Error = err.Error()
+				resp.Procs = append(resp.Procs, procMeta)
 				continue
 			}
 			if res.StatusCode != 200 {
-				beatMeta.Error = "response status is: " + res.Status
-				resp.Beats = append(resp.Beats, beatMeta)
+				procMeta.Error = "response status is: " + res.Status
+				resp.Procs = append(resp.Procs, procMeta)
 				continue
 			}
 
@@ -249,26 +249,26 @@ func (s *Server) BeatMeta(ctx context.Context, _ *proto.Empty) (*proto.BeatMetaR
 			dec := json.NewDecoder(res.Body)
 			if err := dec.Decode(bi); err != nil {
 				res.Body.Close()
-				beatMeta.Error = err.Error()
-				resp.Beats = append(resp.Beats, beatMeta)
+				procMeta.Error = err.Error()
+				resp.Procs = append(resp.Procs, procMeta)
 				continue
 			}
 			res.Body.Close()
 
-			beatMeta.Beat = bi.Beat
-			beatMeta.Hostname = bi.Hostname
-			beatMeta.Id = bi.ID
-			beatMeta.EphemeralId = bi.EphemeralID
-			beatMeta.Version = bi.Version
-			beatMeta.BuildCommit = bi.Commit
-			beatMeta.BuildTime = bi.Time
-			beatMeta.Username = bi.Username
-			beatMeta.UserId = bi.UserID
-			beatMeta.UserGid = bi.GroupID
-			beatMeta.Architecture = bi.BinaryArch
-			beatMeta.ElasticLicensed = bi.ElasticLicensed
+			procMeta.Process = bi.Beat
+			procMeta.Hostname = bi.Hostname
+			procMeta.Id = bi.ID
+			procMeta.EphemeralId = bi.EphemeralID
+			procMeta.Version = bi.Version
+			procMeta.BuildCommit = bi.Commit
+			procMeta.BuildTime = bi.Time
+			procMeta.Username = bi.Username
+			procMeta.UserId = bi.UserID
+			procMeta.UserGid = bi.GroupID
+			procMeta.Architecture = bi.BinaryArch
+			procMeta.ElasticLicensed = bi.ElasticLicensed
 
-			resp.Beats = append(resp.Beats, beatMeta)
+			resp.Procs = append(resp.Procs, procMeta)
 		}
 	}
 	return resp, nil
