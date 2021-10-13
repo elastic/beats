@@ -1,6 +1,6 @@
 {
     "attributes": {
-        "description": "Enterprise Search Metrics Overview",
+        "description": "Enterprise Search deployment overview: low-level metrics, network traffic and product usage information.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
@@ -1810,7 +1810,7 @@
             }
         ],
         "timeRestore": false,
-        "title": "Enterprise Search Overview",
+        "title": "[Enterprise Search] Deployment Overview",
         "version": 1
     },
     "coreMigrationVersion": "8.0.0",
