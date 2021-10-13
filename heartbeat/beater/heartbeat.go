@@ -184,13 +184,11 @@ func RunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg 
 
 	wg.Add(1)
 	go func() {
-		logp.Info("GOTIME")
 		defer wg.Done()
 		defer plugin.Close()
 		for {
 			event := <-results
 			if event == nil {
-				logp.Info("DONE")
 				break
 			}
 			publishClient.Publish(*event)
