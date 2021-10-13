@@ -28,9 +28,6 @@ type Config struct {
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`
-
-	// Undocumented settings, to be deprecated in favor of `drop_fields` processor:
-	IncludeCreatorMetadata bool `config:"include_creator_metadata"`
 }
 
 // AddResourceMetadataConfig allows adding config for enriching additional resources
@@ -41,7 +38,6 @@ type AddResourceMetadataConfig struct {
 
 // InitDefaults initializes the defaults for the config.
 func (c *Config) InitDefaults() {
-	c.IncludeCreatorMetadata = true
 	c.LabelsDedot = true
 	c.AnnotationsDedot = true
 }

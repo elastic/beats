@@ -1,0 +1,113 @@
+{
+    "attributes": {
+        "columns": [
+            "host.name",
+            "windows.service.display_name",
+            "windows.service.state",
+            "windows.service.start_type",
+            "windows.service.uptime.ms",
+            "windows.service.pid",
+            "windows.service.exit_code"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "windows",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "windows"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "windows",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "metricset.name",
+                            "negate": false,
+                            "params": {
+                                "query": "service",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "service"
+                        },
+                        "query": {
+                            "match": {
+                                "metricset.name": {
+                                    "query": "service",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Services [Metricbeat Windows] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b6b7ccc0-c98d-11e7-9835-2f31fe08873b-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:32:00.935Z",
+    "version": "WzQyMzAsMV0="
+}

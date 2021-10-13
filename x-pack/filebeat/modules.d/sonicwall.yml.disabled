@@ -3,7 +3,7 @@
 
 - module: sonicwall
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

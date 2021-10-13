@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "description": "The number of certificates issuances that have succeeded.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Citadel Cert Issuance [Metricbeat Istio]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "7ccbe640-07d8-11eb-985d-2f490d4c2901",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#6092C0",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "number",
+                        "id": "7ccbe641-07d8-11eb-985d-2f490d4c2901",
+                        "label": "success_cert_issuance",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "prometheus.citadel_server_success_cert_issuance_count.counter",
+                                "id": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
+                                "percentiles": [
+                                    {
+                                        "id": "88c0d000-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "50"
+                                    },
+                                    {
+                                        "id": "95c750d0-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "25"
+                                    },
+                                    {
+                                        "id": "9c5ec900-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "75"
+                                    },
+                                    {
+                                        "id": "9f8e3700-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "95"
+                                    },
+                                    {
+                                        "id": "a3581040-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "99"
+                                    }
+                                ],
+                                "type": "max",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "prometheus.labels.type",
+                        "terms_order_by": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
+                        "terms_size": "4",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Citadel Cert Issuance [Metricbeat Istio]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "506c8490-087f-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:32.143Z",
+    "version": "WzM5NzMsMV0="
+}

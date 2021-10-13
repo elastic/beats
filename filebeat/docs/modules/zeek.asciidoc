@@ -10,6 +10,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Zeek (Bro) Module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for https://zeek.org/[Zeek], which used to be called Bro. It
 parses logs that are in the Zeek JSON format.
 

@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Overview of Google Cloud Billing Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "2552123b-6ad6-4d63-89c3-0672ab428580",
+                    "w": 8,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2552123b-6ad6-4d63-89c3-0672ab428580",
+                "panelRefName": "panel_2552123b-6ad6-4d63-89c3-0672ab428580",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "2d3d3b79-0656-45c2-b051-4489484b625c",
+                    "w": 10,
+                    "x": 8,
+                    "y": 0
+                },
+                "panelIndex": "2d3d3b79-0656-45c2-b051-4489484b625c",
+                "panelRefName": "panel_2d3d3b79-0656-45c2-b051-4489484b625c",
+                "title": "Cost Per Month",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "b737e597-cc4d-4437-859c-6d491679599d",
+                    "w": 30,
+                    "x": 18,
+                    "y": 0
+                },
+                "panelIndex": "b737e597-cc4d-4437-859c-6d491679599d",
+                "panelRefName": "panel_b737e597-cc4d-4437-859c-6d491679599d",
+                "title": "Cost Per Project ID",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "9eedb0c7-2089-4e0f-af98-721034203aad",
+                    "w": 8,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "9eedb0c7-2089-4e0f-af98-721034203aad",
+                "panelRefName": "panel_9eedb0c7-2089-4e0f-af98-721034203aad",
+                "title": "Total Number Of Projects",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a",
+                "panelRefName": "panel_f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a",
+                "title": "Cost Per Invoice Month",
+                "type": "lens",
+                "version": "7.9.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "991e60a8-68eb-4c2b-ac9a-b553e90dd49d",
+                    "w": 48,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "991e60a8-68eb-4c2b-ac9a-b553e90dd49d",
+                "panelRefName": "panel_991e60a8-68eb-4c2b-ac9a-b553e90dd49d",
+                "title": "Total Billing Cost",
+                "type": "lens",
+                "version": "7.9.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat GCP] Billing Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "76c9e920-e890-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "5d2f9160-e88e-11ea-bf8c-d13ebf358a78",
+            "name": "2552123b-6ad6-4d63-89c3-0672ab428580:panel_2552123b-6ad6-4d63-89c3-0672ab428580",
+            "type": "visualization"
+        },
+        {
+            "id": "520c6f10-ec8a-11ea-a0ed-7fe6b565d158",
+            "name": "2d3d3b79-0656-45c2-b051-4489484b625c:panel_2d3d3b79-0656-45c2-b051-4489484b625c",
+            "type": "lens"
+        },
+        {
+            "id": "057de170-e88d-11ea-bf8c-d13ebf358a78",
+            "name": "b737e597-cc4d-4437-859c-6d491679599d:panel_b737e597-cc4d-4437-859c-6d491679599d",
+            "type": "lens"
+        },
+        {
+            "id": "dd835300-e88f-11ea-bf8c-d13ebf358a78",
+            "name": "9eedb0c7-2089-4e0f-af98-721034203aad:panel_9eedb0c7-2089-4e0f-af98-721034203aad",
+            "type": "lens"
+        },
+        {
+            "id": "e6933020-e88d-11ea-bf8c-d13ebf358a78",
+            "name": "f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a:panel_f4d0ebcb-ac15-4c31-ab57-7f22e0c3e02a",
+            "type": "lens"
+        },
+        {
+            "id": "73346db0-e88d-11ea-bf8c-d13ebf358a78",
+            "name": "991e60a8-68eb-4c2b-ac9a-b553e90dd49d:panel_991e60a8-68eb-4c2b-ac9a-b553e90dd49d",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NjcsMV0="
+}

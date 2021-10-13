@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Navigation Database Account Overview [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "### Azure Database Accounts\n",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation Database Account Overview [Metricbeat Azure]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4177aab0-83cc-11ea-be84-f5d4d6b9a792",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:49.091Z",
+    "version": "WzM1NDEsMV0="
+}

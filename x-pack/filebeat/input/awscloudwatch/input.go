@@ -154,15 +154,13 @@ func (in *awsCloudWatchInput) Run() {
 				in.logger.Infof("aws-cloudwatch input worker for log group: '%v' has started", in.config.LogGroupName)
 				defer in.logger.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", in.config.LogGroupName)
 				defer in.workerWg.Done()
-				in.run()
+				in.run(svc)
 			}()
 		})
 	}
 }
 
-func (in *awsCloudWatchInput) run() {
-	cwConfig := awscommon.EnrichAWSConfigWithEndpoint(in.config.AwsConfig.Endpoint, "cloudwatchlogs", in.config.RegionName, in.awsConfig)
-	svc := cloudwatchlogs.New(cwConfig)
+func (in *awsCloudWatchInput) run(svc cloudwatchlogsiface.ClientAPI) {
 	for in.inputCtx.Err() == nil {
 		err := in.getLogEventsFromCloudWatch(svc)
 		if err != nil {

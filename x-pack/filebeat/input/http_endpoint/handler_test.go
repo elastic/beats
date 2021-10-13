@@ -26,8 +26,8 @@ func Test_httpReadJSON(t *testing.T) {
 	}{
 		{
 			name:       "single object",
-			body:       `{"a": "42", "b": "c"}`,
-			wantObjs:   []common.MapStr{{"a": "42", "b": "c"}},
+			body:       `{"a": 42, "b": "c"}`,
+			wantObjs:   []common.MapStr{{"a": int64(42), "b": "c"}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -52,8 +52,8 @@ func Test_httpReadJSON(t *testing.T) {
 		},
 		{
 			name:       "sequence of objects accepted (CRLF)",
-			body:       `{"a":"1"}` + "\r" + `{"a":"2"}`,
-			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}},
+			body:       `{"a":1}` + "\r" + `{"a":2}`,
+			wantObjs:   []common.MapStr{{"a": int64(1)}, {"a": int64(2)}},
 			wantStatus: http.StatusOK,
 		},
 		{
@@ -97,6 +97,23 @@ func Test_httpReadJSON(t *testing.T) {
 				[]byte(`{"a":"4"}`),
 			},
 			wantObjs:   []common.MapStr{{"a": "1"}, {"a": "2"}, {"a": "3"}, {"a": "4"}},
+			wantStatus: http.StatusOK,
+		},
+		{
+			name: "numbers",
+			body: `{"a":1} [{"a":false},{"a":3.14}] {"a":-4}`,
+			wantRawMessage: []json.RawMessage{
+				[]byte(`{"a":1}`),
+				[]byte(`{"a":false}`),
+				[]byte(`{"a":3.14}`),
+				[]byte(`{"a":-4}`),
+			},
+			wantObjs: []common.MapStr{
+				{"a": int64(1)},
+				{"a": false},
+				{"a": 3.14},
+				{"a": int64(-4)},
+			},
 			wantStatus: http.StatusOK,
 		},
 	}

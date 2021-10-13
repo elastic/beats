@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: nginx
+
 [[metricbeat-module-nginx]]
 == Nginx module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module periodically fetches metrics from https://nginx.org/[Nginx] servers.
 

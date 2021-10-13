@@ -33,12 +33,12 @@ func ConfigureWith(fn func(*common.Config) (Input, error)) InputManager {
 	return &simpleInputManager{configure: fn}
 }
 
-// Init is required to fullfil the input.InputManager interface.
+// Init is required to fulfil the input.InputManager interface.
 // For the kafka input no special initialization is required.
 func (*simpleInputManager) Init(grp unison.Group, m Mode) error { return nil }
 
-// Creates builds a new Input instance from the given configuation, or returns
-// an error if the configuation is invalid.
+// Create builds a new Input instance from the given configuration, or returns
+// an error if the configuration is invalid.
 func (manager *simpleInputManager) Create(cfg *common.Config) (Input, error) {
 	return manager.configure(cfg)
 }

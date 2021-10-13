@@ -26,6 +26,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/sha512"
+	"debug/elf"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
@@ -38,6 +39,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -348,6 +350,73 @@ func unzip(sourceFile, destinationDir string) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// Tar compress a directory using tar + gzip algorithms
+func Tar(src string, targetFile string) error {
+	fmt.Printf(">> creating TAR file from directory: %s, target: %s\n", src, targetFile)
+
+	f, err := os.Create(targetFile)
+	if err != nil {
+		return fmt.Errorf("error creating tar file: %w", err)
+	}
+	defer f.Close()
+
+	// tar > gzip > file
+	zr := gzip.NewWriter(f)
+	tw := tar.NewWriter(zr)
+
+	// walk through every file in the folder
+	filepath.Walk(src, func(file string, fi os.FileInfo, errFn error) error {
+		if errFn != nil {
+			return fmt.Errorf("error traversing the file system: %w", errFn)
+		}
+
+		// if a symlink, skip file
+		if fi.Mode().Type() == os.ModeSymlink {
+			fmt.Printf(">> skipping symlink: %s\n", file)
+			return nil
+		}
+
+		// generate tar header
+		header, err := tar.FileInfoHeader(fi, file)
+		if err != nil {
+			return fmt.Errorf("error getting file info header: %w", err)
+		}
+
+		// must provide real name
+		// (see https://golang.org/src/archive/tar/common.go?#L626)
+		header.Name = filepath.ToSlash(file)
+
+		// write header
+		if err := tw.WriteHeader(header); err != nil {
+			return fmt.Errorf("error writing header: %w", err)
+		}
+
+		// if not a dir, write file content
+		if !fi.IsDir() {
+			data, err := os.Open(file)
+			if err != nil {
+				return fmt.Errorf("error opening file: %w", err)
+			}
+			defer data.Close()
+			if _, err := io.Copy(tw, data); err != nil {
+				return fmt.Errorf("error compressing file: %w", err)
+			}
+		}
+		return nil
+	})
+
+	// produce tar
+	if err := tw.Close(); err != nil {
+		return fmt.Errorf("error closing tar file: %w", err)
+	}
+	// produce gzip
+	if err := zr.Close(); err != nil {
+		return fmt.Errorf("error closing gzip file: %w", err)
 	}
 
 	return nil
@@ -845,4 +914,49 @@ func IntegrationTestEnvVars() []string {
 		vars = append(vars, ListMatchingEnvVars(prefix)...)
 	}
 	return vars
+}
+
+// ReadGLIBCRequirement returns the required glibc version for a dynamically
+// linked ELF binary. The target machine must have a version equal to or
+// greater than (newer) the returned value.
+func ReadGLIBCRequirement(elfFile string) (*SemanticVersion, error) {
+	e, err := elf.Open(elfFile)
+	if err != nil {
+		return nil, err
+	}
+
+	symbols, err := e.DynamicSymbols()
+	if err != nil {
+		return nil, err
+	}
+
+	versionSet := map[SemanticVersion]struct{}{}
+	for _, sym := range symbols {
+		if strings.HasPrefix(sym.Version, "GLIBC_") {
+			semver, err := NewSemanticVersion(strings.TrimPrefix(sym.Version, "GLIBC_"))
+			if err != nil {
+				continue
+			}
+
+			versionSet[*semver] = struct{}{}
+		}
+	}
+
+	if len(versionSet) == 0 {
+		return nil, errors.New("no GLIBC symbols found in binary (is this a static binary?)")
+	}
+
+	var versions []SemanticVersion
+	for ver := range versionSet {
+		versions = append(versions, ver)
+	}
+
+	sort.Slice(versions, func(i, j int) bool {
+		a := versions[i]
+		b := versions[j]
+		return a.LessThan(&b)
+	})
+
+	max := versions[len(versions)-1]
+	return &max, nil
 }

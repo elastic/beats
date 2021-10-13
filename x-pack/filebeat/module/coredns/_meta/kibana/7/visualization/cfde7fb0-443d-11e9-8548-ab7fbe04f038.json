@@ -1,0 +1,109 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Time Series Visualizer [Filebeat CoreDNS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "65ad37b0-443f-11e9-94ba-69b05a5f82b8"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "e1f6cda0-443e-11e9-94ba-69b05a5f82b8"
+                    }
+                ],
+                "gauge_color_rules": [
+                    {
+                        "id": "6996a6e0-443f-11e9-94ba-69b05a5f82b8"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "fileset.name:kubernetes"
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "CoreDNS Kubernetes",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none",
+                        "terms_field": "fileset.name"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "fileset.name:log"
+                        },
+                        "formatter": "number",
+                        "id": "3c8999f0-443f-11e9-94ba-69b05a5f82b8",
+                        "label": "CoreDNS Native",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "3c8999f1-443f-11e9-94ba-69b05a5f82b8",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "filter",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Time Series Visualizer [Filebeat CoreDNS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "cfde7fb0-443d-11e9-8548-ab7fbe04f038",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:40.046Z",
+    "version": "WzQyNDQsMV0="
+}

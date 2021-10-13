@@ -3,6 +3,7 @@
 // you may not use this file except in compliance with the Elastic License.
 
 // TODO review the need for this
+//go:build linux || darwin || windows
 // +build linux darwin windows
 
 package kubernetes
@@ -10,6 +11,7 @@ package kubernetes
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/kubernetes/metadata"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -25,6 +27,14 @@ type Config struct {
 
 	// Needed when resource is a Pod or Node
 	Node string `config:"node"`
+
+	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
+	IncludeLabels       []string                            `config:"include_labels"`
+	ExcludeLabels       []string                            `config:"exclude_labels"`
+	IncludeAnnotations  []string                            `config:"include_annotations"`
+
+	LabelsDedot      bool `config:"labels.dedot"`
+	AnnotationsDedot bool `config:"annotations.dedot"`
 }
 
 // Resources config section for resources' config blocks
@@ -44,6 +54,8 @@ func (c *Config) InitDefaults() {
 	c.CleanupTimeout = 60 * time.Second
 	c.SyncPeriod = 10 * time.Minute
 	c.Scope = "node"
+	c.LabelsDedot = true
+	c.AnnotationsDedot = true
 }
 
 // Validate ensures correctness of config

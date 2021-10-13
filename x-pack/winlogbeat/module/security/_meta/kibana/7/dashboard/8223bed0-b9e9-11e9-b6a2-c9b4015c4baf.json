@@ -1,0 +1,651 @@
+{
+    "attributes": {
+        "description": "User management activity with TSVB metrics.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "1",
+                    "w": 17,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "3",
+                    "w": 9,
+                    "x": 0,
+                    "y": 55
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Created Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "5",
+                    "w": 9,
+                    "x": 9,
+                    "y": 55
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "title": "Enabled Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "6",
+                    "w": 9,
+                    "x": 0,
+                    "y": 80
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Disabled Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "7",
+                    "w": 9,
+                    "x": 18,
+                    "y": 55
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "title": "Deleted Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "9",
+                    "w": 9,
+                    "x": 18,
+                    "y": 80
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "title": "Passwords Changes [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "10",
+                    "w": 9,
+                    "x": 0,
+                    "y": 46
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "11",
+                    "w": 9,
+                    "x": 9,
+                    "y": 46
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "12",
+                    "w": 9,
+                    "x": 18,
+                    "y": 46
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "13",
+                    "w": 9,
+                    "x": 0,
+                    "y": 71
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "14",
+                    "w": 9,
+                    "x": 18,
+                    "y": 71
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "15",
+                    "w": 9,
+                    "x": 9,
+                    "y": 80
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "title": "Unlocked Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "16",
+                    "w": 9,
+                    "x": 18,
+                    "y": 105
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "title": "Users Changes [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "17",
+                    "w": 9,
+                    "x": 0,
+                    "y": 96
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "18",
+                    "w": 9,
+                    "x": 9,
+                    "y": 71
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "19",
+                    "w": 9,
+                    "x": 18,
+                    "y": 96
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "20",
+                    "w": 9,
+                    "x": 0,
+                    "y": 105
+                },
+                "panelIndex": "20",
+                "panelRefName": "panel_20",
+                "title": "Locked-out Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 48,
+                    "i": "22",
+                    "w": 21,
+                    "x": 27,
+                    "y": 73
+                },
+                "panelIndex": "22",
+                "panelRefName": "panel_22",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "23",
+                    "w": 48,
+                    "x": 0,
+                    "y": 121
+                },
+                "panelIndex": "23",
+                "panelRefName": "panel_23",
+                "type": "search",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "24",
+                    "w": 9,
+                    "x": 9,
+                    "y": 96
+                },
+                "panelIndex": "24",
+                "panelRefName": "panel_24",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "25",
+                    "w": 9,
+                    "x": 9,
+                    "y": 105
+                },
+                "panelIndex": "25",
+                "panelRefName": "panel_25",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+                    "w": 31,
+                    "x": 17,
+                    "y": 0
+                },
+                "panelIndex": "20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+                "panelRefName": "panel_20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-user-account": "#0A437C",
+                        "deleted-user-account": "#82B5D8",
+                        "enabled-user-account": "#0A50A1",
+                        "modified-user-account": "#052B51",
+                        "renamed-user-account": "#1F78C1",
+                        "reset-password": "#5195CE"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-user-account": "#0A437C",
+                            "deleted-user-account": "#82B5D8",
+                            "disabled-user-account": "#BADFF4",
+                            "enabled-user-account": "#0A50A1",
+                            "modified-user-account": "#052B51",
+                            "renamed-user-account": "#1F78C1",
+                            "reset-password": "#5195CE"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+                    "w": 18,
+                    "x": 0,
+                    "y": 7
+                },
+                "panelIndex": "8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+                "panelRefName": "panel_8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "18cc78ac-3f77-4f54-b351-cb94873cae3f",
+                    "w": 14,
+                    "x": 18,
+                    "y": 7
+                },
+                "panelIndex": "18cc78ac-3f77-4f54-b351-cb94873cae3f",
+                "panelRefName": "panel_18cc78ac-3f77-4f54-b351-cb94873cae3f",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
+                    "w": 16,
+                    "x": 32,
+                    "y": 7
+                },
+                "panelIndex": "75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
+                "panelRefName": "panel_75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "f443b5b0-ada7-426f-ae2f-46573f94f24f",
+                    "w": 48,
+                    "x": 0,
+                    "y": 26
+                },
+                "panelIndex": "f443b5b0-ada7-426f-ae2f-46573f94f24f",
+                "panelRefName": "panel_f443b5b0-ada7-426f-ae2f-46573f94f24f",
+                "title": "Actions performed over Users [Winlogbeat Security]",
+                "type": "visualization",
+                "version": "7.7.0"
+            },
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "added-user-account": "#0A437C",
+                        "deleted-user-account": "#82B5D8",
+                        "disabled-user-account": "#BADFF4",
+                        "enabled-user-account": "#0A50A1",
+                        "modified-user-account": "#2F575E",
+                        "renamed-user-account": "#1F78C1",
+                        "reset-password": "#5195CE"
+                    },
+                    "enhancements": {},
+                    "vis": {
+                        "colors": {
+                            "added-user-account": "#0A437C",
+                            "deleted-user-account": "#82B5D8",
+                            "disabled-user-account": "#BADFF4",
+                            "enabled-user-account": "#0A50A1",
+                            "modified-user-account": "#2F575E",
+                            "renamed-user-account": "#1F78C1",
+                            "reset-password": "#5195CE",
+                            "unlocked-user-account": "#0A437C"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 27,
+                    "i": "820c0311-d378-49dc-a614-e0fed2254603",
+                    "w": 21,
+                    "x": 27,
+                    "y": 46
+                },
+                "panelIndex": "820c0311-d378-49dc-a614-e0fed2254603",
+                "panelRefName": "panel_820c0311-d378-49dc-a614-e0fed2254603",
+                "type": "visualization",
+                "version": "7.7.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Winlogbeat Security] User Management Events - Simple Metric",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "8223bed0-b9e9-11e9-b6a2-c9b4015c4baf",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "2dc6b820-b9e8-11e9-b6a2-c9b4015c4baf",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "5e7f0ed0-bcd2-11e9-b6a2-c9b4015c4baf",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "0620c3d0-bcd4-11e9-b6a2-c9b4015c4baf",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "8f20c950-bcd4-11e9-b6a2-c9b4015c4baf",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "ee0319a0-bcd4-11e9-b6a2-c9b4015c4baf",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "da5ffe40-bcd9-11e9-b6a2-c9b4015c4baf",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "102efd20-bcdd-11e9-b6a2-c9b4015c4baf",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "855957d0-bcdd-11e9-b6a2-c9b4015c4baf",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "c359b020-bcdd-11e9-b6a2-c9b4015c4baf",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "0cb2d940-bcde-11e9-b6a2-c9b4015c4baf",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "568a8130-bcde-11e9-b6a2-c9b4015c4baf",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "da2110c0-bcea-11e9-b6a2-c9b4015c4baf",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "abf96c10-bcea-11e9-b6a2-c9b4015c4baf",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "84502430-bce8-11e9-b6a2-c9b4015c4baf",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "ab6f8d80-bce8-11e9-b6a2-c9b4015c4baf",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "5d92b100-bce8-11e9-b6a2-c9b4015c4baf",
+            "name": "19:panel_19",
+            "type": "visualization"
+        },
+        {
+            "id": "4ac8f5f0-bcfe-11e9-b6a2-c9b4015c4baf",
+            "name": "20:panel_20",
+            "type": "visualization"
+        },
+        {
+            "id": "7e178c80-fee1-11e9-8405-516218e3d268",
+            "name": "22:panel_22",
+            "type": "search"
+        },
+        {
+            "id": "324686c0-fefb-11e9-8405-516218e3d268",
+            "name": "23:panel_23",
+            "type": "search"
+        },
+        {
+            "id": "5e19ff80-231c-11ea-8405-516218e3d268",
+            "name": "24:panel_24",
+            "type": "visualization"
+        },
+        {
+            "id": "fa876300-231a-11ea-8405-516218e3d268",
+            "name": "25:panel_25",
+            "type": "visualization"
+        },
+        {
+            "id": "d770b040-9b35-11ea-87e4-49f31ec44891",
+            "name": "20adcb1b-cebf-4a75-9bc4-eaeeee626c5e:panel_20adcb1b-cebf-4a75-9bc4-eaeeee626c5e",
+            "type": "visualization"
+        },
+        {
+            "id": "26877510-9b72-11ea-87e4-49f31ec44891",
+            "name": "8aad73ff-37b1-487a-a3f1-b80b93618ac4:panel_8aad73ff-37b1-487a-a3f1-b80b93618ac4",
+            "type": "visualization"
+        },
+        {
+            "id": "5c9ee410-9b74-11ea-87e4-49f31ec44891",
+            "name": "18cc78ac-3f77-4f54-b351-cb94873cae3f:panel_18cc78ac-3f77-4f54-b351-cb94873cae3f",
+            "type": "visualization"
+        },
+        {
+            "id": "117f5a30-9b71-11ea-87e4-49f31ec44891",
+            "name": "75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d:panel_75f5f1fc-bc7c-4f8f-8e5b-0a52d525aa7d",
+            "type": "visualization"
+        },
+        {
+            "id": "aa31c9d0-9b75-11ea-87e4-49f31ec44891",
+            "name": "f443b5b0-ada7-426f-ae2f-46573f94f24f:panel_f443b5b0-ada7-426f-ae2f-46573f94f24f",
+            "type": "visualization"
+        },
+        {
+            "id": "caf4d2b0-9b76-11ea-87e4-49f31ec44891",
+            "name": "820c0311-d378-49dc-a614-e0fed2254603:panel_820c0311-d378-49dc-a614-e0fed2254603",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-11T13:18:59.362Z",
+    "version": "WzIyNzksMl0="
+}

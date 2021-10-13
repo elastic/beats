@@ -41,6 +41,8 @@ type s3ObjectPayload struct {
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
+	listPrefix           string
+	region               string
 	bucketPollInterval   time.Duration
 	workerSem            *sem
 	s3                   s3API
@@ -60,6 +62,8 @@ func newS3Poller(log *logp.Logger,
 	states *states,
 	store *statestore.Store,
 	bucket string,
+	listPrefix string,
+	awsRegion string,
 	numberOfWorkers int,
 	bucketPollInterval time.Duration) *s3Poller {
 	if metrics == nil {
@@ -68,6 +72,8 @@ func newS3Poller(log *logp.Logger,
 	return &s3Poller{
 		numberOfWorkers:      numberOfWorkers,
 		bucket:               bucket,
+		listPrefix:           listPrefix,
+		region:               awsRegion,
 		bucketPollInterval:   bucketPollInterval,
 		workerSem:            newSem(numberOfWorkers),
 		s3:                   s3,
@@ -139,7 +145,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 	bucketMetadata := strings.Split(p.bucket, ":")
 	bucketName := bucketMetadata[len(bucketMetadata)-1]
 
-	paginator := p.s3.ListObjectsPaginator(bucketName)
+	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
 	for paginator.Next(ctx) {
 		listingID, err := uuid.NewV4()
 		if err != nil {
@@ -178,7 +184,9 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 			p.states.Update(state, "")
 
 			event := s3EventV2{}
+			event.AWSRegion = p.region
 			event.S3.Bucket.Name = bucketName
+			event.S3.Bucket.ARN = p.bucket
 			event.S3.Object.Key = filename
 
 			acker := newEventACKTracker(ctx)

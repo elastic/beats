@@ -59,10 +59,14 @@ func newRunCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	}
 }
 
-func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark service as stopped.
+func run(streams *cli.IOStreams, override cfgOverrider) error {
+	// Windows: Mark service as stopped.
 	// After this is run, the service is considered by the OS to be stopped.
 	// This must be the first deferred cleanup task (last to execute).
-	defer service.NotifyTermination()
+	defer func() {
+		service.NotifyTermination()
+		service.WaitExecutionDone()
+	}()
 
 	locker := filelock.NewAppLocker(paths.Data(), paths.AgentLockFileName)
 	if err := locker.TryLock(); err != nil {
@@ -168,7 +172,7 @@ func run(streams *cli.IOStreams, override cfgOverrider) error { // Windows: Mark
 		case sig := <-signals:
 			if sig == syscall.SIGHUP {
 				rexLogger.Infof("SIGHUP triggered re-exec")
-				rex.ReExec()
+				rex.ReExec(nil)
 			} else {
 				breakout = true
 			}

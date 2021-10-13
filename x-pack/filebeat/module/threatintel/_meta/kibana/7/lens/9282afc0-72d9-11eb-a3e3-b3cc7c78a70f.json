@@ -1,0 +1,150 @@
+{
+    "attributes": {
+        "description": "Total number of indicators by type ingested by the threat intel Filebeat module. Top 10 types.",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2": {
+                            "columnOrder": [
+                                "a6319ec8-2ec8-4d3a-bc54-efe0a306786f",
+                                "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919"
+                            ],
+                            "columns": {
+                                "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919": {
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Count of records",
+                                    "operationType": "count",
+                                    "scale": "ratio",
+                                    "sourceField": "Records"
+                                },
+                                "a6319ec8-2ec8-4d3a-bc54-efe0a306786f": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of threatintel.indicator.type",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "threatintel.indicator.type"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-0",
+                        "key": "event.module",
+                        "negate": false,
+                        "params": {
+                            "query": "threatintel"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "event.module": "threatintel"
+                        }
+                    }
+                },
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "exists": {
+                        "field": "threatintel.indicator.type"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "indexRefName": "filter-index-pattern-1",
+                        "key": "threatintel.indicator.type",
+                        "negate": false,
+                        "type": "exists",
+                        "value": "exists"
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "layers": [
+                    {
+                        "categoryDisplay": "default",
+                        "groups": [
+                            "a6319ec8-2ec8-4d3a-bc54-efe0a306786f"
+                        ],
+                        "layerId": "9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2",
+                        "legendDisplay": "show",
+                        "metric": "1e5c28a2-6405-44ee-bdf1-8bdd03bdf919",
+                        "nestedLegend": false,
+                        "numberDisplay": "value",
+                        "percentDecimals": 2
+                    }
+                ],
+                "palette": {
+                    "name": "default",
+                    "type": "palette"
+                },
+                "shape": "treemap"
+            }
+        },
+        "title": "Total Indicators per Type [Filebeat Threat Intel]",
+        "visualizationType": "lnsPie"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9282afc0-72d9-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "indexpattern-datasource-layer-9e3d1f18-6e1e-4e13-8b0b-9b17d12a15f2",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "filter-index-pattern-1",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-ref-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:34:32.145Z",
+    "version": "WzQ2NTMsMV0="
+}

@@ -1,0 +1,169 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Transactions [Metricbeat CockroachDB]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=10s",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Transactions Begins",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "6db52340-2067-11eb-96da-17d67bb2d46d",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "50",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(164,221,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "1c074fc0-ccf0-11ea-8da4-c95c019bd9d5",
+                        "label": "Transaction Commits",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "1c074fc1-ccf0-11ea-8da4-c95c019bd9d5",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "9241d3c0-2067-11eb-96da-17d67bb2d46d",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "50",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(252,220,0,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "84ac4080-ccf0-11ea-8da4-c95c019bd9d5",
+                        "label": "Transaction Rollbacks",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "84ac4081-ccf0-11ea-8da4-c95c019bd9d5",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "a9b7afc0-2067-11eb-96da-17d67bb2d46d",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "50",
+                        "type": "timeseries"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "9701db00-ccf0-11ea-8da4-c95c019bd9d5",
+                        "label": "Transaction Aborts",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": null,
+                                "id": "9701db01-ccf0-11ea-8da4-c95c019bd9d5",
+                                "type": "positive_rate",
+                                "unit": "1s"
+                            },
+                            {
+                                "function": "sum",
+                                "id": "bc1fc0d0-2067-11eb-96da-17d67bb2d46d",
+                                "type": "series_agg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": null,
+                        "terms_size": "50",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "tooltip_mode": "show_all",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Transactions [Metricbeat CockroachDB]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "61999c30-c766-11ea-8a94-61b423d19ae7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:01.383Z",
+    "version": "WzM3MTIsMV0="
+}

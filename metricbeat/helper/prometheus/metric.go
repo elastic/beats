@@ -344,7 +344,11 @@ type opFilterMap struct {
 func (o opFilterMap) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
 	for k, v := range o.filterMap {
 		if labels[o.label] == k {
-			return fmt.Sprintf("%v.%v", field, v), value, labels
+			if field == "" {
+				return v, value, labels
+			} else {
+				return fmt.Sprintf("%v.%v", field, v), value, labels
+			}
 		}
 	}
 	return "", nil, nil

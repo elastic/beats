@@ -1,10 +1,3 @@
-queue:
-  mem:
-    events: 575
-    flush:
-      min_events: 23
-      timeout: 1s
-
 metricbeat:
   modules:
   - module: docker
@@ -88,6 +81,8 @@ metricbeat:
 output:
   elasticsearch:
     hosts: [127.0.0.1:9200, 127.0.0.1:9300]
+    headers:
+      h1: test-header
     username: elastic
     password: changeme
     bulk_max_size: 23

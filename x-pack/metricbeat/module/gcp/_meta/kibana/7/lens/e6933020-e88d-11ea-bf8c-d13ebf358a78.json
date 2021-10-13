@@ -1,0 +1,109 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "4ca843af-63d7-46b9-a719-51a81eebf1f7": {
+                            "columnOrder": [
+                                "e25f49de-f161-4be8-a8fc-519188a7776c",
+                                "b92edf5e-58bc-4382-9cd5-19db2c332c93",
+                                "af747bf6-66e9-4760-bbd8-3dae9c97159d"
+                            ],
+                            "columns": {
+                                "af747bf6-66e9-4760-bbd8-3dae9c97159d": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Total Billing Cost",
+                                    "operationType": "max",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.billing.total"
+                                },
+                                "b92edf5e-58bc-4382-9cd5-19db2c332c93": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Invoice Month",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "size": 5
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.invoice_month"
+                                },
+                                "e25f49de-f161-4be8-a8fc-519188a7776c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Monthly Cost",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "af747bf6-66e9-4760-bbd8-3dae9c97159d",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.billing.project_id"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "af747bf6-66e9-4760-bbd8-3dae9c97159d"
+                        ],
+                        "layerId": "4ca843af-63d7-46b9-a719-51a81eebf1f7",
+                        "seriesType": "bar_stacked",
+                        "splitAccessor": "b92edf5e-58bc-4382-9cd5-19db2c332c93",
+                        "xAccessor": "e25f49de-f161-4be8-a8fc-519188a7776c"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked"
+            }
+        },
+        "title": "Monthly Cost Per Project [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e6933020-e88d-11ea-bf8c-d13ebf358a78",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-4ca843af-63d7-46b9-a719-51a81eebf1f7",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:08.618Z",
+    "version": "WzM3NzIsMV0="
+}

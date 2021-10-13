@@ -53,11 +53,12 @@ type kibanaConfig struct {
 }
 
 type kibanaFleetConfig struct {
-	CA       string `config:"ca"`
-	Host     string `config:"host"`
-	Password string `config:"password"`
-	Setup    bool   `config:"setup"`
-	Username string `config:"username"`
+	CA           string `config:"ca"`
+	Host         string `config:"host"`
+	Password     string `config:"password"`
+	Setup        bool   `config:"setup"`
+	Username     string `config:"username"`
+	ServiceToken string `config:"service_token"`
 }
 
 func defaultAccessConfig() (setupConfig, error) {
@@ -104,11 +105,12 @@ func defaultAccessConfig() (setupConfig, error) {
 				// Remove FLEET_SETUP in 8.x
 				// The FLEET_SETUP environment variable boolean is a fallback to the old name. The name was updated to
 				// reflect that its setting up Fleet in Kibana versus setting up Fleet Server.
-				Setup:    envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP"),
-				Host:     envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
-				Username: envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME"),
-				Password: envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),
-				CA:       envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
+				Setup:        envBool("KIBANA_FLEET_SETUP", "FLEET_SETUP"),
+				Host:         envWithDefault("http://kibana:5601", "KIBANA_FLEET_HOST", "KIBANA_HOST"),
+				Username:     envWithDefault("elastic", "KIBANA_FLEET_USERNAME", "KIBANA_USERNAME", "ELASTICSEARCH_USERNAME"),
+				Password:     envWithDefault("changeme", "KIBANA_FLEET_PASSWORD", "KIBANA_PASSWORD", "ELASTICSEARCH_PASSWORD"),
+				ServiceToken: envWithDefault("", "KIBANA_FLEET_SERVICE_TOKEN", "FLEET_SERVER_SERVICE_TOKEN"),
+				CA:           envWithDefault("", "KIBANA_FLEET_CA", "KIBANA_CA", "ELASTICSEARCH_CA"),
 			},
 			RetrySleepDuration: retrySleepDuration,
 			RetryMaxCount:      retryMaxCount,

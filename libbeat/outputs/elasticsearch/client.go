@@ -84,6 +84,7 @@ func NewClient(
 
 	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              s.URL,
+		Beatname:         s.Beatname,
 		Username:         s.Username,
 		Password:         s.Password,
 		APIKey:           s.APIKey,
@@ -145,6 +146,7 @@ func (client *Client) Clone() *Client {
 	// create install a template, we don't want these to be included in the clone.
 	connection := eslegclient.ConnectionSettings{
 		URL:               client.conn.URL,
+		Beatname:          client.conn.Beatname,
 		Kerberos:          client.conn.Kerberos,
 		Username:          client.conn.Username,
 		Password:          client.conn.Password,

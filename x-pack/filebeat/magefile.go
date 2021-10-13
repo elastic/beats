@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -45,12 +46,12 @@ func Build() error {
 // GolangCrossBuild builds the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	return filebeat.GolangCrossBuild()
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return filebeat.CrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -130,6 +131,7 @@ func ExportDashboard() error {
 // Config generates both the short and reference configs.
 func Config() {
 	mg.Deps(configYML, devtools.GenerateDirModulesD)
+	mg.SerialDeps(devtools.ValidateDirModulesD, devtools.ValidateDirModulesDDatasetsDisabled)
 }
 
 func configYML() error {

@@ -282,7 +282,7 @@ are sticky, operating behind load balancers can lead to uneven load distribution
 Specifying a TTL on the connection allows to achieve equal connection distribution between the
 instances.  Specifying a TTL of 0 will disable this feature.
 
-The default value is 0.
+The default value is 0. This setting accepts {beats-ref}/config-file-format-type.html#_duration[duration] data type values.
 
 NOTE: The "ttl" option is not yet supported on an async {ls} client (one with the "pipelining" option set).
 

@@ -1,0 +1,105 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Storage Account Ingress Traffic [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "0791c5a0-32d8-11ea-98d2-1194b9f2bfc0"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "fca016e0-32de-11ea-a435-e7199eba380d"
+                    }
+                ],
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "fb8be7c0-32de-11ea-a435-e7199eba380d"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "f0edca80-32d5-11ea-b19d-fb5049b980ca",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(104,188,0,1)",
+                        "fill": 0,
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "bytes",
+                        "hidden": false,
+                        "id": "f0edf190-32d5-11ea-b19d-fb5049b980ca",
+                        "label": "Storage Accounts Ingress Total",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "azure.storage.ingress.total",
+                                "id": "f0edf191-32d5-11ea-b19d-fb5049b980ca",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(0,98,177,1)",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "283dc410-32d9-11ea-98d2-1194b9f2bfc0"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "azure.dimensions.api_name",
+                        "terms_order_by": "f0edf191-32d5-11ea-b19d-fb5049b980ca",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Storage Account Ingress Traffic [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "4eaef260-32e1-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:53.138Z",
+    "version": "WzM1OTksMV0="
+}

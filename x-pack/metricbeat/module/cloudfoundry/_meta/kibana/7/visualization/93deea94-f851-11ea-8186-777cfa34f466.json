@@ -1,0 +1,133 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "ISO memory capacity [Metricbeat Cloud Foundry]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "background_color": "rgba(105,192,111,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "939ee5ac-f851-11ea-9c98-1b6b4c058d58",
+                        "operator": "gt",
+                        "value": 0.4
+                    },
+                    {
+                        "background_color": "rgba(252,220,0,1)",
+                        "color": "rgba(255,255,255,1)",
+                        "id": "93e80d0e-f851-11ea-ae0c-6f6e897b08b1",
+                        "operator": "lte",
+                        "value": 0.4
+                    },
+                    {
+                        "background_color": "rgba(244,78,59,1)",
+                        "id": "93c50fb6-f851-11ea-9589-1bd31d6a8c71",
+                        "operator": "lte",
+                        "value": 0.35
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "9438fb38-f851-11ea-8cbf-2be67ccd287b"
+                    }
+                ],
+                "drop_last_bucket": 1,
+                "filter": {
+                    "language": "kuery",
+                    "query": "event.module: \"cloudfoundry\" and event.dataset:\"cloudfoundry.value\" "
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": null,
+                        "id": "93f0138c-f851-11ea-bbaa-dfc0137bc600",
+                        "text": null,
+                        "value": 0
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "300000",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "93aed944-f851-11ea-ba70-fbde5471d6c0",
+                "ignore_global_filter": 0,
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "cloudfoundry.value.name: \"Diego.TotalPercentageAvailableMemoryCapacity.5M\" and cloudfoundry.envelope.deployment: p-isolation-segment*"
+                        },
+                        "formatter": "'0.0%'",
+                        "hidden": false,
+                        "id": "93b3d516-f851-11ea-b4ca-c32dfcb647e2",
+                        "label": "ISO Memory Capacity",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "cloudfoundry.value.value",
+                                "id": "93b9bc2e-f851-11ea-8d20-9b7927512450",
+                                "type": "avg"
+                            }
+                        ],
+                        "offset_time": "",
+                        "point_size": "1",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "kuery",
+                                    "query": ""
+                                },
+                                "id": "93842b7c-f851-11ea-8281-37e3b8318172",
+                                "label": ""
+                            }
+                        ],
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "steps": 0,
+                        "terms_field": "name.keyword",
+                        "terms_include": "",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "ISO memory capacity [Metricbeat Cloud Foundry]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "93deea94-f851-11ea-8186-777cfa34f466",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:59.416Z",
+    "version": "WzM2ODQsMV0="
+}

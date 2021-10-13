@@ -5,6 +5,8 @@
 
 == CrowdStrike module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is the {beatname_uc} module for CrowdStrike Falcon using the Falcon https://www.crowdstrike.com/blog/tech-center/integrate-with-your-siem[SIEM Connector]. This module collects this data, converts it to ECS, and ingests it to view in the SIEM. By default, the Falcon SIEM connector outputs JSON formatted Falcon Streaming API event data.
 
 This module segments events forwarded by the Falcon SIEM connector into two datasets for endpoint data and Falcon platform audit data.

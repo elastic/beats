@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	"sync"
 	"time"
 
 	"golang.org/x/sync/semaphore"
@@ -207,7 +206,8 @@ func (s *Scheduler) Add(sched Schedule, id string, entrypoint TaskFunc, jobType 
 		default:
 		}
 		s.stats.activeJobs.Inc()
-		lastRanAt = s.runRecursiveJob(jobCtx, entrypoint, jobType)
+		debugf("Job '%s' started", id)
+		lastRanAt := newSchedJob(jobCtx, s, id, jobType, entrypoint).run()
 		s.stats.activeJobs.Dec()
 		s.runOnce(sched.Next(lastRanAt), taskFn)
 		debugf("Job '%v' returned at %v", id, time.Now())
@@ -240,69 +240,4 @@ func (s *Scheduler) runOnce(runAt time.Time, taskFn timerqueue.TimerTaskFn) {
 	// block the timer thread.
 	asyncTask := func(now time.Time) { go taskFn(now) }
 	s.timerQueue.Push(runAt, asyncTask)
-}
-
-// runRecursiveJob runs the entry point for a job, blocking until all subtasks are completed.
-// Subtasks are run in separate goroutines.
-// returns the time execution began on its first task
-func (s *Scheduler) runRecursiveJob(jobCtx context.Context, task TaskFunc, jobType string) (startedAt time.Time) {
-	wg := &sync.WaitGroup{}
-	jobSem := s.jobLimitSem[jobType]
-	if jobSem != nil {
-		jobSem.Acquire(jobCtx, 1)
-	}
-	wg.Add(1)
-	startedAt = s.runRecursiveTask(jobCtx, task, wg, jobSem)
-	wg.Wait()
-	return startedAt
-}
-
-// runRecursiveTask runs an individual task and its continuations until none are left with as much parallelism as possible.
-// Since task funcs can emit continuations recursively we need a function to execute
-// recursively.
-// The wait group passed into this function expects to already have its count incremented by one.
-func (s *Scheduler) runRecursiveTask(jobCtx context.Context, task TaskFunc, wg *sync.WaitGroup, jobSem *semaphore.Weighted) (startedAt time.Time) {
-	defer wg.Done()
-
-	// The accounting for waiting/active tasks is done using atomics.
-	// Absolute accuracy is not critical here so the gap between modifying waitingTasks and activeJobs is acceptable.
-	s.stats.waitingTasks.Inc()
-
-	// Acquire an execution slot in keeping with heartbeat.scheduler.limit
-	// this should block until resources are available.
-	// In the case where the semaphore has free resources immediately
-	// it will not block and will not check the cancelled status of the
-	// context, which is OK, because we check it later anyway.
-	limitErr := s.limitSem.Acquire(jobCtx, 1)
-	s.stats.waitingTasks.Dec()
-	if limitErr == nil {
-		defer s.limitSem.Release(1)
-	}
-
-	// Record the time this task started now that we have a resource to execute with
-	startedAt = time.Now()
-
-	// Check if the scheduler has been shut down. If so, exit early
-	select {
-	case <-jobCtx.Done():
-		return startedAt
-	default:
-		s.stats.activeTasks.Inc()
-
-		continuations := task(jobCtx)
-		s.stats.activeTasks.Dec()
-
-		wg.Add(len(continuations))
-		for _, cont := range continuations {
-			// Run continuations in parallel, note that these each will acquire their own slots
-			// We can discard the started at times for continuations as those are
-			// irrelevant
-			go s.runRecursiveTask(jobCtx, cont, wg, jobSem)
-		}
-		if jobSem != nil && len(continuations) == 0 {
-			jobSem.Release(1)
-		}
-	}
-
-	return startedAt
 }

@@ -18,6 +18,7 @@ const (
 const (
 	ServiceCloudFunctions = "cloudfunctions"
 	ServiceCompute        = "compute"
+	ServiceGKE            = "gke"
 	ServiceLoadBalancing  = "loadbalancing"
 	ServicePubsub         = "pubsub"
 	ServiceStorage        = "storage"

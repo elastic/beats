@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -26,8 +27,9 @@ type config struct {
 	FIPSEnabled         bool                 `config:"fips_enabled"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
-	Bucket              string               `config:"bucket"`
+	BucketARN           string               `config:"bucket_arn"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
@@ -39,6 +41,7 @@ func defaultConfig() config {
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
 		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
 		SQSWaitTime:         20 * time.Second,
 		SQSMaxReceiveCount:  5,
 		FIPSEnabled:         false,
@@ -49,20 +52,21 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	if c.QueueURL == "" && c.Bucket == "" {
-		return fmt.Errorf("queue_url or bucket must provided")
+	if c.QueueURL == "" && c.BucketARN == "" {
+		logp.NewLogger(inputName).Warnf("neither queue_url nor bucket_arn were provided, input %s will stop", inputName)
+		return nil
 	}
 
-	if c.QueueURL != "" && c.Bucket != "" {
-		return fmt.Errorf("queue_url <%v> and bucket <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.Bucket)
+	if c.QueueURL != "" && c.BucketARN != "" {
+		return fmt.Errorf("queue_url <%v> and bucket_arn <%v> "+
+			"cannot be set at the same time", c.QueueURL, c.BucketARN)
 	}
 
-	if c.Bucket != "" && c.BucketListInterval <= 0 {
+	if c.BucketARN != "" && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if c.Bucket != "" && c.NumberOfWorkers <= 0 {
+	if c.BucketARN != "" && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
 	}
 

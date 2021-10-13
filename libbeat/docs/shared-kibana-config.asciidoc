@@ -10,14 +10,15 @@
 //////////////////////////////////////////////////////////////////////////
 
 [[setup-kibana-endpoint]]
-== Configure the Kibana endpoint
+== Configure the {kib} endpoint
 
 ++++
-<titleabbrev>Kibana endpoint</titleabbrev>
+<titleabbrev>{kib} endpoint</titleabbrev>
 ++++
 
-Starting with {beatname_uc} 6.0.0, the Kibana dashboards are loaded into Kibana
-via the Kibana API. This requires a Kibana endpoint configuration.
+{kib} dashboards are loaded into {kib}
+via the {kib} API. This requires a {kib} endpoint configuration. For details on
+authenticating to the {kib} API, see {kibana-ref}/api.html#api-authentication[Authentication].
 
 You configure the endpoint in the `setup.kibana` section of the
 +{beatname_lc}.yml+ config file.
@@ -38,7 +39,7 @@ You can specify the following options in the `setup.kibana` section of the
 [float]
 ==== `setup.kibana.host`
 
-The Kibana host where the dashboards will be loaded. The default is
+The {kib} host where the dashboards will be loaded. The default is
 `127.0.0.1:5601`. The value of `host` can be a `URL` or `IP:PORT`. For example: `http://192.15.3.2`, `192:15.3.2:5601` or `http://192.15.3.2:6701/path`. If no
 port is specified, `5601` is used.
 
@@ -53,7 +54,7 @@ IPv6 addresses must be defined using the following format:
 [[kibana-protocol-option]]
 ==== `setup.kibana.protocol`
 
-The name of the protocol Kibana is reachable on. The options are: `http` or
+The name of the protocol {kib} is reachable on. The options are: `http` or
 `https`. The default is `http`. However, if you specify a URL for host, the
 value of `protocol` is overridden by whatever scheme you specify in the URL.
 
@@ -70,23 +71,23 @@ setup.kibana.path: /kibana
 [float]
 ==== `setup.kibana.username`
 
-The basic authentication username for connecting to Kibana. If you don't
+The basic authentication username for connecting to {kib}. If you don't
 specify a value for this setting, {beatname_uc} uses the `username` specified
-for the Elasticsearch output.
+for the {es} output.
 
 [float]
 ==== `setup.kibana.password`
 
-The basic authentication password for connecting to Kibana. If you don't
+The basic authentication password for connecting to {kib}. If you don't
 specify a value for this setting, {beatname_uc} uses the `password` specified
-for the Elasticsearch output.
+for the {es} output.
 
 [float]
 [[kibana-path-option]]
 ==== `setup.kibana.path`
 
 An HTTP path prefix that is prepended to the HTTP API calls. This is useful for
-the cases where Kibana listens behind an HTTP reverse proxy that exports the API
+the cases where {kib} listens behind an HTTP reverse proxy that exports the API
 under a custom prefix.
 
 [float]
@@ -94,13 +95,13 @@ under a custom prefix.
 ==== `setup.kibana.space.id`
 
 The {kibana-ref}/xpack-spaces.html[Kibana space] ID to use. If specified,
-{beatname_uc} loads Kibana assets into this Kibana space. Omit this option to
+{beatname_uc} loads {kib} assets into this {kib} space. Omit this option to
 use the default space.
 
 [float]
 ===== `setup.kibana.headers`
 
-Custom HTTP headers to add to each request sent to Kibana.
+Custom HTTP headers to add to each request sent to {kib}.
 Example:
 
 [source,yaml]
@@ -112,7 +113,7 @@ setup.kibana.headers:
 [float]
 ==== `setup.kibana.ssl.enabled`
 
-Enables {beatname_uc} to use SSL settings when connecting to Kibana via HTTPS.
+Enables {beatname_uc} to use SSL settings when connecting to {kib} via HTTPS.
 If you configure {beatname_uc} to connect over HTTPS, this setting defaults to
 `true` and {beatname_uc} uses the default SSL settings.
 
@@ -122,9 +123,9 @@ Example configuration:
 ----
 setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
-setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-setup.kibana.ssl.key: "/etc/pki/client/cert.key
+setup.kibana.ssl.certificate_authorities: ["/etc/client/ca.pem"]
+setup.kibana.ssl.certificate: "/etc/client/cert.pem"
+setup.kibana.ssl.key: "/etc/client/cert.key
 ----
 
 See <<configuration-ssl>> for more information.

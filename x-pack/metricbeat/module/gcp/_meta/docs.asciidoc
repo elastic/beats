@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches monitoring metrics from Google Cloud Platform using
 https://cloud.google.com/monitoring/api/metrics_gcp[Stackdriver Monitoring API] for Google Cloud Platform services.
 
@@ -139,7 +143,7 @@ For example, if Compute Metricset fetches 14 metrics (which is the number of met
 
 [float]
 == Metricsets
-Currently, we have `billing`, `compute`, `loadbalancing`, `pubsub`, `metrics` and
+Currently, we have `billing`, `compute`,  `gke`, `loadbalancing`, `pubsub`, `metrics` and
 `storage` metricset in `gcp` module.
 
 [float]
@@ -165,6 +169,19 @@ labels and metadata and metric specific Labels.
 The `compute` metricset comes with a predefined dashboard:
 
 image::./images/metricbeat-gcp-compute-overview.png[]
+
+[float]
+=== `gke`
+
+This metricset fetches metrics for https://cloud.google.com/kubernetes-engine[Kubernetes Engine].
+
+The `gke` metricset contains all GA metrics exported by https://cloud.google.com/monitoring/api/metrics_kubernetes[Cloud Monitoring Kubernetes metrics].
+
+Extra labels and metadata are also extracted using the https://cloud.google.com/compute/docs/reference/rest/v1/instances/get[Compute API].
+
+The `gke` metricset comes with a predefined dashboard:
+
+image::./images/metricbeat-gcp-gke-overview.png[]
 
 [float]
 === `loadbalancing`

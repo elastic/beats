@@ -2,8 +2,8 @@ type: aws-s3
 {{ if .queue_url }}
 queue_url: {{ .queue_url }}
 {{ end }}
-{{ if .bucket }}
-bucket: {{ .bucket }}
+{{ if .bucket_arn }}
+bucket_arn: {{ .bucket_arn }}
 {{ end }}
 
 {{ if .number_of_workers }}
@@ -12,6 +12,10 @@ number_of_workers: {{ .number_of_workers }}
 
 {{ if .bucket_list_interval }}
 bucket_list_interval: {{ .bucket_list_interval }}
+{{ end }}
+
+{{ if .bucket_list_prefix }}
+bucket_list_prefix: {{ .bucket_list_prefix }}
 {{ end }}
 
 {{ if .credential_profile_name }}
@@ -69,4 +73,4 @@ processors:
   - add_fields:
       target: ''
       fields:
-        ecs.version: 1.11.0
+        ecs.version: 1.12.0

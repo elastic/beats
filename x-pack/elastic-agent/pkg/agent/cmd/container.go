@@ -471,10 +471,11 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
+		ServiceToken:  cfg.Fleet.ServiceToken,
 		IgnoreVersion: true,
 		Transport:     transport,
 		Headers:       headers,
-	}, 0)
+	}, 0, "Elastic-Agent")
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {

@@ -28,13 +28,15 @@ func TestConfig(t *testing.T) {
 		parserConf := parser.Config{}
 		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
-			QueueURL:            quequeURL,
-			Bucket:              s3Bucket,
-			APITimeout:          120 * time.Second,
-			VisibilityTimeout:   300 * time.Second,
-			SQSMaxReceiveCount:  5,
-			SQSWaitTime:         20 * time.Second,
-			BucketListInterval:  120 * time.Second,
+			QueueURL:           quequeURL,
+			BucketARN:          s3Bucket,
+			APITimeout:         120 * time.Second,
+			VisibilityTimeout:  300 * time.Second,
+			SQSMaxReceiveCount: 5,
+			SQSWaitTime:        20 * time.Second,
+			BucketListInterval: 120 * time.Second,
+			BucketListPrefix:   "",
+
 			FIPSEnabled:         false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
@@ -69,7 +71,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":            s3Bucket,
+				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 			},
 			"",
@@ -92,7 +94,7 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			"",
-			func(queueURL, s3Bucketr string) config {
+			func(queueURL, s3Bucket string) config {
 				c := makeConfig(queueURL, "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
@@ -109,21 +111,23 @@ func TestConfig(t *testing.T) {
 			"",
 			"",
 			common.MapStr{
-				"queue_url": "",
-				"bucket":    "",
+				"queue_url":  "",
+				"bucket_arn": "",
 			},
-			"queue_url or bucket must provided",
-			nil,
+			"",
+			func(queueURL, s3Bucket string) config {
+				return makeConfig("", "")
+			},
 		},
 		{
 			"error on both queueURL and s3Bucket",
 			queueURL,
 			s3Bucket,
 			common.MapStr{
-				"queue_url": queueURL,
-				"bucket":    s3Bucket,
+				"queue_url":  queueURL,
+				"bucket_arn": s3Bucket,
 			},
-			"queue_url <https://example.com> and bucket <arn:aws:s3:::aBucket> cannot be set at the same time",
+			"queue_url <https://example.com> and bucket_arn <arn:aws:s3:::aBucket> cannot be set at the same time",
 			nil,
 		},
 		{
@@ -164,7 +168,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":               s3Bucket,
+				"bucket_arn":           s3Bucket,
 				"bucket_list_interval": "0",
 			},
 			"bucket_list_interval <0s> must be greater than 0",
@@ -175,7 +179,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":            s3Bucket,
+				"bucket_arn":        s3Bucket,
 				"number_of_workers": "0",
 			},
 			"number_of_workers <0> must be greater than 0",
@@ -231,7 +235,7 @@ func TestConfig(t *testing.T) {
 			"",
 			s3Bucket,
 			common.MapStr{
-				"bucket":                       s3Bucket,
+				"bucket_arn":                   s3Bucket,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
 			},

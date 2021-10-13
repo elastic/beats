@@ -1,0 +1,191 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Flows Over Time [Filebeat Netflow]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "Bytes": "#82B5D8",
+                    "Count": "#052B51",
+                    "Event Count": "#3F2B5B"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Event Count"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Bytes",
+                        "field": "network.bytes"
+                    },
+                    "schema": "metric",
+                    "type": "sum"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "isVislibVis": true,
+                "legendPosition": "top",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Event Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "cardinal",
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-2"
+                    },
+                    {
+                        "data": {
+                            "id": "3",
+                            "label": "Bytes"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "cardinal",
+                        "mode": "stacked",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "area",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "times": [],
+                "type": "area",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Bytes"
+                        },
+                        "type": "value"
+                    },
+                    {
+                        "id": "ValueAxis-2",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "RightAxis-1",
+                        "position": "right",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Event Count"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Flows Over Time [Filebeat Netflow]",
+            "type": "area"
+        }
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "e7c6efa0-1ae8-11e9-9eb0-d1ab52900288",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "c1e2ccd0-1ae5-11e9-9eb0-d1ab52900288",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-09-06T13:06:21.081Z",
+    "version": "WzUyNzcsMV0="
+}

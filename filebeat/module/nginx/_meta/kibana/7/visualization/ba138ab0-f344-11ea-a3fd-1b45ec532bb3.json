@@ -1,0 +1,107 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Ingress Controller response codes over time [Filebeat Nginx]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "lucene",
+                    "query": "event.module:nginx AND fileset.name:ingress_controller"
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "legend_position": "bottom",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "http.response.status_code:[200 TO 299]"
+                                },
+                                "id": "5acdc750-a29d-11e7-a062-a1c3587f4874",
+                                "label": "200s"
+                            },
+                            {
+                                "color": "rgba(252,196,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "http.response.status_code:[300 TO 399]"
+                                },
+                                "id": "6efd2ae0-a29d-11e7-a062-a1c3587f4874",
+                                "label": "300s"
+                            },
+                            {
+                                "color": "rgba(211,49,21,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "http.response.status_code:[400 TO 499]"
+                                },
+                                "id": "76089a90-a29d-11e7-a062-a1c3587f4874",
+                                "label": "400s"
+                            },
+                            {
+                                "color": "rgba(171,20,158,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "http.response.status_code:[500 TO 599]"
+                                },
+                                "id": "7c7929d0-a29d-11e7-a062-a1c3587f4874",
+                                "label": "500s"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "stacked",
+                        "terms_field": "http.response.status_code",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Ingress Controller response codes over time [Filebeat Nginx]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ba138ab0-f344-11ea-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:17.806Z",
+    "version": "WzQ0OTIsMV0="
+}
