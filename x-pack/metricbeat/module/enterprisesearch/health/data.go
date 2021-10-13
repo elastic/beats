@@ -18,8 +18,7 @@ import (
 
 var (
 	schema = s.Schema{
-		"cluster_uuid": c.Str("cluster_uuid"), // This is going to be included in 7.16+
-		"name":         c.Str("name"),
+		"name": c.Str("name"),
 
 		"version": c.Dict("version", s.Schema{
 			"number":     c.Str("number"),
