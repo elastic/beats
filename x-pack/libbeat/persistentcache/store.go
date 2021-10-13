@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
-	badger "github.com/dgraph-io/badger/v2"
+	badger "github.com/dgraph-io/badger/v3"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )

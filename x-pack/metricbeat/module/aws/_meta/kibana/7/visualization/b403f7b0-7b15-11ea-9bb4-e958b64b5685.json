@@ -1,0 +1,65 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "DynamoDB Write Throttle Events [Metricbeat AWS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=1m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0.1",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Write Throttle Events",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "aws.dynamodb.metrics.WriteThrottleEvents.sum",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "aws.dimensions.TableName",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "DynamoDB Write Throttle Events [Metricbeat AWS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b403f7b0-7b15-11ea-9bb4-e958b64b5685",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:26.548Z",
+    "version": "WzMzMzEsMV0="
+}

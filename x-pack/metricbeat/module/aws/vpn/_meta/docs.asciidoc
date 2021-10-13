@@ -16,6 +16,13 @@ iam:ListAccountAliases
 ----
 
 [float]
+=== Dashboard
+
+The aws vpn metricset comes with a predefined dashboard. For example:
+
+image::./images/metricbeat-aws-vpn-overview.png[]
+
+[float]
 === Configuration example
 [source,yaml]
 ----

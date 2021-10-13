@@ -43,7 +43,7 @@ func newProspector(config config) (loginp.Prospector, error) {
 		return nil, fmt.Errorf("error while creating filewatcher %v", err)
 	}
 
-	identifier, err := newFileIdentifier(config.FileIdentity)
+	identifier, err := newFileIdentifier(config.FileIdentity, getIdentifierSuffix(config))
 	if err != nil {
 		return nil, fmt.Errorf("error while creating file identifier: %v", err)
 	}
@@ -103,4 +103,8 @@ func newProspector(config config) (loginp.Prospector, error) {
 	default:
 	}
 	return nil, fmt.Errorf("no such rotation method: %s", rotationMethod)
+}
+
+func getIdentifierSuffix(config config) string {
+	return config.Reader.Parsers.Suffix
 }

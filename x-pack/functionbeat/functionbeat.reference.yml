@@ -296,114 +296,6 @@ functionbeat.provider.aws.functions:
     # Set to true to publish fields with null values in events.
     #keep_null: false
 
-# Configure functions to run on Google Cloud Platform, currently we assume that the credentials
-# are present in the environment to correctly create the function when using the CLI.
-#
-# Configure which region your project is located in.
-functionbeat.provider.gcp.location_id: "europe-west2"
-# Configure which Google Cloud project to deploy your functions.
-functionbeat.provider.gcp.project_id: "my-project-123456"
-# Configure the Google Cloud Storage we should upload the function artifact.
-functionbeat.provider.gcp.storage_name: "functionbeat-deploy"
-
-functionbeat.provider.gcp.functions:
-  # Define the list of function availables, each function required to have a unique name.
-  # Create a function that accepts events coming from Google Pub/Sub.
-  - name: pubsub
-    enabled: false
-    type: pubsub
-
-    # Description of the method to help identify them when you run multiples functions.
-    description: "Google Cloud Function for Pub/Sub"
-
-    # The maximum memory allocated for this function.
-    # Default is 256MB.
-    #memory_size: 256MB
-
-    # Execution timeout in seconds. If the function does not finish in time,
-    # it is considered failed and terminated. Default is 60s.
-    #timeout: 60s
-
-    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
-    #service_account_email: {projectid}@appspot.gserviceaccount.com
-
-    # Labels of the function.
-    #labels:
-    # mylabel: label
-
-    # VPC Connector this function can connect to.
-    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
-    #vpc_connector: ""
-
-    # Number of maximum instances running at the same time. Default is unlimited.
-    #maximum_instances: 0
-
-    trigger:
-      resource: "projects/_/pubsub/myPubSub"
-      #service: "pubsub.googleapis.com"
-
-    # Set to true to publish fields with null values in events.
-    #keep_null: false
-
-    # Optional fields that you can specify to add additional information to the
-    # output. Fields can be scalar values, arrays, dictionaries, or any nested
-    # combination of these.
-    #fields:
-    #  env: staging
-
-    # Define custom processors for this function.
-    #processors:
-    #  - dissect:
-    #      tokenizer: "%{key1} %{key2}"
-
-  # Create a function that accepts events coming from Google Cloud Storage.
-  - name: storage
-    enabled: false
-    type: storage
-
-    # Description of the method to help identify them when you run multiples functions.
-    description: "Google Cloud Function for Cloud Storage"
-
-    # The maximum memory allocated for this function.
-    # Default is 256MB.
-    #memory_size: 256MB
-
-    # Execution timeout in seconds. If the function does not finish in time,
-    # it is considered failed and terminated. Default is 60s.
-    #timeout: 60s
-
-    # Email of the service account of the function. Defaults to {projectid}@appspot.gserviceaccount.com
-    #service_account_email: {projectid}@appspot.gserviceaccount.com
-
-    trigger:
-      resource: "projects/my-project/buckets/my-storage"
-      #event_type: "google.storage.object.finalize"
-
-    # Labels of the function.
-    #labels:
-    # mylabel: label
-
-    # VPC Connector this function can connect to.
-    # Format: projects/*/locations/*/connectors/* or fully-qualified URI
-    #vpc_connector: ""
-
-    # Number of maximum instances running at the same time. Default is unlimited.
-    #maximum_instances: 0
-
-    # Set to true to publish fields with null values in events.
-    #keep_null: false
-
-    # Optional fields that you can specify to add additional information to the
-    # output. Fields can be scalar values, arrays, dictionaries, or any nested
-    # combination of these.
-    #fields:
-    #  env: staging
-
-    # Define custom processors for this function.
-    #processors:
-    #  - dissect:
-    #      tokenizer: "%{key1} %{key2}"
-
 # ================================== General ===================================
 
 # The name of the shipper that publishes the network data. It can be used to group
@@ -447,14 +339,14 @@ functionbeat.provider.gcp.functions:
     # Maximum duration after which events are available to the outputs,
     # if the number of events stored in the queue is < `flush.min_events`.
     #flush.timeout: 1s
-  
+
   # The disk queue stores incoming events on disk until the output is
   # ready for them. This allows a higher event limit than the memory-only
   # queue and lets pending events persist through a restart.
   #disk:
     # The directory path to store the queue's data.
     #path: "${path.data}/diskqueue"
-    
+
     # The maximum space the queue should occupy on disk. Depending on
     # input settings, events that exceed this limit are delayed or discarded.
     #max_size: 10GB
@@ -485,8 +377,8 @@ functionbeat.provider.gcp.functions:
 
   # The spool queue will store events in a local spool file, before
   # forwarding the events to the outputs.
-  #
-  # Beta: spooling to disk is currently a beta feature. Use with care.
+  # Note: the spool queue is deprecated and will be removed in the future.
+  # Use the disk queue instead.
   #
   # The spool file is a circular buffer, which blocks once the file/buffer is full.
   # Events are put into a write buffer and flushed once the write buffer
@@ -765,7 +657,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "functionbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -1306,6 +1198,11 @@ setup.kibana:
 
 # The period after which to log the internal metrics. The default is 30s.
 #logging.metrics.period: 30s
+
+# A list of metrics namespaces to report in the logs. Defaults to [stats].
+# `stats` contains general Beat metrics. `dataset` may be present in some
+# Beats and contains module or input metrics.
+#logging.metrics.namespaces: [stats]
 
 # Logging to rotating files. Set logging.to_files to false to disable logging to
 # files.

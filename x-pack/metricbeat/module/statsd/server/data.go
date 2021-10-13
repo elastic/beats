@@ -11,6 +11,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 )
@@ -97,6 +98,48 @@ func parse(b []byte) ([]statsdMetric, error) {
 		}
 	}
 	return metrics, nil
+}
+
+func eventMapping(metricName string, metricValue interface{}, metricSetFields common.MapStr, mappings map[string]StatsdMapping) {
+	if len(mappings) == 0 {
+		metricSetFields[common.DeDot(metricName)] = metricValue
+		return
+	}
+
+	for _, mapping := range mappings {
+		// The metricname match the one with no labels in mappings
+		// Let's insert it dedotted and continue
+		if metricName == mapping.Metric {
+			metricSetFields[mapping.Value.Field] = metricValue
+			return
+		}
+
+		res := mapping.regex.FindStringSubmatch(metricName)
+
+		// Not all labels match
+		// Skip and continue to next mapping
+		if len(res) != (len(mapping.Labels) + 1) {
+			logger.Debugf("not all labels match in statsd.mapping, skipped")
+			continue
+		}
+
+		// Let's add the metric set fields from labels
+		names := mapping.regex.SubexpNames()
+		for i, _ := range res {
+			for _, label := range mapping.Labels {
+				if label.Attr != names[i] {
+					continue
+				}
+
+				metricSetFields[label.Field] = res[i]
+			}
+		}
+
+		// Let's add the metric with the value field
+		metricSetFields[mapping.Value.Field] = metricValue
+	}
+
+	return
 }
 
 func newMetricProcessor(ttl time.Duration) *metricProcessor {

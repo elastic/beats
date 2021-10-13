@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetIcmp returns asset data.
-// This is the base64 encoded gzipped contents of protos/icmp.
+// This is the base64 encoded zlib format compressed contents of protos/icmp.
 func AssetIcmp() string {
 	return "eJy0kDFvgzAQhXd+xVP2MFUdGCpVnTpU6tC9cswBVozP9Rkq/n1FMBFKCgNSmPD53vee3xFnGgoY3foMiCZaKnB4f/v4PGRASaKD8dGwK/CSAcB4BfGkTWU0qCcXURmypeQZ0l9x2TzCqZau7PGLg6cCdeBuniwFS1FPQQy76/wmy1dD8wq4QmxoCuYDR9Zs84XQs4g5Wfrule1o4TX5Pd2cn7O7MIF+OpKYtySialoIpgedafjlUK6FfUXTtcohkCrVyRIqDu0ce2avu44ed5aWXb1VThJftjfYmsv97FH8L1s8O6EH1ZXgG747C5vU640l+s7KEj119hcAAP//NUH8pQ=="
 }

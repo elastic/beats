@@ -1,0 +1,80 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "User Management Actions [Winlogbeat Security]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "event.action",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 15
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": false,
+                "labels": {
+                    "last_level": true,
+                    "show": false,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "User Management Actions [Winlogbeat Security]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "26877510-9b72-11ea-87e4-49f31ec44891",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "324686c0-fefb-11e9-8405-516218e3d268",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:19:00.386Z",
+    "version": "WzIzMzAsMl0="
+}

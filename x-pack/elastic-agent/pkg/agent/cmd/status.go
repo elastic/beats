@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"text/tabwriter"
 	"time"
 
 	"gopkg.in/yaml.v2"
@@ -36,7 +37,7 @@ func newStatusCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 		Long:  `Status returns the current status of the running Elastic Agent daemon.`,
 		Run: func(c *cobra.Command, args []string) {
 			if err := statusCmd(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},
@@ -96,14 +97,16 @@ func humanOutput(w io.Writer, status *client.AgentStatus) error {
 		fmt.Fprint(w, "Applications: (none)\n")
 	} else {
 		fmt.Fprint(w, "Applications:\n")
+		tw := tabwriter.NewWriter(w, 4, 1, 2, ' ', 0)
 		for _, app := range status.Applications {
-			fmt.Fprintf(w, "  * %s\t(%s)\n", app.Name, app.Status)
+			fmt.Fprintf(tw, "  * %s\t(%s)\n", app.Name, app.Status)
 			if app.Message == "" {
-				fmt.Fprint(w, "    (no message)\n")
+				fmt.Fprint(tw, "\t(no message)\n")
 			} else {
-				fmt.Fprintf(w, "    %s\n", app.Message)
+				fmt.Fprintf(tw, "\t%s\n", app.Message)
 			}
 		}
+		tw.Flush()
 	}
 	return nil
 }

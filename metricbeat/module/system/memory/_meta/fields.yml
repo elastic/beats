@@ -23,6 +23,12 @@
         The total amount of free memory in bytes. This value does not include memory consumed by system caches and
         buffers (see system.memory.actual.free).
 
+    - name: cached
+      type: long
+      format: bytes
+      description: >
+        Total Cached memory on system.
+
     - name: used.pct
       type: scaled_float
       format: percent

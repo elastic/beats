@@ -1,0 +1,98 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Event Types [Filebeat Suricata]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "ECS Event Type",
+                        "field": "event.type",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 20
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Suricata Event Type",
+                        "field": "suricata.eve.event_type",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "labels": {
+                    "last_level": true,
+                    "show": false,
+                    "truncate": 100,
+                    "values": true
+                },
+                "legendPosition": "bottom",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "Event Types [Filebeat Suricata]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0a0aa630-86db-11e8-b59d-21efb914e65c-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "13dd22f0-86cc-11e8-b59d-21efb914e65c-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:53.687Z",
+    "version": "WzQ5MTQsMV0="
+}

@@ -36,6 +36,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/hbtest"
@@ -45,8 +46,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
@@ -342,6 +341,138 @@ func TestLargeResponse(t *testing.T) {
 	)
 }
 
+func TestJsonBody(t *testing.T) {
+	type testCase struct {
+		name                string
+		responseBody        string
+		expression          string
+		condition           common.MapStr
+		expectedErrMsg      string
+		expectedContentType string
+	}
+
+	testCases := []testCase{
+		{
+			"expression simple match",
+			"{\"foo\": \"bar\"}",
+			"foo == \"bar\"",
+			nil,
+			"",
+			"application/json",
+		},
+		{
+			"expression simple mismatch",
+			"{\"foo\": \"bar\"}",
+			"foo == \"bot\"",
+			nil,
+			"JSON body did not match 1 expressions or conditions",
+			"application/json",
+		},
+		{
+			"simple condition match",
+			"{\"foo\": \"bar\"}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"foo": "bar"},
+			},
+			"",
+			"application/json",
+		},
+		{
+			"condition mismatch",
+			"{\"foo\": \"bar\"}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"baz": "bot"},
+			},
+			"JSON body did not match",
+			"application/json",
+		},
+		{
+			"condition invalid json",
+			"notjson",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"foo": "bar"},
+			},
+			"could not parse JSON",
+			"text/plain; charset=utf-8",
+		},
+		{
+			"condition complex type match json",
+			"{\"number\": 3, \"bool\": true}",
+			"",
+			common.MapStr{
+				"equals": common.MapStr{"number": 3, "bool": true},
+			},
+			"",
+			"application/json",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200))
+			defer server.Close()
+
+			jsonCheck := common.MapStr{"description": tc.name}
+			if tc.expression != "" {
+				jsonCheck["expression"] = tc.expression
+			}
+			if tc.condition != nil {
+				jsonCheck["condition"] = tc.condition
+			}
+
+			configSrc := map[string]interface{}{
+				"hosts":                 server.URL,
+				"timeout":               "1s",
+				"response.include_body": "never",
+				"check.response.json": []common.MapStr{
+					jsonCheck,
+				},
+			}
+
+			config, err := common.NewConfigFrom(configSrc)
+			require.NoError(t, err)
+
+			p, err := create("largeresp", config)
+			require.NoError(t, err)
+
+			sched, _ := schedule.Parse("@every 1s")
+			job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+
+			event := &beat.Event{}
+			_, err = job(event)
+			require.NoError(t, err)
+
+			if tc.expectedErrMsg == "" {
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "up", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(1, 0),
+						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
+					)),
+					event.Fields,
+				)
+			} else {
+				testslike.Test(
+					t,
+					lookslike.Strict(lookslike.Compose(
+						hbtest.BaseChecks("127.0.0.1", "down", "http"),
+						hbtest.RespondingTCPChecks(),
+						hbtest.SummaryChecks(0, 1),
+						hbtest.ErrorChecks(tc.expectedErrMsg, "validate"),
+						respondingHTTPChecks(server.URL, tc.expectedContentType, 200),
+					)),
+					event.Fields,
+				)
+			}
+		})
+	}
+}
+
 func runHTTPSServerCheck(
 	t *testing.T,
 	server *httptest.Server,
@@ -404,11 +535,7 @@ func runHTTPSServerCheck(
 }
 
 func TestHTTPSServer(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	server := httptest.NewTLSServer(hbtest.HelloWorldHandler(http.StatusOK))
-
 	runHTTPSServerCheck(t, server, nil)
 }
 
@@ -613,39 +740,6 @@ func TestNoHeaders(t *testing.T) {
 	)
 }
 
-func TestNewRoundTripper(t *testing.T) {
-	configs := map[string]Config{
-		"Plain":      {Timeout: time.Second},
-		"With Proxy": {Timeout: time.Second, ProxyURL: "http://localhost:1234"},
-	}
-
-	for name, config := range configs {
-		t.Run(name, func(t *testing.T) {
-			transp, err := newRoundTripper(&config, &tlscommon.TLSConfig{})
-			require.NoError(t, err)
-
-			if config.ProxyURL == "" {
-				require.Nil(t, transp.Proxy)
-			} else {
-				require.NotNil(t, transp.Proxy)
-			}
-
-			// It's hard to compare func types in tests
-			require.NotNil(t, transp.Dial)
-			require.NotNil(t, transport.TLSDialer)
-
-			expected := (&tlscommon.TLSConfig{}).ToConfig()
-			require.Equal(t, expected.InsecureSkipVerify, transp.TLSClientConfig.InsecureSkipVerify)
-			// When we remove support for the legacy common name treatment
-			// this test has to be adjusted, as we will not depend on our
-			// VerifyConnection callback.
-			require.NotNil(t, transp.TLSClientConfig.VerifyConnection)
-			require.True(t, transp.DisableKeepAlives)
-		})
-	}
-
-}
-
 func TestProxy(t *testing.T) {
 	if runtime.GOOS == "windows" && bits.UintSize == 32 {
 		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
@@ -704,4 +798,37 @@ func httpConnectTunnel(writer http.ResponseWriter, request *http.Request) {
 		wg.Done()
 	}()
 	wg.Wait()
+}
+
+func mustParseURL(t *testing.T, url string) *url.URL {
+	parsed, err := common.ParseURL(url)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return parsed
+}
+
+func TestUserAgentInject(t *testing.T) {
+	ua := ""
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		ua = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	cfg, err := common.NewConfigFrom(map[string]interface{}{
+		"urls": ts.URL,
+	})
+	require.NoError(t, err)
+
+	p, err := create("ua", cfg)
+	require.NoError(t, err)
+
+	sched, _ := schedule.Parse("@every 1s")
+	job := wrappers.WrapCommon(p.Jobs, stdfields.StdMonitorFields{ID: "test", Type: "http", Schedule: sched, Timeout: 1})[0]
+
+	event := &beat.Event{}
+	_, err = job(event)
+	require.NoError(t, err)
+	assert.Contains(t, ua, "Heartbeat")
 }

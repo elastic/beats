@@ -5,6 +5,8 @@
 
 == Palo Alto Networks module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module for Palo Alto Networks PAN-OS firewall monitoring logs received
 over Syslog or read from a file. It currently supports messages of Traffic and
 Threat types.

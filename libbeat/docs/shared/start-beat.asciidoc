@@ -3,7 +3,7 @@
 
 Before starting {beatname_uc}:
 
-* Follow the steps in <<{beatname_lc}-installation-configuration>> to install, 
+* Follow the steps in <<{beatname_lc}-installation-configuration>> to install,
 configure, and set up the {beatname_uc} environment.
 * Make sure {kib} and {es} are running.
 * Make sure the user specified in +{beatname_lc}.yml+ is
@@ -12,6 +12,3 @@ configure, and set up the {beatname_uc} environment.
 To start {beatname_uc}, run:
 
 include::{docdir}/getting-started.asciidoc[tag=start-step]
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]

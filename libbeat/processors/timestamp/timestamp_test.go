@@ -27,6 +27,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
@@ -117,7 +118,7 @@ func TestParseNoYear(t *testing.T) {
 	c := defaultConfig()
 	c.Field = "ts"
 	c.Layouts = append(c.Layouts, time.StampMilli)
-	c.Timezone = "EST"
+	c.Timezone = cfgtype.MustNewTimezone("EST")
 
 	p, err := newFromConfig(c)
 	if err != nil {
@@ -261,7 +262,7 @@ func TestTimezone(t *testing.T) {
 			Error:    true,
 		},
 		"non-existing location": {
-			Timezone: "Kalimdor/Orgrimmar",
+			Timezone: "Equatorial/Kundu",
 			Error:    true,
 		},
 		"incomplete offset": {
@@ -272,12 +273,13 @@ func TestTimezone(t *testing.T) {
 
 	for title, c := range cases {
 		t.Run(title, func(t *testing.T) {
-			config := defaultConfig()
-			config.Field = "ts"
-			config.Timezone = c.Timezone
-			config.Layouts = append(config.Layouts, time.ANSIC)
+			config := common.MustNewConfigFrom(map[string]interface{}{
+				"field":    "ts",
+				"timezone": c.Timezone,
+				"layouts":  []string{time.ANSIC},
+			})
 
-			processor, err := newFromConfig(config)
+			processor, err := New(config)
 			if c.Error {
 				require.Error(t, err)
 				return
@@ -290,7 +292,7 @@ func TestTimezone(t *testing.T) {
 
 			event := &beat.Event{
 				Fields: common.MapStr{
-					config.Field: originalTimestamp,
+					"ts": originalTimestamp,
 				},
 			}
 

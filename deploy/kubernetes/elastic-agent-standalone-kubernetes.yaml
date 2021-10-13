@@ -82,6 +82,15 @@ data:
               - 'kube-state-metrics:8080'
             period: 10s
           - data_stream:
+              dataset: kubernetes.state_job
+              type: metrics
+            metricsets:
+              - state_job
+            add_metadata: true
+            hosts:
+              - 'kube-state-metrics:8080'
+            period: 10s
+          - data_stream:
               dataset: kubernetes.state_node
               type: metrics
             metricsets:
@@ -187,7 +196,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.9.0
+                    ecs.version: 1.12.0
           - data_stream:
               dataset: system.syslog
               type: logs
@@ -203,7 +212,7 @@ data:
               - add_fields:
                   target: ''
                   fields:
-                    ecs.version: 1.9.0
+                    ecs.version: 1.12.0
       - name: container-log
         type: logfile
         use_output: default
@@ -432,7 +441,7 @@ data:
       #      maxconn: 10
       #      network: tcp
       #      period: 10s
-      #      condition: ${kubernetes.pod.labels.app} == 'redis'
+      #      condition: ${kubernetes.labels.app} == 'redis'
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -482,10 +491,10 @@ spec:
             runAsUser: 0
           resources:
             limits:
-              memory: 200Mi
+              memory: 500Mi
             requests:
               cpu: 100m
-              memory: 100Mi
+              memory: 200Mi
           volumeMounts:
             - name: datastreams
               mountPath: /etc/agent.yml
@@ -592,6 +601,10 @@ rules:
       - statefulsets
       - deployments
       - replicasets
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["batch"]
+    resources:
+      - jobs
     verbs: ["get", "list", "watch"]
   - apiGroups:
       - ""

@@ -26,25 +26,25 @@
             },
             "page_stats": {
                 "direct_efficiency": {
-                    "pct": 0.9228
+                    "pct": 0.9839
                 },
                 "kswapd_efficiency": {
-                    "pct": 0.7523
+                    "pct": 0.7739
                 },
                 "pgfree": {
-                    "pages": 16061818710
+                    "pages": 40941189636
                 },
                 "pgscan_direct": {
-                    "pages": 1198580
+                    "pages": 1199988
                 },
                 "pgscan_kswapd": {
-                    "pages": 50222460
+                    "pages": 19970993
                 },
                 "pgsteal_direct": {
-                    "pages": 1106083
+                    "pages": 1180686
                 },
                 "pgsteal_kswapd": {
-                    "pages": 37782783
+                    "pages": 15456470
                 }
             }
         }

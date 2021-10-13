@@ -31,7 +31,9 @@ import (
 // the MetricSet for each host defined in the module's configuration. After the
 // MetricSet has been created then Fetch will begin to be called periodically.
 func init() {
-	mb.Registry.AddMetricSet("php_fpm", "process", New, php_fpm.HostParser)
+	mb.Registry.MustAddMetricSet("php_fpm", "process", New,
+		mb.WithHostParser(php_fpm.HostParser),
+	)
 }
 
 // MetricSet holds any configuration or state information. It must implement

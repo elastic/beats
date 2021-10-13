@@ -59,6 +59,7 @@
         "fileset.name": "notice",
         "input.type": "log",
         "log.offset": 357,
+        "network.direction": "external",
         "related.ip": [
             "207.154.238.205",
             "8.42.77.171"

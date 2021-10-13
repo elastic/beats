@@ -1,0 +1,44 @@
+{
+    "attributes": {
+        "columns": [
+            "method",
+            "type",
+            "path",
+            "event.duration",
+            "status"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"pgsql\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"pgsql\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"event.dataset\":{\"query\":\"pgsql\",\"type\":\"phrase\"}}}}],\"highlight\":{\"fields\":{\"*\":{}},\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"]},\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "PgSQL Transactions [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "PgSQL-transactions-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:46.172Z",
+    "version": "WzMyMjAsMV0="
+}

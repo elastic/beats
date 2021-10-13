@@ -308,8 +308,8 @@
         "service.type": "iptables",
         "source.port": 59344,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -338,8 +338,8 @@
         "service.type": "iptables",
         "source.port": 51653,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -367,8 +367,8 @@
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -397,8 +397,8 @@
         "service.type": "iptables",
         "source.port": 59289,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -426,8 +426,8 @@
         "service.type": "iptables",
         "source.port": 88,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     },
     {
@@ -443,8 +443,8 @@
         "input.type": "log",
         "iptables.id": 4622,
         "iptables.tcp.flags": [
-            "ECE",
             "ACK",
+            "ECE",
             "SYN"
         ],
         "iptables.tcp.reserved_bits": 0,
@@ -457,8 +457,8 @@
         "service.type": "iptables",
         "source.port": 389,
         "tags": [
-            "iptables",
-            "forwarded"
+            "forwarded",
+            "iptables"
         ]
     }
 ]

@@ -1,0 +1,46 @@
+{
+    "attributes": {
+        "columns": [
+            "kafka.log.class",
+            "kafka.log.trace.class",
+            "kafka.log.trace.full"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "kafka.log.trace.class:*"
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Stacktraces [Filebeat Kafka] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Kafka stacktraces-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:46.165Z",
+    "version": "WzQyOTIsMV0="
+}

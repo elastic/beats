@@ -235,7 +235,7 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to one segment (no segments should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		segments: []writerLoopResponseSegment{
+		segments: []writerLoopSegmentResponse{
 			{bytesWritten: 100},
 		},
 	})
@@ -250,7 +250,7 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to two segments (the first one should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		segments: []writerLoopResponseSegment{
+		segments: []writerLoopSegmentResponse{
 			{bytesWritten: 100},
 			{bytesWritten: 100},
 		},
@@ -270,7 +270,7 @@ func TestHandleWriterLoopResponse(t *testing.T) {
 
 	// Write to three segments (the first two should be moved to reading list)
 	dq.handleWriterLoopResponse(writerLoopResponse{
-		segments: []writerLoopResponseSegment{
+		segments: []writerLoopSegmentResponse{
 			{bytesWritten: 100},
 			{bytesWritten: 100},
 			{bytesWritten: 500},

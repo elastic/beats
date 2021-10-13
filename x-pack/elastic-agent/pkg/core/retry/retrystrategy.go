@@ -36,6 +36,7 @@ func Do(ctx context.Context, config *Config, fn func(ctx context.Context) error,
 	retryCount := getRetryCount(config)
 	var err error
 
+RETRY_LOOP:
 	for retryNo := 0; retryNo <= retryCount; retryNo++ {
 		if ctx.Err() != nil {
 			break
@@ -51,10 +52,12 @@ func Do(ctx context.Context, config *Config, fn func(ctx context.Context) error,
 		}
 
 		if retryNo < retryCount {
+			t := time.NewTimer(getDelayDuration(config, retryNo))
 			select {
-			case <-time.After(getDelayDuration(config, retryNo)):
+			case <-t.C:
 			case <-ctx.Done():
-				break
+				t.Stop()
+				break RETRY_LOOP
 			}
 		}
 	}

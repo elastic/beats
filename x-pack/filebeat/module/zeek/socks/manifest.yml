@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/socks.log
   - name: tags
     default: [zeek.socks]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/socks.yml

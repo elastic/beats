@@ -104,6 +104,11 @@ func (d *Dict) Find(key string) (Node, bool) {
 	return nil, false
 }
 
+// Insert inserts a value into a collection.
+func (d *Dict) Insert(node Node) {
+	d.value = append(d.value, node)
+}
+
 func (d *Dict) String() string {
 	var sb strings.Builder
 	for i := 0; i < len(d.value); i++ {
@@ -716,8 +721,10 @@ func load(val reflect.Value) (Node, error) {
 		return loadSliceOrArray(val)
 	case reflect.String:
 		return &StrVal{value: val.Interface().(string)}, nil
-	case reflect.Int, reflect.Int64:
+	case reflect.Int:
 		return &IntVal{value: val.Interface().(int)}, nil
+	case reflect.Int64:
+		return &IntVal{value: int(val.Interface().(int64))}, nil
 	case reflect.Uint:
 		return &UIntVal{value: uint64(val.Interface().(uint))}, nil
 	case reflect.Uint64:

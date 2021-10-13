@@ -1,0 +1,108 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Response Codes [Metricbeat Istio]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "7ccbe640-07d8-11eb-985d-2f490d4c2901",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#6092C0",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "7ccbe641-07d8-11eb-985d-2f490d4c2901",
+                        "label": "Response Codes",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "prometheus.istio_response_bytes.histogram.values",
+                                "id": "7ccbe642-07d8-11eb-985d-2f490d4c2901",
+                                "percentiles": [
+                                    {
+                                        "id": "88c0d000-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "25"
+                                    },
+                                    {
+                                        "id": "95c750d0-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "50"
+                                    },
+                                    {
+                                        "id": "9c5ec900-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "75"
+                                    },
+                                    {
+                                        "id": "a3581040-07d8-11eb-86d1-6521145f6524",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "95"
+                                    },
+                                    {
+                                        "id": "257a4bc0-0c79-11eb-a187-45e4454f723b",
+                                        "mode": "line",
+                                        "percentile": "",
+                                        "shade": 0.2,
+                                        "value": "99"
+                                    }
+                                ],
+                                "type": "count"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "prometheus.labels.response_code",
+                        "terms_size": "100",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Response Codes [Metricbeat Istio]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "09404610-0c7b-11eb-a3fd-1b45ec532bb3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:33.218Z",
+    "version": "WzM5ODcsMV0="
+}

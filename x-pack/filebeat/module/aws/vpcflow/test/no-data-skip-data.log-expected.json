@@ -20,7 +20,8 @@
         "log.offset": 0,
         "service.type": "aws",
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     },
     {
@@ -44,7 +45,8 @@
         "log.offset": 82,
         "service.type": "aws",
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     }
 ]

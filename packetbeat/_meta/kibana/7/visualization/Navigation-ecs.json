@@ -1,0 +1,21 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"}}"
+        },
+        "title": "Navigation [Packetbeat] ECS",
+        "uiStateJSON": "{}",
+        "version": 1,
+        "visState": "{\"aggs\":[],\"params\":{\"fontSize\":10,\"markdown\":\"### Packetbeat:\\n\\n[Overview](#/dashboard/Packetbeat-Dashboard-ecs)\\n\\n[Network Flows](#/dashboard/Packetbeat-Flows-ecs)\\n\\n[DNS Overview](#/dashboard/65120940-1454-11e9-9de0-f98d1808db8e-ecs) | [Tunneling](#/dashboard/DNS-Unique-Domains-ecs)\\n\\n[DHCPv4 Transactions](#/dashboard/a7b35890-8baa-11e8-9676-ef67484126fb-ecs)\\n\\n[TLS Overview](#/dashboard/tls-sessions-ecs)\\n\\n[HTTP transactions](#/dashboard/Packetbeat-HTTP-ecs)\\n\\nDatabases: [MySQL](#/dashboard/Packetbeat-MySQL-performance-ecs) | [PostgreSQL](#/dashboard/Packetbeat-PgSQL-performance-ecs) | [MongoDB](#/dashboard/Packetbeat-MongoDB-performance-ecs) | [Cassandra](#/dashboard/Packetbeat-Cassandra-ecs)\\n\\nRPC: [Thrift](#/dashboard/Packetbeat-Thrift-performance-ecs)\\n\\nStorage: [NFS](#/dashboard/Packetbeat-NFS-ecs)\",\"openLinksInNewTab\":false},\"title\":\"Navigation [Packetbeat] ECS\",\"type\":\"markdown\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Navigation-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:48.230Z",
+    "version": "WzMyMzIsMV0="
+}

@@ -1,0 +1,309 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4732",
+                                "4728",
+                                "4756",
+                                "4751",
+                                "4761",
+                                "4746",
+                                "4785",
+                                "4787"
+                            ],
+                            "type": "phrases",
+                            "value": "4732, 4728, 4756, 4751, 4761, 4746, 4785, 4787"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4732"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4728"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4756"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4751"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4761"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4746"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4785"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4787"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Users Added - Table [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "params": {
+                    "sort": {
+                        "columnIndex": null,
+                        "direction": null
+                    }
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "User",
+                        "field": "winlog.event_data.MemberName",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "Group",
+                        "field": "group.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "customLabel": "Domain",
+                        "field": "group.domain",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "5",
+                    "params": {
+                        "customLabel": "Performed by",
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "customLabel": "Performed by Logon ID",
+                        "field": "winlog.logon.id",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "bucket",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "dimensions": {
+                    "buckets": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 1,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 2,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 3,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        },
+                        {
+                            "accessor": 4,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "metrics": [
+                        {
+                            "accessor": 5,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "perPage": 5,
+                "percentageCol": "",
+                "showMetricsAtAllLevels": false,
+                "showPartialRows": false,
+                "showToolbar": true,
+                "showTotal": false,
+                "sort": {
+                    "columnIndex": null,
+                    "direction": null
+                },
+                "totalFunc": "sum"
+            },
+            "title": "Users Added - Table [Winlogbeat Security]",
+            "type": "table"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "ce867840-f49e-11e9-8405-516218e3d268",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:56.323Z",
+    "version": "WzIyMzgsMl0="
+}

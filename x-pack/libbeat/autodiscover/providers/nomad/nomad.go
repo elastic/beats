@@ -50,12 +50,10 @@ func AutodiscoverBuilder(
 	c *common.Config,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
-	cfgwarn.Experimental("The nomad autodiscover is experimental")
+	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")
 
 	config := defaultConfig()
-
-	err := c.Unpack(&config)
-	if err != nil {
+	if err := c.Unpack(&config); err != nil {
 		return nil, err
 	}
 
@@ -130,18 +128,18 @@ func AutodiscoverBuilder(
 
 	watcher.AddEventHandler(nomad.ResourceEventHandlerFuncs{
 		AddFunc: func(obj nomad.Resource) {
-			logger.Debugf("Watcher Allocation add: %+v", obj.ID)
+			logger.Debugw("Nomad allocation added", "nomad.allocation.id", obj.ID)
 			p.emit(&obj, "start")
 		},
 		UpdateFunc: func(obj nomad.Resource) {
-			logger.Debugf("nomad", "Watcher Allocation update: %+v", obj.ID)
+			logger.Debugw("Nomad allocation updated", "nomad.allocation.id", obj.ID)
 			p.emit(&obj, "stop")
 			// We have a CleanupTimeout grace period (defaults to 15s) to wait for the stop event
 			// to be processed
 			time.AfterFunc(config.CleanupTimeout, func() { p.emit(&obj, "start") })
 		},
 		DeleteFunc: func(obj nomad.Resource) {
-			logger.Debugf("Watcher Allocation delete: %+v", obj.ID)
+			logger.Debugw("Nomad allocation deleted", "nomad.allocation.id", obj.ID)
 			p.emit(&obj, "stop")
 		},
 	})
@@ -152,7 +150,7 @@ func AutodiscoverBuilder(
 // Start for Runner interface.
 func (p *Provider) Start() {
 	if err := p.watcher.Start(); err != nil {
-		p.logger.Errorf("Error starting nomad autodiscover provider: %s", err)
+		p.logger.Errorw("Error starting nomad autodiscover provider", "error", err)
 	}
 }
 
@@ -175,7 +173,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 		// the NodeID
 		host, err := p.metagen.AllocationNodeName(obj.NodeID)
 		if err != nil {
-			p.logger.Errorf("Error fetching node information: %s", err)
+			p.logger.Errorw("Error fetching node information", "error", err)
 		}
 
 		// If we cannot get a host, we assume that the allocation was stopped
@@ -189,7 +187,7 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 	// common metadata from the entire allocation
 	allocMeta := p.metagen.ResourceMetadata(*obj)
 
-	// job metadatata merged with the task metadata
+	// job metadata merged with the task metadata
 	tasks := p.metagen.GroupMeta(obj.Job)
 
 	// emit per-task separated events
@@ -225,7 +223,7 @@ func (p *Provider) publish(event bus.Event) {
 	// Call all appenders to append any extra configuration
 	p.appenders.Append(event)
 
-	p.logger.Debugf("nomad", "Publishing event: %+v", event)
+	p.logger.Debugw("Publishing nomad autodiscover event.", "autodiscover.event", event)
 	p.bus.Publish(event)
 }
 
@@ -275,12 +273,9 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 
 	cname := builder.GetContainerName(container)
 	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
-
-	p.logger.Debugf("Generated hints from %+v %+v", tasks, hints)
-	if len(hints) != 0 {
+	if len(hints) > 0 {
 		e["hints"] = hints
 	}
-	p.logger.Debugf("nomad", "Generated builder event %+v", e)
 
 	prefix := strings.Split(p.config.Prefix, ".")[0]
 	tasks.Delete(prefix)

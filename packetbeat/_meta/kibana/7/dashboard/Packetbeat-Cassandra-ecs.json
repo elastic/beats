@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\": false}",
+        "panelsJSON": "[{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":36,\"y\":8,\"w\":12,\"h\":8,\"i\":\"3\"},\"panelIndex\":\"3\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":8,\"w\":12,\"h\":8,\"i\":\"4\"},\"panelIndex\":\"4\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":16,\"w\":48,\"h\":8,\"i\":\"9\"},\"panelIndex\":\"9\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_9\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":12,\"y\":0,\"w\":36,\"h\":8,\"i\":\"10\"},\"panelIndex\":\"10\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":false},\"enhancements\":{}},\"panelRefName\":\"panel_10\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":12,\"y\":8,\"w\":12,\"h\":8,\"i\":\"11\"},\"panelIndex\":\"11\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_11\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":24,\"w\":48,\"h\":8,\"i\":\"15\"},\"panelIndex\":\"15\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_15\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":32,\"w\":48,\"h\":8,\"i\":\"16\"},\"panelIndex\":\"16\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_16\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":40,\"w\":24,\"h\":12,\"i\":\"17\"},\"panelIndex\":\"17\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":false},\"enhancements\":{}},\"panelRefName\":\"panel_17\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":24,\"y\":40,\"w\":24,\"h\":12,\"i\":\"18\"},\"panelIndex\":\"18\",\"embeddableConfig\":{\"vis\":{\"legendOpen\":false},\"enhancements\":{}},\"panelRefName\":\"panel_18\"},{\"version\":\"7.3.0\",\"type\":\"visualization\",\"gridData\":{\"x\":0,\"y\":0,\"w\":12,\"h\":16,\"i\":\"19\"},\"panelIndex\":\"19\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_19\"},{\"version\":\"7.3.0\",\"type\":\"search\",\"gridData\":{\"x\":0,\"y\":52,\"w\":48,\"h\":12,\"i\":\"20\"},\"panelIndex\":\"20\",\"embeddableConfig\":{\"columns\":[\"cassandra.request.query\",\"cassandra.response.result.rows.meta.keyspace\",\"cassandra.response.result.rows.meta.table\",\"cassandra.response.result.rows.num_rows\"],\"sort\":[\"@timestamp\",\"desc\"],\"enhancements\":{}},\"panelRefName\":\"panel_20\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] Cassandra ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Packetbeat-Cassandra-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Cassandra-ResponseKeyspace-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-ResponseType-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-ResponseTime-ecs",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-RequestCount-ecs",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-Ops-ecs",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-RequestCountStackByType-ecs",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-ResponseCountStackByType-ecs",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-RequestCountByType-ecs",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-ResponseCountByType-ecs",
+            "name": "18:panel_18",
+            "type": "visualization"
+        },
+        {
+            "id": "Navigation-ecs",
+            "name": "19:panel_19",
+            "type": "visualization"
+        },
+        {
+            "id": "Cassandra-QueryView-ecs",
+            "name": "20:panel_20",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:35.924Z",
+    "version": "WzMxMTksMV0="
+}

@@ -1,1051 +1,198 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Sample dashboard for Office 365 Management Activity events",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "title": "Total audit events"
-            },
-            "gridData": {
-              "h": 6,
-              "i": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
-              "w": 10,
-              "x": 0,
-              "y": 0
-            },
-            "panelIndex": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
-            "panelRefName": "panel_0",
-            "title": "Total audit events",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Event histogram by service"
-            },
-            "gridData": {
-              "h": 14,
-              "i": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
-              "w": 38,
-              "x": 10,
-              "y": 0
-            },
-            "panelIndex": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
-            "panelRefName": "panel_1",
-            "title": "Event histogram by service",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "colors": {
-                "alert": "#EF843C",
-                "event": "#7EB26D"
-              },
-              "legendOpen": true,
-              "title": "Events by type",
-              "vis": {
-                "colors": {
-                  "alert": "#E24D42",
-                  "event": "#7EB26D"
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
                 },
-                "legendOpen": true
-              }
-            },
-            "gridData": {
-              "h": 8,
-              "i": "70ab7239-c65c-41da-8242-da61750745d7",
-              "w": 10,
-              "x": 0,
-              "y": 6
-            },
-            "panelIndex": "70ab7239-c65c-41da-8242-da61750745d7",
-            "panelRefName": "panel_2",
-            "title": "Events by type",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "colors": {
-                "failure": "#E24D42",
-                "success": "#629E51"
-              },
-              "legendOpen": false,
-              "title": "Top users by authentication failures",
-              "vis": {
-                "colors": {
-                  "failure": "#E24D42",
-                  "success": "#629E51"
+                "gridData": {
+                    "h": 6,
+                    "i": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                    "w": 10,
+                    "x": 0,
+                    "y": 0
                 },
-                "legendOpen": true
-              }
+                "panelIndex": "b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                "panelRefName": "panel_b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+                "title": "Total audit events",
+                "type": "visualization",
+                "version": "7.6.0"
             },
-            "gridData": {
-              "h": 17,
-              "i": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
-              "w": 10,
-              "x": 0,
-              "y": 14
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                    "w": 38,
+                    "x": 10,
+                    "y": 0
+                },
+                "panelIndex": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                "panelRefName": "panel_9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+                "title": "Event histogram by service",
+                "type": "visualization",
+                "version": "7.6.0"
             },
-            "panelIndex": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
-            "panelRefName": "panel_3",
-            "title": "Top users by authentication failures",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "hiddenLayers": [],
-              "isLayerTOCOpen": false,
-              "mapCenter": {
-                "lat": 42.68781,
-                "lon": -48.94209,
-                "zoom": 1.88
-              },
-              "openTOCDetails": [],
-              "title": "Client geolocation map"
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "alert": "#EF843C",
+                        "event": "#7EB26D"
+                    },
+                    "enhancements": {},
+                    "legendOpen": true,
+                    "vis": {
+                        "colors": {
+                            "alert": "#E24D42",
+                            "event": "#7EB26D"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "70ab7239-c65c-41da-8242-da61750745d7",
+                    "w": 10,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "70ab7239-c65c-41da-8242-da61750745d7",
+                "panelRefName": "panel_70ab7239-c65c-41da-8242-da61750745d7",
+                "title": "Events by type",
+                "type": "visualization",
+                "version": "7.6.0"
             },
-            "gridData": {
-              "h": 17,
-              "i": "15fe975b-6b8b-4445-872d-e06c041e2c31",
-              "w": 38,
-              "x": 10,
-              "y": 14
+            {
+                "embeddableConfig": {
+                    "colors": {
+                        "failure": "#E24D42",
+                        "success": "#629E51"
+                    },
+                    "enhancements": {},
+                    "legendOpen": false,
+                    "vis": {
+                        "colors": {
+                            "failure": "#E24D42",
+                            "success": "#629E51"
+                        },
+                        "legendOpen": true
+                    }
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                    "w": 10,
+                    "x": 0,
+                    "y": 14
+                },
+                "panelIndex": "775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                "panelRefName": "panel_775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+                "title": "Top users by authentication failures",
+                "type": "visualization",
+                "version": "7.6.0"
             },
-            "panelIndex": "15fe975b-6b8b-4445-872d-e06c041e2c31",
-            "panelRefName": "panel_4",
-            "title": "Client geolocation map",
-            "version": "7.6.0"
-          },
-          {
-            "embeddableConfig": {
-              "title": "Data Loss Prevention alerts"
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 42.68781,
+                        "lon": -48.94209,
+                        "zoom": 1.88
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "15fe975b-6b8b-4445-872d-e06c041e2c31",
+                    "w": 38,
+                    "x": 10,
+                    "y": 14
+                },
+                "panelIndex": "15fe975b-6b8b-4445-872d-e06c041e2c31",
+                "panelRefName": "panel_15fe975b-6b8b-4445-872d-e06c041e2c31",
+                "title": "Client geolocation map",
+                "type": "map",
+                "version": "7.6.0"
             },
-            "gridData": {
-              "h": 13,
-              "i": "481f1778-caad-4971-b598-bb61c94bf998",
-              "w": 48,
-              "x": 0,
-              "y": 31
-            },
-            "panelIndex": "481f1778-caad-4971-b598-bb61c94bf998",
-            "panelRefName": "panel_5",
-            "title": "Data Loss Prevention alerts",
-            "version": "7.6.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "481f1778-caad-4971-b598-bb61c94bf998",
+                    "w": 48,
+                    "x": 0,
+                    "y": 31
+                },
+                "panelIndex": "481f1778-caad-4971-b598-bb61c94bf998",
+                "panelRefName": "panel_481f1778-caad-4971-b598-bb61c94bf998",
+                "title": "Data Loss Prevention alerts",
+                "type": "search",
+                "version": "7.6.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat o365] Audit Dashboard ECS",
         "version": 1
-      },
-      "id": "712e2c00-685d-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "dashboard": "7.3.0"
-      },
-      "references": [
-        {
-          "id": "0be1adb0-6860-11ea-8d6a-292ef5d68366",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "8b033510-685a-11ea-8d6a-292ef5d68366",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "d43c95a0-6864-11ea-8d6a-292ef5d68366",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "897d0c70-6869-11ea-8d6a-292ef5d68366",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "dbae13c0-685c-11ea-8d6a-292ef5d68366",
-          "name": "panel_4",
-          "type": "map"
-        },
-        {
-          "id": "8b8e5a10-6886-11ea-8d6a-292ef5d68366",
-          "name": "panel_5",
-          "type": "search"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2020-03-17T19:40:51.528Z",
-      "version": "WzY3MywyXQ=="
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Audit Event Count [Filebeat o365]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "dimensions": {
-              "metrics": [
-                {
-                  "accessor": 0,
-                  "format": {
-                    "id": "number",
-                    "params": {}
-                  },
-                  "type": "vis_dimension"
-                }
-              ]
-            },
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000,
-                  "type": "range"
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 40,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "Audit Event Count [Filebeat o365]",
-          "type": "metric"
-        }
-      },
-      "id": "0be1adb0-6860-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-17T15:42:14.802Z",
-      "version": "WzU5OCwxXQ=="
+    "coreMigrationVersion": "8.0.0",
+    "id": "712e2c00-685d-11ea-8d6a-292ef5d68366",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Events Histogram [Filebeat o365]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.code",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": true,
-                "otherBucketLabel": "Other",
-                "size": 50
-              },
-              "schema": "group",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "drop_partials": false,
-                "extended_bounds": {},
-                "field": "@timestamp",
-                "interval": "auto",
-                "min_doc_count": 1,
-                "scaleMetricValues": false,
-                "timeRange": {
-                  "from": "2020-02-05T03:25:59.045Z",
-                  "to": "2020-02-29T10:59:01.067Z"
-                },
-                "useNormalizedEsInterval": true
-              },
-              "schema": "segment",
-              "type": "date_histogram"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "dimensions": {
-              "series": [
-                {
-                  "accessor": 0,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other",
-                      "parsedUrl": {
-                        "basePath": "",
-                        "origin": "http://localhost:5601",
-                        "pathname": "/app/kibana"
-                      }
-                    }
-                  },
-                  "label": "event.code: Descending",
-                  "params": {}
-                }
-              ],
-              "x": {
-                "accessor": 1,
-                "aggType": "date_histogram",
-                "format": {
-                  "id": "date",
-                  "params": {
-                    "pattern": "YYYY-MM-DD HH:mm"
-                  }
-                },
-                "label": "@timestamp per 12 hours",
-                "params": {
-                  "bounds": {
-                    "max": "2020-02-29T10:59:01.067Z",
-                    "min": "2020-02-05T03:25:59.045Z"
-                  },
-                  "date": true,
-                  "format": "YYYY-MM-DD HH:mm",
-                  "interval": "PT12H",
-                  "intervalESUnit": "h",
-                  "intervalESValue": 12
-                }
-              },
-              "y": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "label": "Count",
-                  "params": {}
-                }
-              ]
-            },
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": false
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Events Histogram [Filebeat o365]",
-          "type": "histogram"
-        }
-      },
-      "id": "8b033510-685a-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
+    "references": [
         {
-          "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-17T14:21:07.680Z",
-      "version": "WzU3MSwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Audit Event Type [Filebeat o365]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.kind",
-                "missingBucket": true,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": true,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "dimensions": {
-              "metric": {
-                "accessor": 0,
-                "aggType": "count",
-                "format": {
-                  "id": "number"
-                },
-                "label": "Count",
-                "params": {}
-              }
-            },
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Audit Event Type [Filebeat o365]",
-          "type": "pie"
-        }
-      },
-      "id": "d43c95a0-6864-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
-          "name": "search_0",
-          "type": "search"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-17T15:34:45.498Z",
-      "version": "WzU5NiwxXQ=="
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.category",
-                  "negate": false,
-                  "params": {
-                    "query": "authentication"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.category": "authentication"
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "Top Authentication Failures [Filebeat o365]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "failure": "#E24D42",
-              "success": "#629E51"
-            },
-            "legendOpen": true
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": ""
-              },
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "asc",
-                "orderBy": "_key",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 2
-              },
-              "schema": "group",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "user.name",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "row": true,
-                "size": 15
-              },
-              "schema": "split",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 200
-                },
-                "position": "left",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": false,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "dimensions": {
-              "series": [
-                {
-                  "accessor": 0,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other",
-                      "parsedUrl": {
-                        "basePath": "",
-                        "origin": "http://localhost:5601",
-                        "pathname": "/app/kibana"
-                      }
-                    }
-                  },
-                  "label": "event.outcome: Ascending",
-                  "params": {}
-                }
-              ],
-              "splitRow": [
-                {
-                  "accessor": 1,
-                  "aggType": "terms",
-                  "format": {
-                    "id": "terms",
-                    "params": {
-                      "id": "string",
-                      "missingBucketLabel": "Missing",
-                      "otherBucketLabel": "Other",
-                      "parsedUrl": {
-                        "basePath": "",
-                        "origin": "http://localhost:5601",
-                        "pathname": "/app/kibana"
-                      }
-                    }
-                  },
-                  "label": "user.name: Descending",
-                  "params": {}
-                }
-              ],
-              "x": null,
-              "y": [
-                {
-                  "accessor": 2,
-                  "aggType": "count",
-                  "format": {
-                    "id": "number"
-                  },
-                  "label": "Count",
-                  "params": {}
-                }
-              ]
-            },
-            "grid": {
-              "categoryLines": false,
-              "valueAxis": ""
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "bottom",
-            "orderBucketsBySum": true,
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": true,
-                  "rotate": 75,
-                  "show": false,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "bottom",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": false,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "Top Authentication Failures [Filebeat o365]",
-          "type": "horizontal_bar"
-        }
-      },
-      "id": "897d0c70-6869-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
+            "id": "0be1adb0-6860-11ea-8d6a-292ef5d68366",
+            "name": "b6942e2a-81dc-40e4-a932-8b7a864b28bc:panel_b6942e2a-81dc-40e4-a932-8b7a864b28bc",
+            "type": "visualization"
         },
         {
-          "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
-          "name": "search_0",
-          "type": "search"
+            "id": "8b033510-685a-11ea-8d6a-292ef5d68366",
+            "name": "9673e6df-4b1e-4771-b1c6-c41c9bfc7272:panel_9673e6df-4b1e-4771-b1c6-c41c9bfc7272",
+            "type": "visualization"
+        },
+        {
+            "id": "d43c95a0-6864-11ea-8d6a-292ef5d68366",
+            "name": "70ab7239-c65c-41da-8242-da61750745d7:panel_70ab7239-c65c-41da-8242-da61750745d7",
+            "type": "visualization"
+        },
+        {
+            "id": "897d0c70-6869-11ea-8d6a-292ef5d68366",
+            "name": "775ced7d-7c58-44bc-8d4e-2a757d2c218c:panel_775ced7d-7c58-44bc-8d4e-2a757d2c218c",
+            "type": "visualization"
+        },
+        {
+            "id": "dbae13c0-685c-11ea-8d6a-292ef5d68366",
+            "name": "15fe975b-6b8b-4445-872d-e06c041e2c31:panel_15fe975b-6b8b-4445-872d-e06c041e2c31",
+            "type": "map"
+        },
+        {
+            "id": "8b8e5a10-6886-11ea-8d6a-292ef5d68366",
+            "name": "481f1778-caad-4971-b598-bb61c94bf998:panel_481f1778-caad-4971-b598-bb61c94bf998",
+            "type": "search"
         }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-17T17:33:41.990Z",
-      "version": "WzYwOCwxXQ=="
-    },
-    {
-      "attributes": {
-        "bounds": {
-          "coordinates": [
-            [
-              [
-                -52.43037,
-                65.94892
-              ],
-              [
-                -52.43037,
-                -22.98633
-              ],
-              [
-                85.77811,
-                -22.98633
-              ],
-              [
-                85.77811,
-                65.94892
-              ],
-              [
-                -52.43037,
-                65.94892
-              ]
-            ]
-          ],
-          "type": "Polygon"
-        },
-        "description": "",
-        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"0b910b6c-77c8-4223-892a-1ebf69b0ccb4\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"type\":\"ES_GEO_GRID\",\"id\":\"3ba31ffc-7051-44bf-96a0-a684020cd2a3\",\"geoField\":\"source.geo.location\",\"requestType\":\"point\",\"resolution\":\"FINE\",\"applyGlobalQuery\":true,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"fillColor\":{\"type\":\"DYNAMIC\",\"options\":{\"color\":\"Yellow to Red\",\"colorCategory\":\"palette_0\",\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3},\"type\":\"ORDINAL\",\"useCustomColorRamp\":false}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFF\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":0}},\"iconSize\":{\"type\":\"DYNAMIC\",\"options\":{\"minSize\":8,\"maxSize\":32,\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"},\"fieldMetaOptions\":{\"isEnabled\":true,\"sigma\":3}}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"DYNAMIC\",\"options\":{\"field\":{\"name\":\"doc_count\",\"origin\":\"source\"}}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbol\":{\"options\":{\"symbolizeAs\":\"circle\",\"symbolId\":\"airfield\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"acc53b7b-3411-406b-9371-6fa62b6b9365\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\"}]",
-        "mapStateJSON": "{\"zoom\":2.88,\"center\":{\"lon\":16.67387,\"lat\":30.87292},\"timeFilters\":{\"from\":\"now-7d\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"event.dataset:\\\"o365.audit\\\" \",\"language\":\"kuery\"},\"filters\":[]}",
-        "title": "Client Geo Map [Filebeat o365 audit]",
-        "uiStateJSON": {
-          "isLayerTOCOpen": true,
-          "openTOCDetails": []
-        }
-      },
-      "id": "dbae13c0-685c-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "map": "7.6.0"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "layer_1_source_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "map",
-      "updated_at": "2020-03-17T14:45:09.571Z",
-      "version": "WzU4NCwxXQ=="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "event.category",
-          "event.type",
-          "event.action",
-          "event.outcome",
-          "user.name",
-          "file.name",
-          "rule.name"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "o365.audit"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "o365.audit"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.kind",
-                  "negate": false,
-                  "params": {
-                    "query": "alert"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.kind": "alert"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                  "key": "event.code",
-                  "negate": false,
-                  "params": [
-                    "ComplianceDLPSharePoint",
-                    "ComplianceDLPExchange"
-                  ],
-                  "type": "phrases",
-                  "value": "ComplianceDLPSharePoint, ComplianceDLPExchange"
-                },
-                "query": {
-                  "bool": {
-                    "minimum_should_match": 1,
-                    "should": [
-                      {
-                        "match_phrase": {
-                          "event.code": "ComplianceDLPSharePoint"
-                        }
-                      },
-                      {
-                        "match_phrase": {
-                          "event.code": "ComplianceDLPExchange"
-                        }
-                      }
-                    ]
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "Data Loss Prevention [Filebeat o365]",
-        "version": 1
-      },
-      "id": "8b8e5a10-6886-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "search": "7.4.0"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2020-03-17T19:36:06.449Z",
-      "version": "WzY3MCwyXQ=="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": "event.dataset:\"o365.audit\" "
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ]
-        ],
-        "title": "Audit Events [Filebeat O365]",
-        "version": 1
-      },
-      "id": "fdc14020-6859-11ea-8d6a-292ef5d68366",
-      "migrationVersion": {
-        "search": "7.4.0"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2020-03-17T14:17:10.688Z",
-      "version": "WzU2OSwxXQ=="
-    }
-  ],
-  "version": "7.6.0"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:49.253Z",
+    "version": "WzQzMDQsMV0="
 }

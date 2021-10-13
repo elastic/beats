@@ -1,0 +1,70 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Logs Severity [Filebeat Logstash] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "log.level",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": true,
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "type": "pie"
+            },
+            "title": "Logs Severity [Filebeat Logstash] ECS",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0b1dace0-cbdb-11e7-9852-73e0a9df1bb6-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "cfaba090-cbda-11e7-9852-73e0a9df1bb6-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:11.672Z",
+    "version": "WzQ0NDEsMV0="
+}

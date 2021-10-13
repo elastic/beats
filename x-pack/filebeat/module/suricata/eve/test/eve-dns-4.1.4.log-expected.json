@@ -24,6 +24,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:HActqwgIaYeC8fc4sfMGrL8jjaI=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -71,6 +72,7 @@
         "input.type": "log",
         "log.offset": 280,
         "network.community_id": "1:Z5dwZB2hQ1ZuxC+6Jw04VtuJ1lw=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -134,6 +136,7 @@
         "input.type": "log",
         "log.offset": 564,
         "network.community_id": "1:Z5dwZB2hQ1ZuxC+6Jw04VtuJ1lw=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -198,6 +201,7 @@
         "input.type": "log",
         "log.offset": 1089,
         "network.community_id": "1:HActqwgIaYeC8fc4sfMGrL8jjaI=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -247,6 +251,7 @@
         "input.type": "log",
         "log.offset": 1552,
         "network.community_id": "1:vfjW/QLkaS6+iMbv/HRuEOgqA4o=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -295,6 +300,7 @@
         "input.type": "log",
         "log.offset": 1835,
         "network.community_id": "1:SDBTqhsjpXwQyrvRX6xpeEaMsAg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -386,6 +392,7 @@
         "input.type": "log",
         "log.offset": 2122,
         "network.community_id": "1:vfjW/QLkaS6+iMbv/HRuEOgqA4o=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -481,6 +488,7 @@
         "input.type": "log",
         "log.offset": 3116,
         "network.community_id": "1:SDBTqhsjpXwQyrvRX6xpeEaMsAg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -533,6 +541,7 @@
         "input.type": "log",
         "log.offset": 4327,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -581,6 +590,7 @@
         "input.type": "log",
         "log.offset": 4610,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -637,6 +647,7 @@
         "input.type": "log",
         "log.offset": 4896,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -698,6 +709,7 @@
         "input.type": "log",
         "log.offset": 5288,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -760,6 +772,7 @@
         "input.type": "log",
         "log.offset": 5675,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -822,6 +835,7 @@
         "input.type": "log",
         "log.offset": 6062,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -884,6 +898,7 @@
         "input.type": "log",
         "log.offset": 6446,
         "network.community_id": "1:O4Lt3gevExgYQL5MQJq7vgssBrQ=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -943,6 +958,7 @@
         "input.type": "log",
         "log.offset": 6829,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1004,6 +1020,7 @@
         "input.type": "log",
         "log.offset": 7221,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1066,6 +1083,7 @@
         "input.type": "log",
         "log.offset": 7636,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1128,6 +1146,7 @@
         "input.type": "log",
         "log.offset": 8051,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1190,6 +1209,7 @@
         "input.type": "log",
         "log.offset": 8466,
         "network.community_id": "1:NKecJMP5cHplk+fr2uNww69SdWg=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1241,6 +1261,7 @@
         "input.type": "log",
         "log.offset": 8881,
         "network.community_id": "1:zh0UVYktuWGDSL+4ROPa1CTtEPE=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1289,6 +1310,7 @@
         "input.type": "log",
         "log.offset": 9165,
         "network.community_id": "1:fuLDtU46PU3PHindOSCj0JKYUaA=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1380,6 +1402,7 @@
         "input.type": "log",
         "log.offset": 9452,
         "network.community_id": "1:zh0UVYktuWGDSL+4ROPa1CTtEPE=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [
@@ -1475,6 +1498,7 @@
         "input.type": "log",
         "log.offset": 10310,
         "network.community_id": "1:fuLDtU46PU3PHindOSCj0JKYUaA=",
+        "network.direction": "internal",
         "network.protocol": "dns",
         "network.transport": "udp",
         "related.ip": [

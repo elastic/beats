@@ -1,0 +1,104 @@
+{
+    "attributes": {
+        "description": "Feed and provider selector for indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Feed and Indicator Selector [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "controls": [
+                    {
+                        "fieldName": "event.dataset",
+                        "id": "1614117070660",
+                        "indexPatternRefName": "control_0_index_pattern",
+                        "label": "Feed Name",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "threatintel.indicator.provider",
+                        "id": "1614117093181",
+                        "indexPatternRefName": "control_1_index_pattern",
+                        "label": "Indicator Provider",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    },
+                    {
+                        "fieldName": "threatintel.indicator.type",
+                        "id": "1614117117360",
+                        "indexPatternRefName": "control_2_index_pattern",
+                        "label": "Indicator Type",
+                        "options": {
+                            "dynamicOptions": true,
+                            "multiselect": true,
+                            "order": "desc",
+                            "size": 5,
+                            "type": "terms"
+                        },
+                        "parent": "",
+                        "type": "list"
+                    }
+                ],
+                "pinFilters": false,
+                "updateFiltersOnChange": false,
+                "useTimeFilter": false
+            },
+            "title": "Feed and Indicator Selector [Filebeat Threat Intel]",
+            "type": "input_control_vis"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "92961600-7621-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "control_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_1_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "control_2_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:32.145Z",
+    "version": "WzQ2NDcsMV0="
+}

@@ -49,6 +49,7 @@ func InjectMonitoring(agentInfo *info.AgentInfo, outputGroup string, rootAst *tr
 			transpiler.NewKey("logs", transpiler.NewBoolVal(true)),
 			transpiler.NewKey("metrics", transpiler.NewBoolVal(true)),
 			transpiler.NewKey("use_output", transpiler.NewStrVal("default")),
+			transpiler.NewKey("namespace", transpiler.NewStrVal("default")),
 		})
 
 		transpiler.Insert(rootAst, transpiler.NewKey("monitoring", monitoringNode), "settings")

@@ -1,0 +1,49 @@
+{
+    "attributes": {
+        "columns": [
+            "event.code",
+            "powershell.engine.version",
+            "powershell.runspace_id",
+            "process.args",
+            "powershell.command.invocation_details",
+            "powershell.file.script_block_text"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "(winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" )"
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Details [Winlogbeat powershell]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "11a61760-9f27-11ea-bef1-95118e62a7c1",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-11T13:18:51.383Z",
+    "version": "WzIxNzIsMl0="
+}

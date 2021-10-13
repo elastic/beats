@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build !windows
 // +build !windows
 
 package process
@@ -21,16 +22,11 @@ func (a *Application) externalProcess(proc *os.Process) {
 		return
 	}
 
-	for range time.After(1 * time.Second) {
-
-	}
 	for {
-		select {
-		case <-time.After(1 * time.Second):
-			if proc.Signal(syscall.Signal(0)) != nil {
-				// failed to contact process, return
-				return
-			}
+		<-time.After(1 * time.Second)
+		if proc.Signal(syscall.Signal(0)) != nil {
+			// failed to contact process, return
+			return
 		}
 	}
 }

@@ -1,0 +1,1 @@
+SyncGateway `replication` metriset contains information about the replicas. Note that you won't see any data if you don't have any replicas configured on your Couchbase buckets.

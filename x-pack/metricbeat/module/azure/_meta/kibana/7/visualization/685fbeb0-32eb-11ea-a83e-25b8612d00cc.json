@@ -1,0 +1,72 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Storage Success E2E Latency [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "da4459b0-32ea-11ea-be35-cb10be813609",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "#3185FC",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "da4459b1-32ea-11ea-be35-cb10be813609",
+                        "label": "Success E2E Latency (ms)",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "azure.storage.success_e2elatency.avg",
+                                "id": "da4459b2-32ea-11ea-be35-cb10be813609",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "azure.dimensions.api_name",
+                        "terms_order_by": "da4459b2-32ea-11ea-be35-cb10be813609",
+                        "type": "timeseries",
+                        "value_template": "{{value}} ms"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Storage Success E2E Latency [Metricbeat Azure]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "685fbeb0-32eb-11ea-a83e-25b8612d00cc",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:53.138Z",
+    "version": "WzM1OTcsMV0="
+}

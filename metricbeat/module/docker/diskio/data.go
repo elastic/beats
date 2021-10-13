@@ -30,9 +30,6 @@ func eventsMapping(r mb.ReporterV2, blkioStatsList []BlkioStats) {
 
 func eventMapping(r mb.ReporterV2, stats *BlkioStats) {
 	fields := common.MapStr{
-		"reads":  stats.reads,
-		"writes": stats.writes,
-		"total":  stats.totals,
 		"read": common.MapStr{
 			"ops":          stats.serviced.reads,
 			"bytes":        stats.servicedBytes.reads,

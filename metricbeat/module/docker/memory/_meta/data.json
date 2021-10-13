@@ -1,61 +1,94 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "container": {
-        "id": "aa41902101351f415e6e983b0673c0ba715dd4bc316bd5fc0ebd6fcf94287f86",
+        "id": "23ce6f1b53181ea3db0611fe4de36f0ebf1c0a37cb8272e028cac06240dafbe0",
         "image": {
-            "name": "redis:latest"
+            "name": "docker.elastic.co/beats/elastic-agent:7.15.0-SNAPSHOT"
         },
-        "name": "amazing_cohen",
+        "name": "elastic-package-stack_elastic-agent_1",
         "runtime": "docker"
     },
     "docker": {
+        "container": {
+            "labels": {
+                "com_docker_compose_config-hash": "8e3d03827946685d53a2f171a126c397a3278da18ecd68a970cba9131160c52c",
+                "com_docker_compose_container-number": "1",
+                "com_docker_compose_oneoff": "False",
+                "com_docker_compose_project": "elastic-package-stack",
+                "com_docker_compose_service": "elastic-agent",
+                "com_docker_compose_version": "1.28.6",
+                "description": "Agent manages other beats based on configuration provided.",
+                "io_k8s_description": "Agent manages other beats based on configuration provided.",
+                "io_k8s_display-name": "Elastic-Agent image",
+                "license": "Elastic License",
+                "maintainer": "infra@elastic.co",
+                "name": "elastic-agent",
+                "org_label-schema_build-date": "2021-07-28T09:55:40Z",
+                "org_label-schema_license": "Elastic License",
+                "org_label-schema_name": "elastic-agent",
+                "org_label-schema_schema-version": "1.0",
+                "org_label-schema_url": "https://www.elastic.co/beats/elastic-agent",
+                "org_label-schema_vcs-ref": "16108a69f9f437c00cb6125c57bbc01c4eb805bb",
+                "org_label-schema_vcs-url": "github.com/elastic/beats/v7",
+                "org_label-schema_vendor": "Elastic",
+                "org_label-schema_version": "7.15.0-SNAPSHOT",
+                "org_opencontainers_image_created": "2021-07-28T09:55:40Z",
+                "org_opencontainers_image_licenses": "Elastic License",
+                "org_opencontainers_image_title": "Elastic-Agent",
+                "org_opencontainers_image_vendor": "Elastic",
+                "release": "1",
+                "summary": "elastic-agent",
+                "url": "https://www.elastic.co/beats/elastic-agent",
+                "vendor": "Elastic",
+                "version": "7.15.0-SNAPSHOT"
+            }
+        },
         "memory": {
             "fail": {
                 "count": 0
             },
-            "limit": 2095878144,
+            "limit": 67514433536,
             "rss": {
-                "pct": 0.0004025882909345325,
-                "total": 843776
+                "pct": 0,
+                "total": 0
             },
             "stats": {
-                "active_anon": 421888,
-                "active_file": 36864,
-                "cache": 86016,
-                "dirty": 0,
-                "hierarchical_memory_limit": 9223372036854771712,
-                "hierarchical_memsw_limit": 9223372036854771712,
-                "inactive_anon": 421888,
-                "inactive_file": 49152,
-                "mapped_file": 53248,
-                "pgfault": 1587,
-                "pgmajfault": 1,
-                "pgpgin": 2426,
-                "pgpgout": 2199,
-                "rss": 843776,
-                "rss_huge": 0,
-                "total_active_anon": 421888,
-                "total_active_file": 36864,
-                "total_cache": 86016,
-                "total_dirty": 0,
-                "total_inactive_anon": 421888,
-                "total_inactive_file": 49152,
-                "total_mapped_file": 53248,
-                "total_pgfault": 1587,
-                "total_pgmajfault": 1,
-                "total_pgpgin": 2426,
-                "total_pgpgout": 2199,
-                "total_rss": 843776,
-                "total_rss_huge": 0,
-                "total_unevictable": 0,
-                "total_writeback": 0,
+                "active_anon": 270336,
+                "active_file": 135168,
+                "anon": 246484992,
+                "anon_thp": 4194304,
+                "file": 325484544,
+                "file_dirty": 0,
+                "file_mapped": 170582016,
+                "file_writeback": 0,
+                "inactive_anon": 250257408,
+                "inactive_file": 325619712,
+                "kernel_stack": 2703360,
+                "pgactivate": 62898,
+                "pgdeactivate": 0,
+                "pgfault": 2150971515,
+                "pglazyfree": 207999,
+                "pglazyfreed": 0,
+                "pgmajfault": 0,
+                "pgrefill": 0,
+                "pgscan": 0,
+                "pgsteal": 0,
+                "shmem": 0,
+                "slab": 8112800,
+                "slab_reclaimable": 5753632,
+                "slab_unreclaimable": 2359168,
+                "sock": 200704,
+                "thp_collapse_alloc": 0,
+                "thp_fault_alloc": 0,
                 "unevictable": 0,
-                "writeback": 0
+                "workingset_activate": 0,
+                "workingset_nodereclaim": 0,
+                "workingset_refault": 0
             },
             "usage": {
-                "max": 7860224,
-                "pct": 0.000672283359618831,
-                "total": 1409024
+                "max": 0,
+                "pct": 0.0039415723433138695,
+                "total": 266113024
             }
         }
     },
@@ -65,7 +98,8 @@
         "module": "docker"
     },
     "metricset": {
-        "name": "memory"
+        "name": "memory",
+        "period": 10000
     },
     "service": {
         "address": "/var/run/docker.sock",

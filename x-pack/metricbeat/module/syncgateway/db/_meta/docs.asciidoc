@@ -1,0 +1,1 @@
+SyncGateway `db` metriset contains the most relevant information of the module about the db metrics

@@ -1,0 +1,114 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Events by Severity [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "listeners": {},
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "id": "0ca18a89-9c81-4bee-835a-85e6103aec37"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "cef.extensions.categoryDeviceGroup:\"/Firewall\""
+                },
+                "hide_last_value_indicator": true,
+                "id": "c39a76e5-f613-41a9-8335-c442747791e0",
+                "index_pattern": "filebeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "0.0[0]a",
+                        "id": "da3b92b4-2c24-473b-9102-fb5a343a96d9",
+                        "label": "Event by Severities",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "0d189776-3f7c-4a92-95b1-73c379a341fc",
+                                "type": "count"
+                            },
+                            {
+                                "field": "0d189776-3f7c-4a92-95b1-73c379a341fc",
+                                "id": "1b1c931c-a09b-4980-af81-6f9c3db56401",
+                                "sigma": "",
+                                "type": "sum_bucket"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_filters": [
+                            {
+                                "color": "rgba(104,204,202,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "severity:\"Low\" OR severity:\"0\""
+                                },
+                                "id": "ebe970ac-5cc9-4c4a-af60-82affafc667c",
+                                "label": "LOW"
+                            },
+                            {
+                                "color": "rgba(252,220,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "severity:\"Medium\""
+                                },
+                                "id": "0c4ff16a-b53d-4ce4-af76-d6b74d8788db",
+                                "label": "MEDIUM"
+                            },
+                            {
+                                "color": "rgba(254,146,0,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "severity:\"High\""
+                                },
+                                "id": "e142c55b-6ee5-416a-8bd3-d10398044864",
+                                "label": "HIGH"
+                            },
+                            {
+                                "color": "rgba(244,78,59,1)",
+                                "filter": {
+                                    "language": "lucene",
+                                    "query": "severity:\"Very-High\""
+                                },
+                                "id": "4b05b562-c419-4214-b814-d4c242251521",
+                                "label": "VERY HIGH"
+                            }
+                        ],
+                        "split_mode": "filters",
+                        "stacked": "none"
+                    }
+                ],
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Events by Severity [Filebeat CEF]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "9bef4db9-a8b2-4be8-b2b0-6ea02fab424d",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:40.331Z",
+    "version": "WzQ3NjgsMV0="
+}

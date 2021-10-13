@@ -1,0 +1,78 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Open Databases [Metricbeat CouchDB] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "filter": {
+                    "language": "kuery",
+                    "query": "couchdb"
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "ef4c9800-b94f-11e9-bce6-47447dde021d"
+                    }
+                ],
+                "gauge_inner_color": null,
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "id": "71dd6340-b94f-11e9-9f6f-832b64f4a79f",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "legend_position": "right",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(12,121,125,1)",
+                        "fill": "0.1",
+                        "formatter": "number",
+                        "id": "71dd8a50-b94f-11e9-9f6f-832b64f4a79f",
+                        "label": "Open Databases",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.couchdb.open_databases",
+                                "id": "71dd8a51-b94f-11e9-9f6f-832b64f4a79f",
+                                "type": "max"
+                            }
+                        ],
+                        "point_size": "0",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Open Databases [Metricbeat CouchDB] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "f8c29f10-b94f-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTMsMV0="
+}

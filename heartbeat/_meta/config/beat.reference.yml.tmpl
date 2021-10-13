@@ -71,26 +71,6 @@ heartbeat.monitors:
   # sub-dictionary. Default is false.
   #fields_under_root: false
 
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
-  # overwrites the pipeline option from the Elasticsearch output.
-  #pipeline:
-
-  # The index name associated with this input. If this is set, it
-  # overwrites the index option from the Elasticsearch output.
-  #index:
-
-  # Set to true to publish fields with null values in events.
-  #keep_null: false
-
 # Define a directory to load monitor definitions from. Definitions take the form
 # of individual yaml files.
 # heartbeat.config.monitors:
@@ -168,16 +148,7 @@ heartbeat.monitors:
     # Required TLS protocols
     #supported_protocols: ["TLSv1.0", "TLSv1.1", "TLSv1.2"]
 
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -209,14 +180,6 @@ heartbeat.monitors:
   ipv4: true
   ipv6: true
   mode: any
-
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
 
   # Optional HTTP proxy url.
   #proxy_url: ''
@@ -260,24 +223,19 @@ heartbeat.monitors:
     # Required response contents.
     #body:
 
-    # Parses the body as JSON, then checks against the given condition expression
+    # Parses the body as JSON, then checks against the given expression
+    #json:
+    #- description: Explanation of what the check does
+-   #  expression: 'myField == "expectedValue"'
+
+    # (Deprecated: see 'expression' above) Parses the body as JSON, then checks against the given condition expression
     #json:
     #- description: Explanation of what the check does
     #  condition:
     #    equals:
     #      myField: expectedValue
 
-
-  # NOTE: THIS FEATURE IS DEPRECATED AND WILL BE REMOVED IN A FUTURE RELEASE
-  # Configure file json file to be watched for changes to the monitor:
-  #watch.poll_file:
-    # Path to check for updates.
-    #path:
-
-    # Interval between file file changed checks.
-    #interval: 5s
-
-  # The Ingest Node pipeline ID associated with this input. If this is set, it
+  # The ingest pipeline ID associated with this input. If this is set, it
   # overwrites the pipeline option from the Elasticsearch output.
   #pipeline:
 
@@ -295,3 +253,14 @@ heartbeat.scheduler:
 
   # Set the scheduler it's time zone
   #location: ''
+
+heartbeat.jobs:
+  # Limit the number of concurrent monitors executed by heartbeat. This differs from
+  # heartbeat.scheduler.limit in that it maps to individual monitors rather than the 
+  # subtasks of monitors. For non-browser monitors a subtask usually corresponds to a
+  # single file descriptor.
+  # This feature is most useful for the browser type
+  #browser.limit: 1
+  #http.limit: 10
+  #tcp.limit: 10
+  #icmp.limit: 10

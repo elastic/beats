@@ -1,0 +1,163 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "allow": "#64B0C8",
+                    "deny": "#E24D42"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "timeRange": {
+                            "from": "2019-01-24T15:47:12.171Z",
+                            "mode": "absolute",
+                            "to": "2019-01-24T15:47:52.785Z"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "event.outcome",
+                        "missingBucket": true,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "_key",
+                        "otherBucket": true,
+                        "otherBucketLabel": "Other",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "isVislibVis": true,
+                "legendPosition": "top",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "stacked",
+                        "show": "true",
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "times": [],
+                "type": "histogram",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Ubiquiti Firewall Event Timeline [Filebeat Iptables] ECS",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "758b3620-1fda-11e9-ae2a-939083c6a64e-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "c4e80aa0-1fd4-11e9-ae2a-939083c6a64e-ecs",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:45.146Z",
+    "version": "WzQyODEsMV0="
+}

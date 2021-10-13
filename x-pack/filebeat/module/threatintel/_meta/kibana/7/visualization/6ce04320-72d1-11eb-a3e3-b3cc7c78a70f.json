@@ -1,0 +1,104 @@
+{
+    "attributes": {
+        "description": "Total number of indicators ingested by the threat intel Filebeat module.",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "exists": {
+                            "field": "event.dataset"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "type": "exists",
+                            "value": "exists"
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Total Indicators [Filebeat Threat Intel]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Total Indicators"
+                    },
+                    "schema": "metric",
+                    "type": "count"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "metric": {
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Total Indicators [Filebeat Threat Intel]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "6ce04320-72d1-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
+            "name": "search_0",
+            "type": "search"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:32.145Z",
+    "version": "WzQ2NTEsMV0="
+}

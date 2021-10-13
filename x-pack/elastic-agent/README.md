@@ -16,3 +16,7 @@ If you are in the 7.13 branch, this will create the `docker.elastic.co/beats/ela
 ```
 elastic-package stack up --version=7.13.0-SNAPSHOT -v
 ```
+
+Please note that the docker container is built in both standard and 'offline' variants.
+The 'offline' variant contains extra files, like the chromium browser, that are too large
+for the standard variant.

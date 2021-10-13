@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Top Processes By CPU [Metricbeat System] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "bar_color_rules": [
+                    {
+                        "bar_color": "rgba(104,188,0,1)",
+                        "id": "60e11be0-1b18-11e7-b09e-037021c4f8df",
+                        "operator": "gte",
+                        "value": 0
+                    },
+                    {
+                        "bar_color": "rgba(104,188,0,1)",
+                        "id": "147a3da2-60a6-4c32-b2c8-18a40db90c6c",
+                        "operator": "empty",
+                        "value": null
+                    }
+                ],
+                "drilldown_url": "",
+                "filter": "",
+                "hide_last_value_indicator": true,
+                "id": "5f5b8d50-1b18-11e7-b09e-037021c4f8df",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "percent",
+                        "id": "5f5b8d51-1b18-11e7-b09e-037021c4f8df",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "system.process.cpu.total.pct",
+                                "id": "5f5b8d52-1b18-11e7-b09e-037021c4f8df",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "process.name",
+                        "terms_order_by": "5f5b8d52-1b18-11e7-b09e-037021c4f8df"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Top Processes By CPU [Metricbeat System] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e0f001c0-1b18-11e7-b09e-037021c4f8df-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:24.050Z",
+    "version": "WzM4NTYsMV0="
+}

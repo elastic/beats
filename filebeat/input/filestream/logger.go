@@ -25,7 +25,7 @@ import (
 
 func loggerWithEvent(logger *logp.Logger, event loginp.FSEvent, src loginp.Source) *logp.Logger {
 	log := logger.With(
-		"operation", event.Op,
+		"operation", event.Op.String(),
 		"source_name", src.Name(),
 	)
 	if event.Info != nil && event.Info.Sys() != nil {

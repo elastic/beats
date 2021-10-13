@@ -41,10 +41,13 @@ type Elasticsearch struct {
 	ServiceToken string            `config:"service_token" yaml:"service_token,omitempty"`
 	TLS          *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty"`
 	Headers      map[string]string `config:"headers" yaml:"headers,omitempty"`
+	ProxyURL     string            `config:"proxy_url" yaml:"proxy_url,omitempty"`
+	ProxyDisable bool              `config:"proxy_disable" yaml:"proxy_disable"`
+	ProxyHeaders map[string]string `config:"proxy_headers" yaml:"proxy_headers"`
 }
 
 // ElasticsearchFromConnStr returns an Elasticsearch configuration from the connection string.
-func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, error) {
+func ElasticsearchFromConnStr(conn string, serviceToken string, insecure bool) (Elasticsearch, error) {
 	u, err := url.Parse(conn)
 	if err != nil {
 		return Elasticsearch{}, err
@@ -60,6 +63,11 @@ func ElasticsearchFromConnStr(conn string, serviceToken string) (Elasticsearch, 
 		Hosts:    []string{u.Host},
 		Path:     u.Path,
 		TLS:      nil,
+	}
+	if insecure {
+		cfg.TLS = &tlscommon.Config{
+			VerificationMode: tlscommon.VerifyNone,
+		}
 	}
 	if serviceToken != "" {
 		cfg.ServiceToken = serviceToken

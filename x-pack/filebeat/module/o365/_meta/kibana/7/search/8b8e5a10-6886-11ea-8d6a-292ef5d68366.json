@@ -1,0 +1,143 @@
+{
+    "attributes": {
+        "columns": [
+            "event.category",
+            "event.type",
+            "event.action",
+            "event.outcome",
+            "user.name",
+            "file.name",
+            "rule.name"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "o365.audit"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "o365.audit"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.kind",
+                            "negate": false,
+                            "params": {
+                                "query": "alert"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.kind": "alert"
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "ComplianceDLPSharePoint",
+                                "ComplianceDLPExchange"
+                            ],
+                            "type": "phrases",
+                            "value": "ComplianceDLPSharePoint, ComplianceDLPExchange"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "ComplianceDLPSharePoint"
+                                        }
+                                    },
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "ComplianceDLPExchange"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Data Loss Prevention [Filebeat o365]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "8b8e5a10-6886-11ea-8d6a-292ef5d68366",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:49.253Z",
+    "version": "WzQzMTAsMV0="
+}

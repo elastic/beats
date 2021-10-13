@@ -17,6 +17,8 @@
 
 package common
 
+import "strings"
+
 var maskList = MakeStringSet(
 	"password",
 	"passphrase",
@@ -27,13 +29,15 @@ var maskList = MakeStringSet(
 	"urls",
 	"host",
 	"hosts",
+	"authorization",
+	"proxy-authorization",
 )
 
 func applyLoggingMask(c interface{}) {
 	switch cfg := c.(type) {
 	case map[string]interface{}:
 		for k, v := range cfg {
-			if maskList.Has(k) {
+			if maskList.Has(strings.ToLower(k)) {
 				if arr, ok := v.([]interface{}); ok {
 					for i := range arr {
 						arr[i] = "xxxxx"

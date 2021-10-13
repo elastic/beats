@@ -3,7 +3,7 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 [[metricbeat-metricset-linux-memory]]
-=== linux memory metricset
+=== Linux memory metricset
 
 beta[]
 

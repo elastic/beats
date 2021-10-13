@@ -27,6 +27,7 @@ import (
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
@@ -95,6 +96,7 @@ The following actions are possible and grouped based on the actions.
   FLEET_SERVER_ELASTICSEARCH_USERNAME - elasticsearch username for Fleet Server [$ELASTICSEARCH_USERNAME]
   FLEET_SERVER_ELASTICSEARCH_PASSWORD - elasticsearch password for Fleet Server [$ELASTICSEARCH_PASSWORD]
   FLEET_SERVER_ELASTICSEARCH_CA - path to certificate authority to use with communicate with elasticsearch [$ELASTICSEARCH_CA]
+  FLEET_SERVER_ELASTICSEARCH_INSECURE - disables cert validation for communication with Elasticsearch
   FLEET_SERVER_SERVICE_TOKEN - service token to use for communication with elasticsearch
   FLEET_SERVER_POLICY_ID - policy ID for Fleet Server to use for itself ("Default Fleet Server policy" used when undefined)
   FLEET_SERVER_HOST - binding host for Fleet Server HTTP (overrides the policy). By default this is 0.0.0.0.
@@ -144,7 +146,7 @@ occurs on every start of the container set FLEET_FORCE to 1.
 }
 
 func logError(streams *cli.IOStreams, err error) {
-	fmt.Fprintf(streams.Err, "Error: %v\n", err)
+	fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 }
 
 func logInfo(streams *cli.IOStreams, a ...interface{}) {
@@ -333,6 +335,12 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		"--path.config", paths.Config(),
 		"--path.logs", paths.Logs(),
 	}
+	if paths.Downloads() != "" {
+		args = append(args, "--path.downloads", paths.Downloads())
+	}
+	if paths.Install() != "" {
+		args = append(args, "--path.install", paths.Install())
+	}
 	if !paths.IsVersionHome() {
 		args = append(args, "--path.home.unversioned")
 	}
@@ -377,6 +385,9 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.FleetServer.InsecureHTTP || cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
+		if cfg.FleetServer.Elasticsearch.Insecure {
+			args = append(args, "--fleet-server-es-insecure")
+		}
 	} else {
 		if cfg.Fleet.URL == "" {
 			return nil, errors.New("FLEET_URL is required when FLEET_ENROLL is true without FLEET_SERVER_ENABLE")
@@ -385,9 +396,9 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		if cfg.Fleet.Insecure {
 			args = append(args, "--insecure")
 		}
-		if cfg.Fleet.CA != "" {
-			args = append(args, "--certificate-authorities", cfg.Fleet.CA)
-		}
+	}
+	if cfg.Fleet.CA != "" {
+		args = append(args, "--certificate-authorities", cfg.Fleet.CA)
 	}
 	if token != "" {
 		args = append(args, "--enrollment-token", token)
@@ -457,14 +468,18 @@ func kibanaClient(cfg kibanaConfig, headers map[string]string) (*kibana.Client, 
 		}
 	}
 
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.TLS = tls
+
 	return kibana.NewClientWithConfigDefault(&kibana.ClientConfig{
 		Host:          cfg.Fleet.Host,
 		Username:      cfg.Fleet.Username,
 		Password:      cfg.Fleet.Password,
+		ServiceToken:  cfg.Fleet.ServiceToken,
 		IgnoreVersion: true,
-		TLS:           tls,
+		Transport:     transport,
 		Headers:       headers,
-	}, 0)
+	}, 0, "Elastic-Agent")
 }
 
 func findPolicy(cfg setupConfig, policies []kibanaPolicy) (*kibanaPolicy, error) {
@@ -700,16 +715,18 @@ func setPaths(statePath, configPath, logsPath string, writePaths bool) error {
 		}
 	}
 	// sync the downloads to the data directory
-	srcDownloads := filepath.Join(paths.Home(), "downloads")
 	destDownloads := filepath.Join(statePath, "data", "downloads")
-	if err := syncDir(srcDownloads, destDownloads); err != nil {
+	if err := syncDir(paths.Downloads(), destDownloads); err != nil {
 		return fmt.Errorf("syncing download directory to STATE_PATH(%s) failed: %s", statePath, err)
 	}
+	originalInstall := paths.Install()
 	originalTop := paths.Top()
 	paths.SetTop(topPath)
 	paths.SetConfig(configPath)
 	// when custom top path is provided the home directory is not versioned
 	paths.SetVersionHome(false)
+	// install path stays on container default mount (otherwise a bind mounted directory could have noexec set)
+	paths.SetInstall(originalInstall)
 	// set LOGS_PATH is given
 	logsPath = envWithDefault(logsPath, "LOGS_PATH")
 	if logsPath != "" {

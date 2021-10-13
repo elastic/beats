@@ -8,6 +8,8 @@ This file is generated! See scripts/docs_collector.py
 
 == ZooKeeper module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses the logs created by https://zookeeper.apache.org/[Apache ZooKeeper]
 
 include::../include/what-happens.asciidoc[]

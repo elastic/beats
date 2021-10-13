@@ -2,25 +2,25 @@
 
 dashboards:
   - id: 77326664-23be-4bf1-a126-6d7e60cfc024
-    file: filebeat-netflow-geo-location.json
+    file: filebeat-netflow-geo-location.ndjson
 
   - id: 38012abe-c611-4124-8497-381fcd85acc8
-    file: filebeat-netflow-traffic-analysis.json
+    file: filebeat-netflow-traffic-analysis.ndjson
 
   - id: c64665f9-d222-421e-90b0-c7310d944b8a
-    file: filebeat-netflow-autonomous-systems.json
+    file: filebeat-netflow-autonomous-systems.ndjson
 
   - id: acd7a630-0c71-4840-bc9e-4a3801374a32
-    file: filebeat-netflow-conversation-partners.json
+    file: filebeat-netflow-conversation-partners.ndjson
 
   - id: 34e26884-161a-4448-9556-43b5bf2f62a2
-    file: filebeat-netflow-overview.json
+    file: filebeat-netflow-overview.ndjson
 
   - id: feebb4e6-b13e-4e4e-b9fc-d3a178276425
-    file: filebeat-netflow-flow-exporters.json
+    file: filebeat-netflow-flow-exporters.ndjson
 
   - id: 94972700-de4a-4272-9143-2fa8d4981365
-    file: filebeat-netflow-flow-records.json
+    file: filebeat-netflow-flow-records.ndjson
 
   - id: 14387a13-53bc-43a4-b9cd-63977aa8d87c
-    file: filebeat-netflow-top-n.json
+    file: filebeat-netflow-top-n.ndjson

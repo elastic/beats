@@ -17,7 +17,7 @@ func init() {
 }
 
 // AssetActivemq returns asset data.
-// This is the base64 encoded gzipped contents of module/activemq.
+// This is the base64 encoded zlib format compressed contents of module/activemq.
 func AssetActivemq() string {
 	return "eJysksFO80AMhO95ilFP/39oHyAHJC7cioQEZ2RtnO2qm2xqe4v69mhDCwktqkTxKZrY801iL7HlQw1yFvbc7SrAgkWusbgfpfXTogKEI5NyDU8V0LA6CYOF1Ne4qwBgnZocGW0SDCQaeo/TPGLyaENkXVVAGzg2Wo9DS/TU8Qxeyg5DIUnKw1G5AJw7Td0cxcjyKZ/8tnx4S9JM9IuuH/VIHSO1sA0f/RBUc/msIsXkfXkW3mVWwz8XSRVJIKwpi+P/q7NcthGm5rZcz6MHbEMGzz0LGTezSLzn3s7hWW/9JS/K8gsw5SbYGXm63Cvch3HNaCV1Xyc1uha0ribNP11ETP7vEwxDDI5K/9Uc0yxq5LavJuR49v77Tt4DAAD//1NHAoY="
 }

@@ -1,0 +1,600 @@
+{
+    "attributes": {
+        "description": "Overview of System Information.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "Host",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "host",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "host"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "host",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "Login",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "login",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "login"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "login",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "User",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "user",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "user"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "user",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "Process",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "process",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "process"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "process",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "Socket",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[4].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "socket",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "socket"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "socket",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": "Package",
+                            "disabled": true,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[5].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "package",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "package"
+                        },
+                        "query": {
+                            "match": {
+                                "event.dataset": {
+                                    "query": "package",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 8,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "2",
+                    "w": 8,
+                    "x": 24,
+                    "y": 4
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "3",
+                    "w": 8,
+                    "x": 32,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "4",
+                    "w": 8,
+                    "x": 16,
+                    "y": 4
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "5",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 8,
+                    "x": 8,
+                    "y": 4
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "8",
+                    "w": 8,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "8",
+                "panelRefName": "panel_8",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "9",
+                    "w": 8,
+                    "x": 8,
+                    "y": 12
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "10",
+                    "w": 8,
+                    "x": 16,
+                    "y": 12
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "11",
+                    "w": 8,
+                    "x": 24,
+                    "y": 12
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "12",
+                    "w": 8,
+                    "x": 24,
+                    "y": 19
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "13",
+                    "w": 8,
+                    "x": 32,
+                    "y": 12
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "14",
+                    "w": 8,
+                    "x": 32,
+                    "y": 19
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "15",
+                    "w": 8,
+                    "x": 40,
+                    "y": 12
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "16",
+                    "w": 48,
+                    "x": 0,
+                    "y": 26
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "17",
+                    "w": 24,
+                    "x": 0,
+                    "y": 34
+                },
+                "panelIndex": "17",
+                "panelRefName": "panel_17",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "18",
+                    "w": 24,
+                    "x": 24,
+                    "y": 34
+                },
+                "panelIndex": "18",
+                "panelRefName": "panel_18",
+                "type": "search",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "19",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "19",
+                "panelRefName": "panel_19",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Auditbeat System] System Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "2be46cb0-27f2-11e9-89af-fd12d59dac90-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[4].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[5].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "cf8aa0a0-18ca-11e9-9094-c50574723088-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "bb0d1870-27f1-11e9-89af-fd12d59dac90-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "7323dd90-27f2-11e9-89af-fd12d59dac90-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "e9225120-27f2-11e9-89af-fd12d59dac90-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "f664fb20-27f3-11e9-89af-fd12d59dac90-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "8d63c420-27f4-11e9-89af-fd12d59dac90-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "9dd991a0-18cb-11e9-9094-c50574723088-ecs",
+            "name": "8:panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "593df9b0-27f7-11e9-89af-fd12d59dac90-ecs",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "00fa0d20-27fc-11e9-89af-fd12d59dac90-ecs",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "0db90830-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "b885dae0-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "295905e0-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "82d46ec0-27fd-11e9-89af-fd12d59dac90-ecs",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "bdf9c530-27fe-11e9-805f-43bf57dfa519-ecs",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "54135e50-27ff-11e9-805f-43bf57dfa519-ecs",
+            "name": "16:panel_16",
+            "type": "visualization"
+        },
+        {
+            "id": "91962a30-1901-11e9-9094-c50574723088-ecs",
+            "name": "17:panel_17",
+            "type": "visualization"
+        },
+        {
+            "id": "d08ebd30-27ff-11e9-805f-43bf57dfa519-ecs",
+            "name": "18:panel_18",
+            "type": "search"
+        },
+        {
+            "id": "4ccc5b50-27f6-11e9-89af-fd12d59dac90-ecs",
+            "name": "19:panel_19",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:36:02.960Z",
+    "version": "WzUwMTksMV0="
+}

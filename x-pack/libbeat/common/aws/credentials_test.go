@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -20,7 +21,7 @@ func TestGetAWSCredentials(t *testing.T) {
 	awsConfig, err := GetAWSCredentials(inputConfig)
 	assert.NoError(t, err)
 
-	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve()
+	retrievedAWSConfig, err := awsConfig.Credentials.Retrieve(context.Background())
 	assert.NoError(t, err)
 
 	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)

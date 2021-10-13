@@ -1,0 +1,45 @@
+{
+    "attributes": {
+        "columns": [
+            "method",
+            "type",
+            "path",
+            "event.duration",
+            "status",
+            "query"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"mongodb\",\"type\":\"phrase\"},\"type\":\"phrase\",\"value\":\"mongodb\",\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index\"},\"query\":{\"match\":{\"event.dataset\":{\"query\":\"mongodb\",\"type\":\"phrase\"}}}}],\"highlight\":{\"fields\":{\"*\":{}},\"fragment_size\":2147483647,\"post_tags\":[\"@/kibana-highlighted-field@\"],\"pre_tags\":[\"@kibana-highlighted-field@\"]},\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true,\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "MongoDB Transaction Search [Packetbeat] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "MongoDB-transactions-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:28:42.017Z",
+    "version": "WzMxNjgsMV0="
+}

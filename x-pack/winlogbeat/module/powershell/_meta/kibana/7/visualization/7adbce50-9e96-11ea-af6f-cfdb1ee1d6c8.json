@@ -1,0 +1,225 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "winlog.provider_name : \"PowerShell\" or winlog.provider_name : \"Microsoft-Windows-PowerShell\" "
+                }
+            }
+        },
+        "title": "Engine and Command started[Winlogbeat powershell]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "*": "#EAB839",
+                    "Engine stopped": "#BF1B00"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "drop_partials": false,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "auto",
+                        "min_doc_count": 1,
+                        "scaleMetricValues": false,
+                        "timeRange": {
+                            "from": "now-1d",
+                            "to": "now"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "segment",
+                    "type": "date_histogram"
+                },
+                {
+                    "enabled": true,
+                    "id": "4",
+                    "params": {
+                        "filters": [
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "event.code: \"400\" "
+                                },
+                                "label": "Engine started"
+                            },
+                            {
+                                "input": {
+                                    "language": "kuery",
+                                    "query": "event.code: \"4105\"  "
+                                },
+                                "label": "Command started"
+                            }
+                        ]
+                    },
+                    "schema": "group",
+                    "type": "filters"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "position": "bottom",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "category"
+                    }
+                ],
+                "detailedTooltip": true,
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 1,
+                            "aggType": "filters",
+                            "format": {},
+                            "label": "filters",
+                            "params": {}
+                        }
+                    ],
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "date_histogram",
+                        "format": {
+                            "id": "date",
+                            "params": {
+                                "pattern": "HH:mm"
+                            }
+                        },
+                        "label": "@timestamp per 30 minutes",
+                        "params": {
+                            "bounds": {
+                                "max": "2020-05-26T09:14:29.996Z",
+                                "min": "2020-05-25T09:14:29.996Z"
+                            },
+                            "date": true,
+                            "format": "HH:mm",
+                            "interval": "PT30M",
+                            "intervalESUnit": "m",
+                            "intervalESValue": 30
+                        }
+                    },
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Count",
+                            "params": {}
+                        }
+                    ]
+                },
+                "fittingFunction": "zero",
+                "grid": {
+                    "categoryLines": false
+                },
+                "isVislibVis": true,
+                "labels": {},
+                "legendPosition": "right",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "interpolate": "linear",
+                        "lineWidth": 2,
+                        "mode": "normal",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "line",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "thresholdLine": {
+                    "color": "#E7664C",
+                    "show": false,
+                    "style": "full",
+                    "value": 10,
+                    "width": 1
+                },
+                "times": [],
+                "type": "line",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "left",
+                        "scale": {
+                            "defaultYExtents": false,
+                            "mode": "normal",
+                            "setYExtents": false,
+                            "type": "log"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "Count"
+                        },
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Engine and Command started[Winlogbeat powershell]",
+            "type": "line"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "7adbce50-9e96-11ea-af6f-cfdb1ee1d6c8",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:51.383Z",
+    "version": "WzIxNjgsMl0="
+}

@@ -1,0 +1,202 @@
+{
+    "attributes": {
+        "description": "The dashboard presents metric data describing ActiveMQ topics. Metrics show statistics of exchanged messages, consumers, producers and memory usage.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+                "panelRefName": "panel_099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+                "panelRefName": "panel_c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+                "panelRefName": "panel_adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+                "panelRefName": "panel_09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "43902672-df24-4be2-beb5-34961f190b5c",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "43902672-df24-4be2-beb5-34961f190b5c",
+                "panelRefName": "panel_43902672-df24-4be2-beb5-34961f190b5c",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ddce0ec5-f393-4479-a8a9-e1c7ffc339cb",
+                    "w": 24,
+                    "x": 24,
+                    "y": 45
+                },
+                "panelIndex": "ddce0ec5-f393-4479-a8a9-e1c7ffc339cb",
+                "panelRefName": "panel_ddce0ec5-f393-4479-a8a9-e1c7ffc339cb",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "c591ef68-9215-49de-a548-30196faa31bd",
+                    "w": 24,
+                    "x": 0,
+                    "y": 45
+                },
+                "panelIndex": "c591ef68-9215-49de-a548-30196faa31bd",
+                "panelRefName": "panel_c591ef68-9215-49de-a548-30196faa31bd",
+                "type": "visualization",
+                "version": "7.4.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "88a65079-a0b4-49c7-abbe-6e181c5dbbc3",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "88a65079-a0b4-49c7-abbe-6e181c5dbbc3",
+                "panelRefName": "panel_88a65079-a0b4-49c7-abbe-6e181c5dbbc3",
+                "type": "visualization",
+                "version": "7.4.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat ActiveMQ] Topics Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d97b7520-0bbe-11ea-81bb-cf244189d349",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "a85c09b0-0bbd-11ea-81bb-cf244189d349",
+            "name": "099a7d74-8287-4717-b1d1-77f7ed2b67d0:panel_099a7d74-8287-4717-b1d1-77f7ed2b67d0",
+            "type": "visualization"
+        },
+        {
+            "id": "e91f2b80-0bbd-11ea-81bb-cf244189d349",
+            "name": "c22e6794-6c79-4f2d-b942-f4a4bb73948e:panel_c22e6794-6c79-4f2d-b942-f4a4bb73948e",
+            "type": "visualization"
+        },
+        {
+            "id": "d22e5e00-0bbd-11ea-81bb-cf244189d349",
+            "name": "adb64a5b-bfe9-4225-a712-f51ad30cab9d:panel_adb64a5b-bfe9-4225-a712-f51ad30cab9d",
+            "type": "visualization"
+        },
+        {
+            "id": "8ae8aa90-0bc8-11ea-81bb-cf244189d349",
+            "name": "09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8:panel_09ea3c98-d808-4c5f-9d04-7a94fd3cc2c8",
+            "type": "visualization"
+        },
+        {
+            "id": "21fb23a0-0bbe-11ea-81bb-cf244189d349",
+            "name": "43902672-df24-4be2-beb5-34961f190b5c:panel_43902672-df24-4be2-beb5-34961f190b5c",
+            "type": "visualization"
+        },
+        {
+            "id": "89de30b0-0bce-11ea-81bb-cf244189d349",
+            "name": "ddce0ec5-f393-4479-a8a9-e1c7ffc339cb:panel_ddce0ec5-f393-4479-a8a9-e1c7ffc339cb",
+            "type": "visualization"
+        },
+        {
+            "id": "e73c2af0-0bce-11ea-81bb-cf244189d349",
+            "name": "c591ef68-9215-49de-a548-30196faa31bd:panel_c591ef68-9215-49de-a548-30196faa31bd",
+            "type": "visualization"
+        },
+        {
+            "id": "3db29790-0bd7-11ea-81bb-cf244189d349",
+            "name": "88a65079-a0b4-49c7-abbe-6e181c5dbbc3:panel_88a65079-a0b4-49c7-abbe-6e181c5dbbc3",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:56.871Z",
+    "version": "WzQxOTQsMV0="
+}

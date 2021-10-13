@@ -1,0 +1,110 @@
+- name: kinesis
+  type: group
+  description: >
+    `kinesis` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by Amazon Kinesis.
+  release: beta
+  fields:
+    - name: metrics
+      type: group
+      fields:
+        - name: GetRecords_Bytes.avg
+          type: double
+          description: >
+            The average number of bytes retrieved from the Kinesis stream, measured over the specified time period.
+        - name: GetRecords_IteratorAgeMilliseconds.avg
+          type: double
+          description: >
+            The age of the last record in all GetRecords calls made against a Kinesis stream, measured over the specified time period.
+            Age is the difference between the current time and when the last record of the GetRecords call was written to the stream.
+        - name: GetRecords_Latency.avg
+          type: double
+          description: >
+            The time taken per GetRecords operation, measured over the specified time period.
+        - name: GetRecords_Records.sum
+          type: long
+          description: >
+            The number of records retrieved from the shard, measured over the specified time period.
+        - name: GetRecords_Success.sum
+          type: long
+          description: >
+            The number of successful GetRecords operations per stream, measured over the specified time period.
+        - name: IncomingBytes.avg
+          type: double
+          description: >
+            The number of bytes successfully put to the Kinesis stream over the specified time period. This metric includes bytes from PutRecord and PutRecords operations.
+        - name: IncomingRecords.avg
+          type: double
+          description: >
+            The number of records successfully put to the Kinesis stream over the specified time period. This metric includes record counts from PutRecord and PutRecords operations.
+        - name: PutRecord_Bytes.avg
+          type: double
+          description: >
+            The number of bytes put to the Kinesis stream using the PutRecord operation over the specified time period.
+        - name: PutRecord_Latency.avg
+          type: double
+          description: >
+            The time taken per PutRecord operation, measured over the specified time period.
+        - name: PutRecord_Success.avg
+          type: double
+          description: >
+            The percentage of successful writes to a Kinesis stream, measured over the specified time period.
+        - name: PutRecords_Bytes.avg
+          type: double
+          description: >
+            The average number of bytes put to the Kinesis stream using the PutRecords operation over the specified time period.
+        - name: PutRecords_Latency.avg
+          type: double
+          description: >
+            The average time taken per PutRecords operation, measured over the specified time period.
+        - name: PutRecords_Success.avg
+          type: long
+          description: >
+            The total number of PutRecords operations where at least one record succeeded, per Kinesis stream, measured over the specified time period.
+        - name: PutRecords_TotalRecords.sum
+          type: long
+          description: >
+            The total number of records sent in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+        - name: PutRecords_SuccessfulRecords.sum
+          type: long
+          description: >
+            The number of successful records in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+        - name: PutRecords_FailedRecords.sum
+          type: long
+          description: >
+            The number of records rejected due to internal failures in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+        - name: PutRecords_ThrottledRecords.sum
+          type: long
+          description: >
+            The number of records rejected due to throttling in a PutRecords operation per Kinesis data stream, measured over the specified time period.
+        - name: ReadProvisionedThroughputExceeded.avg
+          type: long
+          description: >
+            The number of GetRecords calls throttled for the stream over the specified time period.
+        - name: SubscribeToShard_RateExceeded.avg
+          type: long
+          description: >
+            This metric is emitted when a new subscription attempt fails because there already is an active subscription by the same consumer or if you exceed the number of calls per second allowed for this operation.
+        - name: SubscribeToShard_Success.avg
+          type: long
+          description: >
+            This metric records whether the SubscribeToShard subscription was successfully established.
+        - name: SubscribeToShardEvent_Bytes.avg
+          type: long
+          description: >
+            The number of bytes received from the shard, measured over the specified time period.
+        - name: SubscribeToShardEvent_MillisBehindLatest.avg
+          type: long
+          description: >
+            The difference between the current time and when the last record of the SubscribeToShard event was written to the stream.
+        - name: SubscribeToShardEvent_Records.sum
+          type: long
+          description: >
+            The number of records received from the shard, measured over the specified time period.
+        - name: SubscribeToShardEvent_Success.avg
+          type: long
+          description: >
+            This metric is emitted every time an event is published successfully. It is only emitted when there's an active subscription.
+        - name: WriteProvisionedThroughputExceeded.avg
+          type: long
+          description: >
+            The number of records rejected due to throttling for the stream over the specified time period. This metric includes throttling from PutRecord and PutRecords operations.

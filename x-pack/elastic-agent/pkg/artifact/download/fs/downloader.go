@@ -116,13 +116,13 @@ func (e *Downloader) downloadFile(filename, fullPath string) (string, error) {
 func getDropPath(cfg *artifact.Config) string {
 	// if drop path is not provided fallback to beats subfolder
 	if cfg == nil || cfg.DropPath == "" {
-		return filepath.Join(paths.Home(), "downloads")
+		return paths.Downloads()
 	}
 
 	// if droppath does not exist fallback to beats subfolder
 	stat, err := os.Stat(cfg.DropPath)
 	if err != nil || !stat.IsDir() {
-		return filepath.Join(paths.Home(), "downloads")
+		return paths.Downloads()
 	}
 
 	return cfg.DropPath

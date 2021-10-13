@@ -1,0 +1,77 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat GCP]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "cd2ddc00-a6a9-11ea-9765-5f34a0c2e541"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "d26268d0-a6a9-11ea-9765-5f34a0c2e541"
+                    }
+                ],
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": ">=15m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "gcp.loadbalancing.tcp_ssl_proxy.new_connections.value",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "3",
+                        "separate_axis": 0,
+                        "split_color_mode": "kibana",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "gcp.labels.resource.backend_name",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Load Balancing TCP SSL Proxy New Connections [Metricbeat GCP]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "eed05d80-a6ac-11ea-950e-d57608e3aa51",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:12.649Z",
+    "version": "WzM4MDIsMV0="
+}

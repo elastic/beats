@@ -2,8 +2,9 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: openmetrics
+
 [[metricbeat-module-openmetrics]]
-[role="xpack"]
 == Openmetrics module
 
 beta[]

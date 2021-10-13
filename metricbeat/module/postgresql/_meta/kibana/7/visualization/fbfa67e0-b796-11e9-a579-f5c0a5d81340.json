@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Query Latency [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "919c5570-b796-11e9-8ed3-ef1959e6b366",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": "0.1",
+                        "filter": {
+                            "language": "kuery",
+                            "query": "not postgresql.statement.query.text : (\"BEGIN;\" or \"begin\" or \"commit\" or \"end\" or \"END;\" or \"SELECT * FROM pg_stat_statements\" or \"SELECT * FROM pg_stat_database\" or \"SELECT * FROM pg_stat_bgwriter\" or \"SELECT * FROM pg_stat_activity\")"
+                        },
+                        "formatter": "number",
+                        "id": "919c5571-b796-11e9-8ed3-ef1959e6b366",
+                        "label": "Query Latency",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.statement.query.time.total.ms",
+                                "id": "919c7c80-b796-11e9-8ed3-ef1959e6b366",
+                                "type": "max"
+                            },
+                            {
+                                "field": "919c7c80-b796-11e9-8ed3-ef1959e6b366",
+                                "id": "9e553c60-b79f-11e9-9029-a9d302b79ec2",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "9e553c60-b79f-11e9-9029-a9d302b79ec2",
+                                "id": "a58b6590-b79f-11e9-9029-a9d302b79ec2",
+                                "type": "positive_only",
+                                "unit": ""
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "postgresql.statement.query.text",
+                        "terms_order_by": "919c7c80-b796-11e9-8ed3-ef1959e6b366",
+                        "terms_size": "10",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Query Latency [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "fbfa67e0-b796-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDIsMV0="
+}

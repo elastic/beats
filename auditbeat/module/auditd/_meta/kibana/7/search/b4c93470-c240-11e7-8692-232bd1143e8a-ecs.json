@@ -1,0 +1,143 @@
+{
+    "attributes": {
+        "columns": [
+            "agent.name",
+            "auditd.summary.how",
+            "auditd.summary.object.primary",
+            "auditd.summary.object.secondary",
+            "auditd.data.socket.family",
+            "auditd.result"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "auditd",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "auditd"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "auditd",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "auditd.data.syscall",
+                            "negate": false,
+                            "params": {
+                                "query": "bind",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "bind"
+                        },
+                        "query": {
+                            "match": {
+                                "auditd.data.syscall": {
+                                    "query": "bind",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                            "key": "auditd.data.socket.family",
+                            "negate": true,
+                            "params": {
+                                "query": "netlink",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "netlink"
+                        },
+                        "query": {
+                            "match": {
+                                "auditd.data.socket.family": {
+                                    "query": "netlink",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Socket Binds [Auditbeat Auditd] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b4c93470-c240-11e7-8692-232bd1143e8a-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:35:59.895Z",
+    "version": "WzQ5ODAsMV0="
+}

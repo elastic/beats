@@ -1,0 +1,129 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Webserver Total Bytes Transfered [Metricbeat IIS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_min": 0,
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color": null,
+                "background_color_rules": [
+                    {
+                        "id": "71978870-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "f11cfd90-32e5-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "drilldown_url": "",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "gauge_color_rules": [
+                    {
+                        "id": "9c09ed50-32e4-11ea-af9e-d70582a45bda"
+                    }
+                ],
+                "gauge_inner_color": null,
+                "gauge_inner_width": "6",
+                "gauge_style": "circle",
+                "gauge_width": "10",
+                "id": "61fb4190-32e4-11ea-b9f8-4d0b340ad993",
+                "index_pattern": "metricbeat-*",
+                "interval": "",
+                "isModelInvalid": false,
+                "pivot_id": "cloud.instance.name",
+                "pivot_label": "Resource Name",
+                "pivot_rows": "30",
+                "pivot_type": "string",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(251,158,0,1)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "kuery",
+                            "query": ""
+                        },
+                        "formatter": "bytes",
+                        "id": "61fb4191-32e4-11ea-b9f8-4d0b340ad993",
+                        "label": "Total Bytes Sent ",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "agg_with": "avg",
+                                "field": "iis.webserver.network.total_bytes_sent",
+                                "id": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                                "order": "desc",
+                                "order_by": "@timestamp",
+                                "size": 1,
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "cloud.instance.name",
+                        "terms_order_by": "61fb4192-32e4-11ea-b9f8-4d0b340ad993",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "bytes",
+                        "id": "cb6910f0-8580-11ea-8d9f-cf59f8572d31",
+                        "label": "Total Bytes Received",
+                        "line_width": "2",
+                        "metrics": [
+                            {
+                                "field": "iis.webserver.network.total_bytes_received",
+                                "id": "cb693800-8580-11ea-8d9f-cf59f8572d31",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "",
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "time_range_mode": "entire_time_range",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Webserver Total Bytes Transfered [Metricbeat IIS]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "68a9df20-8581-11ea-91bc-ab084c7ec0e7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:29.081Z",
+    "version": "WzM5MjksMV0="
+}

@@ -1,0 +1,27 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS",
+        "uiStateJSON": "{\"mapCenter\": [0, -0.17578125]}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{},\"schema\":\"metric\",\"type\":\"count\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"autoPrecision\":true,\"field\":\"client.geo.location\",\"isFilteredByCollar\":true,\"mapBounds\":{\"bottom_right\":{\"lat\":-84.0160220686566,\"lon\":259.80468750000006},\"top_left\":{\"lat\":83.97925949886205,\"lon\":-259.80468750000006}},\"mapCenter\":{\"lat\":-0.17578097424708533,\"lon\":0},\"mapZoom\":2,\"precision\":2,\"useGeocentroid\":true},\"schema\":\"segment\",\"type\":\"geohash_grid\"}],\"params\":{\"addTooltip\":true,\"colorSchema\":\"Yellow to Red\",\"heatBlur\":15,\"heatClusterSize\":1.5,\"heatMaxZoom\":16,\"heatMinOpacity\":0.1,\"heatNormalizeData\":true,\"heatRadius\":25,\"isDesaturated\":true,\"legendPosition\":\"bottomright\",\"mapCenter\":[15,5],\"mapType\":\"Scaled Circle Markers\",\"mapZoom\":2,\"wms\":{\"enabled\":false,\"options\":{\"attribution\":\"Maps provided by USGS\",\"format\":\"image/png\",\"layers\":\"0\",\"styles\":\"\",\"transparent\":true,\"version\":\"1.3.0\"},\"selectedTmsLayer\":{\"attribution\":\"<p>&#169; <a href=\\\"http://www.openstreetmap.org/copyright\\\">OpenStreetMap</a> contributors | <a href=\\\"https://www.elastic.co/elastic-maps-service\\\">Elastic Maps Service</a></p>&#10;\",\"id\":\"road_map\",\"maxZoom\":18,\"minZoom\":0,\"origin\":\"elastic_maps_service\"},\"url\":\"https://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer\"}},\"title\":\"Client IP Locations (requires GeoIP enrichment) [Packetbeat] ECS\",\"type\":\"tile_map\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Client-locations-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:45.121Z",
+    "version": "WzMyMDAsMV0="
+}

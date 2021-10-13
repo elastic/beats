@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Overview of the Windows Service States",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "1",
+                    "w": 36,
+                    "x": 12,
+                    "y": 12
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 20,
+                    "i": "2",
+                    "w": 12,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "2",
+                "panelRefName": "panel_2",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "4",
+                    "w": 16,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "4",
+                "panelRefName": "panel_4",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "5",
+                    "w": 16,
+                    "x": 32,
+                    "y": 0
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Windows] Services ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d9eba730-c991-11e7-9835-2f31fe08873b-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "eb8277d0-c98c-11e7-9835-2f31fe08873b-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "23a5fff0-c98e-11e7-9835-2f31fe08873b-ecs",
+            "name": "2:panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "830c45f0-c991-11e7-9835-2f31fe08873b-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "35f5ad60-c996-11e7-9835-2f31fe08873b-ecs",
+            "name": "4:panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "c36b2ba0-ca29-11e7-9835-2f31fe08873b-ecs",
+            "name": "5:panel_5",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:32:00.935Z",
+    "version": "WzQyMzEsMV0="
+}

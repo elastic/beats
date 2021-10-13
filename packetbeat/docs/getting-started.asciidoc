@@ -212,6 +212,3 @@ Now that you have your data streaming into {es}, learn how to unify your logs,
 metrics, uptime, and application performance data.
 
 include::{libbeat-dir}/shared/obs-apps.asciidoc[]
-
-// Add Javascript and CSS for tabbed panels
-include::{libbeat-dir}/tab-widgets/code.asciidoc[]

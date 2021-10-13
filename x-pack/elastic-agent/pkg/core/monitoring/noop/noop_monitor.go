@@ -66,3 +66,6 @@ func (b *Monitor) WatchLogs() bool { return false }
 
 // WatchMetrics return true if monitoring is configured and monitoring metrics is enabled.
 func (b *Monitor) WatchMetrics() bool { return false }
+
+// MonitoringNamespace returns monitoring namespace configured.
+func (b *Monitor) MonitoringNamespace() string { return "default" }

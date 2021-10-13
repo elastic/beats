@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
 )
@@ -54,7 +55,9 @@ func TestDownload(t *testing.T) {
 	config := &artifact.Config{
 		SourceURI:       source,
 		TargetDirectory: targetDir,
-		Timeout:         timeout,
+		HTTPTransportSettings: httpcommon.HTTPTransportSettings{
+			Timeout: timeout,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -92,7 +95,9 @@ func TestVerify(t *testing.T) {
 	config := &artifact.Config{
 		SourceURI:       source,
 		TargetDirectory: targetDir,
-		Timeout:         timeout,
+		HTTPTransportSettings: httpcommon.HTTPTransportSettings{
+			Timeout: timeout,
+		},
 	}
 
 	for _, testCase := range testCases {

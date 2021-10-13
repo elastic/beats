@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetConsul returns asset data.
-// This is the base64 encoded gzipped contents of module/consul.
+// This is the base64 encoded zlib format compressed contents of module/consul.
 func AssetConsul() string {
 	return "eJzcVsGO2zgMvecriJw38wE5LLC7h93LzgCzc1sUA1pmbLWyaJDUtP77QnY8sRM7k0ELtKguCSTx8b1HmtAOPlG3B8dRU9gAmLdAe9j+1W9sNwAlqRPfmue4h983AADDITRcpkAbAKFAqLSHggw3AEpmPla6h/+3qmH7G2xrs3b7YQNw8BRK3fc4O4jY0CR7Xta1tIdKOLXHnWnINAwriva6uxSZ1zm5cS3oGtcfGRj+JRPvlAwOZK4mhWbYAR8PLA3mUDgIN4CjJT6qYXQEkmL0sQLUAW2Cfy5nJikZtz6wzU7XpK2hTRFrwmB1d3E+YhbMgTAunM8MenghwRCOcMAHsJogsMMASvJCAi4kNZJFXZKi+YZuVjXL/TgE50qiUTmW4Z1GaHcecZ3CNcwpbtEZLSGf0APHauXCTOd9agqS7G2Pmf801LB0wIWhj1QO3Zadf/jvblVpgyGwe3ac4nkfvUlqRugfwha4+EjOFHrQ7P+1Vmufj9e/Ke/DeUrg2KvOGQBjCV4BoaKYm3I0qRVSTULgY+kdGssdPNVeocEOiiRqR/tyLxkPv0Uy0JpTKEHIksR8gqBGWHaghkbwgiHRut0VCyfzcbELbhf9eJwYJ7hLpYGx/GE6+2r85J/Qn/2Hc+qbouv75jidW2FHqldKiVJgRc+OQyBnLO+WO2Pz9wAHr3Aro+tWnyTF72PTJTFjwwD0hVzKV5bTjDxaTHo+y2+z54LJU9+kNVpfp+qCV406pCv7C9iuoV7zb8rdJRFanIu3K7gl3zTnatXmKa9Ub1xvVLF3avjgfYSIkZUcx3I9/0ixr/+vYMr9SfTwrmyGMaDG7c5q2n1mCeV5p+WXXG+egvr8fjtODDUUo/Ju8zUAAP//ku7rqQ=="
 }

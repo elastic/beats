@@ -10,6 +10,11 @@ processors:
   - user_agent:
         field: user_agent.original
         ignore_missing: true
+  # Serial Number
+  - set:
+      field: observer.serial_number
+      value: "{{rsa.misc.hardware_id}}"
+      ignore_empty_value: true
   # URL
   - uri_parts:
       field: url.original

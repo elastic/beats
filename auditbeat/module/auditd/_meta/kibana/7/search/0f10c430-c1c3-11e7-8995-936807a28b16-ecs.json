@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "columns": [
+            "agent.name",
+            "auditd.summary.actor.primary",
+            "auditd.summary.actor.secondary",
+            "event.action",
+            "auditd.summary.object.type",
+            "auditd.summary.object.primary",
+            "auditd.summary.object.secondary",
+            "auditd.summary.how",
+            "auditd.result"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "auditd",
+                                "type": "phrase"
+                            },
+                            "type": "phrase",
+                            "value": "auditd"
+                        },
+                        "query": {
+                            "match": {
+                                "event.module": {
+                                    "query": "auditd",
+                                    "type": "phrase"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Audit Event Table [Auditbeat Auditd] ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "0f10c430-c1c3-11e7-8995-936807a28b16-ecs",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "auditbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:35:58.815Z",
+    "version": "WzQ5NzMsMV0="
+}

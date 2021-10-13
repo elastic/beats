@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: system
+
 [[metricbeat-module-system]]
 == System module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 The System module allows you to monitor your servers. Because the System module
 always applies to the local server, the `hosts` config option is not needed.

@@ -1,0 +1,65 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Event Types [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "cef.device.event_class_id",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "maxFontSize": 50,
+                "minFontSize": 12,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "square root"
+            },
+            "title": "Top 10 Event Types [Filebeat CEF]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "759e8dc3-0fdb-4cb6-ba47-87a2e2ff8df3",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "f85a3444-8a43-4e46-b872-4e44bc25d0f3",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:38.313Z",
+    "version": "WzQ3MzQsMV0="
+}

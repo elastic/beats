@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Number of View Reads [Metricbeat CouchDB] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": "couchdb"
+                },
+                "id": "1d4e0520-b952-11e9-b9f3-4d741a808166",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(0,156,224,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "1d4e0521-b952-11e9-b9f3-4d741a808166",
+                        "label": "view_reads",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd.view_reads",
+                                "id": "1d4e0522-b952-11e9-b9f3-4d741a808166",
+                                "type": "max"
+                            },
+                            {
+                                "field": "1d4e0522-b952-11e9-b9f3-4d741a808166",
+                                "id": "1d4e0524-b952-11e9-b9f3-4d741a808166",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "1d4e0524-b952-11e9-b9f3-4d741a808166",
+                                "id": "1d4e0523-b952-11e9-b9f3-4d741a808166",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(247,61,231,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "1d4e0525-b952-11e9-b9f3-4d741a808166",
+                        "label": "temporary_view_reads",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "couchdb.server.httpd.temporary_view_reads",
+                                "id": "1d4e0526-b952-11e9-b9f3-4d741a808166",
+                                "type": "max"
+                            },
+                            {
+                                "field": "1d4e0526-b952-11e9-b9f3-4d741a808166",
+                                "id": "1d4e0528-b952-11e9-b9f3-4d741a808166",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "1d4e0528-b952-11e9-b9f3-4d741a808166",
+                                "id": "1d4e0527-b952-11e9-b9f3-4d741a808166",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Number of View Reads [Metricbeat CouchDB] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "496910f0-b952-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:06.496Z",
+    "version": "WzM3NTcsMV0="
+}

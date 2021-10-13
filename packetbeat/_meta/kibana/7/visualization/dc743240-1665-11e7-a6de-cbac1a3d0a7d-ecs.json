@@ -1,0 +1,27 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"query\":{\"language\":\"kuery\",\"query\":\"type:dns\"},\"indexRefName\":\"kibanaSavedObjectMeta.searchSourceJSON.index\"}"
+        },
+        "title": "Top Domains by Data Volume ECS",
+        "uiStateJSON": "{\"vis\": {\"params\": {\"sort\": {\"columnIndex\": null, \"direction\": null}}}}",
+        "version": 1,
+        "visState": "{\"aggs\":[{\"enabled\":true,\"id\":\"1\",\"params\":{\"customLabel\":\"Bytes In\",\"field\":\"source.bytes\"},\"schema\":\"metric\",\"type\":\"sum\"},{\"enabled\":true,\"id\":\"2\",\"params\":{\"customLabel\":\"ETLD+1\",\"field\":\"dns.question.etld_plus_one\",\"missingBucket\":false,\"missingBucketLabel\":\"Missing\",\"order\":\"desc\",\"orderBy\":\"3\",\"otherBucket\":false,\"otherBucketLabel\":\"Other\",\"size\":20},\"schema\":\"bucket\",\"type\":\"terms\"},{\"enabled\":true,\"id\":\"3\",\"params\":{\"customLabel\":\"Bytes Out\",\"field\":\"destination.bytes\"},\"schema\":\"metric\",\"type\":\"sum\"}],\"params\":{\"perPage\":10,\"showMetricsAtAllLevels\":false,\"showPartialRows\":false,\"showTotal\":false,\"sort\":{\"columnIndex\":null,\"direction\":null},\"totalFunc\":\"sum\",\"showToolbar\":true},\"title\":\"Top Domains by Data Volume ECS\",\"type\":\"table\"}"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "dc743240-1665-11e7-a6de-cbac1a3d0a7d-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "packetbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:28:38.960Z",
+    "version": "WzMxNDAsMV0="
+}

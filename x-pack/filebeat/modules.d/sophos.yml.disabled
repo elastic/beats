@@ -3,7 +3,7 @@
 
 - module: sophos
   xg:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp, udp (default) or file.
     #var.input: udp
@@ -27,7 +27,7 @@
 
 
   utm:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

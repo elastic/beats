@@ -14,3 +14,4 @@ metricsets:
   - vpn
   - transitgateway
   - natgateway
+  - kinesis

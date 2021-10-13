@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: rabbitmq
+
 [[metricbeat-module-rabbitmq]]
 == RabbitMQ module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 The RabbitMQ module uses http://www.rabbitmq.com/management.html[HTTP API] created by the management plugin to collect metrics.
 

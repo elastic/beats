@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/bus"
@@ -404,14 +405,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module": "apache2",
+						"module": "apache",
 					},
 				},
 			},
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -454,7 +455,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":  "apache2",
+						"module":  "apache",
 						"fileset": "access",
 					},
 				},
@@ -462,7 +463,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -505,7 +506,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":         "apache2",
+						"module":         "apache",
 						"fileset.stdout": "access",
 						"fileset.stderr": "error",
 					},
@@ -514,7 +515,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -557,14 +558,14 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module": "apache2",
+						"module": "apache",
 					},
 				},
 			},
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"error": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -605,7 +606,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":  "apache2",
+						"module":  "apache",
 						"fileset": "access",
 					},
 				},
@@ -613,7 +614,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -654,7 +655,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":         "apache2",
+						"module":         "apache",
 						"fileset.stdout": "access",
 						"fileset.stderr": "error",
 					},
@@ -663,7 +664,7 @@ func TestGenerateHints(t *testing.T) {
 			len: 1,
 			result: []common.MapStr{
 				{
-					"module": "apache2",
+					"module": "apache",
 					"access": map[string]interface{}{
 						"enabled": true,
 						"input": map[string]interface{}{
@@ -692,9 +693,9 @@ func TestGenerateHints(t *testing.T) {
 	for _, test := range tests {
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		err := paths.InitPaths(&paths.Path{
+		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
-		})
+		}))
 
 		l, err := NewLogHints(test.config)
 		if err != nil {
@@ -825,14 +826,14 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module": "apache2",
+						"module": "apache",
 					},
 				},
 			},
 			len:  1,
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
-				"module": "apache2",
+				"module": "apache",
 				"error": map[string]interface{}{
 					"enabled": true,
 					"input": map[string]interface{}{
@@ -877,7 +878,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 				},
 				"hints": common.MapStr{
 					"logs": common.MapStr{
-						"module":  "apache2",
+						"module":  "apache",
 						"fileset": "access",
 					},
 				},
@@ -885,7 +886,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 			len:  1,
 			path: "/var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log",
 			result: common.MapStr{
-				"module": "apache2",
+				"module": "apache",
 				"access": map[string]interface{}{
 					"enabled": true,
 					"input": map[string]interface{}{
@@ -927,9 +928,9 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 
 		// Configure path for modules access
 		abs, _ := filepath.Abs("../../..")
-		err := paths.InitPaths(&paths.Path{
+		require.NoError(t, paths.InitPaths(&paths.Path{
 			Home: abs,
-		})
+		}))
 
 		l, err := NewLogHints(cfg)
 		if err != nil {
@@ -937,7 +938,7 @@ func TestGenerateHintsWithPaths(t *testing.T) {
 		}
 
 		cfgs := l.CreateConfig(test.event)
-		assert.Equal(t, test.len, len(cfgs), test.msg)
+		require.Equal(t, test.len, len(cfgs), test.msg)
 		if test.len != 0 {
 			config := common.MapStr{}
 			err := cfgs[0].Unpack(&config)

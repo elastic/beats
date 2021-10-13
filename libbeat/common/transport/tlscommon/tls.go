@@ -202,7 +202,7 @@ func ResolveTLSVersion(v uint16) string {
 
 // ResolveCipherSuite takes the integer representation and return the cipher name.
 func ResolveCipherSuite(cipher uint16) string {
-	return tlsCipherSuite(cipher).String()
+	return CipherSuite(cipher).String()
 }
 
 // PEMReader allows to read a certificate in PEM format either through the disk or from a string.

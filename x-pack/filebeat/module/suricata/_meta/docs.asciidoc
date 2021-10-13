@@ -5,6 +5,8 @@
 
 == Suricata module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This is a module to the Suricata IDS/IPS/NSM log. It parses logs that are in the
 https://suricata.readthedocs.io/en/latest/output/eve/eve-json-format.html[
 Suricata Eve JSON format].
@@ -45,6 +47,15 @@ include::../include/var-paths.asciidoc[]
 A list of tags to include in events. Including `forwarded` indicates that the
 events did not originate on this host and causes `host.name` to not be added to
 events. Defaults to `[suricata]`.
+
+`var.internal_networks`::
+
+A list of CIDR ranges describing the IP addresses that
+you consider internal. This is used in determining the value of
+`network.direction`. The values
+can be either a CIDR value or one of the named ranges supported by the
+<<condition-network, `network`>> condition. The default value is `[private]`
+which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
 
 [float]
 === Example dashboard

@@ -18,6 +18,7 @@
 package cursor
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -119,7 +120,7 @@ func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
 	store := cim.store
 	cleaner := &cleaner{log: log}
 	store.Retain()
-	err := group.Go(func(canceler unison.Canceler) error {
+	err := group.Go(func(canceler context.Context) error {
 		defer cim.shutdown()
 		defer store.Release()
 		interval := cim.StateStore.CleanupInterval()

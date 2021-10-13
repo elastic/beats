@@ -50,7 +50,7 @@ resource "aws_s3_bucket_object" "test" {
 resource "aws_instance" "test" {
   ami           = data.aws_ami.latest-amzn.id
   monitoring    = true
-  instance_type = "t1.micro"
+  instance_type = "t2.micro"
   tags = {
     Name = "metricbeat-test"
   }

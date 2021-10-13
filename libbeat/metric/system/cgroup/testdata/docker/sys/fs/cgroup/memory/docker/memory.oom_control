@@ -1,0 +1,2 @@
+oom_kill_disable 0
+under_oom 0

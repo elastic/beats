@@ -914,10 +914,27 @@ processors:
             value: "success"
           - set: event.reason
             from: cyberarkpas.audit.reason
+      on_failure:
+        - append:
+            field: error.message
+            value: 'Failed to enrich based on ID #{{{ event.code }}}: {{{_ingest.on_failure_message}}}'
 
       source: >
-        def clone(def val) {
-            return val instanceof List? new ArrayList(val) : val;
+        def clone(def ref) {
+          if (ref == null) return ref;
+          if (ref instanceof Map) {
+            ref = ref.entrySet().stream().collect(
+                    Collectors.toMap(
+                      e -> e.getKey(),
+                      e -> clone(e.getValue())
+                    )
+                  );
+          } else if (ref instanceof List) {
+            ref = ref.stream().map(e -> clone(e)).collect(
+                    Collectors.toList()
+                  );
+          }
+          return ref;
         }
         def read_field(def map, String name) {
           if (map == null || !(map instanceof Map)) return null;
@@ -925,29 +942,31 @@ processors:
           return pos == -1? map[name]
                           : read_field(map[name.substring(0, pos)], name.substring(pos+1));
         }
+        boolean set_field(Map map, String name, def value) {
+          int pos = name.indexOf(".");
+          if (pos == -1) {
+            map[name] = clone(value);
+            return true;
+          }
+          String key  = name.substring(0, pos),
+                 path = name.substring(pos+1);
+          if (!map.containsKey(key)) {
+            map[key] = new HashMap();
+          }
+          map = map[key];
+          return map instanceof Map? set_field(map, path, value)
+                                   : false;
+        }
         String msgID = ctx.event?.code;
         def actions = params.get(msgID);
         if (actions == null) return;
-        List values = new ArrayList();
         for (def item : actions) {
           def val = item.value;
           if (val == null && (val = read_field(ctx, item.from)) == null || val == "") continue;
-          values.add([
-            "to": item.set,
-            "value": clone(val)
-          ]);
+          if (!set_field(ctx, item.set, val)) {
+            throw new Exception("Failed to set field " + item.set);
+          }
         }
-        if (!values.isEmpty()) ctx._tmp["values"] = values;
-
-  - foreach:
-      field: _tmp.values
-      ignore_missing: true
-      processor:
-        set:
-          field: '{{{_ingest._value.to}}}'
-          copy_from: '_ingest._value.value'
-          ignore_empty_value: true
-          override: true
 
   #
   # Force event.outcome: unknown in case it gets a value other than one of the allowed.
@@ -994,7 +1013,7 @@ processors:
       on_failure:
         - set:
             field: source.domain
-            copy_from: source.address
+            value: '{{{source.address}}}'
   - convert:
       field: destination.address
       target_field: destination.ip
@@ -1003,7 +1022,7 @@ processors:
       on_failure:
         - set:
             field: destination.domain
-            copy_from: destination.address
+            value: '{{{destination.address}}}'
 
   #
   # Populate related.ip

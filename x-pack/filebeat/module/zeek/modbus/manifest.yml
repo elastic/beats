@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/modbus.log
   - name: tags
     default: [zeek.modbus]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/modbus.yml

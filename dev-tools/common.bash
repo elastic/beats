@@ -106,6 +106,9 @@ docker_setup() {
   OS="$(uname)"
   case $OS in
     'Darwin')
+      if ! command -v docker-machine ; then
+        echo "docker-machine is not installed but most likely docker desktop"
+      fi
       # Start the docker machine VM (ignore error if it's already running).
       docker-machine start default || true
       eval $(docker-machine env default)

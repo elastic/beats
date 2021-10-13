@@ -30,7 +30,7 @@ func init() {
 }
 
 // AssetNats returns asset data.
-// This is the base64 encoded gzipped contents of module/nats.
+// This is the base64 encoded zlib format compressed contents of module/nats.
 func AssetNats() string {
 	return "eJy0lEFP3DAQhe/5FU/c4QfkUAkJVeqhXOCOnGSSDDieYI+7pL++coi3y5LAVmXnGCfzvnlv4ks80VTCGQ0FoKyWSlzcXt/fXRRAQ6H2PCqLK/GtAICf0kRLaMVjND6w65DehpUOLVsKVwXgyZIJVKIiNQXQMtkmlHODSzgz0F4ylU4jlei8xHF5siKc6vvcB62XYa86C6Y6FDkUstLtn61pfaCX6tZo+DvdwdHxkLmOOQ5Zasvk9M3RFtInWJt2LBpXR2+vUR2ScfPuKJOxU+rIr5x/wpfqvidwA2mhPa3NnwGG0J3Xl4FCMB39qzHVpG9if0tnxR1jz03FD0a3Pz7BuDv+Tdm20UxWTAN2Gx0zbILaZH2iaSd+LecTcxy9qNRis5XrcpklxOqR6uNl/yKcu9fmsxS053282JkATzXxL2ogbhvvnBsfHT9HgrFjb1wcyHOd/Nh/ix83OdstmzKnp9FODyrni5VdJS+ZA+Kw67nuXxcvVpZDTx4cYDkouXTjp9vfUxjFhQ+WcTAvD0sq2z/Qf1l97SDzC8bCxaEin1zNmlDBzrDOuBW14gkmqgxGuTbWTohuCaXild84z0Hei79aum4OovSytusnTHFDatgGmEqizrbPipC6jt7T+2Qz2HOkSA9rF+RXYKXVmBVer+BlK7Jh5LFja/Eo7Io/AQAA///WPBpU"
 }

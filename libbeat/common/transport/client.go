@@ -224,8 +224,8 @@ func (c *Client) Test(d testing.Driver) {
 		} else {
 			d.Run("TLS", func(d testing.Driver) {
 				netDialer := NetDialer(c.config.Timeout)
-				tlsDialer, err := TestTLSDialer(d, netDialer, c.config.TLS, c.config.Timeout)
-				_, err = tlsDialer.Dial("tcp", c.host)
+				tlsDialer := TestTLSDialer(d, netDialer, c.config.TLS, c.config.Timeout)
+				_, err := tlsDialer.Dial("tcp", c.host)
 				d.Fatal("dial up", err)
 			})
 		}

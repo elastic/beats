@@ -1,0 +1,34 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "airflow": {
+        "dag_duration": {
+            "15m_rate": 0.2,
+            "1m_rate": 0.2,
+            "5m_rate": 0.2,
+            "count": 1,
+            "max": 200,
+            "mean": 200,
+            "mean_rate": 0.2222490946071946,
+            "median": 200,
+            "min": 200,
+            "p75": 200,
+            "p95": 200,
+            "p99": 200,
+            "p99_9": 200,
+            "stddev": 0
+        },
+        "dag_id": "a_dagid",
+        "status": "failure"
+    },
+    "event": {
+        "dataset": "statsd",
+        "module": "airflow"
+    },
+    "labels": {
+        "k1": "v1",
+        "k2": "v2"
+    },
+    "service": {
+        "type": "airflow"
+    }
+}

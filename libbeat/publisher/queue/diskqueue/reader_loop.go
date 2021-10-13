@@ -20,6 +20,7 @@ package diskqueue
 import (
 	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
 )
 
@@ -100,13 +101,12 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 
 	// Open the file and seek to the starting position.
 	handle, err := request.segment.getReader(rl.settings)
+	rl.decoder.useJSON = request.segment.shouldUseJSON()
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}
 	defer handle.Close()
-	// getReader positions us at the start of the data region, so we use
-	// a relative seek to advance to the request position.
-	_, err = handle.Seek(int64(request.startPosition), os.SEEK_CUR)
+	_, err = handle.Seek(int64(request.startPosition), io.SeekStart)
 	if err != nil {
 		return readerLoopResponse{err: err}
 	}
@@ -179,7 +179,7 @@ func (rl *readerLoop) nextFrame(
 	// Ensure we are allowed to read the frame header.
 	if maxLength < frameHeaderSize {
 		return nil, fmt.Errorf(
-			"Can't read next frame: remaining length %d is too low", maxLength)
+			"can't read next frame: remaining length %d is too low", maxLength)
 	}
 	// Wrap the handle to retry non-fatal errors and always return the full
 	// requested data length if possible.
@@ -187,20 +187,20 @@ func (rl *readerLoop) nextFrame(
 	var frameLength uint32
 	err := binary.Read(reader, binary.LittleEndian, &frameLength)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read data frame header: %w", err)
+		return nil, fmt.Errorf("couldn't read data frame header: %w", err)
 	}
 
 	// If the frame extends past the area we were told to read, return an error.
 	// This should never happen unless the segment file is corrupted.
 	if maxLength < uint64(frameLength) {
 		return nil, fmt.Errorf(
-			"Can't read next frame: frame size is %d but remaining data is only %d",
+			"can't read next frame: frame size is %d but remaining data is only %d",
 			frameLength, maxLength)
 	}
 	if frameLength <= frameMetadataSize {
 		// Valid enqueued data must have positive length
 		return nil, fmt.Errorf(
-			"Data frame with no data (length %d)", frameLength)
+			"data frame with no data (length %d)", frameLength)
 	}
 
 	// Read the actual frame data
@@ -208,29 +208,29 @@ func (rl *readerLoop) nextFrame(
 	bytes := rl.decoder.Buffer(int(dataLength))
 	_, err = reader.Read(bytes)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read data frame content: %w", err)
+		return nil, fmt.Errorf("couldn't read data frame content: %w", err)
 	}
 
 	// Read the footer (checksum + duplicate length)
 	var checksum uint32
 	err = binary.Read(reader, binary.LittleEndian, &checksum)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read data frame checksum: %w", err)
+		return nil, fmt.Errorf("couldn't read data frame checksum: %w", err)
 	}
 	expected := computeChecksum(bytes)
 	if checksum != expected {
 		return nil, fmt.Errorf(
-			"Data frame checksum mismatch (%x != %x)", checksum, expected)
+			"data frame checksum mismatch (%x != %x)", checksum, expected)
 	}
 
 	var duplicateLength uint32
 	err = binary.Read(reader, binary.LittleEndian, &duplicateLength)
 	if err != nil {
-		return nil, fmt.Errorf("Couldn't read data frame footer: %w", err)
+		return nil, fmt.Errorf("couldn't read data frame footer: %w", err)
 	}
 	if duplicateLength != frameLength {
 		return nil, fmt.Errorf(
-			"Inconsistent data frame length (%d vs %d)",
+			"inconsistent data frame length (%d vs %d)",
 			frameLength, duplicateLength)
 	}
 
@@ -242,7 +242,7 @@ func (rl *readerLoop) nextFrame(
 		// TODO: Rather than pass this error back to the read request, which
 		// discards the rest of the segment, we should just log the error and
 		// advance to the next frame, which is likely still valid.
-		return nil, fmt.Errorf("Couldn't decode data frame: %w", err)
+		return nil, fmt.Errorf("couldn't decode data frame: %w", err)
 	}
 
 	frame := &readFrame{

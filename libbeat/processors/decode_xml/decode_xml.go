@@ -25,7 +25,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/encoding/xml"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/logp"
@@ -57,7 +56,7 @@ func init() {
 				"field", "target_field",
 				"overwrite_keys", "document_id",
 				"to_lower", "ignore_missing",
-				"ignore_failure",
+				"ignore_failure", "when",
 			)))
 	jsprocessor.RegisterPlugin("DecodeXML", New)
 }
@@ -74,8 +73,6 @@ func New(c *common.Config) (processors.Processor, error) {
 }
 
 func newDecodeXML(config decodeXMLConfig) (processors.Processor, error) {
-	cfgwarn.Experimental("The " + procName + " processor is experimental.")
-
 	// Default target to overwriting field.
 	if config.Target == nil {
 		config.Target = &config.Field

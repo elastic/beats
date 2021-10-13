@@ -52,37 +52,39 @@ func TestNamespace_Generate(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"spam": "baz",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
 			},
-			// Use this for 8.0
-			/*
-				output: common.MapStr{
-					"kubernetes": common.MapStr{
-						"namespace": common.MapStr{
-							"name": name,
-							"uid":  uid,
-							"labels": common.MapStr{
-								"foo": "bar",
-							},
+			output: common.MapStr{
+				"kubernetes": common.MapStr{
+					"namespace": common.MapStr{
+						"name": name,
+						"uid":  uid,
+						"labels": common.MapStr{
+							"foo": "bar",
+						},
+						"annotations": common.MapStr{
+							"spam": "baz",
 						},
 					},
-				},*/
-			output: common.MapStr{"kubernetes": common.MapStr{
-				"namespace":     name,
-				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
-					"foo": "bar",
 				},
-			}},
+			},
 		},
 	}
 
-	cfg := common.NewConfig()
+	cfg, err := common.NewConfigFrom(Config{
+		IncludeAnnotations: []string{"spam"},
+	})
+	if err != nil {
+		t.Fatalf("Could not merge configs")
+	}
+
 	metagen := NewNamespaceMetadataGenerator(cfg, nil, client)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -109,36 +111,38 @@ func TestNamespace_GenerateFromName(t *testing.T) {
 					Labels: map[string]string{
 						"foo": "bar",
 					},
-					Annotations: map[string]string{},
+					Annotations: map[string]string{
+						"spam": "baz",
+					},
 				},
 				TypeMeta: metav1.TypeMeta{
 					Kind:       "Namespace",
 					APIVersion: "v1",
 				},
 			},
-			// Use this for 8.0
-			/*
-				output: common.MapStr{
-					"namespace": common.MapStr{
-						"name": name,
-						"uid":  uid,
-						"labels": common.MapStr{
-							"foo": "bar",
-						},
-					},
-				},*/
 			output: common.MapStr{
-				"namespace":     name,
-				"namespace_uid": uid,
-				"namespace_labels": common.MapStr{
-					"foo": "bar",
+				"namespace": common.MapStr{
+					"name": name,
+					"uid":  uid,
+					"labels": common.MapStr{
+						"foo": "bar",
+					},
+					"annotations": common.MapStr{
+						"spam": "baz",
+					},
 				},
 			},
 		},
 	}
 
 	for _, test := range tests {
-		cfg := common.NewConfig()
+		cfg, err := common.NewConfigFrom(Config{
+			IncludeAnnotations: []string{"spam"},
+		})
+		if err != nil {
+			t.Fatalf("Could not merge configs")
+		}
+
 		namespaces := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		namespaces.Add(test.input)
 		metagen := NewNamespaceMetadataGenerator(cfg, namespaces, client)
