@@ -155,6 +155,17 @@ func (r *fsreader) consumeEvents(done <-chan struct{}) {
 					"event_id", event.ID,
 					"event_flags", flagsToString(event.Flags))
 
+				abs, err := filepath.Abs(event.Path)
+				if err != nil {
+					r.log.Errorw("Failed to obtain absolute path",
+						"file_path", event.Path,
+						"error", err,
+					)
+					event.Path = filepath.Clean(event.Path)
+				} else {
+					event.Path = abs
+				}
+
 				start := time.Now()
 				e := NewEvent(event.Path, flagsToAction(event.Flags), SourceFSNotify,
 					r.config.MaxFileSizeBytes, r.config.HashTypes)
