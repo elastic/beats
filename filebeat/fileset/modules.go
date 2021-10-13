@@ -91,6 +91,10 @@ func newModuleRegistry(modulesPath string,
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %v", mcfg.Module, filesetName, err)
 			}
 			if hasOverride {
+				if _, ok := reg.configuredFilesets[mcfg.Module]; !ok {
+					reg.configuredFilesets[mcfg.Module] = map[string]struct{}{}
+				}
+
 				reg.configuredFilesets[mcfg.Module][filesetName] = struct{}{}
 			}
 
