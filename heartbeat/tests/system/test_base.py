@@ -74,7 +74,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
                     "type": "http",
                     "enabled": "false",
                     "urls": ["http://localhost:9200"],
-                } 
+                }
             ]
         }
 
