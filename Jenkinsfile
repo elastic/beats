@@ -514,7 +514,6 @@ def getBeatsName(baseDir) {
   return baseDir.replace('x-pack/', '')
 }
 
-
 /**
 * This method runs the end 2 end testing
 */
