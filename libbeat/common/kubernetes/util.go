@@ -30,10 +30,29 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
 
+	"github.com/pkg/errors"
+
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-const defaultNode = "localhost"
+const namespaceFilePath = "/var/run/secrets/kubernetes.io/serviceaccount/namespace"
+
+type HostDiscoveryUtils interface {
+	GetNamespace() (string, error)
+	GetPodName() (string, error)
+	GetMachineID() string
+}
+
+// DiscoverKubernetesNodeParams includes parameters for discovering kubernetes node
+type DiscoverKubernetesNodeParams struct {
+	ConfigHost  string
+	Client      kubernetes.Interface
+	IsInCluster bool
+	HostUtils   HostDiscoveryUtils
+}
+
+// DefaultDiscoveryUtils implements functions of HostDiscoveryUtils interface
+type DefaultDiscoveryUtils struct{}
 
 func GetKubeConfigEnvironmentVariable() string {
 	envKubeConfig := os.Getenv("KUBECONFIG")
@@ -92,60 +111,89 @@ func IsInCluster(kubeconfig string) bool {
 
 // DiscoverKubernetesNode figures out the Kubernetes node to use.
 // If host is provided in the config use it directly.
-// If beat is deployed in k8s cluster, use hostname of pod which is pod name to query pod meta for node name.
-// If beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
-func DiscoverKubernetesNode(log *logp.Logger, host string, inCluster bool, client kubernetes.Interface) (node string) {
-	if host != "" {
-		log.Infof("kubernetes: Using node %s provided in the config", host)
-		return host
-	}
+// If it is empty then try
+// 1. If beat is deployed in k8s cluster, use hostname of pod as the pod name to query pod metadata for node name.
+// 2. If step 1 fails or beat is deployed outside k8s cluster, use machine-id to match against k8s nodes for node name.
+// 3. If node cannot be discovered with step 1,2, fallback to NODE_NAME env var as default value. In case it is not set return error.
+func DiscoverKubernetesNode(log *logp.Logger, nd *DiscoverKubernetesNodeParams) (string, error) {
 	ctx := context.TODO()
-	if inCluster {
-		ns, err := InClusterNamespace()
-		if err != nil {
-			log.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
-			return defaultNode
+	// Discover node by configuration file (NODE) if set
+	if nd.ConfigHost != "" {
+		log.Infof("kubernetes: Using node %s provided in the config", nd.ConfigHost)
+		return nd.ConfigHost, nil
+	}
+	// Discover node by serviceaccount namespace and pod's hostname in case Beats is running in cluster
+	if nd.IsInCluster {
+		node, err := discoverInCluster(nd, ctx)
+		if err == nil {
+			log.Infof("kubernetes: Node %s discovered by in cluster pod node query", node)
+			return node, nil
 		}
-		podName, err := os.Hostname()
-		if err != nil {
-			log.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
-			return defaultNode
-		}
-		log.Infof("kubernetes: Using pod name %s and namespace %s to discover kubernetes node", podName, ns)
-		pod, err := client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
-		if err != nil {
-			log.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
-			return defaultNode
-		}
-		log.Infof("kubernetes: Using node %s discovered by in cluster pod node query", pod.Spec.NodeName)
-		return pod.Spec.NodeName
+		log.Debug(err)
 	}
 
-	mid := machineID()
-	if mid == "" {
-		log.Error("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
-		return defaultNode
+	// try discover node by machine id
+	node, err := discoverByMachineId(nd, ctx)
+	if err == nil {
+		log.Infof("kubernetes: Node %s discovered by machine-id matching", node)
+		return node, nil
+	}
+	log.Debug(err)
+
+	// fallback to environment variable NODE_NAME
+	node = os.Getenv("NODE_NAME")
+	if node != "" {
+		log.Infof("kubernetes: Node %s discovered by NODE_NAME environment variable", node)
+		return node, nil
 	}
 
-	nodes, err := client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	return "", errors.New("kubernetes: Node could not be discovered with any known method. Consider setting env var NODE_NAME")
+}
+
+func discoverInCluster(nd *DiscoverKubernetesNodeParams, ctx context.Context) (node string, errorMsg error) {
+	ns, err := nd.HostUtils.GetNamespace()
 	if err != nil {
-		log.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
-		return defaultNode
+		errorMsg = fmt.Errorf("kubernetes: Couldn't get namespace when beat is in cluster with error: %+v", err.Error())
+		return
+	}
+	podName, err := nd.HostUtils.GetPodName()
+	if err != nil {
+		errorMsg = fmt.Errorf("kubernetes: Couldn't get hostname as beat pod name in cluster with error: %+v", err.Error())
+		return
+	}
+	pod, err := nd.Client.CoreV1().Pods(ns).Get(ctx, podName, metav1.GetOptions{})
+	if err != nil {
+		errorMsg = fmt.Errorf("kubernetes: Querying for pod failed with error: %+v", err)
+		return
+	}
+	return pod.Spec.NodeName, nil
+}
+
+func discoverByMachineId(nd *DiscoverKubernetesNodeParams, ctx context.Context) (nodeName string, errorMsg error) {
+	mid := nd.HostUtils.GetMachineID()
+	if mid == "" {
+		errorMsg = errors.New("kubernetes: Couldn't collect info from any of the files in /etc/machine-id /var/lib/dbus/machine-id")
+		return
+	}
+
+	nodes, err := nd.Client.CoreV1().Nodes().List(ctx, metav1.ListOptions{})
+	if err != nil {
+		errorMsg = fmt.Errorf("kubernetes: Querying for nodes failed with error: %+v", err)
+		return
 	}
 	for _, n := range nodes.Items {
 		if n.Status.NodeInfo.MachineID == mid {
-			name := n.GetObjectMeta().GetName()
-			log.Infof("kubernetes: Using node %s discovered by machine-id matching", name)
-			return name
+			nodeName = n.GetObjectMeta().GetName()
+			return nodeName, nil
 		}
 	}
-
-	log.Warn("kubernetes: Couldn't discover node, using localhost as default")
-	return defaultNode
+	errorMsg = fmt.Errorf("kubernetes: Couldn't discover node %s", mid)
+	return
 }
 
-// machineID borrowed from cadvisor.
-func machineID() string {
+//GetMachineID returns the machine-id
+// borrowed from machineID of cadvisor.
+func (hd *DefaultDiscoveryUtils) GetMachineID() string {
 	for _, file := range []string{
 		"/etc/machine-id",
 		"/var/lib/dbus/machine-id",
@@ -158,8 +206,17 @@ func machineID() string {
 	return ""
 }
 
-// InClusterNamespace gets namespace from serviceaccount when beat is in cluster.
-// code borrowed from client-go with some changes.
+// GetNamespace gets namespace from serviceaccount when beat is in cluster.
+func (hd *DefaultDiscoveryUtils) GetNamespace() (string, error) {
+	return InClusterNamespace()
+}
+
+// GetPodName returns the hostname of the pod
+func (hd *DefaultDiscoveryUtils) GetPodName() (string, error) {
+	return os.Hostname()
+}
+
+// InClusterNamespace gets namespace from serviceaccount when beat is in cluster. // code borrowed from client-go with some changes.
 func InClusterNamespace() (string, error) {
 	// get namespace associated with the service account token, if available
 	data, err := ioutil.ReadFile("/var/run/secrets/kubernetes.io/serviceaccount/namespace")

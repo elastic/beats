@@ -35,8 +35,8 @@ stages:
             branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
         stage: mandatory
     crosscompile:
         make: "make -C auditbeat crosscompile"
@@ -52,7 +52,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
     windows:

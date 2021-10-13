@@ -82,7 +82,7 @@ func (g *metaGenerator) ResourceMetadata(obj Resource) common.MapStr {
 // Returns an array of per-task metadata aggregating the group metadata into the
 // task metadata
 func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
-	tasksMeta := []common.MapStr{}
+	var tasksMeta []common.MapStr
 
 	for _, group := range job.TaskGroups {
 		meta := make(map[string]string, len(job.Meta))
@@ -131,7 +131,7 @@ func (g *metaGenerator) GroupMeta(job *Job) []common.MapStr {
 
 // Returns per-task metadata
 func (g *metaGenerator) tasksMeta(group *TaskGroup) []common.MapStr {
-	tasks := []common.MapStr{}
+	var tasks []common.MapStr
 
 	for _, task := range group.Tasks {
 		var svcNames, svcTags, svcCanaryTags []string
@@ -201,7 +201,7 @@ func generateMapSubset(input common.MapStr, keys []string, dedot bool) common.Ma
 }
 
 // AllocationNodeName returns Name of the node where the task is allocated. It
-// does one additional API call to circunvent the empty NodeName property of
+// does one additional API call to circumvent the empty NodeName property of
 // older Nomad versions (up to v0.8)
 func (g *metaGenerator) AllocationNodeName(id string) (string, error) {
 	if name, ok := g.nodesCache[id]; ok {

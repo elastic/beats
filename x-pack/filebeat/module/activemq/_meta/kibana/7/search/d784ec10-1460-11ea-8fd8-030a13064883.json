@@ -1,0 +1,46 @@
+{
+    "attributes": {
+        "columns": [
+            "log.level",
+            "message",
+            "activemq.thread"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset :\"activemq.log\" "
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Application Events [Filebeat ActiveMQ]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d784ec10-1460-11ea-8fd8-030a13064883",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2021-08-04T16:33:53.367Z",
+    "version": "WzQzMzIsMV0="
+}

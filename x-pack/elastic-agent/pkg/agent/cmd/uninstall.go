@@ -27,7 +27,7 @@ Unless -f is used this command will ask confirmation before performing removal.
 `,
 		Run: func(c *cobra.Command, args []string) {
 			if err := uninstallCmd(streams, c, args); err != nil {
-				fmt.Fprintf(streams.Err, "Error: %v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},

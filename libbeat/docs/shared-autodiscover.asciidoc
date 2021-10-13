@@ -482,7 +482,21 @@ The `nomad` autodiscover provider has the following configuration settings:
 
 `namespace`:: (Optional) Namespace to use. If not provided the `default` namespace is used.
 
-`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad.
+`secret_id`:: (Optional) SecretID to use if ACL is enabled in Nomad. This is an
+example ACL policy to apply to the token.
+
+[source,hcl]
+----
+namespace "*" {
+  policy = "read"
+}
+node {
+  policy = "read"
+}
+agent {
+  policy = "read"
+}
+----
 
 `node`:: (Optional) Specify the node to scope {beatname_lc} to in case it
   cannot be accurately detected when `node` scope is used.
@@ -496,6 +510,7 @@ The `nomad` autodiscover provider has the following configuration settings:
 
 `allow_stale`:: (Optional) allows any Nomad server (non-leader) to service a read. This normally
   means that the local node where filebeat is allocated will service filebeat's requests.
+  Defaults to `true`.
 
 include::../../{beatname_lc}/docs/autodiscover-nomad-config.asciidoc[]
 

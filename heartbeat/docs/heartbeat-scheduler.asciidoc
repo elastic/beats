@@ -39,3 +39,24 @@ specify for `limit` should be below the configured ulimit.
 
 The time zone for the scheduler. By default the scheduler uses localtime.
 
+
+[float]
+[[heartbeat-job-limit]]
+==== `job.limit`
+
+On top of the scheduler level limit, {beatname_uc} allows limiting the number of
+concurrent tasks per monitor/job type.
+
+Example configuration:
+
+[source,yaml]
+-------------------------------------------------------------------------------
+heartbeat.jobs:
+  http:
+    limit: 10
+  browser:
+    limit: 5
+-------------------------------------------------------------------------------
+
+In the example, at any given time {beatname_uc} guarantees that only 10
+concurrent `http` tasks and only 5 concurrent `browser` tasks will be active.

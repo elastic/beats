@@ -11,6 +11,7 @@
         "log.level": "high",
         "log.offset": 0,
         "observer.product": "FortiMail",
+        "observer.serial_number": "pexe",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "boNemoe",
@@ -42,6 +43,7 @@
         "log.level": "very-high",
         "log.offset": 117,
         "observer.product": "FortiMail",
+        "observer.serial_number": "ehend",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -85,6 +87,7 @@
         "log.level": "low",
         "log.offset": 355,
         "observer.product": "FortiMail",
+        "observer.serial_number": "doeiu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -127,6 +130,7 @@
         "log.level": "high",
         "log.offset": 534,
         "observer.product": "FortiMail",
+        "observer.serial_number": "uipexea",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -167,6 +171,7 @@
         "log.level": "very-high",
         "log.offset": 706,
         "observer.product": "FortiMail",
+        "observer.serial_number": "itati",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -207,6 +212,7 @@
         "log.level": "high",
         "log.offset": 873,
         "observer.product": "FortiMail",
+        "observer.serial_number": "llamcorp",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -247,6 +253,7 @@
         "log.level": "very-high",
         "log.offset": 1039,
         "observer.product": "FortiMail",
+        "observer.serial_number": "enimad",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -284,6 +291,7 @@
         "log.level": "low",
         "log.offset": 1206,
         "observer.product": "FortiMail",
+        "observer.serial_number": "taliqu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -327,6 +335,7 @@
         "log.level": "very-high",
         "log.offset": 1442,
         "observer.product": "FortiMail",
+        "observer.serial_number": "smo",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -367,6 +376,7 @@
         "log.level": "low",
         "log.offset": 1619,
         "observer.product": "FortiMail",
+        "observer.serial_number": "ntutl",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "edquiano",
@@ -399,6 +409,7 @@
         "log.offset": 1745,
         "network.direction": "inbound",
         "observer.product": "FortiMail",
+        "observer.serial_number": "idestla",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -441,6 +452,7 @@
         "log.level": "high",
         "log.offset": 2075,
         "observer.product": "FortiMail",
+        "observer.serial_number": "amvolup",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -487,6 +499,7 @@
         "log.level": "low",
         "log.offset": 2254,
         "observer.product": "FortiMail",
+        "observer.serial_number": "estiae",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -524,6 +537,7 @@
         "log.level": "medium",
         "log.offset": 2424,
         "observer.product": "FortiMail",
+        "observer.serial_number": "oluptas",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "equat",
@@ -555,6 +569,7 @@
         "log.level": "high",
         "log.offset": 2546,
         "observer.product": "FortiMail",
+        "observer.serial_number": "abi",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "veniamq",
@@ -590,6 +605,7 @@
         "log.offset": 2668,
         "network.direction": "inbound",
         "observer.product": "FortiMail",
+        "observer.serial_number": "orem",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -641,6 +657,7 @@
         "log.level": "very-high",
         "log.offset": 3053,
         "observer.product": "FortiMail",
+        "observer.serial_number": "didunt",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -680,6 +697,7 @@
         "log.level": "high",
         "log.offset": 3256,
         "observer.product": "FortiMail",
+        "observer.serial_number": "tvolu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -718,6 +736,7 @@
         "log.level": "very-high",
         "log.offset": 3450,
         "observer.product": "FortiMail",
+        "observer.serial_number": "stru",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -754,6 +773,7 @@
         "log.level": "high",
         "log.offset": 3632,
         "observer.product": "FortiMail",
+        "observer.serial_number": "uatD",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -795,6 +815,7 @@
         "log.level": "very-high",
         "log.offset": 3829,
         "observer.product": "FortiMail",
+        "observer.serial_number": "tenimad",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -837,6 +858,7 @@
         "log.level": "high",
         "log.offset": 4059,
         "observer.product": "FortiMail",
+        "observer.serial_number": "intoc",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -880,6 +902,7 @@
         "log.level": "high",
         "log.offset": 4286,
         "observer.product": "FortiMail",
+        "observer.serial_number": "quamqua",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -921,6 +944,7 @@
         "log.level": "high",
         "log.offset": 4458,
         "observer.product": "FortiMail",
+        "observer.serial_number": "dolore",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -960,6 +984,7 @@
         "log.level": "low",
         "log.offset": 4705,
         "observer.product": "FortiMail",
+        "observer.serial_number": "uaUten",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1005,6 +1030,7 @@
         "log.level": "low",
         "log.offset": 4884,
         "observer.product": "FortiMail",
+        "observer.serial_number": "aec",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1048,6 +1074,7 @@
         "log.level": "very-high",
         "log.offset": 5130,
         "observer.product": "FortiMail",
+        "observer.serial_number": "amcor",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1089,6 +1116,7 @@
         "log.level": "very-high",
         "log.offset": 5319,
         "observer.product": "FortiMail",
+        "observer.serial_number": "tpersp",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1135,6 +1163,7 @@
         "log.level": "very-high",
         "log.offset": 5501,
         "observer.product": "FortiMail",
+        "observer.serial_number": "dipisci",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1175,6 +1204,7 @@
         "log.level": "low",
         "log.offset": 5672,
         "observer.product": "FortiMail",
+        "observer.serial_number": "nte",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1214,6 +1244,7 @@
         "log.level": "very-high",
         "log.offset": 5854,
         "observer.product": "FortiMail",
+        "observer.serial_number": "ptateve",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1259,6 +1290,7 @@
         "log.offset": 6048,
         "network.direction": "inbound",
         "observer.product": "FortiMail",
+        "observer.serial_number": "atione",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -1312,6 +1344,7 @@
         "log.level": "medium",
         "log.offset": 6484,
         "observer.product": "FortiMail",
+        "observer.serial_number": "liquide",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1359,6 +1392,7 @@
         "log.level": "very-high",
         "log.offset": 6680,
         "observer.product": "FortiMail",
+        "observer.serial_number": "taedict",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1400,6 +1434,7 @@
         "log.level": "very-high",
         "log.offset": 6869,
         "observer.product": "FortiMail",
+        "observer.serial_number": "occ",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1439,6 +1474,7 @@
         "log.level": "very-high",
         "log.offset": 7062,
         "observer.product": "FortiMail",
+        "observer.serial_number": "temUten",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1480,6 +1516,7 @@
         "log.level": "medium",
         "log.offset": 7254,
         "observer.product": "FortiMail",
+        "observer.serial_number": "quide",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1517,6 +1554,7 @@
         "log.level": "medium",
         "log.offset": 7432,
         "observer.product": "FortiMail",
+        "observer.serial_number": "inrepr",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1563,6 +1601,7 @@
         "log.level": "very-high",
         "log.offset": 7619,
         "observer.product": "FortiMail",
+        "observer.serial_number": "riosa",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1609,6 +1648,7 @@
         "log.level": "medium",
         "log.offset": 7804,
         "observer.product": "FortiMail",
+        "observer.serial_number": "undeom",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1649,6 +1689,7 @@
         "log.level": "medium",
         "log.offset": 7970,
         "observer.product": "FortiMail",
+        "observer.serial_number": "edictasu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1689,6 +1730,7 @@
         "log.level": "low",
         "log.offset": 8144,
         "observer.product": "FortiMail",
+        "observer.serial_number": "lumqu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1729,6 +1771,7 @@
         "log.level": "low",
         "log.offset": 8301,
         "observer.product": "FortiMail",
+        "observer.serial_number": "uamqu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.email.email_dst": "emUte",
@@ -1760,6 +1803,7 @@
         "log.level": "very-high",
         "log.offset": 8447,
         "observer.product": "FortiMail",
+        "observer.serial_number": "umS",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1806,6 +1850,7 @@
         "log.level": "low",
         "log.offset": 8642,
         "observer.product": "FortiMail",
+        "observer.serial_number": "urau",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1848,6 +1893,7 @@
         "log.level": "very-high",
         "log.offset": 8825,
         "observer.product": "FortiMail",
+        "observer.serial_number": "upta",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "exerci",
@@ -1879,6 +1925,7 @@
         "log.level": "medium",
         "log.offset": 8954,
         "observer.product": "FortiMail",
+        "observer.serial_number": "mmodoco",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -1925,6 +1972,7 @@
         "log.level": "medium",
         "log.offset": 9146,
         "observer.product": "FortiMail",
+        "observer.serial_number": "porinc",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -1966,6 +2014,7 @@
         "log.level": "high",
         "log.offset": 9328,
         "observer.product": "FortiMail",
+        "observer.serial_number": "itse",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2009,6 +2058,7 @@
         "log.level": "medium",
         "log.offset": 9547,
         "observer.product": "FortiMail",
+        "observer.serial_number": "iciade",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2049,6 +2099,7 @@
         "log.level": "high",
         "log.offset": 9718,
         "observer.product": "FortiMail",
+        "observer.serial_number": "colabori",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2090,6 +2141,7 @@
         "log.level": "high",
         "log.offset": 9919,
         "observer.product": "FortiMail",
+        "observer.serial_number": "atcupid",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2127,6 +2179,7 @@
         "log.level": "low",
         "log.offset": 10141,
         "observer.product": "FortiMail",
+        "observer.serial_number": "gna",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2167,6 +2220,7 @@
         "log.level": "high",
         "log.offset": 10309,
         "observer.product": "FortiMail",
+        "observer.serial_number": "uiineavo",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2210,6 +2264,7 @@
         "log.level": "low",
         "log.offset": 10537,
         "observer.product": "FortiMail",
+        "observer.serial_number": "lupta",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.email.email_dst": "ulapa",
@@ -2242,6 +2297,7 @@
         "log.level": "low",
         "log.offset": 10701,
         "observer.product": "FortiMail",
+        "observer.serial_number": "obeataev",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2278,6 +2334,7 @@
         "log.level": "very-high",
         "log.offset": 10876,
         "observer.product": "FortiMail",
+        "observer.serial_number": "inim",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2318,6 +2375,7 @@
         "log.level": "low",
         "log.offset": 11044,
         "observer.product": "FortiMail",
+        "observer.serial_number": "itaedict",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "ptatemse",
@@ -2349,6 +2407,7 @@
         "log.level": "low",
         "log.offset": 11167,
         "observer.product": "FortiMail",
+        "observer.serial_number": "eleumi",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2389,6 +2448,7 @@
         "log.level": "very-high",
         "log.offset": 11329,
         "observer.product": "FortiMail",
+        "observer.serial_number": "nimadmin",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "tocca",
@@ -2420,6 +2480,7 @@
         "log.level": "very-high",
         "log.offset": 11455,
         "observer.product": "FortiMail",
+        "observer.serial_number": "usant",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2462,6 +2523,7 @@
         "log.level": "very-high",
         "log.offset": 11652,
         "observer.product": "FortiMail",
+        "observer.serial_number": "conseq",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2505,6 +2567,7 @@
         "log.level": "very-high",
         "log.offset": 11887,
         "observer.product": "FortiMail",
+        "observer.serial_number": "ugiatqu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2548,6 +2611,7 @@
         "log.level": "medium",
         "log.offset": 12120,
         "observer.product": "FortiMail",
+        "observer.serial_number": "Bonoru",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2594,6 +2658,7 @@
         "log.level": "very-high",
         "log.offset": 12305,
         "observer.product": "FortiMail",
+        "observer.serial_number": "mquameiu",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2634,6 +2699,7 @@
         "log.level": "medium",
         "log.offset": 12481,
         "observer.product": "FortiMail",
+        "observer.serial_number": "rumetMa",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2677,6 +2743,7 @@
         "log.offset": 12656,
         "network.direction": "inbound",
         "observer.product": "FortiMail",
+        "observer.serial_number": "audant",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -2730,6 +2797,7 @@
         "log.level": "medium",
         "log.offset": 13066,
         "observer.product": "FortiMail",
+        "observer.serial_number": "emipsumq",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2776,6 +2844,7 @@
         "log.level": "medium",
         "log.offset": 13249,
         "observer.product": "FortiMail",
+        "observer.serial_number": "lauda",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2816,6 +2885,7 @@
         "log.level": "low",
         "log.offset": 13439,
         "observer.product": "FortiMail",
+        "observer.serial_number": "inibus",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -2852,6 +2922,7 @@
         "log.level": "low",
         "log.offset": 13612,
         "observer.product": "FortiMail",
+        "observer.serial_number": "naaliq",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2899,6 +2970,7 @@
         "log.level": "high",
         "log.offset": 13788,
         "observer.product": "FortiMail",
+        "observer.serial_number": "dolo",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2938,6 +3010,7 @@
         "log.level": "high",
         "log.offset": 14016,
         "observer.product": "FortiMail",
+        "observer.serial_number": "imipsam",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -2988,6 +3061,7 @@
         "log.offset": 14269,
         "network.protocol": "ipv6-icmp",
         "observer.product": "FortiMail",
+        "observer.serial_number": "econ",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3039,6 +3113,7 @@
         "log.level": "very-high",
         "log.offset": 14586,
         "observer.product": "FortiMail",
+        "observer.serial_number": "atevelit",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3080,6 +3155,7 @@
         "log.level": "low",
         "log.offset": 14795,
         "observer.product": "FortiMail",
+        "observer.serial_number": "ddo",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3128,6 +3204,7 @@
         "log.offset": 15048,
         "network.direction": "internal",
         "observer.product": "FortiMail",
+        "observer.serial_number": "odit",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3181,6 +3258,7 @@
         "log.level": "very-high",
         "log.offset": 15464,
         "observer.product": "FortiMail",
+        "observer.serial_number": "orsit",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3232,6 +3310,7 @@
         "log.offset": 15674,
         "network.direction": "internal",
         "observer.product": "FortiMail",
+        "observer.serial_number": "quidol",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3285,6 +3364,7 @@
         "log.level": "high",
         "log.offset": 16096,
         "observer.product": "FortiMail",
+        "observer.serial_number": "evelite",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "dolor",
@@ -3316,6 +3396,7 @@
         "log.level": "medium",
         "log.offset": 16221,
         "observer.product": "FortiMail",
+        "observer.serial_number": "itse",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "exeaco",
@@ -3347,6 +3428,7 @@
         "log.level": "medium",
         "log.offset": 16342,
         "observer.product": "FortiMail",
+        "observer.serial_number": "emvele",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3385,6 +3467,7 @@
         "log.level": "very-high",
         "log.offset": 16528,
         "observer.product": "FortiMail",
+        "observer.serial_number": "aliq",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -3425,6 +3508,7 @@
         "log.level": "high",
         "log.offset": 16695,
         "observer.product": "FortiMail",
+        "observer.serial_number": "pariatur",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3472,6 +3556,7 @@
         "log.level": "low",
         "log.offset": 16891,
         "observer.product": "FortiMail",
+        "observer.serial_number": "imaven",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -3512,6 +3597,7 @@
         "log.level": "medium",
         "log.offset": 17055,
         "observer.product": "FortiMail",
+        "observer.serial_number": "iade",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3559,6 +3645,7 @@
         "log.level": "low",
         "log.offset": 17252,
         "observer.product": "FortiMail",
+        "observer.serial_number": "conse",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3605,6 +3692,7 @@
         "log.level": "very-high",
         "log.offset": 17430,
         "observer.product": "FortiMail",
+        "observer.serial_number": "nvol",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "labor",
@@ -3636,6 +3724,7 @@
         "log.level": "medium",
         "log.offset": 17552,
         "observer.product": "FortiMail",
+        "observer.serial_number": "mwritte",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.user": [
@@ -3672,6 +3761,7 @@
         "log.level": "high",
         "log.offset": 17731,
         "observer.product": "FortiMail",
+        "observer.serial_number": "vel",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "edutpers",
@@ -3704,6 +3794,7 @@
         "log.level": "medium",
         "log.offset": 17851,
         "observer.product": "FortiMail",
+        "observer.serial_number": "sBonoru",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3743,6 +3834,7 @@
         "log.level": "medium",
         "log.offset": 18079,
         "observer.product": "FortiMail",
+        "observer.serial_number": "cid",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3790,6 +3882,7 @@
         "log.level": "high",
         "log.offset": 18282,
         "observer.product": "FortiMail",
+        "observer.serial_number": "icta",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3839,6 +3932,7 @@
         "log.level": "high",
         "log.offset": 18470,
         "observer.product": "FortiMail",
+        "observer.serial_number": "quaturve",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -3886,6 +3980,7 @@
         "log.offset": 18728,
         "network.direction": "unknown",
         "observer.product": "FortiMail",
+        "observer.serial_number": "eprehen",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3926,6 +4021,7 @@
         "log.level": "low",
         "log.offset": 19025,
         "observer.product": "FortiMail",
+        "observer.serial_number": "tiumtot",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -3974,6 +4070,7 @@
         "log.level": "medium",
         "log.offset": 19231,
         "observer.product": "FortiMail",
+        "observer.serial_number": "equ",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [
@@ -4012,6 +4109,7 @@
         "log.level": "very-high",
         "log.offset": 19466,
         "observer.product": "FortiMail",
+        "observer.serial_number": "sunt",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "rsa.internal.event_desc": "pta",
@@ -4046,6 +4144,7 @@
         "log.offset": 19589,
         "network.protocol": "igmp",
         "observer.product": "FortiMail",
+        "observer.serial_number": "ntutlabo",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.hosts": [
@@ -4097,6 +4196,7 @@
         "log.level": "medium",
         "log.offset": 19902,
         "observer.product": "FortiMail",
+        "observer.serial_number": "int",
         "observer.type": "Firewall",
         "observer.vendor": "Fortinet",
         "related.ip": [

@@ -1,677 +1,168 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "Filebeat Okta module Kibana dashboard",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "hiddenLayers": [],
-              "isLayerTOCOpen": false,
-              "mapCenter": {
-                "lat": 26.54701,
-                "lon": -44.69098,
-                "zoom": 2.75
-              },
-              "openTOCDetails": []
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": false,
+                    "mapCenter": {
+                        "lat": 26.54701,
+                        "lon": -44.69098,
+                        "zoom": 2.75
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 22,
+                    "i": "8013824b-5a66-494c-acc5-3df8b7678879",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8013824b-5a66-494c-acc5-3df8b7678879",
+                "panelRefName": "panel_8013824b-5a66-494c-acc5-3df8b7678879",
+                "type": "map",
+                "version": "8.0.0-SNAPSHOT"
             },
-            "gridData": {
-              "h": 22,
-              "i": "8013824b-5a66-494c-acc5-3df8b7678879",
-              "w": 48,
-              "x": 0,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                    "w": 10,
+                    "x": 0,
+                    "y": 22
+                },
+                "panelIndex": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                "panelRefName": "panel_c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
             },
-            "panelIndex": "8013824b-5a66-494c-acc5-3df8b7678879",
-            "panelRefName": "panel_0",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
-              "w": 10,
-              "x": 0,
-              "y": 22
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                    "w": 9,
+                    "x": 10,
+                    "y": 22
+                },
+                "panelIndex": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                "panelRefName": "panel_195db901-dc2b-4b7d-80c3-742e2712ac2a",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
             },
-            "panelIndex": "c6a66fe5-21a2-4308-8563-d4a7f5135d25",
-            "panelRefName": "panel_1",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
-              "w": 9,
-              "x": 10,
-              "y": 22
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                    "w": 19,
+                    "x": 29,
+                    "y": 22
+                },
+                "panelIndex": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                "panelRefName": "panel_dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
             },
-            "panelIndex": "195db901-dc2b-4b7d-80c3-742e2712ac2a",
-            "panelRefName": "panel_2",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
-              "w": 19,
-              "x": 29,
-              "y": 22
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "a25a43ed-3262-486c-a482-1fac52f26128",
+                    "w": 10,
+                    "x": 19,
+                    "y": 22
+                },
+                "panelIndex": "a25a43ed-3262-486c-a482-1fac52f26128",
+                "panelRefName": "panel_a25a43ed-3262-486c-a482-1fac52f26128",
+                "type": "visualization",
+                "version": "8.0.0-SNAPSHOT"
             },
-            "panelIndex": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
-            "panelRefName": "panel_3",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 11,
-              "i": "a25a43ed-3262-486c-a482-1fac52f26128",
-              "w": 10,
-              "x": 19,
-              "y": 22
-            },
-            "panelIndex": "a25a43ed-3262-486c-a482-1fac52f26128",
-            "panelRefName": "panel_4",
-            "version": "8.0.0-SNAPSHOT"
-          },
-          {
-            "embeddableConfig": {},
-            "gridData": {
-              "h": 16,
-              "i": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
-              "w": 48,
-              "x": 0,
-              "y": 33
-            },
-            "panelIndex": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
-            "panelRefName": "panel_5",
-            "version": "8.0.0-SNAPSHOT"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 33
+                },
+                "panelIndex": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                "panelRefName": "panel_c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+                "type": "search",
+                "version": "8.0.0-SNAPSHOT"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Okta] Overview",
         "version": 1
-      },
-      "id": "749203a0-67b1-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "dashboard": "7.3.0"
-      },
-      "references": [
-        {
-          "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
-          "name": "panel_0",
-          "type": "map"
-        },
-        {
-          "id": "545d6a00-67ae-11ea-a76f-bf44814e437d",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "7c6ec080-67c6-11ea-a76f-bf44814e437d",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "cda883a0-67c6-11ea-a76f-bf44814e437d",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "0a784b30-67c7-11ea-a76f-bf44814e437d",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "21028750-67ca-11ea-a76f-bf44814e437d",
-          "name": "panel_5",
-          "type": "search"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2020-03-17T00:05:24.763Z",
-      "version": "Wzk5LDJd"
     },
-    {
-      "attributes": {
-        "bounds": {
-          "coordinates": [
-            [
-              [
-                -138.87786,
-                64.23743
-              ],
-              [
-                -138.87786,
-                -28.21681
-              ],
-              [
-                49.49591,
-                -28.21681
-              ],
-              [
-                49.49591,
-                64.23743
-              ],
-              [
-                -138.87786,
-                64.23743
-              ]
-            ]
-          ],
-          "type": "Polygon"
-        },
-        "description": "",
-        "layerListJSON": "[{\"sourceDescriptor\":{\"type\":\"EMS_TMS\",\"isAutoSelect\":true},\"id\":\"6908e81b-1695-4445-aee4-8bc8c9f65600\",\"label\":null,\"minZoom\":0,\"maxZoom\":24,\"alpha\":1,\"visible\":true,\"style\":{},\"type\":\"VECTOR_TILE\"},{\"sourceDescriptor\":{\"id\":\"4b8bd321-4b90-4d97-83e0-2b12bf091f66\",\"geoField\":\"client.geo.location\",\"filterByMapBounds\":false,\"type\":\"ES_SEARCH\",\"tooltipProperties\":[],\"sortField\":\"\",\"sortOrder\":\"desc\",\"useTopHits\":false,\"topHitsSize\":1,\"applyGlobalQuery\":false,\"indexPatternRefName\":\"layer_1_source_index_pattern\"},\"style\":{\"type\":\"VECTOR\",\"properties\":{\"icon\":{\"type\":\"STATIC\",\"options\":{\"value\":\"airfield\"}},\"fillColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#54B399\"}},\"lineColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#41937c\"}},\"lineWidth\":{\"type\":\"STATIC\",\"options\":{\"size\":1}},\"iconSize\":{\"type\":\"STATIC\",\"options\":{\"size\":6}},\"iconOrientation\":{\"type\":\"STATIC\",\"options\":{\"orientation\":0}},\"labelText\":{\"type\":\"STATIC\",\"options\":{\"value\":\"\"}},\"labelColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#000000\"}},\"labelSize\":{\"type\":\"STATIC\",\"options\":{\"size\":14}},\"labelBorderColor\":{\"type\":\"STATIC\",\"options\":{\"color\":\"#FFFFFF\"}},\"symbolizeAs\":{\"options\":{\"value\":\"circle\"}},\"labelBorderSize\":{\"options\":{\"size\":\"SMALL\"}}},\"isTimeAware\":true},\"id\":\"dc52e707-92d7-4de7-becf-a3a8bfaa2c2d\",\"label\":\"Okta \",\"minZoom\":0,\"maxZoom\":24,\"alpha\":0.75,\"visible\":true,\"type\":\"VECTOR\",\"query\":{\"query\":\"event.dataset : \\\"okta.system\\\" \",\"language\":\"kuery\"}}]",
-        "mapStateJSON": "{\"zoom\":2.75,\"center\":{\"lon\":-44.69098,\"lat\":26.54701},\"timeFilters\":{\"from\":\"now-15w\",\"to\":\"now\"},\"refreshConfig\":{\"isPaused\":false,\"interval\":0},\"query\":{\"query\":\"\",\"language\":\"kuery\"},\"filters\":[{\"$state\":{\"store\":\"appState\"},\"meta\":{\"alias\":null,\"disabled\":false,\"index\":\"filebeat-*\",\"key\":\"event.dataset\",\"negate\":false,\"params\":{\"query\":\"okta.system\"},\"type\":\"phrase\"},\"query\":{\"match_phrase\":{\"event.dataset\":\"okta.system\"}}}]}",
-        "title": "Geolocation [Filebeat Okta]",
-        "uiStateJSON": {
-          "isLayerTOCOpen": true,
-          "openTOCDetails": []
-        }
-      },
-      "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "layer_1_source_index_pattern",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "map",
-      "updated_at": "2020-03-16T18:08:36.806Z",
-      "version": "WzYyLDJd"
+    "coreMigrationVersion": "8.0.0",
+    "id": "749203a0-67b1-11ea-a76f-bf44814e437d",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "okta.system"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "okta.system"
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+    "references": [
+        {
+            "id": "281ca660-67b1-11ea-a76f-bf44814e437d",
+            "name": "8013824b-5a66-494c-acc5-3df8b7678879:panel_8013824b-5a66-494c-acc5-3df8b7678879",
+            "type": "map"
         },
-        "title": "Event Outcome [Filebeat Okta]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "event.outcome",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Event Outcome [Filebeat Okta]",
-          "type": "pie"
+        {
+            "id": "545d6a00-67ae-11ea-a76f-bf44814e437d",
+            "name": "c6a66fe5-21a2-4308-8563-d4a7f5135d25:panel_c6a66fe5-21a2-4308-8563-d4a7f5135d25",
+            "type": "visualization"
+        },
+        {
+            "id": "7c6ec080-67c6-11ea-a76f-bf44814e437d",
+            "name": "195db901-dc2b-4b7d-80c3-742e2712ac2a:panel_195db901-dc2b-4b7d-80c3-742e2712ac2a",
+            "type": "visualization"
+        },
+        {
+            "id": "cda883a0-67c6-11ea-a76f-bf44814e437d",
+            "name": "dc5128e2-0b4d-4dd5-bbc2-624f64467a77:panel_dc5128e2-0b4d-4dd5-bbc2-624f64467a77",
+            "type": "visualization"
+        },
+        {
+            "id": "0a784b30-67c7-11ea-a76f-bf44814e437d",
+            "name": "a25a43ed-3262-486c-a482-1fac52f26128:panel_a25a43ed-3262-486c-a482-1fac52f26128",
+            "type": "visualization"
+        },
+        {
+            "id": "21028750-67ca-11ea-a76f-bf44814e437d",
+            "name": "c0d5bac3-7e50-4ef9-a401-5a596ec84ee9:panel_c0d5bac3-7e50-4ef9-a401-5a596ec84ee9",
+            "type": "search"
         }
-      },
-      "id": "545d6a00-67ae-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-16T17:59:26.029Z",
-      "version": "WzU5LDJd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "okta.system"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "okta.system"
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Transaction Types [Filebeat Okta]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "okta.transaction.type",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Transaction Types [Filebeat Okta]",
-          "type": "pie"
-        }
-      },
-      "id": "7c6ec080-67c6-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-16T20:41:17.703Z",
-      "version": "WzY3LDJd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {}
-        },
-        "title": "Time Series [Filebeat Okta]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [],
-          "params": {
-            "axis_formatter": "number",
-            "axis_position": "left",
-            "axis_scale": "normal",
-            "bar_color_rules": [
-              {
-                "id": "abd68650-67c6-11ea-8c7d-ed286611413e"
-              }
-            ],
-            "default_index_pattern": "filebeat-*",
-            "default_timefield": "@timestamp",
-            "id": "61ca57f0-469d-11e7-af02-69e470af7417",
-            "index_pattern": "filebeat-*",
-            "interval": "",
-            "isModelInvalid": false,
-            "series": [
-              {
-                "axis_position": "right",
-                "chart_type": "line",
-                "color": "#68BC00",
-                "fill": 0.5,
-                "filter": {
-                  "language": "kuery",
-                  "query": "event.dataset : \"okta.system\""
-                },
-                "formatter": "number",
-                "id": "61ca57f1-469d-11e7-af02-69e470af7417",
-                "line_width": 1,
-                "metrics": [
-                  {
-                    "id": "61ca57f2-469d-11e7-af02-69e470af7417",
-                    "type": "count"
-                  }
-                ],
-                "point_size": 1,
-                "separate_axis": 0,
-                "split_mode": "everything",
-                "stacked": "none"
-              }
-            ],
-            "show_grid": 1,
-            "show_legend": 1,
-            "time_field": "",
-            "type": "timeseries"
-          },
-          "title": "Time Series [Filebeat Okta]",
-          "type": "metrics"
-        }
-      },
-      "id": "cda883a0-67c6-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [],
-      "type": "visualization",
-      "updated_at": "2020-03-16T20:43:33.977Z",
-      "version": "WzcwLDJd"
-    },
-    {
-      "attributes": {
-        "description": "",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "okta.system"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "okta.system"
-                  }
-                }
-              }
-            ],
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "title": "Actor Types [Filebeat Okta]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "okta.actor.type",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 5
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "Actor Types [Filebeat Okta]",
-          "type": "pie"
-        }
-      },
-      "id": "0a784b30-67c7-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "visualization": "7.4.2"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2020-03-16T20:45:16.003Z",
-      "version": "WzcyLDJd"
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "okta.system"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "okta.system"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.outcome",
-                  "negate": false,
-                  "params": {
-                    "query": "FAILURE"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.outcome": "FAILURE"
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [
-          [
-            "@timestamp",
-            "desc"
-          ],
-          [
-            "event.created",
-            "desc"
-          ]
-        ],
-        "title": "Okta Failure Events",
-        "version": 1
-      },
-      "id": "21028750-67ca-11ea-a76f-bf44814e437d",
-      "migrationVersion": {
-        "search": "7.4.0"
-      },
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2020-03-16T21:11:52.041Z",
-      "version": "Wzg5LDJd"
-    }
-  ],
-  "version": "8.0.0-SNAPSHOT"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:33:39.099Z",
+    "version": "WzQyMzMsMV0="
 }

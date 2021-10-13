@@ -27,7 +27,6 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
 	"github.com/elastic/beats/v7/libbeat/common/match"
@@ -35,6 +34,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/debug"
+	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 )
@@ -57,7 +57,7 @@ type filestream struct {
 	encodingFactory encoding.EncodingFactory
 	encoding        encoding.Encoding
 	closerConfig    closerConfig
-	parserConfig    []common.ConfigNamespace
+	parsers         parser.Config
 }
 
 // Plugin creates a new filestream input plugin for creating a stateful input.
@@ -97,6 +97,7 @@ func configure(cfg *common.Config) (loginp.Prospector, loginp.Harvester, error) 
 		readerConfig:    config.Reader,
 		encodingFactory: encodingFactory,
 		closerConfig:    config.Close,
+		parsers:         config.Reader.Parsers,
 	}
 
 	return prospector, filestream, nil
@@ -217,12 +218,9 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath)
+	r = readfile.NewFilemeta(r, fs.newPath, offset)
 
-	r, err = newParsers(r, parserConfig{maxBytes: inp.readerConfig.MaxBytes, lineTerminator: inp.readerConfig.LineTerminator}, inp.readerConfig.Parsers)
-	if err != nil {
-		return nil, err
-	}
+	r = inp.parsers.Create(r)
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
@@ -331,8 +329,7 @@ func (inp *filestream) readFromSource(
 			continue
 		}
 
-		event := inp.eventFromMessage(message, path)
-		if err := p.Publish(event, s); err != nil {
+		if err := p.Publish(message.ToEvent(), s); err != nil {
 			return err
 		}
 	}
@@ -365,22 +362,4 @@ func matchAny(matchers []match.Matcher, text string) bool {
 		}
 	}
 	return false
-}
-
-func (inp *filestream) eventFromMessage(m reader.Message, path string) beat.Event {
-	if m.Fields == nil {
-		m.Fields = common.MapStr{}
-	}
-
-	if len(m.Content) > 0 {
-		if _, ok := m.Fields["message"]; !ok {
-			m.Fields["message"] = string(m.Content)
-		}
-	}
-
-	return beat.Event{
-		Timestamp: m.Ts,
-		Meta:      m.Meta,
-		Fields:    m.Fields,
-	}
 }

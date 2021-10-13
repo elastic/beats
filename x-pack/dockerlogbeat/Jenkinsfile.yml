@@ -19,8 +19,11 @@ stages:
           make -C x-pack/dockerlogbeat update;
           make check-no-changes;
         stage: lint
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
     packaging-linux:

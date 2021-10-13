@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration
 // +build !integration
 
 package eslegclient
@@ -228,7 +229,6 @@ func TestEnforceParameters(t *testing.T) {
 			client, _ := NewConnection(ConnectionSettings{
 				Parameters: test.preconfigured,
 				URL:        "http://localhost",
-				Timeout:    0,
 			})
 
 			client.Encoder = NewJSONEncoder(nil, false)

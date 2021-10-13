@@ -1,0 +1,276 @@
+default: true
+input:
+  module: statsd
+  metricset: server
+  defaults:
+    namespace: "airflow"
+    statsd.mappings:
+      - metric: '<job_name>_start'
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: started
+      - metric: '<job_name>_end'
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: ended
+      - metric: <job_name>_heartbeat_failure
+        labels:
+          - attr: job_name
+            field: job_name
+        value:
+          field: heartbeat_failure
+      - metric: 'operator_failures_<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: failures
+      - metric: 'operator_successes_<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: successes
+      - metric: 'ti_failures'
+        value:
+          field: task_failures
+      - metric: 'ti_successes'
+        value:
+          field: task_successes
+      - metric: 'previously_succeeded'
+        value:
+          field: previously_succeeded
+      - metric: 'zombies_killed'
+        value:
+          field: zombies_killed
+      - metric: 'scheduler_heartbeat'
+        value:
+          field: scheduler_heartbeat
+      - metric: 'dag_processing.manager_stalls'
+        value:
+          field: dag_file_processor_manager_stalls
+      - metric: 'dag_file_refresh_error'
+        value:
+          field: dag_file_refresh_error
+      - metric: 'dag_processing.processes'
+        value:
+          field: dag_processes
+      - metric: 'scheduler.tasks.killed_externally'
+        value:
+          field: task_killed_externally
+      - metric: 'scheduler.tasks.running'
+        value:
+          field: task_running
+      - metric: 'scheduler.tasks.starving'
+        value:
+          field: task_starving
+      - metric: 'scheduler.orphaned_tasks.cleared'
+        value:
+          field: task_orphaned_cleared
+      - metric: 'scheduler.orphaned_tasks.adopted'
+        value:
+          field: task_orphaned_adopted
+      - metric: 'scheduler.critical_section_busy'
+        value:
+          field: scheduler_critical_section_busy
+      - metric: 'sla_email_notification_failure'
+        value:
+          field: sla_email_notification_failure
+      - metric: 'ti.start.<dagid>.<taskid>'
+        labels:
+          - attr: dagid
+            field: dag_id
+          - attr: taskid
+            field: task_id
+        value:
+          field: task_started
+      - metric: 'ti.finish.<dagid>.<taskid>.<status>'
+        labels:
+          - attr: dagid
+            field: dag_id
+          - attr: taskid
+            field: task_id
+          - attr: status
+            field: status
+        value:
+          field: task_finished
+      - metric: 'dag.callback_exceptions'
+        value:
+          field: dag_callback_exceptions
+      - metric: 'celery.task_timeout_error'
+        value:
+          field: task_celery_timeout_error
+      - metric: 'task_removed_from_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dag_id
+        value:
+          field: task_removed
+      - metric: 'task_restored_to_dag.<dagid>'
+        labels:
+          - attr: dagid
+            field: dag_id
+        value:
+          field: task_restored
+      - metric: 'task_instance_created-<operator_name>'
+        labels:
+          - attr: operator_name
+            field: operator_name
+        value:
+          field: task_created
+      - metric: 'dagbag_size'
+        value:
+          field: dag_bag_size
+      - metric: 'dag_processing.import_errors'
+        value:
+          field: dag_import_errors
+      - metric: 'dag_processing.total_parse_time'
+        value:
+          field: dag_total_parse_time
+      - metric: 'dag_processing.last_runtime.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_runtime
+      - metric: 'dag_processing.last_run.seconds_ago.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_run_seconds_ago
+      - metric: 'dag_processing.processor_timeouts'
+        value:
+          field: processor_timeouts
+      - metric: 'scheduler.tasks.without_dagrun'
+        value:
+          field: task_without_dagrun
+      - metric: 'scheduler.tasks.running'
+        value:
+          field: task_running
+      - metric: 'scheduler.tasks.starving'
+        value:
+          field: task_starving
+      - metric: 'scheduler.tasks.executable'
+        value:
+          field: task_executable
+      - metric: 'executor.open_slots'
+        value:
+          field: executor_open_slots
+      - metric: 'executor.queued_tasks'
+        value:
+          field: executor_queued_tasks
+      - metric: 'executor.running_tasks'
+        value:
+          field: executor_running_tasks
+      - metric: 'pool.open_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_open_slots
+      - metric: 'pool.queued_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_queued_slots
+      - metric: 'pool.running_slots.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_running_slots
+      - metric: 'pool.starving_tasks.<pool_name>'
+        labels:
+          - attr: pool_name
+            field: pool_name
+        value:
+          field: pool_starving_tasks
+      - metric: 'smart_sensor_operator.poked_tasks'
+        value:
+          field: smart_sensor_operator_poked_tasks
+      - metric: 'smart_sensor_operator.poked_success'
+        value:
+          field: smart_sensor_operator_poked_success
+      - metric: 'smart_sensor_operator.poked_exception'
+        value:
+          field: smart_sensor_operator_poked_exception
+      - metric: 'smart_sensor_operator.exception_failures'
+        value:
+          field: smart_sensor_operator_exception_failures
+      - metric: 'smart_sensor_operator.infra_failures'
+        value:
+          field: smart_sensor_operator_infra_failures
+      - metric: 'dagrun.dependency-check.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_dependency_check
+      - metric: 'dag.<dag_id>.<task_id>.duration'
+        labels:
+          - attr: dag_id
+            field: dag_id
+          - attr: task_id
+            field: task_id
+        value:
+          field: task_duration
+      - metric: 'dag_processing.last_duration.<dag_file>'
+        labels:
+          - attr: dag_file
+            field: dag_file
+        value:
+          field: dag_last_duration
+      - metric: 'dagrun.duration.success.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: success_dag_duration
+      - metric: 'dagrun.duration.failed.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: failed_dag_duration
+      - metric: 'dagrun.schedule_delay.<dag_id>'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_schedule_delay
+      - metric: 'scheduler.critical_section_duration'
+        value:
+          field: scheduler_critical_section_duration
+      - metric: 'dagrun.<dag_id>.first_task_scheduling_delay'
+        labels:
+          - attr: dag_id
+            field: dag_id
+        value:
+          field: dag_first_task_scheduling_delay
+processors:
+  - add_fields:
+      when:
+        has_fields: ["airflow.failed_dag_duration"]
+      target: ''
+      fields:
+        airflow.status: failure
+  - add_fields:
+      when:
+        has_fields: ["airflow.success_dag_duration"]
+      target: ''
+      fields:
+        airflow.status: success
+  - rename:
+      fields:
+        - from: airflow.failed_dag_duration
+          to: airflow.dag_duration
+        - from: airflow.success_dag_duration
+          to: airflow.dag_duration
+      ignore_missing: true
+      fail_on_error: false

@@ -23,6 +23,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:0HUQbshhYbATQXDHv/ysOs0DlZA=",
+        "network.direction": "internal",
         "network.protocol": "mysql",
         "network.transport": "tcp",
         "related.ip": [

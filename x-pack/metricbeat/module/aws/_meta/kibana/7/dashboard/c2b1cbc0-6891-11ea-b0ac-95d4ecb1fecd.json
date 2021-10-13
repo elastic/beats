@@ -1,0 +1,320 @@
+{
+    "attributes": {
+        "description": "Overview of AWS NAT Gateway Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "346ce7bf-e1af-4e0d-856b-5aa412903167",
+                    "w": 7,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "346ce7bf-e1af-4e0d-856b-5aa412903167",
+                "panelRefName": "panel_346ce7bf-e1af-4e0d-856b-5aa412903167",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "19a9f053-a548-4e9d-a257-45932c3b73a5",
+                    "w": 8,
+                    "x": 7,
+                    "y": 0
+                },
+                "panelIndex": "19a9f053-a548-4e9d-a257-45932c3b73a5",
+                "panelRefName": "panel_19a9f053-a548-4e9d-a257-45932c3b73a5",
+                "title": "Error Port Allocation",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "a7a70775-f4ad-4323-b13c-9c9a3bf1bdf3",
+                    "w": 8,
+                    "x": 15,
+                    "y": 0
+                },
+                "panelIndex": "a7a70775-f4ad-4323-b13c-9c9a3bf1bdf3",
+                "panelRefName": "panel_a7a70775-f4ad-4323-b13c-9c9a3bf1bdf3",
+                "title": "Packets Drop",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "b5fe853e-d5b0-4918-93ec-8be70f2881a8",
+                    "w": 8,
+                    "x": 23,
+                    "y": 0
+                },
+                "panelIndex": "b5fe853e-d5b0-4918-93ec-8be70f2881a8",
+                "panelRefName": "panel_b5fe853e-d5b0-4918-93ec-8be70f2881a8",
+                "title": "Total Connection Established",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "33663eae-1bc3-47d4-a9fc-3cd2b43c66ef",
+                    "w": 17,
+                    "x": 31,
+                    "y": 0
+                },
+                "panelIndex": "33663eae-1bc3-47d4-a9fc-3cd2b43c66ef",
+                "panelRefName": "panel_33663eae-1bc3-47d4-a9fc-3cd2b43c66ef",
+                "title": "Active Connection Count",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "4e454740-281a-43b1-92f4-8dd2e37e184f",
+                    "w": 24,
+                    "x": 0,
+                    "y": 11
+                },
+                "panelIndex": "4e454740-281a-43b1-92f4-8dd2e37e184f",
+                "panelRefName": "panel_4e454740-281a-43b1-92f4-8dd2e37e184f",
+                "title": "Bytes In From Destination",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "f40587a4-47f1-494a-b8b9-33365ce34d2f",
+                    "w": 24,
+                    "x": 24,
+                    "y": 11
+                },
+                "panelIndex": "f40587a4-47f1-494a-b8b9-33365ce34d2f",
+                "panelRefName": "panel_f40587a4-47f1-494a-b8b9-33365ce34d2f",
+                "title": "Bytes In From Source",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "00075068-bf27-49e1-8beb-d5572500205b",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "00075068-bf27-49e1-8beb-d5572500205b",
+                "panelRefName": "panel_00075068-bf27-49e1-8beb-d5572500205b",
+                "title": "Bytes Out To Destination",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "c95ab156-9118-4c3c-94ee-55b4c9f5589c",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "c95ab156-9118-4c3c-94ee-55b4c9f5589c",
+                "panelRefName": "panel_c95ab156-9118-4c3c-94ee-55b4c9f5589c",
+                "title": "Bytes Out To Source",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "f7c6e3f7-419d-43ff-a2bb-d5931371f347",
+                    "w": 24,
+                    "x": 0,
+                    "y": 37
+                },
+                "panelIndex": "f7c6e3f7-419d-43ff-a2bb-d5931371f347",
+                "panelRefName": "panel_f7c6e3f7-419d-43ff-a2bb-d5931371f347",
+                "title": "Packets In From Destination",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "dcc56438-240a-45a4-81ec-a54be3d27c43",
+                    "w": 24,
+                    "x": 24,
+                    "y": 37
+                },
+                "panelIndex": "dcc56438-240a-45a4-81ec-a54be3d27c43",
+                "panelRefName": "panel_dcc56438-240a-45a4-81ec-a54be3d27c43",
+                "title": "Packets In From Source",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "db77d690-f343-4dc2-8695-d45a03361e01",
+                    "w": 24,
+                    "x": 0,
+                    "y": 50
+                },
+                "panelIndex": "db77d690-f343-4dc2-8695-d45a03361e01",
+                "panelRefName": "panel_db77d690-f343-4dc2-8695-d45a03361e01",
+                "title": "Packets Out To Destination",
+                "type": "visualization",
+                "version": "7.6.1"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "d882a862-87aa-4169-9dc3-0591252fa736",
+                    "w": 24,
+                    "x": 24,
+                    "y": 50
+                },
+                "panelIndex": "d882a862-87aa-4169-9dc3-0591252fa736",
+                "panelRefName": "panel_d882a862-87aa-4169-9dc3-0591252fa736",
+                "title": "Packets Out To Source",
+                "type": "visualization",
+                "version": "7.6.1"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] NATGateway Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "c2b1cbc0-6891-11ea-b0ac-95d4ecb1fecd",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "8345d580-6891-11ea-b0ac-95d4ecb1fecd",
+            "name": "346ce7bf-e1af-4e0d-856b-5aa412903167:panel_346ce7bf-e1af-4e0d-856b-5aa412903167",
+            "type": "visualization"
+        },
+        {
+            "id": "ce7445c0-688f-11ea-b0ac-95d4ecb1fecd",
+            "name": "19a9f053-a548-4e9d-a257-45932c3b73a5:panel_19a9f053-a548-4e9d-a257-45932c3b73a5",
+            "type": "visualization"
+        },
+        {
+            "id": "9bf8e1e0-6890-11ea-b0ac-95d4ecb1fecd",
+            "name": "a7a70775-f4ad-4323-b13c-9c9a3bf1bdf3:panel_a7a70775-f4ad-4323-b13c-9c9a3bf1bdf3",
+            "type": "visualization"
+        },
+        {
+            "id": "68970b10-6890-11ea-b0ac-95d4ecb1fecd",
+            "name": "b5fe853e-d5b0-4918-93ec-8be70f2881a8:panel_b5fe853e-d5b0-4918-93ec-8be70f2881a8",
+            "type": "visualization"
+        },
+        {
+            "id": "c186b610-688d-11ea-b0ac-95d4ecb1fecd",
+            "name": "33663eae-1bc3-47d4-a9fc-3cd2b43c66ef:panel_33663eae-1bc3-47d4-a9fc-3cd2b43c66ef",
+            "type": "visualization"
+        },
+        {
+            "id": "b36532e0-688e-11ea-b0ac-95d4ecb1fecd",
+            "name": "4e454740-281a-43b1-92f4-8dd2e37e184f:panel_4e454740-281a-43b1-92f4-8dd2e37e184f",
+            "type": "visualization"
+        },
+        {
+            "id": "bc5dcc90-688e-11ea-b0ac-95d4ecb1fecd",
+            "name": "f40587a4-47f1-494a-b8b9-33365ce34d2f:panel_f40587a4-47f1-494a-b8b9-33365ce34d2f",
+            "type": "visualization"
+        },
+        {
+            "id": "e0e65e60-688e-11ea-b0ac-95d4ecb1fecd",
+            "name": "00075068-bf27-49e1-8beb-d5572500205b:panel_00075068-bf27-49e1-8beb-d5572500205b",
+            "type": "visualization"
+        },
+        {
+            "id": "c7d6cf90-688e-11ea-b0ac-95d4ecb1fecd",
+            "name": "c95ab156-9118-4c3c-94ee-55b4c9f5589c:panel_c95ab156-9118-4c3c-94ee-55b4c9f5589c",
+            "type": "visualization"
+        },
+        {
+            "id": "bdb8ddd0-6890-11ea-b0ac-95d4ecb1fecd",
+            "name": "f7c6e3f7-419d-43ff-a2bb-d5931371f347:panel_f7c6e3f7-419d-43ff-a2bb-d5931371f347",
+            "type": "visualization"
+        },
+        {
+            "id": "c84ed3d0-6890-11ea-b0ac-95d4ecb1fecd",
+            "name": "dcc56438-240a-45a4-81ec-a54be3d27c43:panel_dcc56438-240a-45a4-81ec-a54be3d27c43",
+            "type": "visualization"
+        },
+        {
+            "id": "08645080-6891-11ea-b0ac-95d4ecb1fecd",
+            "name": "db77d690-f343-4dc2-8695-d45a03361e01:panel_db77d690-f343-4dc2-8695-d45a03361e01",
+            "type": "visualization"
+        },
+        {
+            "id": "fd915180-6890-11ea-b0ac-95d4ecb1fecd",
+            "name": "d882a862-87aa-4169-9dc3-0591252fa736:panel_d882a862-87aa-4169-9dc3-0591252fa736",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:32.666Z",
+    "version": "WzMzODAsMV0="
+}

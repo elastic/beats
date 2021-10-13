@@ -1,0 +1,130 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e350c9e6-e6b7-40f1-83ed-94a38ed9467a": {
+                            "columnOrder": [
+                                "55121be2-80f6-407c-9352-3e13705ac860",
+                                "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                                "5b846eff-5ca7-45b0-b4c2-0346e9986302"
+                            ],
+                            "columns": {
+                                "55121be2-80f6-407c-9352-3e13705ac860": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "10s"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "5b846eff-5ca7-45b0-b4c2-0346e9986302": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Container Memory Usage Pct",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 2
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.memory.usage.pct"
+                                },
+                                "eb452b61-bf12-46c0-afae-c0f1c776156c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "container identifier",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "5b846eff-5ca7-45b0-b4c2-0346e9986302",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "awsfargate.task_stats.identifier"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "5b846eff-5ca7-45b0-b4c2-0346e9986302"
+                        ],
+                        "layerId": "e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "eb452b61-bf12-46c0-afae-c0f1c776156c",
+                        "xAccessor": "55121be2-80f6-407c-9352-3e13705ac860"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                }
+            }
+        },
+        "title": "Container Memory Usage Pct [Metricbeat AWSFargate]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "d3f3aa80-2e8d-11eb-a417-f961313c14f6",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e350c9e6-e6b7-40f1-83ed-94a38ed9467a",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0ODMsMV0="
+}

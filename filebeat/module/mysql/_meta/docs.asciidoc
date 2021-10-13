@@ -3,6 +3,8 @@
 
 == MySQL module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses the slow logs and error logs
 created by https://www.mysql.com/[MySQL].
 

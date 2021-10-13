@@ -67,9 +67,6 @@ func TestTLSSANIPConnection(t *testing.T) {
 }
 
 func TestTLSHostname(t *testing.T) {
-	if runtime.GOOS == "windows" && bits.UintSize == 32 {
-		t.Skip("flaky test: https://github.com/elastic/beats/issues/25857")
-	}
 	ip, port, cert, certFile, teardown := setupTLSTestServer(t)
 	defer teardown()
 

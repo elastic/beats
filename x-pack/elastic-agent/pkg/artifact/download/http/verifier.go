@@ -19,6 +19,7 @@ import (
 
 	"golang.org/x/crypto/openpgp"
 
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/artifact"
@@ -46,12 +47,19 @@ func NewVerifier(config *artifact.Config, allowEmptyPgp bool, pgp []byte) (*Veri
 		return nil, errors.New("expecting PGP but retrieved none", errors.TypeSecurity)
 	}
 
-	client := http.Client{Timeout: config.Timeout}
-	rtt := withHeaders(client.Transport, headers)
-	client.Transport = rtt
+	client, err := config.HTTPTransportSettings.Client(
+		httpcommon.WithAPMHTTPInstrumentation(),
+		httpcommon.WithModRoundtripper(func(rt http.RoundTripper) http.RoundTripper {
+			return withHeaders(rt, headers)
+		}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
 	v := &Verifier{
 		config:        config,
-		client:        client,
+		client:        *client,
 		allowEmptyPgp: allowEmptyPgp,
 		pgpBytes:      pgp,
 	}

@@ -38,7 +38,6 @@ func TestEnroll(t *testing.T) {
 				require.NoError(t, err)
 
 				require.Equal(t, PermanentEnroll, req.Type)
-				require.Equal(t, "im-a-beat", req.SharedID)
 				require.Equal(t, make(map[string]interface{}), req.Metadata.UserProvided)
 				require.Equal(t, "linux", req.Metadata.Local.OS.Name)
 
@@ -73,7 +72,6 @@ func TestEnroll(t *testing.T) {
 			req := &EnrollRequest{
 				Type:         PermanentEnroll,
 				EnrollAPIKey: "my-enrollment-api-key",
-				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),
@@ -109,7 +107,6 @@ func TestEnroll(t *testing.T) {
 			req := &EnrollRequest{
 				Type:         PermanentEnroll,
 				EnrollAPIKey: "my-enrollment-api-key",
-				SharedID:     "im-a-beat",
 				Metadata: Metadata{
 					Local:        testMetadata(),
 					UserProvided: make(map[string]interface{}),

@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/magefile/mage/sh"
 	"github.com/pkg/errors"
 )
 
@@ -59,19 +58,6 @@ func KibanaDashboards(moduleDirs ...string) error {
 				return err
 			}
 		}
-	}
-
-	esBeatsDir, err := ElasticBeatsDir()
-	if err != nil {
-		return err
-	}
-
-	// Convert 7.x dashboards to strings.
-	err = sh.Run(pythonExe,
-		filepath.Join(esBeatsDir, "libbeat/scripts/unpack_dashboards.py"),
-		"--glob="+filepath.Join(kibanaBuildDir, "7/dashboard/*.json"))
-	if err != nil {
-		return err
 	}
 
 	return nil

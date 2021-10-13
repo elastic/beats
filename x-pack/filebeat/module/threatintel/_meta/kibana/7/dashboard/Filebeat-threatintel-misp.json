@@ -1,2099 +1,350 @@
 {
-  "objects": [
-    {
-      "attributes": {
+    "attributes": {
         "description": "MISP indicators ingested by the threat intel Filebeat module.",
         "hits": 0,
         "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
             }
-          }
         },
         "optionsJSON": {
-          "hidePanelTitles": false,
-          "useMargins": true
+            "hidePanelTitles": false,
+            "useMargins": true
         },
         "panelsJSON": [
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 589
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 589
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "dddbb2ed-b025-4bc3-b3a1-16f834da532b",
+                    "w": 15,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "dddbb2ed-b025-4bc3-b3a1-16f834da532b",
+                "panelRefName": "panel_0",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "dddbb2ed-b025-4bc3-b3a1-16f834da532b",
-              "w": 15,
-              "x": 0,
-              "y": 0
-            },
-            "panelIndex": "dddbb2ed-b025-4bc3-b3a1-16f834da532b",
-            "panelRefName": "panel_0",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 370
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 370
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "bb692014-ed24-441d-a717-d40025f46602",
+                    "w": 10,
+                    "x": 15,
+                    "y": 0
+                },
+                "panelIndex": "bb692014-ed24-441d-a717-d40025f46602",
+                "panelRefName": "panel_1",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "bb692014-ed24-441d-a717-d40025f46602",
-              "w": 10,
-              "x": 15,
-              "y": 0
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "fcc0d72f-70ee-4fac-b859-77326444f472",
+                    "w": 14,
+                    "x": 25,
+                    "y": 0
+                },
+                "panelIndex": "fcc0d72f-70ee-4fac-b859-77326444f472",
+                "panelRefName": "panel_2",
+                "version": "7.11.0"
             },
-            "panelIndex": "bb692014-ed24-441d-a717-d40025f46602",
-            "panelRefName": "panel_1",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a3b70237-fbd4-43c6-96b6-ffb3c9266b55",
+                    "w": 9,
+                    "x": 39,
+                    "y": 0
+                },
+                "panelIndex": "a3b70237-fbd4-43c6-96b6-ffb3c9266b55",
+                "panelRefName": "panel_3",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "fcc0d72f-70ee-4fac-b859-77326444f472",
-              "w": 14,
-              "x": 25,
-              "y": 0
-            },
-            "panelIndex": "fcc0d72f-70ee-4fac-b859-77326444f472",
-            "panelRefName": "panel_2",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "a3b70237-fbd4-43c6-96b6-ffb3c9266b55",
-              "w": 9,
-              "x": 39,
-              "y": 0
-            },
-            "panelIndex": "a3b70237-fbd4-43c6-96b6-ffb3c9266b55",
-            "panelRefName": "panel_3",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "table": null,
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 814
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": null,
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 814
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "c34da3b4-e3d8-4ade-85f2-1f2195aa9cdc",
+                    "w": 19,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "c34da3b4-e3d8-4ade-85f2-1f2195aa9cdc",
+                "panelRefName": "panel_4",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "c34da3b4-e3d8-4ade-85f2-1f2195aa9cdc",
-              "w": 19,
-              "x": 0,
-              "y": 18
-            },
-            "panelIndex": "c34da3b4-e3d8-4ade-85f2-1f2195aa9cdc",
-            "panelRefName": "panel_4",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 451
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 451
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "c23a8d34-62e3-42f2-912b-120251392d03",
+                    "w": 12,
+                    "x": 19,
+                    "y": 18
+                },
+                "panelIndex": "c23a8d34-62e3-42f2-912b-120251392d03",
+                "panelRefName": "panel_5",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "c23a8d34-62e3-42f2-912b-120251392d03",
-              "w": 12,
-              "x": 19,
-              "y": 18
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a9e87eb5-f981-472c-9fb1-00f956c7ca1e",
+                    "w": 9,
+                    "x": 31,
+                    "y": 18
+                },
+                "panelIndex": "a9e87eb5-f981-472c-9fb1-00f956c7ca1e",
+                "panelRefName": "panel_6",
+                "version": "7.11.0"
             },
-            "panelIndex": "c23a8d34-62e3-42f2-912b-120251392d03",
-            "panelRefName": "panel_5",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "a47d65d3-01ef-4488-9c0d-2fbd23b923ad",
+                    "w": 8,
+                    "x": 40,
+                    "y": 18
+                },
+                "panelIndex": "a47d65d3-01ef-4488-9c0d-2fbd23b923ad",
+                "panelRefName": "panel_7",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "a9e87eb5-f981-472c-9fb1-00f956c7ca1e",
-              "w": 9,
-              "x": 31,
-              "y": 18
-            },
-            "panelIndex": "a9e87eb5-f981-472c-9fb1-00f956c7ca1e",
-            "panelRefName": "panel_6",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "a47d65d3-01ef-4488-9c0d-2fbd23b923ad",
-              "w": 8,
-              "x": 40,
-              "y": 18
-            },
-            "panelIndex": "a47d65d3-01ef-4488-9c0d-2fbd23b923ad",
-            "panelRefName": "panel_7",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 324
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 324
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "c4010d5b-9082-453d-90a1-a4bc629f62a7",
+                    "w": 10,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "c4010d5b-9082-453d-90a1-a4bc629f62a7",
+                "panelRefName": "panel_8",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "c4010d5b-9082-453d-90a1-a4bc629f62a7",
-              "w": 10,
-              "x": 0,
-              "y": 36
-            },
-            "panelIndex": "c4010d5b-9082-453d-90a1-a4bc629f62a7",
-            "panelRefName": "panel_8",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 371
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 371
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "e59a30c1-97bb-4f16-81ba-9a9dc705fed6",
+                    "w": 12,
+                    "x": 10,
+                    "y": 36
+                },
+                "panelIndex": "e59a30c1-97bb-4f16-81ba-9a9dc705fed6",
+                "panelRefName": "panel_9",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "e59a30c1-97bb-4f16-81ba-9a9dc705fed6",
-              "w": 12,
-              "x": 10,
-              "y": 36
-            },
-            "panelIndex": "e59a30c1-97bb-4f16-81ba-9a9dc705fed6",
-            "panelRefName": "panel_9",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {},
-              "vis": {
-                "params": {
-                  "colWidth": [
-                    {
-                      "colIndex": 0,
-                      "width": 600.5
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "colWidth": [
+                                {
+                                    "colIndex": 0,
+                                    "width": 600.5
+                                }
+                            ]
+                        }
                     }
-                  ]
-                }
-              }
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "1309e7f5-8554-4265-a8c4-9f8f00db8299",
+                    "w": 14,
+                    "x": 22,
+                    "y": 36
+                },
+                "panelIndex": "1309e7f5-8554-4265-a8c4-9f8f00db8299",
+                "panelRefName": "panel_10",
+                "version": "7.11.0"
             },
-            "gridData": {
-              "h": 18,
-              "i": "1309e7f5-8554-4265-a8c4-9f8f00db8299",
-              "w": 14,
-              "x": 22,
-              "y": 36
-            },
-            "panelIndex": "1309e7f5-8554-4265-a8c4-9f8f00db8299",
-            "panelRefName": "panel_10",
-            "version": "7.11.0"
-          },
-          {
-            "embeddableConfig": {
-              "enhancements": {}
-            },
-            "gridData": {
-              "h": 18,
-              "i": "42cec04d-ab8e-4aa2-a78b-7c6a6d8b8798",
-              "w": 12,
-              "x": 36,
-              "y": 36
-            },
-            "panelIndex": "42cec04d-ab8e-4aa2-a78b-7c6a6d8b8798",
-            "panelRefName": "panel_11",
-            "version": "7.11.0"
-          }
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 18,
+                    "i": "42cec04d-ab8e-4aa2-a78b-7c6a6d8b8798",
+                    "w": 12,
+                    "x": 36,
+                    "y": 36
+                },
+                "panelIndex": "42cec04d-ab8e-4aa2-a78b-7c6a6d8b8798",
+                "panelRefName": "panel_11",
+                "version": "7.11.0"
+            }
         ],
         "timeRestore": false,
         "title": "[Filebeat Threat Intel] MISP",
         "version": 1
-      },
-      "id": "47e6fdc0-76b9-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "dashboard": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "7582b030-73c6-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_0",
-          "type": "visualization"
-        },
-        {
-          "id": "a09329d0-73c6-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_1",
-          "type": "visualization"
-        },
-        {
-          "id": "7c7d3750-73c3-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_2",
-          "type": "visualization"
-        },
-        {
-          "id": "418e5a30-73c2-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_3",
-          "type": "visualization"
-        },
-        {
-          "id": "c102b0f0-73c6-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_4",
-          "type": "visualization"
-        },
-        {
-          "id": "55b5c280-76b7-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_5",
-          "type": "visualization"
-        },
-        {
-          "id": "ad55b1e0-73c8-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_6",
-          "type": "visualization"
-        },
-        {
-          "id": "bf3dfde0-73c3-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_7",
-          "type": "visualization"
-        },
-        {
-          "id": "ec68c4a0-73c6-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_8",
-          "type": "visualization"
-        },
-        {
-          "id": "02294f80-73c7-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_9",
-          "type": "visualization"
-        },
-        {
-          "id": "1c969990-73c7-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_10",
-          "type": "visualization"
-        },
-        {
-          "id": "57faae10-73c5-11eb-a3e3-b3cc7c78a70f",
-          "name": "panel_11",
-          "type": "visualization"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "dashboard",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjMsMl0="
     },
-    {
-      "attributes": {
-        "description": "MISP domain indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.domain"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.domain",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Domain Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP Domain Indicator",
-                "field": "threatintel.indicator.domain",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP Domain Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "7582b030-73c6-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTIsMl0="
+    "coreMigrationVersion": "8.0.0",
+    "id": "47e6fdc0-76b9-11eb-a3e3-b3cc7c78a70f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
     },
-    {
-      "attributes": {
-        "description": "MISP IP indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.ip"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.ip",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
+    "references": [
+        {
+            "id": "7582b030-73c6-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_0",
+            "type": "visualization"
         },
-        "savedSearchRefName": "search_0",
-        "title": "MISP IP Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP IP Indicator",
-                "field": "threatintel.indicator.ip",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP IP Indicators [Filebeat Threat Intel]",
-          "type": "table"
+        {
+            "id": "a09329d0-73c6-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "7c7d3750-73c3-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "418e5a30-73c2-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "c102b0f0-73c6-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "55b5c280-76b7-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "ad55b1e0-73c8-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "bf3dfde0-73c3-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "ec68c4a0-73c6-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "02294f80-73c7-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "1c969990-73c7-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "57faae10-73c5-11eb-a3e3-b3cc7c78a70f",
+            "name": "panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
         }
-      },
-      "id": "a09329d0-73c6-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTMsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Types of MISP indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.type"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.type",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Indicator Type [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "threatintel.indicator.type",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "MISP Indicator Type [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "7c7d3750-73c3-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTQsMl0="
-    },
-    {
-      "attributes": {
-        "description": "Total number of Abuse URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {
-                "customLabel": "MISP Indicators"
-              },
-              "schema": "metric",
-              "type": "count"
-            }
-          ],
-          "params": {
-            "addLegend": false,
-            "addTooltip": true,
-            "metric": {
-              "colorSchema": "Green to Red",
-              "colorsRange": [
-                {
-                  "from": 0,
-                  "to": 10000
-                }
-              ],
-              "invertColors": false,
-              "labels": {
-                "show": true
-              },
-              "metricColorMode": "None",
-              "percentageMode": false,
-              "style": {
-                "bgColor": false,
-                "bgFill": "#000",
-                "fontSize": 60,
-                "labelColor": false,
-                "subText": ""
-              },
-              "useRanges": false
-            },
-            "type": "metric"
-          },
-          "title": "MISP Indicators [Filebeat Threat Intel]",
-          "type": "metric"
-        }
-      },
-      "id": "418e5a30-73c2-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTUsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP URL indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.url.full"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.url.full",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP URL Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP URL Indicator",
-                "field": "threatintel.indicator.url.full",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP URL Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "c102b0f0-73c6-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTYsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP tags for indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "tags"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "tags",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Tags [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP Tags",
-                "field": "tags",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP Tags [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "55b5c280-76b7-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNDIsMl0="
-    },
-    {
-      "attributes": {
-        "description": "TLP of MISP indicators ingested by the threat intel Filebeat module. Top 10 datasets.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Indicator TLP [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "green": "#7EB26D",
-              "white": "#E0F9D7"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "Indicator Marking TLP",
-                "field": "threatintel.indicator.marking.tlp",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "segment",
-              "type": "terms"
-            },
-            {
-              "enabled": true,
-              "id": "3",
-              "params": {
-                "field": "threatintel.indicator.marking.tlp",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "group",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTimeMarker": false,
-            "addTooltip": true,
-            "categoryAxes": [
-              {
-                "id": "CategoryAxis-1",
-                "labels": {
-                  "filter": true,
-                  "show": true,
-                  "truncate": 100
-                },
-                "position": "bottom",
-                "scale": {
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {},
-                "type": "category"
-              }
-            ],
-            "grid": {
-              "categoryLines": false
-            },
-            "labels": {
-              "show": true
-            },
-            "legendPosition": "right",
-            "seriesParams": [
-              {
-                "data": {
-                  "id": "1",
-                  "label": "Count"
-                },
-                "drawLinesBetweenPoints": true,
-                "lineWidth": 2,
-                "mode": "stacked",
-                "show": true,
-                "showCircles": true,
-                "type": "histogram",
-                "valueAxis": "ValueAxis-1"
-              }
-            ],
-            "thresholdLine": {
-              "color": "#E7664C",
-              "show": false,
-              "style": "full",
-              "value": 10,
-              "width": 1
-            },
-            "times": [],
-            "type": "histogram",
-            "valueAxes": [
-              {
-                "id": "ValueAxis-1",
-                "labels": {
-                  "filter": false,
-                  "rotate": 0,
-                  "show": true,
-                  "truncate": 100
-                },
-                "name": "LeftAxis-1",
-                "position": "left",
-                "scale": {
-                  "mode": "normal",
-                  "type": "linear"
-                },
-                "show": true,
-                "style": {},
-                "title": {
-                  "text": "Count"
-                },
-                "type": "value"
-              }
-            ]
-          },
-          "title": "MISP Indicator TLP [Filebeat Threat Intel]",
-          "type": "histogram"
-        }
-      },
-      "id": "ad55b1e0-73c8-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTcsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP indicator ingested by the threat intel Filebeat module has been published.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.misp.published"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.misp.published",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Indicator Published [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "true": "#7EB26D"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "threatintel.misp.published",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 3
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": false,
-            "labels": {
-              "last_level": true,
-              "show": true,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "MISP Indicator Published [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "bf3dfde0-73c3-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTgsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP MD5 hash indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.file.hash.md5"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.file.hash.md5",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP MD5 Hash Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP MD5 Hash Indicator",
-                "field": "threatintel.indicator.file.hash.md5",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP MD5 Hash Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "ec68c4a0-73c6-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNTksMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP SHA1 hash indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.file.hash.sha1"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.file.hash.sha1",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP SHA1 Hash Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP SHA1 Hash Indicator",
-                "field": "threatintel.indicator.file.hash.sha1",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP SHA1 Hash Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "02294f80-73c7-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjAsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP SHA256 hash indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.file.hash.sha256"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.file.hash.sha256",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP SHA256 Hash Indicators [Filebeat Threat Intel]",
-        "uiStateJSON": {},
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "customLabel": "MISP SHA256 Hash Indicator",
-                "field": "threatintel.indicator.file.hash.sha256",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "bucket",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "perPage": 10,
-            "percentageCol": "",
-            "showMetricsAtAllLevels": false,
-            "showPartialRows": false,
-            "showToolbar": false,
-            "showTotal": false,
-            "totalFunc": "sum"
-          },
-          "title": "MISP SHA256 Hash Indicators [Filebeat Threat Intel]",
-          "type": "table"
-        }
-      },
-      "id": "1c969990-73c7-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjEsMl0="
-    },
-    {
-      "attributes": {
-        "description": "MISP provider for indicators ingested by the threat intel Filebeat module.",
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.dataset",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel.misp"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.dataset": "threatintel.misp"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "exists": {
-                  "field": "threatintel.indicator.provider"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "threatintel.indicator.provider",
-                  "negate": false,
-                  "type": "exists",
-                  "value": "exists"
-                }
-              }
-            ],
-            "query": {
-              "language": "kuery",
-              "query": ""
-            }
-          }
-        },
-        "savedSearchRefName": "search_0",
-        "title": "MISP Indicator Provider [Filebeat Threat Intel]",
-        "uiStateJSON": {
-          "vis": {
-            "colors": {
-              "misp": "#5195CE"
-            }
-          }
-        },
-        "version": 1,
-        "visState": {
-          "aggs": [
-            {
-              "enabled": true,
-              "id": "1",
-              "params": {},
-              "schema": "metric",
-              "type": "count"
-            },
-            {
-              "enabled": true,
-              "id": "2",
-              "params": {
-                "field": "threatintel.indicator.provider",
-                "missingBucket": false,
-                "missingBucketLabel": "Missing",
-                "order": "desc",
-                "orderBy": "1",
-                "otherBucket": false,
-                "otherBucketLabel": "Other",
-                "size": 10
-              },
-              "schema": "segment",
-              "type": "terms"
-            }
-          ],
-          "params": {
-            "addLegend": true,
-            "addTooltip": true,
-            "isDonut": true,
-            "labels": {
-              "last_level": true,
-              "show": false,
-              "truncate": 100,
-              "values": true
-            },
-            "legendPosition": "right",
-            "type": "pie"
-          },
-          "title": "MISP Indicator Provider [Filebeat Threat Intel]",
-          "type": "pie"
-        }
-      },
-      "id": "57faae10-73c5-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "visualization": "7.11.0"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-          "name": "search_0",
-          "type": "search"
-        },
-        {
-          "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-          "type": "tag"
-        }
-      ],
-      "type": "visualization",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyNjIsMl0="
-    },
-    {
-      "attributes": {
-        "color": "#a548ae",
-        "description": "Tag for indicators ingested by the Threat Intel Filebeat module.",
-        "name": "threat intel"
-      },
-      "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
-      "namespaces": [
-        "default"
-      ],
-      "references": [],
-      "type": "tag",
-      "updated_at": "2021-03-10T19:01:18.125Z",
-      "version": "WzIyMTcsMl0="
-    },
-    {
-      "attributes": {
-        "columns": [
-          "_source"
-        ],
-        "description": "",
-        "hits": 0,
-        "kibanaSavedObjectMeta": {
-          "searchSourceJSON": {
-            "filter": [
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                  "key": "event.module",
-                  "negate": false,
-                  "params": {
-                    "query": "threatintel"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.module": "threatintel"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-                  "key": "event.category",
-                  "negate": false,
-                  "params": {
-                    "query": "threat"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.category": "threat"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-                  "key": "event.kind",
-                  "negate": false,
-                  "params": {
-                    "query": "enrichment"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.kind": "enrichment"
-                  }
-                }
-              },
-              {
-                "$state": {
-                  "store": "appState"
-                },
-                "meta": {
-                  "alias": null,
-                  "disabled": false,
-                  "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-                  "key": "event.type",
-                  "negate": false,
-                  "params": {
-                    "query": "indicator"
-                  },
-                  "type": "phrase"
-                },
-                "query": {
-                  "match_phrase": {
-                    "event.type": "indicator"
-                  }
-                }
-              }
-            ],
-            "highlightAll": true,
-            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
-            "query": {
-              "language": "kuery",
-              "query": ""
-            },
-            "version": true
-          }
-        },
-        "sort": [],
-        "title": "All Logs [Filebeat Threat Intel] ECS",
-        "version": 1
-      },
-      "id": "6acbb070-72d0-11eb-a3e3-b3cc7c78a70f",
-      "migrationVersion": {
-        "search": "7.9.3"
-      },
-      "namespaces": [
-        "default"
-      ],
-      "references": [
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-          "type": "index-pattern"
-        },
-        {
-          "id": "filebeat-*",
-          "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[3].meta.index",
-          "type": "index-pattern"
-        }
-      ],
-      "type": "search",
-      "updated_at": "2021-03-10T19:01:19.048Z",
-      "version": "WzIyMTksMl0="
-    }
-  ],
-  "version": "7.11.1"
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:34:31.083Z",
+    "version": "WzQ2MzEsMV0="
 }

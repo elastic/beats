@@ -199,7 +199,6 @@ func makeOptions(cfg Config) []zap.Option {
 	if cfg.ECSEnabled {
 		fields := []zap.Field{
 			zap.String("service.name", cfg.Beat),
-			zap.String("event.dataset", cfg.LogFilename()),
 		}
 		options = append(options, zap.Fields(fields...))
 	}

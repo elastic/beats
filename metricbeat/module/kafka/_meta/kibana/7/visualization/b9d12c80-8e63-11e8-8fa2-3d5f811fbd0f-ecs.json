@@ -1,0 +1,112 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "id": "8b27e6a0-8e61-11e8-b741-c3e458b74a68"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "NOT kafka.topic.name:__consumer_offsets"
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "bar",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": "0.1",
+                        "filter": {
+                            "language": "lucene",
+                            "query": "metricset.name: partition AND kafka.partition.partition.is_leader: true"
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Topic Offsets",
+                        "line_width": "0.5",
+                        "metrics": [
+                            {
+                                "field": "kafka.partition.offset.newest",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": "0",
+                        "seperate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kafka.topic.name",
+                        "terms_order_by": "_term",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,0.52)",
+                        "fill": "0",
+                        "filter": {
+                            "language": "lucene",
+                            "query": "metricset.name: consumergroup"
+                        },
+                        "formatter": "number",
+                        "id": "d43034c0-8f1e-11e8-8784-cd0acd161a28",
+                        "label": "Consumer Offsets",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "kafka.consumergroup.offset",
+                                "id": "d43034c1-8f1e-11e8-8784-cd0acd161a28",
+                                "type": "sum"
+                            }
+                        ],
+                        "point_size": "1.5",
+                        "seperate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_filters": [
+                            {
+                                "color": "#68BC00",
+                                "id": "dd41ada0-8f1e-11e8-8784-cd0acd161a28"
+                            }
+                        ],
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kafka.consumergroup.id",
+                        "terms_order_by": "_term",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Kafka Topic & Consumer Offsets [Metricbeat Kafka] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:34.185Z",
+    "version": "WzM5ODksMV0="
+}

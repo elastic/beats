@@ -19,7 +19,6 @@ package log
 
 import (
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
@@ -32,22 +31,26 @@ import (
 var (
 	prevSnap = monitoring.FlatSnapshot{
 		Ints: map[string]int64{
-			"count": 10,
-			"gone":  1,
+			"count":        10,
+			"gone":         1,
+			"active_gauge": 6,
 		},
 		Floats: map[string]float64{
-			"system.load.1": 2.0,
-			"float_counter": 1,
+			"system.load.1":     2.0,
+			"float_counter":     1,
+			"foo.histogram.p99": 4.0,
 		},
 	}
 	curSnap = monitoring.FlatSnapshot{
 		Ints: map[string]int64{
-			"count": 20,
-			"new":   1,
+			"count":        20,
+			"new":          1,
+			"active_gauge": 5,
 		},
 		Floats: map[string]float64{
-			"system.load.1": 1.2,
-			"float_counter": 3,
+			"system.load.1":     1.2,
+			"float_counter":     3,
+			"foo.histogram.p99": 4.1,
 		},
 	}
 )
@@ -67,23 +70,27 @@ func TestMakeDeltaSnapshot(t *testing.T) {
 	assert.EqualValues(t, 1, delta.Ints["new"])
 	assert.EqualValues(t, 1.2, delta.Floats["system.load.1"])
 	assert.EqualValues(t, 2, delta.Floats["float_counter"])
+	assert.EqualValues(t, 5, delta.Ints["active_gauge"])
+	assert.EqualValues(t, 4.1, delta.Floats["foo.histogram.p99"])
 	assert.NotContains(t, delta.Ints, "gone")
 }
 
 func TestReporterLog(t *testing.T) {
 	logp.DevelopmentSetup(logp.ToObserverOutput())
-	reporter := reporter{period: 30 * time.Second, logger: logp.NewLogger("monitoring")}
+	reporter := reporter{config: defaultConfig(), logger: logp.NewLogger("monitoring")}
 
-	reporter.logSnapshot(monitoring.FlatSnapshot{})
+	reporter.logSnapshot(map[string]monitoring.FlatSnapshot{})
 	logs := logp.ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 1) {
 		assert.Equal(t, "No non-zero metrics in the last 30s", logs[0].Message)
 	}
 
 	reporter.logSnapshot(
-		monitoring.FlatSnapshot{
-			Bools: map[string]bool{
-				"running": true,
+		map[string]monitoring.FlatSnapshot{
+			"metrics": monitoring.FlatSnapshot{
+				Bools: map[string]bool{
+					"running": true,
+				},
 			},
 		},
 	)
@@ -93,10 +100,10 @@ func TestReporterLog(t *testing.T) {
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.running", true)
 	}
 
-	reporter.logTotals(curSnap)
+	reporter.logTotals(map[string]monitoring.FlatSnapshot{"metrics": curSnap})
 	logs = logp.ObserverLogs().TakeAll()
 	if assert.Len(t, logs, 2) {
-		assert.Equal(t, "Total non-zero metrics", logs[0].Message)
+		assert.Equal(t, "Total metrics", logs[0].Message)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.count", 20)
 		assertMapHas(t, logs[0].ContextMap(), "monitoring.metrics.new", 1)
 		assert.Contains(t, logs[1].Message, "Uptime: ")

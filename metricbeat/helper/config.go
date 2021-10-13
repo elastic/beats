@@ -20,21 +20,24 @@ package helper
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 )
 
 // Config for an HTTP helper
 type Config struct {
-	TLS             *tlscommon.Config `config:"ssl"`
 	ConnectTimeout  time.Duration     `config:"connect_timeout"`
-	Timeout         time.Duration     `config:"timeout"`
 	Headers         map[string]string `config:"headers"`
 	BearerTokenFile string            `config:"bearer_token_file"`
+
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
 
 func defaultConfig() Config {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 10 * time.Second
+
 	return Config{
 		ConnectTimeout: 2 * time.Second,
-		Timeout:        10 * time.Second,
+		Transport:      transport,
 	}
 }

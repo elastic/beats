@@ -5,6 +5,7 @@
 package aws
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"testing"
@@ -58,7 +59,13 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 	}
 	httpReq, _ := http.NewRequest("", "", nil)
 	return cloudwatch.ListMetricsRequest{
+		Input: input,
+		Copy:  m.ListMetricsRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "ListMetrics",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.ListMetricsOutput{
 				Metrics: []cloudwatch.Metric{
 					{
@@ -69,6 +76,7 @@ func (m *MockCloudWatchClient) ListMetricsRequest(input *cloudwatch.ListMetricsI
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
@@ -81,7 +89,13 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 	httpReq, _ := http.NewRequest("", "", nil)
 
 	return cloudwatch.GetMetricDataRequest{
+		Input: input,
+		Copy:  m.GetMetricDataRequest,
 		Request: &awssdk.Request{
+			Operation: &awssdk.Operation{
+				Name:      "GetMetricData",
+				Paginator: nil,
+			},
 			Data: &cloudwatch.GetMetricDataOutput{
 				MetricDataResults: []cloudwatch.MetricDataResult{
 					{
@@ -107,16 +121,24 @@ func (m *MockCloudWatchClient) GetMetricDataRequest(input *cloudwatch.GetMetricD
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
 	}
 }
 
 func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegroupstaggingapi.GetResourcesInput) resourcegroupstaggingapi.GetResourcesRequest {
 	httpReq, _ := http.NewRequest("", "", nil)
-	return resourcegroupstaggingapi.GetResourcesRequest{
+	op := &awssdk.Operation{
+		Name:       "GetResources",
+		HTTPMethod: "POST",
+		HTTPPath:   "/",
+		Paginator:  nil,
+	}
+	firstPageResult := resourcegroupstaggingapi.GetResourcesRequest{
 		Request: &awssdk.Request{
+			Operation: op,
 			Data: &resourcegroupstaggingapi.GetResourcesOutput{
-				PaginationToken: awssdk.String(""),
+				PaginationToken: awssdk.String("PaginationToken"),
 				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{
 					{
 						ResourceARN: awssdk.String("arn:aws:rds:eu-west-1:123456789012:db:mysql-db-1"),
@@ -147,7 +169,32 @@ func (m *MockResourceGroupsTaggingClient) GetResourcesRequest(input *resourcegro
 				},
 			},
 			HTTPRequest: httpReq,
+			Retryer:     awssdk.NoOpRetryer{},
 		},
+		Input: input,
+		Copy:  m.GetResourcesRequest,
+	}
+
+	// aws resourcegroupstaggingapi default pagination size is 50, if resource amount is a
+	// multiple of 50, then last request has an empty result.
+	lastPageWithEmptyResult := resourcegroupstaggingapi.GetResourcesRequest{
+		Request: &awssdk.Request{
+			Data: &resourcegroupstaggingapi.GetResourcesOutput{
+				PaginationToken:        awssdk.String(""),
+				ResourceTagMappingList: []resourcegroupstaggingapi.ResourceTagMapping{},
+			},
+			HTTPRequest: httpReq,
+			Operation:   op,
+			Retryer:     awssdk.NoOpRetryer{},
+		},
+		Input: input,
+		Copy:  m.GetResourcesRequest,
+	}
+
+	if input.PaginationToken == nil {
+		return firstPageResult
+	} else {
+		return lastPageWithEmptyResult
 	}
 }
 
@@ -180,7 +227,16 @@ func TestGetMetricDataPerRegion(t *testing.T) {
 
 	mockSvc := &MockCloudWatchClient{}
 	var metricDataQueries []cloudwatch.MetricDataQuery
-	getMetricDataOutput, err := getMetricDataPerRegion(metricDataQueries, nil, mockSvc, startTime, endTime)
+
+	getMetricDataInput := &cloudwatch.GetMetricDataInput{
+		NextToken:         nil,
+		StartTime:         &startTime,
+		EndTime:           &endTime,
+		MetricDataQueries: metricDataQueries,
+	}
+
+	reqGetMetricData := mockSvc.GetMetricDataRequest(getMetricDataInput)
+	getMetricDataOutput, err := reqGetMetricData.Send(context.TODO())
 	if err != nil {
 		fmt.Println("failed getMetricDataPerRegion: ", err)
 		t.FailNow()

@@ -263,8 +263,8 @@
         "source.packets": 0,
         "source.port": 46408,
         "tags": [
-            "zeek.connection",
-            "local_orig"
+            "local_orig",
+            "zeek.connection"
         ],
         "zeek.connection.history": "C",
         "zeek.connection.local_orig": true,

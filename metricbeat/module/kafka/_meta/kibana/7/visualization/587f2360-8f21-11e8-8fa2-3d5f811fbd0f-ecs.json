@@ -1,0 +1,88 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_max": "1",
+                "axis_min": "-1",
+                "axis_position": "right",
+                "filter": {
+                    "language": "lucene",
+                    "query": "NOT kafka.topic.name:__consumer_offsets"
+                },
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "hide_in_legend": 0,
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Consumer -> Partition Reassignment",
+                        "line_width": "1",
+                        "metrics": [
+                            {
+                                "field": "kafka.consumergroup.partition",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "sum"
+                            },
+                            {
+                                "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "id": "6b69c760-8f20-11e8-8927-d7e991b5b6ab",
+                                "type": "derivative",
+                                "unit": ""
+                            },
+                            {
+                                "id": "976f9d80-8f20-11e8-8927-d7e991b5b6ab",
+                                "script": "if (params.sum_partition < 0) { return -1 } else if (params.sum_partition > 0) { return 1 }",
+                                "type": "calculation",
+                                "variables": [
+                                    {
+                                        "field": "6b69c760-8f20-11e8-8927-d7e991b5b6ab",
+                                        "id": "99cc2b20-8f20-11e8-8927-d7e991b5b6ab",
+                                        "name": "sum_partition"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": "20",
+                        "seperate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "kafka.consumergroup.id",
+                        "value_template": ""
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Consumer Partition Reassignments [Metricbeat Kafka] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:34.185Z",
+    "version": "WzM5OTMsMV0="
+}

@@ -33,6 +33,11 @@ type Config struct {
 	Scheduler       Scheduler            `config:"scheduler"`
 	Autodiscover    *autodiscover.Config `config:"autodiscover"`
 	SyntheticSuites []*common.Config     `config:"synthetic_suites"`
+	Jobs            map[string]JobLimit  `config:"jobs"`
+}
+
+type JobLimit struct {
+	Limit int64 `config:"limit" validate:"min=0"`
 }
 
 // Scheduler defines the syntax of a heartbeat.yml scheduler block.

@@ -2,8 +2,14 @@
 This file is generated! See scripts/mage/docs_collector.go
 ////
 
+:modulename: haproxy
+
 [[metricbeat-module-haproxy]]
 == HAProxy module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This module collects stats from http://www.haproxy.org/[HAProxy]. It supports
 collection from TCP sockets, UNIX sockets, or HTTP with or without basic

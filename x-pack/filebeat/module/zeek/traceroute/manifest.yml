@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/traceroute.log
   - name: tags
     default: [zeek.traceroute]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/traceroute.yml

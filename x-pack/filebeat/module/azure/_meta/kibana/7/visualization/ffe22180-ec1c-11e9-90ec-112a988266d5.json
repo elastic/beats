@@ -1,0 +1,93 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "User Tag Cloud [Filebeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "azure.activitylogs.identity.claims_initiated_by_user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "bucket": {
+                    "accessor": 0,
+                    "format": {
+                        "id": "terms",
+                        "params": {
+                            "id": "string",
+                            "missingBucketLabel": "Missing",
+                            "otherBucketLabel": "Other"
+                        }
+                    },
+                    "type": "vis_dimension"
+                },
+                "maxFontSize": 32,
+                "metric": {
+                    "accessor": 1,
+                    "format": {
+                        "id": "string",
+                        "params": {}
+                    },
+                    "type": "vis_dimension"
+                },
+                "minFontSize": 12,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear",
+                "showLabel": true
+            },
+            "title": "User Tag Cloud [Filebeat Azure]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ffe22180-ec1c-11e9-90ec-112a988266d5",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:34:02.545Z",
+    "version": "WzQzOTEsMV0="
+}

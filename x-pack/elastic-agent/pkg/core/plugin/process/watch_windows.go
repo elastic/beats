@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
 // +build windows
 
 package process
@@ -26,11 +27,9 @@ func (a *Application) externalProcess(proc *os.Process) {
 	}
 
 	for {
-		select {
-		case <-time.After(1 * time.Second):
-			if isWindowsProcessExited(proc.Pid) {
-				return
-			}
+		<-time.After(1 * time.Second)
+		if isWindowsProcessExited(proc.Pid) {
+			return
 		}
 	}
 }

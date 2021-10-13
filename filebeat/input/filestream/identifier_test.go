@@ -36,7 +36,7 @@ type testFileIdentifierConfig struct {
 
 func TestFileIdentifier(t *testing.T) {
 	t.Run("default file identifier", func(t *testing.T) {
-		identifier, err := newFileIdentifier(nil)
+		identifier, err := newFileIdentifier(nil, "")
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
@@ -59,6 +59,30 @@ func TestFileIdentifier(t *testing.T) {
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
 	})
 
+	t.Run("default file identifier with suffix", func(t *testing.T) {
+		identifier, err := newFileIdentifier(nil, "my-suffix")
+		require.NoError(t, err)
+		assert.Equal(t, DefaultIdentifierName, identifier.Name())
+
+		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		if err != nil {
+			t.Fatalf("cannot create temporary file for test: %v", err)
+		}
+		defer os.Remove(tmpFile.Name())
+
+		fi, err := tmpFile.Stat()
+		if err != nil {
+			t.Fatalf("cannot stat temporary file for test: %v", err)
+		}
+
+		src := identifier.GetSource(loginp.FSEvent{
+			NewPath: tmpFile.Name(),
+			Info:    fi,
+		})
+
+		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())
+	})
+
 	t.Run("path identifier", func(t *testing.T) {
 		c := common.MustNewConfigFrom(map[string]interface{}{
 			"identifier": map[string]interface{}{
@@ -69,7 +93,7 @@ func TestFileIdentifier(t *testing.T) {
 		err := c.Unpack(&cfg)
 		require.NoError(t, err)
 
-		identifier, err := newFileIdentifier(cfg.Identifier)
+		identifier, err := newFileIdentifier(cfg.Identifier, "")
 		require.NoError(t, err)
 		assert.Equal(t, pathName, identifier.Name())
 

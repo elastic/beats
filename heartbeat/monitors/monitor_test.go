@@ -39,7 +39,7 @@ func TestMonitor(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+	mon, err := newMonitor(serverMonConf, reg, pipelineConnector, sched)
 	require.NoError(t, err)
 
 	mon.Start()
@@ -90,11 +90,11 @@ func TestDuplicateMonitorIDs(t *testing.T) {
 	defer sched.Stop()
 
 	makeTestMon := func() (*Monitor, error) {
-		return newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+		return newMonitor(serverMonConf, reg, pipelineConnector, sched)
 	}
 
 	// Ensure that an error is returned on a bad config
-	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched, false)
+	_, m0Err := newMonitor(badConf, reg, pipelineConnector, sched)
 	require.Error(t, m0Err)
 
 	// Would fail if the previous newMonitor didn't free the monitor.id
@@ -125,7 +125,7 @@ func TestCheckInvalidConfig(t *testing.T) {
 	require.NoError(t, err)
 	defer sched.Stop()
 
-	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched, false)
+	m, err := newMonitor(serverMonConf, reg, pipelineConnector, sched)
 	// This could change if we decide the contract for newMonitor should always return a monitor
 	require.Nil(t, m, "For this test to work we need a nil value for the monitor.")
 
@@ -133,5 +133,5 @@ func TestCheckInvalidConfig(t *testing.T) {
 	require.Equal(t, 0, built.Load())
 	require.Equal(t, 0, closed.Load())
 
-	require.Error(t, checkMonitorConfig(serverMonConf, reg, false))
+	require.Error(t, checkMonitorConfig(serverMonConf, reg))
 }

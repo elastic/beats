@@ -1,0 +1,251 @@
+{
+    "attributes": {
+        "description": "Kafka analysis of topics and consumer groups",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false,
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "1",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "title": "Kafka Topic & Consumer Offsets",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "3",
+                    "w": 16,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "title": "Kafka Controls",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "title": "Consumer Group Lag by Topic",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "spy": null
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "10",
+                    "w": 25,
+                    "x": 16,
+                    "y": 0
+                },
+                "panelIndex": "10",
+                "panelRefName": "panel_10",
+                "title": "Kafka Metrics",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 7,
+                    "i": "12",
+                    "w": 24,
+                    "x": 0,
+                    "y": 33
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "title": "Consumer Partition Reassignments",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "13",
+                    "w": 7,
+                    "x": 41,
+                    "y": 0
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "title": "Consumer Metrics",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "spy": null,
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "14",
+                    "w": 24,
+                    "x": 24,
+                    "y": 27
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "title": "Kafka Consumer Group Clients",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "15",
+                    "w": 24,
+                    "x": 24,
+                    "y": 6
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "title": "Kafka Brokers",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": {
+                        "sort": {
+                            "column": "26d2cd90-d2f5-11e8-9dd4-c5f03280d7b0",
+                            "order": "desc"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "16",
+                    "w": 24,
+                    "x": 24,
+                    "y": 16
+                },
+                "panelIndex": "16",
+                "panelRefName": "panel_16",
+                "title": "Kafka Topic Details",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kafka] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ea488d90-8e63-11e8-8fa2-3d5f811fbd0f-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "b9d12c80-8e63-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "8d2f79a0-8e65-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "944188f0-8e79-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "dc89f8d0-8e8e-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "10:panel_10",
+            "type": "visualization"
+        },
+        {
+            "id": "587f2360-8f21-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "1681f1a0-90e7-11e8-8fa2-3d5f811fbd0f-ecs",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "9a7576e0-d231-11e8-8766-dbbdc39e7ba9-ecs",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "27dd5960-d2ed-11e8-8766-dbbdc39e7ba9-ecs",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "491fee50-d2f5-11e8-8766-dbbdc39e7ba9-ecs",
+            "name": "16:panel_16",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:31:34.185Z",
+    "version": "WzM5ODgsMV0="
+}

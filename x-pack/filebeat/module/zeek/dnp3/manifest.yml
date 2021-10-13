@@ -10,6 +10,8 @@ var:
       - /usr/local/var/logs/current/dnp3.log
   - name: tags
     default: [zeek.dnp3]
+  - name: internal_networks
+    default: [ private ]
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/dnp3.yml

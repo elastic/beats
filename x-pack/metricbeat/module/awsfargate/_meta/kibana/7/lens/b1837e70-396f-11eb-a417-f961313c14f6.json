@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": "",
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "82f43ff6-6ac1-4f73-b532-61b6b9fe15b0": {
+                            "columnOrder": [
+                                "e139ccbc-54ff-4921-b345-e3c3ff6a9efc",
+                                "d7b9836e-d606-4aab-b2d8-44cbc726a950"
+                            ],
+                            "columns": {
+                                "d7b9836e-d606-4aab-b2d8-44cbc726a950": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "CPU Utilization",
+                                    "operationType": "average",
+                                    "params": {
+                                        "format": {
+                                            "id": "percent",
+                                            "params": {
+                                                "decimals": 2
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "awsfargate.task_stats.cpu.total.norm.pct"
+                                },
+                                "e139ccbc-54ff-4921-b345-e3c3ff6a9efc": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Cluster Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "d7b9836e-d606-4aab-b2d8-44cbc726a950",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "awsfargate.task_stats.cluster_name"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "d7b9836e-d606-4aab-b2d8-44cbc726a950"
+                        ],
+                        "layerId": "82f43ff6-6ac1-4f73-b532-61b6b9fe15b0",
+                        "seriesType": "bar_horizontal",
+                        "xAccessor": "e139ccbc-54ff-4921-b345-e3c3ff6a9efc"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_horizontal",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                }
+            }
+        },
+        "title": "CPU Utilization Per Cluster [Metricbeat AWSFargate]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "b1837e70-396f-11eb-a417-f961313c14f6",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-82f43ff6-6ac1-4f73-b532-61b6b9fe15b0",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:41.879Z",
+    "version": "WzM0ODIsMV0="
+}

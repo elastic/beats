@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -579,6 +580,16 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		os.Setenv(agentDropPath, dropPath)
+		if runtime.GOARCH == "arm64" {
+			const platformsVar = "PLATFORMS"
+			oldPlatforms := os.Getenv(platformsVar)
+			os.Setenv(platformsVar, runtime.GOOS+"/"+runtime.GOARCH)
+			if oldPlatforms != "" {
+				defer os.Setenv(platformsVar, oldPlatforms)
+			} else {
+				defer os.Unsetenv(oldPlatforms)
+			}
+		}
 
 		// cleanup after build
 		defer os.RemoveAll(dropPath)

@@ -19,8 +19,11 @@ stages:
           make -C x-pack/osquerybeat update;
           make check-no-changes;
         stage: lint
-    build:
-        mage: "mage build test"
+    unitTest:
+        mage: "mage build unitTest"
+        stage: mandatory
+    goIntegTest:
+        mage: "mage goIntegTest"
         stage: mandatory
     macos:
         mage: "mage build unitTest"
@@ -33,7 +36,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
     windows:

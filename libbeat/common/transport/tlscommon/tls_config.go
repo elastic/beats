@@ -56,7 +56,7 @@ type TLSConfig struct {
 
 	// List of supported cipher suites. If nil, a default list provided by the
 	// implementation will be used.
-	CipherSuites []uint16
+	CipherSuites []CipherSuite
 
 	// Types of elliptic curves that will be used in an ECDHE handshake. If empty,
 	// the implementation will choose a default.
@@ -97,6 +97,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 	if c.Verification == VerifyNone {
 		logp.NewLogger("tls").Warn("SSL/TLS verifications disabled.")
 	}
+
 	return &tls.Config{
 		MinVersion:         minVersion,
 		MaxVersion:         maxVersion,
@@ -104,7 +105,7 @@ func (c *TLSConfig) ToConfig() *tls.Config {
 		RootCAs:            c.RootCAs,
 		ClientCAs:          c.ClientCAs,
 		InsecureSkipVerify: insecure,
-		CipherSuites:       c.CipherSuites,
+		CipherSuites:       convCipherSuites(c.CipherSuites),
 		CurvePreferences:   c.CurvePreferences,
 		Renegotiation:      c.Renegotiation,
 		ClientAuth:         c.ClientAuth,

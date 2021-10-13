@@ -1,0 +1,160 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "VM placements on ESXi Hosts[Metricbeat VSphere] ECS",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 40": "rgb(247,252,245)",
+                    "120 - 160": "rgb(35,139,69)",
+                    "40 - 80": "rgb(199,233,192)",
+                    "80 - 120": "rgb(116,196,118)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "VM Name",
+                        "field": "vsphere.virtualmachine.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 50
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "customLabel": "ESXi Host",
+                        "field": "vsphere.virtualmachine.host.hostname",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 50
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": true,
+                "colorSchema": "Greens",
+                "colorsNumber": 4,
+                "colorsRange": [],
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 0,
+                            "aggType": "terms",
+                            "format": {
+                                "id": "terms",
+                                "params": {
+                                    "id": "string",
+                                    "missingBucketLabel": "Missing",
+                                    "otherBucketLabel": "Other"
+                                }
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "x": {
+                        "accessor": 1,
+                        "aggType": "terms",
+                        "format": {
+                            "id": "terms",
+                            "params": {
+                                "id": "string",
+                                "missingBucketLabel": "Missing",
+                                "otherBucketLabel": "Other"
+                            }
+                        },
+                        "params": {}
+                    },
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ]
+                },
+                "enableHover": false,
+                "invertColors": false,
+                "legendPosition": "right",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "type": "heatmap",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "black",
+                            "overwriteColor": false,
+                            "rotate": 0,
+                            "show": false
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "VM placements on ESXi Hosts[Metricbeat VSphere] ECS",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "e3a3e080-f018-11e9-aaf3-15199b632da7",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "1411b690-f017-11e9-aaf3-15199b632da7",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:59.928Z",
+    "version": "WzQyMjMsMV0="
+}

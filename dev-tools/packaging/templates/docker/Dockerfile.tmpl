@@ -13,13 +13,18 @@ RUN mkdir -p {{ $beatHome }}/data {{ $beatHome }}/logs && \
     find {{ $beatHome }} -type d -exec chmod 0755 {} \; && \
     find {{ $beatHome }} -type f -exec chmod 0644 {} \; && \
     chmod 0755 {{ $beatBinary }} && \
-{{- if .linux_capabilities }}
-    setcap {{ .linux_capabilities }} {{ $beatBinary }} && \
-{{- end }}
 {{- range $i, $modulesd := .ModulesDirs }}
     chmod 0775 {{ $beatHome}}/{{ $modulesd }} && \
 {{- end }}
     chmod 0775 {{ $beatHome }}/data {{ $beatHome }}/logs
+
+{{- if .linux_capabilities }}
+# Since the beat is stored at the other end of a symlink we must follow the symlink first
+# For security reasons setcap does not support symlinks. This is smart in the general case
+# but in our specific case since we're building a trusted image from trusted binaries this is
+# fine. Thus, we use readlink to follow the link and setcap on the actual binary
+RUN readlink -f {{ $beatBinary }} | xargs setcap {{ .linux_capabilities }}
+{{- end }}
 
 FROM {{ .from }}
 
@@ -47,7 +52,7 @@ ENV NODE_PATH={{ $beatHome }}/.node
 RUN echo \
     $NODE_PATH \
     {{ $beatHome }}/.config \
-    {{ $beatHome }}/suites \
+    {{ $beatHome }}/.synthetics \
     {{ $beatHome }}/.npm \
     {{ $beatHome }}/.cache \
     | xargs -IDIR sh -c 'mkdir -p DIR && chmod 0770 DIR'
@@ -127,8 +132,9 @@ USER {{ .user }}
 {{- if (and (eq .BeatName "heartbeat") (not (contains .from "ubi-minimal")))  }}
 # Setup synthetics env vars
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
+ENV BEAT_SETUID_AS={{ .user }}
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=12.18.4
+ENV NODE_VERSION=14.17.5
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

@@ -1,5 +1,3 @@
-import os
-
 import xpack_metricbeat
 import test_base
 from beat import common_tests

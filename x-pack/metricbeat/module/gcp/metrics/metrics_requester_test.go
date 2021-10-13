@@ -18,78 +18,91 @@ func TestGetFilterForMetric(t *testing.T) {
 	var logger = logp.NewLogger("test")
 	cases := []struct {
 		title          string
+		s              string
 		m              string
 		r              metricsRequester
 		expectedFilter string
 	}{
 		{
 			"compute service with zone in config",
+			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1-a\")",
 		},
 		{
 			"pubsub service with zone in config",
+			"pubsub",
 			"pubsub.googleapis.com/subscription/ack_message_count",
 			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with zone in config",
+			"loadbalancing",
 			"loadbalancing.googleapis.com/https/backend_latencies",
 			metricsRequester{config: config{Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
 			"compute service with region in config",
+			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-east1\")",
 		},
 		{
 			"pubsub service with region in config",
+			"pubsub",
 			"pubsub.googleapis.com/subscription/ack_message_count",
 			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"pubsub.googleapis.com/subscription/ack_message_count\"",
 		},
 		{
 			"loadbalancing service with region in config",
+			"loadbalancing",
 			"loadbalancing.googleapis.com/https/backend_latencies",
 			metricsRequester{config: config{Region: "us-east1"}, logger: logger},
 			"metric.type=\"loadbalancing.googleapis.com/https/backend_latencies\"",
 		},
 		{
 			"compute service with both region and zone in config",
+			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{Region: "us-central1", Zone: "us-central1-a"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\" AND resource.labels.zone = starts_with(\"us-central1\")",
 		},
 		{
 			"compute uptime with partial region",
+			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Region: "us-west"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west\")",
 		},
 		{
 			"compute uptime with partial zone",
+			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Zone: "us-west1-"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 		{
 			"compute uptime with wildcard in region",
+			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Region: "us-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-\")",
 		},
 		{
 			"compute uptime with wildcard in zone",
+			"compute",
 			"compute.googleapis.com/instance/uptime",
 			metricsRequester{config: config{Zone: "us-west1-*"}, logger: logger},
 			"metric.type=\"compute.googleapis.com/instance/uptime\" AND resource.labels.zone = starts_with(\"us-west1-\")",
 		},
 		{
 			"compute service with no region/zone in config",
+			"compute",
 			"compute.googleapis.com/firewall/dropped_bytes_count",
 			metricsRequester{config: config{}, logger: logger},
 			"metric.type=\"compute.googleapis.com/firewall/dropped_bytes_count\"",
@@ -98,7 +111,7 @@ func TestGetFilterForMetric(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			filter := c.r.getFilterForMetric(c.m)
+			filter := c.r.getFilterForMetric(c.s, c.m)
 			assert.Equal(t, c.expectedFilter, filter)
 		})
 	}

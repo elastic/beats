@@ -1,0 +1,59 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "82e648a8-6d9a-4ae0-9449-b802ce1ac723": {
+                            "columnOrder": [
+                                "d62f1bf0-71b4-41ba-9d9c-dc9f4e478ac1"
+                            ],
+                            "columns": {
+                                "d62f1bf0-71b4-41ba-9d9c-dc9f4e478ac1": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Unique users",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "azure.app_state.users_count.unique"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "accessor": "d62f1bf0-71b4-41ba-9d9c-dc9f4e478ac1",
+                "layerId": "82e648a8-6d9a-4ae0-9449-b802ce1ac723"
+            }
+        },
+        "title": "App state Unique users [Metricbeat Azure]",
+        "visualizationType": "lnsMetric"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "a89c8fd0-03ec-11eb-8034-63f2039e9d3f",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-82e648a8-6d9a-4ae0-9449-b802ce1ac723",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:30:42.950Z",
+    "version": "WzM0OTEsMV0="
+}

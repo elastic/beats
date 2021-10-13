@@ -40,7 +40,7 @@ class TestAutodiscover(BaseTest):
         proc = self.start_beat()
 
         self.wait_until(lambda: self.log_contains(
-            re.compile('autodiscover.+Got a start event:', re.I)))
+            re.compile('autodiscover.+Got a start event', re.I)))
 
         self.wait_until(lambda: self.output_count(lambda x: x >= 1))
 

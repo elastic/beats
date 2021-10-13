@@ -3,7 +3,7 @@
 
 - module: fortinet
   firewall:
-    enabled: true
+    enabled: false
 
     # Set which input to use between tcp, udp (default) or file.
     #var.input: udp
@@ -26,7 +26,7 @@
     #var.external_interfaces: [ "WAN" ]
 
   clientendpoint:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -45,7 +45,7 @@
     # var.tz_offset: local
 
   fortimail:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp
@@ -64,7 +64,7 @@
     # var.tz_offset: local
 
   fortimanager:
-    enabled: true
+    enabled: false
 
     # Set which input to use between udp (default), tcp or file.
     # var.input: udp

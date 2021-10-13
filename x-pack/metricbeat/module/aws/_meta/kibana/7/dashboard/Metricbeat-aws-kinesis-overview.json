@@ -1,0 +1,264 @@
+{
+    "attributes": {
+        "description": "Overview of Amazon Kinesis Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "0359194f-01a1-4a5b-8040-c897bdc86638",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0359194f-01a1-4a5b-8040-c897bdc86638",
+                "panelRefName": "panel_0359194f-01a1-4a5b-8040-c897bdc86638",
+                "title": "Filters",
+                "type": "visualization",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 5
+                },
+                "panelIndex": "df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                "panelRefName": "panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
+                "title": "GetRecords Latency",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "5f153d11-e84a-4ac5-aec9-4fca79863744",
+                    "w": 16,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "5f153d11-e84a-4ac5-aec9-4fca79863744",
+                "panelRefName": "panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
+                "title": "PutRecords Latency",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                    "w": 16,
+                    "x": 16,
+                    "y": 5
+                },
+                "panelIndex": "a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                "panelRefName": "panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
+                "title": "PutRecord Latency",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                    "w": 16,
+                    "x": 32,
+                    "y": 20
+                },
+                "panelIndex": "01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                "panelRefName": "panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
+                "title": "GetRecords Bytes",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                    "w": 16,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                "panelRefName": "panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
+                "title": "PutRecords Bytes",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e18e62e5-672a-4939-afe1-68354e76aefc",
+                    "w": 16,
+                    "x": 16,
+                    "y": 20
+                },
+                "panelIndex": "e18e62e5-672a-4939-afe1-68354e76aefc",
+                "panelRefName": "panel_e18e62e5-672a-4939-afe1-68354e76aefc",
+                "title": "PutRecord Bytes",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                    "w": 16,
+                    "x": 32,
+                    "y": 35
+                },
+                "panelIndex": "a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                "panelRefName": "panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+                "title": "GetRecords Success",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                    "w": 16,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                "panelRefName": "panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
+                "title": "PutRecords Success",
+                "type": "lens",
+                "version": "7.11.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                    "w": 16,
+                    "x": 16,
+                    "y": 35
+                },
+                "panelIndex": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                "panelRefName": "panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+                "title": "PutRecord Success",
+                "type": "lens",
+                "version": "7.11.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] Kinesis Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "07d67a60-d872-11eb-8220-c9141cc1b15c",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "3c5d7860-d903-11eb-8220-c9141cc1b15c",
+            "name": "0359194f-01a1-4a5b-8040-c897bdc86638:panel_0359194f-01a1-4a5b-8040-c897bdc86638",
+            "type": "visualization"
+        },
+        {
+            "id": "63aa5990-d86f-11eb-8220-c9141cc1b15c",
+            "name": "df2dc50f-c09b-4dcd-96a8-24037c576db3:panel_df2dc50f-c09b-4dcd-96a8-24037c576db3",
+            "type": "lens"
+        },
+        {
+            "id": "9deb6a80-d870-11eb-8220-c9141cc1b15c",
+            "name": "5f153d11-e84a-4ac5-aec9-4fca79863744:panel_5f153d11-e84a-4ac5-aec9-4fca79863744",
+            "type": "lens"
+        },
+        {
+            "id": "2a711450-d871-11eb-8220-c9141cc1b15c",
+            "name": "a7378b79-483c-4e99-97e2-9b49fd9e81da:panel_a7378b79-483c-4e99-97e2-9b49fd9e81da",
+            "type": "lens"
+        },
+        {
+            "id": "d1468000-d86f-11eb-8220-c9141cc1b15c",
+            "name": "01a12917-ef1c-47b6-964a-26ef424dd0d3:panel_01a12917-ef1c-47b6-964a-26ef424dd0d3",
+            "type": "lens"
+        },
+        {
+            "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
+            "name": "7e5774cb-e2e5-4f11-95bc-732ed6600757:panel_7e5774cb-e2e5-4f11-95bc-732ed6600757",
+            "type": "lens"
+        },
+        {
+            "id": "6d631980-d870-11eb-8220-c9141cc1b15c",
+            "name": "e18e62e5-672a-4939-afe1-68354e76aefc:panel_e18e62e5-672a-4939-afe1-68354e76aefc",
+            "type": "lens"
+        },
+        {
+            "id": "79d713c0-d86f-11eb-8220-c9141cc1b15c",
+            "name": "a1f01da7-4496-4f4e-acc8-9e6efd826f52:panel_a1f01da7-4496-4f4e-acc8-9e6efd826f52",
+            "type": "lens"
+        },
+        {
+            "id": "c68d7c30-d870-11eb-8220-c9141cc1b15c",
+            "name": "6ddd4401-6625-42b6-9270-9bc17c8408e6:panel_6ddd4401-6625-42b6-9270-9bc17c8408e6",
+            "type": "lens"
+        },
+        {
+            "id": "56ac2b40-d871-11eb-8220-c9141cc1b15c",
+            "name": "fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773:panel_fb4e4fb3-91de-46c8-b3f8-ef17ba3c4773",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:30.617Z",
+    "version": "WzMzNjMsMV0="
+}

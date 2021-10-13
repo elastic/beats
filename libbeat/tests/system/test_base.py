@@ -138,7 +138,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
             max_timeout=2)
         proc.check_kill_and_wait()
         self.wait_until(
-            lambda: self.log_contains("Total non-zero metrics"),
+            lambda: self.log_contains("Total metrics"),
             max_timeout=2)
 
     def test_persistent_uuid(self):

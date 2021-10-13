@@ -1,0 +1,87 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "background_color_rules": [
+                    {
+                        "id": "3ece14c0-5e4c-11ea-9061-37f24ca5b01f"
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "3b9c35c0-5e4c-11ea-9061-37f24ca5b01f"
+                    }
+                ],
+                "drop_last_bucket": 0,
+                "gauge_color_rules": [
+                    {
+                        "id": "3b27a200-5e4c-11ea-9061-37f24ca5b01f"
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "5m",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": "0",
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "",
+                        "line_width": "3",
+                        "metrics": [
+                            {
+                                "field": "gcp.compute.firewall.dropped_packets_count.value",
+                                "id": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                "type": "avg"
+                            }
+                        ],
+                        "point_size": "2",
+                        "separate_axis": 0,
+                        "split_color_mode": "rainbow",
+                        "split_mode": "terms",
+                        "stacked": "none",
+                        "terms_field": "cloud.instance.name",
+                        "terms_order_by": "61ca57f2-469d-11e7-af02-69e470af7417",
+                        "type": "timeseries"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "type": "top_n",
+                "use_kibana_indexes": false
+            },
+            "title": "Compute Firewall Dropped Packets [Metricbeat GCP]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "ef1508c0-5e4c-11ea-a4f6-717338406083",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:09.611Z",
+    "version": "WzM3ODMsMV0="
+}

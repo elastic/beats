@@ -21,6 +21,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:HsGjbon+HsK9xnMq+1A32BR9C4Y=",
+        "network.direction": "internal",
         "network.name": "localdomain",
         "network.protocol": "dhcp",
         "network.transport": "udp",

@@ -32,9 +32,9 @@ Example output config with SSL enabled:
 [source,yaml]
 ----
 output.elasticsearch.hosts: ["https://192.168.1.42:9200"]
-output.elasticsearch.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-output.elasticsearch.ssl.certificate: "/etc/pki/client/cert.pem"
-output.elasticsearch.ssl.key: "/etc/pki/client/cert.key"
+output.elasticsearch.ssl.certificate_authorities: ["/etc/client/ca.pem"]
+output.elasticsearch.ssl.certificate: "/etc/client/cert.pem"
+output.elasticsearch.ssl.key: "/etc/client/cert.key"
 ----
 
 ifndef::no-output-logstash[]
@@ -48,9 +48,9 @@ Example Kibana endpoint config with SSL enabled:
 ----
 setup.kibana.host: "https://192.0.2.255:5601"
 setup.kibana.ssl.enabled: true
-setup.kibana.ssl.certificate_authorities: ["/etc/pki/root/ca.pem"]
-setup.kibana.ssl.certificate: "/etc/pki/client/cert.pem"
-setup.kibana.ssl.key: "/etc/pki/client/cert.key"
+setup.kibana.ssl.certificate_authorities: ["/etc/client/ca.pem"]
+setup.kibana.ssl.certificate: "/etc/client/cert.pem"
+setup.kibana.ssl.key: "/etc/client/cert.key"
 ----
 endif::no_kibana[]
 
@@ -264,7 +264,7 @@ certificate_authorities:
 
 [float]
 [[client-certificate]]
-==== `certificate: "/etc/pki/client/cert.pem"`
+==== `certificate: "/etc/client/cert.pem"`
 
 The path to the certificate for SSL client authentication is only required if
 `client_authentication` is specified. If the certificate
@@ -302,7 +302,7 @@ certificate: |
 
 [float]
 [[client-key]]
-==== `key: "/etc/pki/client/cert.key"`
+==== `key: "/etc/client/cert.key"`
 
 The client certificate key used for client authentication and is only required
 if `client_authentication` is configured. The key option support embedding of the private key:
@@ -423,7 +423,7 @@ certificate_authorities:
 
 [float]
 [[server-certificate]]
-==== `certificate: "/etc/pki/server/cert.pem"`
+==== `certificate: "/etc/server/cert.pem"`
 
 For server authentication, the path to the SSL authentication certificate must
 be specified for TLS. If the certificate is not specified, startup will fail.
@@ -457,7 +457,7 @@ certificate: |
 
 [float]
 [[server-key]]
-==== `key: "/etc/pki/server/cert.key"`
+==== `key: "/etc/server/cert.key"`
 
 The server certificate key used for authentication is required.
 The key option support embedding of the private key:

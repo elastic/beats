@@ -1,0 +1,166 @@
+{
+    "attributes": {
+        "description": "Overview of AWS Lambda Metrics",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a",
+                    "w": 14,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a",
+                "panelRefName": "panel_8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a",
+                "title": "AWS Account Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "443a9699-3451-44f7-8415-99a16c3f45b3",
+                    "w": 34,
+                    "x": 14,
+                    "y": 0
+                },
+                "panelIndex": "443a9699-3451-44f7-8415-99a16c3f45b3",
+                "panelRefName": "panel_443a9699-3451-44f7-8415-99a16c3f45b3",
+                "title": "Top Errors",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "60a16bf0-2979-467a-b30e-05ea29547b41",
+                    "w": 14,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "60a16bf0-2979-467a-b30e-05ea29547b41",
+                "panelRefName": "panel_60a16bf0-2979-467a-b30e-05ea29547b41",
+                "title": "AWS Region Filter",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "349ef0d1-fea1-4b91-b95d-7a668914e10b",
+                    "w": 48,
+                    "x": 0,
+                    "y": 10
+                },
+                "panelIndex": "349ef0d1-fea1-4b91-b95d-7a668914e10b",
+                "panelRefName": "panel_349ef0d1-fea1-4b91-b95d-7a668914e10b",
+                "title": "Lambda Function Duration in Milliseconds",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "048b1577-5aed-48e5-8f90-147aa3d56c1a",
+                    "w": 24,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "048b1577-5aed-48e5-8f90-147aa3d56c1a",
+                "panelRefName": "panel_048b1577-5aed-48e5-8f90-147aa3d56c1a",
+                "title": "Top Invoked Lambda Functions",
+                "type": "visualization",
+                "version": "7.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "4c8e471c-45da-47be-a866-c5bfc6d28a05",
+                    "w": 24,
+                    "x": 24,
+                    "y": 24
+                },
+                "panelIndex": "4c8e471c-45da-47be-a866-c5bfc6d28a05",
+                "panelRefName": "panel_4c8e471c-45da-47be-a866-c5bfc6d28a05",
+                "title": "Top Throttled Lambda Functions",
+                "type": "visualization",
+                "version": "7.3.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat AWS] Lambda Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "7ac8e1d0-28d2-11ea-ba6c-49a884eb104f",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "deab0260-2981-11e9-86eb-a3a07a77f530",
+            "name": "8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a:panel_8f2d1b8f-fef3-4a9a-9cc8-7f0e2c65e35a",
+            "type": "visualization"
+        },
+        {
+            "id": "4bf0a740-28d1-11ea-ba6c-49a884eb104f",
+            "name": "443a9699-3451-44f7-8415-99a16c3f45b3:panel_443a9699-3451-44f7-8415-99a16c3f45b3",
+            "type": "visualization"
+        },
+        {
+            "id": "b5308940-7347-11e9-816b-07687310a99a",
+            "name": "60a16bf0-2979-467a-b30e-05ea29547b41:panel_60a16bf0-2979-467a-b30e-05ea29547b41",
+            "type": "visualization"
+        },
+        {
+            "id": "39dfc8d0-28cf-11ea-ba6c-49a884eb104f",
+            "name": "349ef0d1-fea1-4b91-b95d-7a668914e10b:panel_349ef0d1-fea1-4b91-b95d-7a668914e10b",
+            "type": "visualization"
+        },
+        {
+            "id": "1f3f00c0-28d1-11ea-ba6c-49a884eb104f",
+            "name": "048b1577-5aed-48e5-8f90-147aa3d56c1a:panel_048b1577-5aed-48e5-8f90-147aa3d56c1a",
+            "type": "visualization"
+        },
+        {
+            "id": "915bcd50-28d1-11ea-ba6c-49a884eb104f",
+            "name": "4c8e471c-45da-47be-a866-c5bfc6d28a05:panel_4c8e471c-45da-47be-a866-c5bfc6d28a05",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:30:31.702Z",
+    "version": "WzMzNzMsMV0="
+}

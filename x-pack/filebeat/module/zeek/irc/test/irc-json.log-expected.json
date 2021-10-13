@@ -28,6 +28,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [
@@ -75,6 +76,7 @@
         "input.type": "log",
         "log.offset": 206,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [
@@ -127,6 +129,7 @@
         "input.type": "log",
         "log.offset": 432,
         "network.community_id": "1:YdkGov/c+KLtmg7Cf5DLDB4+YdQ=",
+        "network.direction": "outbound",
         "network.protocol": "irc",
         "network.transport": "tcp",
         "related.ip": [

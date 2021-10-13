@@ -5,6 +5,13 @@ This section describes common problems you might encounter with
 {beatname_uc}. Also check out the
 https://discuss.elastic.co/c/beats/{beatname_lc}[{beatname_uc} discussion forum].
 
+[[filebeat-kubernetes-metadata-error-extracting-container-id]]
+=== Error extracting container id while using Kubernetes metadata
+
+The `add_kubernetes_metadata` processor might throw the error `Error extracting container id - source value does not contain matcher's logs_path`.
+There might be some issues with the matchers definitions or the location of `logs_path`.
+Please verify the Kubernetes pod is healthy.
+
 [[filebeat-network-volumes]]
 === Can't read log files from network volumes
 

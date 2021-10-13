@@ -98,6 +98,7 @@ func TestReaderGroup(t *testing.T) {
 }
 
 func TestDefaultHarvesterGroup(t *testing.T) {
+	t.Skip("flaky test: https://github.com/elastic/beats/issues/26727")
 	source := &testSource{"/path/to/test"}
 
 	requireSourceAddedToBookkeeper := func(t *testing.T, hg *defaultHarvesterGroup, s Source) {

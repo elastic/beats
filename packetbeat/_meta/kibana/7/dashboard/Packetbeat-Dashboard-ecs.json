@@ -1,0 +1,79 @@
+{
+    "attributes": {
+        "description": "Packetbeat overview dashboard.",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": "{\"filter\":[],\"highlightAll\":true,\"query\":{\"language\":\"kuery\",\"query\":\"\"},\"version\":true}"
+        },
+        "optionsJSON": "{\"darkTheme\": false}",
+        "panelsJSON": "[{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":10,\"i\":\"1\",\"w\":12,\"x\":12,\"y\":20},\"panelIndex\":\"1\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_0\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":10,\"i\":\"2\",\"w\":12,\"x\":36,\"y\":20},\"panelIndex\":\"2\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_1\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"5\",\"w\":24,\"x\":0,\"y\":45},\"panelIndex\":\"5\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_2\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"6\",\"w\":24,\"x\":0,\"y\":60},\"panelIndex\":\"6\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_3\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"7\",\"w\":24,\"x\":24,\"y\":45},\"panelIndex\":\"7\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_4\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"8\",\"w\":24,\"x\":24,\"y\":60},\"panelIndex\":\"8\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_5\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"9\",\"w\":36,\"x\":12,\"y\":0},\"panelIndex\":\"9\",\"embeddableConfig\":{\"mapBounds\":{\"bottom_right\":{\"lat\":-54.97761367069625,\"lon\":153.984375},\"top_left\":{\"lat\":54.97761367069628,\"lon\":-153.984375}},\"mapCollar\":{\"bottom_right\":{\"lat\":-90,\"lon\":180},\"top_left\":{\"lat\":90,\"lon\":-180},\"zoom\":2},\"mapZoom\":2,\"enhancements\":{}},\"panelRefName\":\"panel_6\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":15,\"i\":\"10\",\"w\":48,\"x\":0,\"y\":30},\"panelIndex\":\"10\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_7\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":20,\"i\":\"11\",\"w\":12,\"x\":0,\"y\":0},\"panelIndex\":\"11\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_8\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":10,\"i\":\"12\",\"w\":12,\"x\":0,\"y\":20},\"panelIndex\":\"12\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_9\"},{\"version\":\"7.0.0-SNAPSHOT\",\"gridData\":{\"h\":10,\"i\":\"13\",\"w\":12,\"x\":24,\"y\":20},\"panelIndex\":\"13\",\"embeddableConfig\":{\"enhancements\":{}},\"panelRefName\":\"panel_10\"}]",
+        "timeRestore": false,
+        "title": "[Packetbeat] Overview ECS",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "Packetbeat-Dashboard-ecs",
+    "migrationVersion": {
+        "dashboard": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "Web-transactions-ecs",
+            "name": "panel_0",
+            "type": "visualization"
+        },
+        {
+            "id": "DB-transactions-ecs",
+            "name": "panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "Response-times-percentiles-ecs",
+            "name": "panel_2",
+            "type": "visualization"
+        },
+        {
+            "id": "Errors-count-over-time-ecs",
+            "name": "panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "Errors-vs-successful-transactions-ecs",
+            "name": "panel_4",
+            "type": "visualization"
+        },
+        {
+            "id": "Latency-histogram-ecs",
+            "name": "panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "Client-locations-ecs",
+            "name": "panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "Response-times-repartition-ecs",
+            "name": "panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "Navigation-ecs",
+            "name": "panel_8",
+            "type": "visualization"
+        },
+        {
+            "id": "e3f09730-1b80-11e9-83df-75eebb35951e-ecs",
+            "name": "panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "059fe5e0-d2dd-11e7-9914-4982455b3063-ecs",
+            "name": "panel_10",
+            "type": "visualization"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-08-04T16:28:45.121Z",
+    "version": "WzMyMTAsMV0="
+}

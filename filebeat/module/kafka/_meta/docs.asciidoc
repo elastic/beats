@@ -3,6 +3,8 @@
 
 == Kafka module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 The +{modulename}+ module collects and parses the logs created by
 https://kafka.apache.org/[Kafka].
 

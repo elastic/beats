@@ -17,7 +17,7 @@ import (
 
 // NewDownloader creates a downloader which first checks local directory
 // and then fallbacks to remote if configured.
-func NewDownloader(log *logger.Logger, config *artifact.Config) download.Downloader {
+func NewDownloader(log *logger.Logger, config *artifact.Config) (download.Downloader, error) {
 	downloaders := make([]download.Downloader, 0, 3)
 	downloaders = append(downloaders, fs.NewDownloader(config))
 
@@ -31,6 +31,11 @@ func NewDownloader(log *logger.Logger, config *artifact.Config) download.Downloa
 		}
 	}
 
-	downloaders = append(downloaders, http.NewDownloader(config))
-	return composed.NewDownloader(downloaders...)
+	httpDownloader, err := http.NewDownloader(config)
+	if err != nil {
+		return nil, err
+	}
+
+	downloaders = append(downloaders, httpDownloader)
+	return composed.NewDownloader(downloaders...), nil
 }

@@ -1,139 +1,87 @@
-# Testing on OSX
+# Testing Metricbeat
 
-A previous document regarding testing metricbeat at OSX existed, and have been moved to [./darwin.md](darwin.md)
 
-# Testing on Linux
+## Create kubernetes cluster using kind
 
-## Create Elasticsearch + Kibana instances
+Follow instructions at https://kind.sigs.k8s.io/docs/user/quick-start/#installation and install kind.
 
-You can rely on your EK tuple of choice as long as it is addresable from the kubernetes cluster.
+Create a kind kubernetes cluster.
+```
+kind create cluster  --image 'kindest/node:v1.21.1'
+```
 
-To boot a docker based EK this should suffice, be sure to replace image tags according to version:
+## Deploy Kube-state-metrics
 
+Prerequisite for collecting kubernetes meaningful metrics is kube-state-metrics.
+Deploy it to your cluster manually by
 ```bash
-# Run Elasticsearch
-docker run --name es -d -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.3.0
-
-# Run Kibana
-docker run --name kibana -d --link es:elasticsearch -p 5601:5601 \
-    docker.elastic.co/kibana/kibana:7.3.0
-```
-
-## Prepare assets
-
-Generate binary and other assets for the beats branch you want to test, then copy them to a folder layed out to run:
-
-- create folder `/home/myuser/playground/metricbeat`
-- copy to that folder `metricbeat` binary and `metricbeat.yml`
-- recursive copy `modules.d` from source repo to destination folder
-- recursive copy `_meta/kibana.generated/{version}/dashboard/` to `kibana/{version}/dashboard/`
-
-Configure `metricbeat.yml` and modules, do not use `localhost` to point to elasticsearch and kibana but the public ip of the host (one that will be routable from minikube)
-
-
-## Create minikube cluster
-
-Follow instructions https://kubernetes.io/docs/tasks/tools/install-minikube/ and start the minikube cluster.
-
-Usually we should be ok with the kubernetes version that minikube creates, but you can force it by using `--kubernetes-version` flag.
-
-```
-minikube start --kubernetes-version v1.15.0
-```
-
-## Playground Pod
-
-A playground Pod hosts the ubuntu container metricbeat will be running. A working playground is provided under [./01_playground](./01_playground) subfolder.
-
-This file contains:
-
-- a service account.
-- a cluster role, if you are consuming kubernetes API resources, make sure that the APIGroup/Version, Resource and verb are listed here.
-- a cluster role binding that links the service account to the service role
-- an Ubuntu Pod:
-  - uses `hostNetwork`, so it can reach ports at the host instance (for instance, the kubelet)
-  - executes `sleep infinity`, so that it never exists, but does nothing
-  - in order to be useful for filebeat, it mounts `/var/log/`, `/var/lib/docker/containers` and `/var/lib/filebeat-data`
-
-At the time of writing this the Pod has been only used for 2 tests from the same person (hello), there is a lot of room for improvement.
-
-To deploy the pod _as is_ you need to:
-
-```
-kubectl apply -f https://raw.githubusercontent.com/elastic/beats/master/metricbeat/module/kubernetes/_meta/test/docs/01_playground/playground-ubuntu.yaml
-```
-
-## Test
-
-
-Binary and assets needed for the test that we prepared above need to be copied to the playground pod. Use `kubectl` to copy the directory, further iterations might only need to copy the changing assets.
-
-Replace source folder and Pod namespace/name
-
-```
-kubectl cp --no-preserve  /home/myuser/playground/metricbeat playground:/metricbeat
-```
-
-Now you can exec into the container and launch metricbeat
-
-```
- kubectl exec -ti playground /bin/bash
-
- cd /metricbeat
- ./metricbeat -c metricbeat.yml  -e
-
- ```
-
-### Test Iterations
-
-When copying new assets to an already used playground Pod, you will most probably run into an issue:
-```
-tar: metricbeat/kibana/7/dashboard/Metricbeat-aerospike-overview.json: Cannot open: Not a directory
-tar: metricbeat/kibana/7/dashboard/Metricbeat-apache-overview.json: Cannot open: Not a directory
-tar: metricbeat/kibana/7/dashboard/Metricbeat-ceph-overview.json: Cannot open: Not a directory
-tar: metricbeat/kibana/7/dashboard/Metricbeat-consul-overview.json: Cannot open: Not a directory
-```
-
-I haven't looked much into this, there seems to be something going on when kubernetes untars the bundled directory. As a workaround, delete the metricbeat directory at the Pod before copying a new set of assets.
-
-# Testing kubernetes loads
-
-## Kube-state-metrics
-
-Kube-state-metrics needs to be deployed for all the `state_` prefix metricsets at kubernetes. Yamls are to be found at the [upstream project](https://github.com/kubernetes/kube-state-metrics/tree/master/kubernetes)
-
-Installing kube-state-metrics can be done either installing the yamls one by one from their remote location or cloning and installing the folder contents. Be sure to checkout the target release version before installing.
-
-```
 git clone git@github.com:kubernetes/kube-state-metrics.git
 cd kube-state-metrics/
 
-git checkout -b release-1.7 origin/release-1.7
-kubectl apply -f kubernetes/
+kubectl apply -k .
+```
+
+## Create ELK stack
+
+You can spin up an ELK stack in two ways
+1. [Proposed] Using elastic cloud https://cloud.elastic.co
+2. Locally on your kind cluster (EK tuple will suffice).
+```bash
+# Deploy Elasticsearch and Kibana
+kubectl apply -f ../01_playground/ek_stack.yaml
+
+# Expose Kibana with port forwarding. In your browser visit localhost:5601
+kubectl port-forward deployment/kibana 5601:5601
 ```
 
 
-## Core components test
+## Playground Metricbeat Pod
 
-Testing core components (kubelet, apiserver, controller manager, scheduler) requires a diverse range of objects to be created. Using [Sonobuoy](https://github.com/heptio/sonobuoy) is the fastest path for testing,getting metrics and filling dashboards.
+A slightly modified (as of beats/deploy/kubernetes/metricbeat-kubernetes.yaml) all-in-one metricbeat manifest resides under 01_playground directory.
+The daemonset executes an infinite sleep command instead of starting metricbeat.
 
-Refer to the documentation at Sonobuoy, at the time of this writing installing and running can be achieved with a couple commands
+ELASTICSEARCH_HOST, ELASTICSEARCH_PORT, ELASTICSEARCH_USERNAME, ELASTICSEARCH_PASSWORD variables are set according to local kind EK stack.
 
+In case of Elastic Cloud deployment configure the variables ELASTIC_CLOUD_ID and ELASTIC_CLOUD_AUTH properly.
+
+Deploy metricbeat
 ```
-go get -u -v github.com/heptio/sonobuoy
-sonobuoy run --wait
+kubectl apply -f ../01_playground/metricbeat.yaml
 ```
 
-## Regular kubernetes components
+## Build and launch metricbeat process
 
-You can find at [./02_objects](./02_objects) example kubernetes objects used during development and testing.
-For now only a CronJob example is added, add your kubernetes object of choice under that folder if you consider it will be useful for other people when developing, testing and troubleshooting.
+Next step is to build metricbeat binary and copy it in the running metricbeat pod.
 
-# Going further
+Under beats/metricbeat execute
 
-- All improvements are welcome.
-- Different ways to test are welcome and can live here side by side.
-- Using kind seems to be a lot more lightweight.
-- Probably some steps above can be tackled using [telepresence](https://www.telepresence.io/).
-- Probably Sonobuoy can be replaced with kubernetes e2e tests.
+```bash
+# Build metricbeat
+GOOS=linux GOARCH=amd64 go build
+
+# Copy binary in pod
+kubectl cp ./metricbeat `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'`:/usr/share/metricbeat/ -n kube-system
+````
+The above command only copies metricbeat binary.
+In case of configuration files updates it can be modified to copy also those files in the right container paths.
+
+```bash
+# Exec in the container and launch metricbeat
+kubectl exec `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'` -n kube-system -- bash -c "metricbeat -e -c /etc/metricbeat.yml"
+```
+Metricbeat will launch and the process logs will appear in the terminal.
+
+You can as well exec in metricbeat pod with bash command and then run metricbeat.
+This gives the flexibility to easily start and stop the process.
+
+
+### Test Iterations
+
+In case a new update is needed in the binary or configurations files
+1. delete the running metricbeat pod.
+```bash
+# Delete metricbeat
+kubectl delete pod `kubectl get pod -n kube-system -l k8s-app=metricbeat -o jsonpath='{.items[].metadata.name}'`
+```
+2. Execute previous step (Build and launch metricbeat process)
 

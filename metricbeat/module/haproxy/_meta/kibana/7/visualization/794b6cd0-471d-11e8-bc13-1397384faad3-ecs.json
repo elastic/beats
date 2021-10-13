@@ -1,0 +1,154 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Active servers in backend [Metricbeat HAProxy] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "background_color_rules": [
+                    {
+                        "color": "rgba(255,0,6,1)",
+                        "id": "1ec0dde0-471d-11e8-9876-09cc6c85f5f2",
+                        "operator": "lte",
+                        "value": 0
+                    },
+                    {
+                        "color": "rgba(255,0,6,1)",
+                        "id": "8d345723-dc15-424c-a8df-0777fe7a4ffa",
+                        "operator": "empty",
+                        "value": null
+                    }
+                ],
+                "bar_color_rules": [
+                    {
+                        "id": "297160c0-471d-11e8-9876-09cc6c85f5f2"
+                    }
+                ],
+                "filter": {
+                    "language": "lucene",
+                    "query": "haproxy.stat.component_type:(2 OR 3)"
+                },
+                "gauge_color_rules": [
+                    {
+                        "gauge": "rgba(255,0,5,1)",
+                        "id": "4ce156a0-471d-11e8-9876-09cc6c85f5f2",
+                        "operator": "lte",
+                        "text": null,
+                        "value": 0
+                    },
+                    {
+                        "gauge": "rgba(255,196,0,1)",
+                        "id": "f8458a80-4721-11e8-b854-2f6d2b452362",
+                        "operator": "lte",
+                        "value": 0.5
+                    },
+                    {
+                        "gauge": "rgba(255,0,5,1)",
+                        "id": "99d5e990-9b29-45c9-b191-e8034fb39ec5",
+                        "operator": "empty",
+                        "text": null,
+                        "value": null
+                    }
+                ],
+                "gauge_inner_width": 10,
+                "gauge_max": "1",
+                "gauge_style": "half",
+                "gauge_width": 10,
+                "hide_last_value_indicator": true,
+                "id": "61ca57f0-469d-11e7-af02-69e470af7417",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "filter": {
+                            "language": "lucene",
+                            "query": "haproxy.stat.status:UP"
+                        },
+                        "formatter": "number",
+                        "id": "61ca57f1-469d-11e7-af02-69e470af7417",
+                        "label": "Active servers",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "denominator": "*",
+                                "field": "haproxy.stat.server.id",
+                                "id": "b754d060-471e-11e8-9876-09cc6c85f5f2",
+                                "metric_agg": "count",
+                                "numerator": "*",
+                                "script": "params.up / (params.down + params.up)",
+                                "type": "cardinality",
+                                "variables": [
+                                    {
+                                        "field": "61ca57f2-469d-11e7-af02-69e470af7417",
+                                        "id": "cfd51780-471e-11e8-9d35-6baabcdce3dc",
+                                        "name": "down"
+                                    },
+                                    {
+                                        "field": "a049c420-471e-11e8-9876-09cc6c85f5f2",
+                                        "id": "45e6ec00-471f-11e8-9d35-6baabcdce3dc",
+                                        "name": "up"
+                                    }
+                                ]
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "terms_field": "haproxy.stat.proxy.name"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "number",
+                        "id": "2cba9420-4724-11e8-b854-2f6d2b452362",
+                        "label": "Total servers",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "field": "haproxy.stat.server.id",
+                                "id": "2cba9421-4724-11e8-b854-2f6d2b452362",
+                                "type": "cardinality"
+                            }
+                        ],
+                        "point_size": 1,
+                        "seperate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "metric",
+                "use_kibana_indexes": false
+            },
+            "title": "HAProxy active servers in backend ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "794b6cd0-471d-11e8-bc13-1397384faad3-ecs",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:22.960Z",
+    "version": "WzM4MzcsMV0="
+}

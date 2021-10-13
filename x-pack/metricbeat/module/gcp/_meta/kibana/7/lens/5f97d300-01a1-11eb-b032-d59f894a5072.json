@@ -1,0 +1,121 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "91e62734-6524-424c-b2b5-3974c835dd6c": {
+                            "columnOrder": [
+                                "ed36f31e-ed2a-460a-a881-18e191f75d04",
+                                "6be62612-437b-448d-9631-c6cc0938225d",
+                                "5424865c-c988-4e26-b00b-b3cf90e1e4cf"
+                            ],
+                            "columns": {
+                                "0888bf93-1ecf-467a-b0b5-9e0deee6545c": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of gcp.labels.resource.topic_id",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "5424865c-c988-4e26-b00b-b3cf90e1e4cf",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.labels.resource.topic_id"
+                                },
+                                "5424865c-c988-4e26-b00b-b3cf90e1e4cf": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Topic Oldest Unacked Message Age By Region",
+                                    "operationType": "average",
+                                    "scale": "ratio",
+                                    "sourceField": "gcp.pubsub.topic.oldest_unacked_message_age_by_region.value"
+                                },
+                                "6be62612-437b-448d-9631-c6cc0938225d": {
+                                    "dataType": "date",
+                                    "isBucketed": true,
+                                    "label": "@timestamp",
+                                    "operationType": "date_histogram",
+                                    "params": {
+                                        "interval": "1m"
+                                    },
+                                    "scale": "interval",
+                                    "sourceField": "@timestamp"
+                                },
+                                "ed36f31e-ed2a-460a-a881-18e191f75d04": {
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Top values of gcp.labels.metrics.region",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "orderBy": {
+                                            "columnId": "5424865c-c988-4e26-b00b-b3cf90e1e4cf",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "size": 3
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "gcp.labels.metrics.region"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "filters": [],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "fittingFunction": "None",
+                "layers": [
+                    {
+                        "accessors": [
+                            "5424865c-c988-4e26-b00b-b3cf90e1e4cf"
+                        ],
+                        "layerId": "91e62734-6524-424c-b2b5-3974c835dd6c",
+                        "position": "top",
+                        "seriesType": "line",
+                        "showGridlines": false,
+                        "splitAccessor": "ed36f31e-ed2a-460a-a881-18e191f75d04",
+                        "xAccessor": "6be62612-437b-448d-9631-c6cc0938225d"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "line"
+            }
+        },
+        "title": "Topic Oldest Unacked Message Age By Region [Metricbeat GCP]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5f97d300-01a1-11eb-b032-d59f894a5072",
+    "migrationVersion": {
+        "lens": "7.13.1"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-91e62734-6524-424c-b2b5-3974c835dd6c",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2021-08-04T16:31:13.736Z",
+    "version": "WzM4MDksMV0="
+}

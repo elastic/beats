@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/app"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/monitoring/noop"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/process"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/plugin/service"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/server"
@@ -143,11 +144,20 @@ func (o *Operator) Close() error {
 }
 
 // HandleConfig handles configuration for a pipeline and performs actions to achieve this configuration.
-func (o *Operator) HandleConfig(cfg configrequest.Request) error {
+func (o *Operator) HandleConfig(cfg configrequest.Request) (err error) {
+	defer func() {
+		err = filterContextCancelled(err)
+	}()
+
 	_, stateID, steps, ack, err := o.stateResolver.Resolve(cfg)
 	if err != nil {
-		o.statusReporter.Update(state.Failed, err.Error(), nil)
-		return errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
+		if err == filterContextCancelled(err) {
+			// error is not filtered and should be reported
+			o.statusReporter.Update(state.Failed, err.Error(), nil)
+			err = errors.New(err, errors.TypeConfig, fmt.Sprintf("operator: failed to resolve configuration %s, error: %v", cfg, err))
+		}
+
+		return err
 	}
 	o.statusController.UpdateStateID(stateID)
 
@@ -293,12 +303,21 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	// TODO: (michal) join args into more compact options version
 	var a Application
 	var err error
+
+	monitor := o.monitor
+	appName := p.BinaryName()
+	if app.IsSidecar(p) {
+		// make watchers unmonitorable
+		monitor = noop.NewMonitor()
+		appName += "_monitoring"
+	}
+
 	if p.ServicePort() == 0 {
 		// Applications without service ports defined are ran as through the process application type.
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			desc,
@@ -306,7 +325,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.config,
 			o.logger,
 			o.reporter,
-			o.monitor,
+			monitor,
 			o.statusController)
 	} else {
 		// Service port is defined application is ran with service application type, with it fetching
@@ -314,7 +333,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),
@@ -323,7 +342,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 			o.config,
 			o.logger,
 			o.reporter,
-			o.monitor,
+			monitor,
 			o.statusController)
 	}
 
@@ -343,4 +362,11 @@ func (o *Operator) deleteApp(p Descriptor) {
 
 	o.logger.Debugf("operator is removing %s from app collection: %v", p.ID(), o.apps)
 	delete(o.apps, id)
+}
+
+func filterContextCancelled(err error) error {
+	if errors.Is(err, context.Canceled) {
+		return nil
+	}
+	return err
 }

@@ -462,10 +462,30 @@ processors:
         ANY: '.*'
       if: 'ctx?.file?.name != null && ctx?.file?.name != ""'
 
-  - set:
-      field: user
-      copy_from: source.user
-      if: "ctx?.source?.user != null"
+  - script:
+      lang: painless
+      description: Copy source.user to user
+      source: >
+        def clone(def ref) {
+          if (ref == null) return ref;
+          if (ref instanceof Map) {
+            ref = ref.entrySet().stream().collect(
+                    Collectors.toMap(
+                      e -> e.getKey(),
+                      e -> clone(e.getValue())
+                    )
+                  );
+          } else if (ref instanceof List) {
+            ref = ref.stream().map(e -> clone(e)).collect(
+                    Collectors.toList()
+                  );
+          }
+          return ref;
+        }
+        def u = ctx?.source?.user;
+        if (u != null) {
+          ctx["user"] = clone(u);
+        }
 
   - append:
       field: related.user

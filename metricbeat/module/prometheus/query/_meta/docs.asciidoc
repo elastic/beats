@@ -1,4 +1,4 @@
-This is the `query` metricset to query from https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries[querying API of Promtheus].
+This is the `query` metricset to query from https://prometheus.io/docs/prometheus/latest/querying/api/#expression-queries[querying API of Prometheus].
 
 
 [float]

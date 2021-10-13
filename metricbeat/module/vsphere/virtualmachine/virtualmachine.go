@@ -20,11 +20,11 @@ package virtualmachine
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
 
 	"github.com/pkg/errors"
 	"github.com/vmware/govmomi"
@@ -38,25 +38,26 @@ import (
 
 func init() {
 	mb.Registry.MustAddMetricSet("vsphere", "virtualmachine", New,
+		mb.WithHostParser(vsphere.HostParser),
 		mb.DefaultMetricSet(),
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet
+// MetricSet type defines all fields of the MetricSet.
 type MetricSet struct {
-	mb.BaseMetricSet
-	HostURL         *url.URL
-	Insecure        bool
+	*vsphere.MetricSet
 	GetCustomFields bool
 }
 
-// New create a new instance of the MetricSet
+// New creates a new instance of the MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	ms, err := vsphere.NewMetricSet(base)
+	if err != nil {
+		return nil, err
+	}
+
 	config := struct {
-		Username        string `config:"username"`
-		Password        string `config:"password"`
-		Insecure        bool   `config:"insecure"`
-		GetCustomFields bool   `config:"get_custom_fields"`
+		GetCustomFields bool `config:"get_custom_fields"`
 	}{
 		GetCustomFields: false,
 	}
@@ -64,18 +65,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-
-	u, err := url.Parse(base.HostData().URI)
-	if err != nil {
-		return nil, err
-	}
-
-	u.User = url.UserPassword(config.Username, config.Password)
-
 	return &MetricSet{
-		BaseMetricSet:   base,
-		HostURL:         u,
-		Insecure:        config.Insecure,
+		MetricSet:       ms,
 		GetCustomFields: config.GetCustomFields,
 	}, nil
 }

@@ -105,7 +105,10 @@ func (e *CheckinCmd) Execute(ctx context.Context, r *CheckinRequest) (*CheckinRe
 		return nil, client.ExtractError(resp.Body)
 	}
 
-	rs, _ := ioutil.ReadAll(resp.Body)
+	rs, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.New(err, "failed to read checkin response")
+	}
 
 	checkinResponse := &CheckinResponse{}
 	decoder := json.NewDecoder(bytes.NewReader(rs))

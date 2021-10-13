@@ -6,8 +6,11 @@ package operation
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 
@@ -28,6 +31,38 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/state"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/status"
 )
+
+func TestExportedMetrics(t *testing.T) {
+	programName := "testing"
+	expectedMetricsName := "metric_name"
+	program.SupportedMap[programName] = program.Spec{ExprtedMetrics: []string{expectedMetricsName}}
+
+	exportedMetrics := normalizeHTTPCopyRules(programName)
+
+	exportedMetricFound := false
+	for _, kv := range exportedMetrics {
+		from, found := kv["from"]
+		if !found {
+			continue
+		}
+		to, found := kv["to"]
+		if !found {
+			continue
+		}
+
+		if to != expectedMetricsName {
+			continue
+		}
+		if from != fmt.Sprintf("http.agent.%s", expectedMetricsName) {
+			continue
+		}
+		exportedMetricFound = true
+		break
+	}
+
+	require.True(t, exportedMetricFound, "exported metric not found")
+	delete(program.SupportedMap, programName)
+}
 
 func TestGenerateSteps(t *testing.T) {
 	const sampleOutput = "sample-output"
@@ -214,6 +249,9 @@ func (b *testMonitor) Reload(cfg *config.Config) error { return nil }
 
 // IsMonitoringEnabled returns true if monitoring is configured.
 func (b *testMonitor) IsMonitoringEnabled() bool { return b.monitorLogs || b.monitorMetrics }
+
+// MonitoringNamespace returns monitoring namespace configured.
+func (b *testMonitor) MonitoringNamespace() string { return "default" }
 
 // WatchLogs return true if monitoring is configured and monitoring logs is enabled.
 func (b *testMonitor) WatchLogs() bool { return b.monitorLogs }

@@ -20,6 +20,7 @@
         "input.type": "log",
         "log.offset": 0,
         "network.community_id": "1:1Hp/o0hOC62lAwrV+a0ZKDE3rrs=",
+        "network.direction": "external",
         "network.protocol": "socks",
         "network.transport": "tcp",
         "related.ip": [

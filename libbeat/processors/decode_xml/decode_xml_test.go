@@ -177,6 +177,41 @@ func TestDecodeXML(t *testing.T) {
 			},
 		},
 		{
+			description: "Decoding with an array and mixed-case keys",
+			config: decodeXMLConfig{
+				Field:   "message",
+				ToLower: true,
+			},
+			Input: common.MapStr{
+				"message": `<AuditBase>
+				  <ContextComponents>
+					<Component>
+					  <RelyingParty>N/A</RelyingParty>
+					</Component>
+					<Component>
+					  <PrimaryAuth>N/A</PrimaryAuth>
+					</Component>
+				  </ContextComponents>
+				</AuditBase>`,
+			},
+			Output: common.MapStr{
+				"message": common.MapStr{
+					"auditbase": map[string]interface{}{
+						"contextcomponents": map[string]interface{}{
+							"component": []interface{}{
+								map[string]interface{}{
+									"relyingparty": "N/A",
+								},
+								map[string]interface{}{
+									"primaryauth": "N/A",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
 			description: "Decoding with multiple xml objects",
 			config: decodeXMLConfig{
 				Field: "message",

@@ -1,0 +1,115 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Conflict/Deadlock Rates [Metricbeat PostgreSQL] ECS",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "filter": {
+                    "language": "kuery",
+                    "query": ""
+                },
+                "id": "6c90db30-b79a-11e9-a8f0-d7983cd3d871",
+                "index_pattern": "metricbeat-*",
+                "interval": "auto",
+                "isModelInvalid": false,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(12,121,125,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6c90db31-b79a-11e9-a8f0-d7983cd3d871",
+                        "label": "conflicts",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.conflicts",
+                                "id": "6c90db32-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "6c90db32-b79a-11e9-a8f0-d7983cd3d871",
+                                "id": "6c90db34-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "6c90db34-b79a-11e9-a8f0-d7983cd3d871",
+                                "id": "6c90db33-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    },
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "rgba(244,78,59,1)",
+                        "fill": 0,
+                        "formatter": "number",
+                        "id": "6c90db35-b79a-11e9-a8f0-d7983cd3d871",
+                        "label": "deadlocks",
+                        "line_width": 2,
+                        "metrics": [
+                            {
+                                "field": "postgresql.database.deadlocks",
+                                "id": "6c90db36-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "avg"
+                            },
+                            {
+                                "field": "6c90db36-b79a-11e9-a8f0-d7983cd3d871",
+                                "id": "6c90db38-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "derivative",
+                                "unit": "1s"
+                            },
+                            {
+                                "field": "6c90db38-b79a-11e9-a8f0-d7983cd3d871",
+                                "id": "6c90db37-b79a-11e9-a8f0-d7983cd3d871",
+                                "type": "positive_only"
+                            }
+                        ],
+                        "point_size": 0,
+                        "separate_axis": 0,
+                        "split_color_mode": "gradient",
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "type": "timeseries",
+                        "value_template": "{{value}}"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "@timestamp",
+                "type": "timeseries",
+                "use_kibana_indexes": false
+            },
+            "title": "Conflict/Deadlock Rates [Metricbeat PostgreSQL] ECS",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "960ecdf0-b79a-11e9-a579-f5c0a5d81340",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:31:45.573Z",
+    "version": "WzQxMDcsMV0="
+}

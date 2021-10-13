@@ -17,15 +17,17 @@
 
 package timestamp
 
+import "github.com/elastic/beats/v7/libbeat/common/cfgtype"
+
 type config struct {
-	Field          string   `config:"field" validate:"required"`   // Source field containing time time to be parsed.
-	TargetField    string   `config:"target_field"`                // Target field for the parsed time value. The target value is always written as UTC. Defaults to @timestamp.
-	Layouts        []string `config:"layouts" validate:"required"` // Timestamp layouts that define the expected time value format.
-	Timezone       string   `config:"timezone"`                    // Timezone (e.g. America/New_York) to use when parsing a timestamp not containing a timezone.
-	IgnoreMissing  bool     `config:"ignore_missing"`              // Ignore errors when the source field is missing.
-	IgnoreFailure  bool     `config:"ignore_failure"`              // Ignore errors when parsing the timestamp.
-	TestTimestamps []string `config:"test"`                        // A list of timestamps that must parse successfully when loading the processor.
-	ID             string   `config:"id"`                          // An identifier for this processor. Useful for debugging.
+	Field          string            `config:"field" validate:"required"`   // Source field containing time time to be parsed.
+	TargetField    string            `config:"target_field"`                // Target field for the parsed time value. The target value is always written as UTC. Defaults to @timestamp.
+	Layouts        []string          `config:"layouts" validate:"required"` // Timestamp layouts that define the expected time value format.
+	Timezone       *cfgtype.Timezone `config:"timezone"`                    // IANA time zone (e.g. America/New_York) or fixed offset to use when parsing a timestamp not containing a timezone.
+	IgnoreMissing  bool              `config:"ignore_missing"`              // Ignore errors when the source field is missing.
+	IgnoreFailure  bool              `config:"ignore_failure"`              // Ignore errors when parsing the timestamp.
+	TestTimestamps []string          `config:"test"`                        // A list of timestamps that must parse successfully when loading the processor.
+	ID             string            `config:"id"`                          // An identifier for this processor. Useful for debugging.
 }
 
 func defaultConfig() config {

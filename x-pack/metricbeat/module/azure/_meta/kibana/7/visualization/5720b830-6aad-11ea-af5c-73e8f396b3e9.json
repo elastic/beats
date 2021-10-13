@@ -1,0 +1,30 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {}
+        },
+        "title": "Navigation Container Instance Overview [Metricbeat Azure]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "fontSize": 12,
+                "markdown": "### Azure Containers\n\n[**Instances**](#/dashboard/9c11ac60-6cf6-11ea-8fe8-71add5fd7c38) |\n[Registries](#/dashboard/6f2393f0-6d08-11ea-8fe8-71add5fd7c38) |\n[Services](#/dashboard/dae20ed0-6d0a-11ea-8fe8-71add5fd7c38) ",
+                "openLinksInNewTab": false
+            },
+            "title": "Navigation Container Instance Overview [Metricbeat Azure]",
+            "type": "markdown"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "5720b830-6aad-11ea-af5c-73e8f396b3e9",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:30:45.960Z",
+    "version": "WzM1MTksMV0="
+}

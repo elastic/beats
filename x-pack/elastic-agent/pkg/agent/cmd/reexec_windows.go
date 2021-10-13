@@ -2,6 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
 // +build windows
 
 package cmd
@@ -36,7 +37,7 @@ func newReExecWindowsCommand(_ []string, streams *cli.IOStreams) *cobra.Command 
 			}
 			err = reExec(serviceName, servicePid)
 			if err != nil {
-				fmt.Fprintf(streams.Err, "%v\n", err)
+				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
 				os.Exit(1)
 			}
 		},

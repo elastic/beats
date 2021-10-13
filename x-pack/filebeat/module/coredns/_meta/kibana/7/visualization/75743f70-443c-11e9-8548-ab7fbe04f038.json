@@ -1,0 +1,100 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Unique Domains [Filebeat CoreDNS]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {
+                        "customLabel": "Unique Domains",
+                        "field": "coredns.query.name"
+                    },
+                    "schema": "metric",
+                    "type": "cardinality"
+                }
+            ],
+            "params": {
+                "addLegend": false,
+                "addTooltip": true,
+                "metric": {
+                    "bucket": {
+                        "accessor": 0,
+                        "aggType": "terms",
+                        "format": {
+                            "id": "terms",
+                            "params": {
+                                "id": "string",
+                                "missingBucketLabel": "Missing",
+                                "otherBucketLabel": "Other"
+                            }
+                        },
+                        "params": {}
+                    },
+                    "colorSchema": "Green to Red",
+                    "colorsRange": [
+                        {
+                            "from": 0,
+                            "to": 10000
+                        }
+                    ],
+                    "invertColors": false,
+                    "labels": {
+                        "show": true
+                    },
+                    "metricColorMode": "None",
+                    "metrics": [
+                        {
+                            "accessor": 0,
+                            "aggType": "cardinality",
+                            "format": {
+                                "id": "number"
+                            },
+                            "params": {}
+                        }
+                    ],
+                    "percentageMode": false,
+                    "style": {
+                        "bgColor": false,
+                        "bgFill": "#000",
+                        "fontSize": 60,
+                        "labelColor": false,
+                        "subText": ""
+                    },
+                    "useRanges": false
+                },
+                "type": "metric"
+            },
+            "title": "Unique Domains [Filebeat CoreDNS]",
+            "type": "metric"
+        }
+    },
+    "coreMigrationVersion": "8.0.0",
+    "id": "75743f70-443c-11e9-8548-ab7fbe04f038",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-04T16:33:40.046Z",
+    "version": "WzQyNDMsMV0="
+}

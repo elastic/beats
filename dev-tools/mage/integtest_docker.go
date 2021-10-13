@@ -95,7 +95,7 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 	}
 	dockerRepoRoot := filepath.Join("/go/src", repo.CanonicalRootImportPath)
 	dockerGoCache := filepath.Join(dockerRepoRoot, "build/docker-gocache")
-	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-amd64")
+	magePath := filepath.Join("/go/src", repo.CanonicalRootImportPath, repo.SubDir, "build/mage-linux-"+GOARCH)
 	goPkgCache := filepath.Join(filepath.SplitList(build.Default.GOPATH)[0], "pkg/mod/cache/download")
 	dockerGoPkgCache := "/gocache"
 

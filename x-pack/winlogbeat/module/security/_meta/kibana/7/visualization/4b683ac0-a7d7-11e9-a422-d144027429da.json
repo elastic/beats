@@ -1,0 +1,229 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.code",
+                            "negate": false,
+                            "params": [
+                                "4625"
+                            ],
+                            "type": "phrases",
+                            "value": "4625"
+                        },
+                        "query": {
+                            "bool": {
+                                "minimum_should_match": 1,
+                                "should": [
+                                    {
+                                        "match_phrase": {
+                                            "event.code": "4625"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+                            "key": "winlog.provider_name",
+                            "negate": false,
+                            "params": {
+                                "query": "Microsoft-Windows-Security-Auditing"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "winlog.provider_name": "Microsoft-Windows-Security-Auditing"
+                            }
+                        }
+                    }
+                ],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Failed Logon HeatMap [Winlogbeat Security]",
+        "uiStateJSON": {
+            "vis": {
+                "defaultColors": {
+                    "0 - 4": "rgb(255,255,204)",
+                    "12 - 16": "rgb(252,91,46)",
+                    "16 - 20": "rgb(212,16,32)",
+                    "4 - 8": "rgb(254,225,135)",
+                    "8 - 12": "rgb(254,171,73)"
+                }
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "user.name",
+                        "missingBucket": false,
+                        "missingBucketLabel": "Missing",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "otherBucket": false,
+                        "otherBucketLabel": "Other",
+                        "size": 15
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "drop_partials": true,
+                        "extended_bounds": {},
+                        "field": "@timestamp",
+                        "interval": "h",
+                        "min_doc_count": 1,
+                        "scaleMetricValues": false,
+                        "timeRange": {
+                            "from": "2020-05-17T09:37:55.995Z",
+                            "to": "2020-05-22T03:09:27.260Z"
+                        },
+                        "useNormalizedEsInterval": true
+                    },
+                    "schema": "group",
+                    "type": "date_histogram"
+                }
+            ],
+            "params": {
+                "addLegend": true,
+                "addTooltip": false,
+                "colorSchema": "Yellow to Red",
+                "colorsNumber": 5,
+                "colorsRange": [],
+                "dimensions": {
+                    "series": [
+                        {
+                            "accessor": 1,
+                            "aggType": "date_histogram",
+                            "format": {
+                                "id": "date",
+                                "params": {
+                                    "pattern": "YYYY-MM-DD HH:mm"
+                                }
+                            },
+                            "label": "@timestamp per hour",
+                            "params": {}
+                        }
+                    ],
+                    "x": {
+                        "accessor": 0,
+                        "aggType": "terms",
+                        "format": {
+                            "id": "terms",
+                            "params": {
+                                "id": "string",
+                                "missingBucketLabel": "Missing",
+                                "otherBucketLabel": "Other",
+                                "parsedUrl": {
+                                    "basePath": "/s/siem",
+                                    "origin": "https://192.168.1.72:5601",
+                                    "pathname": "/s/siem/app/kibana"
+                                }
+                            }
+                        },
+                        "label": "user.name: Descending",
+                        "params": {}
+                    },
+                    "y": [
+                        {
+                            "accessor": 2,
+                            "aggType": "count",
+                            "format": {
+                                "id": "number"
+                            },
+                            "label": "Count",
+                            "params": {}
+                        }
+                    ]
+                },
+                "enableHover": true,
+                "invertColors": false,
+                "legendPosition": "bottom",
+                "percentageMode": false,
+                "setColorRange": false,
+                "times": [],
+                "type": "heatmap",
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "color": "black",
+                            "overwriteColor": false,
+                            "rotate": 0,
+                            "show": true
+                        },
+                        "scale": {
+                            "defaultYExtents": false,
+                            "type": "linear"
+                        },
+                        "show": false,
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Failed Logon HeatMap [Winlogbeat Security]",
+            "type": "heatmap"
+        }
+    },
+    "coreMigrationVersion": "7.14.0",
+    "id": "4b683ac0-a7d7-11e9-a422-d144027429da",
+    "migrationVersion": {
+        "visualization": "7.14.0"
+    },
+    "references": [
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "winlogbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2021-08-11T13:18:54.296Z",
+    "version": "WzIxOTgsMl0="
+}

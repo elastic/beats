@@ -71,11 +71,11 @@ func GetKubeProxyConfig(t *testing.T, metricSetName string) map[string]interface
 		"module":     "kubernetes",
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
-		"hosts":      []string{"localhost:10252"},
+		"hosts":      []string{"localhost:10249"},
 	}
 }
 
-// GetSchedulerConfig function returns configuration for talking to kube-proxy.
+// GetSchedulerConfig function returns configuration for talking to kube-scheduler.
 func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface{} {
 	t.Helper()
 	return map[string]interface{}{
@@ -83,5 +83,16 @@ func GetSchedulerConfig(t *testing.T, metricSetName string) map[string]interface
 		"metricsets": []string{metricSetName},
 		"host":       "${NODE_NAME}",
 		"hosts":      []string{"localhost:10251"},
+	}
+}
+
+// GetControllerManagerConfig function returns configuration for talking to kube-controller-manager.
+func GetControllerManagerConfig(t *testing.T, metricSetName string) map[string]interface{} {
+	t.Helper()
+	return map[string]interface{}{
+		"module":     "kubernetes",
+		"metricsets": []string{metricSetName},
+		"host":       "${NODE_NAME}",
+		"hosts":      []string{"localhost:10252"},
 	}
 }
