@@ -125,3 +125,8 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 -- The `enable_idempotent` config is a boolean setting to enable or disable the output support Idempotent. {pull}28095[28095]
 - Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
 - Update Go version to 1.17.1. {pull}27543[27543]
+- Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+
+==== Deprecated
+
+- Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]
