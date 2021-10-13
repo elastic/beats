@@ -87,7 +87,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
 
 	if bt.config.OneShot != nil {
-		err := bt.RunOneShot(b)
+		err := bt.runOneShot(b)
 		if err != nil {
 			return err
 		}
@@ -138,8 +138,8 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-// RunOneShot runs the given config then exits immediately after any queued events have been sent to ES
-func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
+// runOneShot runs the given config then exits immediately after any queued events have been sent to ES
+func (bt *Heartbeat) runOneShot(b *beat.Beat) error {
 	logp.Info("Starting one_shot run. This is an experimental feature and may be changed or removed in the future!")
 	cfgs := bt.config.OneShot
 
@@ -151,7 +151,7 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 
 	wg := &sync.WaitGroup{}
 	for _, cfg := range cfgs {
-		err := RunOnceSingleConfig(cfg, publishClient, wg)
+		err := runOneShotSingleConfig(cfg, publishClient, wg)
 		if err != nil {
 			logp.Warn("error running one_shot config: %s", err)
 		}
@@ -165,7 +165,7 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 	return nil
 }
 
-func RunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
+func runOneShotSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
 	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
 	if err != nil {
 		return fmt.Errorf("could not get stdmon fields: %w", err)
