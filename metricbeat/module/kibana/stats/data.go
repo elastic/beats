@@ -19,6 +19,7 @@ package stats
 
 import (
 	"encoding/json"
+	"github.com/elastic/beats/v7/libbeat/logp"
 
 	"github.com/pkg/errors"
 
@@ -103,7 +104,7 @@ var (
 	})
 )
 
-func eventMapping(r mb.ReporterV2, content []byte) error {
+func eventMapping(l *logp.Logger, r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
@@ -119,11 +120,13 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 
 	// Set elasticsearch cluster id
 	elasticsearchClusterID, ok := data["cluster_uuid"]
-	if !ok {
+	if ok {
+		event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
+	} else {
+		// TODO Try to find cluster_uuid in a new endpoint. Skipping for now in case it's not found
 		event.Error = elastic.MakeErrorForMissingField("cluster_uuid", elastic.Kibana)
-		return event.Error
+		l.Warn(event.Error.Error())
 	}
-	event.ModuleFields.Put("elasticsearch.cluster.id", elasticsearchClusterID)
 
 	// Set service ID
 	uuid, err := dataFields.GetValue("uuid")

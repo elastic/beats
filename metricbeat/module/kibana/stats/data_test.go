@@ -21,6 +21,7 @@
 package stats
 
 import (
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -40,7 +41,8 @@ func TestEventMapping(t *testing.T) {
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input)
+		logger := logp.L()
+		err = eventMapping(logger, reporter, input)
 		require.NoError(t, err, f)
 		require.True(t, len(reporter.GetEvents()) >= 1, f)
 		require.Equal(t, 0, len(reporter.GetErrors()), f)

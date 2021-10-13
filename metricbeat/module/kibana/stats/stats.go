@@ -118,5 +118,5 @@ func (m *MetricSet) fetchStats(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventMapping(r, content)
+	return eventMapping(m.Logger(), r, content)
 }

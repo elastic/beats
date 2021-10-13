@@ -1,0 +1,57 @@
+{
+    "process": {
+        "memory": {
+            "heap": {
+                "total_bytes": 330063872,
+                "used_bytes": 276327616,
+                "size_limit": 4345298944
+            },
+            "resident_set_size_bytes": 416129024
+        },
+        "pid": 1198,
+        "event_loop_delay": 0.39106399938464165,
+        "uptime_ms": 19359262.31582
+    },
+    "os": {
+        "platform": "linux",
+        "platform_release": "linux-5.14.10-200.fc34.x86_64",
+        "load": {
+            "1m": 0.79,
+            "5m": 0.72,
+            "15m": 0.8
+        },
+        "memory": {
+            "total_bytes": 33295835136,
+            "free_bytes": 2083454976,
+            "used_bytes": 31212380160
+        },
+        "uptime_ms": 23505330,
+        "distro": "CentOS",
+        "distro_release": "CentOS-8.4.2105\n"
+    },
+    "requests": {
+        "disconnects": 0,
+        "total": 4,
+        "status_codes": {
+            "200": 4
+        }
+    },
+    "response_times": {
+        "avg_ms": 1.75,
+        "max_ms": 2
+    },
+    "concurrent_connections": 0,
+    "kibana": {
+        "uuid": "e83d7ce9-d611-4057-a1d1-89fb70721dc1",
+        "name": "06f3960c7a0d",
+        "index": ".kibana",
+        "host": "0.0.0.0",
+        "locale": "en",
+        "transport_address": "0.0.0.0:5601",
+        "version": "8.0.0",
+        "snapshot": true,
+        "status": "green"
+    },
+    "last_updated": "2021-10-13T14:25:17.119Z",
+    "collection_interval_ms": 5000
+}

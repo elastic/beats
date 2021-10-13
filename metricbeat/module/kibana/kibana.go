@@ -36,7 +36,6 @@ const (
 	// API Paths
 	StatusPath   = "api/status"
 	StatsPath    = "api/stats"
-	SettingsPath = "api/settings"
 )
 
 var (
