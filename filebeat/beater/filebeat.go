@@ -116,6 +116,29 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 	if !moduleRegistry.Empty() {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
+
+		// Deprecation warning logic for v8.0 (https://github.com/elastic/beats/pull/27526)
+		for _, mod := range moduleRegistry.ModuleNames() {
+			if mod == "" {
+				continue
+			}
+
+			loadedFilesets, err := moduleRegistry.ModuleFilesets(mod)
+			if err != nil {
+				logp.Err("Error retrieving module filesets: %+v", err)
+				return nil, err
+			}
+
+			configuredFilesets := moduleRegistry.ModuleConfiguredFilesets(mod)
+			if len(configuredFilesets) != len(loadedFilesets) {
+				for _, loadedFileset := range loadedFilesets {
+					if _, ok := configuredFilesets[loadedFileset]; !ok {
+						logp.Warn("Fileset `%s` for module `%s` is loaded but was not explicitly defined in the config. "+
+							"Starting from v8.0 this fileset won't be loaded unless explicitly defined", loadedFileset, mod)
+					}
+				}
+			}
+		}
 	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()

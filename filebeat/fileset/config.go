@@ -37,9 +37,10 @@ type ModuleConfig struct {
 
 // FilesetConfig contains the configuration file options for a fileset
 type FilesetConfig struct {
-	Enabled *bool                  `config:"enabled"`
-	Var     map[string]interface{} `config:"var"`
-	Input   map[string]interface{} `config:"input"`
+	Enabled    *bool                  `config:"enabled"`
+	Var        map[string]interface{} `config:"var"`
+	Input      map[string]interface{} `config:"input"`
+	Configured bool
 }
 
 // NewFilesetConfig creates a new FilesetConfig from a common.Config.
