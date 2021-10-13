@@ -20,8 +20,13 @@ pipeline {
   stages {
     stage('Nighly beats builds') {
       steps {
+<<<<<<< HEAD
         build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true)])
         build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true)])
+=======
+        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true), booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+        build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true), booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+>>>>>>> 916e1dd1e2 (ci: run macos builds on a nightly basis (#28391))
       }
     }
   }
