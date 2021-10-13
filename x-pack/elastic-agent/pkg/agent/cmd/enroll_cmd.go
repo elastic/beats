@@ -71,22 +71,6 @@ type enrollCmd struct {
 
 // enrollCmdFleetServerOption define all the supported enrollment options for bootstrapping with Fleet Server.
 type enrollCmdFleetServerOption struct {
-<<<<<<< HEAD
-	ConnStr         string
-	ElasticsearchCA string
-	ServiceToken    string
-	PolicyID        string
-	Host            string
-	Port            uint16
-	Cert            string
-	CertKey         string
-	Insecure        bool
-	SpawnAgent      bool
-	Headers         map[string]string
-	ProxyURL        string
-	ProxyDisabled   bool
-	ProxyHeaders    map[string]string
-=======
 	ConnStr               string
 	ElasticsearchCA       string
 	ElasticsearchInsecure bool
@@ -99,7 +83,9 @@ type enrollCmdFleetServerOption struct {
 	Insecure              bool
 	SpawnAgent            bool
 	Headers               map[string]string
->>>>>>> 62d84db2a4 ([Elastic-Agent] Modify output to be insecure if flag is provided (#28007))
+	ProxyURL              string
+	ProxyDisabled         bool
+	ProxyHeaders          map[string]string
 }
 
 // enrollCmdOption define all the supported enrollment option.
@@ -280,16 +266,10 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context) (string, error) {
 		c.options.FleetServer.Host, c.options.FleetServer.Port,
 		c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 		c.options.FleetServer.Headers,
-<<<<<<< HEAD
 		c.options.FleetServer.ProxyURL,
 		c.options.FleetServer.ProxyDisabled,
 		c.options.FleetServer.ProxyHeaders,
-=======
-		c.options.ProxyURL,
-		c.options.ProxyDisabled,
-		c.options.ProxyHeaders,
 		c.options.FleetServer.ElasticsearchInsecure,
->>>>>>> 62d84db2a4 ([Elastic-Agent] Modify output to be insecure if flag is provided (#28007))
 	)
 	if err != nil {
 		return "", err
@@ -484,13 +464,8 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 			c.options.FleetServer.Host, c.options.FleetServer.Port,
 			c.options.FleetServer.Cert, c.options.FleetServer.CertKey, c.options.FleetServer.ElasticsearchCA,
 			c.options.FleetServer.Headers,
-<<<<<<< HEAD
-			c.options.FleetServer.ProxyURL, c.options.FleetServer.ProxyDisabled, c.options.FleetServer.ProxyHeaders)
-=======
-			c.options.ProxyURL, c.options.ProxyDisabled, c.options.ProxyHeaders,
-			c.options.FleetServer.ElasticsearchInsecure,
-		)
->>>>>>> 62d84db2a4 ([Elastic-Agent] Modify output to be insecure if flag is provided (#28007))
+			c.options.FleetServer.ProxyURL, c.options.FleetServer.ProxyDisabled, c.options.FleetServer.ProxyHeaders,
+			c.options.FleetServer.ElasticsearchInsecure)
 		if err != nil {
 			return err
 		}

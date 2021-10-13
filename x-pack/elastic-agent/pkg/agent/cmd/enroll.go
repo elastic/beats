@@ -176,17 +176,10 @@ func buildEnrollmentFlags(cmd *cobra.Command, url string, token string) []string
 		args = append(args, k+"="+v)
 	}
 
-<<<<<<< HEAD
-=======
-	if delayEnroll {
-		args = append(args, "--delay-enroll")
-	}
-
 	if fElasticSearchInsecure {
 		args = append(args, "--fleet-server-es-insecure")
 	}
 
->>>>>>> 62d84db2a4 ([Elastic-Agent] Modify output to be insecure if flag is provided (#28007))
 	return args
 }
 
@@ -280,22 +273,6 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 		Staging:              staging,
 		FixPermissions:       fromInstall,
 		FleetServer: enrollCmdFleetServerOption{
-<<<<<<< HEAD
-			ConnStr:         fServer,
-			ElasticsearchCA: fElasticSearchCA,
-			ServiceToken:    fServiceToken,
-			PolicyID:        fPolicy,
-			Host:            fHost,
-			Port:            fPort,
-			Cert:            fCert,
-			CertKey:         fCertKey,
-			Insecure:        fInsecure,
-			SpawnAgent:      !fromInstall,
-			Headers:         mapFromEnvList(fHeaders),
-			ProxyURL:        fProxyURL,
-			ProxyDisabled:   fProxyDisabled,
-			ProxyHeaders:    mapFromEnvList(fProxyHeaders),
-=======
 			ConnStr:               fServer,
 			ElasticsearchCA:       fElasticSearchCA,
 			ElasticsearchInsecure: fElasticSearchInsecure,
@@ -308,7 +285,9 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			Insecure:              fInsecure,
 			SpawnAgent:            !fromInstall,
 			Headers:               mapFromEnvList(fHeaders),
->>>>>>> 62d84db2a4 ([Elastic-Agent] Modify output to be insecure if flag is provided (#28007))
+			ProxyURL:              fProxyURL,
+			ProxyDisabled:         fProxyDisabled,
+			ProxyHeaders:          mapFromEnvList(fProxyHeaders),
 		},
 	}
 
