@@ -5,18 +5,14 @@
 package browser
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"sync"
 	"syscall"
 
-	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/synthexec"
 )
 
 func init() {
@@ -49,31 +45,5 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		return plugin.Plugin{}, err
 	}
 
-	extraArgs := []string{}
-	if s.suiteCfg.Sandbox {
-		extraArgs = append(extraArgs, "--sandbox")
-	}
-
-	var j jobs.Job
-	if src, ok := s.InlineSource(); ok {
-		j = synthexec.InlineJourneyJob(context.TODO(), src, s.Params(), extraArgs...)
-	} else {
-		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := s.Fetch()
-			if err != nil {
-				return nil, fmt.Errorf("could not fetch for suite job: %w", err)
-			}
-			sj, err := synthexec.SuiteJob(context.TODO(), s.Workdir(), s.Params(), s.FilterJourneys(), extraArgs...)
-			if err != nil {
-				return nil, err
-			}
-			return sj(event)
-		}
-	}
-
-	return plugin.Plugin{
-		Jobs:      []jobs.Job{j},
-		DoClose:   s.Close,
-		Endpoints: 1,
-	}, nil
+	return s.plugin(), nil
 }
