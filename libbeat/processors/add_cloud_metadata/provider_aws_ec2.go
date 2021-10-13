@@ -26,18 +26,19 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 )
 
-const ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
-const ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
-const ec2InstanceIMDSv2TokenTTLHeader = "X-aws-ec2-metadata-token-ttl-seconds"
-const ec2InstanceIMDSv2TokenTTLValue = "21600"
-const ec2InstanceIMDSv2TokenURI = "/latest/api/token"
+const (
+	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
+	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
+	ec2InstanceIMDSv2TokenTTLHeader   = "X-aws-ec2-metadata-token-ttl-seconds"
+	ec2InstanceIMDSv2TokenTTLValue    = "21600"
+	ec2InstanceIMDSv2TokenURI         = "/latest/api/token"
+)
 
 // fetches IMDSv2 token, returns empty one on errors
 func getIMDSv2Token(c *common.Config) string {
@@ -45,13 +46,13 @@ func getIMDSv2Token(c *common.Config) string {
 
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
-		logger.Warnf("error while getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
-		logger.Warnf("error while getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		logger.Warnf("error when load TLS config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
 
@@ -69,7 +70,7 @@ func getIMDSv2Token(c *common.Config) string {
 
 	tokenReq, err := http.NewRequest("PUT", fmt.Sprintf("http://%s%s", metadataHost, ec2InstanceIMDSv2TokenURI), nil)
 	if err != nil {
-		logger.Warnf("error while getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		logger.Warnf("error when make token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
 
@@ -82,18 +83,18 @@ func getIMDSv2Token(c *common.Config) string {
 	}(rsp.Body)
 
 	if err != nil {
-		logger.Warnf("error while getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		logger.Warnf("error when read token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
 
 	if rsp.StatusCode != http.StatusOK {
-		logger.Warnf("error while getting IMDSv2 token: http request status %d. No token in the metadata request will be used.", rsp.StatusCode)
+		logger.Warnf("error when check request status for getting IMDSv2 token: http request status %d. No token in the metadata request will be used.", rsp.StatusCode)
 		return ""
 	}
 
 	all, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		logger.Warnf("error while getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		logger.Warnf("error when reading token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
 
