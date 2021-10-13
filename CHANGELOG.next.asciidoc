@@ -93,7 +93,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
 - Remove old `httpjson` config implementation. {pull}28054[28054]
-- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
@@ -111,12 +110,12 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 - Add Linux pressure metricset {pull}27355[27355]
-- Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 - Remove deprecated fields in Docker module. {issue}11835[11835] {pull}27933[27933]
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated config option default_region from aws module. {pull}28120[28120]
+- Remove deprecated config option perfmon.counters from windows/perfmon metricset. {pull}28282[28282]
 - Remove deprecated fields in Redis module. {issue}11835[11835] {pull}28246[28246]
 
 *Packetbeat*
@@ -312,17 +311,19 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Fix for `field [source] not present as part of path [source.ip]` error in azure pipelines. {pull}22377[22377]
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
-- Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
-- sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
+- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
 - Resolve issue with @timestamp for defender_atp. {pull}28272[28272]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
+- Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
 
 *Journalbeat*
 
@@ -423,6 +424,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Remove io.time from windows {pull}22237[22237]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - `beat` module respects `basepath` config option. {pull}28162[28162]
+- Fix list_docker.go {pull}28374[28374]
 
 *Packetbeat*
 

@@ -396,22 +396,6 @@ func TestMarshalUnmarshalArray(t *testing.T) {
 	}
 }
 
-func TestMarshalFloatValues(t *testing.T) {
-	assert := assert.New(t)
-
-	var f float64
-
-	f = 5
-
-	a := MapStr{
-		"f": Float(f),
-	}
-
-	b, err := json.Marshal(a)
-	assert.Nil(err)
-	assert.Equal(string(b), "{\"f\":5.000000}")
-}
-
 func TestNormalizeTime(t *testing.T) {
 	ny, err := time.LoadLocation("America/New_York")
 	if err != nil {
