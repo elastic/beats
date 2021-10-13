@@ -4,7 +4,7 @@ heartbeat.config.monitors:
   reload.enabled: false
   reload.period: 5s
 
-heartbeat.monitors:
+heartbeat.one_shot:
 - type: browser
   enabled: true
   id: my-monitor
@@ -22,14 +22,22 @@ heartbeat.monitors:
             await page.hhover('css=[data-nav-item=products]');
         });
   schedule: "@every 1m"
-
+- type: http
+  id: httptest
+  name: httptest
+  urls: "http://www.google.com"
+  schedule: "@every 1m"
+- type: tcp
+  id: tcptest
+  name: tcptest
+  hosts: "elastic.co:80"
+  schedule: "@every 1m"
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
 setup.kibana:
-cloud.id: i-o-optimized-deployment:dXMtY2VudHJhbDEuZ2NwLmNsb3VkLmVzLmlvJDczNTgwZjNhYmNmNzRiZmNiNmU4YjA4ZjgxYmRjZTI1JDMyNDNiZjg1ZmIyZDQxNjk4MzkyZDU0ODM4MjVhODMx
-cloud.auth: "elastic:rs0vhn0hxzFaHUbi1Xd3ieQo"
+
+output.console: ~
 
 processors:
 - add_observer_metadata:
-

@@ -20,6 +20,7 @@ package beater
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"syscall"
 	"time"
 
@@ -140,7 +141,32 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 // RunOneShot runs the given config then exits immediately after any queued events have been sent to ES
 func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 	logp.Info("Starting one-shot run")
-	cfg := bt.config.OneShot
+	cfgs := bt.config.OneShot
+
+	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
+	if err != nil {
+		return fmt.Errorf("could not create sync client: %w", err)
+	}
+	defer publishClient.Close()
+
+	wg := &sync.WaitGroup{}
+	for _, cfg := range cfgs {
+		logp.Info("RUN A CONFIG")
+		err := RunOnceSingleConfig(cfg, publishClient, wg)
+		if err != nil {
+			logp.Error(fmt.Errorf("error running runonce config: %w", err))
+		}
+	}
+
+	wg.Wait()
+	publishClient.Wait()
+
+	logp.Info("Ending one-shot run")
+
+	return nil
+}
+
+func RunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
 	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
 	if err != nil {
 		return fmt.Errorf("could not get stdmon fields: %w", err)
@@ -153,27 +179,24 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 	if err != nil {
 		return err
 	}
-	defer plugin.Close()
-
-	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
-	if err != nil {
-		return fmt.Errorf("could not create sync client: %w", err)
-	}
-	defer publishClient.Close()
 
 	results := plugin.RunWrapped(sf)
 
-	for {
-		event := <-results
-		if event == nil {
-			break
+	wg.Add(1)
+	go func() {
+		logp.Info("GOTIME")
+		defer wg.Done()
+		defer plugin.Close()
+		for {
+			event := <-results
+			if event == nil {
+				logp.Info("DONE")
+				break
+			}
+			publishClient.Publish(*event)
 		}
-		publishClient.Publish(*event)
-	}
+	}()
 
-	publishClient.Wait()
-
-	logp.Info("Ending one-shot run")
 	return nil
 }
 
