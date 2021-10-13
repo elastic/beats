@@ -50,9 +50,9 @@ heartbeat.monitors:
   {% endif %}
 {% endfor -%}
 
-{%- if one_shot is defined %}
-heartbeat.one_shot:
-{% for monitor in one_shot -%}
+{%- if run_once is defined %}
+heartbeat.run_once:
+{% for monitor in run_once -%}
 - type: {{ monitor.type }}
   schedule: '{{ monitor.schedule|default("@every 1s") }}'
   {%- if monitor.timeout is defined %}

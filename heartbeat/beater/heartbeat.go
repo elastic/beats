@@ -85,17 +85,16 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
+	groups, _ := syscall.Getgroups()
+	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	if bt.config.OneShot != nil {
-		err := bt.runOneShot(b)
+	if bt.config.RunOnce != nil {
+		err := bt.runRunOnce(b)
 		if err != nil {
 			return err
 		}
 		return nil
 	}
-
-	groups, _ := syscall.Getgroups()
-	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
 	stopStaticMonitors, err := bt.RunStaticMonitors(b)
 	if err != nil {
@@ -138,10 +137,10 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	return nil
 }
 
-// runOneShot runs the given config then exits immediately after any queued events have been sent to ES
-func (bt *Heartbeat) runOneShot(b *beat.Beat) error {
-	logp.Info("Starting one_shot run. This is an experimental feature and may be changed or removed in the future!")
-	cfgs := bt.config.OneShot
+// runRunOnce runs the given config then exits immediately after any queued events have been sent to ES
+func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
+	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
+	cfgs := bt.config.RunOnce
 
 	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
 	if err != nil {
@@ -151,21 +150,21 @@ func (bt *Heartbeat) runOneShot(b *beat.Beat) error {
 
 	wg := &sync.WaitGroup{}
 	for _, cfg := range cfgs {
-		err := runOneShotSingleConfig(cfg, publishClient, wg)
+		err := runRunOnceSingleConfig(cfg, publishClient, wg)
 		if err != nil {
-			logp.Warn("error running one_shot config: %s", err)
+			logp.Warn("error running run_once config: %s", err)
 		}
 	}
 
 	wg.Wait()
 	publishClient.Wait()
 
-	logp.Info("Ending one_shot run")
+	logp.Info("Ending run_once run")
 
 	return nil
 }
 
-func runOneShotSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
+func runRunOnceSingleConfig(cfg *common.Config, publishClient *core.SyncClient, wg *sync.WaitGroup) (err error) {
 	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
 	if err != nil {
 		return fmt.Errorf("could not get stdmon fields: %w", err)

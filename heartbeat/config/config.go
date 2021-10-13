@@ -27,7 +27,7 @@ import (
 
 // Config defines the structure of heartbeat.yml.
 type Config struct {
-	OneShot         []*common.Config     `config:"one_shot"`
+	RunOnce         []*common.Config     `config:"run_once"`
 	Monitors        []*common.Config     `config:"monitors"`
 	ConfigMonitors  *common.Config       `config:"config.monitors"`
 	Scheduler       Scheduler            `config:"scheduler"`

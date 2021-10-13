@@ -112,15 +112,15 @@ include::monitors/monitor-browser.asciidoc[]
 
 [float]
 [[one-shot-mode]]
-=== One Shot Mode (Experimental)
+=== Run Once Mode (Experimental)
 
-You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in "one shot" mode. This is an experimental feature
+You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in "run once" mode. This is an experimental feature
 and is subject to change.
 
 [source,yaml]
 ----------------------------------------------------------------------
 # heartbeat.yml
-heartbeat.one_shot:
+heartbeat.run_once:
 - type: icmp
   id: ping-myhost
   name: My Host Ping

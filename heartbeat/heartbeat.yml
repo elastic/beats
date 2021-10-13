@@ -40,12 +40,12 @@ heartbeat.monitors:
 # Experimental: Configure monitors that run exactly once.
 # If enabled, heartbeat.monitors will be ignored
 # Heartbeat will run these monitors once then exit.
-#heartbeat.one_shot:
+#heartbeat.run_once:
 #- type: http
   #id: my-monitor
   #name: My Monitor
   #urls: ["http://localhost:9200"]
-  # Note, you must still provide the schedule field! Heartbeat
+  # NOTE: you must still provide the schedule field! Heartbeat
   # Uses this to determine the contents of the monitor.timespan field
   #schedule: '@every 10s'
 

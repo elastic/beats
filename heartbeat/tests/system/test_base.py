@@ -33,13 +33,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         self.wait_until(lambda: self.log_contains("heartbeat is running"))
         heartbeat_proc.check_kill_and_wait()
 
-    def test_one_shot(self):
+    def test_run_once(self):
         """
         Basic test with exiting Heartbeat normally
         """
 
         config = {
-            "one_shot": [
+            "run_once": [
                 {
                     "type": "http",
                     "id": "http-check",
@@ -60,7 +60,7 @@ class Test(BaseTest, common_tests.TestExportsMixin):
 
         heartbeat_proc = self.start_beat()
         self.wait_until(lambda: self.output_has(lines=2))
-        self.wait_until(lambda: self.log_contains("Ending one_shot run"))
+        self.wait_until(lambda: self.log_contains("Ending run_once run"))
         heartbeat_proc.check_wait()
 
     def test_disabled(self):
