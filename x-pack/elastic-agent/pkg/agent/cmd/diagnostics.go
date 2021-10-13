@@ -104,7 +104,7 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 func humanDiagnosticsOutput(w io.Writer, obj interface{}) error {
 	diag, ok := obj.(DiagnosticsInfo)
 	if !ok {
-		return fmt.Errorf("unable to cast %T as DiagnosticsInfo")
+		return fmt.Errorf("unable to cast %T as DiagnosticsInfo", obj)
 	}
 	return outputDiagnostics(w, diag)
 }
