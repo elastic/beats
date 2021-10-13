@@ -235,7 +235,7 @@ func (m *MetricSet) upMetricFamily(value float64) *p.OpenMetricFamily {
 	}
 	label2 := labels.Label{
 		Name:  upMetricJobLabel,
-		Value: upMetricJobValue,
+		Value: m.Module().Name(),
 	}
 	metric := p.OpenMetric{
 		Gauge: &gauge,
