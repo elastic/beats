@@ -433,12 +433,8 @@ shared:
       dockerfile: 'Dockerfile.elastic-agent.tmpl'
       docker_entrypoint: 'docker-entrypoint.elastic-agent.tmpl'
       user: '{{ .BeatName }}'
-<<<<<<< HEAD
-      linux_capabilities: ''
-=======
       linux_capabilities: 'cap_net_raw+eip'
       image_name: ''
->>>>>>> a78a980da2 ([Heartbeat] Setuid to regular user / lower capabilities when possible (#27878))
     files:
       'elastic-agent.yml':
         source: 'elastic-agent.docker.yml'
