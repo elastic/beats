@@ -85,7 +85,7 @@ type enrollCmdFleetServerOption struct {
 	Insecure              bool
 	SpawnAgent            bool
 	Headers               map[string]string
-  Timeout               time.Duration
+	Timeout               time.Duration
 }
 
 // enrollCmdOption define all the supported enrollment option.

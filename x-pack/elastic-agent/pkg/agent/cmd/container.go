@@ -387,8 +387,8 @@ func buildEnrollArgs(cfg setupConfig, token string, policyID string) ([]string, 
 		}
 		if cfg.FleetServer.Elasticsearch.Insecure {
 			args = append(args, "--fleet-server-es-insecure")
-    }
-    if cfg.FleetServer.Timeout != 0 {
+		}
+		if cfg.FleetServer.Timeout != 0 {
 			args = append(args, "--fleet-server-timeout")
 			args = append(args, cfg.FleetServer.Timeout.String())
 		}

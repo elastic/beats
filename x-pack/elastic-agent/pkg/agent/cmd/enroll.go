@@ -335,7 +335,7 @@ func enroll(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
 			Insecure:              fInsecure,
 			SpawnAgent:            !fromInstall,
 			Headers:               mapFromEnvList(fHeaders),
-      Timeout:               fTimeout,
+			Timeout:               fTimeout,
 		},
 	}
 
