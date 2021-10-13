@@ -33670,12 +33670,6 @@ type: double
 Google Cloud Load Balancing metrics
 
 
-[float]
-=== https
-
-Google Cloud Load Balancing metrics
-
-
 *`gcp.loadbalancing.https.backend_request_bytes_count.value`*::
 +
 --
@@ -33689,6 +33683,15 @@ type: long
 +
 --
 The number of requests served by backends of HTTP/S load balancer.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.https.backend_response_bytes_count.value`*::
++
+--
+The number of bytes sent as responses from backends (or cache) to external HTTP(S) load balancer.
 
 type: long
 
@@ -33721,11 +33724,41 @@ type: long
 
 --
 
-[float]
-=== l3.internal
+*`gcp.loadbalancing.l3.external.egress_bytes_count.value`*::
++
+--
+The number of bytes sent from external TCP/UDP network load balancer backend to client of the flow. For TCP flows it's counting bytes on application stream only.
 
-Google Cloud Load Balancing metrics
+type: long
 
+--
+
+*`gcp.loadbalancing.l3.external.egress_packets_count.value`*::
++
+--
+The number of packets sent from external TCP/UDP network load balancer backend to client of the flow.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.l3.external.ingress_bytes_count.value`*::
++
+--
+The number of bytes sent from client to external TCP/UDP network load balancer backend. For TCP flows it's counting bytes on application stream only.
+
+type: long
+
+--
+
+*`gcp.loadbalancing.l3.external.ingress_packets_count.value`*::
++
+--
+The number of packets sent from client to external TCP/UDP network load balancer backend.
+
+type: long
+
+--
 
 *`gcp.loadbalancing.l3.internal.egress_bytes_count.value`*::
 +
@@ -33762,12 +33795,6 @@ The number of packets sent from client to ILB backend.
 type: long
 
 --
-
-[float]
-=== tcp_ssl_proxy
-
-Google Cloud Load Balancing metrics
-
 
 *`gcp.loadbalancing.tcp_ssl_proxy.closed_connections.value`*::
 +
