@@ -7,8 +7,8 @@ package browser
 import (
 	"fmt"
 	"os"
-	"os/user"
 	"sync"
+	"syscall"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -35,12 +35,9 @@ func create(name string, cfg *common.Config) (p plugin.Plugin, err error) {
 		logp.Info("Synthetic browser monitor detected! Please note synthetic monitors are a beta feature!")
 	})
 
-	curUser, err := user.Current()
-	if err != nil {
-		return plugin.Plugin{}, fmt.Errorf("could not determine current user for script monitor %w: ", err)
-	}
-	if curUser.Uid == "0" {
-		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root! Current UID is %s", curUser.Uid)
+	// We do not use user.Current() which does not reflect setuid changes!
+	if syscall.Geteuid() == 0 {
+		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root!")
 	}
 
 	s, err := NewSuite(cfg)
