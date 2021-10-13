@@ -109,3 +109,37 @@ include::monitors/monitor-tcp.asciidoc[]
 include::monitors/monitor-http.asciidoc[]
 
 include::monitors/monitor-browser.asciidoc[]
+
+[float]
+[[one-shot-mode]]
+=== One Shot Mode (Experimental)
+
+You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in "one shot" mode. This is an experimental feature
+and is subject to change.
+
+[source,yaml]
+----------------------------------------------------------------------
+# heartbeat.yml
+heartbeat.one_shot:
+- type: icmp
+  id: ping-myhost
+  name: My Host Ping
+  hosts: ["myhost"]
+  # Note that schedule is still needed to inform heartbeat when the next
+  # expected check is to be run. This is needed to populate the monitor.timespan field used by the Uptime app.
+  schedule: '@every 5s'
+- type: tcp
+  id: myhost-tcp-echo
+  name: My Host TCP Echo
+  hosts: ["myhost:777"]  # default TCP Echo Protocol
+  check.send: "Check"
+  check.receive: "Check"
+  schedule: '@every 5s'
+- type: http
+  id: service-status
+  name: Service Status
+  service.name: my-apm-service-name
+  hosts: ["http://localhost:80/service/status"]
+  check.response.status: [200]
+  schedule: '@every 5s'
+----------------------------------------------------------------------
