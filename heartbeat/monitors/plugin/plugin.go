@@ -68,7 +68,7 @@ func (p Plugin) RunWrapped(fields stdfields.StdMonitorFields) chan *beat.Event {
 		conts, err := j(e)
 		// No error handling since WrapCommon handles all errors
 		if err != nil {
-			panic(fmt.Sprintf("unexpected error on wrapped job!", err))
+			panic(fmt.Sprintf("unexpected error on wrapped job!: %s", err))
 		}
 		results <- e
 		for _, c := range conts {
