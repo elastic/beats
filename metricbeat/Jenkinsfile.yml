@@ -46,7 +46,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
     windows:
