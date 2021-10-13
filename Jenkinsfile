@@ -563,7 +563,7 @@ def e2e_with_entrypoint(Map args = [:]) {
 */
 def e2e_with_job(Map args = [:]) {
   def jobName = args.e2e?.get('job')
-  def testSuite = args.e2e?.get('suite', '')
+  def testMatrixFile = args.e2e?.get('testMatrixFile', '')
   def notifyContext = "e2e-${args.context}"
   def e2eTestsPipeline = "${jobName}/${isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"}"
 
@@ -572,7 +572,7 @@ def e2e_with_job(Map args = [:]) {
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
     string(name: 'BEAT_VERSION', value: "${env.VERSION}-SNAPSHOT"),
-    string(name: 'runTestsSuites', value: testSuite),
+    string(name: 'testMatrixFile', value: testMatrixFile),
     string(name: 'GITHUB_CHECK_NAME', value: notifyContext),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
     string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
@@ -619,7 +619,7 @@ def target(Map args = [:]) {
             cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // Publish packages shoud happen always to easily consume those artifacts if the
+        // Publish packages should happen always to easily consume those artifacts if the
         // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")

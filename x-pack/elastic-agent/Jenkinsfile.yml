@@ -98,7 +98,7 @@ stages:
         e2e:
             enabled: true
             job: 'e2e-tests/e2e-testing-mbp'
-            suite: 'fleet'
+            testMatrixFile: '.ci/.e2e-tests-for-elastic-agent.yaml'
         stage: packaging
     packaging-arm:
         packaging-arm: "mage package"
