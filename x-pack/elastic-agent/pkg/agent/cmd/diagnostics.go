@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"text/tabwriter"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -109,6 +110,25 @@ func humanDiagnosticsOutput(w io.Writer, obj interface{}) error {
 }
 
 func outputDiagnostics(w io.Writer, d DiagnosticsInfo) error {
-	fmt.Fprintf(w, "%#v\n", d)
+	tw := tabwriter.NewWriter(w, 4, 1, 2, ' ', 0)
+	fmt.Fprintf(tw, "elastic-agent\tversion: %s\n", d.AgentVersion.Version)
+	fmt.Fprintf(tw, "\tbuild_commit: %s\tbuild_time:%s\tsnapshot_build:%v\n", d.AgentVersion.Commit, d.AgentVersion.BuildTime, d.AgentVersion.Snapshot)
+	if len(d.ProcMeta) == 0 {
+		fmt.Fprintf(tw, "Applications: (none)\n")
+	} else {
+		fmt.Fprintf(tw, "Applications:\n")
+		for _, app := range d.ProcMeta {
+			fmt.Fprintf(tw, "  *\tname: %s\troute_key: %s\n", app.Name, app.RouteKey)
+			if app.Error != "" {
+				fmt.Fprintf(tw, "\terror: %s\n", app.Error)
+			} else {
+				fmt.Fprintf(tw, "\tprocess: %s\tid: %s\tephemeral_id: %s\telastic_license: %v\n", app.Process, app.ID, app.EphemeralID, app.ElasticLicensed)
+				fmt.Fprintf(tw, "\tversion: %s\tcommit: %s\tbuild_time: %s\tbinary_arch: %v\n", app.Version, app.BuildCommit, app.BuildTime, app.BinaryArchitecture)
+				fmt.Fprintf(tw, "\thostname: %s\tusername: %s\tuser_id: %s\tuser_gid: %s\n", app.Hostname, app.Username, app.UserID, app.UserGID)
+			}
+
+		}
+	}
+	tw.Flush()
 	return nil
 }
