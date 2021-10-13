@@ -140,7 +140,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 
 // RunOneShot runs the given config then exits immediately after any queued events have been sent to ES
 func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
-	logp.Info("Starting one-shot run")
+	logp.Info("Starting one_shot run. This is an experimental feature and may be changed or removed in the future!")
 	cfgs := bt.config.OneShot
 
 	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
@@ -151,17 +151,16 @@ func (bt *Heartbeat) RunOneShot(b *beat.Beat) error {
 
 	wg := &sync.WaitGroup{}
 	for _, cfg := range cfgs {
-		logp.Info("RUN A CONFIG")
 		err := RunOnceSingleConfig(cfg, publishClient, wg)
 		if err != nil {
-			logp.Error(fmt.Errorf("error running runonce config: %w", err))
+			logp.Warn("error running one_shot config: %s", err)
 		}
 	}
 
 	wg.Wait()
 	publishClient.Wait()
 
-	logp.Info("Ending one-shot run")
+	logp.Info("Ending one_shot run")
 
 	return nil
 }
