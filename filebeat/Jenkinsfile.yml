@@ -55,6 +55,7 @@ stages:
     shipping-to-next-major:
       mage: >-                 ## Run module integration tests under next major of Elastic stack.
         STACK_ENVIRONMENT=next-major
+        TESTING_FILEBEAT_SKIP_DIFF=1
         mage pythonIntegTest
       withModule: true
       stage: mandatory
