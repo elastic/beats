@@ -31,15 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
-
-// Float is a float64 wrapper that implements the encoding/json Marshaler
-// interface to add a decimal point to all float values.
-//
-// Deprecated: This type should no longer be used and the Marshaler interface
-// is not consulted while marshaling to JSON in libbeat outputs.
-type Float float64
-
 // EventConverter is used to convert MapStr objects for publishing
 type EventConverter interface {
 	Convert(m MapStr) MapStr
@@ -304,11 +295,6 @@ func joinKeys(keys ...string) string {
 		keys = keys[1:]
 	}
 	return strings.Join(keys, ".")
-}
-
-// Defines the marshal of the Float type
-func (f Float) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%.6f", f)), nil
 }
 
 // DeDot a string by replacing all . with _
