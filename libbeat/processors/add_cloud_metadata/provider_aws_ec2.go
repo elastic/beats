@@ -76,6 +76,11 @@ func getIMDSv2Token(c *common.Config) string {
 
 	tokenReq.Header.Add(ec2InstanceIMDSv2TokenTTLHeader, ec2InstanceIMDSv2TokenTTLValue)
 	rsp, err := client.Do(tokenReq)
+	if rsp == nil {
+		logger.Warnf("read token request for getting IMDSv2 token returns empty: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
 	defer func(body io.ReadCloser) {
 		if body != nil {
 			body.Close()
