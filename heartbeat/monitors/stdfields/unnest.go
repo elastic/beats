@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // OptionalStream represents a config that has a stream set, which in practice
@@ -70,9 +69,5 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 	}
 
 	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
-
-	xx := common.MapStr{}
-	res.Unpack(&xx)
-	logp.Warn("UNNEST SUCCESS! %v", xx)
 	return
 }
