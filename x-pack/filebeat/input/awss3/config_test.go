@@ -28,13 +28,15 @@ func TestConfig(t *testing.T) {
 		parserConf := parser.Config{}
 		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
-			QueueURL:            quequeURL,
-			BucketARN:           s3Bucket,
-			APITimeout:          120 * time.Second,
-			VisibilityTimeout:   300 * time.Second,
-			SQSMaxReceiveCount:  5,
-			SQSWaitTime:         20 * time.Second,
-			BucketListInterval:  120 * time.Second,
+			QueueURL:           quequeURL,
+			BucketARN:          s3Bucket,
+			APITimeout:         120 * time.Second,
+			VisibilityTimeout:  300 * time.Second,
+			SQSMaxReceiveCount: 5,
+			SQSWaitTime:        20 * time.Second,
+			BucketListInterval: 120 * time.Second,
+			BucketListPrefix:   "",
+
 			FIPSEnabled:         false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
