@@ -39,6 +39,3 @@ stages:
     goIntegTest:
         mage: "mage goIntegTest"
         stage: mandatory
-    pythonIntegTest:
-        mage: "mage pythonIntegTest"
-        stage: mandatory
