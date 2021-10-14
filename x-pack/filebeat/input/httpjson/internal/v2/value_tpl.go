@@ -60,6 +60,8 @@ func (t *valueTpl) Unpack(in string) error {
 			"hmac":                hmacStringHex,
 			"base64Encode":        base64Encode,
 			"base64EncodeNoPad":   base64EncodeNoPad,
+			"base64Decode":        base64Decode,
+			"base64DecodeNoPad":   base64DecodeNoPad,
 			"join":                join,
 			"sprintf":             fmt.Sprintf,
 			"hmacBase64":          hmacStringBase64,
@@ -271,7 +273,17 @@ func base64EncodeNoPad(values ...string) string {
 	return base64.RawStdEncoding.EncodeToString([]byte(data))
 }
 
-func hmacString(hmacType string, hmacKey string, data string) []byte {
+func base64Decode(enc string) string {
+	dec, _ := base64.StdEncoding.DecodeString(enc)
+	return string(dec)
+}
+
+func base64DecodeNoPad(enc string) string {
+	dec, _ := base64.RawStdEncoding.DecodeString(enc)
+	return string(dec)
+}
+
+func hmacString(hmacType string, hmacKey []byte, data string) []byte {
 	if data == "" {
 		return nil
 	}
@@ -279,9 +291,9 @@ func hmacString(hmacType string, hmacKey string, data string) []byte {
 	var mac hash.Hash
 	switch hmacType {
 	case "sha256":
-		mac = hmac.New(sha256.New, []byte(hmacKey))
+		mac = hmac.New(sha256.New, hmacKey)
 	case "sha1":
-		mac = hmac.New(sha1.New, []byte(hmacKey))
+		mac = hmac.New(sha1.New, hmacKey)
 	default:
 		// Upstream config validation prevents this from happening.
 		return nil
@@ -298,7 +310,7 @@ func hmacStringHex(hmacType string, hmacKey string, values ...string) string {
 	if data == "" {
 		return ""
 	}
-	bytes := hmacString(hmacType, hmacKey, data)
+	bytes := hmacString(hmacType, []byte(hmacKey), data)
 	// Get result and encode as hexadecimal string
 	return hex.EncodeToString(bytes)
 }
@@ -308,7 +320,7 @@ func hmacStringBase64(hmacType string, hmacKey string, values ...string) string 
 	if data == "" {
 		return ""
 	}
-	bytes := hmacString(hmacType, hmacKey, data)
+	bytes := hmacString(hmacType, []byte(hmacKey), data)
 
 	// Get result and encode as hexadecimal string
 	return base64.StdEncoding.EncodeToString(bytes)
