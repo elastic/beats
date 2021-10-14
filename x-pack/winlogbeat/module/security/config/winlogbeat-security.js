@@ -1963,7 +1963,7 @@ var security = (function () {
         .Add(function(evt) {
             var user = evt.Get("winlog.event_data.TargetUserName");
             if (user) {
-                if (/.@*/.test(user)) {
+                if (user.indexOf('@')>0) {
                     user = user.split('@')[0];
                     evt.Put('user.target.name', user);
                 }
@@ -2261,7 +2261,6 @@ var security = (function () {
             evt.AppendTo('related.user', userOld);
             if (userOld) {
                 evt.Put('user.target.name', userOld);
-                evt.Put('user.target.domain', domain);
             }
             if (userNew) {
                 evt.Put('user.changes.name', userNew);
