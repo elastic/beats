@@ -112,7 +112,7 @@ func (s *Suite) jobs() []jobs.Job {
 func (s *Suite) plugin() plugin.Plugin {
 	return plugin.Plugin{
 		Jobs:      s.jobs(),
-		Close:     s.Close,
+		DoClose:   s.Close,
 		Endpoints: 1,
 	}
 }
