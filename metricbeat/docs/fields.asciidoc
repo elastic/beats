@@ -33115,9 +33115,7 @@ type: float
 Google Cloud Compute metrics
 
 
-
-
-*`gcp.compute.instance.firewall.dropped_bytes_count.value`*::
+*`gcp.compute.firewall.dropped_bytes_count.value`*::
 +
 --
 Incoming bytes dropped by the firewall
@@ -33126,7 +33124,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.firewall.dropped_packets_count.value`*::
+*`gcp.compute.firewall.dropped_packets_count.value`*::
 +
 --
 Incoming packets dropped by the firewall
@@ -33135,20 +33133,10 @@ type: long
 
 --
 
-
 *`gcp.compute.instance.cpu.reserved_cores.value`*::
 +
 --
 Number of cores reserved on the host of the instance
-
-type: double
-
---
-
-*`gcp.compute.instance.cpu.utilization.value`*::
-+
---
-The fraction of the allocated CPU that is currently in use on the instance
 
 type: double
 
@@ -33163,6 +33151,14 @@ type: double
 
 --
 
+*`gcp.compute.instance.cpu.utilization.value`*::
++
+--
+The fraction of the allocated CPU that is currently in use on the instance
+
+type: double
+
+--
 
 *`gcp.compute.instance.disk.read_bytes_count.value`*::
 +
@@ -33200,15 +33196,41 @@ type: long
 
 --
 
-*`gcp.compute.instance.uptime.value`*::
+*`gcp.compute.instance.memory.balloon.ram_size.value`*::
 +
 --
-How long the VM has been running, in seconds
+The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
 
 type: long
 
 --
 
+*`gcp.compute.instance.memory.balloon.ram_used.value`*::
++
+--
+Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
++
+--
+The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
++
+--
+The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
 
 *`gcp.compute.instance.network.received_bytes_count.value`*::
 +
@@ -33246,38 +33268,19 @@ type: long
 
 --
 
-
-*`gcp.compute.instance.memory.balloon.ram_size.value`*::
+*`gcp.compute.instance.uptime.value`*::
 +
 --
-The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+Number of seconds the VM has been running.
 
 type: long
 
 --
 
-*`gcp.compute.instance.memory.balloon.ram_used.value`*::
+*`gcp.compute.instance.uptime_total.value`*::
 +
 --
-Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
-+
---
-The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
-+
---
-The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
 
 type: long
 
