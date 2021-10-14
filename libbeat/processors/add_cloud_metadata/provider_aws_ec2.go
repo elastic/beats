@@ -18,14 +18,19 @@
 package add_cloud_metadata
 
 import (
+	"fmt"
+	"io"
+	"io/ioutil"
+	"net"
+	"net/http"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
+	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-<<<<<<< HEAD
-const ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
-=======
 const (
 	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
 	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
@@ -99,7 +104,6 @@ func getIMDSv2Token(c *common.Config) string {
 
 	return string(all)
 }
->>>>>>> 58ff2a4b43 (Check IMDSv2 token response is empty (#28418))
 
 // AWS EC2 Metadata Service
 var ec2MetadataFetcher = provider{
@@ -124,7 +128,13 @@ var ec2MetadataFetcher = provider{
 			return common.MapStr{"cloud": out}
 		}
 
-		fetcher, err := newMetadataFetcher(config, "aws", nil, metadataHost, ec2Schema, ec2InstanceIdentityURI)
+		headers := make(map[string]string, 1)
+		token := getIMDSv2Token(config)
+		if len(token) > 0 {
+			headers[ec2InstanceIMDSv2TokenValueHeader] = token
+		}
+
+		fetcher, err := newMetadataFetcher(config, "aws", headers, metadataHost, ec2Schema, ec2InstanceIdentityURI)
 		return fetcher, err
 	},
 }

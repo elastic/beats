@@ -4,6 +4,7 @@
 
 // +build integration
 // +build gcp
+// +build billing
 
 package billing
 
@@ -21,8 +22,8 @@ func TestFetch(t *testing.T) {
 	config["period"] = "24h"
 	config["dataset_id"] = "master_gcp"
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	metricSet := mbtest.NewReportingMetricSetV2WithContext(t, config)
+	events, errs := mbtest.ReportingFetchV2WithContext(metricSet)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
