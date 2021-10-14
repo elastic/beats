@@ -12,6 +12,21 @@ Changes will be described in a later alpha / beta.
 === Beats version 8.0.0-alpha1
 
 Changes will be described in a later alpha / beta.
+[[release-notes-7.15.1]]
+=== Beats version 7.15.1
+https://github.com/elastic/beats/compare/v7.15.0...v7.15.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
+- sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
+
+*Metricbeat*
+
+- Add support for kube-state-metrics v2.0.0. {pull}27552[27552]
+
 [[release-notes-7.15.0]]
 === Beats version 7.15.0
 https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
@@ -54,6 +69,7 @@ https://github.com/elastic/beats/compare/v7.14.2...v7.15.0[View commits]
 *Auditbeat*
 
 - File Integrity Module: Honor `include_files` when doing initial scan. {issue}27273[27273] {pull}27722[27722]
+- Fix handling of root and relative paths {issue}24430[24430] {pull}28354[28354]
 
 *Filebeat*
 

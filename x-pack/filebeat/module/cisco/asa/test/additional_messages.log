@@ -83,6 +83,7 @@ Apr 27 2020 02:03:03 dev01: %ASA-6-713904: All IPSec SA proposals found unaccept
 Apr 27 2020 02:03:03 dev01: %ASA-6-713903: IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713902: Group = 100.60.140.10, All IPSec SA proposals found unacceptable!
 Apr 27 2020 02:03:03 dev01: %ASA-6-713901: Group = 100.60.140.10, IP = 192.128.1.1, All IPSec SA proposals found unacceptable!
+Apr 27 02:03:03 dev01: %ASA-5-713049: Group = 100.60.140.10, Username = test_user, IP = 1.2.3.4, Security negotiation complete for User (test_user) Responder, Inbound SPI = 0x0000000, Outbound SPI = 0x0000000
 Apr 27 2020 02:03:03 dev01: %ASA-4-106023: Deny protocol 47 src outside:100.66.124.24 dst inside:172.31.98.44 by access-group "inbound"
 Apr 27 2020 02:03:03 dev01: %ASA-4-106023: Deny icmp src OUTSIDE:2a05:d016:add:4002:91f2:a9b2:e09a:6fc6 dst OUTSIDE:fe00:afa0::1 (type 128, code 0) by access-group "OUTSIDE_in"
 Apr 27 2020 02:03:03 dev01: %ASA-4-302016: Teardown UDP connection 123364823 for OUTSIDE:82.0.0.1/500 to identity:85.0.0.1/500 duration 92:24:20 bytes 4671944
