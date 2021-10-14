@@ -15,13 +15,13 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
   }
   triggers {
-    cron('H H(1-4) * * 0')
+    cron('H H(2-3) * * 1-5')
   }
   stages {
     stage('Nighly beats builds') {
       steps {
-        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
-        build(quietPeriod: 1000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+        build(quietPeriod: 0, job: 'Beats/beats/master', parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
+        build(quietPeriod: 2000, job: 'Beats/beats/7.x', parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
       }
     }
   }
