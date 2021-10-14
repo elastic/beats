@@ -384,3 +384,52 @@ func TestGetRegionForBucketARN(t *testing.T) {
 	regionName, err := getRegionForBucketARN(context.Background(), s3Client, tfConfig.BucketName)
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }
+
+func TestPaginatorListPrefix(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to setup S3 and must be executed manually.
+	tfConfig := getTerraformOutputs(t)
+
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt", // Skipped (no match).
+	)
+
+	awsConfig, err := external.LoadDefaultAWSConfig()
+	awsConfig.Region = tfConfig.AWSRegion
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+
+	s3API := &awsS3API{
+		client: s3Client,
+	}
+
+	var objects []string
+	paginator := s3API.ListObjectsPaginator(tfConfig.BucketName, "log")
+	for paginator.Next(context.Background()) {
+		page := paginator.CurrentPage()
+		for _, object := range page.Contents {
+			objects = append(objects, *object.Key)
+		}
+	}
+
+	assert.NoError(t, paginator.Err())
+
+	expected := []string{
+		"log.json",
+		"log.ndjson",
+		"log.txt",
+	}
+
+	assert.Equal(t, expected, objects)
+}
