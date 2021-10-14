@@ -43,7 +43,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
-- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
@@ -60,7 +59,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix ECS compliance of user.id field in system/users  metricset {pull}19019[19019]
 - Remove "invalid zero" metrics on Windows and Darwin, don't report linux-only memory and diskio metrics when running under agent. {pull}21457[21457]
 - Add Linux pressure metricset {pull}27355[27355]
-- Add support for kube-state-metrics v2.0.0 {pull}27552[27552]
 - Add User-Agent header to HTTP requests. {issue}18160[18160] {pull}27509[27509]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
 
@@ -137,6 +135,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
 - Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
 - Fix build constraint that caused issues with doc builds. {pull}27381[27381]
+- Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
 
 *Auditbeat*
 
@@ -194,15 +193,19 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
-- Update Sophos xg module pipeline to deal with missing `date` and `time` fields. {pull}27834[27834]
-- sophos/xg fileset: Add missing pipeline for System Health logs. {pull}27827[27827] {issue}27826[27826]
+- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
+- Add support for username in cisco asa security negotiation logs {pull}26975[26975]
+- Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
+- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
+- Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
 
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
+- Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
 
 *Journalbeat*
 
