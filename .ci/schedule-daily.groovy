@@ -15,15 +15,14 @@ pipeline {
     durabilityHint('PERFORMANCE_OPTIMIZED')
   }
   triggers {
-    cron('H H(1-2) * * 0')
+    cron('H H(2-3) * * 1-5')
   }
   stages {
     stage('Nighly beats builds') {
       steps {
         runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        runBuild(quietPeriod: 1000, job: 'Beats/beats/7.x')
-        // <minor> is an alias to be replaced with the latest release branch
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.<minor>')
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.x')
+        runBuild(quietPeriod: 4000, job: 'Beats/beats/7.<minor>')
       }
     }
   }
@@ -40,5 +39,5 @@ def runBuild(Map args = [:]) {
     def parts = stackVersions.release().split('\\.')
     jobName = args.job.replaceAll('<minor>', parts[1])
   }
-  build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'awsCloudTests', value: true)], wait: false, propagate: false)
+  build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
 }
