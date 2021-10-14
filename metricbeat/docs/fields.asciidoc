@@ -34270,7 +34270,6 @@ type: long
 Google Cloud Storage metrics
 
 
-
 *`gcp.storage.api.request_count.value`*::
 +
 --
@@ -34279,7 +34278,6 @@ Delta count of API calls, grouped by the API method name and response code.
 type: long
 
 --
-
 
 *`gcp.storage.authz.acl_based_object_access_count.value`*::
 +
@@ -34308,7 +34306,6 @@ type: long
 
 --
 
-
 *`gcp.storage.network.received_bytes_count.value`*::
 +
 --
@@ -34326,7 +34323,6 @@ Delta count of bytes sent over the network, grouped by the API method name and r
 type: long
 
 --
-
 
 *`gcp.storage.storage.object_count.value`*::
 +
