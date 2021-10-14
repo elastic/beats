@@ -28,8 +28,8 @@ var diagOutputs = map[string]outputter{
 func newDiagnosticsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "diagnostics",
-		Short: "Diagnostics gather diagnostics information from the elastic-agent and running processes.",
-		Long:  "Diagnostics gather diagnostics information from the elastic-agent and running processes.",
+		Short: "Gather diagnostics information from the elastic-agent and running processes.",
+		Long:  "Gather diagnostics information from the elastic-agent and running processes.",
 		Run: func(c *cobra.Command, args []string) {
 			if err := diagnosticCmd(streams, c, args); err != nil {
 				fmt.Fprintf(streams.Err, "Error: %v\n%s\n", err, troubleshootMessage())
@@ -112,7 +112,7 @@ func humanDiagnosticsOutput(w io.Writer, obj interface{}) error {
 func outputDiagnostics(w io.Writer, d DiagnosticsInfo) error {
 	tw := tabwriter.NewWriter(w, 4, 1, 2, ' ', 0)
 	fmt.Fprintf(tw, "elastic-agent\tversion: %s\n", d.AgentVersion.Version)
-	fmt.Fprintf(tw, "\tbuild_commit: %s\tbuild_time:%s\tsnapshot_build:%v\n", d.AgentVersion.Commit, d.AgentVersion.BuildTime, d.AgentVersion.Snapshot)
+	fmt.Fprintf(tw, "\tbuild_commit: %s\tbuild_time: %s\tsnapshot_build: %v\n", d.AgentVersion.Commit, d.AgentVersion.BuildTime, d.AgentVersion.Snapshot)
 	if len(d.ProcMeta) == 0 {
 		fmt.Fprintf(tw, "Applications: (none)\n")
 	} else {

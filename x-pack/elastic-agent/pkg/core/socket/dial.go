@@ -14,7 +14,10 @@ import (
 
 // DialContext returns a function that can be used to dial a local unix-domain socket.
 func DialContext(socket string) func(context.Context, string, string) (net.Conn, error) {
-	return func(_ context.Context, _, _ string) (net.Conn, error) {
-		return net.Dial("unix", socket)
+	return func(ctx context.Context, _, _ string) (net.Conn, error) {
+		var d net.Dialer
+		d.LocalAddr = nil
+		addr := net.UnixAddr{Name: socket, Net: "unix"}
+		return d.DialContext(ctx, "unix", addr.String())
 	}
 }
