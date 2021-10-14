@@ -189,7 +189,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 		if err == nil {
 			resp.Body.Close()
 		}
-		logp.Info("attempt to download zip at %s failed: %s, will retry in 1s", z.URL, err)
+		logp.Warn("attempt to download zip at %s failed: %s, will retry in 1s", z.URL, err)
 		time.Sleep(time.Second)
 	}
 	if resp != nil && resp.StatusCode > 300 {
