@@ -27,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/beats/v7/libbeat/processors/add_data_stream"
@@ -94,9 +93,6 @@ func newCommonPublishConfigs(info beat.Info, cfg *common.Config) (pipetool.Confi
 		return nil, err
 	}
 
-	xx := common.MapStr{}
-	cfg.Unpack(&xx)
-	logp.Warn("PRECO %v", xx)
 	sf, err := stdfields.ConfigToStdMonitorFields(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse cfg for datastream %w", err)
