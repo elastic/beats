@@ -40,7 +40,7 @@ func TestUnnestStream(t *testing.T) {
 			cfg: common.MapStr{
 				"id": "myuuid",
 				"streams": []common.MapStr{
-					common.MapStr{
+					{
 						"streamid": "mystreamid",
 						"data_stream": common.MapStr{
 							"namespace": "mynamespace",
@@ -64,13 +64,13 @@ func TestUnnestStream(t *testing.T) {
 			cfg: common.MapStr{
 				"id": "myuuid",
 				"data_stream": common.MapStr{
-					"type": "mytype",
+					"namespace": "mynamespace",
 				},
 				"streams": []common.MapStr{
-					common.MapStr{
+					{
 						"data_stream": common.MapStr{
-							"namespace": "mynamespace",
-							"dataset":   "mydataset",
+							"type":    "mytype",
+							"dataset": "mydataset",
 						},
 					},
 				},
@@ -81,6 +81,39 @@ func TestUnnestStream(t *testing.T) {
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
 					"type":      "mytype",
+				},
+			}),
+		},
+		{
+			name: "base is last, not first stream",
+			cfg: common.MapStr{
+				"id": "myuuid",
+				"data_stream": common.MapStr{
+					"namespace": "parentnamespace",
+				},
+				"streams": []common.MapStr{
+					{
+						"data_stream": common.MapStr{
+							// Intentionally missing `type` since
+							// this is not the base dataset.
+							// There is only one stream with `type`
+							"dataset": "notbasedataset",
+						},
+					},
+					{
+						"data_stream": common.MapStr{
+							"type":    "basetype",
+							"dataset": "basedataset",
+						},
+					},
+				},
+			},
+			v: lookslike.MustCompile(common.MapStr{
+				"id": "myuuid",
+				"data_stream": common.MapStr{
+					"namespace": "parentnamespace",
+					"type":      "basetype",
+					"dataset":   "basedataset",
 				},
 			}),
 		},
