@@ -27967,8 +27967,6 @@ type: long
 `gke` contains the metrics that we scraped from GCP Stackdriver API containing monitoring metrics for GCP GKE
 
 
-
-
 *`gcp.gke.container.cpu.core_usage_time.value`*::
 +
 --
@@ -28014,7 +28012,6 @@ type: double
 
 --
 
-
 *`gcp.gke.container.ephemeral_storage.limit_bytes.value`*::
 +
 --
@@ -28041,7 +28038,6 @@ Local ephemeral storage usage in bytes. Sampled every 60 seconds.
 type: long
 
 --
-
 
 *`gcp.gke.container.memory.limit_bytes.value`*::
 +
@@ -28115,8 +28111,6 @@ type: double
 
 --
 
-
-
 *`gcp.gke.node.cpu.allocatable_cores.value`*::
 +
 --
@@ -28152,7 +28146,6 @@ Total number of CPU cores on the node. Sampled every 60 seconds.
 type: double
 
 --
-
 
 *`gcp.gke.node.ephemeral_storage.allocatable_bytes.value`*::
 +
@@ -28199,7 +28192,6 @@ type: long
 
 --
 
-
 *`gcp.gke.node.memory.allocatable_bytes.value`*::
 +
 --
@@ -28235,7 +28227,6 @@ Cumulative memory bytes used by the node. Sampled every 60 seconds.
 type: long
 
 --
-
 
 *`gcp.gke.node.network.received_bytes_count.value`*::
 +
@@ -28273,8 +28264,6 @@ type: long
 
 --
 
-
-
 *`gcp.gke.node_daemon.cpu.core_usage_time.value`*::
 +
 --
@@ -28284,7 +28273,6 @@ type: double
 
 --
 
-
 *`gcp.gke.node_daemon.memory.used_bytes.value`*::
 +
 --
@@ -28293,8 +28281,6 @@ Memory usage by the system daemon in bytes. Sampled every 60 seconds.
 type: long
 
 --
-
-
 
 *`gcp.gke.pod.network.received_bytes_count.value`*::
 +
@@ -28313,7 +28299,6 @@ Cumulative number of bytes transmitted by the pod over the network. Sampled ever
 type: long
 
 --
-
 
 *`gcp.gke.pod.volume.total_bytes.value`*::
 +
