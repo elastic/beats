@@ -154,6 +154,9 @@
           fields:
             - name: name
               type: text
+              multi_fields:
+                - name: keyword
+                  type: keyword
             - name: index
               type: integer
             - name: status
