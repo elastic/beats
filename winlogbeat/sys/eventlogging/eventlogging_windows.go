@@ -413,12 +413,7 @@ func parseSID(record eventLogRecord, buffer []byte) (*sys.SID, error) {
 	}
 
 	sid := (*windows.SID)(unsafe.Pointer(&buffer[record.userSidOffset]))
-	identifier, err := sid.String()
-	if err != nil {
-		return nil, err
-	}
-
-	return &sys.SID{Identifier: identifier}, nil
+	return &sys.SID{Identifier: sid.String()}, nil
 }
 
 // ClearEventLog takes an event log file handle and empties the log. If a backup
