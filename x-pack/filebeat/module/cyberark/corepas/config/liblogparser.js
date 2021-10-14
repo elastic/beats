@@ -958,7 +958,7 @@ function tagval(id, src, cfg, keys, on_success) {
         for (i=0; i<pairs.length; i++) {
             var m = pairs[i].match(kv_regex);
             var field;
-            if (m === null || m.length !== 3 || m[1] === undefined || m[2] === undefined) {
+            if (m === null || m.length !== 3 || m[1] === undefined || m[2] === undefined || m[1] === "" || m[2] === "") {
                 prev += pairs[i] + cfg.pair_separator;
                 continue;
             }
@@ -2499,7 +2499,7 @@ function test_tvm() {
     var assertEqual = function(evt, key, expected) {
         var value = evt.Get(key);
         if (value !== expected)
-            throw("failed for " + key + ": expected:'" + expected + "' got:'" + value + "'");
+            throw("failed for " + key + ": expected:'" + expected + "' got:'" + value + "' " + JSON.stringify(evt));
     };
     tests.forEach(function (test, idx) {
         var processor = tagval("test", "message", test.config, test.mappings, test.on_success);
