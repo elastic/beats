@@ -111,7 +111,7 @@ include::monitors/monitor-http.asciidoc[]
 include::monitors/monitor-browser.asciidoc[]
 
 [float]
-[[one-shot-mode]]
+[[run-once-mode]]
 === Run Once Mode (Experimental)
 
 You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in "run once" mode. This is an experimental feature

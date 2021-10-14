@@ -142,7 +142,7 @@ func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
 	cfgs := bt.config.RunOnce
 
-	publishClient, err := core.NewSyncClient(logp.NewLogger("oneshot mode"), b.Publisher, beat.ClientConfig{})
+	publishClient, err := core.NewSyncClient(logp.NewLogger("run_once mode"), b.Publisher, beat.ClientConfig{})
 	if err != nil {
 		return fmt.Errorf("could not create sync client: %w", err)
 	}
