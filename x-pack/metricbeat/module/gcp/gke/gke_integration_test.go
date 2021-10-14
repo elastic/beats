@@ -2,37 +2,31 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build integration && aws
-// +build integration,aws
+//go:build integration && gcp
+// +build integration,gcp
 
-package ec2
+package gke
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
-	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws/mtest"
+	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
 
 func TestFetch(t *testing.T) {
-	config := mtest.GetConfigForTest(t, "ec2", "300s")
+	config := metrics.GetConfigForTest(t, "gke")
+	fmt.Printf("%+v\n", config)
 
-	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	events, errs := mbtest.ReportingFetchV2Error(metricSet)
+	metricSet := mbtest.NewReportingMetricSetV2WithContext(t, config)
+	events, errs := mbtest.ReportingFetchV2WithContext(metricSet)
 	if len(errs) > 0 {
 		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
 	}
 
 	assert.NotEmpty(t, events)
 	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
-}
-
-func TestData(t *testing.T) {
-	config := mtest.GetConfigForTest(t, "ec2", "300s")
-
-	metricSet := mbtest.NewFetcher(t, config)
-	metricSet.WriteEvents(t, "/")
 }
