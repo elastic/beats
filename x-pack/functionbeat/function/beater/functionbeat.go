@@ -31,6 +31,7 @@ var (
 	refreshDelay     = 15 * time.Minute
 	supportedOutputs = []string{
 		"elasticsearch",
+		"kafka",
 		"logstash",
 		"console", // for local debugging
 	}

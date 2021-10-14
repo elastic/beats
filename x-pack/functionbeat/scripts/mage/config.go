@@ -15,7 +15,6 @@ func XPackConfigFileParams() devtools.ConfigFileParams {
 	p.ExtraVars = map[string]interface{}{
 		"ExcludeConsole":             false,
 		"ExcludeFileOutput":          true,
-		"ExcludeKafka":               true,
 		"ExcludeRedis":               true,
 		"UseDockerMetadataProcessor": false,
 	}
