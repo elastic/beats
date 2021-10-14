@@ -23,7 +23,83 @@ import (
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
 
+<<<<<<< HEAD
 const ec2InstanceIdentityURI = "/2014-02-25/dynamic/instance-identity/document"
+=======
+const (
+	ec2InstanceIdentityURI            = "/2014-02-25/dynamic/instance-identity/document"
+	ec2InstanceIMDSv2TokenValueHeader = "X-aws-ec2-metadata-token"
+	ec2InstanceIMDSv2TokenTTLHeader   = "X-aws-ec2-metadata-token-ttl-seconds"
+	ec2InstanceIMDSv2TokenTTLValue    = "21600"
+	ec2InstanceIMDSv2TokenURI         = "/latest/api/token"
+)
+
+// fetches IMDSv2 token, returns empty one on errors
+func getIMDSv2Token(c *common.Config) string {
+	logger := logp.NewLogger("add_cloud_metadata")
+
+	config := defaultConfig()
+	if err := c.Unpack(&config); err != nil {
+		logger.Warnf("error when load config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
+	if err != nil {
+		logger.Warnf("error when load TLS config for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	client := http.Client{
+		Timeout: config.Timeout,
+		Transport: &http.Transport{
+			DisableKeepAlives: true,
+			DialContext: (&net.Dialer{
+				Timeout:   config.Timeout,
+				KeepAlive: 0,
+			}).DialContext,
+			TLSClientConfig: tlsConfig.ToConfig(),
+		},
+	}
+
+	tokenReq, err := http.NewRequest("PUT", fmt.Sprintf("http://%s%s", metadataHost, ec2InstanceIMDSv2TokenURI), nil)
+	if err != nil {
+		logger.Warnf("error when make token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	tokenReq.Header.Add(ec2InstanceIMDSv2TokenTTLHeader, ec2InstanceIMDSv2TokenTTLValue)
+	rsp, err := client.Do(tokenReq)
+	if rsp == nil {
+		logger.Warnf("read token request for getting IMDSv2 token returns empty: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	defer func(body io.ReadCloser) {
+		if body != nil {
+			body.Close()
+		}
+	}(rsp.Body)
+
+	if err != nil {
+		logger.Warnf("error when read token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	if rsp.StatusCode != http.StatusOK {
+		logger.Warnf("error when check request status for getting IMDSv2 token: http request status %d. No token in the metadata request will be used.", rsp.StatusCode)
+		return ""
+	}
+
+	all, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		logger.Warnf("error when reading token request for getting IMDSv2 token: %s. No token in the metadata request will be used.", err)
+		return ""
+	}
+
+	return string(all)
+}
+>>>>>>> 58ff2a4b43 (Check IMDSv2 token response is empty (#28418))
 
 // AWS EC2 Metadata Service
 var ec2MetadataFetcher = provider{
