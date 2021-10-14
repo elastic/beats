@@ -11,10 +11,26 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
 )
+
+func TestFetch(t *testing.T) {
+	config := metrics.GetConfigForTest(t, "compute")
+	fmt.Printf("%+v\n", config)
+
+	metricSet := mbtest.NewReportingMetricSetV2WithContext(t, config)
+	events, errs := mbtest.ReportingFetchV2WithContext(metricSet)
+	if len(errs) > 0 {
+		t.Fatalf("Expected 0 error, had %d. %v\n", len(errs), errs)
+	}
+
+	assert.NotEmpty(t, events)
+	mbtest.TestMetricsetFieldsDocumented(t, metricSet, events)
+}
 
 func TestData(t *testing.T) {
 	metricPrefixIs := func(metricPrefix string) func(e common.MapStr) bool {

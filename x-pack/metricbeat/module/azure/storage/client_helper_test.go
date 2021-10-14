@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/monitor/mgmt/2019-06-01/insights"
-	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-03-01/resources"
+	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-10-01/resources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
@@ -33,12 +33,12 @@ var (
 	}
 )
 
-func MockResource() resources.GenericResource {
+func MockResource() resources.GenericResourceExpanded {
 	id := "123"
 	name := "resourceName"
 	location := "resourceLocation"
 	rType := "resourceType"
-	return resources.GenericResource{
+	return resources.GenericResourceExpanded{
 		ID:       &id,
 		Name:     &name,
 		Location: &location,
@@ -97,7 +97,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
-		metric, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
+		metric, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.Error(t, err)
 		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts.")
 		assert.Equal(t, metric, []azure.Metric(nil))
@@ -107,7 +107,7 @@ func TestMapMetric(t *testing.T) {
 		m := &azure.MockService{}
 		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
-		metrics, err := mapMetrics(client, []resources.GenericResource{resource}, resourceConfig)
+		metrics, err := mapMetrics(client, []resources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.NoError(t, err)
 		assert.Equal(t, metrics[0].ResourceId, "123")
 		assert.Equal(t, metrics[0].Namespace, "Microsoft.Storage/storageAccounts")

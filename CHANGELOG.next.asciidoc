@@ -326,6 +326,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
 - Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
+- Log browser `zip_url` download failures as `warn` instead of as `info`. {pull}28440[28440]
 
 *Journalbeat*
 
@@ -759,11 +760,13 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
+- Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
 
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
 - Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
+- Experimental 'run once' mode. {pull}25972[25972]
 
 *Journalbeat*
 
