@@ -24,6 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ServiceFields struct {
@@ -43,6 +44,10 @@ type StdMonitorFields struct {
 }
 
 func ConfigToStdMonitorFields(config *common.Config) (StdMonitorFields, error) {
+	xx := common.MapStr{}
+	config.Unpack(&xx)
+	logp.Warn("CONV %v", xx)
+
 	mpi := StdMonitorFields{Enabled: true}
 
 	if err := config.Unpack(&mpi); err != nil {

@@ -41,6 +41,7 @@ func TestUnnestStream(t *testing.T) {
 				"id": "myuuid",
 				"streams": []common.MapStr{
 					{
+						"type":     "montype",
 						"streamid": "mystreamid",
 						"data_stream": common.MapStr{
 							"namespace": "mynamespace",
@@ -51,7 +52,8 @@ func TestUnnestStream(t *testing.T) {
 				},
 			},
 			v: lookslike.MustCompile(common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
@@ -62,12 +64,14 @@ func TestUnnestStream(t *testing.T) {
 		{
 			name: "split data stream",
 			cfg: common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "mynamespace",
 				},
 				"streams": []common.MapStr{
 					{
+						"type": "montype",
 						"data_stream": common.MapStr{
 							"type":    "mytype",
 							"dataset": "mydataset",
@@ -76,7 +80,8 @@ func TestUnnestStream(t *testing.T) {
 				},
 			},
 			v: lookslike.MustCompile(common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
@@ -101,6 +106,7 @@ func TestUnnestStream(t *testing.T) {
 						},
 					},
 					{
+						"type": "montype",
 						"data_stream": common.MapStr{
 							"type":    "basetype",
 							"dataset": "basedataset",
@@ -109,7 +115,8 @@ func TestUnnestStream(t *testing.T) {
 				},
 			},
 			v: lookslike.MustCompile(common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "parentnamespace",
 					"type":      "basetype",

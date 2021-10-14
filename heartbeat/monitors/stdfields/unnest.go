@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // OptionalStream represents a config that has a stream set, which in practice
@@ -34,9 +35,7 @@ type OptionalStream struct {
 }
 
 type BaseStream struct {
-	DataStream struct {
-		Type string `config:"type"`
-	} `config:"data_stream"`
+	Type string `config:"type"`
 }
 
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
@@ -59,7 +58,7 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 	for _, stream := range optS.Streams {
 		bs := &BaseStream{}
 		stream.Unpack(bs)
-		if bs.DataStream.Type != "" {
+		if bs.Type != "" {
 			res = stream
 			break
 		}
@@ -71,5 +70,9 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 	}
 
 	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
+
+	xx := common.MapStr{}
+	res.Unpack(&xx)
+	logp.Warn("UNNEST SUCCESS! %v", xx)
 	return
 }
