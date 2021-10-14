@@ -134,7 +134,7 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 				for _, loadedFileset := range loadedFilesets {
 					if _, ok := configuredFilesets[loadedFileset]; !ok {
 						logp.Warn("Fileset `%s` for module `%s` is loaded but was not explicitly defined in the config. "+
-							"Starting from v8.0 this fileset won't be loaded unless explicitly defined", loadedFileset, mod)
+							"Starting from v8.0 this fileset won't be loaded unless explicitly defined.", loadedFileset, mod)
 					}
 				}
 			}
