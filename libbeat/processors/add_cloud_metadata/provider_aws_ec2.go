@@ -80,7 +80,7 @@ func getIMDSv2Token(c *common.Config) string {
 		logger.Warnf("read token request for getting IMDSv2 token returns empty: %s. No token in the metadata request will be used.", err)
 		return ""
 	}
-	
+
 	defer func(body io.ReadCloser) {
 		if body != nil {
 			body.Close()
