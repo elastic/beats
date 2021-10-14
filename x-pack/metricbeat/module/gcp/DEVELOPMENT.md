@@ -68,3 +68,10 @@ Run `make update` to update `fields.go` from each metricset `fields.yml`
 
 The implementation is within `metrics` metricset. That metricset allows other metricsets to use it
 as a "parent module" and implement the light-weigth module pattern.
+
+# Running integration tests
+
+Golang integration tests may be run with: `TEST_TAGS=gcp MODULE=gcp mage goIntegTest`
+
+This command will exclude `gcp.billing` metricset, as without access to a Billing Account it will always return an empty set of metrics.
+TODO: mock data so tests are not coupled with real GCP infrastructure.
