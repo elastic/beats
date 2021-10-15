@@ -29,6 +29,7 @@ type config struct {
 	QueueURL            string               `config:"queue_url"`
 	BucketARN           string               `config:"bucket_arn"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
@@ -40,6 +41,7 @@ func defaultConfig() config {
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
 		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
 		SQSWaitTime:         20 * time.Second,
 		SQSMaxReceiveCount:  5,
 		FIPSEnabled:         false,

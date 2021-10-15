@@ -215,6 +215,7 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	log := ctx.Logger.With("bucket_arn", in.config.BucketARN)
 	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
 	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
+	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 	log.Debugf("AWS S3 service name is %v.", s3ServiceName)
 
@@ -233,6 +234,7 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		states,
 		persistentStore,
 		in.config.BucketARN,
+		in.config.BucketListPrefix,
 		in.awsConfig.Region,
 		in.config.NumberOfWorkers,
 		in.config.BucketListInterval)
