@@ -30,7 +30,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
-
+- File integrity dataset: Remove non-ECS `hash.*` fields. Hashes are under `file.hash.*`. {issue}19039[19039] {pull}28378[28378]
+- Auditd dataset: Removes the authentication_success and authentication_failure event.type values for user logins. {issue}19039[19039] {pull}28378[28378]
 
 *Filebeat*
 
@@ -326,6 +327,8 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
 - Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
+- Log browser `zip_url` download failures as `warn` instead of as `info`. {pull}28440[28440]
+- Properly locate base stream in fleet configs. {pull}28455[28455]
 
 *Journalbeat*
 
@@ -431,6 +434,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 *Packetbeat*
 
 - Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
+- Fix data stream name for network flows when running under Elastic Agent and Fleet. {pull}28408[28408]
 
 *Winlogbeat*
 
@@ -531,6 +535,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
 - Update cloud.google.com/go library. {pull}28229[28229]
+- Add additional metadata to the root HTTP endpoint. {pull}28265[28265]
 - Upgrade k8s.io/client-go library. {pull}28228[28228]
 
 *Auditbeat*
@@ -759,11 +764,14 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
+- Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
 
 *Heartbeat*
 
 - Add mime type detection for http responses. {pull}22976[22976]
 - Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
+- Experimental 'run once' mode. {pull}25972[25972]
+- Add `keyword` multi-field mapping for `synthetics.step.name`. {pull}28452[28452]
 
 *Journalbeat*
 
@@ -892,6 +900,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 - Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
 - Preliminary AIX support {pull}27954[27954]
+- Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 
 *Packetbeat*
 
