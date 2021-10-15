@@ -83,7 +83,23 @@ func cleanMetricNameString(s string, aligner string, mc metricsConfig) string {
 	return metricName
 }
 
-var reMapping = map[string]string{}
+var reMapping = map[string]string{
+	// gcp.compute metricset
+	"firewall.dropped_bytes_count.value":                 "firewall.dropped.bytes",
+	"instance.cpu.usage_time.value":                      "instance.cpu.usage_time.sec",
+	"instance.cpu.utilization.value":                     "instance.cpu.usage.pct",
+	"instance.disk.read_bytes_count.value":               "instance.disk.read.bytes",
+	"instance.disk.write_bytes_count.value":              "instance.disk.write.bytes",
+	"instance.memory.balloon.swap_in_bytes_count.value":  "instance.memory.balloon.swap_in.bytes",
+	"instance.memory.balloon.swap_out_bytes_count.value": "instance.memory.balloon.swap_out.bytes",
+	"instance.network.received_bytes_count.value":        "instance.network.ingress.bytes",
+	"instance.network.received_packets_count.value":      "instance.network.ingress.packets.count",
+	"instance.network.sent_bytes_count.value":            "instance.network.egress.bytes",
+	"instance.network.sent_packets_count.value":          "instance.network.egress.packets.count",
+	"instance.uptime.value":                              "instance.uptime.sec",
+	"instance.uptime_total.value":                        "instance.uptime_total.sec",
+
+}
 
 func remap(l *logp.Logger, s string) string {
 	var newS string
