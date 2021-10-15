@@ -2358,7 +2358,7 @@ alias to: error.message
 [float]
 === geoip
 
-The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or Ingest Node.
+The geoip fields are defined as a convenience in case you decide to enrich the data using a geoip filter in Logstash or an Elasticsearch geoip ingest processor.
 
 
 
@@ -17322,13 +17322,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 

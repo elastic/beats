@@ -41,6 +41,7 @@ pull_request_rules:
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
+      - "#approved-reviews-by>=1"
     actions:
       merge:
         method: squash
@@ -84,6 +85,7 @@ pull_request_rules:
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
+      - "#approved-reviews-by>=1"
     actions:
       merge:
         method: squash
@@ -114,6 +116,13 @@ pull_request_rules:
           **NOTE**: `backport-skip` has been added to this pull request.
       label:
         add:
+          - backport-skip
+  - name: remove-backport label
+    conditions:
+      - label~=backport-v
+    actions:
+      label:
+        remove:
           - backport-skip
   - name: backport patches to 7.x branch
     conditions:

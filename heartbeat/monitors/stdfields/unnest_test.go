@@ -40,7 +40,8 @@ func TestUnnestStream(t *testing.T) {
 			cfg: common.MapStr{
 				"id": "myuuid",
 				"streams": []common.MapStr{
-					common.MapStr{
+					{
+						"type":     "montype",
 						"streamid": "mystreamid",
 						"data_stream": common.MapStr{
 							"namespace": "mynamespace",
@@ -51,7 +52,8 @@ func TestUnnestStream(t *testing.T) {
 				},
 			},
 			v: lookslike.MustCompile(common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
@@ -62,25 +64,63 @@ func TestUnnestStream(t *testing.T) {
 		{
 			name: "split data stream",
 			cfg: common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
-					"type": "mytype",
+					"namespace": "mynamespace",
 				},
 				"streams": []common.MapStr{
-					common.MapStr{
+					{
+						"type": "montype",
 						"data_stream": common.MapStr{
-							"namespace": "mynamespace",
-							"dataset":   "mydataset",
+							"type":    "mytype",
+							"dataset": "mydataset",
 						},
 					},
 				},
 			},
 			v: lookslike.MustCompile(common.MapStr{
-				"id": "myuuid",
+				"id":   "myuuid",
+				"type": "montype",
 				"data_stream": common.MapStr{
 					"namespace": "mynamespace",
 					"dataset":   "mydataset",
 					"type":      "mytype",
+				},
+			}),
+		},
+		{
+			name: "base is last, not first stream",
+			cfg: common.MapStr{
+				"id": "myuuid",
+				"data_stream": common.MapStr{
+					"namespace": "parentnamespace",
+				},
+				"streams": []common.MapStr{
+					{
+						"data_stream": common.MapStr{
+							// Intentionally missing `type` since
+							// this is not the base dataset.
+							// There is only one stream with `type`
+							"dataset": "notbasedataset",
+						},
+					},
+					{
+						"type": "montype",
+						"data_stream": common.MapStr{
+							"type":    "basetype",
+							"dataset": "basedataset",
+						},
+					},
+				},
+			},
+			v: lookslike.MustCompile(common.MapStr{
+				"id":   "myuuid",
+				"type": "montype",
+				"data_stream": common.MapStr{
+					"namespace": "parentnamespace",
+					"type":      "basetype",
+					"dataset":   "basedataset",
 				},
 			}),
 		},
