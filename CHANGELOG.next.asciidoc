@@ -898,6 +898,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Move openmetrics module to oss. {pull}26561[26561]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 - Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
+- Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 
 *Packetbeat*
 
