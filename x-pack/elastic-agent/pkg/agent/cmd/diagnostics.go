@@ -5,6 +5,7 @@
 package cmd
 
 import (
+<<<<<<< HEAD
 	"archive/zip"
 	"context"
 	"encoding/json"
@@ -28,6 +29,20 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config/operations"
+=======
+	"context"
+	"fmt"
+	"io"
+	"os"
+	"text/tabwriter"
+	"time"
+
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/cli"
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 )
 
 var diagOutputs = map[string]outputter{
@@ -36,6 +51,7 @@ var diagOutputs = map[string]outputter{
 	"yaml":  yamlOutput,
 }
 
+<<<<<<< HEAD
 // DiagnosticsInfo a struct to track all information related to diagnostics for the agent.
 type DiagnosticsInfo struct {
 	ProcMeta     []client.ProcMeta
@@ -49,6 +65,9 @@ type AgentConfig struct {
 }
 
 func newDiagnosticsCommand(s []string, streams *cli.IOStreams) *cobra.Command {
+=======
+func newDiagnosticsCommand(_ []string, streams *cli.IOStreams) *cobra.Command {
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 	cmd := &cobra.Command{
 		Use:   "diagnostics",
 		Short: "Gather diagnostics information from the elastic-agent and running processes.",
@@ -62,11 +81,15 @@ func newDiagnosticsCommand(s []string, streams *cli.IOStreams) *cobra.Command {
 	}
 
 	cmd.Flags().String("output", "human", "Output the diagnostics information in either human, json, or yaml (default: human)")
+<<<<<<< HEAD
 	cmd.AddCommand(newDiagnosticsCollectCommandWithArgs(s, streams))
+=======
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 
 	return cmd
 }
 
+<<<<<<< HEAD
 func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "collect",
@@ -97,6 +120,12 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
 
 	return cmd
+=======
+// DiagnosticsInfo a struct to track all inforation related to diagnostics for the agent.
+type DiagnosticsInfo struct {
+	ProcMeta     []client.ProcMeta
+	AgentVersion client.Version
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 }
 
 func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) error {
@@ -127,6 +156,7 @@ func diagnosticCmd(streams *cli.IOStreams, cmd *cobra.Command, args []string) er
 	return outputFunc(streams.Out, diag)
 }
 
+<<<<<<< HEAD
 func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string) error {
 	err := tryContainerLoadPaths()
 	if err != nil {
@@ -160,6 +190,8 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 	return nil
 }
 
+=======
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 	daemon := client.New()
 	diag := DiagnosticsInfo{}
@@ -177,7 +209,11 @@ func getDiagnostics(ctx context.Context) (DiagnosticsInfo, error) {
 
 	version, err := daemon.Version(ctx)
 	if err != nil {
+<<<<<<< HEAD
 		return diag, err
+=======
+		return DiagnosticsInfo{}, err
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 	}
 	diag.AgentVersion = version
 
@@ -215,6 +251,7 @@ func outputDiagnostics(w io.Writer, d DiagnosticsInfo) error {
 	tw.Flush()
 	return nil
 }
+<<<<<<< HEAD
 
 func gatherConfig() (AgentConfig, error) {
 	cfg := AgentConfig{}
@@ -371,3 +408,5 @@ func closeHandlers(err error, closers ...io.Closer) error {
 	}
 	return mErr.ErrorOrNil()
 }
+=======
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))

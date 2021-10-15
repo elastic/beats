@@ -192,6 +192,7 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
 		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
 
+<<<<<<< HEAD
 		if u, err := user.Current(); err != nil {
 			if _, ok := err.(user.UnknownUserIdError); ok {
 				// This usually happens if the user UID does not exist in /etc/passwd. It might be the case on K8S
@@ -206,6 +207,15 @@ func Run(settings Settings, bt beat.Creator) error {
 			monitoring.NewString(registry, "uid").Set(u.Uid)
 			monitoring.NewString(registry, "gid").Set(u.Gid)
 		}
+=======
+		u, err := user.Current()
+		if err != nil {
+			return err
+		}
+		monitoring.NewString(registry, "username").Set(u.Username)
+		monitoring.NewString(registry, "uid").Set(u.Uid)
+		monitoring.NewString(registry, "gid").Set(u.Gid)
+>>>>>>> 887e40a182 (Add start of elastic-agent diagnostics command (#28265))
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
