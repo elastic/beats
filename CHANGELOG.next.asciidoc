@@ -434,6 +434,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 *Packetbeat*
 
 - Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
+- Fix data stream name for network flows when running under Elastic Agent and Fleet. {pull}28408[28408]
 
 *Winlogbeat*
 
