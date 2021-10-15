@@ -657,35 +657,12 @@ func buildMetricbeatEvent(msgs []*auparse.AuditMessage, config Config) mb.Event 
 }
 
 func normalizeEventFields(event *aucoalesce.Event, m common.MapStr) {
-	// we need to merge types for backwards compatibility
-	types := event.ECS.Event.Type
-
-	// Remove this block in 8.x
-	{
-		getFieldAsStr := func(key string) (s string, found bool) {
-			iface, err := m.GetValue(key)
-			if err != nil {
-				return
-			}
-			s, found = iface.(string)
-			return
-		}
-		oldCategory, ok1 := getFieldAsStr("event.category")
-		oldAction, ok2 := getFieldAsStr("event.action")
-		oldOutcome, ok3 := getFieldAsStr("event.outcome")
-		if ok1 && ok2 && ok3 {
-			if oldCategory == "user-login" && oldAction == "logged-in" { // USER_LOGIN
-				types = append(types, fmt.Sprintf("authentication_%s", oldOutcome))
-			}
-		}
-	}
-
 	m.Put("event.kind", "event")
 	if len(event.ECS.Event.Category) > 0 {
 		m.Put("event.category", event.ECS.Event.Category)
 	}
-	if len(types) > 0 {
-		m.Put("event.type", types)
+	if len(event.ECS.Event.Type) > 0 {
+		m.Put("event.type", event.ECS.Event.Type)
 	}
 	if event.ECS.Event.Outcome != "" {
 		m.Put("event.outcome", event.ECS.Event.Outcome)
