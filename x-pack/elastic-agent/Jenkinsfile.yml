@@ -95,7 +95,9 @@ stages:
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
-            enabled: false
+            enabled: true
+            job: 'e2e-tests/e2e-testing-mbp'
+            testMatrixFile: '.ci/.e2e-tests-for-elastic-agent.yaml'
         stage: packaging
     packaging-arm:
         packaging-arm: "mage package"
