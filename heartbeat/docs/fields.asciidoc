@@ -15221,6 +15221,13 @@ type: text
 
 --
 
+*`synthetics.step.name.keyword`*::
++
+--
+type: keyword
+
+--
+
 *`synthetics.step.index`*::
 +
 --

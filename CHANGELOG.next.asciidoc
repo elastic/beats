@@ -442,6 +442,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add mime type detection for http responses. {pull}22976[22976]
 - Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
 - Experimental 'run once' mode. {pull}25972[25972]
+- Add `keyword` multi-field mapping for `synthetics.step.name`. {pull}28452[28452]
 
 *Journalbeat*
 
