@@ -12,8 +12,8 @@ def escape_path(path):
 def has_file(objs, path, sha1hash):
     found = False
     for obj in objs:
-        if 'file.path' in obj and 'hash.sha1' in obj \
-                and obj['file.path'].lower() == path.lower() and obj['hash.sha1'] == sha1hash:
+        if 'file.path' in obj and 'file.hash.sha1' in obj \
+                and obj['file.path'].lower() == path.lower() and obj['file.hash.sha1'] == sha1hash:
             found = True
             break
     assert found, "File '{0}' with sha1sum '{1}' not found".format(path, sha1hash)
