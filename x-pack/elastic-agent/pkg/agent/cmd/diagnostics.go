@@ -35,7 +35,7 @@ var diagOutputs = map[string]outputter{
 	"yaml":  yamlOutput,
 }
 
-// DiagnosticsInfo a struct to track all inforation related to diagnostics for the agent.
+// DiagnosticsInfo a struct to track all information related to diagnostics for the agent.
 type DiagnosticsInfo struct {
 	ProcMeta     []client.ProcMeta
 	AgentVersion client.Version
@@ -92,7 +92,7 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 		},
 	}
 
-	cmd.Flags().StringP("file", "f", "", "name of the output diagnostics zip archeive")
+	cmd.Flags().StringP("file", "f", "", "name of the output diagnostics zip archive")
 	cmd.Flags().String("output", "yaml", "Output the collected information in either json, or yaml (default: yaml)") // replace output flag with different options
 
 	return cmd
@@ -152,10 +152,10 @@ func diagnosticsCollectCmd(streams *cli.IOStreams, fileName, outputFormat string
 
 	err = createZip(fileName, outputFormat, diag, cfg)
 	if err != nil {
-		return fmt.Errorf("unable to create archieve %q: %w", fileName, err)
+		return fmt.Errorf("unable to create archive %q: %w", fileName, err)
 	}
 	fmt.Fprintf(streams.Out, "Created diagnostics archive %q\n", fileName)
-	fmt.Fprintln(streams.Out, "***** WARNING *****\nCreated archive may contain plain text credentials.\nEnsure that files in archieve are redacted before sharing.\n*******************")
+	fmt.Fprintln(streams.Out, "***** WARNING *****\nCreated archive may contain plain text credentials.\nEnsure that files in archive are redacted before sharing.\n*******************")
 	return nil
 }
 
@@ -237,6 +237,10 @@ func gatherConfig() (AgentConfig, error) {
 	return cfg, nil
 }
 
+// createZip creates a zip archive with the passed fileName.
+//
+// The passed DiagnosticsInfo and AgentConfig data is written in the specified output format.
+// Any local log files are collected and copied into the archive.
 func createZip(fileName, outputFormat string, diag DiagnosticsInfo, cfg AgentConfig) error {
 	f, err := os.Create(fileName)
 	if err != nil {
@@ -317,7 +321,7 @@ func zipLogs(zw *zip.Writer) error {
 		if d.IsDir() {
 			_, err := zw.Create("logs/" + name + "/")
 			if err != nil {
-				fmt.Errorf("unable to create log directory in archive: %w", err)
+				return fmt.Errorf("unable to create log directory in archive: %w", err)
 			}
 			return nil
 		}
@@ -351,6 +355,7 @@ func writeFile(w io.Writer, outputFormat string, v interface{}) error {
 	return je.Encode(v)
 }
 
+// closeHandlers will close all passed closers attaching any errors to the passed err and returning the result
 func closeHandlers(err error, closers ...io.Closer) error {
 	var mErr *multierror.Error
 	mErr = multierror.Append(mErr, err)
