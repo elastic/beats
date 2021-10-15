@@ -614,6 +614,39 @@
                 - name: rejected
                   path: elasticsearch.node.stats.thread_pool.write.rejected.count
                   type: alias
+        - name: ingest
+          type: group
+          fields: 
+            - name: total
+              type: group
+            - name: pipelines
+              type: alias
+              path: elasticsearch.node.stats.ingest.pipelines
+              fields:
+        - name: indexing_pressure
+          type: group
+          fields: 
+            - name: memory
+              type: group
+              fields:
+                - name: current
+                  type: group
+                  fields: 
+                    - name: combined_coordinating_and_primary_in_bytes
+                      type: alias
+                      path: elasticsearch.node.stats.indexing_pressure.current.combined_coordinating_and_primary_in_bytes
+                    - name: coordinating_in_bytes
+                      type: alias
+                      path: elasticsearch.node.stats.indexing_pressure.current.coordinating_in_bytes
+                    - name: coordinating_in_bytes
+                      type: alias
+                      path: elasticsearch.node.stats.indexing_pressure.current.coordinating_in_bytes
+                - name: total
+                  type: group
+                - name: limit_in_bytes
+                  type: alias
+                  path: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
+        
     - name: indices_stats
       type: group
       fields:

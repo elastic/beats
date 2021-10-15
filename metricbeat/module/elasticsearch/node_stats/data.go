@@ -257,12 +257,50 @@ var (
 			"get":    c.Dict("get", threadPoolStatsSchema),
 			"search": c.Dict("search", threadPoolStatsSchema),
 		}),
+		"indexing_pressure": c.Dict("indexing_pressure", s.Schema{
+			"memory": c.Dict("memory", s.Schema{
+				"current":        c.Dict("current", current_memory_pressure),
+				"total":          c.Dict("total", total_memory_pressure),
+				"limit_in_bytes": c.Int("limit_in_bytes"),
+			}),
+		}),
+		"ingest": c.Dict("ingest", s.Schema{
+			"total": c.Dict("total", s.Schema{
+				"count":          c.Int("count"),
+				"time_in_millis": c.Int("time_in_millis"),
+				"current":        c.Int("current"),
+				"failed":         c.Int("failed"),
+			}),
+		}),
 	}
 
 	collectorSchema = s.Schema{
 		"collection": s.Object{
 			"count": c.Int("collection_count"),
 			"ms":    c.Int("collection_time_in_millis"),
+		},
+	}
+
+	current_memory_pressure = s.Schema{
+		"current": s.Object{
+			"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+			"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
+			"primary_in_bytes":                           c.Int("primary_in_bytes"),
+			"replica_in_bytes":                           c.Int("replica_in_bytes"),
+			"all_in_bytes":                               c.Int("all_in_bytes"),
+		},
+	}
+
+	total_memory_pressure = s.Schema{
+		"total": s.Object{
+			"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+			"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
+			"primary_in_bytes":                           c.Int("primary_in_bytes"),
+			"replica_in_bytes":                           c.Int("replica_in_bytes"),
+			"all_in_bytes":                               c.Int("all_in_bytes"),
+			"coordinating_rejections":                    c.Int("coordinating_rejections"),
+			"primary_rejections":                         c.Int("primary_rejections"),
+			"replica_rejections":                         c.Int("replica_rejections"),
 		},
 	}
 
