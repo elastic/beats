@@ -6207,6 +6207,16 @@ type: object
 
 --
 
+*`azure.storage_account.*.*`*::
++
+--
+storage account
+
+
+type: object
+
+--
+
 [[exported-fields-beat-common]]
 == Beat fields
 
@@ -33115,9 +33125,7 @@ type: float
 Google Cloud Compute metrics
 
 
-
-
-*`gcp.compute.instance.firewall.dropped_bytes_count.value`*::
+*`gcp.compute.firewall.dropped_bytes_count.value`*::
 +
 --
 Incoming bytes dropped by the firewall
@@ -33126,7 +33134,7 @@ type: long
 
 --
 
-*`gcp.compute.instance.firewall.dropped_packets_count.value`*::
+*`gcp.compute.firewall.dropped_packets_count.value`*::
 +
 --
 Incoming packets dropped by the firewall
@@ -33135,20 +33143,10 @@ type: long
 
 --
 
-
 *`gcp.compute.instance.cpu.reserved_cores.value`*::
 +
 --
 Number of cores reserved on the host of the instance
-
-type: double
-
---
-
-*`gcp.compute.instance.cpu.utilization.value`*::
-+
---
-The fraction of the allocated CPU that is currently in use on the instance
 
 type: double
 
@@ -33163,6 +33161,14 @@ type: double
 
 --
 
+*`gcp.compute.instance.cpu.utilization.value`*::
++
+--
+The fraction of the allocated CPU that is currently in use on the instance
+
+type: double
+
+--
 
 *`gcp.compute.instance.disk.read_bytes_count.value`*::
 +
@@ -33200,15 +33206,41 @@ type: long
 
 --
 
-*`gcp.compute.instance.uptime.value`*::
+*`gcp.compute.instance.memory.balloon.ram_size.value`*::
 +
 --
-How long the VM has been running, in seconds
+The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
 
 type: long
 
 --
 
+*`gcp.compute.instance.memory.balloon.ram_used.value`*::
++
+--
+Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
++
+--
+The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
+
+*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
++
+--
+The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+
+type: long
+
+--
 
 *`gcp.compute.instance.network.received_bytes_count.value`*::
 +
@@ -33246,38 +33278,19 @@ type: long
 
 --
 
-
-*`gcp.compute.instance.memory.balloon.ram_size.value`*::
+*`gcp.compute.instance.uptime.value`*::
 +
 --
-The total amount of memory in the VM. This metric is only available for VMs that belong to the e2 family.
+Number of seconds the VM has been running.
 
 type: long
 
 --
 
-*`gcp.compute.instance.memory.balloon.ram_used.value`*::
+*`gcp.compute.instance.uptime_total.value`*::
 +
 --
-Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`gcp.compute.instance.memory.balloon.swap_in_bytes_count.value`*::
-+
---
-The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-
-type: long
-
---
-
-*`gcp.compute.instance.memory.balloon.swap_out_bytes_count.value`*::
-+
---
-The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
+Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
 
 type: long
 
@@ -57718,140 +57731,6 @@ type: long
 
 --
 
-*`system.diskio.iostat.read.request.merges_per_sec`*::
-+
---
-The number of read requests merged per second that were queued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.request.merges_per_sec`*::
-+
---
-The number of write requests merged per second that were queued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.read.request.per_sec`*::
-+
---
-The number of read requests that were issued to the device per second
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.request.per_sec`*::
-+
---
-The number of write requests that were issued to the device per second
-
-
-type: float
-
---
-
-*`system.diskio.iostat.read.per_sec.bytes`*::
-+
---
-The number of Bytes read from the device per second.
-
-
-type: float
-
-format: bytes
-
---
-
-*`system.diskio.iostat.read.await`*::
-+
---
-The average time spent for read requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.write.per_sec.bytes`*::
-+
---
-The number of Bytes write from the device per second.
-
-
-type: float
-
-format: bytes
-
---
-
-*`system.diskio.iostat.write.await`*::
-+
---
-The average time spent for write requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.request.avg_size`*::
-+
---
-The average size (in bytes) of the requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.queue.avg_size`*::
-+
---
-The average queue length of the requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.await`*::
-+
---
-The average time spent for requests issued to the device to be served.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.service_time`*::
-+
---
-The average service time (in milliseconds) for I/O requests that were issued to the device.
-
-
-type: float
-
---
-
-*`system.diskio.iostat.busy`*::
-+
---
-Percentage of CPU time during which I/O requests were issued to the device (bandwidth utilization for the device). Device saturation occurs when this value is close to 100%.
-
-
-type: float
-
---
-
 [float]
 === entropy
 
@@ -58294,42 +58173,6 @@ format: bytes
 
 --
 
-*`system.memory.swap.out.pages`*::
-+
---
-count of pages swapped out
-
-type: long
-
---
-
-*`system.memory.swap.in.pages`*::
-+
---
-count of pages swapped in
-
-type: long
-
---
-
-*`system.memory.swap.readahead.pages`*::
-+
---
-swap readahead pages
-
-type: long
-
---
-
-*`system.memory.swap.readahead.cached`*::
-+
---
-swap readahead cache hits
-
-type: long
-
---
-
 *`system.memory.swap.used.pct`*::
 +
 --
@@ -58339,203 +58182,6 @@ The percentage of used swap memory.
 type: scaled_float
 
 format: percent
-
---
-
-[float]
-=== page_stats
-
-memory page statistics
-
-
-*`system.memory.page_stats.pgscan_kswapd.pages`*::
-+
---
-pages scanned by kswapd
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgscan_direct.pages`*::
-+
---
-pages scanned directly
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgfree.pages`*::
-+
---
-pages freed by the system
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgsteal_kswapd.pages`*::
-+
---
-number of pages reclaimed by kswapd
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.pgsteal_direct.pages`*::
-+
---
-number of pages reclaimed directly
-
-type: long
-
-format: number
-
---
-
-*`system.memory.page_stats.direct_efficiency.pct`*::
-+
---
-direct reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
-
-type: scaled_float
-
-format: percent
-
---
-
-*`system.memory.page_stats.kswapd_efficiency.pct`*::
-+
---
-kswapd reclaim efficiency percentage. A lower percentage indicates the system is struggling to reclaim memory.
-
-type: scaled_float
-
-format: percent
-
---
-
-[float]
-=== hugepages
-
-This group contains statistics related to huge pages usage on the system.
-
-
-*`system.memory.hugepages.total`*::
-+
---
-Number of huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.used.bytes`*::
-+
---
-Memory used in allocated huge pages.
-
-
-type: long
-
-format: bytes
-
---
-
-*`system.memory.hugepages.used.pct`*::
-+
---
-Percentage of huge pages used.
-
-
-type: long
-
-format: percent
-
---
-
-*`system.memory.hugepages.free`*::
-+
---
-Number of available huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.reserved`*::
-+
---
-Number of reserved but not allocated huge pages in the pool.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.surplus`*::
-+
---
-Number of overcommited huge pages.
-
-
-type: long
-
-format: number
-
---
-
-*`system.memory.hugepages.default_size`*::
-+
---
-Default size for huge pages.
-
-
-type: long
-
-format: bytes
-
---
-
-[float]
-=== swap.out
-
-huge pages swapped out
-
-
-*`system.memory.hugepages.swap.out.pages`*::
-+
---
-pages swapped out
-
-type: long
-
---
-
-*`system.memory.hugepages.swap.out.fallback`*::
-+
---
-Count of huge pages that must be split before swapout
-
-type: long
 
 --
 
