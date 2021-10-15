@@ -8,6 +8,7 @@ import (
 	"archive/zip"
 	"context"
 	"encoding/json"
+	stderrors "errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -310,9 +311,13 @@ func zipLogs(zw *zip.Writer) error {
 	// using Data() + "/logs", for some reason default paths/Logs() is the home dir...
 	logPath := filepath.Join(paths.Data(), "logs") + string(filepath.Separator)
 	return filepath.WalkDir(logPath, func(path string, d fs.DirEntry, fErr error) error {
+		if stderrors.Is(fErr, fs.ErrNotExist) {
+			return nil
+		}
 		if fErr != nil {
 			return fmt.Errorf("unable to walk log dir: %w", fErr)
 		}
+
 		name := strings.TrimPrefix(path, logPath)
 		if name == "" {
 			return nil
@@ -332,27 +337,27 @@ func zipLogs(zw *zip.Writer) error {
 		}
 		zf, err := zw.Create("logs/" + name)
 		if err != nil {
-			return fmt.Errorf("unable to create log file in archive: %w", err)
+			return closeHandlers(fmt.Errorf("unable to create log file in archive: %w", err), lf)
 		}
 		_, err = io.Copy(zf, lf)
 		if err != nil {
-			return fmt.Errorf("log file copy failed: %w", err)
+			return closeHandlers(fmt.Errorf("log file copy failed: %w", err), lf)
 		}
 
-		return nil
+		return lf.Close()
 	})
 }
 
 // writeFile writes json or yaml data from the interface to the writer.
 func writeFile(w io.Writer, outputFormat string, v interface{}) error {
-	if outputFormat == "yaml" {
-		ye := yaml.NewEncoder(w)
-		err := ye.Encode(v)
-		return closeHandlers(err, ye)
+	if outputFormat == "json" {
+		je := json.NewEncoder(w)
+		je.SetIndent("", "  ")
+		return je.Encode(v)
 	}
-	je := json.NewEncoder(w)
-	je.SetIndent("", "  ")
-	return je.Encode(v)
+	ye := yaml.NewEncoder(w)
+	err := ye.Encode(v)
+	return closeHandlers(err, ye)
 }
 
 // closeHandlers will close all passed closers attaching any errors to the passed err and returning the result
