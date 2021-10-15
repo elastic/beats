@@ -18,7 +18,7 @@ require (
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.3.0
 	github.com/Masterminds/semver v1.4.2
-	github.com/Microsoft/go-winio v0.4.15-0.20190919025122-fc70bd9a86b5
+	github.com/Microsoft/go-winio v0.4.16
 	github.com/PaesslerAG/gval v1.0.0
 	github.com/PaesslerAG/jsonpath v0.1.1
 	github.com/Shopify/sarama v1.27.0
