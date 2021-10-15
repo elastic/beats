@@ -234,7 +234,6 @@ class Test(BaseTest):
 
         self._check_if_dashboard_exported(folder_name)
 
-
     def _check_if_dashboard_exported(self, folder_name):
         kibana_semver = semver.VersionInfo.parse(self.get_version())
         dashboard_folder = os.path.join(folder_name, "_meta", "kibana", str(kibana_semver.major), "dashboard")
