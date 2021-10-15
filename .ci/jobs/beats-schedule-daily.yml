@@ -1,8 +1,8 @@
 ---
 - job:
-    name: beats-schedule-weekly
-    display-name: Jobs scheduled weekly (Sunday)
-    description: Jobs scheduled weekly (Sunday)
+    name: beats-schedule-daily
+    display-name: Jobs scheduled daily (weekdays)
+    description: Jobs scheduled daily (weekdays)
     view: Beats
     project-type: pipeline
     parameters:
@@ -11,7 +11,7 @@
           default: master
           description: the Git branch specifier to build
     pipeline-scm:
-      script-path: .ci/schedule-weekly.groovy
+      script-path: .ci/schedule-daily.groovy
       scm:
         - git:
             url: git@github.com:elastic/beats.git
@@ -24,4 +24,4 @@
             branches:
               - $branch_specifier
     triggers:
-      - timed: 'H H(1-2) * * 0'
+      - timed: 'H H(2-3) * * 1-5'
