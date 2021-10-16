@@ -2444,11 +2444,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/aws/aws-lambda-go
-Version: v1.6.0
+Version: v1.13.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/aws/aws-lambda-go@v1.6.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/aws/aws-lambda-go@v1.13.3/LICENSE:
 
 
                                  Apache License
