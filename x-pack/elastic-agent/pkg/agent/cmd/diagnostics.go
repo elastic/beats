@@ -78,7 +78,7 @@ func newDiagnosticsCollectCommandWithArgs(_ []string, streams *cli.IOStreams) *c
 
 			if file == "" {
 				ts := time.Now().UTC()
-				file = "elastic-agent-diagnostics-" + ts.Format(time.RFC3339) + ".zip"
+				file = "elastic-agent-diagnostics-" + ts.Format("2006-01-02T15-04-05Z07-00") + ".zip" // RFC3339 format that replaces : with -, so it will work on Windows
 			}
 
 			output, _ := c.Flags().GetString("output")
