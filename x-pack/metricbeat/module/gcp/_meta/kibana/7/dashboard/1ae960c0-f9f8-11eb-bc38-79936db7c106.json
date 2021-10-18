@@ -1044,7 +1044,7 @@
                                                     "label": "Median of CPU usage",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.node.cpu.core_usage_time.sec"
                                                 },
                                                 "7cbf9dda-019f-43c8-b28f-803caab15753": {
                                                     "dataType": "date",
