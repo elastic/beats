@@ -1208,7 +1208,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.allocatable_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.allocatable.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
