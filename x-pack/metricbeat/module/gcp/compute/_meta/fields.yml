@@ -3,7 +3,7 @@
   release: beta
   type: group
   fields:
-  - name: firewall.dropped_bytes_count.value
+  - name: firewall.dropped.bytes
     type: long
     description: Incoming bytes dropped by the firewall
   - name: firewall.dropped_packets_count.value
@@ -12,19 +12,19 @@
   - name: instance.cpu.reserved_cores.value
     type: double
     description: Number of cores reserved on the host of the instance
-  - name: instance.cpu.usage_time.value
+  - name: instance.cpu.usage_time.sec
     type: double
     description: Usage for all cores in seconds
-  - name: instance.cpu.utilization.value
+  - name: instance.cpu.usage.pct
     type: double
     description: The fraction of the allocated CPU that is currently in use on the instance
-  - name: instance.disk.read_bytes_count.value
+  - name: instance.disk.read.bytes
     type: long
     description: Count of bytes read from disk
   - name: instance.disk.read_ops_count.value
     type: long
     description: Count of disk read IO operations
-  - name: instance.disk.write_bytes_count.value
+  - name: instance.disk.write.bytes
     type: long
     description: Count of bytes written to disk
   - name: instance.disk.write_ops_count.value
@@ -36,27 +36,27 @@
   - name: instance.memory.balloon.ram_used.value
     type: long
     description: Memory currently used in the VM. This metric is only available for VMs that belong to the e2 family.
-  - name: instance.memory.balloon.swap_in_bytes_count.value
+  - name: instance.memory.balloon.swap_in.bytes
     type: long
     description: The amount of memory read into the guest from its own swap space. This metric is only available for VMs that belong to the e2 family.
-  - name: instance.memory.balloon.swap_out_bytes_count.value
+  - name: instance.memory.balloon.swap_out.bytes
     type: long
     description: The amount of memory written from the guest to its own swap space. This metric is only available for VMs that belong to the e2 family.
-  - name: instance.network.received_bytes_count.value
+  - name: instance.network.ingress.bytes
     type: long
     description: Count of bytes received from the network
-  - name: instance.network.received_packets_count.value
+  - name: instance.network.ingress.packets.count
     type: long
     description: Count of packets received from the network
-  - name: instance.network.sent_bytes_count.value
+  - name: instance.network.egress.bytes
     type: long
     description: Count of bytes sent over the network
-  - name: instance.network.sent_packets_count.value
+  - name: instance.network.egress.packets.count
     type: long
     description: Count of packets sent over the network
-  - name: instance.uptime.value
+  - name: instance.uptime.sec
     type: long
     description: Number of seconds the VM has been running.
-  - name: instance.uptime_total.value
+  - name: instance.uptime_total.sec
     type: long
     description: Elapsed time since the VM was started, in seconds. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
