@@ -1385,7 +1385,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 },
                                                 "d1db0066-9429-4e89-b1d8-68ff7d81814a": {
                                                     "customLabel": true,
@@ -2190,7 +2190,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
