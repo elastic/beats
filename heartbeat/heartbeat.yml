@@ -21,69 +21,6 @@ heartbeat.config.monitors:
 
 # Configure monitors inline
 heartbeat.monitors:
-- id: 2d1023d5-8b59-4f25-8a0f-30013b70b8ef
-  name: Script recorder 3
-  revision: 1
-  type: synthetics/browser
-  use_output: default
-  meta:
-    package:
-      name: synthetics
-      version: 0.3.3
-  data_stream:
-    namespace: default
-  streams:
-    - id: >-
-        synthetics/browser-browser.screenshot-2d1023d5-8b59-4f25-8a0f-30013b70b8ef
-      data_stream:
-        dataset: browser.screenshot
-        type: synthetics
-      processors:
-        - add_observer_metadata:
-            geo:
-              name: Fleet managed
-        - add_fields:
-            target: ''
-            fields:
-              monitor.fleet_managed: true
-    - id: >-
-        synthetics/browser-browser.network-2d1023d5-8b59-4f25-8a0f-30013b70b8ef
-      data_stream:
-        dataset: browser.network
-        type: synthetics
-      processors:
-        - add_observer_metadata:
-            geo:
-              name: Fleet managed
-        - add_fields:
-            target: ''
-            fields:
-              monitor.fleet_managed: true
-    - id: synthetics/browser-browser-2d1023d5-8b59-4f25-8a0f-30013b70b8ef
-      name: Script recorder 3
-      type: browser
-      data_stream:
-        dataset: browser
-        type: synthetics
-      __ui:
-        script_source:
-          is_generated_script: true
-          file_name: recorded.journey.js
-      schedule: '@every 3m'
-      timeout: 16s
-      source.inline.script: |-
-        step('Go to https://www.google.com/?gws_rd=ssl', async () => {
-          await page.goto('https://www.google.com/?gws_rd=ssl');
-          await page.click('[aria-label="Search"]');
-          await page.fill('[aria-label="Search"]', 'wikipedia');
-          await Promise.all([
-            page.waitForNavigation(/*{ url: 'https://www.google.com/search?q=wikipedia&source=hp&ei=aE1oYZawCYCzytMPuNGmoA4&iflsig=ALs-wAMAAAAAYWhbeGnY8WJZFkIIMZg0Z15NGUxF_SAW&ved=0ahUKEwiWhIq5nMrzAhWAmXIEHbioCeQQ4dUDCAk&uact=5&oq=wikipedia&gs_lcp=Cgdnd3Mtd2l6EAMyCAgAEIAEELEDMggIABCABBCxAzILCC4QgAQQsQMQgwEyCwgAEIAEELEDEIMBMgsIABCABBCxAxCDATIFCAAQgAQyCAgAEIAEELEDMggIABCABBCxAzIICAAQgAQQsQMyCwgAEIAEELEDEIMBOg4IABDqAhCPARCMAxDlAjoOCC4Q6gIQjwEQjAMQ5QI6DgguEIAEELEDEMcBEKMCOggILhCxAxCDAToLCC4QgAQQxwEQowI6DgguEIAEELEDEMcBENEDOhEILhCABBCxAxCDARDHARCjAjoOCC4QgAQQsQMQgwEQkwI6CAgAELEDEIMBOgsILhCABBDHARCvAToHCAAQgAQQClCeIVjgK2DnL2gBcAB4AIABSogBmASSAQE5mAEAoAEBsAEK&sclient=gws-wiz' }*/),
-            page.press('[aria-label="Search"]', 'Enter')
-          ]);
-          await page.click('text=Wikipedia, the free encyclopedia');
-          expect(page.url()).toBe('https://en.wikipedia.org/wiki/Main_Page');
-          await page.click('[placeholder="Search Wikipedia"]');
-        });
 - type: http
   # Set enabled to true (or delete the following line) to enable this example monitor
   enabled: false
@@ -168,11 +105,11 @@ setup.kibana:
 # ================================== Outputs ===================================
 
 # Configure what output to use when sending the data collected by the beat.
-output.console: ~
+
 # ---------------------------- Elasticsearch Output ----------------------------
-#output.elasticsearch:
+output.elasticsearch:
   # Array of hosts to connect to.
-  #hosts: ["localhost:9200"]
+  hosts: ["localhost:9200"]
 
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
