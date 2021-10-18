@@ -50,13 +50,10 @@ func init() {
 	// Note that we discard any errors because they are not actionable.
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
-	fmt.Printf("SETCAPS\n")
 	setCapabilities()
-	fmt.Printf("SETCAPSE\n")
 
 	switch runtime.GOARCH {
 	case "amd64", "386":
-		fmt.Printf("SETCOMP\n\n")
 		err := setSeccompRules()
 		if err != nil {
 			panic(err)
