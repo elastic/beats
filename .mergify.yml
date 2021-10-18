@@ -1,3 +1,12 @@
+queue_rules:
+  - name: bumps
+    conditions:
+      - check-success=beats-ci/pr-merge
+      - label=automation
+      - "#approved-reviews-by>=1"
+      - files~=(^testing/environments/snapshot.*\.yml$|^\.mergify\.yml$)
+
+
 pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
@@ -39,13 +48,11 @@ pull_request_rules:
   - name: automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
     conditions:
       - check-success=beats-ci/pr-merge
-      - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
-      - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
+        name: bumps
         method: squash
-        strict: smart+fasttrack
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -82,14 +89,12 @@ pull_request_rules:
   - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
     conditions:
       - check-success=beats-ci/pr-merge
-      - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
-      - "#approved-reviews-by>=1"
     actions:
-      merge:
+      queue:
+        name: bumps
         method: squash
-        strict: smart+fasttrack
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
