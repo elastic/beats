@@ -1402,7 +1402,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.limit_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.limit.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
