@@ -127,23 +127,37 @@ func (a *Autodiscover) Start() {
 
 func (a *Autodiscover) worker() {
 	var updated, retry bool
-
+	ticker := time.NewTicker(retryPeriod)
 	for {
-		select {
-		case event := <-a.listener.Events():
-			// This will happen on Stop:
-			if event == nil {
-				return
+		// accumulate updates for every event that comes in so that we dont overwhelm
+		// the reloading engine with too many updates
+		for {
+			var needsUpdate, doBreak bool
+			select {
+			case event := <-a.listener.Events():
+				// This will happen on Stop:
+				if event == nil {
+					return
+				}
+
+				if _, ok := event["start"]; ok {
+					needsUpdate = a.handleStart(event)
+				}
+				if _, ok := event["stop"]; ok {
+					needsUpdate = a.handleStop(event)
+				}
+
+				if needsUpdate {
+					updated = true
+				}
+
+			case <-ticker.C:
+				doBreak = true
 			}
 
-			if _, ok := event["start"]; ok {
-				updated = a.handleStart(event)
+			if doBreak {
+				break
 			}
-			if _, ok := event["stop"]; ok {
-				updated = a.handleStop(event)
-			}
-
-		case <-time.After(retryPeriod):
 		}
 
 		if updated || retry {

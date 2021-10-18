@@ -20,6 +20,7 @@ package cfgfile
 import (
 	"sync"
 
+	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
 	"github.com/mitchellh/hashstructure"
 	"github.com/pkg/errors"
@@ -160,7 +161,9 @@ func HashConfig(c *common.Config) (uint64, error) {
 	if err := c.Unpack(&config); err != nil {
 		return 0, err
 	}
-	return hashstructure.Hash(config, nil)
+	return hashstructure.Hash(config, &hashstructure.HashOptions{
+		Hasher: xxhash.New(),
+	})
 }
 
 func (r *RunnerList) copyRunnerList() map[uint64]Runner {
