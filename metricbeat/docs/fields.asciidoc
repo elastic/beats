@@ -25100,8 +25100,16 @@ type: keyword
 
 --
 
+<<<<<<< HEAD
 [float]
 === index.summary
+=======
+[[exported-fields-enterprisesearch]]
+== Enterprise Search fields
+
+Enterprise Search module
+
+>>>>>>> 78bcab36c7 (Add the cluster_uuid field to Enterprise search stats metricset (#28287))
 
 index
 
@@ -25113,6 +25121,7 @@ index
 --
 Total number of documents in the index.
 
+<<<<<<< HEAD
 
 type: long
 
@@ -25122,13 +25131,29 @@ type: long
 +
 --
 Total number of deleted documents in the index.
+=======
+*`enterprisesearch.cluster_uuid`*::
++
+--
+Cluster UUID for the Elasticsearch cluster used as the data store for Enterprise Search.
+>>>>>>> 78bcab36c7 (Add the cluster_uuid field to Enterprise search stats metricset (#28287))
 
 
 type: long
 
 --
 
+<<<<<<< HEAD
 *`elasticsearch.index.summary.primaries.store.size.bytes`*::
+=======
+[float]
+=== health
+
+Enterprise Search health
+
+
+*`enterprisesearch.health.name`*::
+>>>>>>> 78bcab36c7 (Add the cluster_uuid field to Enterprise search stats metricset (#28287))
 +
 --
 Total size of the index in bytes.
@@ -25892,6 +25917,61 @@ type: long
 
 --
 
+<<<<<<< HEAD
+=======
+[float]
+=== product_usage
+
+Aggregate product usage statistics for the Enterprise Search deployment.
+
+
+[float]
+=== app_search
+
+App Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.app_search.total_engines`*::
++
+--
+Current number of App Search engines within the deployment.
+
+type: long
+
+--
+
+[float]
+=== workplace_search
+
+Workplace Search product usage statistics.
+
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_org_sources`*::
++
+--
+Current number of Workplace Search org-wide content sources within the deployment.
+
+type: long
+
+--
+
+*`enterprisesearch.stats.product_usage.workplace_search.total_private_sources`*::
++
+--
+Current number of Workplace Search private content sources within the deployment.
+
+type: long
+
+--
+
+[[exported-fields-envoyproxy]]
+== Envoyproxy fields
+
+envoyproxy module
+
+
+
+>>>>>>> 78bcab36c7 (Add the cluster_uuid field to Enterprise search stats metricset (#28287))
 [float]
 === jvm
 
