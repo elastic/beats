@@ -1545,7 +1545,7 @@
                                                 "61256570-b7dd-4bec-b73d-d12d993ae091": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.value",
+                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.pct",
                                                     "operationType": "median",
                                                     "params": {
                                                         "format": {
@@ -1556,7 +1556,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.value"
+                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.pct"
                                                 }
                                             },
                                             "incompleteColumns": {}
