@@ -417,7 +417,7 @@ def runE2ETests(){
 def triggerE2ETests(String suite) {
   echo("Triggering E2E tests for PR-${env.CHANGE_ID}. Test suites: ${suite}.")
 
-  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}.x"
+  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
   def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
 
@@ -426,7 +426,6 @@ def triggerE2ETests(String suite) {
     booleanParam(name: 'forceSkipPresubmit', value: true),
     booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
     string(name: 'BEAT_VERSION', value: beatVersion),
-    booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
     string(name: 'runTestsSuites', value: suite),
     string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
     string(name: 'GITHUB_CHECK_REPO', value: env.REPO),

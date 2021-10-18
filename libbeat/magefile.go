@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -35,6 +36,7 @@ import (
 func init() {
 	unittest.RegisterPythonTestDeps(Fields)
 	integtest.RegisterGoTestDeps(Fields)
+	integtest.RegisterPythonTestDeps(Fields)
 }
 
 // Build builds the Beat binary.

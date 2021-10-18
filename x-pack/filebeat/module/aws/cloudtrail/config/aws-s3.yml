@@ -13,6 +13,11 @@ number_of_workers: {{ .number_of_workers }}
 {{ if .bucket_list_interval }}
 bucket_list_interval: {{ .bucket_list_interval }}
 {{ end }}
+
+{{ if .bucket_list_prefix }}
+bucket_list_prefix: {{ .bucket_list_prefix }}
+{{ end }}
+
 file_selectors:
 {{ if .process_cloudtrail_logs }}
   - regex: '/CloudTrail/'

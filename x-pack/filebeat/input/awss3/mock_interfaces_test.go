@@ -274,17 +274,17 @@ func (mr *MockS3APIMockRecorder) GetObject(ctx, bucket, key interface{}) *gomock
 }
 
 // ListObjectsPaginator mocks base method.
-func (m *MockS3API) ListObjectsPaginator(bucket string) s3Pager {
+func (m *MockS3API) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket)
+	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket, prefix)
 	ret0, _ := ret[0].(s3Pager)
 	return ret0
 }
 
 // ListObjectsPaginator indicates an expected call of ListObjectsPaginator.
-func (mr *MockS3APIMockRecorder) ListObjectsPaginator(bucket interface{}) *gomock.Call {
+func (mr *MockS3APIMockRecorder) ListObjectsPaginator(bucket, prefix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*MockS3API)(nil).ListObjectsPaginator), bucket)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*MockS3API)(nil).ListObjectsPaginator), bucket, prefix)
 }
 
 // Mocks3Getter is a mock of s3Getter interface.
@@ -349,17 +349,17 @@ func (m *Mocks3Lister) EXPECT() *Mocks3ListerMockRecorder {
 }
 
 // ListObjectsPaginator mocks base method.
-func (m *Mocks3Lister) ListObjectsPaginator(bucket string) s3Pager {
+func (m *Mocks3Lister) ListObjectsPaginator(bucket, prefix string) s3Pager {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket)
+	ret := m.ctrl.Call(m, "ListObjectsPaginator", bucket, prefix)
 	ret0, _ := ret[0].(s3Pager)
 	return ret0
 }
 
 // ListObjectsPaginator indicates an expected call of ListObjectsPaginator.
-func (mr *Mocks3ListerMockRecorder) ListObjectsPaginator(bucket interface{}) *gomock.Call {
+func (mr *Mocks3ListerMockRecorder) ListObjectsPaginator(bucket, prefix interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*Mocks3Lister)(nil).ListObjectsPaginator), bucket)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListObjectsPaginator", reflect.TypeOf((*Mocks3Lister)(nil).ListObjectsPaginator), bucket, prefix)
 }
 
 // MockS3Pager is a mock of s3Pager interface.
