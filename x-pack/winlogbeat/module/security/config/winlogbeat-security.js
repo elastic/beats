@@ -1952,7 +1952,7 @@ var security = (function () {
             var removeIfEmptyOrHyphen = function(evt, key) {
                 var val = evt.Get(key);
                 if (!val || val === "-") {
-                    evt.Delete("user.effective.name");
+                    evt.Delete(key);
                     return true;
                 }
                 return false;
