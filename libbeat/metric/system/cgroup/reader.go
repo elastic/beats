@@ -113,8 +113,9 @@ func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
 
 	// Determine what subsystems are supported by the kernel.
 	subsystems, err := SupportedSubsystems(opts.RootfsMountpoint)
+	// We can return a not-quite-an-error ErrCgroupsMissing here, so return the bare error.
 	if err != nil {
-		return nil, errors.Wrap(err, "error finding subsystems")
+		return nil, err
 	}
 
 	// Locate the mountpoints of those subsystems.

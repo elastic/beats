@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Make error message about locked data path actionable. {pull}18667[18667]
 - Fix panic with inline SSL when the certificate or key were small than 256 bytes. {pull}23820[23820]
 - Skip add_kubernetes_metadata processor when kubernetes metadata are already present {pull}27689[27689]
+- Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 
 *Auditbeat*
 
@@ -135,6 +136,10 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Preserve annotations in a kubernetes namespace metadata {pull}27045[27045]
 - Allow conditional processing in `decode_xml` and `decode_xml_wineventlog`. {pull}27159[27159]
 - Fix build constraint that caused issues with doc builds. {pull}27381[27381]
+- Beats dashboards use custom index when `setup.dashboards.index` is set. {issue}21232[21232] {pull}27901[27901]
+- Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
+- Allow `clone3` syscall in seccomp filters. {pull}28117[28117]
+- Remove unnecessary escaping step in dashboard loading, so they can be displayed in Kibana. {pull}28395[28395]
 - Fix handling of float data types within processors. {issue}28279[28279] {pull}28280[28280]
 
 *Auditbeat*
@@ -193,11 +198,13 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Drop aws.vpcflow.pkt_srcaddr and aws.vpcflow.pkt_dstaddr when equal to "-". {pull}22721[22721] {issue}22716[22716]
 - Improve Cisco ASA/FTD parsing of messages - better support for identity FW messages. Change network.bytes, source.bytes, and destination.bytes to long from integer since value can exceed integer capacity.  Add descriptions for various processors for easier pipeline editing in Kibana UI. {pull}23766[23766]
 - Update indentation for azure filebeat configuration. {pull}26604[26604]
+- Add support for passing a prefix on S3 bucket list mode for AWS-S3 input {pull}28252[28252] {issue}27965[27965]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
 - Add support for username in cisco asa security negotiation logs {pull}26975[26975]
 - Relax time parsing and capture group and session type in Cisco ASA module {issue}24710[24710] {pull}28325[28325]
 - Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 - Correctly track bytes read when max_bytes is exceeded. {issue}28317[28317] {pull}28352[28352]
+- Fix aws-s3 input by checking if GetObject API call response content type exists. {pull}28457[28457]
 
 *Heartbeat*
 
@@ -205,6 +212,8 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fixed scheduler shutdown issues which would in rare situations cause a panic due to semaphore misuse. {pull}16397[16397]
 - Fixed TCP TLS checks to properly validate hostnames, this broke in 7.x and only worked for IP SANs. {pull}17549[17549]
 - Fix broken seccomp filtering and improve security via `setcap` and `setuid` when running as root on linux in containers. {pull}27878[27878]
+- Log browser `zip_url` download failures as `warn` instead of as `info`. {pull}28440[28440]
+- Properly locate base stream in fleet configs. {pull}28455[28455]
 
 *Journalbeat*
 
@@ -260,6 +269,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix `logstash` module when `xpack.enabled: true` is set from emitting redundant events. {pull}22808[22808]
 - Change vsphere.datastore.capacity.used.pct value to betweeen 0 and 1. {pull}23148[23148]
 - `beat` module respects `basepath` config option. {pull}28162[28162]
+- Fix list_docker.go {pull}28374[28374]
 
 *Packetbeat*
 
@@ -312,6 +322,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Add default seccomp policy for linux arm64. {pull}27955[27955]
 - Add cluster level add_kubernetes_metadata support for centralized enrichment {pull}24621[24621]
 - Update cloud.google.com/go library. {pull}28229[28229]
+- Add additional metadata to the root HTTP endpoint. {pull}28265[28265]
 - Upgrade k8s.io/client-go library. {pull}28228[28228]
 - Update ECS to 1.12.0. {pull}27770[27770]
 - Fields mapped as `match_only_text` will automatically fallback to a `text` mapping when using Elasticsearch versions that do not support `match_only_text`. {pull}27770[27770]
@@ -426,6 +437,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Move processing to ingest node for AWS vpcflow fileset. {pull}28168[28168]
 - Release zoom module as GA. {pull}28106[28106]
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
+- Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
 
 
 *Heartbeat*
@@ -433,6 +445,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Bundle synthetics deps with heartbeat docker image. {pull}23274[23274]
 - Add mime type detection for http responses. {pull}22976[22976]
 - Support JSON expressions / validation of JSON arrays. {pull}28073[28073]
+- Experimental 'run once' mode. {pull}25972[25972]
 
 *Journalbeat*
 
@@ -496,6 +509,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Fix release state of kubernetes metricsets. {pull}26864[26864]
 - Add `gke` metricset collection to `gcp` module {pull}26824[26824]
 - Added a new beta `enterprisesearch` module for Elastic Enterprise Search {pull}27549[27549]
+- Register additional name for `storage` metricset in the azure module. {pull}28447[28447]
 
 *Packetbeat*
 

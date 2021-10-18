@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build !integration && (darwin || freebsd || linux || windows)
 // +build !integration
 // +build darwin freebsd linux windows
 
