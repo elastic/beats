@@ -2338,7 +2338,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2493,7 +2493,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
