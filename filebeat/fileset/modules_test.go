@@ -53,7 +53,7 @@ func TestNewModuleRegistry(t *testing.T) {
 		{Module: "auditd"},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, nil, beat.Info{Version: "5.2.0"})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -118,7 +118,7 @@ func TestNewModuleRegistryConfig(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, nil, beat.Info{Version: "5.2.0"})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 
@@ -143,7 +143,7 @@ func TestMovedModule(t *testing.T) {
 		},
 	}
 
-	reg, err := newModuleRegistry(modulesPath, configs, nil, beat.Info{Version: "5.2.0"})
+	reg, err := newModuleRegistry(modulesPath, configs, nil, nil, beat.Info{Version: "5.2.0"})
 	require.NoError(t, err)
 	assert.NotNil(t, reg)
 }
@@ -158,7 +158,28 @@ func TestApplyOverrides(t *testing.T) {
 		module, fileset string
 		overrides       *ModuleOverrides
 		expected        FilesetConfig
+		hasOverride     bool
 	}{
+		{
+			name: "no overrides",
+			fcfg: FilesetConfig{
+				Var: map[string]interface{}{
+					"a":   "test",
+					"b.c": "test",
+				},
+				Input: map[string]interface{}{},
+			},
+			module:  "nginx",
+			fileset: "access",
+			expected: FilesetConfig{
+				Var: map[string]interface{}{
+					"a":   "test",
+					"b.c": "test",
+				},
+				Input: map[string]interface{}{},
+			},
+			hasOverride: false,
+		},
 		{
 			name: "var overrides",
 			fcfg: FilesetConfig{
@@ -184,6 +205,7 @@ func TestApplyOverrides(t *testing.T) {
 				},
 				Input: map[string]interface{}{},
 			},
+			hasOverride: true,
 		},
 		{
 			name: "enable and var overrides",
@@ -210,6 +232,7 @@ func TestApplyOverrides(t *testing.T) {
 				},
 				Input: map[string]interface{}{},
 			},
+			hasOverride: true,
 		},
 		{
 			name:    "input overrides",
@@ -229,14 +252,16 @@ func TestApplyOverrides(t *testing.T) {
 				},
 				Var: map[string]interface{}{},
 			},
+			hasOverride: true,
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := applyOverrides(&test.fcfg, test.module, test.fileset, test.overrides)
+			result, hasOverride, err := applyOverrides(&test.fcfg, test.module, test.fileset, test.overrides)
 			require.NoError(t, err)
 			assert.Equal(t, &test.expected, result)
+			assert.Equal(t, test.hasOverride, hasOverride)
 		})
 	}
 }
@@ -336,17 +361,28 @@ func TestAppendWithoutDuplicates(t *testing.T) {
 func TestMcfgFromConfig(t *testing.T) {
 	falseVar := false
 	tests := []struct {
-		name     string
-		config   *common.Config
-		expected ModuleConfig
+		name                       string
+		config                     *common.Config
+		expectedModuleConfig       ModuleConfig
+		expectedConfiguredFilesets map[string]struct{}
 	}{
+		{
+			name: "not defined fileset",
+			config: load(t, map[string]interface{}{
+				"module": "nginx",
+			}),
+			expectedModuleConfig: ModuleConfig{
+				Module: "nginx",
+			},
+			expectedConfiguredFilesets: map[string]struct{}{},
+		},
 		{
 			name: "disable fileset",
 			config: load(t, map[string]interface{}{
 				"module":        "nginx",
 				"error.enabled": false,
 			}),
-			expected: ModuleConfig{
+			expectedModuleConfig: ModuleConfig{
 				Module: "nginx",
 				Filesets: map[string]*FilesetConfig{
 					"error": {
@@ -356,6 +392,9 @@ func TestMcfgFromConfig(t *testing.T) {
 					},
 				},
 			},
+			expectedConfiguredFilesets: map[string]struct{}{
+				"error": struct{}{},
+			},
 		},
 		{
 			name: "set variable",
@@ -363,7 +402,7 @@ func TestMcfgFromConfig(t *testing.T) {
 				"module":          "nginx",
 				"access.var.test": false,
 			}),
-			expected: ModuleConfig{
+			expectedModuleConfig: ModuleConfig{
 				Module: "nginx",
 				Filesets: map[string]*FilesetConfig{
 					"access": {
@@ -374,16 +413,20 @@ func TestMcfgFromConfig(t *testing.T) {
 					},
 				},
 			},
+			expectedConfiguredFilesets: map[string]struct{}{
+				"access": struct{}{},
+			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result, err := mcfgFromConfig(test.config)
+			result, configuredFilets, err := mcfgFromConfig(test.config)
 			require.NoError(t, err)
-			assert.Equal(t, test.expected.Module, result.Module)
-			assert.Equal(t, len(test.expected.Filesets), len(result.Filesets))
-			for name, fileset := range test.expected.Filesets {
+			assert.Equal(t, test.expectedConfiguredFilesets, configuredFilets)
+			assert.Equal(t, test.expectedModuleConfig.Module, result.Module)
+			assert.Equal(t, len(test.expectedModuleConfig.Filesets), len(result.Filesets))
+			for name, fileset := range test.expectedModuleConfig.Filesets {
 				assert.Equal(t, fileset, result.Filesets[name])
 			}
 		})
