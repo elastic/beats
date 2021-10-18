@@ -1994,7 +1994,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.request_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.request.bytes"
                                                 },
                                                 "6c0d18a2-af02-4262-8e81-25b7b7a83578": {
                                                     "dataType": "date",
