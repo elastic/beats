@@ -1245,7 +1245,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.total_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.total.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
