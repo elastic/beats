@@ -20,8 +20,11 @@ package beater
 import (
 	"errors"
 	"fmt"
+<<<<<<< HEAD
 	"sync"
 	"syscall"
+=======
+>>>>>>> parent of a78a980da2... [Heartbeat] Setuid to regular user / lower capabilities when possible (#27878)
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
@@ -85,9 +88,7 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 // Run executes the beat.
 func (bt *Heartbeat) Run(b *beat.Beat) error {
 	logp.Info("heartbeat is running! Hit CTRL-C to stop it.")
-	groups, _ := syscall.Getgroups()
-	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
-
+	
 	if bt.config.RunOnce != nil {
 		err := bt.runRunOnce(b)
 		if err != nil {
