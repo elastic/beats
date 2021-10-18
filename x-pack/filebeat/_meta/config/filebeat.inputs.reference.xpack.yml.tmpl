@@ -146,3 +146,7 @@
   # This is used to sleep between AWS `FilterLogEvents` API calls inside the same
   # collection period.
   #api_sleep: 200ms
+
+  # This is used to shift collection start time and end time back in order to
+  # collect logs when there is a delay in CloudWatch.
+  #latency: 1m
