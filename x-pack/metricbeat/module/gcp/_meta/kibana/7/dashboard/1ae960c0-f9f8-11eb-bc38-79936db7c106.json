@@ -2022,7 +2022,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.limit_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.limit.bytes"
                                                 },
                                                 "a240469a-0df5-4ae3-86a0-70aa20b7e2e4": {
                                                     "customLabel": true,
