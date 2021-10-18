@@ -1930,6 +1930,15 @@ var security = (function () {
         }
     }
 
+    var removeIfEmptyOrHyphen = function(evt, key) {
+        var val = evt.Get(key);
+        if (!val || val === "-") {
+            evt.Delete(key);
+            return true;
+        }
+        return false;
+    }
+
     var copyTargetUserToEffective = new processor.Chain()
         .Convert({
             fields: [
@@ -1949,16 +1958,8 @@ var security = (function () {
             }
         })
         .Add(function(evt) {
-            var removeIfEmptyOrHyphen = function(evt, key) {
-                var val = evt.Get(key);
-                if (!val || val === "-") {
-                    evt.Delete(key);
-                    return true;
-                }
-                return false;
-            };
             if (!removeIfEmptyOrHyphen(evt, "user.effective.name")) {
-                evt.AppendTo("related.user", user);
+                evt.AppendTo("related.user", evt.Get("user.effective.name"));
             }
             removeIfEmptyOrHyphen(evt, "user.effective.domain");
             removeIfEmptyOrHyphen(evt, "user.effective.id");
@@ -1983,6 +1984,13 @@ var security = (function () {
                 }
                 evt.AppendTo('related.user', user);
             }
+        })
+        .Add(function(evt) {
+            if (!removeIfEmptyOrHyphen(evt, "user.target.name")) {
+                evt.AppendTo("related.user", evt.Get("user.target.name"));
+            }
+            removeIfEmptyOrHyphen(evt, "user.target.domain");
+            removeIfEmptyOrHyphen(evt, "user.target.id");
         })
         .Build();
 
