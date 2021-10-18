@@ -506,6 +506,26 @@ def getBeatsName(baseDir) {
 }
 
 /**
+<<<<<<< HEAD
+=======
+* This method runs the end 2 end testing
+*/
+def e2e(Map args = [:]) {
+  if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
+  if (args.e2e.get('entrypoint', '')?.trim()) {
+    e2e_with_entrypoint(args)
+  } else {
+    e2e_with_job(args)
+  }
+}
+
+/**
+>>>>>>> d1bcb503b7 (CI: disable e2e for elastic-agent on tags/branches (#28481))
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
 */
