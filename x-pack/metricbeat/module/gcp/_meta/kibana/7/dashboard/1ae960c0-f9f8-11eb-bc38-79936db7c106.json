@@ -1901,7 +1901,7 @@
                                                     "label": "Media received bytes count",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.node.network.received_bytes.count"
                                                 }
                                             },
                                             "incompleteColumns": {}
