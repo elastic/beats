@@ -18723,9 +18723,6 @@ type: keyword
 
 --
 
-[float]
-=== certificate_chain
-
 *`tls.detailed.server_certificate_chain`*::
 +
 --
