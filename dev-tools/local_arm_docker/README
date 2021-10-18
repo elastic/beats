@@ -1,4 +1,0 @@
-This directory contains scripts and a dockerfile for running a local arm64 dev environment in the event
-that you need to debug beats on arm64 on an x86 box.
-
-You can start the environment with ./run.sh
