@@ -3,6 +3,18 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.14.2]]
+=== Beats version 7.14.2
+https://github.com/elastic/beats/compare/v7.14.1...v7.14.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Auditd module: Fix the top exec commands dashboard visualization. {pull}27638[27638]
+- Store offset in `log.offset` field of events from the filestream input. {pull}27688[27688]
+- Fix `httpjson` input rate limit processing and documentation. {pull}27739[27739]
+
 [[release-notes-7.14.1]]
 === Beats version 7.14.1
 https://github.com/elastic/beats/compare/v7.14.0...v7.14.1[View commits]

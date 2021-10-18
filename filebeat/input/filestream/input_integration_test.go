@@ -693,6 +693,8 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 }
 
 func TestFilestreamTruncateBlockedOutput(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/27085")
+
 	env := newInputTestingEnvironment(t)
 	env.pipeline = &mockPipelineConnector{blocking: true}
 

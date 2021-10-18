@@ -397,6 +397,7 @@ func TestParsersMultilineTimeout(t *testing.T) {
 
 // test_max_bytes from test_multiline.py
 func TestParsersMultilineMaxBytes(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/28088")
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
