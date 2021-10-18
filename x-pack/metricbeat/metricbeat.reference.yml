@@ -513,7 +513,7 @@ metricbeat.modules:
   #xpack.enabled: false
   #scope: node
 
-#--------------------------- Enterprisesearch Module ---------------------------
+#-------------------------- Enterprise Search Module --------------------------
 - module: enterprisesearch
   metricsets: ["health", "stats"]
   enabled: true
