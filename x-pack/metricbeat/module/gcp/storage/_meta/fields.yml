@@ -3,30 +3,30 @@
   release: beta
   type: group
   fields:
-  - name: api.request_count.value
+  - name: api.request.count
     type: long
     description: Delta count of API calls, grouped by the API method name and response code.
-  - name: authz.acl_based_object_access_count.value
+  - name: authz.acl_based_object_access_.ount
     type: long
     description: Delta count of requests that result in an object being granted access solely due to object ACLs.
-  - name: authz.acl_operations_count.value
+  - name: authz.acl_operations.count
     type: long
     description: Usage of ACL operations broken down by type.
-  - name: authz.object_specific_acl_mutation_count.value
+  - name: authz.object_specific_acl_mutation.count
     type: long
     description: Delta count of changes made to object specific ACLs.
-  - name: network.received_bytes_count.value
+  - name: network.received.bytes
     type: long
     description: Delta count of bytes received over the network, grouped by the API method name and response code.
-  - name: network.sent_bytes_count.value
+  - name: network.sent.bytes
     type: long
     description: Delta count of bytes sent over the network, grouped by the API method name and response code.
-  - name: storage.object_count.value
+  - name: storage.object.count
     type: long
     description: Total number of objects per bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
-  - name: storage.total_byte_seconds.value
+  - name: storage.total_byte_seconds.bytes
     type: long
     description: Delta count of bytes received over the network, grouped by the API method name and response code.
-  - name: storage.total_bytes.value
+  - name: storage.total.bytes
     type: long
     description: Total size of all objects in the bucket, grouped by storage class. This value is measured once per day, and the value is repeated at each sampling interval throughout the day.
