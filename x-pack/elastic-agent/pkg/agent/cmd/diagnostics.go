@@ -309,7 +309,7 @@ func zipLogs(zw *zip.Writer) error {
 	}
 
 	// using Data() + "/logs", for some reason default paths/Logs() is the home dir...
-	logPath := filepath.Join(paths.Data(), "logs") + string(filepath.Separator)
+	logPath := filepath.Join(paths.Home(), "logs") + string(filepath.Separator)
 	return filepath.WalkDir(logPath, func(path string, d fs.DirEntry, fErr error) error {
 		if stderrors.Is(fErr, fs.ErrNotExist) {
 			return nil
