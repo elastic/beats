@@ -2321,7 +2321,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.total_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.total.bytes"
                                                 },
                                                 "f621ffdf-1cd0-4d6e-940c-92ff4710cb1f": {
                                                     "customLabel": true,
