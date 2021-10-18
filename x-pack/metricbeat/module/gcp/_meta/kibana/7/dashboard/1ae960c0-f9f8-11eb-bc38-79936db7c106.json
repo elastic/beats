@@ -2039,7 +2039,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
