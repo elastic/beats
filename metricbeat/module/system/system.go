@@ -20,6 +20,7 @@ package system
 import (
 	"sync"
 
+	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -38,12 +39,22 @@ type Module struct {
 	mb.BaseModule
 }
 
-// NewModule instatiates the system module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+
+	partialConfig := struct {
+		Hostfs string `config:"system.hostfs"`
+	}{}
+
+	base.UnpackConfig(&partialConfig)
+	logp.Info("Config: %v", partialConfig)
+
+	paths.Paths.Hostfs = partialConfig.Hostfs
 
 	once.Do(func() {
 		initModule(paths.Paths.Hostfs)
 	})
+
+	logp.Info("Paths: %s", paths.Paths.String())
 
 	return &Module{BaseModule: base}, nil
 }
