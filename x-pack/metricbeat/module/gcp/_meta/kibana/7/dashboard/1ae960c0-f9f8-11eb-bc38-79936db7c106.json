@@ -1693,7 +1693,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.received.bytes"
                                                 },
                                                 "cc552381-d8b0-4376-9331-e8a320441314": {
                                                     "customLabel": true,
@@ -1702,7 +1702,7 @@
                                                     "label": "Median of all network traffic",
                                                     "operationType": "formula",
                                                     "params": {
-                                                        "formula": "median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                        "formula": "median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent_bytes_count.value)",
                                                         "isFormulaBroken": false
                                                     },
                                                     "references": [
@@ -1714,16 +1714,16 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent_bytes_count.value)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.received.bytes"
                                                 },
                                                 "cc552381-d8b0-4376-9331-e8a320441314X1": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent_bytes_count.value)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
                                                     "sourceField": "gcp.gke.pod.network.sent_bytes_count.value"
@@ -1732,7 +1732,7 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent_bytes_count.value)",
                                                     "operationType": "math",
                                                     "params": {
                                                         "tinymathAst": {
@@ -1745,7 +1745,7 @@
                                                                 "min": 0
                                                             },
                                                             "name": "add",
-                                                            "text": "median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                            "text": "median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent_bytes_count.value)",
                                                             "type": "function"
                                                         }
                                                     },
