@@ -8546,11 +8546,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/adriansr/fsnotify
-Version: v0.0.0-20180417234312-c9bbe1f46f1d
+Version: v1.4.8-0.20211018144411-a81f2b630e7c
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/adriansr/fsnotify@v0.0.0-20180417234312-c9bbe1f46f1d/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/adriansr/fsnotify@v1.4.8-0.20211018144411-a81f2b630e7c/LICENSE:
 
 Copyright (c) 2012 The Go Authors. All rights reserved.
 Copyright (c) 2012 fsnotify Authors. All rights reserved.
@@ -16870,11 +16870,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/sys
-Version: v0.0.0-20210809222454-d867a43fc93e
+Version: v0.0.0-20211007075335-d3039528d8ac
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20210809222454-d867a43fc93e/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/sys@v0.0.0-20211007075335-d3039528d8ac/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
