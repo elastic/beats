@@ -18,9 +18,10 @@ import (
 type rateLimiter struct {
 	log *logp.Logger
 
-	limit     *valueTpl
-	reset     *valueTpl
-	remaining *valueTpl
+	limit       *valueTpl
+	reset       *valueTpl
+	remaining   *valueTpl
+	early_limit *float64
 }
 
 func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLimiter {
@@ -29,10 +30,11 @@ func newRateLimiterFromConfig(config *rateLimitConfig, log *logp.Logger) *rateLi
 	}
 
 	return &rateLimiter{
-		log:       log,
-		limit:     config.Limit,
-		reset:     config.Reset,
-		remaining: config.Remaining,
+		log:         log,
+		limit:       config.Limit,
+		reset:       config.Reset,
+		remaining:   config.Remaining,
+		early_limit: config.EarlyLimit,
 	}
 }
 
@@ -114,7 +116,26 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (int64, error) {
 		return 0, fmt.Errorf("failed to parse rate-limit remaining value: %w", err)
 	}
 
-	if m != 0 {
+    // by default, httpjson will continue requests until Limit is 0
+    // can optionally stop requests "early"
+    var active_limit int64 = 0
+    if r.early_limit != nil {
+        var early_limit float64 = *r.early_limit
+        if early_limit > 0 && early_limit < 1 {
+            limit, _ := r.limit.Execute(ctx, tr, nil, r.log)
+            if limit != "" {
+                l, err := strconv.ParseInt(limit, 10, 64)
+                if err == nil {
+                    active_limit = l - int64(early_limit * float64(l))
+                }
+            }
+        } else if early_limit >= 1 {
+            active_limit = int64(early_limit)
+        }
+    }
+
+    r.log.Debugf("Rate Limit: Using active Early Limit: %f", active_limit)
+	if m > active_limit {
 		return 0, nil
 	}
 
