@@ -3,67 +3,67 @@
   release: beta
   type: group
   fields:
-  - name: container.cpu.core_usage_time.value
+  - name: container.cpu.core_usage_time.sec
     type: double
     description: Cumulative CPU usage on all cores used by the container in seconds. Sampled every 60 seconds.
   - name: container.cpu.limit_cores.value
     type: double
     description: CPU cores limit of the container. Sampled every 60 seconds.
-  - name: container.cpu.limit_utilization.value
+  - name: container.cpu.limit_utilization.pct
     type: double
     description: The fraction of the CPU limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
   - name: container.cpu.request_cores.value
     type: double
     description: Number of CPU cores requested by the container. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: container.cpu.request_utilization.value
+  - name: container.cpu.request_utilization.pct
     type: double
     description: The fraction of the requested CPU that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
-  - name: container.ephemeral_storage.limit_bytes.value
+  - name: container.ephemeral_storage.limit.bytes
     type: long
     description: Local ephemeral storage limit in bytes. Sampled every 60 seconds.
-  - name: container.ephemeral_storage.request_bytes.value
+  - name: container.ephemeral_storage.request.bytes
     type: long
     description: Local ephemeral storage request in bytes. Sampled every 60 seconds.
-  - name: container.ephemeral_storage.used_bytes.value
+  - name: container.ephemeral_storage.used.bytes
     type: long
     description: Local ephemeral storage usage in bytes. Sampled every 60 seconds.
-  - name: container.memory.limit_bytes.value
+  - name: container.memory.limit.bytes
     type: long
     description: Memory limit of the container in bytes. Sampled every 60 seconds.
-  - name: container.memory.limit_utilization.value
+  - name: container.memory.limit_utilization.pct
     type: double
     description: The fraction of the memory limit that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed the limit. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: container.memory.page_fault_count.value
+  - name: container.memory.page_fault.count
     type: long
     description: Number of page faults, broken down by type, major and minor.
-  - name: container.memory.request_bytes.value
+  - name: container.memory.request.bytes
     type: long
     description: Memory request of the container in bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: container.memory.request_utilization.value
+  - name: container.memory.request_utilization.pct
     type: double
     description: The fraction of the requested memory that is currently in use on the instance. This value can be greater than 1 as usage can exceed the request. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
-  - name: container.memory.used_bytes.value
+  - name: container.memory.used.bytes
     type: long
     description: Memory usage in bytes. Sampled every 60 seconds.
-  - name: container.restart_count.value
+  - name: container.restart.count
     type: long
     description: Number of times the container has restarted. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: container.uptime.value
+  - name: container.uptime.sec
     type: double
     description: Time in seconds that the container has been running. Sampled every 60 seconds.
   - name: node.cpu.allocatable_cores.value
     type: double
     description: Number of allocatable CPU cores on the node. Sampled every 60 seconds.
-  - name: node.cpu.allocatable_utilization.value
+  - name: node.cpu.allocatable_utilization.pct
     type: double
     description: The fraction of the allocatable CPU that is currently in use on the instance. Sampled every 60 seconds. After sampling, data is not visible for up to 240 seconds.
-  - name: node.cpu.core_usage_time.value
+  - name: node.cpu.core_usage_time.sec
     type: double
     description: Cumulative CPU usage on all cores used on the node in seconds. Sampled every 60 seconds.
   - name: node.cpu.total_cores.value
     type: double
     description: Total number of CPU cores on the node. Sampled every 60 seconds.
-  - name: node.ephemeral_storage.allocatable_bytes.value
+  - name: node.ephemeral_storage.allocatable.bytes
     type: long
     description: Local ephemeral storage bytes allocatable on the node. Sampled every 60 seconds.
   - name: node.ephemeral_storage.inodes_free.value
@@ -72,28 +72,28 @@
   - name: node.ephemeral_storage.inodes_total.value
     type: long
     description: Total number of inodes on local ephemeral storage. Sampled every 60 seconds.
-  - name: node.ephemeral_storage.total_bytes.value
+  - name: node.ephemeral_storage.total.bytes
     type: long
     description: Total ephemeral storage bytes on the node. Sampled every 60 seconds.
-  - name: node.ephemeral_storage.used_bytes.value
+  - name: node.ephemeral_storage.used.bytes
     type: long
     description: Local ephemeral storage bytes used by the node. Sampled every 60 seconds.
-  - name: node.memory.allocatable_bytes.value
+  - name: node.memory.allocatable.bytes
     type: long
     description: Cumulative memory bytes used by the node. Sampled every 60 seconds.
-  - name: node.memory.allocatable_utilization.value
+  - name: node.memory.allocatable_utilization.pct
     type: double
     description: The fraction of the allocatable memory that is currently in use on the instance. This value cannot exceed 1 as usage cannot exceed allocatable memory bytes. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: node.memory.total_bytes.value
+  - name: node.memory.total.bytes
     type: long
     description: Number of bytes of memory allocatable on the node. Sampled every 60 seconds.
-  - name: node.memory.used_bytes.value
+  - name: node.memory.used.bytes
     type: long
     description: Cumulative memory bytes used by the node. Sampled every 60 seconds.
-  - name: node.network.received_bytes_count.value
+  - name: node.network.received_bytes.count
     type: long
     description: Cumulative number of bytes received by the node over the network. Sampled every 60 seconds.
-  - name: node.network.sent_bytes_count.value
+  - name: node.network.sent_bytes.count
     type: long
     description: Cumulative number of bytes transmitted by the node over the network. Sampled every 60 seconds.
   - name: node.pid_limit.value
@@ -102,24 +102,24 @@
   - name: node.pid_used.value
     type: long
     description: The number of running process in the OS on the node. Sampled every 60 seconds.
-  - name: node_daemon.cpu.core_usage_time.value
+  - name: node_daemon.cpu.core_usage_time.sec
     type: double
     description: Cumulative CPU usage on all cores used by the node level system daemon in seconds. Sampled every 60 seconds.
-  - name: node_daemon.memory.used_bytes.value
+  - name: node_daemon.memory.used.bytes
     type: long
     description: Memory usage by the system daemon in bytes. Sampled every 60 seconds.
-  - name: pod.network.received_bytes_count.value
+  - name: pod.network.received.bytes
     type: long
     description: Cumulative number of bytes received by the pod over the network. Sampled every 60 seconds.
-  - name: pod.network.sent_bytes_count.value
+  - name: pod.network.sent.bytes
     type: long
     description: Cumulative number of bytes transmitted by the pod over the network. Sampled every 60 seconds.
-  - name: pod.volume.total_bytes.value
+  - name: pod.volume.total.bytes
     type: long
     description: Total number of disk bytes available to the pod. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
-  - name: pod.volume.used_bytes.value
+  - name: pod.volume.used.bytes
     type: long
     description: Number of disk bytes used by the pod. Sampled every 60 seconds.
-  - name: pod.volume.utilization.value
+  - name: pod.volume.utilization.pct
     type: double
     description: The fraction of the volume that is currently being used by the instance. This value cannot be greater than 1 as usage cannot exceed the total available volume space. Sampled every 60 seconds. After sampling, data is not visible for up to 120 seconds.
