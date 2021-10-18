@@ -314,25 +314,24 @@
               type: long
     - name: indexing_pressure
           type: group
+          description: >
+            Stats about indexing pressure
           fields: 
-            - name: memory
+            - name: memory.current.combined_coordinating_and_primary_in_bytes
+              type: alias
+              path: elasticsearch.node.stats.indexing_pressure.memory.current.comd_coordinating_and_primary_in_bytes
+            - name: memory.current.combined_coordinating_and_primary_in_bytes
+              type: alias
+              path: elasticsearch.node.stats.indexing_pressure.memory.currentbineordinating_and_primary_in_bytes
+            - name: memory.current.coordinating_in_bytes
+              type: alias
+              paelasticsearch.node.stats.indexing_pressure.current.coording_in_bytes
+            - name: coordinating_in_bytes
+              type: alias
+              paelasticsearch.node.stats.indexing_pressure.current.coording_in_by
+            - name: total
               type: group
-              fields:
-                - name: current
-                  type: group
-                  fields: 
-                    - name: combined_coordinating_and_primary_in_bytes
-                      type: alias
-                      path: elasticsearch.node.stats.indexing_pressure.current.combined_coordinating_and_primary_in_bytes
-                    - name: coordinating_in_bytes
-                      type: alias
-                      path: elasticsearch.node.stats.indexing_pressure.current.coordinating_in_bytes
-                    - name: coordinating_in_bytes
-                      type: alias
-                      path: elasticsearch.node.stats.indexing_pressure.current.coordinating_in_bytes
-                - name: total
-                  type: group
-                - name: limit_in_bytes
-                  type: alias
-                  path: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
+            - name: limit_in_bytes
+              type: alias
+              path: elasticsearch.node.stats.indexing_pressure.limit_in_bytes
         
