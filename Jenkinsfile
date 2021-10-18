@@ -203,8 +203,22 @@ def runLinting() {
     }
   }
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
+      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+        deleteDir()
+        unstash 'source'
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
