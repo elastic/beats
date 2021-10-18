@@ -841,7 +841,7 @@
                                                     "label": "Total Core usage",
                                                     "operationType": "sum",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.sec"
                                                 },
                                                 "216fee6f-2b14-4989-87e6-d64b21805f49": {
                                                     "dataType": "date",
@@ -900,7 +900,7 @@
                                                     "label": "CPU usage (seconds)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.sec"
                                                 }
                                             },
                                             "incompleteColumns": {}
