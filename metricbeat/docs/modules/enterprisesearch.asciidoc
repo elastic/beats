@@ -6,7 +6,7 @@ This file is generated! See scripts/mage/docs_collector.go
 
 [[metricbeat-module-enterprisesearch]]
 [role="xpack"]
-== enterprisesearch module
+== Enterprise Search module
 
 beta[]
 
@@ -24,7 +24,7 @@ The Enterprise Search module requires a set of credentials (a username and a pas
 [float]
 === Example configuration
 
-The enterprisesearch module supports the standard configuration options that are described
+The Enterprise Search module supports the standard configuration options that are described
 in <<configuration-metricbeat>>. Here is an example configuration:
 
 [source,yaml]
