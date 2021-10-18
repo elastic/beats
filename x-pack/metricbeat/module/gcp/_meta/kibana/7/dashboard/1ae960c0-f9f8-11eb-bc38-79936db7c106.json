@@ -415,7 +415,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.restart_count.value"
+                                                    "sourceField": "gcp.gke.container.restart.count"
                                                 }
                                             },
                                             "incompleteColumns": {}
