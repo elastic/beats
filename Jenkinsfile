@@ -506,14 +506,24 @@ def getBeatsName(baseDir) {
 }
 
 /**
+* This method runs the end 2 end testing
+*/
+def e2e(Map args = [:]) {
+  if (!args.e2e?.get('enabled', false)) { return }
+  if (args.e2e.get('entrypoint', '')?.trim()) {
+    e2e_with_entrypoint(args)
+  } else {
+    e2e_with_job(args)
+  }
+}
+
+/**
 * This method runs the end 2 end testing in the same worker where the packages have been
 * generated, this should help to speed up the things
 */
-def e2e(Map args = [:]) {
-  def enabled = args.e2e?.get('enabled', false)
+def e2e_with_entrypoint(Map args = [:]) {
   def entrypoint = args.e2e?.get('entrypoint')
   def dockerLogFile = "docker_logs_${entrypoint}.log"
-  if (!enabled) { return }
   dir("${env.WORKSPACE}/src/github.com/elastic/e2e-testing") {
     // TBC with the target branch if running on a PR basis.
     git(branch: 'master', credentialsId: '2a9602aa-ab9f-4e52-baf3-b71ca88469c7-UserAndToken', url: 'https://github.com/elastic/e2e-testing.git')
@@ -527,17 +537,44 @@ def e2e(Map args = [:]) {
               "LOG_LEVEL=TRACE"]) {
       def status = 0
       filebeat(output: dockerLogFile){
-        status = sh(script: ".ci/scripts/${entrypoint}",
-                    label: "Run functional tests ${entrypoint}",
-                    returnStatus: true)
-      }
-      junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
-      archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
-      if (status != 0) {
-        error("ERROR: functional tests for ${args?.directory?.trim()} has failed. See the test report and ${dockerLogFile}.")
+        try {
+          sh(script: ".ci/scripts/${entrypoint}", label: "Run functional tests ${entrypoint}")
+        } finally {
+          junit(allowEmptyResults: true, keepLongStdio: true, testResults: "outputs/TEST-*.xml")
+          archiveArtifacts allowEmptyArchive: true, artifacts: "outputs/TEST-*.xml"
+        }
       }
     }
   }
+}
+
+/**
+* This method triggers the end 2 end testing job.
+*/
+def e2e_with_job(Map args = [:]) {
+  def jobName = args.e2e?.get('job')
+  def testMatrixFile = args.e2e?.get('testMatrixFile', '')
+  def notifyContext = "e2e-${args.context}"
+  def e2eTestsPipeline = "${jobName}/${isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"}"
+
+  def parameters = [
+    booleanParam(name: 'forceSkipGitChecks', value: true),
+    booleanParam(name: 'forceSkipPresubmit', value: true),
+    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
+    string(name: 'BEAT_VERSION', value: "${env.VERSION}-SNAPSHOT"),
+    string(name: 'testMatrixFile', value: testMatrixFile),
+    string(name: 'GITHUB_CHECK_NAME', value: notifyContext),
+    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
+    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
+  ]
+
+  build(job: "${e2eTestsPipeline}",
+    parameters: parameters,
+    propagate: false,
+    wait: false
+  )
+
+  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 /**
@@ -572,18 +609,14 @@ def target(Map args = [:]) {
             cmd(label: "${args.id?.trim() ? args.id : env.STAGE_NAME} - ${command}", script: "${command}")
           }
         }
-        // TODO:
-        // Packaging should happen only after the e2e?
+        // Publish packages should happen always to easily consume those artifacts if the
+        // e2e were triggered and failed.
         if (isPackaging) {
           publishPackages("${directory}")
+          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
         if(isE2E) {
           e2e(args)
-        }
-        // TODO:
-        // push docker images should happen only after the e2e?
-        if (isPackaging) {
-          pushCIDockerImages(beatsFolder: "${directory}", arch: dockerArch)
         }
       }
     }
