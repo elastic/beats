@@ -2602,7 +2602,7 @@
                                                 "374bc09a-188c-4cdf-b993-b31eb3754e46": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.value",
+                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.pct",
                                                     "operationType": "max",
                                                     "params": {
                                                         "format": {
@@ -2613,7 +2613,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.volume.utilization.value"
+                                                    "sourceField": "gcp.gke.pod.volume.utilization.pct"
                                                 },
                                                 "b47b55db-eb5b-4a10-8c49-c6920135fedf": {
                                                     "dataType": "date",
