@@ -439,9 +439,8 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add source.ip validation for event ID 4778 in the Security module. {issue}19627[19627]
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
-- Fix related.ip field in renameCommonAuthFields {pull}24892[24892]
-- Add ECS 1.9 new users fields {pull}26509[26509]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
+- Add ECS 1.9 new users fields {pull}26509[26509]
 
 *Functionbeat*
 

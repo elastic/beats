@@ -1946,8 +1946,22 @@ var security = (function () {
                     user = user.split('@')[0];
                     evt.Put('user.effective.name', user);
                 }
-                evt.AppendTo('related.user', user);
             }
+        })
+        .Add(function(evt) {
+            var removeIfEmptyOrHyphen = function(evt, key) {
+                var val = evt.Get(key);
+                if (!val || val === "-") {
+                    evt.Delete("user.effective.name");
+                    return true;
+                }
+                return false;
+            };
+            if (!removeIfEmptyOrHyphen(evt, "user.effective.name")) {
+                evt.AppendTo("related.user", user);
+            }
+            removeIfEmptyOrHyphen(evt, "user.effective.domain");
+            removeIfEmptyOrHyphen(evt, "user.effective.id");
         })
         .Build();
 
