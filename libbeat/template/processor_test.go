@@ -18,6 +18,7 @@
 package template
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -691,6 +692,41 @@ func TestProcessDefaultField(t *testing.T) {
 				},
 			},
 		},
+		// Check that multi_fields are correctly stored in defaultFields.
+		mapping.Field{
+			Name: "qux",
+			Type: "keyword",
+			MultiFields: []mapping.Field{
+				{
+					Name: "text",
+					Type: "text",
+				},
+			},
+		},
+		mapping.Field{
+			Name:         "bouba",
+			Type:         "keyword",
+			DefaultField: &disableDefaultField,
+			MultiFields: []mapping.Field{
+				{
+					Name:         "text",
+					Type:         "text",
+					DefaultField: &enableDefaultField,
+				},
+			},
+		},
+		mapping.Field{
+			Name:         "kiki",
+			Type:         "keyword",
+			DefaultField: &enableDefaultField,
+			MultiFields: []mapping.Field{
+				{
+					Name:         "text",
+					Type:         "text",
+					DefaultField: &disableDefaultField,
+				},
+			},
+		},
 	}
 
 	version, err := common.NewVersion("7.0.0")
@@ -704,13 +740,19 @@ func TestProcessDefaultField(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Len(t, defaultFields, 4)
-	assert.Contains(t, defaultFields,
-		"foo",
+	expectedFields := []string{
 		"bar",
-		"nested.foo",
+		"foo",
 		"nested.bar",
-	)
+		"nested.foo",
+		"qux",
+		"qux.text",
+		"bouba.text",
+		"kiki",
+	}
+	sort.Strings(defaultFields)
+	sort.Strings(expectedFields)
+	assert.Equal(t, defaultFields, expectedFields)
 }
 
 func TestProcessWildcardOSS(t *testing.T) {
