@@ -282,26 +282,22 @@ var (
 	}
 
 	current_memory_pressure = s.Schema{
-		"current": s.Object{
-			"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
-			"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
-			"primary_in_bytes":                           c.Int("primary_in_bytes"),
-			"replica_in_bytes":                           c.Int("replica_in_bytes"),
-			"all_in_bytes":                               c.Int("all_in_bytes"),
-		},
+		"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
+		"primary_in_bytes":                           c.Int("primary_in_bytes"),
+		"replica_in_bytes":                           c.Int("replica_in_bytes"),
+		"all_in_bytes":                               c.Int("all_in_bytes"),
 	}
 
 	total_memory_pressure = s.Schema{
-		"total": s.Object{
-			"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
-			"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
-			"primary_in_bytes":                           c.Int("primary_in_bytes"),
-			"replica_in_bytes":                           c.Int("replica_in_bytes"),
-			"all_in_bytes":                               c.Int("all_in_bytes"),
-			"coordinating_rejections":                    c.Int("coordinating_rejections"),
-			"primary_rejections":                         c.Int("primary_rejections"),
-			"replica_rejections":                         c.Int("replica_rejections"),
-		},
+		"combined_coordinating_and_primary_in_bytes": c.Int("combined_coordinating_and_primary_in_bytes"),
+		"coordinating_in_bytes":                      c.Int("coordinating_in_bytes"),
+		"primary_in_bytes":                           c.Int("primary_in_bytes"),
+		"replica_in_bytes":                           c.Int("replica_in_bytes"),
+		"all_in_bytes":                               c.Int("all_in_bytes"),
+		"coordinating_rejections":                    c.Int("coordinating_rejections"),
+		"primary_rejections":                         c.Int("primary_rejections"),
+		"replica_rejections":                         c.Int("replica_rejections"),
 	}
 
 	threadPoolStatsSchema = s.Schema{
