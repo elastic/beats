@@ -1180,7 +1180,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.used.bytes"
                                                 },
                                                 "a54c8062-91a8-4b99-a7fb-60b3d355ade9": {
                                                     "dataType": "date",
