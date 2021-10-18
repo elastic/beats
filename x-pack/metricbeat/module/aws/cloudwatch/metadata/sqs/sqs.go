@@ -40,7 +40,7 @@ func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, ev
 		if _, ok := events[queueName]; !ok {
 			continue
 		}
-		events[queueName].RootFields.Put(metadataPrefix+"name", queueName)
+		events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
 	}
 	return events
 }
