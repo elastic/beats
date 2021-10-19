@@ -15,23 +15,18 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
-// +build linux dragonfly freebsd netbsd openbsd solaris aix
+package docker
 
-package memlog
+import "github.com/docker/docker/api/types"
 
-import (
-	"os"
-)
+// Types don't need build constraints, unlike the docker.Client code, which is linux-only.
+// Put this here for client code that's importing it on non-linux systems
 
-// syncFile implements the fsync operation for most *nix systems.
-// The call is retried if EINTR or EAGAIN is returned.
-func syncFile(f *os.File) error {
-	// best effort.
-	for {
-		err := f.Sync()
-		if err == nil || !isRetryErr(err) {
-			return err
-		}
-	}
+// Select Docker API version
+const dockerAPIVersion = "1.22"
+
+// Stat contains container and statistics information
+type Stat struct {
+	Container *types.Container
+	Stats     types.StatsJSON
 }
