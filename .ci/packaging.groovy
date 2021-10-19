@@ -416,9 +416,11 @@ def runE2ETests(){
       };
     }
 
-    runE2e(runTestsSuites: suites,
+    runE2E(runTestsSuites: suites,
            beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
-           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME)
+           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
 }
 

@@ -527,10 +527,11 @@ def e2e(Map args = [:]) {
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    runE2e(jobName: args.e2e?.get('job'),
-           testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
            beatVersion: "${env.VERSION}-SNAPSHOT",
-           gitHubCheckName: "e2e-${args.context}")
+           gitHubCheckName: "e2e-${args.context}",
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
 }
 
