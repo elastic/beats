@@ -184,7 +184,7 @@ run with 5Mbps download, 3Mbps upload and 20ms latency which emulates a standard
 Cabel connection.
 
 Users can control the throttling parameters, Below is an example of emulating a
-3G connection with 1.6Mbps download, 750Kbps upload and 150 round trip time.
+3G connection with 1.6Mbps download, 750Kbps upload and 150ms round trip time.
 
 [source,yaml]
 -------------------------------------------------------------------------------
