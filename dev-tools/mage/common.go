@@ -905,6 +905,7 @@ func IntegrationTestEnvVars() []string {
 	prefixes := []string{
 		"AWS_",
 		"AZURE_",
+		"GCP_",
 
 		// Accepted by terraform, but not by many clients, including Beats
 		"GOOGLE_",

@@ -50,7 +50,6 @@ stages:
                 - "macOS"
             parameters:
                 - "macosTest"
-            branches: true     ## for all the branches
             tags: true         ## for all the tags
         stage: extended
     windows:
@@ -96,7 +95,9 @@ stages:
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
-            enabled: false
+            enabled: true
+            job: 'e2e-tests/e2e-testing-mbp'
+            testMatrixFile: '.ci/.e2e-tests-for-elastic-agent.yaml'
         stage: packaging
     packaging-arm:
         packaging-arm: "mage package"

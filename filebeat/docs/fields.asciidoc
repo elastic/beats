@@ -21713,6 +21713,16 @@ type: keyword
 
 --
 
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 

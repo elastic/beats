@@ -90,6 +90,7 @@
 - Ignore ErrNotExists when fixing permissions. {issue}27836[27836] {pull}27846[27846]
 - Snapshot artifact lookup will use agent.download proxy settings. {issue}27903[27903] {pull}27904[27904]
 - Fix lazy acker to only add new actions to the batch. {pull}27981[27981]
+- Allow HTTP metrics to run in bootstrap mode. Add ability to adjust timeouts for Fleet Server. {pull}28260[28260]
 
 ==== New features
 
@@ -145,3 +146,5 @@
 - Agent now adapts the beats queue size based on output settings. {issue}26638[26638] {pull}27429[27429]
 - Support ephemeral containers in Kubernetes dynamic provider. {issue}27020[#27020] {pull}27707[27707]
 - Add complete k8s metadata through composable provider. {pull}27691[27691]
+- Add diagnostics command to gather beat metadata. {pull}28265[28265]
+- Add `KIBANA_FLEET_SERVICE_TOKEN` to Elastic Agent container. {pull}28096[28096]
