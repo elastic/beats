@@ -76,6 +76,7 @@ require (
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.1
 	github.com/fatih/color v1.9.0
+	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
@@ -222,6 +223,7 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.3 // indirect
