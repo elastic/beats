@@ -78,7 +78,7 @@ var (
 		Labels: map[string]p.LabelMap{
 			"pod":       p.KeyLabel(mb.ModuleDataKey + ".pod.name"),
 			"container": p.KeyLabel("name"),
-			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+			"namespace": p.KeyLabel(mb.ModuleDataKey + ".namespace.name"),
 
 			"node":         p.Label(mb.ModuleDataKey + ".node.name"),
 			"container_id": p.Label("id"),
@@ -143,20 +143,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	m.enricher.Enrich(events)
 
-	// Calculate deprecated nanocores values
 	for _, event := range events {
-		if request, err := event.GetValue("cpu.request.cores"); err == nil {
-			if requestCores, ok := request.(float64); ok {
-				event.Put("cpu.request.nanocores", requestCores*nanocores)
-			}
-		}
-
-		if limit, err := event.GetValue("cpu.limit.cores"); err == nil {
-			if limitCores, ok := limit.(float64); ok {
-				event.Put("cpu.limit.nanocores", limitCores*nanocores)
-			}
-		}
-
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		containerFields := common.MapStr{}

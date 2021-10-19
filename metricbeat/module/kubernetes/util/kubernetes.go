@@ -195,7 +195,7 @@ func NewResourceMetadataEnricher(
 		},
 		// index
 		func(e common.MapStr) string {
-			return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
+			return join(getString(e, mb.ModuleDataKey+".namespace.name"), getString(e, "name"))
 		},
 	)
 

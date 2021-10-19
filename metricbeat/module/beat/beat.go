@@ -21,6 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/url"
+	"path"
+	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -35,9 +37,11 @@ func init() {
 	}
 }
 
+var metricSets = []string{"state", "stats"}
+
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"state", "stats"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, metricSets, logp.NewLogger(ModuleName))
 }
 
 // ModuleName is the name of this module.
@@ -76,7 +80,7 @@ type State struct {
 
 // GetInfo returns the data for the Beat's / endpoint.
 func GetInfo(m *MetricSet) (*Info, error) {
-	content, err := fetchPath(m.HTTP, "/", "")
+	content, err := fetchPath(m.HTTP, "/")
 	if err != nil {
 		return nil, err
 	}
@@ -92,7 +96,7 @@ func GetInfo(m *MetricSet) (*Info, error) {
 
 // GetState returns the data for the Beat's /state endpoint.
 func GetState(m *MetricSet) (*State, error) {
-	content, err := fetchPath(m.HTTP, "/state", "")
+	content, err := fetchPath(m.HTTP, "/state")
 	if err != nil {
 		return nil, err
 	}
@@ -106,16 +110,28 @@ func GetState(m *MetricSet) (*State, error) {
 	return info, nil
 }
 
-func fetchPath(httpHelper *helper.HTTP, path string, query string) ([]byte, error) {
+func fetchPath(httpHelper *helper.HTTP, path string) ([]byte, error) {
 	currentURI := httpHelper.GetURI()
 	defer httpHelper.SetURI(currentURI)
 
 	// Parses the uri to replace the path
-	u, _ := url.Parse(currentURI)
-	u.Path = path
-	u.RawQuery = query
+	u, err := url.Parse(currentURI)
+	if err != nil {
+		return nil, err
+	}
 
-	// Http helper includes the HostData with username and password
-	httpHelper.SetURI(u.String())
+	// HTTP helper includes the HostData with username and password
+	httpHelper.SetURI(fetchURI(u, path))
 	return httpHelper.FetchContent()
+}
+
+func fetchURI(u *url.URL, uriPath string) string {
+	for _, s := range metricSets {
+		if strings.HasSuffix(u.Path, s) {
+			u.Path = u.Path[:len(u.Path)-len(s)]
+			break
+		}
+	}
+	u.Path = path.Join(u.Path, uriPath)
+	return u.String()
 }

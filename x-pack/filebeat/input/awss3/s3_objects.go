@@ -172,7 +172,15 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	if err != nil {
 		return "", nil, nil, err
 	}
+
+	if resp == nil {
+		return "", nil, nil, errors.New("empty response from s3 get object")
+	}
+
 	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
+	if resp.ContentType == nil {
+		return "", meta, resp.Body, nil
+	}
 	return *resp.ContentType, meta, resp.Body, nil
 }
 

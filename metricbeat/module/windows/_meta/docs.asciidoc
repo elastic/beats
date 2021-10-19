@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This is the `windows` module which collects metrics from Windows systems.
 The module contains the `service` metricset, which is set up by default when the `windows` module is enabled.
 The `service` metricset will retrieve status information of the services on the Windows machines. The second `windows`

@@ -126,8 +126,10 @@ func generateMapStrFromEvent(eve *kubernetes.Event, dedotConfig dedotConfig) com
 		"timestamp": common.MapStr{
 			"created": kubernetes.Time(&eve.ObjectMeta.CreationTimestamp).UTC(),
 		},
+		"namespace": common.MapStr{
+			"name": eve.ObjectMeta.GetNamespace(),
+		},
 		"name":             eve.ObjectMeta.GetName(),
-		"namespace":        eve.ObjectMeta.GetNamespace(),
 		"self_link":        eve.ObjectMeta.GetSelfLink(),
 		"generate_name":    eve.ObjectMeta.GetGenerateName(),
 		"uid":              eve.ObjectMeta.GetUID(),

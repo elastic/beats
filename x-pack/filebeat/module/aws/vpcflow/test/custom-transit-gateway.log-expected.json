@@ -45,7 +45,8 @@
         "source.ip": "10.20.33.164",
         "source.port": 39812,
         "tags": [
-            "forwarded"
+            "forwarded",
+            "preserve_original_event"
         ]
     }
 ]

@@ -5,8 +5,8 @@ defaults)
 
 * Makes sure each multiline log event gets sent as a single event
 
-* Uses ingest node to parse and process the log lines, shaping the data into a structure suitable
-for visualizing in Kibana
+* Uses an {es} ingest pipeline to parse and process the log lines, shaping the
+data into a structure suitable for visualizing in Kibana
 
 ifeval::["{has-dashboards}"=="true"]
 * Deploys dashboards for visualizing the log data

@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build linux,!go1.8 darwin,!go1.10 !linux,!darwin !cgo
+//go:build (linux && !go1.8) || (darwin && !go1.10) || (!linux && !darwin) || !cgo
+// +build linux,!go1.8 darwin,!go1.10 !linux,!darwin !cgo
 
 package plugin
 

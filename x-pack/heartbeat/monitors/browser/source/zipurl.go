@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
+	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 type ZipURLSource struct {
@@ -112,8 +113,10 @@ func unzip(tf *os.File, targetDir string, folder string) error {
 	for _, f := range rdr.File {
 		err = unzipFile(targetDir, folder, f)
 		if err != nil {
-			// TODO: err handlers
-			os.RemoveAll(targetDir)
+			rmErr := os.RemoveAll(targetDir)
+			if rmErr != nil {
+				return fmt.Errorf("could not remove directory after encountering error unzipping file: %w, (original unzip error: %s)", rmErr, err)
+			}
 			return err
 		}
 	}
@@ -186,6 +189,7 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 		if err == nil {
 			resp.Body.Close()
 		}
+		logp.Warn("attempt to download zip at %s failed: %s, will retry in 1s", z.URL, err)
 		time.Sleep(time.Second)
 	}
 	if resp != nil && resp.StatusCode > 300 {
@@ -195,7 +199,6 @@ func retryingZipRequest(method string, z *ZipURLSource) (resp *http.Response, er
 }
 
 func zipRequest(method string, z *ZipURLSource) (*http.Response, error) {
-
 	req, err := http.NewRequest(method, z.URL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("could not issue request to: %s %w", z.URL, err)

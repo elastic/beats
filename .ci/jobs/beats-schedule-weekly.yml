@@ -24,4 +24,4 @@
             branches:
               - $branch_specifier
     triggers:
-      - timed: 'H H(1-4) * * 0'
+      - timed: 'H H(1-2) * * 0'
