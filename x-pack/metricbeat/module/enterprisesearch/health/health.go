@@ -63,12 +63,10 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		return errors.Wrap(err, "error in fetch")
 	}
 
-	event, err := eventMapping(content)
+	err = eventMapping(report, content)
 	if err != nil {
 		return errors.Wrap(err, "error converting event")
 	}
-
-	report.Event(mb.Event{MetricSetFields: event})
 
 	return nil
 }

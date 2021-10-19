@@ -203,8 +203,22 @@ def runLinting() {
     }
   }
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
+      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -519,6 +533,11 @@ def getBeatsName(baseDir) {
 */
 def e2e(Map args = [:]) {
   if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {

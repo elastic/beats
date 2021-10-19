@@ -445,13 +445,15 @@ func (plugin *tlsPlugin) createEvent(conn *tlsConnectionData) beat.Event {
 	// Serialize ECS TLS fields
 	pb.MarshalStruct(fields, "tls", tls)
 	if plugin.includeDetailedFields {
-		fields.Put("tls.detailed", detailed)
 		if cert, ok := detailed["client_certificate"]; ok {
 			fields.Put("tls.client.x509", cert)
+			detailed.Delete("client_certificate")
 		}
 		if cert, ok := detailed["server_certificate"]; ok {
 			fields.Put("tls.server.x509", cert)
+			detailed.Delete("server_certificate")
 		}
+		fields.Put("tls.detailed", detailed)
 	}
 
 	// Fixes for non-array datatypes
