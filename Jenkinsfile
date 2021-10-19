@@ -516,6 +516,11 @@ def getBeatsName(baseDir) {
 */
 def e2e(Map args = [:]) {
   if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
