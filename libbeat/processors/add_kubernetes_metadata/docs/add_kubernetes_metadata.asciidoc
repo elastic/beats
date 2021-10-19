@@ -141,5 +141,6 @@ client. It defaults to `KUBECONFIG` environment variable if present.
 `cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
 running configuration for a container. This is `60s` by default.
 `sync_period`:: (Optional) Specify the timeout for listing historical resources.
+`workers`:: (Optional) The number of parallel instances that should process Kubernetes watch events. The default is 1.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.
