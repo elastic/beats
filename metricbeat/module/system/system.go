@@ -20,7 +20,8 @@ package system
 import (
 	"sync"
 
-	"github.com/elastic/beats/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -40,21 +41,20 @@ type Module struct {
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
+	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 3 {
+		partialConfig := struct {
+			Hostfs string `config:"system.hostfs"`
+		}{}
 
-	partialConfig := struct {
-		Hostfs string `config:"system.hostfs"`
-	}{}
+		base.UnpackConfig(&partialConfig)
+		paths.Paths.Hostfs = partialConfig.Hostfs
 
-	base.UnpackConfig(&partialConfig)
-	logp.Info("Config: %v", partialConfig)
-
-	paths.Paths.Hostfs = partialConfig.Hostfs
+		logp.Info("refreshed hostfs: %s", paths.Paths.String())
+	}
 
 	once.Do(func() {
 		initModule(paths.Paths.Hostfs)
 	})
-
-	logp.Info("Paths: %s", paths.Paths.String())
 
 	return &Module{BaseModule: base}, nil
 }
