@@ -277,6 +277,10 @@ ARN of the AWS S3 bucket that will be polled for list operation. (Required when 
 
 Time interval for polling listing of the S3 bucket: default to `120s`.
 
+[float]
+==== `bucket_list_prefix`
+
+Prefix to apply for the list request to the S3 bucket. Default empty.
 
 [float]
 ==== `number_of_workers`
