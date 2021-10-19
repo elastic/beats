@@ -43,7 +43,7 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModuleDirs:       []string{"module/docker", "module/kubernetes"},
 			ModulesToExclude: nil,
 			Outfile:          "include/list_docker.go",
-			BuildTags:        "\n// +build linux darwin windows\n",
+			BuildTags:        "\n//go:build linux || darwin || windows\n// +build linux darwin windows\n",
 			Pkg:              "include"})
 	if err != nil {
 		return err

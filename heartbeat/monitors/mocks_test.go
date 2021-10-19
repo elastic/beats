@@ -145,7 +145,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 	return plugin.PluginFactory{
 			Name:    "test",
 			Aliases: []string{"testAlias"},
-			Builder: func(s string, config *common.Config) (plugin.Plugin, error) {
+			Make: func(s string, config *common.Config) (plugin.Plugin, error) {
 				built.Inc()
 				// Declare a real config block with a required attr so we can see what happens when it doesn't work
 				unpacked := struct {
@@ -160,7 +160,7 @@ func mockPluginBuilder() (plugin.PluginFactory, *atomic.Int, *atomic.Int) {
 					closed.Inc()
 					return nil
 				}
-				return plugin.Plugin{Jobs: j, Close: closer, Endpoints: 1}, err
+				return plugin.Plugin{Jobs: j, DoClose: closer, Endpoints: 1}, err
 			},
 			Stats: plugin.NewPluginCountersRecorder("test", reg)},
 		built,
