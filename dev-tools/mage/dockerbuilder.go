@@ -196,9 +196,6 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 
 func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
 	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
-	if variant != "" {
-		tag = fmt.Sprintf("%s-%s", tag, variant)
-	}
 	if b.Snapshot {
 		tag = tag + "-SNAPSHOT"
 	}
