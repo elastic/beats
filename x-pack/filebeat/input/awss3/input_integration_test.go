@@ -437,6 +437,7 @@ func TestPaginatorListPrefix(t *testing.T) {
 	}
 
 	assert.Equal(t, expected, objects)
+}
 
 func TestGetProviderFromDomain(t *testing.T) {
 	assert.Equal("aws", getProviderFromDomain("", ""))

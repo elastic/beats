@@ -30,7 +30,7 @@ type config struct {
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
 	BucketARN           string               `config:"bucket_arn"`
-	BucketName          string               `config:"bucket_name"`
+	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
 	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
@@ -58,7 +58,7 @@ func defaultConfig() config {
 }
 
 func (c *config) Validate() error {
-	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.BucketName != ""}
+	configs := []bool{c.QueueURL != "", c.BucketARN != "", c.NonAWSBucketName != ""}
 	enabled := []bool{}
 	for i := range configs {
 		if configs[i] {
@@ -70,14 +70,14 @@ func (c *config) Validate() error {
 		return nil
 	} else if len(enabled) > 1 {
 		return fmt.Errorf("queue_url <%v>,  bucket_arn <%v>,  bucket_name <%v> "+
-			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.BucketName)
+			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
 	}
 
-	if (c.BucketARN != "" || c.BucketName != "") && c.BucketListInterval <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.BucketListInterval <= 0 {
 		return fmt.Errorf("bucket_list_interval <%v> must be greater than 0", c.BucketListInterval)
 	}
 
-	if (c.BucketARN != "" || c.BucketName != "") && c.NumberOfWorkers <= 0 {
+	if (c.BucketARN != "" || c.NonAWSBucketName != "") && c.NumberOfWorkers <= 0 {
 		return fmt.Errorf("number_of_workers <%v> must be greater than 0", c.NumberOfWorkers)
 	}
 

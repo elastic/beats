@@ -64,9 +64,9 @@ Listing of the S3 bucket will be polled according the time interval defined by
 
 The `aws-s3` input can also poll 3rd party S3 compatible services such as the self hosted Minio.
 Using non-AWS S3 compatible buckets requires the use of `access_key_id` and `secret_access_key` for authentication.
-To specify the S3 bucket name, use the `bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
+To specify the S3 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
 `endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>`, that will be used as the API endpoint of the service, or a single domain.
-If a domain is provided, the full endpoint URI will be constructed with the regin name in the standard form of `https://s3.<region>.<domain>` supported by AWS and several 3rd party providers.
+If a domain is provided, the full endpoint URI will be constructed with the region name in the standard form of `https://s3.<region>.<domain>` supported by AWS and several 3rd party providers.
 No `endpoint` is needed if using the native AWS S3 service hosted at `amazonaws.com`.
 Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS domains that require a different endpoint.
 
@@ -74,7 +74,7 @@ Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS
 ----
 {beatname_lc}.inputs:
 - type: aws-s3
-  bucket_name: test-s3-bucket
+  non_aws_bucket_name: test-s3-bucket
   number_of_workers: 5
   bucket_list_interval: 300s
   access_key_id: xxxxxxx
@@ -258,7 +258,7 @@ configuring multiline options.
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `bucket_name` are not set).
+URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `visibility_timeout`
@@ -292,10 +292,10 @@ value is `20s`.
 [float]
 ==== `bucket_arn`
 
-ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` and `bucket_name` are not set).
+ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` and `non_aws_bucket_name` are not set).
 
 [float]
-==== `bucket_name`
+==== `non_aws_bucket_name`
 
 Name of the S3 bucket that will be polled for list operation. Required for 3rd party S3 compatible services but can also be used for AWS hosted buckets instead of `bucket_arn`. (Required when `queue_url` and `bucket_arn` are not set).
 

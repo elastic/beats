@@ -138,7 +138,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}
 
-	if in.config.BucketARN != "" || in.config.BucketName != "" {
+	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
 		// Create S3 receiver and S3 notification processor.
 		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
 		if err != nil {
@@ -200,14 +200,14 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	}
 	var bucketName string
 	var bucketID string
-	if in.config.BucketName != "" {
-		bucketName = in.config.BucketName
+	if in.config.NonAWSBucketName != "" {
+		bucketName = in.config.NonAWSBucketName
 		bucketID = bucketName
 	} else if in.config.BucketARN != "" {
 		bucketName = getBucketNameFromARN(in.config.BucketARN)
 		bucketID = in.config.BucketARN
 	}
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, "", in.awsConfig))
+	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint(in.config.AWSConfig.Endpoint, s3ServiceName, in.awsConfig.Region, in.awsConfig))
 	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
