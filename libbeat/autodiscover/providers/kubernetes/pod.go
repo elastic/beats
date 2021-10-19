@@ -186,7 +186,8 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 		}
 
 		// Look at all the namespace level default annotations and do a merge with priority going to the pod annotations.
-		if rawNsAnn, ok := kubeMeta["namespace_annotations"]; ok {
+		rawNsAnn, err := kubeMeta.GetValue("namespace.annotations")
+		if err == nil {
 			namespaceAnnotations, _ := rawNsAnn.(common.MapStr)
 			if len(namespaceAnnotations) != 0 {
 				annotations.DeepUpdateNoOverwrite(namespaceAnnotations)
@@ -381,7 +382,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *containerI
 		"runtime": c.runtime,
 	}
 	if len(namespaceAnnotations) != 0 {
-		kubemeta["namespace_annotations"] = namespaceAnnotations
+		kubemeta.Put("namespace.annotations", namespaceAnnotations)
 	}
 
 	ports := c.spec.Ports
@@ -433,7 +434,7 @@ func (p *pod) podEvent(flag string, pod *kubernetes.Pod, ports common.MapStr, in
 	kubemeta = kubemeta.Clone()
 	kubemeta["annotations"] = annotations
 	if len(namespaceAnnotations) != 0 {
-		kubemeta["namespace_annotations"] = namespaceAnnotations
+		kubemeta.Put("namespace.annotations", namespaceAnnotations)
 	}
 
 	// Don't set a port on the event

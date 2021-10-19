@@ -38,6 +38,7 @@ func init() {
 					"chown",
 					"clock_gettime",
 					"clone",
+					"clone3",
 					"close",
 					"connect",
 					"dup",

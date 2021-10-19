@@ -415,7 +415,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.restart_count.value"
+                                                    "sourceField": "gcp.gke.container.restart.count"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -841,7 +841,7 @@
                                                     "label": "Total Core usage",
                                                     "operationType": "sum",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.sec"
                                                 },
                                                 "216fee6f-2b14-4989-87e6-d64b21805f49": {
                                                     "dataType": "date",
@@ -900,7 +900,7 @@
                                                     "label": "CPU usage (seconds)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.container.cpu.core_usage_time.sec"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1044,7 +1044,7 @@
                                                     "label": "Median of CPU usage",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.cpu.core_usage_time.value"
+                                                    "sourceField": "gcp.gke.node.cpu.core_usage_time.sec"
                                                 },
                                                 "7cbf9dda-019f-43c8-b28f-803caab15753": {
                                                     "dataType": "date",
@@ -1180,7 +1180,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.used.bytes"
                                                 },
                                                 "a54c8062-91a8-4b99-a7fb-60b3d355ade9": {
                                                     "dataType": "date",
@@ -1208,7 +1208,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.allocatable_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.allocatable.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1245,7 +1245,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.memory.total_bytes.value"
+                                                    "sourceField": "gcp.gke.node.memory.total.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1385,7 +1385,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 },
                                                 "d1db0066-9429-4e89-b1d8-68ff7d81814a": {
                                                     "customLabel": true,
@@ -1402,7 +1402,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.limit_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.limit.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1545,7 +1545,7 @@
                                                 "61256570-b7dd-4bec-b73d-d12d993ae091": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.value",
+                                                    "label": "Median of gcp.gke.container.memory.limit_utilization.pct",
                                                     "operationType": "median",
                                                     "params": {
                                                         "format": {
@@ -1556,7 +1556,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.value"
+                                                    "sourceField": "gcp.gke.container.memory.limit_utilization.pct"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1693,7 +1693,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.received.bytes"
                                                 },
                                                 "cc552381-d8b0-4376-9331-e8a320441314": {
                                                     "customLabel": true,
@@ -1702,7 +1702,7 @@
                                                     "label": "Median of all network traffic",
                                                     "operationType": "formula",
                                                     "params": {
-                                                        "formula": "median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                        "formula": "median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent.bytes)",
                                                         "isFormulaBroken": false
                                                     },
                                                     "references": [
@@ -1714,25 +1714,25 @@
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent.bytes)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.received.bytes"
                                                 },
                                                 "cc552381-d8b0-4376-9331-e8a320441314X1": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent.bytes)",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.sent_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.sent.bytes"
                                                 },
                                                 "cc552381-d8b0-4376-9331-e8a320441314X2": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Part of median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                    "label": "Part of median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent.bytes)",
                                                     "operationType": "math",
                                                     "params": {
                                                         "tinymathAst": {
@@ -1745,7 +1745,7 @@
                                                                 "min": 0
                                                             },
                                                             "name": "add",
-                                                            "text": "median(gcp.gke.pod.network.received_bytes_count.value) + median(gcp.gke.pod.network.sent_bytes_count.value)",
+                                                            "text": "median(gcp.gke.pod.network.received.bytes) + median(gcp.gke.pod.network.sent.bytes)",
                                                             "type": "function"
                                                         }
                                                     },
@@ -1770,7 +1770,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.network.sent_bytes_count.value"
+                                                    "sourceField": "gcp.gke.pod.network.sent.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1901,7 +1901,7 @@
                                                     "label": "Media received bytes count",
                                                     "operationType": "median",
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.network.received_bytes_count.value"
+                                                    "sourceField": "gcp.gke.node.network.received_bytes.count"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1994,7 +1994,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.request_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.request.bytes"
                                                 },
                                                 "6c0d18a2-af02-4262-8e81-25b7b7a83578": {
                                                     "dataType": "date",
@@ -2022,7 +2022,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.limit_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.limit.bytes"
                                                 },
                                                 "a240469a-0df5-4ae3-86a0-70aa20b7e2e4": {
                                                     "customLabel": true,
@@ -2039,7 +2039,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2190,7 +2190,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.container.memory.used_bytes.value"
+                                                    "sourceField": "gcp.gke.container.memory.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2321,7 +2321,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.total_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.total.bytes"
                                                 },
                                                 "f621ffdf-1cd0-4d6e-940c-92ff4710cb1f": {
                                                     "customLabel": true,
@@ -2338,7 +2338,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2493,7 +2493,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used_bytes.value"
+                                                    "sourceField": "gcp.gke.node.ephemeral_storage.used.bytes"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -2602,7 +2602,7 @@
                                                 "374bc09a-188c-4cdf-b993-b31eb3754e46": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.value",
+                                                    "label": "Maximum of gcp.gke.pod.volume.utilization.pct",
                                                     "operationType": "max",
                                                     "params": {
                                                         "format": {
@@ -2613,7 +2613,7 @@
                                                         }
                                                     },
                                                     "scale": "ratio",
-                                                    "sourceField": "gcp.gke.pod.volume.utilization.value"
+                                                    "sourceField": "gcp.gke.pod.volume.utilization.pct"
                                                 },
                                                 "b47b55db-eb5b-4a10-8c49-c6920135fedf": {
                                                     "dataType": "date",

@@ -21578,6 +21578,16 @@ type: keyword
 
 --
 
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -27523,16 +27533,6 @@ coredns fields after normalization
 
 
 
-*`coredns.id`*::
-+
---
-id of the DNS transaction
-
-
-type: keyword
-
---
-
 *`coredns.query.size`*::
 +
 --
@@ -27545,56 +27545,6 @@ format: bytes
 
 --
 
-*`coredns.query.class`*::
-+
---
-DNS query class
-
-
-type: keyword
-
---
-
-*`coredns.query.name`*::
-+
---
-DNS query name
-
-
-type: keyword
-
---
-
-*`coredns.query.type`*::
-+
---
-DNS query type
-
-
-type: keyword
-
---
-
-*`coredns.response.code`*::
-+
---
-DNS response code
-
-
-type: keyword
-
---
-
-*`coredns.response.flags`*::
-+
---
-DNS response flags
-
-
-type: keyword
-
---
-
 *`coredns.response.size`*::
 +
 --
@@ -27604,16 +27554,6 @@ size of the DNS response
 type: integer
 
 format: bytes
-
---
-
-*`coredns.dnssec_ok`*::
-+
---
-dnssec flag
-
-
-type: boolean
 
 --
 
@@ -34641,7 +34581,7 @@ For log events the message field contains the log message, optimized for viewing
 For structured logs without an original message field, other fields can be concatenated to form a human-readable summary of the event.
 If multiple messages exist, they can be combined into one message.
 
-type: text
+type: match_only_text
 
 example: Hello World
 
@@ -34768,7 +34708,7 @@ example: Google LLC
 *`as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -34815,7 +34755,7 @@ example: Google LLC
 *`client.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35100,7 +35040,7 @@ example: Albert Einstein
 *`client.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35149,6 +35089,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`client.user.name`*::
@@ -35158,14 +35100,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`client.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35316,6 +35258,18 @@ example: lambda
 These fields contain information about binary code signatures.
 
 
+*`code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`code_signature.exists`*::
 +
 --
@@ -35371,6 +35325,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -35553,7 +35518,7 @@ example: Google LLC
 *`destination.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35838,7 +35803,7 @@ example: Albert Einstein
 *`destination.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35887,6 +35852,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`destination.user.name`*::
@@ -35896,14 +35863,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`destination.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -35928,6 +35895,18 @@ Many operating systems refer to "shared code libraries" with different names, bu
 * Shared Object (`.so`) commonly used on Unix-like operating systems
 * Dynamic library (`.dylib`) commonly used on macOS
 
+
+*`dll.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
 
 *`dll.code_signature.exists`*::
 +
@@ -35984,6 +35963,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`dll.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -36710,7 +36700,7 @@ type: keyword
 --
 Error message.
 
-type: text
+type: match_only_text
 
 --
 
@@ -36719,16 +36709,14 @@ type: text
 --
 The stack trace of this error in plain text.
 
-type: keyword
-
-Field is not indexed.
+type: wildcard
 
 --
 
 *`error.stack_trace.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -37095,6 +37083,18 @@ example: ["readonly", "system"]
 
 --
 
+*`file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`file.code_signature.exists`*::
 +
 --
@@ -37150,6 +37150,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -37524,6 +37535,19 @@ example: png
 
 --
 
+*`file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`file.gid`*::
 +
 --
@@ -37667,7 +37691,7 @@ example: /home/alice/example.png
 *`file.path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -37773,7 +37797,7 @@ type: keyword
 *`file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38577,7 +38601,7 @@ example: Mac OS Mojave
 *`host.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38606,7 +38630,7 @@ example: Mac OS X
 *`host.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38699,7 +38723,7 @@ example: Albert Einstein
 *`host.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38748,6 +38772,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`host.user.name`*::
@@ -38757,14 +38783,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`host.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38803,7 +38829,7 @@ format: bytes
 --
 The full HTTP request body.
 
-type: keyword
+type: wildcard
 
 example: Hello world
 
@@ -38812,7 +38838,7 @@ example: Hello world
 *`http.request.body.content.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -38896,7 +38922,7 @@ format: bytes
 --
 The full HTTP response body.
 
-type: keyword
+type: wildcard
 
 example: Hello world
 
@@ -38905,7 +38931,7 @@ example: Hello world
 *`http.response.body.content.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -39714,7 +39740,7 @@ example: Mac OS Mojave
 *`observer.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -39743,7 +39769,7 @@ example: Mac OS X
 *`observer.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -39961,7 +39987,7 @@ type: keyword
 *`organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -39996,7 +40022,7 @@ example: Mac OS Mojave
 *`os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -40025,7 +40051,7 @@ example: Mac OS X
 *`os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -40331,6 +40357,18 @@ example: 4
 
 --
 
+*`process.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`process.code_signature.exists`*::
 +
 --
@@ -40389,6 +40427,17 @@ example: EQHXZ8M8AV
 
 --
 
+*`process.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
+
+--
+
 *`process.code_signature.trusted`*::
 +
 --
@@ -40419,7 +40468,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: keyword
+type: wildcard
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -40428,7 +40477,7 @@ example: /usr/bin/ssh -l user 10.0.0.16
 *`process.command_line.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -40713,6 +40762,17 @@ type: keyword
 
 --
 
+*`process.end`*::
++
+--
+The time the process ended.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
 *`process.entity_id`*::
 +
 --
@@ -40740,7 +40800,7 @@ example: /usr/bin/ssh
 *`process.executable.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -40816,7 +40876,7 @@ example: ssh
 *`process.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -40841,6 +40901,18 @@ This field can be useful for querying or performing bucket analysis on how many 
 type: long
 
 example: 4
+
+--
+
+*`process.parent.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
 
 --
 
@@ -40902,6 +40974,17 @@ example: EQHXZ8M8AV
 
 --
 
+*`process.parent.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
+
+--
+
 *`process.parent.code_signature.trusted`*::
 +
 --
@@ -40932,7 +41015,7 @@ example: true
 Full command line that started the process, including the absolute path to the executable, and all arguments.
 Some arguments may be filtered to protect sensitive information.
 
-type: keyword
+type: wildcard
 
 example: /usr/bin/ssh -l user 10.0.0.16
 
@@ -40941,7 +41024,7 @@ example: /usr/bin/ssh -l user 10.0.0.16
 *`process.parent.command_line.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41226,6 +41309,17 @@ type: keyword
 
 --
 
+*`process.parent.end`*::
++
+--
+The time the process ended.
+
+type: date
+
+example: 2016-05-23T08:05:34.853Z
+
+--
+
 *`process.parent.entity_id`*::
 +
 --
@@ -41253,7 +41347,7 @@ example: /usr/bin/ssh
 *`process.parent.executable.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41329,7 +41423,7 @@ example: ssh
 *`process.parent.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41496,7 +41590,7 @@ type: keyword
 *`process.parent.title.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41525,7 +41619,7 @@ example: /home/alice
 *`process.parent.working_directory.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41692,7 +41786,7 @@ type: keyword
 *`process.title.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41721,7 +41815,7 @@ example: /home/alice
 *`process.working_directory.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -41749,7 +41843,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -42015,7 +42109,7 @@ example: Google LLC
 *`server.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42300,7 +42394,7 @@ example: Albert Einstein
 *`server.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42349,6 +42443,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`server.user.name`*::
@@ -42358,14 +42454,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`server.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42386,6 +42482,30 @@ example: ["kibana_admin", "reporting_user"]
 The service fields describe the service for or from which the data was collected.
 These fields help you find and correlate logs for a specific service and version.
 
+
+*`service.address`*::
++
+--
+Address where data about this service was collected from.
+This should be a URI, network address (ipv4:port or [ipv6]:port) or a resource path (sockets).
+
+type: keyword
+
+example: 172.26.0.2:5432
+
+--
+
+*`service.environment`*::
++
+--
+Identifies the environment where the service is running.
+If the same service runs in different environments (production, staging, QA, development, etc.), the environment can identify other instances of the same service. Can also group services and applications from the same environment.
+
+type: keyword
+
+example: production
+
+--
 
 *`service.ephemeral_id`*::
 +
@@ -42514,7 +42634,7 @@ example: Google LLC
 *`source.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42799,7 +42919,7 @@ example: Albert Einstein
 *`source.user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42848,6 +42968,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`source.user.name`*::
@@ -42857,14 +42979,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`source.user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42929,7 +43051,7 @@ example: Google LLC
 *`threat.enrichments.indicator.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -42993,6 +43115,18 @@ example: ["readonly", "system"]
 
 --
 
+*`threat.enrichments.indicator.file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`threat.enrichments.indicator.file.code_signature.exists`*::
 +
 --
@@ -43048,6 +43182,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`threat.enrichments.indicator.file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -43422,6 +43567,19 @@ example: png
 
 --
 
+*`threat.enrichments.indicator.file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`threat.enrichments.indicator.file.gid`*::
 +
 --
@@ -43441,6 +43599,51 @@ Primary group name of the file.
 type: keyword
 
 example: alice
+
+--
+
+*`threat.enrichments.indicator.file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.enrichments.indicator.file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
 
 --
 
@@ -43520,7 +43723,85 @@ example: /home/alice/example.png
 *`threat.enrichments.indicator.file.path.text`*::
 +
 --
-type: text
+type: match_only_text
+
+--
+
+*`threat.enrichments.indicator.file.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.enrichments.indicator.file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.enrichments.indicator.file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.enrichments.indicator.file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.enrichments.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.enrichments.indicator.file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.enrichments.indicator.file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -43548,7 +43829,7 @@ type: keyword
 *`threat.enrichments.indicator.file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -43709,51 +43990,6 @@ example: America/Argentina/Buenos_Aires
 
 --
 
-*`threat.enrichments.indicator.hash.md5`*::
-+
---
-MD5 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha1`*::
-+
---
-SHA1 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha256`*::
-+
---
-SHA256 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.sha512`*::
-+
---
-SHA512 hash.
-
-type: keyword
-
---
-
-*`threat.enrichments.indicator.hash.ssdeep`*::
-+
---
-SSDEEP hash.
-
-type: keyword
-
---
-
 *`threat.enrichments.indicator.ip`*::
 +
 --
@@ -43799,84 +44035,6 @@ The date and time when intelligence source last modified information for this in
 type: date
 
 example: 2020-11-05T17:25:47.000Z
-
---
-
-*`threat.enrichments.indicator.pe.architecture`*::
-+
---
-CPU architecture target for the file.
-
-type: keyword
-
-example: x64
-
---
-
-*`threat.enrichments.indicator.pe.company`*::
-+
---
-Internal company name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft Corporation
-
---
-
-*`threat.enrichments.indicator.pe.description`*::
-+
---
-Internal description of the file, provided at compile-time.
-
-type: keyword
-
-example: Paint
-
---
-
-*`threat.enrichments.indicator.pe.file_version`*::
-+
---
-Internal version of the file, provided at compile-time.
-
-type: keyword
-
-example: 6.3.9600.17415
-
---
-
-*`threat.enrichments.indicator.pe.imphash`*::
-+
---
-A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
-Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
-
-type: keyword
-
-example: 0c6803c4e922103c4dca5963aad36ddf
-
---
-
-*`threat.enrichments.indicator.pe.original_file_name`*::
-+
---
-Internal name of the file, provided at compile-time.
-
-type: keyword
-
-example: MSPAINT.EXE
-
---
-
-*`threat.enrichments.indicator.pe.product`*::
-+
---
-Internal product name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft® Windows® Operating System
 
 --
 
@@ -43931,7 +44089,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -44084,7 +44242,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -44093,7 +44251,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`threat.enrichments.indicator.url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -44104,7 +44262,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -44113,7 +44271,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`threat.enrichments.indicator.url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -44131,7 +44289,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -44549,7 +44707,8 @@ example: MITRE ATT&CK
 *`threat.group.alias`*::
 +
 --
-The alias(es) of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group alias(es).
+The alias(es) of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group alias(es).
 
 type: keyword
 
@@ -44560,7 +44719,8 @@ example: [ "Magecart Group 6" ]
 *`threat.group.id`*::
 +
 --
-The id of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group id.
+The id of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group id.
 
 type: keyword
 
@@ -44571,7 +44731,8 @@ example: G0037
 *`threat.group.name`*::
 +
 --
-The name of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group name.
+The name of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group name.
 
 type: keyword
 
@@ -44582,7 +44743,8 @@ example: FIN6
 *`threat.group.reference`*::
 +
 --
-The reference URL of the group for a set of related intrusion activity that are tracked by a common name in the security community. While not required, you can use a MITRE ATT&CK® group reference URL.
+The reference URL of the group for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® group reference URL.
 
 type: keyword
 
@@ -44615,7 +44777,7 @@ example: Google LLC
 *`threat.indicator.as.organization.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -44680,6 +44842,18 @@ example: ["readonly", "system"]
 
 --
 
+*`threat.indicator.file.code_signature.digest_algorithm`*::
++
+--
+The hashing algorithm used to sign the process.
+This value can distinguish signatures when a file is signed multiple times by the same signer but with a different digest algorithm.
+
+type: keyword
+
+example: sha256
+
+--
+
 *`threat.indicator.file.code_signature.exists`*::
 +
 --
@@ -44735,6 +44909,17 @@ This is used to identify the team or vendor of a software product. The field is 
 type: keyword
 
 example: EQHXZ8M8AV
+
+--
+
+*`threat.indicator.file.code_signature.timestamp`*::
++
+--
+Date and time when the code signature was generated and signed.
+
+type: date
+
+example: 2021-01-01T12:10:30Z
 
 --
 
@@ -45109,6 +45294,19 @@ example: png
 
 --
 
+*`threat.indicator.file.fork_name`*::
++
+--
+A fork is additional data associated with a filesystem object.
+On Linux, a resource fork is used to store additional data with a filesystem object. A file always has at least one fork for the data portion, and additional forks may exist.
+On NTFS, this is analogous to an Alternate Data Stream (ADS), and the default data stream for a file is just called $DATA. Zone.Identifier is commonly used by Windows to track contents downloaded from the Internet. An ADS is typically of the form: `C:\path\to\filename.extension:some_fork_name`, and `some_fork_name` is the value that should populate `fork_name`. `filename.extension` should populate `file.name`, and `extension` should populate `file.extension`. The full path, `file.path`, will include the fork name.
+
+type: keyword
+
+example: Zone.Identifer
+
+--
+
 *`threat.indicator.file.gid`*::
 +
 --
@@ -45128,6 +45326,51 @@ Primary group name of the file.
 type: keyword
 
 example: alice
+
+--
+
+*`threat.indicator.file.hash.md5`*::
++
+--
+MD5 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha1`*::
++
+--
+SHA1 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha256`*::
++
+--
+SHA256 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.sha512`*::
++
+--
+SHA512 hash.
+
+type: keyword
+
+--
+
+*`threat.indicator.file.hash.ssdeep`*::
++
+--
+SSDEEP hash.
+
+type: keyword
 
 --
 
@@ -45207,7 +45450,85 @@ example: /home/alice/example.png
 *`threat.indicator.file.path.text`*::
 +
 --
-type: text
+type: match_only_text
+
+--
+
+*`threat.indicator.file.pe.architecture`*::
++
+--
+CPU architecture target for the file.
+
+type: keyword
+
+example: x64
+
+--
+
+*`threat.indicator.file.pe.company`*::
++
+--
+Internal company name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft Corporation
+
+--
+
+*`threat.indicator.file.pe.description`*::
++
+--
+Internal description of the file, provided at compile-time.
+
+type: keyword
+
+example: Paint
+
+--
+
+*`threat.indicator.file.pe.file_version`*::
++
+--
+Internal version of the file, provided at compile-time.
+
+type: keyword
+
+example: 6.3.9600.17415
+
+--
+
+*`threat.indicator.file.pe.imphash`*::
++
+--
+A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
+Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
+
+type: keyword
+
+example: 0c6803c4e922103c4dca5963aad36ddf
+
+--
+
+*`threat.indicator.file.pe.original_file_name`*::
++
+--
+Internal name of the file, provided at compile-time.
+
+type: keyword
+
+example: MSPAINT.EXE
+
+--
+
+*`threat.indicator.file.pe.product`*::
++
+--
+Internal product name of the file, provided at compile-time.
+
+type: keyword
+
+example: Microsoft® Windows® Operating System
 
 --
 
@@ -45235,7 +45556,7 @@ type: keyword
 *`threat.indicator.file.target_path.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -45396,51 +45717,6 @@ example: America/Argentina/Buenos_Aires
 
 --
 
-*`threat.indicator.hash.md5`*::
-+
---
-MD5 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha1`*::
-+
---
-SHA1 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha256`*::
-+
---
-SHA256 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.sha512`*::
-+
---
-SHA512 hash.
-
-type: keyword
-
---
-
-*`threat.indicator.hash.ssdeep`*::
-+
---
-SSDEEP hash.
-
-type: keyword
-
---
-
 *`threat.indicator.ip`*::
 +
 --
@@ -45487,84 +45763,6 @@ The date and time when intelligence source last modified information for this in
 type: date
 
 example: 2020-11-05T17:25:47.000Z
-
---
-
-*`threat.indicator.pe.architecture`*::
-+
---
-CPU architecture target for the file.
-
-type: keyword
-
-example: x64
-
---
-
-*`threat.indicator.pe.company`*::
-+
---
-Internal company name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft Corporation
-
---
-
-*`threat.indicator.pe.description`*::
-+
---
-Internal description of the file, provided at compile-time.
-
-type: keyword
-
-example: Paint
-
---
-
-*`threat.indicator.pe.file_version`*::
-+
---
-Internal version of the file, provided at compile-time.
-
-type: keyword
-
-example: 6.3.9600.17415
-
---
-
-*`threat.indicator.pe.imphash`*::
-+
---
-A hash of the imports in a PE file. An imphash -- or import hash -- can be used to fingerprint binaries even after recompilation or other code-level transformations have occurred, which would change more traditional hash values.
-Learn more at https://www.fireeye.com/blog/threat-research/2014/01/tracking-malware-import-hashing.html.
-
-type: keyword
-
-example: 0c6803c4e922103c4dca5963aad36ddf
-
---
-
-*`threat.indicator.pe.original_file_name`*::
-+
---
-Internal name of the file, provided at compile-time.
-
-type: keyword
-
-example: MSPAINT.EXE
-
---
-
-*`threat.indicator.pe.product`*::
-+
---
-Internal product name of the file, provided at compile-time.
-
-type: keyword
-
-example: Microsoft® Windows® Operating System
 
 --
 
@@ -45619,7 +45817,7 @@ example: ZQBuAC0AVQBTAAAAZQBuAAAAAAA=
 Content when writing string types.
 Populated as an array when writing string data to the registry. For single string registry types (REG_SZ, REG_EXPAND_SZ), this should be an array with one string. For sequences of string with REG_MULTI_SZ, this array will be variable length. For numeric data, such as REG_DWORD and REG_QWORD, this should be populated with the decimal representation (e.g `"1"`).
 
-type: keyword
+type: wildcard
 
 example: ["C:\rta\red_ttp\bin\myapp.exe"]
 
@@ -45773,7 +45971,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -45782,7 +45980,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`threat.indicator.url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -45793,7 +45991,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -45802,7 +46000,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`threat.indicator.url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -45820,7 +46018,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -46169,10 +46367,23 @@ example: 3
 
 --
 
+*`threat.software.alias`*::
++
+--
+The alias(es) of the software for a set of related intrusion activity that are tracked by a common name in the security community.
+While not required, you can use a MITRE ATT&CK® associated software description.
+
+type: keyword
+
+example: [ "X-Agent" ]
+
+--
+
 *`threat.software.id`*::
 +
 --
-The id of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software id.
+The id of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software id.
 
 type: keyword
 
@@ -46183,7 +46394,8 @@ example: S0552
 *`threat.software.name`*::
 +
 --
-The name of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software name.
+The name of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software name.
 
 type: keyword
 
@@ -46194,7 +46406,7 @@ example: AdFind
 *`threat.software.platforms`*::
 +
 --
-The platforms of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software platforms.
+The platforms of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
 Recommended Values:
   * AWS
   * Azure
@@ -46207,6 +46419,8 @@ Recommended Values:
   * SaaS
   * Windows
 
+While not required, you can use a MITRE ATT&CK® software platforms.
+
 type: keyword
 
 example: [ "Windows" ]
@@ -46216,7 +46430,8 @@ example: [ "Windows" ]
 *`threat.software.reference`*::
 +
 --
-The reference URL of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software reference URL.
+The reference URL of the software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
+While not required, you can use a MITRE ATT&CK® software reference URL.
 
 type: keyword
 
@@ -46227,10 +46442,12 @@ example: https://attack.mitre.org/software/S0552/
 *`threat.software.type`*::
 +
 --
-The type of software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®. While not required, you can use a MITRE ATT&CK® software type.
+The type of software used by this threat to conduct behavior commonly modeled using MITRE ATT&CK®.
 Recommended values
   * Malware
   * Tool
+
+ While not required, you can use a MITRE ATT&CK® software type.
 
 type: keyword
 
@@ -46296,7 +46513,7 @@ example: Command and Scripting Interpreter
 *`threat.technique.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -46336,7 +46553,7 @@ example: PowerShell
 *`threat.technique.subtechnique.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47284,7 +47501,7 @@ type: keyword
 --
 If full URLs are important to your use case, they should be stored in `url.full`, whether this field is reconstructed or present in the event source.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top
 
@@ -47293,7 +47510,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top
 *`url.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47304,7 +47521,7 @@ Unmodified original url as seen in the event source.
 Note that in network monitoring, the observed URL may be a full URL, whereas in access logs, the URL is often just represented as a path.
 This field is meant to represent the URL as it was observed, complete or not.
 
-type: keyword
+type: wildcard
 
 example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elasticsearch
 
@@ -47313,7 +47530,7 @@ example: https://www.elastic.co:443/search?q=elasticsearch#top or /search?q=elas
 *`url.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47331,7 +47548,7 @@ type: keyword
 --
 Path of the request, such as "/search".
 
-type: keyword
+type: wildcard
 
 --
 
@@ -47456,7 +47673,7 @@ example: Albert Einstein
 *`user.changes.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47505,6 +47722,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.changes.name`*::
@@ -47514,14 +47733,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.changes.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47579,7 +47798,7 @@ example: Albert Einstein
 *`user.effective.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47628,6 +47847,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.effective.name`*::
@@ -47637,14 +47858,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.effective.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47682,7 +47903,7 @@ example: Albert Einstein
 *`user.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47731,6 +47952,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.name`*::
@@ -47740,14 +47963,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47795,7 +48018,7 @@ example: Albert Einstein
 *`user.target.full_name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47844,6 +48067,8 @@ Unique identifier of the user.
 
 type: keyword
 
+example: S-1-5-21-202424912787-2692429404-2351956786-1000
+
 --
 
 *`user.target.name`*::
@@ -47853,14 +48078,14 @@ Short name or login of the user.
 
 type: keyword
 
-example: albert
+example: a.einstein
 
 --
 
 *`user.target.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47918,7 +48143,7 @@ example: Mozilla/5.0 (iPhone; CPU iPhone OS 12_1 like Mac OS X) AppleWebKit/605.
 *`user_agent.original.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47947,7 +48172,7 @@ example: Mac OS Mojave
 *`user_agent.os.full.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -47976,7 +48201,7 @@ example: Mac OS X
 *`user_agent.os.name.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -48100,7 +48325,7 @@ example: In macOS before 2.12.6, there is a vulnerability in the RPC...
 *`vulnerability.description.text`*::
 +
 --
-type: text
+type: match_only_text
 
 --
 
@@ -48885,7 +49110,7 @@ type: float
 *`elasticsearch.gc.phase.cpu_time.sys_sec`*::
 +
 --
-CPU time spent inside the kernel. 
+CPU time spent inside the kernel.
 
 
 type: float
@@ -49055,7 +49280,7 @@ Young GC
 
 type: long
 
-example: 
+example:
 
 --
 
@@ -49066,7 +49291,7 @@ example:
 
 type: long
 
-example: 
+example:
 
 --
 
@@ -49138,7 +49363,7 @@ Types
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -49182,7 +49407,7 @@ Extra source information
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -49226,7 +49451,7 @@ Id
 
 type: keyword
 
-example: 
+example:
 
 --
 
@@ -64710,14 +64935,14 @@ type: keyword
 [float]
 === authentication_info
 
-Authentication information. 
+Authentication information.
 
 
 
 *`gcp.audit.authentication_info.principal_email`*::
 +
 --
-The email address of the authenticated user making the request. 
+The email address of the authenticated user making the request.
 
 
 type: keyword
@@ -64727,7 +64952,7 @@ type: keyword
 *`gcp.audit.authentication_info.authority_selector`*::
 +
 --
-The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
+The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority.
 
 
 type: keyword
@@ -64794,7 +65019,7 @@ type: keyword
 *`gcp.audit.request.name`*::
 +
 --
-Name of the request. 
+Name of the request.
 
 
 type: keyword
@@ -64804,7 +65029,7 @@ type: keyword
 *`gcp.audit.request.resource_name`*::
 +
 --
-Name of the request resource. 
+Name of the request resource.
 
 
 type: keyword
@@ -64821,7 +65046,7 @@ Metadata about the request.
 *`gcp.audit.request_metadata.caller_ip`*::
 +
 --
-The IP address of the caller. 
+The IP address of the caller.
 
 
 type: ip
@@ -64905,7 +65130,7 @@ type: keyword
 *`gcp.audit.response.status`*::
 +
 --
-Status of the response. 
+Status of the response.
 
 
 type: keyword
@@ -64952,14 +65177,14 @@ type: keyword
 [float]
 === status
 
-The status of the overall operation. 
+The status of the overall operation.
 
 
 
 *`gcp.audit.status.code`*::
 +
 --
-The status code, which should be an enum value of google.rpc.Code. 
+The status code, which should be an enum value of google.rpc.Code.
 
 
 type: integer
@@ -64969,7 +65194,7 @@ type: integer
 *`gcp.audit.status.message`*::
 +
 --
-A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
+A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client.
 
 
 type: keyword
@@ -85507,13 +85732,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 
@@ -92409,7 +92665,7 @@ type: text
 *`misp.identity.identity_class`*::
 +
 --
-The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov 
+The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov
 
 
 type: keyword
@@ -92419,7 +92675,7 @@ type: keyword
 *`misp.identity.labels`*::
 +
 --
-The list of roles that this Identity performs.  
+The list of roles that this Identity performs.
 
 
 type: keyword
@@ -92432,7 +92688,7 @@ example: CEO
 *`misp.identity.sectors`*::
 +
 --
-The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov 
+The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov
 
 
 type: keyword
@@ -92682,7 +92938,7 @@ Fields provide support for specifying information about threat indicators, and r
 *`misp.threat_indicator.labels`*::
 +
 --
-list of type open-vocab that specifies the type of indicator.  
+list of type open-vocab that specifies the type of indicator.
 
 
 type: keyword
@@ -92831,7 +93087,7 @@ format: string
 *`misp.threat_indicator.attack_pattern`*::
 +
 --
-The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning. 
+The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning.
 
 
 type: keyword
@@ -92844,7 +93100,7 @@ example: [destination:ip = '91.219.29.188/32']
 *`misp.threat_indicator.attack_pattern_kql`*::
 +
 --
-The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
+The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format.
 
 
 type: keyword
@@ -93671,7 +93927,7 @@ type: long
 *`mysql.slowlog.sort_range_count`*::
 +
 --
-Number of sorts that were done using ranges. 
+Number of sorts that were done using ranges.
 
 
 type: long
@@ -93771,7 +94027,7 @@ type: long
 *`mysql.slowlog.read_rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position. 
+The number of requests to read a row based on a fixed position.
 
 
 type: long
@@ -111930,7 +112186,7 @@ Fields for Pensando DFW
 *`pensando.dfw.action`*::
 +
 --
-Action on the flow. 
+Action on the flow.
 
 
 type: keyword
@@ -111940,7 +112196,7 @@ type: keyword
 *`pensando.dfw.app_id`*::
 +
 --
-Application ID 
+Application ID
 
 
 type: integer
@@ -111950,7 +112206,7 @@ type: integer
 *`pensando.dfw.destination_address`*::
 +
 --
-Address of destination. 
+Address of destination.
 
 
 type: keyword
@@ -111960,7 +112216,7 @@ type: keyword
 *`pensando.dfw.destination_port`*::
 +
 --
-Port of destination. 
+Port of destination.
 
 
 type: integer
@@ -111970,7 +112226,7 @@ type: integer
 *`pensando.dfw.direction`*::
 +
 --
-Direction of the flow 
+Direction of the flow
 
 
 type: keyword
@@ -111980,7 +112236,7 @@ type: keyword
 *`pensando.dfw.protocol`*::
 +
 --
-Protocol of the flow 
+Protocol of the flow
 
 
 type: keyword
@@ -111990,7 +112246,7 @@ type: keyword
 *`pensando.dfw.rule_id`*::
 +
 --
-Rule ID that was matched. 
+Rule ID that was matched.
 
 
 type: keyword
@@ -112000,7 +112256,7 @@ type: keyword
 *`pensando.dfw.session_id`*::
 +
 --
-Session ID of the flow 
+Session ID of the flow
 
 
 type: integer
@@ -112010,7 +112266,7 @@ type: integer
 *`pensando.dfw.session_state`*::
 +
 --
-Session state of the flow. 
+Session state of the flow.
 
 
 type: keyword
@@ -112020,7 +112276,7 @@ type: keyword
 *`pensando.dfw.source_address`*::
 +
 --
-Source address of the flow. 
+Source address of the flow.
 
 
 type: keyword
@@ -112030,7 +112286,7 @@ type: keyword
 *`pensando.dfw.source_port`*::
 +
 --
-Source port of the flow. 
+Source port of the flow.
 
 
 type: integer
@@ -112040,7 +112296,7 @@ type: integer
 *`pensando.dfw.timestamp`*::
 +
 --
-Timestamp of the log. 
+Timestamp of the log.
 
 
 type: date
@@ -151154,6 +151410,156 @@ type: keyword
 
 --
 
+*`threatintel.misp.context.attribute.id`*::
++
+--
+The ID of the secondary attribute related to the event object.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.type`*::
++
+--
+The type of the secondary attribute related to the event object. For example email, ipv4, sha1 and such.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.category`*::
++
+--
+The category of the secondary attribute related to the event object. For example "Network Activity".
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.to_ids`*::
++
+--
+If the secondary attribute should be automatically synced with an IDS.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.uuid`*::
++
+--
+The UUID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.event_id`*::
++
+--
+The local event ID of the secondary attribute related to the event.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.distribution`*::
++
+--
+How the secondary attribute has been distributed, represented by integer numbers.
+
+
+type: long
+
+--
+
+*`threatintel.misp.context.attribute.timestamp`*::
++
+--
+The timestamp in which the secondary attribute was attached to the event object.
+
+
+type: date
+
+--
+
+*`threatintel.misp.context.attribute.comment`*::
++
+--
+Comments made to the secondary attribute itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.sharing_group_id`*::
++
+--
+The group ID of the sharing group related to the specific secondary attribute.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.deleted`*::
++
+--
+If the secondary attribute has been removed from the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.disable_correlation`*::
++
+--
+If correlation has been enabled on the secondary attribute related to the event object.
+
+
+type: boolean
+
+--
+
+*`threatintel.misp.context.attribute.object_id`*::
++
+--
+The ID of the Object in which the secondary attribute is attached.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.object_relation`*::
++
+--
+The type of relation the secondary attribute has with the event object itself.
+
+
+type: keyword
+
+--
+
+*`threatintel.misp.context.attribute.value`*::
++
+--
+The value of the attribute, depending on the type like "url, sha1, email-src".
+
+
+type: keyword
+
+--
+
 [float]
 === otx
 
@@ -151378,6 +151784,103 @@ Number of rules observed.
 
 
 type: long
+
+--
+
+[float]
+=== threatq
+
+Fields for ThreatQ Threat Library
+
+
+
+*`threatintel.threatq.updated_at`*::
++
+--
+Last modification time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.created_at`*::
++
+--
+Object creation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_at`*::
++
+--
+Expiration time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_calculated_at`*::
++
+--
+Expiration calculation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.published_at`*::
++
+--
+Object publication time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.status`*::
++
+--
+Object status within the Threat Library
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.indicator_value`*::
++
+--
+Original indicator value
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.adversaries`*::
++
+--
+Adversaries that are linked to the object
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.attributes`*::
++
+--
+These provide additional context about an object
+
+
+type: flattened
 
 --
 

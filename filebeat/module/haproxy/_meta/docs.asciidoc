@@ -1,7 +1,7 @@
 :modulename: haproxy
 :has-dashboards: true
 
-== haproxy module
+== HAproxy module
 
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 

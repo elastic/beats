@@ -6,11 +6,9 @@ osquerybeat:
 #  inputs:
 #    - type: osquery
 #      streams:
-#        - id: "E169F085-AC8B-48AF-9355-D2977030CE24"
-#          query: "select * from users"
 #        - id: "CFDE1EAA-0C6C-4D19-9EEC-45802B2A8C01"
 #          query: "select * from processes"
-#          interval: 1m
+#          interval: 60
 
 # ============================== Process Security ==============================
 # Disable seccomp system call filtering on Linux.

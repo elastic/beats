@@ -345,6 +345,7 @@ func TestJsonBody(t *testing.T) {
 	type testCase struct {
 		name                string
 		responseBody        string
+		expression          string
 		condition           common.MapStr
 		expectedErrMsg      string
 		expectedContentType string
@@ -352,8 +353,25 @@ func TestJsonBody(t *testing.T) {
 
 	testCases := []testCase{
 		{
-			"simple match",
+			"expression simple match",
 			"{\"foo\": \"bar\"}",
+			"foo == \"bar\"",
+			nil,
+			"",
+			"application/json",
+		},
+		{
+			"expression simple mismatch",
+			"{\"foo\": \"bar\"}",
+			"foo == \"bot\"",
+			nil,
+			"JSON body did not match 1 expressions or conditions",
+			"application/json",
+		},
+		{
+			"simple condition match",
+			"{\"foo\": \"bar\"}",
+			"",
 			common.MapStr{
 				"equals": common.MapStr{"foo": "bar"},
 			},
@@ -361,8 +379,9 @@ func TestJsonBody(t *testing.T) {
 			"application/json",
 		},
 		{
-			"mismatch",
+			"condition mismatch",
 			"{\"foo\": \"bar\"}",
+			"",
 			common.MapStr{
 				"equals": common.MapStr{"baz": "bot"},
 			},
@@ -370,8 +389,9 @@ func TestJsonBody(t *testing.T) {
 			"application/json",
 		},
 		{
-			"invalid json",
+			"condition invalid json",
 			"notjson",
+			"",
 			common.MapStr{
 				"equals": common.MapStr{"foo": "bar"},
 			},
@@ -379,8 +399,9 @@ func TestJsonBody(t *testing.T) {
 			"text/plain; charset=utf-8",
 		},
 		{
-			"complex type match json",
+			"condition complex type match json",
 			"{\"number\": 3, \"bool\": true}",
+			"",
 			common.MapStr{
 				"equals": common.MapStr{"number": 3, "bool": true},
 			},
@@ -394,15 +415,20 @@ func TestJsonBody(t *testing.T) {
 			server := httptest.NewServer(hbtest.CustomResponseHandler([]byte(tc.responseBody), 200))
 			defer server.Close()
 
+			jsonCheck := common.MapStr{"description": tc.name}
+			if tc.expression != "" {
+				jsonCheck["expression"] = tc.expression
+			}
+			if tc.condition != nil {
+				jsonCheck["condition"] = tc.condition
+			}
+
 			configSrc := map[string]interface{}{
 				"hosts":                 server.URL,
 				"timeout":               "1s",
 				"response.include_body": "never",
 				"check.response.json": []common.MapStr{
-					{
-						"description": "myJsonCheck",
-						"condition":   tc.condition,
-					},
+					jsonCheck,
 				},
 			}
 

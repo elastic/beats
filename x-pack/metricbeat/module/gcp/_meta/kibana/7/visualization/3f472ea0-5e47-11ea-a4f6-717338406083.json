@@ -30,7 +30,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": "gcp.compute.instance.cpu.utilization.value",
+                                "field": "gcp.compute.instance.cpu.usage.pct",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "avg"
                             }
