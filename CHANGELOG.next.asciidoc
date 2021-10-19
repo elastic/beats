@@ -774,6 +774,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
 - Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
 - Add latency config option for aws-cloudwatch input. {pull}28509[28509]
+- Added proxy support to threatintel/malwarebazaar. {pull}28533[28533]
 
 *Heartbeat*
 
