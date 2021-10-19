@@ -28,8 +28,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/go-sysinfo/types"
 	"github.com/pkg/errors"
+
+	"github.com/elastic/go-sysinfo/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
