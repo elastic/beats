@@ -24,9 +24,28 @@
             Kubernetes Pod IP
 
         - name: namespace
-          type: keyword
-          description: >
-            Kubernetes namespace
+          type: group
+          fields:
+            - name: name
+              type: keyword
+              description: >
+                Kubernetes namespace name
+            - name: uuid
+              type: keyword
+              description: >
+                Kubernetes namespace uuid
+            - name: labels.*
+              type: object
+              object_type: keyword
+              object_type_mapping_type: "*"
+              description: >
+                Kubernetes namespace labels map
+            - name: annotations.*
+              type: object
+              object_type: keyword
+              object_type_mapping_type: "*"
+              description: >
+                Kubernetes namespace annotations map
 
         - name: node.name
           type: keyword

@@ -21577,6 +21577,16 @@ type: keyword
 
 --
 
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -85721,13 +85731,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 
