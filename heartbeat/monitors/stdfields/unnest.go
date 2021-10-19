@@ -33,6 +33,10 @@ type OptionalStream struct {
 	Streams    []*common.Config `config:"streams"`
 }
 
+type BaseStream struct {
+	Type string `config:"type"`
+}
+
 // UnnestStream detects configs that come from fleet and transforms the config into something compatible
 // with heartbeat, by mixing some fields (id, data_stream) with those from the first stream. It assumes
 // that there is exactly one stream associated with the input.
@@ -47,7 +51,23 @@ func UnnestStream(config *common.Config) (res *common.Config, err error) {
 		return config, nil
 	}
 
-	res = optS.Streams[0]
-	err = res.MergeWithOpts(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
+	// Find the 'base' stream, that is the one stream that has `type` set.
+	// The other streams are sort of ancillary and only for fleet internals, the
+	// base stream has the full monitor config contained within
+	for _, stream := range optS.Streams {
+		bs := &BaseStream{}
+		stream.Unpack(bs)
+		if bs.Type != "" {
+			res = stream
+			break
+		}
+	}
+
+	if res == nil {
+		id, _ := config.String("id", 0)
+		return nil, fmt.Errorf("could not determine base stream for config: %s", id)
+	}
+
+	err = res.Merge(common.MapStr{"id": optS.Id, "data_stream": optS.DataStream})
 	return
 }

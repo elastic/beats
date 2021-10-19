@@ -571,14 +571,12 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	certMap := common.MapStr{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
-		// remove this in 8.x
-		"version":        cert.Version,
-		"serial_number":  cert.SerialNumber.Text(10),
-		"issuer":         toMap(&cert.Issuer),
-		"subject":        toMap(&cert.Subject),
-		"not_before":     cert.NotBefore,
-		"not_after":      cert.NotAfter,
-		"version_number": cert.Version,
+		"serial_number":        cert.SerialNumber.Text(10),
+		"issuer":               toMap(&cert.Issuer),
+		"subject":              toMap(&cert.Subject),
+		"not_before":           cert.NotBefore,
+		"not_after":            cert.NotAfter,
+		"version_number":       cert.Version,
 	}
 	if keySize := getKeySize(cert.PublicKey); keySize > 0 {
 		certMap["public_key_size"] = keySize
@@ -604,8 +602,6 @@ func toMap(name *pkix.Name) common.MapStr {
 		{"organization", name.Organization},
 		{"organizational_unit", name.OrganizationalUnit},
 		{"locality", name.Locality},
-		// remove this in 8.x
-		{"province", name.Province},
 		{"postal_code", name.PostalCode},
 		{"serial_number", name.SerialNumber},
 		{"common_name", name.CommonName},

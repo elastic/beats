@@ -24,3 +24,4 @@ input:
           - "instance/network/sent_bytes_count"
           - "instance/network/sent_packets_count"
           - "instance/uptime"
+          - "instance/uptime_total"

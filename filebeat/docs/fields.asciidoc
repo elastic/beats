@@ -21577,6 +21577,16 @@ type: keyword
 
 --
 
+*`cisco.asa.session_type`*::
++
+--
+Session type (for example, IPsec or UDP)
+
+
+type: keyword
+
+--
+
 [float]
 === cisco.ftd
 
@@ -85721,13 +85731,44 @@ type: ip
 
 --
 
-*`kubernetes.namespace`*::
+
+*`kubernetes.namespace.name`*::
 +
 --
-Kubernetes namespace
+Kubernetes namespace name
 
 
 type: keyword
+
+--
+
+*`kubernetes.namespace.uuid`*::
++
+--
+Kubernetes namespace uuid
+
+
+type: keyword
+
+--
+
+*`kubernetes.namespace.labels.*`*::
++
+--
+Kubernetes namespace labels map
+
+
+type: object
+
+--
+
+*`kubernetes.namespace.annotations.*`*::
++
+--
+Kubernetes namespace annotations map
+
+
+type: object
 
 --
 
@@ -151742,6 +151783,103 @@ Number of rules observed.
 
 
 type: long
+
+--
+
+[float]
+=== threatq
+
+Fields for ThreatQ Threat Library
+
+
+
+*`threatintel.threatq.updated_at`*::
++
+--
+Last modification time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.created_at`*::
++
+--
+Object creation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_at`*::
++
+--
+Expiration time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.expires_calculated_at`*::
++
+--
+Expiration calculation time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.published_at`*::
++
+--
+Object publication time
+
+
+type: date
+
+--
+
+*`threatintel.threatq.status`*::
++
+--
+Object status within the Threat Library
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.indicator_value`*::
++
+--
+Original indicator value
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.adversaries`*::
++
+--
+Adversaries that are linked to the object
+
+
+type: keyword
+
+--
+
+*`threatintel.threatq.attributes`*::
++
+--
+These provide additional context about an object
+
+
+type: flattened
 
 --
 
