@@ -114,32 +114,17 @@ include::monitors/monitor-browser.asciidoc[]
 [[run-once-mode]]
 === Run Once Mode (Experimental)
 
-You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in "run once" mode. This is an experimental feature
-and is subject to change.
+You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in 
+"run once" mode by setting `heartbeat.run_once: true`. All {beatname_uc} monitors will ignore their schedules and run exactly once at startup.
+This is an experimental feature and is subject to change. 
+
+Note, the `schedule` field is still required and is used by {beatname_uc} to set the expectation around when
+the next run will occur. That duration is encoded in the `monitor.timespan` field in the {beatname_uc} output.
 
 [source,yaml]
 ----------------------------------------------------------------------
 # heartbeat.yml
-heartbeat.run_once:
-- type: icmp
-  id: ping-myhost
-  name: My Host Ping
-  hosts: ["myhost"]
-  # Note that schedule is still needed to inform heartbeat when the next
-  # expected check is to be run. This is needed to populate the monitor.timespan field used by the Uptime app.
-  schedule: '@every 5s'
-- type: tcp
-  id: myhost-tcp-echo
-  name: My Host TCP Echo
-  hosts: ["myhost:777"]  # default TCP Echo Protocol
-  check.send: "Check"
-  check.receive: "Check"
-  schedule: '@every 5s'
-- type: http
-  id: service-status
-  name: Service Status
-  service.name: my-apm-service-name
-  hosts: ["http://localhost:80/service/status"]
-  check.response.status: [200]
-  schedule: '@every 5s'
+heartbeat.run_once: true
+heartbeat.monitors:
+# your monitor config here...
 ----------------------------------------------------------------------
