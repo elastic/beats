@@ -34,7 +34,6 @@ func (c ColumnType) String() string {
 	return [...]string{"string", "int64", "uint64"}[c]
 }
 
-// rec.Set(fields, 0, "username", ColumnTypeString)
 type ColumnInfo struct {
 	IndexFrom int
 	Name      string
