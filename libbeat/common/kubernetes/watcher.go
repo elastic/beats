@@ -215,9 +215,9 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 	}
 	if deleted, ok := obj.(cache.DeletedFinalStateUnknown); ok {
 		w.logger.Debugf("Enqueued DeletedFinalStateUnknown contained object: %+v", deleted.Obj)
-		w.queue.Add(&item{key, obj, state})
+		w.queue.Add(item{key, obj, state})
 	} else {
-		w.queue.Add(&item{key, nil, state})
+		w.queue.Add(item{key, nil, state})
 	}
 
 }
@@ -230,9 +230,9 @@ func (w *watcher) process(ctx context.Context) bool {
 	}
 	defer w.queue.Done(obj)
 
-	var entry *item
+	var entry item
 	var ok bool
-	if entry, ok = obj.(*item); !ok {
+	if entry, ok = obj.(item); !ok {
 		utilruntime.HandleError(fmt.Errorf("expected *item in workqueue but got %#v", obj))
 		return true
 	}
@@ -245,7 +245,7 @@ func (w *watcher) process(ctx context.Context) bool {
 		return true
 	}
 	if !exists {
-		if entry.state == delete && entry.objectRaw != nil {
+		if entry.state == delete {
 			w.logger.Debugf("Object %+v was not found in the store, deleting anyway!", key)
 			// delete anyway in order to clean states
 			w.handler.OnDelete(entry.objectRaw)
