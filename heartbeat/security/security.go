@@ -19,7 +19,7 @@
 //go:build linux
 // +build linux
 
-package main
+package security
 
 import (
 	"fmt"
@@ -139,6 +139,7 @@ func setSeccompRules() error {
 		"bind",
 		"brk",
 		"capget",
+		"capset",
 		"chdir",
 		"chmod",
 		"chown",
@@ -165,6 +166,7 @@ func setSeccompRules() error {
 		"getdents64",
 		"getegid",
 		"geteuid",
+		"getgroups",
 		"getgid",
 		"getpeername",
 		"getpgrp",
