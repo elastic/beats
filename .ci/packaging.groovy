@@ -417,7 +417,7 @@ def runE2ETests(){
 def triggerE2ETests(String suite) {
   echo("Triggering E2E tests for PR-${env.CHANGE_ID}. Test suites: ${suite}.")
 
-  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}.x"
+  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"
   def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
   def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
 
