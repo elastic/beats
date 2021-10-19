@@ -384,7 +384,7 @@ func TestPod_Generate(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil)
+	metagen := NewPodMetadataGenerator(config, nil, client, nil, nil, nil)
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
@@ -510,7 +510,7 @@ func TestPod_GenerateFromName(t *testing.T) {
 		assert.NoError(t, err)
 		pods := cache.NewStore(cache.MetaNamespaceKeyFunc)
 		pods.Add(test.input)
-		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil)
+		metagen := NewPodMetadataGenerator(config, pods, client, nil, nil, nil)
 
 		accessor, err := meta.Accessor(test.input)
 		require.NoError(t, err)
@@ -634,7 +634,7 @@ func TestPod_GenerateWithNodeNamespace(t *testing.T) {
 		namespaces.Add(test.namespace)
 		nsMeta := NewNamespaceMetadataGenerator(config, namespaces, client)
 
-		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta)
+		metagen := NewPodMetadataGenerator(config, pods, client, nodeMeta, nsMeta, nil)
 		t.Run(test.name, func(t *testing.T) {
 			assert.Equal(t, test.output, metagen.Generate(test.input))
 		})
