@@ -39,7 +39,8 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         """
 
         config = {
-            "run_once": [
+            "run_once": true,
+            "monitors": [
                 {
                     "type": "http",
                     "id": "http-check",
