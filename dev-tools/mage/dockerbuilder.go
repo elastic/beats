@@ -66,29 +66,25 @@ func (b *dockerBuilder) Build() error {
 		return err
 	}
 
-	// We always have at least one default variant
-	variants := append([]string{""}, b.PackageSpec.Variants...)
-	for _, variant := range variants {
-		if err := b.prepareBuild(variant); err != nil {
-			return errors.Wrap(err, "failed to prepare build")
-		}
+	if err := b.prepareBuild(); err != nil {
+		return errors.Wrap(err, "failed to prepare build")
+	}
 
-		tag, err := b.dockerBuild()
-		tries := 3
-		for err != nil && tries != 0 {
-			fmt.Println(">> Building docker images again (after 10 s)")
-			// This sleep is to avoid hitting the docker build issues when resources are not available.
-			time.Sleep(time.Second * 10)
-			tag, err = b.dockerBuild()
-			tries -= 1
-		}
-		if err != nil {
-			return errors.Wrap(err, "failed to build docker")
-		}
+	tag, err := b.dockerBuild()
+	tries := 3
+	for err != nil && tries != 0 {
+		fmt.Println(">> Building docker images again (after 10 s)")
+		// This sleep is to avoid hitting the docker build issues when resources are not available.
+		time.Sleep(time.Second * 10)
+		tag, err = b.dockerBuild()
+		tries -= 1
+	}
+	if err != nil {
+		return errors.Wrap(err, "failed to build docker")
+	}
 
-		if err := b.dockerSave(tag); err != nil {
-			return errors.Wrap(err, "failed to save docker as artifact")
-		}
+	if err := b.dockerSave(tag); err != nil {
+		return errors.Wrap(err, "failed to save docker as artifact")
 	}
 
 	return nil
@@ -124,7 +120,7 @@ func (b *dockerBuilder) copyFiles() error {
 	return nil
 }
 
-func (b *dockerBuilder) prepareBuild(variant string) error {
+func (b *dockerBuilder) prepareBuild() error {
 	elasticBeatsDir, err := ElasticBeatsDir()
 	if err != nil {
 		return err
@@ -134,7 +130,6 @@ func (b *dockerBuilder) prepareBuild(variant string) error {
 	data := map[string]interface{}{
 		"ExposePorts": b.exposePorts(),
 		"ModulesDirs": b.modulesDirs(),
-		"Variant":     variant,
 	}
 
 	err = filepath.Walk(templatesDir, func(path string, info os.FileInfo, _ error) error {
