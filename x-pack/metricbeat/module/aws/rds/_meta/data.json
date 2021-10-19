@@ -5,17 +5,19 @@
             "namespace": "AWS/RDS"
         },
         "dimensions": {
-            "DBClusterIdentifier": "database-1",
-            "Role": "WRITER"
+            "DatabaseClass": "db.r5.large"
         },
         "rds": {
             "aurora_bin_log_replica_lag": 0,
             "aurora_replica": {
+                "lag": {
+                    "ms": 19.9485
+                },
                 "lag_max": {
-                    "ms": 13.449000358581543
+                    "ms": 21.318500518798828
                 },
                 "lag_min": {
-                    "ms": 13.449000358581543
+                    "ms": 21.318500518798828
                 }
             },
             "aurora_volume_left_total": {
@@ -27,54 +29,49 @@
             },
             "cpu": {
                 "total": {
-                    "pct": 6.975116251937533
+                    "pct": 0.06552109062928828
                 }
             },
             "database_connections": 0,
             "deadlocks": 0,
             "engine_uptime": {
-                "sec": 20413803
+                "sec": 33121208
             },
             "free_local_storage": {
-                "bytes": 25608523776
+                "bytes": 27275925504
             },
             "freeable_memory": {
-                "bytes": 4695093248
+                "bytes": 4604928000
             },
             "latency": {
-                "commit": 5.198533333333333,
+                "commit": 3.2349916666666667,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.19726666666666667,
-                "insert": 0.19726666666666667,
+                "dml": 0.09888333333333334,
+                "insert": 0.09888333333333334,
                 "read": 0,
-                "select": 0.21317204301075268,
+                "select": 0.2432811228126595,
                 "update": 0,
-                "write": 0.0013534145331858408
+                "write": 0.0005787267919438727
             },
             "login_failures": 0,
-            "queries": 8.830095631601747,
+            "queries": 7.862475898034027,
             "throughput": {
-                "commit": 0.49980840677740196,
+                "commit": 0.24950762724254,
                 "ddl": 0,
                 "delete": 0,
-                "dml": 0.49980840677740196,
-                "insert": 0.49980840677740196,
-                "network": 1.3998600139986002,
-                "network_receive": 0.6999300069993001,
-                "network_transmit": 0.6999300069993001,
-                "select": 3.098812122019892,
+                "dml": 0.24950762724254,
+                "insert": 0.24950762724254,
+                "network": 1.3985171580449323,
+                "network_receive": 0.6992585790224661,
+                "network_transmit": 0.6992585790224661,
+                "select": 2.9299395125804084,
                 "update": 0
             },
             "transactions": {
                 "active": 0,
                 "blocked": 0
             }
-        },
-        "tags": {
-            "cluster": "database-1",
-            "created-by": "ks",
-            "dept": "eng"
         }
     },
     "cloud": {
@@ -83,7 +80,7 @@
             "name": "elastic-beats"
         },
         "provider": "aws",
-        "region": "us-east-1"
+        "region": "eu-west-1"
     },
     "event": {
         "dataset": "aws.rds",
