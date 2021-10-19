@@ -195,18 +195,17 @@ func (b *dockerBuilder) expandDockerfile(templatesDir string, data map[string]in
 }
 
 func (b *dockerBuilder) dockerBuild(variant string) (string, error) {
-	imageName := b.imageName
+	tag := fmt.Sprintf("%s:%s", b.imageName, b.Version)
 	if variant != "" {
-		imageName = fmt.Sprintf("%s-%s", imageName, variant)
+		tag = fmt.Sprintf("%s-%s", tag, variant)
 	}
-	taggedImageName := fmt.Sprintf("%s:%s", imageName, b.Version)
 	if b.Snapshot {
-		taggedImageName = taggedImageName + "-SNAPSHOT"
+		tag = tag + "-SNAPSHOT"
 	}
 	if repository, _ := b.ExtraVars["repository"]; repository != "" {
-		taggedImageName = fmt.Sprintf("%s/%s", repository, taggedImageName)
+		tag = fmt.Sprintf("%s/%s", repository, tag)
 	}
-	return taggedImageName, sh.Run("docker", "build", "-t", taggedImageName, b.buildDir)
+	return tag, sh.Run("docker", "build", "-t", tag, b.buildDir)
 }
 
 func (b *dockerBuilder) dockerSave(tag string) error {
