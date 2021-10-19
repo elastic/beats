@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in Kafka module. {pull}27938[27938]
 - Remove deprecated fields in coredns module. {pull}28196[28196]
 - Remove old `httpjson` config implementation. {pull}28054[28054]
+- Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {issue}27423[27423]
 
 *Heartbeat*
 
@@ -129,6 +130,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - `event.category` no longer contains the value `network_traffic` because this is not a valid ECS event category value. {pull}20556[20556]
 - Added redact_headers configuration option, to allow HTTP request headers to be redacted whilst keeping the header field included in the beat. {pull}15353[15353]
 - Add dns.question.subdomain and dns.question.top_level_domain fields. {pull}14578[14578]
+- Remove deprecated TLS fields in favor of tls.server.x509 and tls.client.x509 ECS fields. {pull}28487[28487]
 
 *Winlogbeat*
 
@@ -435,6 +437,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - `beat` module respects `basepath` config option. {pull}28162[28162]
 - Fix list_docker.go {pull}28374[28374]
 - Divide RDS metric cpu.total.pct by 100. {pull}28456[28456]
+
 *Packetbeat*
 
 - Handle truncated DNS records more gracefully. {issue}21495[21495] {pull}28297[28297]
@@ -448,6 +451,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Protect against accessing undefined variables in Sysmon module. {issue}22219[22219] {pull}22236[22236]
 - Protect against accessing an undefined variable in Security module. {pull}22937[22937]
 - Tolerate faults when Windows Event Log session is interrupted {issue}27947[27947] {pull}28191[28191]
+- Add ECS 1.9 new users fields {pull}26509[26509]
 
 *Functionbeat*
 
@@ -769,6 +773,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Release zoom module as GA. {pull}28106[28106]
 - Add support for secondary object attribute handling in ThreatIntel MISP module {pull}28124[28124]
 - Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
+- Add latency config option for aws-cloudwatch input. {pull}28509[28509]
 
 *Heartbeat*
 
