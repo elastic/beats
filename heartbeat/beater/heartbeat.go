@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
