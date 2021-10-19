@@ -96,7 +96,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Remove deprecated fields in coredns module. {pull}28196[28196]
 - Remove old `httpjson` config implementation. {pull}28054[28054]
 - Added dataset `threatq` to the `threatintel` module to ingest indicators from ThreatQ {issue}27423[27423]
-- Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 
 *Heartbeat*
 
