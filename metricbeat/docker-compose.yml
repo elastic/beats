@@ -19,7 +19,7 @@ services:
     build:
       context: ./module/elasticsearch/_meta
       args:
-        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.14.0}
+        ELASTICSEARCH_VERSION: ${ELASTICSEARCH_VERSION:-7.15.0}
     environment:
       - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
       - "network.host="
