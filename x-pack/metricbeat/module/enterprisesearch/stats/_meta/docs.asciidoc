@@ -1,3 +1,3 @@
-This is the stats metricset of the module enterprisesearch.
+This is the `stats` metricset of the Enterprise Search module.
 
 This metricset allows users to fetch and ingest Enterprise Search solution statistics information from the https://www.elastic.co/guide/en/enterprise-search/current/monitoring-apis.html#stats-api[Stats API].
