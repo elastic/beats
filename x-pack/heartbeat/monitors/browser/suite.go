@@ -85,6 +85,16 @@ func (s *Suite) extraArgs() []string {
 	if s.suiteCfg.Screenshots != "" {
 		extraArgs = append(extraArgs, "--screenshots", s.suiteCfg.Screenshots)
 	}
+	if s.suiteCfg.Throttling != nil {
+		switch t := s.suiteCfg.Throttling.(type) {
+		case bool:
+			if !t {
+				extraArgs = append(extraArgs, "--no-throttling")
+			}
+		case string:
+			extraArgs = append(extraArgs, "--throttling", fmt.Sprintf("%v", s.suiteCfg.Throttling))
+		}
+	}
 
 	return extraArgs
 }
