@@ -1066,8 +1066,8 @@ specs:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
 
-      # Complete image gets a 'complete' variant for synthetics and other large
-      # packages too big to fit in the main image
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
     - os: linux
       arch: arm64
       types: [docker]
