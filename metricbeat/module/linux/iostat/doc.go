@@ -15,23 +15,4 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux || dragonfly || freebsd || netbsd || openbsd || solaris || aix
-// +build linux dragonfly freebsd netbsd openbsd solaris aix
-
-package memlog
-
-import (
-	"os"
-)
-
-// syncFile implements the fsync operation for most *nix systems.
-// The call is retried if EINTR or EAGAIN is returned.
-func syncFile(f *os.File) error {
-	// best effort.
-	for {
-		err := f.Sync()
-		if err == nil || !isRetryErr(err) {
-			return err
-		}
-	}
-}
+package iostat
