@@ -47,12 +47,9 @@ func Build() error {
 		return err
 	}
 
-	// Building osquery-extension.ext
-	inputFiles := filepath.Join("ext/osquery-extension/main.go")
-	params.InputFiles = []string{inputFiles}
+	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
 	params.CGO = false
-	params.Env = make(map[string]string)
 	err = devtools.Build(params)
 	if err != nil {
 		return err
