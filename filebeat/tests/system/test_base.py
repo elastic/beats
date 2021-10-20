@@ -61,4 +61,3 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='filebeat-*', h='name')) > 0
-
