@@ -303,8 +303,8 @@ func TestConfig(t *testing.T) {
 			"",
 			nonAWSS3Bucket,
 			common.MapStr{
-				"non_aws_s3_bucket": nonAWSS3Bucket,
-				"number_of_workers": 5,
+				"non_aws_bucket_name": nonAWSS3Bucket,
+				"number_of_workers":   5,
 			},
 			"",
 			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
@@ -396,7 +396,7 @@ func TestConfig(t *testing.T) {
 			if tc.expectedCfg == nil {
 				t.Fatal("missing expected config in test case")
 			}
-			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.s3Bucket), c)
+			assert.EqualValues(t, tc.expectedCfg(tc.queueURL, tc.s3Bucket, tc.nonAWSS3Bucket), c)
 		})
 	}
 }
