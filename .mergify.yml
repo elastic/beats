@@ -127,7 +127,7 @@ pull_request_rules:
   - name: backport patches to 7.x branch
     conditions:
       - merged
-      - label=backport-v7.17.0
+      - label=backport-v7.16.0
     actions:
       backport:
         assignees:
