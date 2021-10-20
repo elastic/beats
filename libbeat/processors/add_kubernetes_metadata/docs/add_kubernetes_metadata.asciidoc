@@ -138,5 +138,8 @@ Example:
 -------------------------------------------------------------------------------------
 `kube_config`:: (Optional) Use given config file as configuration for Kubernetes
 client. It defaults to `KUBECONFIG` environment variable if present.
+`cleanup_timeout`:: (Optional) Specify the time of inactivity before stopping the
+running configuration for a container. This is `60s` by default.
+`sync_period`:: (Optional) Specify the timeout for listing historical resources.
 `default_indexers.enabled`:: (Optional) Enable or disable default pod indexers when you want to specify your own.
 `default_matchers.enabled`:: (Optional) Enable or disable default pod matchers when you want to specify your own.

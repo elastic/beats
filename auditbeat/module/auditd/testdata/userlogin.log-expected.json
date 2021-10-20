@@ -34,8 +34,7 @@
       ],
       "outcome": "failure",
       "type": [
-        "start",
-        "authentication_failure"
+        "start"
       ]
     },
     "network": {
@@ -98,8 +97,7 @@
       ],
       "outcome": "success",
       "type": [
-        "start",
-        "authentication_success"
+        "start"
       ]
     },
     "network": {

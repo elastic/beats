@@ -53,9 +53,7 @@ SYSTEM_DISKIO_FIELDS = ["name", "read.count", "write.count", "read.bytes",
                         "write.bytes", "read.time", "write.time"]
 
 SYSTEM_DISKIO_FIELDS_LINUX = ["name", "read.count", "write.count", "read.bytes",
-                              "write.bytes", "read.time", "write.time", "io.time", "io.ops",
-                              "iostat.read.request.merges_per_sec", "iostat.write.request.merges_per_sec", "iostat.read.request.per_sec", "iostat.write.request.per_sec", "iostat.read.per_sec.bytes", "iostat.write.per_sec.bytes"
-                              "iostat.request.avg_size", "iostat.queue.avg_size", "iostat.await", "iostat.service_time", "iostat.busy"]
+                              "write.bytes", "read.time", "write.time", "io.time", "io.ops"]
 
 SYSTEM_FILESYSTEM_FIELDS = ["available", "device_name", "type", "files", "free",
                             "free_files", "mount_point", "total", "used.bytes",
@@ -68,7 +66,7 @@ SYSTEM_FILESYSTEM_FIELDS_WINDOWS = ["available", "device_name", "type", "free",
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
 
 SYSTEM_MEMORY_FIELDS_LINUX = ["swap", "actual.free", "free", "total", "cached", "used.bytes", "used.pct", "actual.used.bytes",
-                              "actual.used.pct", "hugepages", "page_stats"]
+                              "actual.used.pct"]
 
 SYSTEM_MEMORY_FIELDS = ["swap", "actual.free", "free", "total", "used.bytes", "used.pct", "actual.used.bytes",
                                 "actual.used.pct", "hugepages", "page_stats"]
