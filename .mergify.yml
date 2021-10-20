@@ -133,7 +133,7 @@ pull_request_rules:
         assignees:
           - "{{ author }}"
         branches:
-          - "7.x"
+          - "7.16"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
