@@ -7,7 +7,6 @@ package awss3
 import (
 	"errors"
 	"fmt"
-	"net/url"
 	"time"
 
 	"github.com/dustin/go-humanize"
@@ -66,10 +65,10 @@ func (c *config) Validate() error {
 		}
 	}
 	if len(enabled) == 0 {
-		logp.NewLogger(inputName).Warnf("neither queue_url, bucket_arn, bucket_name were provided, input %s will stop", inputName)
+		logp.NewLogger(inputName).Warnf("neither queue_url, bucket_arn, non_aws_bucket_name were provided, input %s will stop", inputName)
 		return nil
 	} else if len(enabled) > 1 {
-		return fmt.Errorf("queue_url <%v>,  bucket_arn <%v>,  bucket_name <%v> "+
+		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
 			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
 	}
 
@@ -101,22 +100,14 @@ func (c *config) Validate() error {
 			c.APITimeout, c.SQSWaitTime)
 	}
 
-	endpoint, _ := url.Parse(c.AWSConfig.Endpoint)
-	if c.QueueURL != "" && endpoint.Scheme != "" {
-		return errors.New("SQS Queues cannot be used when using a non-AWS S3 bucket.")
-	}
-
-	if c.BucketARN != "" && endpoint.Scheme != "" {
-		return errors.New("bucket_arn cannot be used with a non-AWS S3 bucket. Use bucket_name instead.")
-	}
-	if c.FIPSEnabled && endpoint.Scheme != "" {
+	if c.FIPSEnabled && c.NonAWSBucketName != "" {
 		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket.")
 	}
-	if c.PathStyle && c.AWSConfig.Endpoint == "" {
-		return errors.New("Cannot use path style when using AWS native S3 services")
+	if c.PathStyle && c.NonAWSBucketName == "" {
+		return errors.New("path_style can only be used when polling non-AWS S3 services")
 	}
-	if c.ProviderOverride != "" && c.AWSConfig.Endpoint == "" {
-		return errors.New("Cannot override provider when using AWS native S3 services")
+	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
+		return errors.New("provider can only be overriden when polling non-AWS S3 services")
 	}
 
 	return nil
