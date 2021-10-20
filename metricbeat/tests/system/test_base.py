@@ -14,7 +14,7 @@ from beat import common_tests
 from elasticsearch import Elasticsearch
 
 
-class Test(BaseTest, common_tests.TestExportsMixin):
+class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
