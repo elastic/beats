@@ -54,7 +54,7 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
@@ -92,7 +92,7 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, policy_name, self.alias_name)
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_policy_created(policy_name)
 
@@ -111,7 +111,7 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_docs_written_to_alias(self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
@@ -131,7 +131,7 @@ class TestRunILM(BaseTest):
         self.wait_until(lambda: self.log_contains("PublishEvents: 1 events have been published"))
         proc.check_kill_and_wait()
 
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name, pattern=pattern)
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=pattern)
 
@@ -153,7 +153,7 @@ class TestRunILM(BaseTest):
 
         resolved_pattern = datetime.datetime.now().strftime("%Y.%m.%d")
 
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name, pattern=resolved_pattern)
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name, pattern=resolved_pattern)
 
@@ -204,7 +204,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                   extra_args=["setup", self.setupCmd, "--template"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
@@ -220,7 +220,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                   extra_args=["setup", self.setupCmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
@@ -255,7 +255,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                               "-E", "setup.ilm.policy_name=" + self.custom_policy])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -271,7 +271,7 @@ class TestCommandSetupILMPolicy(BaseTest):
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
 
