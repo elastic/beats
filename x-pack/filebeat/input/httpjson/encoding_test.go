@@ -57,7 +57,7 @@ func TestDecodeCSV(t *testing.T) {
 			"EVENT_TYPE,TIMESTAMP,REQUEST_ID,ORGANIZATION_ID,USER_ID\n" +
 				"Login,20211018071505.579,id4,user2\n",
 			"",
-			"malformed CSV, record does not match header length",
+			"record on line 2: wrong number of fields",
 		},
 	}
 	for _, test := range tests {

@@ -144,9 +144,12 @@ func decodeAsCSV(p []byte, dst *response) error {
 		return err
 	}
 
-	for event, err := r.Read(); err == nil; event, err = r.Read() {
+	event, err := r.Read()
+	for ; err == nil; event, err = r.Read() {
 		o := map[string]interface{}{}
 		if len(header) != len(event) {
+			// sanity check, csv.Reader should fail on this scenario
+			// and this code path should be unreachable
 			return errors.New("malformed CSV, record does not match header length")
 		}
 		for i, h := range header {
