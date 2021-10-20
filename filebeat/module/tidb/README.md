@@ -91,7 +91,7 @@ make python-env
 source ./build/python-env/bin/activate
 make filebeat.test
 # Run after each time module changing
-make update
+make fmt update
 # Start tests
 GENERATE=1 INTEGRATION_TESTS=1 BEAT_STRICT_PERMS=false TESTING_FILEBEAT_MODULES=tidb pytest tests/system/test_modules.py
 ```
@@ -105,3 +105,7 @@ curl -X GET --location "http://localhost:9200/test-filebeat-modules/_search"
 ### View test configs and logs
 
 Test results locate at `filebeat/build/system-tests/run/test_modules.Test.test_fileset_file_0_tidb/`
+
+### Update `x-pack/filebeat`
+
+You should run `make fmt update` in `x-pack/filebeat` to sync code before pushing to PR.
