@@ -1,0 +1,1954 @@
+{
+    "attributes": {
+        "description": "Enterprise Search deployment overview: product usage, network metrics, low-level resource utilization, etc",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.module",
+                            "negate": false,
+                            "params": {
+                                "query": "enterprisesearch"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.module": "enterprisesearch"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "fontSize": 12,
+                            "markdown": "# Product Usage",
+                            "openLinksInNewTab": false
+                        },
+                        "title": "",
+                        "type": "markdown",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "7f957d85-d635-4c60-9449-01175e6bc122",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "7f957d85-d635-4c60-9449-01175e6bc122",
+                "type": "visualization",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-0d0ae348-91e8-44a0-b442-f409a093178a",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "0d0ae348-91e8-44a0-b442-f409a093178a": {
+                                            "columnOrder": [
+                                                "ade6560c-7f95-4f3f-a01e-154a3139ff55",
+                                                "c5c8d5c3-4bd7-4689-b3a9-7d6d00cd24f2"
+                                            ],
+                                            "columns": {
+                                                "ade6560c-7f95-4f3f-a01e-154a3139ff55": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "c5c8d5c3-4bd7-4689-b3a9-7d6d00cd24f2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Active Nodes",
+                                                    "operationType": "unique_count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.cluster_uuid"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c5c8d5c3-4bd7-4689-b3a9-7d6d00cd24f2"
+                                        ],
+                                        "layerId": "0d0ae348-91e8-44a0-b442-f409a093178a",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "ade6560c-7f95-4f3f-a01e-154a3139ff55"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "1534ebcc-1209-4d1a-829e-b92128b025e9",
+                    "w": 24,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "1534ebcc-1209-4d1a-829e-b92128b025e9",
+                "title": "Active Enterprise Search Nodes",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-84b53681-6661-4b25-80df-4b4662b8d685",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "84b53681-6661-4b25-80df-4b4662b8d685": {
+                                            "columnOrder": [
+                                                "1b101cee-67f3-4bcc-83cb-47bdb826d22c",
+                                                "d0eec076-f510-436a-9868-898e63f16266",
+                                                "8a7f1cb1-97c6-4de7-a3b6-eeed5a93e9bd",
+                                                "52e0322a-25ad-42db-aa63-f12574a01a09"
+                                            ],
+                                            "columns": {
+                                                "1b101cee-67f3-4bcc-83cb-47bdb826d22c": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "52e0322a-25ad-42db-aa63-f12574a01a09": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Private Sources",
+                                                    "operationType": "median",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.product_usage.workplace_search.total_private_sources"
+                                                },
+                                                "8a7f1cb1-97c6-4de7-a3b6-eeed5a93e9bd": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Org Sources",
+                                                    "operationType": "median",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.product_usage.workplace_search.total_org_sources"
+                                                },
+                                                "d0eec076-f510-436a-9868-898e63f16266": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "App Search Engines",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.product_usage.app_search.total_engines"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": false,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "d0eec076-f510-436a-9868-898e63f16266",
+                                            "8a7f1cb1-97c6-4de7-a3b6-eeed5a93e9bd",
+                                            "52e0322a-25ad-42db-aa63-f12574a01a09"
+                                        ],
+                                        "layerId": "84b53681-6661-4b25-80df-4b4662b8d685",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "1b101cee-67f3-4bcc-83cb-47bdb826d22c"
+                                    }
+                                ],
+                                "legend": {
+                                    "isInside": false,
+                                    "isVisible": true,
+                                    "position": "bottom",
+                                    "showSingleSeries": true
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "b330f58a-2b26-432a-b359-747c23654557",
+                    "w": 24,
+                    "x": 24,
+                    "y": 4
+                },
+                "panelIndex": "b330f58a-2b26-432a-b359-747c23654557",
+                "title": "Product Usage",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "fontSize": 12,
+                            "markdown": "# Network Metrics",
+                            "openLinksInNewTab": false
+                        },
+                        "title": "",
+                        "type": "markdown",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "aeb9e2f9-f281-45b3-9e2a-ee516d62126a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "aeb9e2f9-f281-45b3-9e2a-ee516d62126a",
+                "type": "visualization",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-5e24b58b-47b0-4f0e-bea0-df51c7af4896",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "5e24b58b-47b0-4f0e-bea0-df51c7af4896": {
+                                            "columnOrder": [
+                                                "1079c9fa-6120-49b1-9d62-af75ecc00525",
+                                                "4ef7aabc-0fa2-4a89-89c4-2a7d908fddfe",
+                                                "4831819f-66f7-45b0-824f-cba088840eee",
+                                                "e8965f7f-bdb0-418b-8e23-ee84c42518b0",
+                                                "790cae75-ce3f-4ccd-a767-84632c4a1dae"
+                                            ],
+                                            "columns": {
+                                                "1079c9fa-6120-49b1-9d62-af75ecc00525": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "4831819f-66f7-45b0-824f-cba088840eee": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.network.received.bytes",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.network.received.bytes"
+                                                },
+                                                "4ef7aabc-0fa2-4a89-89c4-2a7d908fddfe": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Incoming",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "4831819f-66f7-45b0-824f-cba088840eee"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "790cae75-ce3f-4ccd-a767-84632c4a1dae": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.network.sent.bytes",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.network.sent.bytes"
+                                                },
+                                                "e8965f7f-bdb0-418b-8e23-ee84c42518b0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Outgoing",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "790cae75-ce3f-4ccd-a767-84632c4a1dae"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "4ef7aabc-0fa2-4a89-89c4-2a7d908fddfe",
+                                            "e8965f7f-bdb0-418b-8e23-ee84c42518b0"
+                                        ],
+                                        "layerId": "5e24b58b-47b0-4f0e-bea0-df51c7af4896",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "1079c9fa-6120-49b1-9d62-af75ecc00525"
+                                    }
+                                ],
+                                "legend": {
+                                    "isInside": true,
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yTitle": "bytes/sec"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "117a974f-7477-4bc5-951c-ad50e617ef68",
+                    "w": 24,
+                    "x": 0,
+                    "y": 19
+                },
+                "panelIndex": "117a974f-7477-4bc5-951c-ad50e617ef68",
+                "title": "Network Traffic",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-ab0dfa29-0a04-448e-ae11-edf8a0427c48",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "ab0dfa29-0a04-448e-ae11-edf8a0427c48": {
+                                            "columnOrder": [
+                                                "1baeaecc-cd8d-4793-b3f9-2981ad03418b",
+                                                "476c8804-4014-461d-aa46-1b006658dcca",
+                                                "cc2f4b02-bcf2-49b2-a95d-1718db2e04fe",
+                                                "c1821e7b-d24b-4a1c-9afe-b44842c966d8",
+                                                "10f51273-2d6f-4f34-b23d-3a28726352c8",
+                                                "631736a3-f9d2-49d1-a45f-e2bc3796fc32",
+                                                "7ced77f8-34c2-430c-b11d-45b366734863",
+                                                "e4bfadc8-b049-4e8d-a6fc-6cbf84d6df40",
+                                                "aa9f33f1-d530-4e0d-af2c-23672edd56fa"
+                                            ],
+                                            "columns": {
+                                                "10f51273-2d6f-4f34-b23d-3a28726352c8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "4xx",
+                                                    "operationType": "median",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.responses.4xx"
+                                                },
+                                                "1baeaecc-cd8d-4793-b3f9-2981ad03418b": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "476c8804-4014-461d-aa46-1b006658dcca": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "1xx",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "7ced77f8-34c2-430c-b11d-45b366734863"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "631736a3-f9d2-49d1-a45f-e2bc3796fc32": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "5xx",
+                                                    "operationType": "median",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.responses.5xx"
+                                                },
+                                                "7ced77f8-34c2-430c-b11d-45b366734863": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.responses.1xx",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.responses.1xx"
+                                                },
+                                                "aa9f33f1-d530-4e0d-af2c-23672edd56fa": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.responses.3xx",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.responses.3xx"
+                                                },
+                                                "c1821e7b-d24b-4a1c-9afe-b44842c966d8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "3xx",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "aa9f33f1-d530-4e0d-af2c-23672edd56fa"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "cc2f4b02-bcf2-49b2-a95d-1718db2e04fe": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "2xx",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "e4bfadc8-b049-4e8d-a6fc-6cbf84d6df40"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "e4bfadc8-b049-4e8d-a6fc-6cbf84d6df40": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.responses.2xx",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.responses.2xx"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "Linear",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "476c8804-4014-461d-aa46-1b006658dcca",
+                                            "cc2f4b02-bcf2-49b2-a95d-1718db2e04fe",
+                                            "c1821e7b-d24b-4a1c-9afe-b44842c966d8",
+                                            "10f51273-2d6f-4f34-b23d-3a28726352c8",
+                                            "631736a3-f9d2-49d1-a45f-e2bc3796fc32"
+                                        ],
+                                        "layerId": "ab0dfa29-0a04-448e-ae11-edf8a0427c48",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "1baeaecc-cd8d-4793-b3f9-2981ad03418b",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "left",
+                                                "color": "#6092c0",
+                                                "forAccessor": "476c8804-4014-461d-aa46-1b006658dcca"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "color": "#54b399",
+                                                "forAccessor": "cc2f4b02-bcf2-49b2-a95d-1718db2e04fe"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "c1821e7b-d24b-4a1c-9afe-b44842c966d8"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "10f51273-2d6f-4f34-b23d-3a28726352c8"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "631736a3-f9d2-49d1-a45f-e2bc3796fc32"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isInside": true,
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yTitle": "responses/sec"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 10,
+                    "i": "00eb0f89-4a3b-4ebe-8c1f-2d9fc6fc13b0",
+                    "w": 24,
+                    "x": 24,
+                    "y": 19
+                },
+                "panelIndex": "00eb0f89-4a3b-4ebe-8c1f-2d9fc6fc13b0",
+                "title": "HTTP Responses",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-0efbdd59-a39c-42d6-a596-115019496378",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "0efbdd59-a39c-42d6-a596-115019496378": {
+                                            "columnOrder": [
+                                                "125132ed-117e-426b-b29e-ffa870c7cf74",
+                                                "312cbb39-bd19-4cc3-906a-96d2811cb1a3",
+                                                "6160010f-d025-46ca-aed5-40d9c117bf04",
+                                                "1108c89d-b2bf-4f3a-8afd-aec8b0176adf"
+                                            ],
+                                            "columns": {
+                                                "1108c89d-b2bf-4f3a-8afd-aec8b0176adf": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.stats.http.connections.total",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.connections.total"
+                                                },
+                                                "125132ed-117e-426b-b29e-ffa870c7cf74": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "312cbb39-bd19-4cc3-906a-96d2811cb1a3": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Current Connections",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.stats.http.connections.current"
+                                                },
+                                                "6160010f-d025-46ca-aed5-40d9c117bf04": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Connection Rate",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "1108c89d-b2bf-4f3a-8afd-aec8b0176adf"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "312cbb39-bd19-4cc3-906a-96d2811cb1a3",
+                                            "6160010f-d025-46ca-aed5-40d9c117bf04"
+                                        ],
+                                        "layerId": "0efbdd59-a39c-42d6-a596-115019496378",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "125132ed-117e-426b-b29e-ffa870c7cf74",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "right",
+                                                "forAccessor": "6160010f-d025-46ca-aed5-40d9c117bf04"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "312cbb39-bd19-4cc3-906a-96d2811cb1a3"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isInside": true,
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightTitle": "Connections/sec",
+                                "yTitle": "Connections"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "f58b85e4-0623-4eda-8a22-4645b4658825",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "f58b85e4-0623-4eda-8a22-4645b4658825",
+                "title": "Active HTTP Connections",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "fontSize": 12,
+                            "markdown": "# Network Metrics",
+                            "openLinksInNewTab": false
+                        },
+                        "title": "",
+                        "type": "markdown",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "803dcfc0-874d-45f6-81e6-e7822f3e4757",
+                    "w": 48,
+                    "x": 0,
+                    "y": 40
+                },
+                "panelIndex": "803dcfc0-874d-45f6-81e6-e7822f3e4757",
+                "type": "visualization",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-beaaf733-314f-497d-ae53-6bd8cacc159a",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "beaaf733-314f-497d-ae53-6bd8cacc159a": {
+                                            "columnOrder": [
+                                                "805cf0b8-0d01-40fe-a8e1-5dbc69ce1070",
+                                                "1d2594e3-33b9-4b8e-986f-268cdbfe3dfb",
+                                                "a8b8a7a9-684e-4d7e-b675-b988edc90aac",
+                                                "e5ad4665-d717-4bed-81fe-6d11001817d4",
+                                                "b5eac894-ebbc-4417-9da3-eb3aed9c3998"
+                                            ],
+                                            "columns": {
+                                                "1d2594e3-33b9-4b8e-986f-268cdbfe3dfb": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Total",
+                                                    "operationType": "median",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.memory_usage.heap_max.bytes"
+                                                },
+                                                "805cf0b8-0d01-40fe-a8e1-5dbc69ce1070": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "a8b8a7a9-684e-4d7e-b675-b988edc90aac": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Allocated",
+                                                    "operationType": "median",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.memory_usage.heap_committed.bytes"
+                                                },
+                                                "b5eac894-ebbc-4417-9da3-eb3aed9c3998": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Off-heap",
+                                                    "operationType": "median",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.memory_usage.non_heap_committed.bytes"
+                                                },
+                                                "e5ad4665-d717-4bed-81fe-6d11001817d4": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Used",
+                                                    "operationType": "median",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "bytes",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        }
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.memory_usage.heap_used.bytes"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "1d2594e3-33b9-4b8e-986f-268cdbfe3dfb",
+                                            "e5ad4665-d717-4bed-81fe-6d11001817d4",
+                                            "b5eac894-ebbc-4417-9da3-eb3aed9c3998",
+                                            "a8b8a7a9-684e-4d7e-b675-b988edc90aac"
+                                        ],
+                                        "layerId": "beaaf733-314f-497d-ae53-6bd8cacc159a",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "805cf0b8-0d01-40fe-a8e1-5dbc69ce1070",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "1d2594e3-33b9-4b8e-986f-268cdbfe3dfb"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "a8b8a7a9-684e-4d7e-b675-b988edc90aac"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "e5ad4665-d717-4bed-81fe-6d11001817d4"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "horizontalAlignment": "right",
+                                    "isInside": true,
+                                    "isVisible": true,
+                                    "position": "bottom",
+                                    "verticalAlignment": "top"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yTitle": "Bytes"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "c72f1e47-34f8-41a2-91f5-452da0a8d052",
+                    "w": 24,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "c72f1e47-34f8-41a2-91f5-452da0a8d052",
+                "title": "Memory Usage",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-1d99fbfc-3f4b-47ac-9a91-cec22a18f7c4",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "1d99fbfc-3f4b-47ac-9a91-cec22a18f7c4": {
+                                            "columnOrder": [
+                                                "ba3f6710-7ba4-4e33-b865-aa3b29a611cc",
+                                                "c92a9912-3cdb-403a-b686-87c8c58cac43"
+                                            ],
+                                            "columns": {
+                                                "ba3f6710-7ba4-4e33-b865-aa3b29a611cc": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "c92a9912-3cdb-403a-b686-87c8c58cac43": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Objects",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.memory_usage.object_pending_finalization_count"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c92a9912-3cdb-403a-b686-87c8c58cac43"
+                                        ],
+                                        "layerId": "1d99fbfc-3f4b-47ac-9a91-cec22a18f7c4",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "ba3f6710-7ba4-4e33-b865-aa3b29a611cc"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "bottom",
+                                    "showSingleSeries": false
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 11,
+                    "i": "a381a1ed-82a0-4b43-9dd5-8172e4dc4a92",
+                    "w": 24,
+                    "x": 24,
+                    "y": 44
+                },
+                "panelIndex": "a381a1ed-82a0-4b43-9dd5-8172e4dc4a92",
+                "title": "JVM Object Finalizer Queue",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-50da9c38-fcc3-4c43-a74e-85672a6ce4b0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "50da9c38-fcc3-4c43-a74e-85672a6ce4b0": {
+                                            "columnOrder": [
+                                                "5bc7d0eb-20e7-4846-a3d0-4f8d82317623",
+                                                "30bcd973-ce24-4101-bf9f-8e43715b2cd9",
+                                                "e2c87a95-f4a1-41e6-9848-6d2bb31d53da",
+                                                "2d04b3ab-8d59-4ec0-831c-b9228a1c62b5",
+                                                "dcd14020-52ef-40b2-ba74-30c56176b5f8"
+                                            ],
+                                            "columns": {
+                                                "2d04b3ab-8d59-4ec0-831c-b9228a1c62b5": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.health.jvm.gc.collection_count",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.gc.collection_count"
+                                                },
+                                                "30bcd973-ce24-4101-bf9f-8e43715b2cd9": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "GC Rate (per second)",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "2d04b3ab-8d59-4ec0-831c-b9228a1c62b5"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "5bc7d0eb-20e7-4846-a3d0-4f8d82317623": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "dcd14020-52ef-40b2-ba74-30c56176b5f8": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.health.jvm.gc.collection_time.ms",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.gc.collection_time.ms"
+                                                },
+                                                "e2c87a95-f4a1-41e6-9848-6d2bb31d53da": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "GC Time (msec)",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "dcd14020-52ef-40b2-ba74-30c56176b5f8"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "curveType": "LINEAR",
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "30bcd973-ce24-4101-bf9f-8e43715b2cd9",
+                                            "e2c87a95-f4a1-41e6-9848-6d2bb31d53da"
+                                        ],
+                                        "layerId": "50da9c38-fcc3-4c43-a74e-85672a6ce4b0",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "5bc7d0eb-20e7-4846-a3d0-4f8d82317623",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "30bcd973-ce24-4101-bf9f-8e43715b2cd9"
+                                            },
+                                            {
+                                                "axisMode": "right",
+                                                "forAccessor": "e2c87a95-f4a1-41e6-9848-6d2bb31d53da"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "bottom"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "0a6dec60-0d76-4d56-8de7-bbc11b056dd4",
+                    "w": 24,
+                    "x": 0,
+                    "y": 55
+                },
+                "panelIndex": "0a6dec60-0d76-4d56-8de7-bbc11b056dd4",
+                "title": "JVM Garbage Collection",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-525cd9ab-aabd-4650-9fd3-49b273d63dfd",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "525cd9ab-aabd-4650-9fd3-49b273d63dfd": {
+                                            "columnOrder": [
+                                                "e357cbf6-3e7b-4a1a-ab01-8bf1158d8c9e",
+                                                "ebf70775-2697-4596-9a54-4c9dd8729dca",
+                                                "82b0a7eb-7726-47ef-aaf8-1559ce454967",
+                                                "6906ad8f-3215-47d0-9861-2d183269ce10",
+                                                "23c8da16-6db9-442b-bd8f-a39786c37047"
+                                            ],
+                                            "columns": {
+                                                "23c8da16-6db9-442b-bd8f-a39786c37047": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Maximum of enterprisesearch.health.jvm.threads.total_started",
+                                                    "operationType": "max",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.threads.total_started"
+                                                },
+                                                "6906ad8f-3215-47d0-9861-2d183269ce10": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Creation Rate",
+                                                    "operationType": "counter_rate",
+                                                    "references": [
+                                                        "23c8da16-6db9-442b-bd8f-a39786c37047"
+                                                    ],
+                                                    "scale": "ratio",
+                                                    "timeScale": "s"
+                                                },
+                                                "82b0a7eb-7726-47ef-aaf8-1559ce454967": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Daemon Threads",
+                                                    "operationType": "median",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.threads.daemon"
+                                                },
+                                                "e357cbf6-3e7b-4a1a-ab01-8bf1158d8c9e": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "ebf70775-2697-4596-9a54-4c9dd8729dca": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Active Threads",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.jvm.threads.current"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "ebf70775-2697-4596-9a54-4c9dd8729dca",
+                                            "82b0a7eb-7726-47ef-aaf8-1559ce454967",
+                                            "6906ad8f-3215-47d0-9861-2d183269ce10"
+                                        ],
+                                        "layerId": "525cd9ab-aabd-4650-9fd3-49b273d63dfd",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "e357cbf6-3e7b-4a1a-ab01-8bf1158d8c9e",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "right",
+                                                "forAccessor": "6906ad8f-3215-47d0-9861-2d183269ce10"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "82b0a7eb-7726-47ef-aaf8-1559ce454967"
+                                            },
+                                            {
+                                                "axisMode": "left",
+                                                "forAccessor": "ebf70775-2697-4596-9a54-4c9dd8729dca"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "bottom"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightTitle": "Threads/sec",
+                                "yTitle": "Threads"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "49705139-1a81-4a84-bb21-d8e48643ed88",
+                    "w": 24,
+                    "x": 24,
+                    "y": 55
+                },
+                "panelIndex": "49705139-1a81-4a84-bb21-d8e48643ed88",
+                "title": "JVM Threads",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "id": "",
+                        "params": {
+                            "fontSize": 12,
+                            "markdown": "# Background Workers",
+                            "openLinksInNewTab": false
+                        },
+                        "title": "",
+                        "type": "markdown",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "a03d7633-3463-4c56-9a3d-a02f8b39772c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 67
+                },
+                "panelIndex": "a03d7633-3463-4c56-9a3d-a02f8b39772c",
+                "type": "visualization",
+                "version": "7.16.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "metricbeat-*",
+                                "name": "indexpattern-datasource-layer-d7ce3f00-e90b-429d-af0d-91651c3ec1c0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "d7ce3f00-e90b-429d-af0d-91651c3ec1c0": {
+                                            "columnOrder": [
+                                                "f9190822-6861-4d63-94d1-52e9c3cfd223",
+                                                "c190f356-68d2-47ab-a465-07c32958d727",
+                                                "4da78b25-82c4-48ed-a954-bdb991ad6c23"
+                                            ],
+                                            "columns": {
+                                                "4da78b25-82c4-48ed-a954-bdb991ad6c23": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Active Workers",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.crawler.workers.active"
+                                                },
+                                                "c190f356-68d2-47ab-a465-07c32958d727": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Total Workers",
+                                                    "operationType": "average",
+                                                    "scale": "ratio",
+                                                    "sourceField": "enterprisesearch.health.crawler.workers.pool_size"
+                                                },
+                                                "f9190822-6861-4d63-94d1-52e9c3cfd223": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c190f356-68d2-47ab-a465-07c32958d727",
+                                            "4da78b25-82c4-48ed-a954-bdb991ad6c23"
+                                        ],
+                                        "layerId": "d7ce3f00-e90b-429d-af0d-91651c3ec1c0",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "f9190822-6861-4d63-94d1-52e9c3cfd223"
+                                    }
+                                ],
+                                "legend": {
+                                    "isInside": true,
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yTitle": "Workers"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "40cbf119-cfab-48a5-b37e-a6c8edf4b9ba",
+                    "w": 24,
+                    "x": 0,
+                    "y": 71
+                },
+                "panelIndex": "40cbf119-cfab-48a5-b37e-a6c8edf4b9ba",
+                "title": "Crawler Workers",
+                "type": "lens",
+                "version": "7.16.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Enterprise Search] Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.16.0",
+    "id": "e179f130-2c4a-11ec-9ab7-4fbdf1480ffc",
+    "migrationVersion": {
+        "dashboard": "7.16.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1534ebcc-1209-4d1a-829e-b92128b025e9:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "1534ebcc-1209-4d1a-829e-b92128b025e9:indexpattern-datasource-layer-0d0ae348-91e8-44a0-b442-f409a093178a",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "b330f58a-2b26-432a-b359-747c23654557:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "b330f58a-2b26-432a-b359-747c23654557:indexpattern-datasource-layer-84b53681-6661-4b25-80df-4b4662b8d685",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "117a974f-7477-4bc5-951c-ad50e617ef68:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "117a974f-7477-4bc5-951c-ad50e617ef68:indexpattern-datasource-layer-5e24b58b-47b0-4f0e-bea0-df51c7af4896",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "00eb0f89-4a3b-4ebe-8c1f-2d9fc6fc13b0:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "00eb0f89-4a3b-4ebe-8c1f-2d9fc6fc13b0:indexpattern-datasource-layer-ab0dfa29-0a04-448e-ae11-edf8a0427c48",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "f58b85e4-0623-4eda-8a22-4645b4658825:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "f58b85e4-0623-4eda-8a22-4645b4658825:indexpattern-datasource-layer-0efbdd59-a39c-42d6-a596-115019496378",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "c72f1e47-34f8-41a2-91f5-452da0a8d052:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "c72f1e47-34f8-41a2-91f5-452da0a8d052:indexpattern-datasource-layer-beaaf733-314f-497d-ae53-6bd8cacc159a",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "a381a1ed-82a0-4b43-9dd5-8172e4dc4a92:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "a381a1ed-82a0-4b43-9dd5-8172e4dc4a92:indexpattern-datasource-layer-1d99fbfc-3f4b-47ac-9a91-cec22a18f7c4",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "0a6dec60-0d76-4d56-8de7-bbc11b056dd4:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "0a6dec60-0d76-4d56-8de7-bbc11b056dd4:indexpattern-datasource-layer-50da9c38-fcc3-4c43-a74e-85672a6ce4b0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "49705139-1a81-4a84-bb21-d8e48643ed88:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "49705139-1a81-4a84-bb21-d8e48643ed88:indexpattern-datasource-layer-525cd9ab-aabd-4650-9fd3-49b273d63dfd",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "40cbf119-cfab-48a5-b37e-a6c8edf4b9ba:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "40cbf119-cfab-48a5-b37e-a6c8edf4b9ba:indexpattern-datasource-layer-d7ce3f00-e90b-429d-af0d-91651c3ec1c0",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-10-19T17:06:49.093Z",
+    "version": "WzIzMjksMV0="
+}
