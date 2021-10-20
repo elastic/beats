@@ -54,9 +54,7 @@ func buildEncoder(cfg Config) zapcore.Encoder {
 		encCreator = zapcore.NewConsoleEncoder
 	}
 
-	if cfg.ECSEnabled {
-		encCfg = ecszap.ECSCompatibleEncoderConfig(encCfg)
-	}
+	encCfg = ecszap.ECSCompatibleEncoderConfig(encCfg)
 	return encCreator(encCfg)
 }
 
