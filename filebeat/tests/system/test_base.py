@@ -1,9 +1,5 @@
 import os
 import unittest
-import pytest
-import semver
-import requests
-import shutil
 from filebeat import BaseTest
 from elasticsearch import Elasticsearch
 from beat.beat import INTEGRATION_TESTS
