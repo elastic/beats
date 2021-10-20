@@ -94,6 +94,7 @@ class TestExportsMixin:
         yml = yaml.load(output, Loader=yaml.FullLoader)
         assert isinstance(yml, dict)
 
+
 class TestDashboardMixin:
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
