@@ -19,7 +19,6 @@ processors:
       - logs_path:
           logs_path: "/var/log/containers/"
 {{ end }}
-  - add_cloud_metadata: ~
   - dissect:
       tokenizer: '[%{time}] [%{log.level}] [%{log.logger}] %{tidb.body}'
       field: "message"

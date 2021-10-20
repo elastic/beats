@@ -19,7 +19,6 @@ processors:
       - logs_path:
           logs_path: "/var/log/containers/"
 {{ end }}
-  - add_cloud_metadata: ~
   - script:
       lang: javascript
       id: tidb_slow_log_parser
