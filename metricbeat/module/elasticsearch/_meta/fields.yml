@@ -618,11 +618,11 @@
           type: group
           fields: 
             - name: total
-              type: group
-            - name: pipelines
               type: alias
-              path: elasticsearch.node.stats.ingest.pipelines
-              fields:
+              path: elasticsearch.node.stats.ingest.total
+            #- name: pipelines
+            #  type: flattened
+            #  path: elasticsearch.node.stats.ingest.pipelines
         - name: indexing_pressure
           type: group
           description: >

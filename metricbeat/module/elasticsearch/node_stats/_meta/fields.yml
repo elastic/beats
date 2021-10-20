@@ -312,6 +312,15 @@
               type: long
             - name: rejected.count
               type: long
+    - name: ingest
+          type: group
+          fields: 
+            - name: total
+              type: alias
+              path: elasticsearch.node.stats.ingest.total
+            #- name: pipelines
+            #  type: flattened
+            #  path: elasticsearch.node.stats.ingest.pipelines
     - name: indexing_pressure
           type: group
           description: >
@@ -325,10 +334,10 @@
               path: elasticsearch.node.stats.indexing_pressure.memory.currentbineordinating_and_primary_in_bytes
             - name: memory.current.coordinating_in_bytes
               type: alias
-              paelasticsearch.node.stats.indexing_pressure.current.coording_in_bytes
+              path: elasticsearch.node.stats.indexing_pressure.current.coording_in_bytes
             - name: coordinating_in_bytes
               type: alias
-              paelasticsearch.node.stats.indexing_pressure.current.coording_in_by
+              path: elasticsearch.node.stats.indexing_pressure.current.coording_in_by
             - name: total
               type: group
             - name: limit_in_bytes
