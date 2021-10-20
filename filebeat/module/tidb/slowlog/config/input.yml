@@ -50,7 +50,7 @@ processors:
             }
 
             function safePut(k, v) {
-                event.Put(params.keyPrefix + k, v)
+                event.Put(params.keyPrefix + k.toLowerCase(), v)
             }
 
             // a var handling multiline query
@@ -95,7 +95,7 @@ processors:
             return event
         }
   - timestamp:
-      field: 'tidb.slowlog.Time'
+      field: 'tidb.slowlog.time'
       ignore_missing: true
       layouts:
         - '2006-01-02T15:04:05.999999999-07:00'

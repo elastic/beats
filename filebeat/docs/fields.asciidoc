@@ -151932,7 +151932,7 @@ Contains fields from the TiDB slow logs.
 
 
 
-*`tidb.slowlog.Time`*::
+*`tidb.slowlog.time`*::
 +
 --
 The print time of log.
@@ -151942,7 +151942,7 @@ type: date_nanos
 
 --
 
-*`tidb.slowlog.Query_time`*::
+*`tidb.slowlog.query_time`*::
 +
 --
 The execution time of a statement.
@@ -151952,7 +151952,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Optimize_time`*::
+*`tidb.slowlog.optimize_time`*::
 +
 --
 
@@ -151961,7 +151961,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Wait_TS`*::
+*`tidb.slowlog.wait_ts`*::
 +
 --
 
@@ -151970,7 +151970,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Num_cop_tasks`*::
+*`tidb.slowlog.num_cop_tasks`*::
 +
 --
 
@@ -151979,7 +151979,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Parse_time`*::
+*`tidb.slowlog.parse_time`*::
 +
 --
 The parsing time for the statement.
@@ -151989,7 +151989,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Compile_time`*::
+*`tidb.slowlog.compile_time`*::
 +
 --
 The duration of the query optimization.
@@ -151999,7 +151999,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Query`*::
+*`tidb.slowlog.query`*::
 +
 --
 A SQL statement. This field is not printed as a key in the slow log. It is the last line of the slow log.
@@ -152009,7 +152009,7 @@ type: text
 
 --
 
-*`tidb.slowlog.Prev_stmt`*::
+*`tidb.slowlog.prev_stmt`*::
 +
 --
 
@@ -152018,7 +152018,7 @@ type: text
 
 --
 
-*`tidb.slowlog.Digest`*::
+*`tidb.slowlog.digest`*::
 +
 --
 The fingerprint of the SQL statement.
@@ -152028,7 +152028,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Stats`*::
+*`tidb.slowlog.stats`*::
 +
 --
 
@@ -152037,7 +152037,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Txn_start_ts`*::
+*`tidb.slowlog.txn_start_ts`*::
 +
 --
 The start timestamp and the unique ID of a transaction. You can use this value to search for the transaction-related logs.
@@ -152047,7 +152047,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Is_internal`*::
+*`tidb.slowlog.is_internal`*::
 +
 --
 Whether a SQL statement is TiDB internal. True indicates that a SQL statement is executed internally in TiDB and false indicates that a SQL statement is executed by the user.
@@ -152057,7 +152057,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Index_ids`*::
+*`tidb.slowlog.index_ids`*::
 +
 --
 The IDs of the indexes involved in a statement.
@@ -152067,7 +152067,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Succ`*::
+*`tidb.slowlog.succ`*::
 +
 --
 Whether a statement is executed successfully.
@@ -152077,7 +152077,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Backoff_time`*::
+*`tidb.slowlog.backoff_time`*::
 +
 --
 The waiting time before retry when a statement encounters errors that require a retry. The common errors as such include: lock occurs, Region split, and TiKV server is busy.
@@ -152087,7 +152087,7 @@ type: double
 
 --
 
-*`tidb.slowlog.LockKeys_time`*::
+*`tidb.slowlog.lockKeys_time`*::
 +
 --
 
@@ -152096,7 +152096,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Plan`*::
+*`tidb.slowlog.plan`*::
 +
 --
 The execution plan of the statement. Use the tidb_decode_plan function in TiDB -- select tidb_decode_plan('xxx...') statement -- to parse the specific execution plan.
@@ -152106,7 +152106,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Plan_digest`*::
+*`tidb.slowlog.plan_digest`*::
 +
 --
 
@@ -152115,7 +152115,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Prepared`*::
+*`tidb.slowlog.prepared`*::
 +
 --
 Whether this statement is a Prepare or Execute request or not.
@@ -152125,7 +152125,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Plan_from_cache`*::
+*`tidb.slowlog.plan_from_cache`*::
 +
 --
 Whether this statement hits the execution plan cache.
@@ -152135,7 +152135,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Plan_from_binding`*::
+*`tidb.slowlog.plan_from_binding`*::
 +
 --
 
@@ -152144,7 +152144,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Has_more_results`*::
+*`tidb.slowlog.has_more_results`*::
 +
 --
 
@@ -152153,7 +152153,7 @@ type: boolean
 
 --
 
-*`tidb.slowlog.Rewrite_time`*::
+*`tidb.slowlog.rewrite_time`*::
 +
 --
 The time consumed for rewriting the query of this statement.
@@ -152163,7 +152163,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Preproc_subqueries`*::
+*`tidb.slowlog.preproc_subqueries`*::
 +
 --
 The number of subqueries (in the statement) that are executed in advance. For example, the where id in (select if from t) subquery might be executed in advance.
@@ -152173,7 +152173,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Preproc_subqueries_time`*::
+*`tidb.slowlog.preproc_subqueries_time`*::
 +
 --
 The time consumed for executing the subquery of this statement in advance.
@@ -152183,7 +152183,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Exec_retry_count`*::
+*`tidb.slowlog.exec_retry_count`*::
 +
 --
 The retry times of this statement. This field is usually for pessimistic transactions in which the statement is retried when the lock is failed.
@@ -152192,7 +152192,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Exec_retry_time`*::
+*`tidb.slowlog.exec_retry_time`*::
 +
 --
 The execution retry duration of this statement. For example, if a statement has been executed three times in total (failed for the first two times), Exec_retry_time means the total duration of the first two executions. The duration of the last execution is Query_time minus Exec_retry_time.
@@ -152202,7 +152202,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Prewrite_time`*::
+*`tidb.slowlog.prewrite_time`*::
 +
 --
 The duration of the first phase (prewrite) of the two-phase transaction commit.
@@ -152212,7 +152212,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Wait_prewrite_binlog_time`*::
+*`tidb.slowlog.wait_prewrite_binlog_time`*::
 +
 --
 
@@ -152221,7 +152221,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Commit_time`*::
+*`tidb.slowlog.commit_time`*::
 +
 --
 The duration of the second phase (commit) of the two-phase transaction commit.
@@ -152231,7 +152231,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Get_commit_ts_time`*::
+*`tidb.slowlog.get_commit_ts_time`*::
 +
 --
 The time spent on getting commit_ts during the second phase (commit) of the two-phase transaction commit.
@@ -152241,7 +152241,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Commit_backoff_time`*::
+*`tidb.slowlog.commit_backoff_time`*::
 +
 --
 
@@ -152250,7 +152250,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Backoff_types`*::
+*`tidb.slowlog.backoff_types`*::
 +
 --
 
@@ -152259,7 +152259,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Resolve_lock_time`*::
+*`tidb.slowlog.resolve_lock_time`*::
 +
 --
 
@@ -152268,7 +152268,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Local_latch_wait_time`*::
+*`tidb.slowlog.local_latch_wait_time`*::
 +
 --
 The time that TiDB spends on waiting for the lock before the second phase (commit) of the two-phase transaction commit.
@@ -152278,7 +152278,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Write_keys`*::
+*`tidb.slowlog.write_keys`*::
 +
 --
 The count of keys that the transaction writes to the Write CF in TiKV.
@@ -152288,7 +152288,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Write_size`*::
+*`tidb.slowlog.write_size`*::
 +
 --
 The total size of the keys or values to be written when the transaction commits.
@@ -152298,7 +152298,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Prewrite_region`*::
+*`tidb.slowlog.prewrite_region`*::
 +
 --
 The number of TiKV Regions involved in the first phase (prewrite) of the two-phase transaction commit. Each Region triggers a remote procedure call.
@@ -152308,7 +152308,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Txn_retry`*::
+*`tidb.slowlog.txn_retry`*::
 +
 --
 
@@ -152317,7 +152317,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_time`*::
+*`tidb.slowlog.cop_time`*::
 +
 --
 
@@ -152326,7 +152326,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Mem_max`*::
+*`tidb.slowlog.mem_max`*::
 +
 --
 The maximum memory space used during the execution period of a SQL statement (the unit is byte).
@@ -152336,7 +152336,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Disk_max`*::
+*`tidb.slowlog.disk_max`*::
 +
 --
 The maximum disk space used during the execution period of a SQL statement (the unit is byte).
@@ -152346,7 +152346,7 @@ type: double
 
 --
 
-*`tidb.slowlog.User`*::
+*`tidb.slowlog.user`*::
 +
 --
 The name of the user who executes this statement.
@@ -152356,7 +152356,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.User@Host`*::
+*`tidb.slowlog.user@host`*::
 +
 --
 The name of the user who executes this statement.
@@ -152366,7 +152366,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Conn_ID`*::
+*`tidb.slowlog.conn_id`*::
 +
 --
 The Connection ID (session ID). For example, you can use the keyword con:3 to search for the log whose session ID is 3.
@@ -152376,7 +152376,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Host`*::
+*`tidb.slowlog.host`*::
 +
 --
 
@@ -152385,7 +152385,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.DB`*::
+*`tidb.slowlog.db`*::
 +
 --
 The current database.
@@ -152395,7 +152395,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Index_names`*::
+*`tidb.slowlog.index_names`*::
 +
 --
 
@@ -152404,7 +152404,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Request_count`*::
+*`tidb.slowlog.request_count`*::
 +
 --
 The number of Coprocessor requests that a statement sends.
@@ -152414,7 +152414,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Total_keys`*::
+*`tidb.slowlog.total_keys`*::
 +
 --
 The number of keys that Coprocessor has scanned.
@@ -152424,7 +152424,7 @@ type: double
 
 --
 
-*`tidb.slowlog.KV_total`*::
+*`tidb.slowlog.kv_total`*::
 +
 --
 
@@ -152433,7 +152433,7 @@ type: double
 
 --
 
-*`tidb.slowlog.PD_total`*::
+*`tidb.slowlog.pd_total`*::
 +
 --
 
@@ -152442,7 +152442,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Backoff_total`*::
+*`tidb.slowlog.backoff_total`*::
 +
 --
 
@@ -152451,7 +152451,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Backoff_Detail`*::
+*`tidb.slowlog.backoff_detail`*::
 +
 --
 
@@ -152460,7 +152460,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Write_sql_response_total`*::
+*`tidb.slowlog.write_sql_response_total`*::
 +
 --
 
@@ -152469,7 +152469,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Process_time`*::
+*`tidb.slowlog.process_time`*::
 +
 --
 The total processing time of a SQL statement in TiKV. Because data is sent to TiKV concurrently, this value might exceed Query_time.
@@ -152479,7 +152479,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Wait_time`*::
+*`tidb.slowlog.wait_time`*::
 +
 --
 The total waiting time of a statement in TiKV. Because the Coprocessor of TiKV runs a limited number of threads, requests might queue up when all threads of Coprocessor are working. When a request in the queue takes a long time to process, the waiting time of the subsequent requests increases.
@@ -152489,7 +152489,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Process_keys`*::
+*`tidb.slowlog.process_keys`*::
 +
 --
 The number of keys that Coprocessor has processed. Compared with total_keys, processed_keys does not include the old versions of MVCC. A great difference between processed_keys and total_keys indicates that many old versions exist.
@@ -152499,7 +152499,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_proc_avg`*::
+*`tidb.slowlog.cop_proc_avg`*::
 +
 --
 The average execution time of cop-tasks.
@@ -152509,7 +152509,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_proc_p90`*::
+*`tidb.slowlog.cop_proc_p90`*::
 +
 --
 The P90 execution time of cop-tasks.
@@ -152519,7 +152519,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_proc_max`*::
+*`tidb.slowlog.cop_proc_max`*::
 +
 --
 The maximum execution time of cop-tasks.
@@ -152529,7 +152529,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_proc_addr`*::
+*`tidb.slowlog.cop_proc_addr`*::
 +
 --
 The address of the cop-task with the longest execution time.
@@ -152539,7 +152539,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Cop_wait_avg`*::
+*`tidb.slowlog.cop_wait_avg`*::
 +
 --
 The average waiting time of cop-tasks.
@@ -152549,7 +152549,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_wait_p90`*::
+*`tidb.slowlog.cop_wait_p90`*::
 +
 --
 The P90 waiting time of cop-tasks.
@@ -152559,7 +152559,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_wait_max`*::
+*`tidb.slowlog.cop_wait_max`*::
 +
 --
 The maximum waiting time of cop-tasks.
@@ -152569,7 +152569,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Cop_wait_addr`*::
+*`tidb.slowlog.cop_wait_addr`*::
 +
 --
 The address of the cop-task whose waiting time is the longest.
@@ -152579,7 +152579,7 @@ type: keyword
 
 --
 
-*`tidb.slowlog.Rocksdb_delete_skipped_count`*::
+*`tidb.slowlog.rocksdb_delete_skipped_count`*::
 +
 --
 
@@ -152588,7 +152588,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Rocksdb_key_skipped_count`*::
+*`tidb.slowlog.rocksdb_key_skipped_count`*::
 +
 --
 
@@ -152597,7 +152597,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Rocksdb_block_cache_hit_count`*::
+*`tidb.slowlog.rocksdb_block_cache_hit_count`*::
 +
 --
 
@@ -152606,7 +152606,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Rocksdb_block_read_count`*::
+*`tidb.slowlog.rocksdb_block_read_count`*::
 +
 --
 
@@ -152615,7 +152615,7 @@ type: double
 
 --
 
-*`tidb.slowlog.Rocksdb_block_read_byte`*::
+*`tidb.slowlog.rocksdb_block_read_byte`*::
 +
 --
 
