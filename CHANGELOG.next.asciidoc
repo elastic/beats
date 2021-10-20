@@ -451,6 +451,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Azure signinlogs - Add support for ManagedIdentitySignInLogs, NonInteractiveUserSignInLogs, and ServicePrincipalSignInLogs. {issue}23653[23653]
 - Add `base64Decode` and `base64DecodeNoPad` functions to `httpsjon` templates. {pull}28385[28385]
 - Add latency config option for aws-cloudwatch input. {pull}28509[28509]
+- Added proxy support to threatintel/malwarebazaar. {pull}28533[28533]
 
 
 *Heartbeat*
