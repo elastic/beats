@@ -6,7 +6,7 @@ from beat.beat import INTEGRATION_TESTS
 from beat import common_tests
 
 
-class Test(BaseTest, common_tests.TestExportsMixin):
+class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMixin):
 
     def test_base(self):
         """
