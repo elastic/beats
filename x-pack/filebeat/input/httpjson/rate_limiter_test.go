@@ -201,10 +201,10 @@ func TestGetRateLimitReturnsResetValueIfEarlyLimitPercent(t *testing.T) {
 	assert.NoError(t, tplReset.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Reset"]]`))
 	assert.NoError(t, tplRemaining.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`))
 	rateLimit := &rateLimiter{
-		limit:      tplLimit,
-		reset:      tplReset,
-		remaining:  tplRemaining,
-		log:        logp.NewLogger("TestGetRateLimitReturns0IfEarlyLimit1"),
+		limit:       tplLimit,
+		reset:       tplReset,
+		remaining:   tplRemaining,
+		log:         logp.NewLogger("TestGetRateLimitReturns0IfEarlyLimit1"),
 		early_limit: earlyLimit,
 	}
 	resp := &http.Response{Header: header}
