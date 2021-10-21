@@ -200,13 +200,6 @@ func (t *Template) LoadMinimal() (common.MapStr, error) {
 		return nil, fmt.Errorf("unknown template type %v", t.templateType)
 	}
 
-	if t.config.Settings.Source != nil {
-		m["mappings"] = buildMappings(
-			t.beatVersion, t.esVersion, t.beatName,
-			nil, nil,
-			common.MapStr(t.config.Settings.Source))
-	}
-
 	return m, nil
 }
 
@@ -218,22 +211,34 @@ func (t *Template) loadMinimalLegacy() common.MapStr {
 		"settings": common.MapStr{
 			"index": t.config.Settings.Index,
 		},
+		"mappings": buildMappings(
+			t.beatVersion, t.esVersion, t.beatName,
+			nil, nil,
+			common.MapStr(t.config.Settings.Source)),
 	}
 }
 
 func (t *Template) loadMinimalComponent() common.MapStr {
+	templ := common.MapStr{}
+	if t.config.Settings.Source != nil {
+		templ["mappings"] = buildMappings(
+			t.beatVersion, t.esVersion, t.beatName,
+			nil, nil,
+			common.MapStr(t.config.Settings.Source))
+	}
+	templ["settings"] = common.MapStr{
+		"index": t.config.Settings.Index,
+	}
 	return common.MapStr{
-		"template": common.MapStr{
-			"settings": common.MapStr{
-				"index": t.config.Settings.Index,
-			},
-		},
+		"template": templ,
 	}
 }
 
 func (t *Template) loadMinimalIndex() common.MapStr {
+	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	m := t.loadMinimalComponent()
 	m["priority"] = t.priority
+	m[keyPattern] = patterns
 	return m
 }
 
