@@ -259,6 +259,7 @@ func getProgramsFromConfig(log *logger.Logger, agentInfo *info.AgentInfo, cfg *c
 	if err != nil {
 		return nil, err
 	}
+
 	composableWaiter := newWaitForCompose(composableCtrl)
 	configModifiers := &pipeline.ConfigModifiers{
 		Decorators: []pipeline.DecoratorFunc{modifiers.InjectMonitoring},

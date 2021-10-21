@@ -50,6 +50,10 @@ heartbeat.monitors:
   {% endif %}
 {% endfor -%}
 
+{%- if run_once is defined %}
+heartbeat.run_once: {{run_once}}
+{% endif -%}
+
 {% if reload or reload_path -%}
 heartbeat.config.monitors:
   path: {{ reload_path|default("${path.config}/monitors.d/*.yml") }}

@@ -1,0 +1,194 @@
+{
+    "attributes": {
+        "description": "This dashboard showcases various visualizations for ThreatQ data",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "threatintel.threatq"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "threatintel.threatq"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f5981005-7afc-4ee5-8fef-e8f17464b985",
+                    "w": 24,
+                    "x": 0,
+                    "y": 15
+                },
+                "panelIndex": "f5981005-7afc-4ee5-8fef-e8f17464b985",
+                "panelRefName": "panel_f5981005-7afc-4ee5-8fef-e8f17464b985",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                "panelRefName": "panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "table": null,
+                    "vis": null
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "444e9a99-323f-47ec-8d87-281cbff693b2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "444e9a99-323f-47ec-8d87-281cbff693b2",
+                "panelRefName": "panel_444e9a99-323f-47ec-8d87-281cbff693b2",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                    "w": 24,
+                    "x": 24,
+                    "y": 15
+                },
+                "panelIndex": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                "panelRefName": "panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 30
+                },
+                "panelIndex": "61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                "panelRefName": "panel_61810a64-070a-4a1e-bccf-f69e4f1474b5",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "36c7a051-69e0-48d8-997a-9fbc0f648362",
+                    "w": 24,
+                    "x": 24,
+                    "y": 30
+                },
+                "panelIndex": "36c7a051-69e0-48d8-997a-9fbc0f648362",
+                "panelRefName": "panel_36c7a051-69e0-48d8-997a-9fbc0f648362",
+                "type": "visualization",
+                "version": "7.15.0"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Filebeat Threat Intel] ThreatQ",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "3b605720-ff78-11eb-acb2-2960a7069ed1",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "a911a8b0-ff77-11eb-acb2-2960a7069ed1",
+            "name": "f5981005-7afc-4ee5-8fef-e8f17464b985:panel_f5981005-7afc-4ee5-8fef-e8f17464b985",
+            "type": "visualization"
+        },
+        {
+            "id": "5d395d80-ff71-11eb-acb2-2960a7069ed1",
+            "name": "59e852ab-fa7b-4759-9f2f-8298cfb28f39:panel_59e852ab-fa7b-4759-9f2f-8298cfb28f39",
+            "type": "visualization"
+        },
+        {
+            "id": "5eb61d00-ff72-11eb-acb2-2960a7069ed1",
+            "name": "444e9a99-323f-47ec-8d87-281cbff693b2:panel_444e9a99-323f-47ec-8d87-281cbff693b2",
+            "type": "visualization"
+        },
+        {
+            "id": "cf4b4e40-ff69-11eb-acb2-2960a7069ed1",
+            "name": "54b3a1cd-07f7-471e-9fbe-540cfeaab23a:panel_54b3a1cd-07f7-471e-9fbe-540cfeaab23a",
+            "type": "lens"
+        },
+        {
+            "id": "028175a0-ff74-11eb-acb2-2960a7069ed1",
+            "name": "61810a64-070a-4a1e-bccf-f69e4f1474b5:panel_61810a64-070a-4a1e-bccf-f69e4f1474b5",
+            "type": "lens"
+        },
+        {
+            "id": "302d0850-ff7b-11eb-acb2-2960a7069ed1",
+            "name": "36c7a051-69e0-48d8-997a-9fbc0f648362:panel_36c7a051-69e0-48d8-997a-9fbc0f648362",
+            "type": "visualization"
+        },
+        {
+            "id": "d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "name": "tag-d6ef8f20-70a9-11eb-a3e3-b3cc7c78a70f",
+            "type": "tag"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2021-10-11T08:07:31.696Z",
+    "version": "WzYyMywxXQ=="
+}
