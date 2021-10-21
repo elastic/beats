@@ -14,7 +14,7 @@ from beat import common_tests
 from elasticsearch import Elasticsearch
 
 
-class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMixin):
+class Test(BaseTest, common_tests.TestExportsMixin):
 
     COMPOSE_SERVICES = ['elasticsearch', 'kibana']
 
@@ -57,6 +57,33 @@ class Test(BaseTest, common_tests.TestExportsMixin, common_tests.TestDashboardMi
         assert exit_code == 0
         assert self.log_contains('Loaded index template')
         assert len(es.cat.templates(name='metricbeat-*', h='name')) > 0
+
+    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
+    @pytest.mark.timeout(8*60, func_only=True)
+    def test_dashboards(self):
+        """
+        Test that the dashboards can be loaded with `setup --dashboards`
+        """
+        if self.is_saved_object_api_available():
+            raise unittest.SkipTest(
+                "Kibana Saved Objects API is used since 7.15")
+
+        shutil.copytree(self.kibana_dir(), os.path.join(self.working_dir, "kibana"))
+
+        es = Elasticsearch([self.get_elasticsearch_url()])
+        self.render_config_template(
+            modules=[{
+                "name": "apache",
+                "metricsets": ["status"],
+                "hosts": ["localhost"],
+            }],
+            elasticsearch={"host": self.get_elasticsearch_url()},
+            kibana={"host": self.get_kibana_url()},
+        )
+        exit_code = self.run_beat(extra_args=["setup", "--dashboards"])
+
+        assert exit_code == 0, 'Error output: ' + self.get_log()
+        assert self.log_contains("Kibana dashboards successfully loaded.")
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     def test_migration(self):
