@@ -35,26 +35,50 @@ func init() {
 	}
 }
 
+type HostFSConfig struct {
+	HostFS string `config:"system.hostfs"`
+}
+
 // Module represents the system module
 type Module struct {
 	mb.BaseModule
+	HostFS string
+}
+
+type SystemModule interface {
+	GetHostFS() string
 }
 
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 3 {
-		partialConfig := struct {
-			Hostfs string `config:"system.hostfs"`
-		}{}
-
+	var hostfs string
+	// If this is fleet, ignore the global path, as its not being set.
+	if fleetmode.Enabled() {
+		partialConfig := HostFSConfig{}
 		base.UnpackConfig(&partialConfig)
-		paths.Paths.Hostfs = partialConfig.Hostfs
 
-		logp.Info("refreshed hostfs: %s", paths.Paths.String())
+		if partialConfig.HostFS != "" {
+			hostfs = partialConfig.HostFS
+		} else {
+			hostfs = "/"
+		}
+
+		logp.Info("In Fleet, using HostFS: %s", hostfs)
+	} else {
+		hostfs = paths.Paths.Hostfs
 	}
 
 	once.Do(func() {
-		initModule(paths.Paths.Hostfs)
+		initModule(hostfs)
 	})
 
-	return &Module{BaseModule: base}, nil
+	// set the main Path,
+	if fleetmode.Enabled() && len(paths.Paths.Hostfs) < 2 {
+		paths.Paths.Hostfs = hostfs
+	}
+
+	return &Module{BaseModule: base, HostFS: hostfs}, nil
+}
+
+func (m Module) GetHostFS() string {
+	return m.HostFS
 }
