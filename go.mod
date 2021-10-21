@@ -10,10 +10,10 @@ require (
 	code.cloudfoundry.org/go-loggregator v7.4.0+incompatible
 	code.cloudfoundry.org/rfc5424 v0.0.0-20180905210152-236a6d29298a // indirect
 	github.com/Azure/azure-event-hubs-go/v3 v3.1.2
-	github.com/Azure/azure-sdk-for-go v37.1.0+incompatible
+	github.com/Azure/azure-sdk-for-go v57.0.0+incompatible
 	github.com/Azure/azure-storage-blob-go v0.8.0
 	github.com/Azure/go-ansiterm v0.0.0-20170929234023-d6e3b3328b78 // indirect
-	github.com/Azure/go-autorest/autorest v0.11.12
+	github.com/Azure/go-autorest/autorest v0.11.16
 	github.com/Azure/go-autorest/autorest/adal v0.9.15
 	github.com/Azure/go-autorest/autorest/azure/auth v0.4.2
 	github.com/Azure/go-autorest/autorest/date v0.3.0
@@ -70,14 +70,15 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.2.0
 	github.com/elastic/go-structform v0.0.9
-	github.com/elastic/go-sysinfo v1.7.0
-	github.com/elastic/go-txfile v0.0.7
+	github.com/elastic/go-sysinfo v1.7.1
+	github.com/elastic/go-txfile v0.0.8
 	github.com/elastic/go-ucfg v0.8.3
 	github.com/elastic/go-windows v1.0.1
 	github.com/elastic/gosigar v0.14.1
 	github.com/fatih/color v1.9.0
+	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
-	github.com/fsnotify/fsnotify v1.4.9
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/go-ole/go-ole v1.2.5-0.20190920104607-14974a1cf647 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.2+incompatible // indirect
 	github.com/go-sql-driver/mysql v1.5.0
@@ -85,7 +86,7 @@ require (
 	github.com/gocarina/gocsv v0.0.0-20170324095351-ffef3ffc77be
 	github.com/godbus/dbus v0.0.0-20190422162347-ade71ed3457e
 	github.com/godror/godror v0.10.4
-	github.com/gofrs/flock v0.7.2-0.20190320160742-5135e617513b
+	github.com/gofrs/flock v0.8.1
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gogo/protobuf v1.3.2
 	github.com/golang/mock v1.6.0
@@ -114,7 +115,7 @@ require (
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kardianos/service v1.2.1-0.20210728001519-a323c3813bc7
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
-	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
+	github.com/lib/pq v1.10.3
 	github.com/magefile/mage v1.11.0
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.6
@@ -143,7 +144,6 @@ require (
 	github.com/samuel/go-parser v0.0.0-20130731160455-ca8abbf65d0e // indirect
 	github.com/samuel/go-thrift v0.0.0-20140522043831-2187045faa54
 	github.com/sanathkr/yaml v1.0.1-0.20170819201035-0056894fa522 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/shirou/gopsutil v3.20.12+incompatible
 	github.com/shopspring/decimal v1.2.0
 	github.com/spf13/cobra v0.0.5
@@ -152,6 +152,7 @@ require (
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/tsg/gopacket v0.0.0-20200626092518-2ab8e397a786
 	github.com/ugorji/go/codec v1.1.8
+	github.com/urso/magetools v0.0.0-20200125210132-c2e338f92f3a // indirect
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
 	github.com/vmware/govmomi v0.0.0-20170802214208-2cad15190b41
 	github.com/xdg/scram v1.0.3
@@ -170,7 +171,7 @@ require (
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
+	golang.org/x/sys v0.0.0-20211007075335-d3039528d8ac
 	golang.org/x/text v0.3.6
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.1.6
@@ -192,6 +193,7 @@ require (
 	k8s.io/api v0.21.1
 	k8s.io/apimachinery v0.21.1
 	k8s.io/client-go v0.21.1
+	kernel.org/pub/linux/libs/security/libcap/cap v1.2.57
 )
 
 require (
@@ -221,6 +223,7 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/evanphx/json-patch v4.9.0+incompatible // indirect
+	github.com/fearful-symmetry/gomsr v0.0.1 // indirect
 	github.com/go-logr/logr v0.4.0 // indirect
 	github.com/gobuffalo/here v0.6.0 // indirect
 	github.com/godbus/dbus/v5 v5.0.3 // indirect
@@ -269,7 +272,6 @@ require (
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/urso/go-bin v0.0.0-20180220135811-781c575c9f0e // indirect
-	github.com/urso/magetools v0.0.0-20190919040553-290c89e0c230 // indirect
 	github.com/xdg/stringprep v1.0.3 // indirect
 	go.elastic.co/fastjson v1.1.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
@@ -283,6 +285,7 @@ require (
 	k8s.io/klog/v2 v2.8.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7 // indirect
 	k8s.io/utils v0.0.0-20201110183641-67b214c5f920 // indirect
+	kernel.org/pub/linux/libs/security/libcap/psx v1.2.57 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.0 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
@@ -296,7 +299,7 @@ replace (
 	github.com/dop251/goja => github.com/andrewkroh/goja v0.0.0-20190128172624-dd2ac4456e20
 	github.com/dop251/goja_nodejs => github.com/dop251/goja_nodejs v0.0.0-20171011081505-adff31b136e6
 	github.com/fsnotify/fsevents => github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270
-	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v0.0.0-20180417234312-c9bbe1f46f1d
+	github.com/fsnotify/fsnotify => github.com/adriansr/fsnotify v1.4.8-0.20211018144411-a81f2b630e7c
 	github.com/golang/glog => github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4
 	github.com/google/gopacket => github.com/adriansr/gopacket v1.1.18-0.20200327165309-dd62abfa8a41
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect

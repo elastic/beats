@@ -109,3 +109,22 @@ include::monitors/monitor-tcp.asciidoc[]
 include::monitors/monitor-http.asciidoc[]
 
 include::monitors/monitor-browser.asciidoc[]
+
+[float]
+[[run-once-mode]]
+=== Run Once Mode (Experimental)
+
+You can configure {beatname_uc} run monitors exactly once then exit, bypassing the scheduler. This is referred to as running {beatname_uc} in 
+"run once" mode by setting `heartbeat.run_once: true`. All {beatname_uc} monitors will ignore their schedules and run exactly once at startup.
+This is an experimental feature and is subject to change. 
+
+Note, the `schedule` field is still required and is used by {beatname_uc} to set the expectation around when
+the next run will occur. That duration is encoded in the `monitor.timespan` field in the {beatname_uc} output.
+
+[source,yaml]
+----------------------------------------------------------------------
+# heartbeat.yml
+heartbeat.run_once: true
+heartbeat.monitors:
+# your monitor config here...
+----------------------------------------------------------------------
