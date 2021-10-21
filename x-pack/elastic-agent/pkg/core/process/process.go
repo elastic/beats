@@ -8,7 +8,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"os"
 	"os/exec"
 
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
@@ -22,9 +21,9 @@ var (
 
 // Info groups information about fresh new process
 type Info struct {
-	PID     int
-	Process *os.Process
-	Stdin   io.WriteCloser
+	PID   int
+	Cmd   *exec.Cmd
+	Stdin io.WriteCloser
 }
 
 // Option is an option func to change the underlying command
@@ -60,15 +59,15 @@ func StartContext(ctx context.Context, logger *logger.Logger, path string, confi
 	}
 
 	return &Info{
-		PID:     cmd.Process.Pid,
-		Process: cmd.Process,
-		Stdin:   stdin,
+		PID:   cmd.Process.Pid,
+		Cmd:   cmd,
+		Stdin: stdin,
 	}, err
 }
 
 // Stop stops the process cleanly.
 func (i *Info) Stop() error {
-	return terminateCmd(i.Process)
+	return terminateCmd(i.Cmd.Process)
 }
 
 // StopWait stops the process and waits for it to exit.
@@ -77,6 +76,5 @@ func (i *Info) StopWait() error {
 	if err != nil {
 		return err
 	}
-	_, err = i.Process.Wait()
-	return err
+	return i.Cmd.Wait()
 }

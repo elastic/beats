@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -53,8 +54,10 @@ func TestProcesses(t *testing.T) {
 					"filebeat--8.0.0": {
 						ProcessInfo: &process.Info{
 							PID: 123,
-							Process: &os.Process{
-								Pid: 123,
+							Cmd: &exec.Cmd{
+								Process: &os.Process{
+									Pid: 123,
+								},
 							},
 						},
 						Status: state.Configuring,
@@ -91,8 +94,10 @@ func TestProcesses(t *testing.T) {
 					"filebeat--8.0.0--tag": {
 						ProcessInfo: &process.Info{
 							PID: 123,
-							Process: &os.Process{
-								Pid: 123,
+							Cmd: &exec.Cmd{
+								Process: &os.Process{
+									Pid: 123,
+								},
 							},
 						},
 						Status: state.Configuring,

@@ -222,7 +222,7 @@ func containerCmd(streams *cli.IOStreams, cmd *cobra.Command) error {
 			logInfo(streams, "Legacy apm-server daemon started.")
 			go func() {
 				if err := func() error {
-					apmProcState, err := apmProc.Process.Wait()
+					apmProcState, err := apmProc.Cmd.Process.Wait()
 					if err != nil {
 						return err
 					}

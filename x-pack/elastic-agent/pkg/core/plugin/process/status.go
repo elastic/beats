@@ -101,8 +101,8 @@ func (a *Application) restart(proc *process.Info) {
 	a.stopWatcher(proc)
 
 	// kill the process
-	if proc != nil && proc.Process != nil {
-		_ = proc.Process.Kill()
+	if proc != nil && proc.Cmd.Process != nil {
+		_ = proc.Cmd.Process.Kill()
 	}
 
 	if proc != a.state.ProcessInfo {

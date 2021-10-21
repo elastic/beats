@@ -577,7 +577,7 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 	}
 	resChan := make(chan *os.ProcessState)
 	go func() {
-		procState, _ := proc.Process.Wait()
+		procState, _ := proc.Cmd.Process.Wait()
 		resChan <- procState
 	}()
 	c.agentProc = proc

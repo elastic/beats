@@ -189,7 +189,7 @@ func (a *Application) watch(ctx context.Context, p app.Taggable, proc *process.I
 		var procState *os.ProcessState
 
 		select {
-		case ps := <-a.waitProc(proc.Process):
+		case ps := <-a.waitProc(proc.Cmd.Process):
 			procState = ps
 		case <-a.bgContext.Done():
 			return
@@ -275,7 +275,7 @@ func (a *Application) cleanUp() {
 }
 
 func (a *Application) gracefulKill(proc *process.Info) {
-	if proc == nil || proc.Process == nil {
+	if proc == nil || proc.Cmd.Process == nil {
 		return
 	}
 
@@ -288,9 +288,9 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	go func() {
 		wg.Done()
 
-		if _, err := proc.Process.Wait(); err != nil {
+		if _, err := proc.Cmd.Process.Wait(); err != nil {
 			// process is not a child - some OSs requires process to be child
-			a.externalProcess(proc.Process)
+			a.externalProcess(proc.Cmd.Process)
 		}
 		close(doneChan)
 	}()
@@ -304,6 +304,6 @@ func (a *Application) gracefulKill(proc *process.Info) {
 	select {
 	case <-doneChan:
 	case <-t.C:
-		_ = proc.Process.Kill()
+		_ = proc.Cmd.Process.Kill()
 	}
 }

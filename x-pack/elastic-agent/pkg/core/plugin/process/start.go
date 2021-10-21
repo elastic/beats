@@ -52,7 +52,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 		a.stopWatcher(a.state.ProcessInfo)
 
 		// kill the process
-		_ = a.state.ProcessInfo.Process.Kill()
+		_ = a.state.ProcessInfo.Cmd.Process.Kill()
 		a.state.ProcessInfo = nil
 	}
 
@@ -98,7 +98,7 @@ func (a *Application) start(ctx context.Context, t app.Taggable, cfg map[string]
 				a.srvState = nil
 			}
 			if a.state.ProcessInfo != nil {
-				_ = a.state.ProcessInfo.Process.Kill()
+				_ = a.state.ProcessInfo.Cmd.Process.Kill()
 				a.state.ProcessInfo = nil
 			}
 		}
