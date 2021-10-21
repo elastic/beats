@@ -200,7 +200,7 @@ func GoIntegTest(ctx context.Context) error {
 // Use TESTING_FILEBEAT_FILESETS=fileset[,fileset] to limit what fileset to test.
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(Fields, Dashboards)
 	}
 	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {
