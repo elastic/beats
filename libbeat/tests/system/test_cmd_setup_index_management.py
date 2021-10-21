@@ -57,7 +57,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                   extra_args=["setup", self.cmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
         self.idxmgmt.assert_docs_written_to_alias(self.alias_name)
         self.idxmgmt.assert_alias_created(self.alias_name)
@@ -74,7 +74,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                   extra_args=["setup", self.cmd])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
         self.idxmgmt.assert_alias_created(self.alias_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
@@ -88,6 +88,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         """
         Test setup --index-management when ilm disabled
         """
+
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
@@ -110,7 +111,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.enabled=false"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
@@ -126,7 +127,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.policy_name=" + self.custom_policy])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.custom_policy, self.alias_name)
         self.idxmgmt.assert_policy_created(self.custom_policy)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -188,7 +189,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
@@ -207,7 +208,7 @@ class TestCommandSetupIndexManagement(BaseTest):
         self.custom_alias = self.beat_name + "-myalias"
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
         self.idxmgmt.assert_alias_created(self.custom_alias)
 
@@ -224,7 +225,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_template + "*"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.alias_name, self.policy_name, self.alias_name)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.alias_name, self.policy_name, self.alias_name)
         self.idxmgmt.assert_index_template_index_pattern(self.alias_name, [self.alias_name + "-*"])
         self.idxmgmt.assert_alias_created(self.alias_name)
 
@@ -242,7 +243,7 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.pattern=" + self.custom_template + "*"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_template)
+        self.idxmgmt.assert_index_template_loaded(self.custom_template)
         self.idxmgmt.assert_index_template_index_pattern(self.custom_template, [self.custom_template + "*"])
         self.idxmgmt.assert_alias_not_created(self.alias_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
@@ -261,13 +262,17 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2"])
 
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.index_name)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
 
         # check that settings are overwritten
-        resp = self.es.transport.perform_request('GET', '/_template/' + self.index_name)
-        assert self.index_name in resp
-        index = resp[self.index_name]["settings"]["index"]
-        assert index["number_of_shards"] == "2", index["number_of_shards"]
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.index_name)
+        found = False
+        for index_template in resp["index_templates"]:
+            if self.index_name == index_template["name"]:
+                found = True
+                index = index_template["index_template"]["template"]["settings"]["index"]
+                assert index["number_of_shards"] == "2", index["number_of_shards"]
+        assert found
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -281,10 +286,11 @@ class TestCommandSetupIndexManagement(BaseTest):
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.cmd,
                                               "-E", "setup.ilm.enabled=false",
+                                              "-E", "setup.template.priority=160",
                                               "-E", "setup.template.name=" + self.custom_alias,
                                               "-E", "setup.template.pattern=" + self.custom_alias + "*"])
         assert exit_code == 0
-        self.idxmgmt.assert_legacy_index_template_loaded(self.custom_alias)
+        self.idxmgmt.assert_index_template_loaded(self.custom_alias)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
@@ -293,10 +299,15 @@ class TestCommandSetupIndexManagement(BaseTest):
                                               "-E", "setup.template.settings.index.number_of_shards=2",
                                               "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
+        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_policy_created(self.policy_name)
         # check that template was overwritten
-        resp = self.es.transport.perform_request('GET', '/_template/' + self.custom_alias)
-        assert self.custom_alias in resp
-        index = resp[self.custom_alias]["settings"]["index"]
-        assert index["number_of_shards"] == "2", index["number_of_shards"]
+        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_alias)
+
+        found = False
+        for index_template in resp["index_templates"]:
+            if index_template["name"] == self.custom_alias:
+                found = True
+                index = index_template["index_template"]["template"]["settings"]["index"]
+                assert index["number_of_shards"] == "2", index["number_of_shards"]
+        assert found

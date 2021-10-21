@@ -37,7 +37,7 @@ class IdxMgmt(unittest.TestCase):
             template = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/_template/" + template + "*")
+            self._client.transport.perform_request('DELETE', "/_index_template/" + template + "*")
         except NotFoundError:
             pass
 
@@ -54,7 +54,7 @@ class IdxMgmt(unittest.TestCase):
 
     def assert_index_template_not_loaded(self, template):
         with pytest.raises(NotFoundError):
-            self._client.transport.perform_request('GET', '/_template/' + template)
+            self._client.transport.perform_request('GET', '/_index_template/' + template)
 
     def assert_legacy_index_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_template/' + template)
@@ -67,6 +67,16 @@ class IdxMgmt(unittest.TestCase):
         for index_template in resp['index_templates']:
             if index_template['name'] == template:
                 found = True
+        assert found
+
+    def assert_ilm_index_template_loaded(self, template, policy, alias):
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
+        found = False
+        for index_template in resp['index_templates']:
+            if index_template['name'] == template:
+                found = True
+                assert index_template['index_template']['template']['settings']["index"]["lifecycle"]["name"] == policy
+                assert index_template['index_template']['template']['settings']["index"]["lifecycle"]["rollover_alias"] == alias
         assert found
 
     def assert_component_template_loaded(self, template):
@@ -84,9 +94,12 @@ class IdxMgmt(unittest.TestCase):
         assert resp[template]["settings"]["index"]["lifecycle"]["rollover_alias"] == alias
 
     def assert_index_template_index_pattern(self, template, index_pattern):
-        resp = self._client.transport.perform_request('GET', '/_template/' + template)
-        assert template in resp
-        assert resp[template]["index_patterns"] == index_pattern
+        resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
+        for index_template in resp['index_templates']:
+            if index_template['name'] == template:
+                assert index_pattern == index_template['index_template']['index_patterns']
+                found = True
+        assert found
 
     def assert_alias_not_created(self, alias):
         resp = self._client.transport.perform_request('GET', '/_alias')
