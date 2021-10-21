@@ -26,6 +26,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/mapping"
 )
 
+// DefaultField controls the default value for the default_field flag.
+const DefaultField = true
+
 var (
 	minVersionAlias                   = common.MustNewVersion("6.4.0")
 	minVersionFieldMeta               = common.MustNewVersion("7.6.0")
@@ -62,7 +65,7 @@ type fieldState struct {
 func (p *Processor) Process(fields mapping.Fields, state *fieldState, output common.MapStr) error {
 	if state == nil {
 		// Set the defaults.
-		state = &fieldState{DefaultField: true}
+		state = &fieldState{DefaultField: DefaultField}
 	}
 
 	for _, field := range fields {
@@ -257,6 +260,23 @@ func (p *Processor) ip(f *mapping.Field) common.MapStr {
 	return property
 }
 
+func stateFromField(f *mapping.Field) *fieldState {
+	if f == nil {
+		return nil
+	}
+	st := &fieldState{
+		DefaultField: DefaultField,
+		Path:         f.Name,
+	}
+	if f.DefaultField != nil {
+		st.DefaultField = *f.DefaultField
+	}
+	if f.Path != "" {
+		st.Path = f.Path + "." + f.Name
+	}
+	return st
+}
+
 func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 	property := p.getDefaultProperties(f)
 
@@ -277,7 +297,7 @@ func (p *Processor) keyword(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields)
 		property["fields"] = fields
 	}
 
@@ -299,7 +319,7 @@ func (p *Processor) wildcard(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields)
 		property["fields"] = fields
 	}
 
@@ -335,7 +355,7 @@ func (p *Processor) text(f *mapping.Field) common.MapStr {
 
 	if len(f.MultiFields) > 0 {
 		fields := common.MapStr{}
-		p.Process(f.MultiFields, nil, fields)
+		p.Process(f.MultiFields, stateFromField(f), fields)
 		properties["fields"] = fields
 	}
 
