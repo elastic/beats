@@ -122,6 +122,7 @@ func PythonTest(params PythonTestArgs) error {
 	pytestEnv := map[string]string{
 		// activate sets this. Not sure if it's ever needed.
 		"VIRTUAL_ENV": ve,
+		"ES_PASS":     "changeme",
 	}
 	if IsInIntegTestEnv() {
 		pytestEnv["INTEGRATION_TESTS"] = "1"
@@ -134,6 +135,8 @@ func PythonTest(params PythonTestArgs) error {
 		"--timeout=90",
 		"--durations=20",
 		"-x",
+		"-v",
+		"-s",
 	}
 	if mg.Verbose() {
 		pytestOptions = append(pytestOptions, "-v")
