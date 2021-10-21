@@ -39,30 +39,13 @@ type testTemplate struct {
 func TestNumberOfRoutingShards(t *testing.T) {
 	const notPresent = 0 // setting missing indicator
 	const settingKey = "number_of_routing_shards"
-	const fullKey = "settings.index." + settingKey
+	const fullKey = "template.settings.index." + settingKey
 
 	cases := map[string]struct {
 		esVersion string
 		set       int
 		want      int
 	}{
-		"Do not set default for older version than 6.1": {
-			esVersion: "6.0.0",
-			want:      notPresent,
-		},
-		"Default present if ES 6.1.0 is used": {
-			esVersion: "6.1.0",
-			want:      30,
-		},
-		"Default present for newer ES 6.x version": {
-			esVersion: "6.8.2",
-			want:      30,
-		},
-		"Can overwrite default for ES 6.x": {
-			esVersion: "6.1.0",
-			set:       1024,
-			want:      1024,
-		},
 		"Do not set by default for ES 7.x": {
 			esVersion: "7.0.0",
 			want:      notPresent,
@@ -108,16 +91,6 @@ func TestNumberOfRoutingShards(t *testing.T) {
 
 func TestTemplate(t *testing.T) {
 	currentVersion := getVersion("")
-
-	t.Run("for ES 6.x", func(t *testing.T) {
-		cfg := DefaultConfig()
-		cfg.Type = IndexTemplateLegacy
-		template := createTestTemplate(t, currentVersion, "6.4.0", cfg)
-		template.Assert("index_patterns", []string{"testbeat-" + currentVersion + "-*"})
-		template.Assert("order", 1)
-		template.Assert("mappings.doc._meta", common.MapStr{"beat": "testbeat", "version": currentVersion})
-		template.Assert("settings.index.max_docvalue_fields_search", 200)
-	})
 
 	t.Run("for ES 7.x", func(t *testing.T) {
 		template := createTestTemplate(t, currentVersion, "7.2.0", DefaultConfig())
