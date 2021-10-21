@@ -20,6 +20,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/config"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/id"
 )
 
 const (
@@ -166,7 +167,13 @@ func (c *Client) Send(
 	headers http.Header,
 	body io.Reader,
 ) (*http.Response, error) {
-	c.log.Debugf("Request method: %s, path: %s", method, path)
+	// Generate a request ID for tracking
+	var reqId string
+	if u, err := id.Generate(); err == nil {
+		reqId = u.String()
+	}
+
+	c.log.Debugf("Request method: %s, path: %s, reqId: %s", method, path, reqId)
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	requester := c.nextRequester()
@@ -182,6 +189,11 @@ func (c *Client) Send(
 	req.Header.Add("Accept", "application/json")
 	// TODO: Make this header specific to fleet-server or remove it
 	req.Header.Set("kbn-xsrf", "1") // Without this Kibana will refuse to answer the request.
+
+	// If available, add the request id as an HTTP header
+	if reqId != "" {
+		req.Header.Add("X-Request-ID", reqId)
+	}
 
 	// copy headers.
 	for header, values := range headers {
