@@ -15,7 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//+build !nologpglobal
+//go:build !nologpglobal
+// +build !nologpglobal
 
 package logp
 

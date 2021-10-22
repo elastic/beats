@@ -31,10 +31,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
-var textMarshalerType = reflect.TypeOf((*encoding.TextMarshaler)(nil)).Elem()
-
-type Float float64
-
 // EventConverter is used to convert MapStr objects for publishing
 type EventConverter interface {
 	Convert(m MapStr) MapStr
@@ -208,10 +204,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		}
 		return tmp, nil
 
-	case float64:
-		return Float(value.(float64)), nil
-	case float32:
-		return Float(value.(float32)), nil
+	case float32, float64:
 	case []float32, []float64:
 	case complex64, complex128:
 	case []complex64, []complex128:
@@ -238,7 +231,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 			return v.Uint() &^ (1 << 63), nil
 		case reflect.Float32, reflect.Float64:
-			return Float(v.Float()), nil
+			return v.Float(), nil
 		case reflect.Complex64, reflect.Complex128:
 			return v.Complex(), nil
 		case reflect.String:
@@ -302,11 +295,6 @@ func joinKeys(keys ...string) string {
 		keys = keys[1:]
 	}
 	return strings.Join(keys, ".")
-}
-
-// Defines the marshal of the Float type
-func (f Float) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%.6f", f)), nil
 }
 
 // DeDot a string by replacing all . with _

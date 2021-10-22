@@ -141,7 +141,7 @@ func TestLoginType(t *testing.T) {
 	for idx, expected := range []common.MapStr{
 		{
 			"event.category":      []string{"authentication"},
-			"event.type":          []string{"start", "authentication_failure"},
+			"event.type":          []string{"start"},
 			"event.outcome":       "failure",
 			"user.effective.name": "(invalid user)",
 			"user.id":             nil,
@@ -149,7 +149,7 @@ func TestLoginType(t *testing.T) {
 		},
 		{
 			"event.category":      []string{"authentication"},
-			"event.type":          []string{"start", "authentication_success"},
+			"event.type":          []string{"start"},
 			"event.outcome":       "success",
 			"user.effective.name": "adrian",
 			"user.audit.id":       nil,

@@ -944,7 +944,7 @@ function tagval(id, src, cfg, keys, on_success) {
     }
     var quotes_len = cfg.open_quote.length > 0 && cfg.close_quote.length > 0?
         cfg.open_quote.length + cfg.close_quote.length : 0;
-    var kv_regex = new RegExp('^*([^' + cfg.kv_separator + ']*)*' + cfg.kv_separator + '*(.*)*$');
+    var kv_regex = new RegExp('^([^' + cfg.kv_separator + ']*)*' + cfg.kv_separator + ' *(.*)*$');
     return function(evt) {
         var msg = evt.Get(src);
         if (msg === undefined) {

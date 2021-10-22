@@ -1,0 +1,45 @@
+- name: rapl
+  type: group
+  release: beta
+  description: >
+    Wattage as reported by Intel RAPL
+  fields:
+    - name: core
+      type: long
+      description: >
+        The core where the RAPL request originated from. Only one core is queried per hardware CPU.
+    - name: dram.watts
+      type: float
+      description: >
+        Power usage in watts on the DRAM RAPL domain
+    - name: dram.joules
+      type: float
+      description: >
+        Raw power usage counter for the DRAM domain
+
+    - name: pp0.watts
+      type: float
+      description: >
+        Power usage in watts on the PP0 RAPL domain
+    - name: pp0.joules
+      type: float
+      description: >
+        Raw power usage counter for the PP0 domain
+
+    - name: pp1.watts
+      type: float
+      description: >
+        Power usage in watts on the PP1 RAPL domain
+    - name: pp1.joules
+      type: float
+      description: >
+        Raw power usage counter for the PP1 domain
+
+    - name: package.watts
+      type: float
+      description: >
+        Power usage in watts on the Package RAPL domain
+    - name: package.joules
+      type: float
+      description: >
+        Raw power usage counter for the package domain

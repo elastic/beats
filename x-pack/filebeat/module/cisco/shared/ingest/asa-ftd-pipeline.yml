@@ -326,7 +326,7 @@ processors:
       if: "ctx._temp_.cisco.message_id == '113019'"
       field: "message"
       description: "113019"
-      pattern: "Group = %{}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{message}"
+      pattern: "Group = %{source.user.group.name}, Username = %{source.user.name}, IP = %{destination.address}, Session disconnected. Session Type: %{_temp_.cisco.session_type}, Duration: %{_temp_.duration_hms}, Bytes xmt: %{source.bytes}, Bytes rcv: %{destination.bytes}, Reason: %{event.reason}"
   - grok:
       if: '["302013", "302015"].contains(ctx._temp_.cisco.message_id)'
       field: "message"
@@ -651,6 +651,13 @@ processors:
       field: "message"
       description: "713049"
       pattern: "Group = %{}, IP = %{source.address}, Security negotiation complete for LAN-to-LAN Group (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+      ignore_failure: true
+  - dissect:
+      if: "ctx._temp_.cisco.message_id == '713049'"
+      field: "message"
+      description: "713049"
+      pattern: "Group = %{}, Username = %{user.name}, IP = %{source.address}, Security negotiation complete for User (%{}) %{}, Inbound SPI = %{}, Outbound SPI = %{}"
+      ignore_failure: true
   - grok:
       if: "ctx._temp_.cisco.message_id == '716002'"
       field: "message"
@@ -1318,7 +1325,7 @@ processors:
                 } else if (c == (char)':') {
                     total = (total + cur) * 60;
                     cur = 0;
-                } else {
+                } else if (c != (char)'h' && c == (char)'m' && c == (char)'s') {
                     return 0;
                 }
             }

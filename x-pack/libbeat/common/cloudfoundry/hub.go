@@ -129,13 +129,14 @@ func (h *Hub) DopplerConsumerFromClient(client *cfclient.Client, callbacks Doppl
 	if dopplerAddress == "" {
 		dopplerAddress = client.Endpoint.DopplerEndpoint
 	}
-	httpClient, _, err := h.httpClient()
+	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
 	if err != nil {
-		return nil, errors.Wrap(err, "getting http client")
+		return nil, errors.Wrap(err, "loading tls config")
 	}
+	proxy := h.cfg.Transport.Proxy.ProxyFunc()
 
 	tr := TokenRefresherFromCfClient(client)
-	return newDopplerConsumer(dopplerAddress, h.cfg.ShardID, h.log, httpClient, tr, callbacks)
+	return newDopplerConsumer(dopplerAddress, h.cfg.ShardID, h.log, tlsConfig.ToConfig(), proxy, tr, callbacks)
 }
 
 // doerFromClient returns an auth token doer using uaa.
