@@ -82,6 +82,14 @@ var protectedFlags = Flags{
 	"config_refresh": 10,
 }
 
+func init() {
+	// Append platform specific flags
+	plArgs := platformArgs()
+	for k, v := range plArgs {
+		protectedFlags[k] = v
+	}
+}
+
 func convertToArgs(flags Flags) Args {
 	if flags == nil {
 		return nil
