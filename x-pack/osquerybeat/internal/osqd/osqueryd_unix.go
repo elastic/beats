@@ -45,7 +45,7 @@ func SocketPath(dir string) string {
 	return filepath.Join(dir, "osquery.sock")
 }
 
-func platformArgs() []string {
+func platformArgs() map[string]interface{} {
 	return nil
 }
 
