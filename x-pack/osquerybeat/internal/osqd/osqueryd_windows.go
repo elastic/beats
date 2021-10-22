@@ -28,9 +28,9 @@ func SocketPath(dir string) string {
 	return `\\.\pipe\elastic\osquery\` + uuid.Must(uuid.NewV4()).String()
 }
 
-func platformArgs() []string {
-	return []string{
-		"--allow_unsafe",
+func platformArgs() map[string]interface{} {
+	return map[string]interface{}{
+		"allow_unsafe": true,
 	}
 }
 
