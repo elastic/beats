@@ -14,15 +14,14 @@
                 "deleted": 0,
                 "not_visible": 0,
                 "received": 0,
-                "sent": 0.2857142857142857,
-                "visible": 827.8
+                "sent": 0,
+                "visible": 1577.8
             },
             "oldest_message_age": {
-                "sec": 345606.4
+                "sec": 345603.2
             },
-            "queuename": "filebeat-aws-elb-test",
-            "sent_message_size": {
-                "bytes": 1006.5
+            "queue": {
+                "name": "filebeat-aws-elb-test"
             }
         },
         "tags": {

@@ -35,6 +35,7 @@ import (
 func init() {
 	unittest.RegisterPythonTestDeps(Fields)
 	integtest.RegisterGoTestDeps(Fields)
+	integtest.RegisterPythonTestDeps(Fields)
 }
 
 // Build builds the Beat binary.
