@@ -62,6 +62,7 @@ class TestCommandTest(BaseTest):
         assert self.log_contains('TLS... WARN secure connection disabled')
         assert self.log_contains('talk to server... OK')
 
+    @unittest.skipIf(not INTEGRATION_TESTS, "integration test")
     def test_wrong_output(self):
         """
         Test test wrong output works

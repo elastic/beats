@@ -17,7 +17,7 @@ class TestCommandVersion(BaseTest):
 
         self.elasticsearch_url = self.get_elasticsearch_url()
         print("Using elasticsearch: {}".format(self.elasticsearch_url))
-        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url)
+        self.es = self.get_elasticsearch_instance(url=self.elasticsearch_url, user='beats')
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
