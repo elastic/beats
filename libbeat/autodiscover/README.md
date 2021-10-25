@@ -60,15 +60,15 @@ We will use metricbeat as an example.
 Step-by-step walkthrough
 1. Kubernetes provider `init` function [adds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L46) the provider in the autodiscover providers registry at startup. For Kubernetes provider an `AutodiscoverBuilder` func is passed as an argument.
 2. Metricbeat calls `NewAutodiscover` [function](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L183) which checks in the config for enabled providers and [builds](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/provider.go#L90) them one by one, calling the `AutodiscoverBuilder` func.
-3. Kubernetes `AutodiscoverBuilder` creates and returns a [Kubernetes Provider struct](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L131) which is then added to an Autodiscover manager struct.
+3. Kubernetes `AutodiscoverBuilder` creates and returns a [Kubernetes Provider struct](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L132) which is then added to an Autodiscover manager struct.
 4. When unique is set to true [NewLeaderElectionManager](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L141) is set as the eventManager of Kubernetes Provider.
 4. Metricbeat [starts](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L249) the Autodiscover manager which starts for Kubernets provider the [leaderElectionManager](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L326). Before starting the providers it also starts a worker for listening of events that will be published by the eventers of each provider.
-5. `OnStartedLeading` is executed when the specific metricbeat instance gains the leader election lock. [StartLeading](startLeading) cretaes a bus event with `"start":    true,`  and publishes it. The template configurations is also added in this event.
+5. `OnStartedLeading` is executed when the specific metricbeat instance gains the leader election lock. [StartLeading](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L205) creates a bus event with `"start":    true,`  and publishes it. The template configurations is also added in this event.
 6. [Listener](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L140) of events get the published event and generates [configs](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L185) for it. Configs include the variables and settings from the template set by the user.
 7. For each config the worker checks if it already [exists](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L225)(It was already handled). If at least one of the events config does not exist, then the config is marked as `updated`.
 8. The runners list get [reloaded](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/cfgfile/list.go#L54). It is checked from the list of current runners if each config is handled by one of them.
    If no runner is handling that config a new runner will [start](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/cfgfile/list.go#L107). If some runners are no longer needed will be removed.
-9. Starting of a runner starts under the hood the metricbeat [module](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/metricbeat/mb/module/runner.go#L76) with the specific metricsets as they are set in the template.
+9. Starting of a runner starts under the hood the metricbeat [module](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/metricbeat/mb/module/runner.go#L76) with the specific metricsets as they are set in the template. Same also applies for filebeat and heartbeat cases.
 
 ### Autodiscover without LeaderElection
 
@@ -121,7 +121,7 @@ related [method](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295
 
 https://www.elastic.co/guide/en/beats/metricbeat/master/configuration-autodiscover-hints.html
 
-Metricbeat and Filebeat support autodiscover based on hints from the provider. The hints system looks for hints in Kubernetes Pod annotations which have the prefix co.elastic.metrics. As soon as the container starts, Metricbeat/Filebeat will check if it contains any hints and launch the proper config for it. Hints tell Metricbeat/Filebeat how to get metrics for the given container.
+Metricbeat, Filebeat and Heartbeat support autodiscover based on hints from the provider. The hints system looks for hints in Kubernetes Pod annotations which have the prefix co.elastic.metrics. As soon as the container starts, Metricbeat/Filebeat will check if it contains any hints and launch the proper config for it. Hints tell Metricbeat/Filebeat how to get metrics for the given container.
 
 Example metricbeat configuration:
 ```
@@ -188,73 +188,4 @@ Everything works the same as Autodiscover without LeaderElection until step 8.
 
 
 ##  Autodiscover provider in Elastic Agent
-
-https://www.elastic.co/guide/en/fleet/master/dynamic-input-configuration.html#dynamic-providers
-
-Currently Kubernetes dynamic provider can only be configured in [standalone](https://github.com/elastic/beats/blob/master/deploy/kubernetes/elastic-agent-standalone-kubernetes.yaml#L24) agent.
-In fleet managed agent it is enabled by default with default values.
-
-Template based autodiscover of Kubernetes resources is only supported in standalone mode as of now.
-It is not part of the Kubernetes Integration yet.
-
-Hints based autodiscover is not supported yet.
-
-### Template based autodiscover
-
-Example:
-As an example we will use gain redis module.
-In agent.yml(configmap) an extra input block needs to be added.
-```
-      # Add extra input blocks here, based on conditions
-      # so as to automatically identify targeted Pods and start monitoring them
-      # using a predefined integration. For instance:
-      - name: redis
-        type: redis/metrics
-        use_output: default
-        meta:
-          package:
-            name: redis
-            version: 0.3.6
-        data_stream:
-          namespace: default
-        streams:
-          - data_stream:
-              dataset: redis.info
-              type: metrics
-            metricsets:
-              - info
-            hosts:
-              - '${kubernetes.pod.ip}:6379'
-            idle_timeout: 20s
-            maxconn: 10
-            network: tcp
-            period: 10s
-            condition: ${kubernetes.pod.labels.app} == 'redis'
-```
-
-What makes this input block dynamic are the variables hosts and condition.
-`${kubernetes.pod.ip}` and `${kubernetes.pod.labels.app}`
-
-#### High level description
-The Kubernetes dynamic provider watches for Kubernetes resources and generates mappings from them (similar to events in beats provider). The mappings include those variables([list of variables](https://www.elastic.co/guide/en/fleet/master/dynamic-input-configuration.html#kubernetes-provider)) for each k8s resource with unique value for each one of them.
-Agent composable controller which controls all the providers receives these mappings and tries to match them with the  input blogs of the configurations.
-This means that for every mapping that the condition matches (kubernetes.pod.labels.app equals to redis), a
-new input will be created in which the condition will be removed(not needed anymore) and the `kubernetes.pod.ip` variable will be substituted from the value in the same mapping.
-The updated complete inputs blog will be then forwarded to agent to spawn/update metricbeat and filebeat instances.
-
-##### Internals
-
-Step-by-step walkthrough
-1. Elastic agent running in local mode initiates a new [composable controller](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/agent/application/local_mode.go#L112).
-2. The controller consists of all contextProviders and [dynamicProviders](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/composable/controller.go#L73).
-3. Agent initiates a new [emitter](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/agent/application/local_mode.go#L118) which [starts](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/emitter.go#L27) all the dynamicProviders of the [controller](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/composable/controller.go#L122).
-4. Kubernetes Dynamic provider depending on the [resource type](https://github.com/elastic/beats/blob/master/x-pack/elastic-agent/pkg/composable/providers/kubernetes/kubernetes.go#L56)(default is pod) initiates a [watcher](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/providers/kubernetes/pod.go#L69) for
-   the specific resource the same way as in metrcbeat/filebeat kubernetes provider.
-5. Under the hood a dedicated watcher starts for pods, nodes and namespaces as well as a metadata generator.
-6. The difference is that the watchers instead of publishing events, they create [data](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/providers/kubernetes/pod.go#L134) from the objects read from the queue. These [data](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/providers/kubernetes/pod.go#L244) consist of mappings, processors and a priority .
-7. A [mapping](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/providers/kubernetes/pod.go#L217) includes all those variables retrieved from the kubernetes resource metadata while the [processors](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/providers/kubernetes/pod.go#L236) indicate the addition of extra fields.
-8. Composable controller [collects](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/controller.go#L244) the created data and [compares](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/controller.go#L263) their mappings and processors against the existing ones. If there is a change, it updates the dynamicProviderState and notifies a worker thread through a [signal](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/controller.go#L272).
-9. When the worker gets [notified](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/controller.go#L141) for a change it creates new [variables](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/composable/controller.go#L170) from the mappings and processors.
-10. It then updates the emitter[https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/controller.go#L111] with them.
-11. The emitter controller will update the ast that is then used by the agent to generate the final inputs and spawn new programs to deploy the changes([code](https://github.com/elastic/beats/blob/3c77c9a92a2e90b85f525293cb4c2cfc5bc996b1/x-pack/elastic-agent/pkg/agent/application/pipeline/emitter/controller.go#L151)).
-
+Follow the link [here]().
