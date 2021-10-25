@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load index templates v2 (composable index templates) by default when talking to ES 7.16 or ES 8.x. Please note that you cannot load templates
 into Elasticsearch 7.8 or older with this default. To load templates to these ES version, set `setup.template.type` back
 to `legacy`. {pull}28538[28538]
+- Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 
 *Auditbeat*
 
@@ -90,6 +91,9 @@ to `legacy`. {pull}28538[28538]
 - Fix unprefixed fields in `fields.yml` for Powershell module {issue}18984[18984]
 
 *Functionbeat*
+
+- Support for Google Cloud Functions have been removed, as it has been in Beta for a long time and been broken
+for a few releases. Please use other tools provided by Elastic to fetch data from GCP (e.g. Filebeat).
 
 
 ==== Bugfixes
@@ -550,6 +554,7 @@ to `legacy`. {pull}28538[28538]
 
 *Affecting all Beats*
 
+- Deprecate `setup.template.type`. In the future Beats will load data streams instead of regular indices.
 
 *Filebeat*
 
