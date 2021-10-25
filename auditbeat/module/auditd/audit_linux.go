@@ -745,7 +745,9 @@ func addProcess(p aucoalesce.Process, m common.MapStr) {
 	}
 	if p.PPID != "" {
 		if ppid, err := strconv.Atoi(p.PPID); err == nil {
-			process["ppid"] = ppid
+			process["parent"] = common.MapStr{
+				"parent": ppid,
+			}
 		}
 	}
 	if p.Title != "" {
