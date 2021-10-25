@@ -10,7 +10,7 @@
         "period": 10000
     },
     "os": {
-        "full": "Linux 5.10.47-linuxkit x86_64"
+        "full": "Linux 4.15.0-154-generic x86_64"
     },
     "process": {
         "pid": 1
@@ -19,7 +19,7 @@
         "info": {
             "clients": {
                 "blocked": 0,
-                "connected": 1,
+                "connected": 2,
                 "max_input_buffer": 0,
                 "max_output_buffer": 0
             },
@@ -28,9 +28,9 @@
             },
             "cpu": {
                 "used": {
-                    "sys": 0.23,
+                    "sys": 0.03,
                     "sys_children": 0,
-                    "user": 0.05,
+                    "user": 0.02,
                     "user_children": 0
                 }
             },
@@ -42,7 +42,7 @@
                     "rss": {}
                 },
                 "fragmentation": {
-                    "ratio": 2.85
+                    "ratio": 2.82
                 },
                 "max": {
                     "policy": "noeviction",
@@ -50,9 +50,9 @@
                 },
                 "used": {
                     "lua": 37888,
-                    "peak": 822456,
-                    "rss": 2347008,
-                    "value": 822456
+                    "peak": 843312,
+                    "rss": 2379776,
+                    "value": 843312
                 }
             },
             "persistence": {
@@ -95,7 +95,7 @@
                     "copy_on_write": {},
                     "last_save": {
                         "changes_since": 0,
-                        "time": 1633422962
+                        "time": 1635170510
                     }
                 }
             },
@@ -122,12 +122,12 @@
                 "git_dirty": "0",
                 "git_sha1": "00000000",
                 "hz": 10,
-                "lru_clock": 6033096,
+                "lru_clock": 7780563,
                 "mode": "standalone",
                 "multiplexing_api": "epoll",
-                "run_id": "ddfd6edda7dcd357ac9f24ebfb0ef8b3ee771f8d",
+                "run_id": "a17e261ad9241c5fcdf3f8af9e9dd475281c2a5b",
                 "tcp_port": 6379,
-                "uptime": 86
+                "uptime": 5
             },
             "slowlog": {
                 "count": 0
@@ -136,7 +136,7 @@
                 "active_defrag": {},
                 "commands_processed": 2,
                 "connections": {
-                    "received": 82,
+                    "received": 5,
                     "rejected": 0
                 },
                 "instantaneous": {
@@ -156,10 +156,10 @@
                 "migrate_cached_sockets": 0,
                 "net": {
                     "input": {
-                        "bytes": 80
+                        "bytes": 72
                     },
                     "output": {
-                        "bytes": 2111
+                        "bytes": 2129
                     }
                 },
                 "pubsub": {
@@ -177,7 +177,7 @@
         }
     },
     "service": {
-        "address": "localhost:53854",
+        "address": "172.25.0.2:6379",
         "type": "redis",
         "version": "3.2.12"
     }
