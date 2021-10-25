@@ -54,7 +54,7 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		Image:  image,
 		Cmd:    cmd,
 		Labels: labels,
-	}, nil, nil, "")
+	}, nil, nil, nil, "")
 	if err != nil {
 		return "", errors.Wrap(err, "creating container")
 	}
