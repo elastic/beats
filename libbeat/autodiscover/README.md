@@ -12,7 +12,7 @@ For Elastic Agent we will discuss later.
 **Providers**
 Autodiscover providers work by watching for events on the system and translating those events into internal autodiscover events with a common format. When you configure the provider, you can optionally use fields from the autodiscover event to set conditions that, when met, launch specific configurations.
 
-On start, Metricbeat/Filebeat/Agent will scan existing containers and launch the proper configs for them. Then it will watch for new start/stop events. This ensures you don’t need to worry about state, but only define your desired configs.
+On start Metricbeat/Filebeat/Agent will scan existing containers and launch the proper configs for them. Then it will watch for new start/stop events. This ensures you don’t need to worry about state, but only define your desired configs.
 
 The Kubernetes autodiscover provider watches for Kubernetes nodes, pods, services and namespaces when they start, update, and stop.
 
@@ -65,7 +65,7 @@ Step-by-step walkthrough
 4. Metricbeat [starts](https://github.com/elastic/beats/blob/master/metricbeat/beater/metricbeat.go#L249) the Autodiscover manager which starts for Kubernets provider the [leaderElectionManager](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L326). Before starting the providers it also starts a worker for listening of events that will be published by the eventers of each provider.
 5. `OnStartedLeading` is executed when the specific metricbeat instance gains the leader election lock. [StartLeading](startLeading) cretaes a bus event with `"start":    true,`  and publishes it. The template configurations is also added in this event.
 6. [Listener](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L140) of events get the published event and generates [configs](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L185) for it. Configs include the variables and settings from the template set by the user.
-7. For each config the worker checks if it already [exists](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L225)(It was already handled). If at least of the configs of the event does not then the config is marked as `updated`.
+7. For each config the worker checks if it already [exists](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/autodiscover.go#L225)(It was already handled). If at least one of the events config does not exist, then the config is marked as `updated`.
 8. The runners list get [reloaded](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/cfgfile/list.go#L54). It is checked from the list of current runners if each config is handled by one of them.
    If no runner is handling that config a new runner will [start](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/cfgfile/list.go#L107). If some runners are no longer needed will be removed.
 9. Starting of a runner starts under the hood the metricbeat [module](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/metricbeat/mb/module/runner.go#L76) with the specific metricsets as they are set in the template.
@@ -102,7 +102,7 @@ Steps 1-3 are exactly the same as with Leader Election.
 5. The kubernetes node that the metricbeat instance is running on is [discovered](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/pod.go#L72).
 6. A dedicated watcher to watch [pods](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/pod.go#L82),nodes and namespaces get started. Also a [metadata generator](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/pod.go#L113) is started to enrich the events with kubernetes metadata.
 7. Each time a new event is about to be published by the watchers(we will have a dedicated section of how events are published), it is checked whether the condition set by the user [matches](https://github.com/elastic/beats/blob/4b1f69923b3f2abbbf1860295fe5dbff7db3d63c/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L182) the event.
-8. If it matches, then a config is created with the configuration set by user and it is added in the event. After tha the event gets published.
+8. If it matches, then a config is created with the configuration set by user and it is added in the event. After that the event gets published.
 9. The worker listening for events receives the start event and checks if there is any update in the configs of the event. (same process with leader election steps 6-9)
 10. If there is an update it starts or stops the runners needed. In our example it starts a new runner that starts the redis module.
 
@@ -179,7 +179,7 @@ Everything works the same as Autodiscover without LeaderElection until step 8.
 
 8. If there is no conditions in the template set by the user, the configs will be generated from [hints](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L186).
 9. Wether hints are enabled or not is part of the [Kubernetes Provider struct](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L121) builders field.
-10. GenerateHints[https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L213] function looks into the event's annotations. A [hints map](https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L226) is created with all hints and returned.
+10. [GenerateHints](https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L213) function looks into the event's annotations. A [hints map](https://github.com/elastic/beats/blob/eff92354db783001880f4bade9f59942fca747ba/libbeat/autodiscover/builder/helper.go#L226) is created with all hints and returned.
 11. From those hints, configs are [created](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/builder.go#L97) in the same form as in `Autodiscover without LeaderElection` step 8.
     They contain the same information as if they where set explicitly in the metricbeat configureation but actually derive from the pod annotations.
 12. Those configs are then [added](https://github.com/elastic/beats/blob/master/libbeat/autodiscover/providers/kubernetes/kubernetes.go#L197) in the event and gets published.
