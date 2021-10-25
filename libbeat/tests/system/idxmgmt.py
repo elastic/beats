@@ -31,6 +31,8 @@ class IdxMgmt(unittest.TestCase):
             self._client.transport.perform_request('DELETE', "/" + index + "*")
         except NotFoundError:
             pass
+        except RequestError:
+            self._client.transport.perform_request('DELETE', "/" + index)
 
     def delete_template(self, template=""):
         if self.needs_init(template):
@@ -40,6 +42,8 @@ class IdxMgmt(unittest.TestCase):
             self._client.transport.perform_request('DELETE', "/_index_template/" + template + "*")
         except NotFoundError:
             pass
+        except RequestError:
+            self._client.transport.perform_request('DELETE', "/_index_template/" + template)
 
     def delete_policy(self, policy):
         # Delete any existing policy starting with given policy
