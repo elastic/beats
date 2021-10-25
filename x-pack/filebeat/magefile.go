@@ -163,7 +163,7 @@ func GoIntegTest(ctx context.Context) error {
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(Fields, Dashboards)
 	}
 	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {
