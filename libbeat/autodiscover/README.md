@@ -188,4 +188,4 @@ Everything works the same as Autodiscover without LeaderElection until step 8.
 
 
 ##  Autodiscover provider in Elastic Agent
-Follow the link [here]().
+Follow the link [here](https://github.com/elastic/beats/blob/aa264bdf008a9bf309e61744e9ec8c5586593f12/x-pack/elastic-agent/pkg/composable/providers/kubernetes/README.md).
