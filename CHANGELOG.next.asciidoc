@@ -48,6 +48,9 @@ to `legacy`. {pull}28538[28538]
 - Disable the option of running --machine-learning on its own. {pull}20241[20241]
 - Fix PANW field spelling "veredict" to "verdict" on event.action {pull}18808[18808]
 - Add support for GMT timezone offsets in `decode_cef`. {pull}20993[20993]
+- Remove all alias fields pointing to ECS fields from modules. This affects the Suricata and Traefik modules. {issue}10535[10535] {pull}26627[26627]
+- Add option for S3 input to work without SQS notification {issue}18205[18205] {pull}27332[27332]
+- Fix Crowdstrike ingest pipeline that was creating flattened `process` fields. {issue}27622[27622] {pull}27623[27623]
 
 *Heartbeat*
 
