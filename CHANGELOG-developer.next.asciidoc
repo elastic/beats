@@ -55,6 +55,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Remove `NumCPU` as clients should update the CPU count on the fly in case of config changes in a VM. {pull}23154[23154]
 - Remove Metricbeat EventFetcher and EventsFetcher interface. Use the reporter interface instead. {pull}25093[25093]
 - Update Darwin build image to a debian 10 base that increases the MacOS SDK and minimum supported version used in build to 10.14. {issue}24193[24193]
+- Removed the `common.Float` type. {issue}28279[28279] {pull}28280[28280] {pull}28376[28376]
 
 ==== Bugfixes
 
@@ -63,6 +64,7 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Fix export dashboard command when running against Elastic Cloud hosted Kibana. {pull}22746[22746]
 - Remove `event.dataset` (ECS) annotion from `libbeat.logp`. {issue}27404[27404]
 - Errors should be thrown as errors. Metricsets inside Metricbeat will now throw errors as the `error` log level. {pull}27804[27804]
+- Avoid panicking in `add_fields` processor when input event.Fields is a nil map. {pull}28219[28219]
 
 ==== Added
 
@@ -120,3 +122,10 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Add sorting to array fields for generated data files (*-generated.json) {pull}25320[25320]
 - Update to go-concert 0.2.0 {pull}27162[27162]
 - Update Go version to 1.16.5. {issue}26182[26182] {pull}26186[26186]
+- Introduce `libbeat/beat.Beat.OutputConfigReloader` {pull}28048[28048]
+- Update Go version to 1.17.1. {pull}27543[27543]
+- Whitelist `GCP_*` environment variables in dev tools {pull}28364[28364]
+
+==== Deprecated
+
+- Deprecated the `common.Float` type. {issue}28279[28279] {pull}28280[28280]

@@ -7,7 +7,7 @@ processors:
       value: '{{_ingest.timestamp}}'
   - set:
       field: ecs.version
-      value: '1.11.0'
+      value: '1.12.0'
   - rename:
       field: message
       target_field: event.original

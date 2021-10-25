@@ -2,9 +2,6 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-// TODO review the need for this
-// +build linux darwin windows
-
 package kubernetes
 
 import (
@@ -30,6 +27,7 @@ type Config struct {
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 	IncludeLabels       []string                            `config:"include_labels"`
 	ExcludeLabels       []string                            `config:"exclude_labels"`
+	IncludeAnnotations  []string                            `config:"include_annotations"`
 
 	LabelsDedot      bool `config:"labels.dedot"`
 	AnnotationsDedot bool `config:"annotations.dedot"`

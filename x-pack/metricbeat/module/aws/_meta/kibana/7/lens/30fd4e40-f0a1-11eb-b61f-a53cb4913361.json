@@ -49,7 +49,7 @@
                                     "label": "Write IOPS (Count/Second)",
                                     "operationType": "formula",
                                     "params": {
-                                        "formula": "average(aws.rds.write_io.ops_per_sec)",
+                                        "formula": "average(aws.rds.write.iops)",
                                         "isFormulaBroken": false
                                     },
                                     "references": [
@@ -64,7 +64,7 @@
                                     "label": "Part of Write IOPS (Count/Second)",
                                     "operationType": "average",
                                     "scale": "ratio",
-                                    "sourceField": "aws.rds.write_io.ops_per_sec"
+                                    "sourceField": "aws.rds.write.iops"
                                 }
                             },
                             "incompleteColumns": {}

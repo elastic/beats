@@ -85,16 +85,7 @@ func (eventlogRunner) Run(
 	publisher cursor.Publisher,
 ) error {
 	log := ctx.Logger.With("eventlog", source.Name())
-	checkpoint := initCheckpoint(log, cursor)
-
 	api := source.(eventlog.EventLog)
-
-	err := api.Open(checkpoint)
-	if err != nil {
-		return fmt.Errorf("failed to open windows event log: %v", err)
-	}
-
-	log.Debugf("Windows Event Log '%s' opened successfully", source.Name())
 
 	// setup closing the API if either the run function is signaled asynchronously
 	// to shut down or when returning after io.EOF
@@ -105,41 +96,64 @@ func (eventlogRunner) Run(
 	})
 	defer cancelFn()
 
-	// read loop
-	for cancelCtx.Err() == nil {
-		records, err := api.Read()
-		switch err {
-		case nil:
-			break
-		case io.EOF:
-			log.Debugf("End of Winlog event stream reached: %v", err)
+runLoop:
+	for {
+		if cancelCtx.Err() != nil {
 			return nil
-		default:
-			// only log error if we are not shutting down
-			if cancelCtx.Err() != nil {
+		}
+
+		evtCheckpoint := initCheckpoint(log, cursor)
+		openErr := api.Open(evtCheckpoint)
+		if eventlog.IsRecoverable(openErr) {
+			log.Errorf("Encountered recoverable error when opening Windows Event Log: %v", openErr)
+			timed.Wait(cancelCtx, 5*time.Second)
+			continue
+		} else if openErr != nil {
+			return fmt.Errorf("failed to open windows event log: %v", openErr)
+		}
+		log.Debugf("Windows Event Log '%s' opened successfully", source.Name())
+
+		// read loop
+		for cancelCtx.Err() == nil {
+			records, err := api.Read()
+			if eventlog.IsRecoverable(err) {
+				log.Errorf("Encountered recoverable error when reading from Windows Event Log: %v", err)
+				if closeErr := api.Close(); closeErr != nil {
+					log.Errorf("Error closing Windows Event Log handle: %v", closeErr)
+				}
+				continue runLoop
+			}
+			switch err {
+			case nil:
+				break
+			case io.EOF:
+				log.Debugf("End of Winlog event stream reached: %v", err)
 				return nil
+			default:
+				// only log error if we are not shutting down
+				if cancelCtx.Err() != nil {
+					return nil
+				}
+
+				log.Errorf("Error occured while reading from Windows Event Log '%v': %v", source.Name(), err)
+				return err
 			}
 
-			log.Errorf("Error occured while reading from Windows Event Log '%v': %v", source.Name(), err)
-			return err
-		}
+			if len(records) == 0 {
+				timed.Wait(cancelCtx, time.Second)
+				continue
+			}
 
-		if len(records) == 0 {
-			timed.Wait(cancelCtx, time.Second)
-			continue
-		}
-
-		for _, record := range records {
-			event := record.ToEvent()
-			if err := publisher.Publish(event, record.Offset); err != nil {
-				// Publisher indicates disconnect when returning an error.
-				// stop trying to publish records and quit
-				return err
+			for _, record := range records {
+				event := record.ToEvent()
+				if err := publisher.Publish(event, record.Offset); err != nil {
+					// Publisher indicates disconnect when returning an error.
+					// stop trying to publish records and quit
+					return err
+				}
 			}
 		}
 	}
-
-	return nil
 }
 
 func initCheckpoint(log *logp.Logger, cursor cursor.Cursor) checkpoint.EventLogState {
