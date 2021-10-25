@@ -22,6 +22,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Load index templates v2 (composable index templates) by default when talking to ES 7.16 or ES 8.x. Please note that you cannot load templates
 into Elasticsearch 7.8 or older with this default. To load templates to these ES version, set `setup.template.type` back
 to `legacy`. {pull}28538[28538]
+- Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 
 *Auditbeat*
 
