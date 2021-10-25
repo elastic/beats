@@ -91,6 +91,9 @@ to `legacy`. {pull}28538[28538]
 
 *Functionbeat*
 
+- Support for Google Cloud Functions have been removed, as it has been in Beta for a long time and been broken
+for a few releases. Please use other tools provided by Elastic to fetch data from GCP (e.g. Filebeat).
+
 
 ==== Bugfixes
 
