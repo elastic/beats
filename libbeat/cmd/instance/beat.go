@@ -29,6 +29,7 @@ import (
 	"math/big"
 	"math/rand"
 	"os"
+	"os/user"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -162,7 +163,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 	name := settings.Name
 	idxPrefix := settings.IndexPrefix
-	version := settings.Version
+	agentVersion := settings.Version
 	elasticLicensed := settings.ElasticLicensed
 
 	return handleError(func() error {
@@ -172,7 +173,7 @@ func Run(settings Settings, bt beat.Creator) error {
 					"panic", r, zap.Stack("stack"))
 			}
 		}()
-		b, err := NewBeat(name, idxPrefix, version, elasticLicensed)
+		b, err := NewBeat(name, idxPrefix, agentVersion, elasticLicensed)
 		if err != nil {
 			return err
 		}
@@ -183,6 +184,20 @@ func Run(settings Settings, bt beat.Creator) error {
 		monitoring.NewString(registry, "beat").Set(b.Info.Beat)
 		monitoring.NewString(registry, "name").Set(b.Info.Name)
 		monitoring.NewString(registry, "hostname").Set(b.Info.Hostname)
+
+		// Add more beat metadata
+		monitoring.NewString(registry, "binary_arch").Set(runtime.GOARCH)
+		monitoring.NewString(registry, "build_commit").Set(version.Commit())
+		monitoring.NewTimestamp(registry, "build_time").Set(version.BuildTime())
+		monitoring.NewBool(registry, "elastic_licensed").Set(b.Info.ElasticLicensed)
+
+		u, err := user.Current()
+		if err != nil {
+			return err
+		}
+		monitoring.NewString(registry, "username").Set(u.Username)
+		monitoring.NewString(registry, "uid").Set(u.Uid)
+		monitoring.NewString(registry, "gid").Set(u.Gid)
 
 		// Add additional info to state registry. This is also reported to monitoring
 		stateRegistry := monitoring.GetNamespace("state").GetRegistry()
@@ -414,6 +429,7 @@ func (b *Beat) launch(settings Settings, bt beat.Creator) error {
 	// Set Beat ID in registry vars, in case it was loaded from meta file
 	infoRegistry := monitoring.GetNamespace("info").GetRegistry()
 	monitoring.NewString(infoRegistry, "uuid").Set(b.Info.ID.String())
+	monitoring.NewString(infoRegistry, "ephemeral_id").Set(b.Info.EphemeralID.String())
 
 	serviceRegistry := monitoring.GetNamespace("state").GetRegistry().GetRegistry("service")
 	monitoring.NewString(serviceRegistry, "id").Set(b.Info.ID.String())
@@ -508,6 +524,7 @@ type SetupSettings struct {
 	Template bool
 	//Deprecated: use IndexManagementKey instead
 	ILMPolicy bool
+	SetupAll  bool
 }
 
 // Setup registers ES index template, kibana dashboards, ml jobs and pipelines.
@@ -532,7 +549,7 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if outCfg.Name() != "elasticsearch" {
 				return fmt.Errorf("Index management requested but the Elasticsearch output is not configured/enabled")
 			}
-			esClient, err := eslegclient.NewConnectedClient(outCfg.Config())
+			esClient, err := eslegclient.NewConnectedClient(outCfg.Config(), b.Info.Beat)
 			if err != nil {
 				return err
 			}
@@ -573,11 +590,12 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 		if setup.MachineLearning && b.SetupMLCallback != nil {
 			cfgwarn.Deprecate("8.0.0", "Setting up ML using %v is going to be removed. Please use the ML app to setup jobs.", strings.Title(b.Info.Beat))
 			fmt.Println("Setting up ML using setup --machine-learning is going to be removed in 8.0.0. Please use the ML app instead.\nSee more: https://www.elastic.co/guide/en/machine-learning/current/index.html")
-			err = b.SetupMLCallback(&b.Beat, b.Config.Kibana)
+			fmt.Println("It is not possble to load ML jobs into an Elasticsearch 8.0.0 or newer using the Beat.")
+
+			err = b.SetupMLCallback(&b.Beat, !setup.SetupAll, b.Config.Kibana)
 			if err != nil {
 				return err
 			}
-			fmt.Println("Loaded machine learning job configurations")
 		}
 
 		if setup.Pipeline && b.OverwritePipelinesCallback != nil {
@@ -822,7 +840,7 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 			return fmt.Errorf("error initKibanaConfig: %v", err)
 		}
 
-		client, err := kibana.NewKibanaClient(kibanaConfig)
+		client, err := kibana.NewKibanaClient(kibanaConfig, b.Info.Beat)
 		if err != nil {
 			return fmt.Errorf("error connecting to Kibana: %v", err)
 		}
@@ -875,6 +893,11 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 
 func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
 	return reload.ReloadableFunc(func(config *reload.ConfigWithMeta) error {
+		if b.OutputConfigReloader != nil {
+			if err := b.OutputConfigReloader.Reload(config); err != nil {
+				return err
+			}
+		}
 		return outReloader.Reload(config, b.createOutput)
 	})
 }

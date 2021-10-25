@@ -277,6 +277,10 @@ ARN of the AWS S3 bucket that will be polled for list operation. (Required when 
 
 Time interval for polling listing of the S3 bucket: default to `120s`.
 
+[float]
+==== `bucket_list_prefix`
+
+Prefix to apply for the list request to the S3 bucket. Default empty.
 
 [float]
 ==== `number_of_workers`
@@ -304,12 +308,13 @@ sqs:ChangeMessageVisibility
 sqs:DeleteMessage
 ----
 
-Reduced specific AWS permissions are required for IAM user to access S3
+Reduced specific S3 AWS permissions are required for IAM user to access S3
 when using the polling list of S3 bucket objects:
 
 ----
 s3:GetObject
 s3:ListBucket
+s3:GetBucketLocation
 ----
 
 [float]

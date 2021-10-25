@@ -22,7 +22,7 @@ const requestNamespace = "request"
 func registerRequestTransforms() {
 	registerTransform(requestNamespace, appendName, newAppendRequest)
 	registerTransform(requestNamespace, deleteName, newDeleteRequest)
-	registerTransform(requestNamespace, setName, newSetRequest)
+	registerTransform(requestNamespace, setName, newSetRequestPagination)
 }
 
 type httpClient struct {

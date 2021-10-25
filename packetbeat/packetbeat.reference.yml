@@ -974,7 +974,7 @@ output.elasticsearch:
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "packetbeat-%{[agent.version]}-%{+yyyy.MM.dd}"
 
-  # Optional ingest node pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -1700,8 +1700,8 @@ output.elasticsearch:
 
 # Select the kind of index template. From Elasticsearch 7.8, it is possible to
 # use component templates. Available options: legacy, component, index.
-# By default packetbeat uses the legacy index templates.
-#setup.template.type: legacy
+# By default packetbeat uses index templates.
+#setup.template.type: index
 
 # Template name. By default the template name is "packetbeat-%{[agent.version]}"
 # The template name and pattern has to be set in case the Elasticsearch index pattern is modified.

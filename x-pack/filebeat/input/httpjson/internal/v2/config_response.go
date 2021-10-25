@@ -24,13 +24,14 @@ type responseConfig struct {
 }
 
 type splitConfig struct {
-	Target          string           `config:"target" validation:"required"`
-	Type            string           `config:"type"`
-	Transforms      transformsConfig `config:"transforms"`
-	Split           *splitConfig     `config:"split"`
-	KeepParent      bool             `config:"keep_parent"`
-	KeyField        string           `config:"key_field"`
-	DelimiterString string           `config:"delimiter"`
+	Target           string           `config:"target" validation:"required"`
+	Type             string           `config:"type"`
+	Transforms       transformsConfig `config:"transforms"`
+	Split            *splitConfig     `config:"split"`
+	KeepParent       bool             `config:"keep_parent"`
+	KeyField         string           `config:"key_field"`
+	DelimiterString  string           `config:"delimiter"`
+	IgnoreEmptyValue bool             `config:"ignore_empty_value"`
 }
 
 func (c *responseConfig) Validate() error {

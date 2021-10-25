@@ -40,8 +40,6 @@ pipeline {
   }
   parameters {
     booleanParam(name: 'macos', defaultValue: false, description: 'Allow macOS stages.')
-    booleanParam(name: 'linux', defaultValue: true, description: 'Allow linux stages.')
-    booleanParam(name: 'arm', defaultValue: true, description: 'Allow ARM stages.')
   }
   stages {
     stage('Filter build') {
@@ -125,12 +123,6 @@ pipeline {
               stage('Package Linux'){
                 agent { label 'ubuntu-18 && immutable' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.linux
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PLATFORMS = [
@@ -224,12 +216,6 @@ pipeline {
               stage('Package Docker images for linux/arm64'){
                 agent { label 'arm' }
                 options { skipDefaultCheckout() }
-                when {
-                  beforeAgent true
-                  expression {
-                    return params.arm
-                  }
-                }
                 environment {
                   HOME = "${env.WORKSPACE}"
                   PACKAGES = "docker"
@@ -335,7 +321,7 @@ def tagAndPush(Map args = [:]) {
   }
   // supported image flavours
   def variants = ["", "-oss", "-ubi8"]
-  // 
+  //
   if(beatName == 'elastic-agent'){
       variants.add("-complete")
   }
@@ -424,37 +410,12 @@ def runE2ETests(){
       };
     }
 
-    triggerE2ETests(suites)
+    runE2E(runTestsSuites: suites,
+           beatVersion: "${env.BEAT_VERSION}-SNAPSHOT",
+           gitHubCheckName: env.GITHUB_CHECK_E2E_TESTS_NAME,
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
-}
-
-def triggerE2ETests(String suite) {
-  echo("Triggering E2E tests for PR-${env.CHANGE_ID}. Test suites: ${suite}.")
-
-  def branchName = isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}.x"
-  def e2eTestsPipeline = "e2e-tests/e2e-testing-mbp/${branchName}"
-  def beatVersion = "${env.BEAT_VERSION}-SNAPSHOT"
-
-  def parameters = [
-    booleanParam(name: 'forceSkipGitChecks', value: true),
-    booleanParam(name: 'forceSkipPresubmit', value: true),
-    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-    string(name: 'BEAT_VERSION', value: beatVersion),
-    booleanParam(name: 'BEATS_USE_CI_SNAPSHOTS', value: true),
-    string(name: 'runTestsSuites', value: suite),
-    string(name: 'GITHUB_CHECK_NAME', value: env.GITHUB_CHECK_E2E_TESTS_NAME),
-    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-  ]
-
-  build(job: "${e2eTestsPipeline}",
-    parameters: parameters,
-    propagate: false,
-    wait: false
-  )
-
-  def notifyContext = "${env.GITHUB_CHECK_E2E_TESTS_NAME}"
-  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 def withMacOSEnv(Closure body){

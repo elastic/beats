@@ -52,7 +52,7 @@ func GenDashboardCmd(settings instance.Settings) *cobra.Command {
 				b.Config.Kibana = common.NewConfig()
 			}
 
-			client, err := kibana.NewKibanaClient(b.Config.Kibana)
+			client, err := kibana.NewKibanaClient(b.Config.Kibana, b.Info.Beat)
 			if err != nil {
 				fatalf("Error creating Kibana client: %+v.\n", err)
 			}

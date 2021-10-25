@@ -75,14 +75,6 @@ class Test(BaseTest):
 
         self.index_name = "test-filebeat-modules"
 
-        body = {
-            "transient": {
-                "script.max_compilations_rate": "2000/1m"
-            }
-        }
-
-        self.es.transport.perform_request('PUT', "/_cluster/settings", body=body)
-
     @parameterized.expand(load_fileset_test_cases)
     @unittest.skipIf(not INTEGRATION_TESTS,
                      "integration tests are disabled, run with INTEGRATION_TESTS=1 to enable them.")
@@ -213,6 +205,15 @@ class Test(BaseTest):
 
         assert len(expected) == len(objects), "expected {} events to compare but got {}".format(
             len(expected), len(objects))
+
+        # Do not perform a comparison between the resulting and expected documents
+        # if the TESTING_FILEBEAT_SKIP_DIFF flag is set.
+        #
+        # This allows to run a basic check with older versions of ES that can lead
+        # to slightly different documents without maintaining multiple sets of
+        # golden files.
+        if os.getenv("TESTING_FILEBEAT_SKIP_DIFF"):
+            return
 
         for idx in range(len(expected)):
             ev = expected[idx]

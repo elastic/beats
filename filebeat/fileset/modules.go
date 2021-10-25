@@ -44,19 +44,22 @@ var availableMLModules = map[string]string{
 const logName = "modules"
 
 type ModuleRegistry struct {
-	registry map[string]map[string]*Fileset // module -> fileset -> Fileset
-	log      *logp.Logger
+	configuredFilesets map[string]map[string]struct{} // module -> fileset -> struct{}
+	registry           map[string]map[string]*Fileset // module -> fileset -> Fileset
+	log                *logp.Logger
 }
 
 // newModuleRegistry reads and loads the configured module into the registry.
 func newModuleRegistry(modulesPath string,
 	moduleConfigs []*ModuleConfig,
 	overrides *ModuleOverrides,
+	configuredFilesets map[string]map[string]struct{},
 	beatInfo beat.Info,
 ) (*ModuleRegistry, error) {
 	reg := ModuleRegistry{
-		registry: map[string]map[string]*Fileset{},
-		log:      logp.NewLogger(logName),
+		configuredFilesets: configuredFilesets,
+		registry:           map[string]map[string]*Fileset{},
+		log:                logp.NewLogger(logName),
 	}
 
 	for _, mcfg := range moduleConfigs {
@@ -77,14 +80,22 @@ func newModuleRegistry(modulesPath string,
 		}
 
 		for _, filesetName := range moduleFilesets {
+			var hasOverride bool
 			fcfg, exists := mcfg.Filesets[filesetName]
 			if !exists {
 				fcfg = &FilesetConfig{}
 			}
 
-			fcfg, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
+			fcfg, hasOverride, err = applyOverrides(fcfg, mcfg.Module, filesetName, overrides)
 			if err != nil {
 				return nil, fmt.Errorf("error applying overrides on fileset %s/%s: %v", mcfg.Module, filesetName, err)
+			}
+			if hasOverride {
+				if _, ok := reg.configuredFilesets[mcfg.Module]; !ok {
+					reg.configuredFilesets[mcfg.Module] = map[string]struct{}{}
+				}
+
+				reg.configuredFilesets[mcfg.Module][filesetName] = struct{}{}
 			}
 
 			if fcfg.Enabled != nil && !(*fcfg.Enabled) {
@@ -141,16 +152,19 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 		}
 	}
 	var mcfgs []*ModuleConfig
+	configuredFilesets := map[string]map[string]struct{}{}
 	for _, cfg := range moduleConfigs {
 		cfg, err = mergePathDefaults(cfg)
 		if err != nil {
 			return nil, err
 		}
 
-		moduleConfig, err := mcfgFromConfig(cfg)
+		moduleConfig, moduleConfiguredFilests, err := mcfgFromConfig(cfg)
 		if err != nil {
 			return nil, errors.Wrap(err, "error unpacking module config")
 		}
+
+		configuredFilesets[moduleConfig.Module] = moduleConfiguredFilests
 		mcfgs = append(mcfgs, moduleConfig)
 	}
 
@@ -159,22 +173,22 @@ func NewModuleRegistry(moduleConfigs []*common.Config, beatInfo beat.Info, init 
 		return nil, err
 	}
 
-	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, beatInfo)
+	return newModuleRegistry(modulesPath, mcfgs, modulesOverrides, configuredFilesets, beatInfo)
 }
 
-func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
+func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, map[string]struct{}, error) {
 	var mcfg ModuleConfig
 
 	err := cfg.Unpack(&mcfg)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var dict map[string]interface{}
 
 	err = cfg.Unpack(&dict)
 	if err != nil {
-		return nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
+		return nil, nil, fmt.Errorf("error unpacking module %s in a dict: %v", mcfg.Module, err)
 	}
 
 	mcfg.Filesets = map[string]*FilesetConfig{}
@@ -185,17 +199,31 @@ func mcfgFromConfig(cfg *common.Config) (*ModuleConfig, error) {
 
 		tmpCfg, err := common.NewConfigFrom(filesetConfig)
 		if err != nil {
-			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
 
 		fcfg, err := NewFilesetConfig(tmpCfg)
 		if err != nil {
-			return nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
+			return nil, nil, fmt.Errorf("error creating config from fileset %s/%s: %v", mcfg.Module, name, err)
 		}
 		mcfg.Filesets[name] = fcfg
 	}
 
-	return &mcfg, nil
+	// This calls cfg.GetFields() instead of iterating over `dict` keys
+	// because cfg.Unpack above doesn't return keys that map to a nil value,
+	// but GetFields() returns all keys. We need to observe filesets that
+	// don't contain any configuration (all default values).
+	configuredFilets := map[string]struct{}{}
+
+	for _, name := range cfg.GetFields() {
+		if name == "module" || name == "enabled" || name == "path" {
+			continue
+		}
+
+		configuredFilets[name] = struct{}{}
+	}
+
+	return &mcfg, configuredFilets, nil
 }
 
 func getCurrentModuleName(modulePath, module string) (string, bool) {
@@ -239,20 +267,20 @@ func getModuleFilesets(modulePath, module string) ([]string, error) {
 
 func applyOverrides(fcfg *FilesetConfig,
 	module, fileset string,
-	overrides *ModuleOverrides) (*FilesetConfig, error) {
+	overrides *ModuleOverrides) (*FilesetConfig, bool, error) {
 
 	if overrides == nil {
-		return fcfg, nil
+		return fcfg, false, nil
 	}
 
 	overridesConfigs := overrides.Get(module, fileset)
 	if len(overridesConfigs) == 0 {
-		return fcfg, nil
+		return fcfg, false, nil
 	}
 
 	config, err := common.NewConfigFrom(fcfg)
 	if err != nil {
-		return nil, fmt.Errorf("error creating vars config object: %v", err)
+		return nil, false, fmt.Errorf("error creating vars config object: %v", err)
 	}
 
 	toMerge := []*common.Config{config}
@@ -260,15 +288,15 @@ func applyOverrides(fcfg *FilesetConfig,
 
 	resultConfig, err := common.MergeConfigs(toMerge...)
 	if err != nil {
-		return nil, fmt.Errorf("error merging configs: %v", err)
+		return nil, false, fmt.Errorf("error merging configs: %v", err)
 	}
 
 	res, err := NewFilesetConfig(resultConfig)
 	if err != nil {
-		return nil, fmt.Errorf("error unpacking configs: %v", err)
+		return nil, false, fmt.Errorf("error unpacking configs: %v", err)
 	}
 
-	return res, nil
+	return res, true, nil
 }
 
 // appendWithoutDuplicates appends basic module configuration for each module in the
@@ -392,6 +420,11 @@ func checkAvailableProcessors(esClient PipelineLoader, requiredProcessors []Proc
 
 // LoadML loads the machine-learning configurations into Elasticsearch, if X-Pack is available
 func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
+	if !mlimporter.IsCompatible(esClient) {
+		logp.Info("Skipping loading machine learning jobs because of Elasticsearch version is too new.\nIt must be 7.x for setting up ML using Beats. Please use the Machine Learning UI in Kibana.")
+		return nil
+	}
+
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
 		return errors.Errorf("error checking if xpack is available: %v", err)
@@ -417,6 +450,11 @@ func (reg *ModuleRegistry) LoadML(esClient PipelineLoader) error {
 
 // SetupML sets up the machine-learning configurations into Elasticsearch using Kibana, if X-Pack is available
 func (reg *ModuleRegistry) SetupML(esClient PipelineLoader, kibanaClient *kibana.Client) error {
+	if !mlimporter.IsCompatible(esClient) {
+		logp.Info("Skipping loading machine learning jobs because of Elasticsearch version is too new.\nIt must be 7.x for setting up it using Beats. Please use the Machine Learning UI in Kibana.")
+		return nil
+	}
+
 	haveXpack, err := mlimporter.HaveXpackML(esClient)
 	if err != nil {
 		return errors.Errorf("Error checking if xpack is available: %v", err)
@@ -474,4 +512,14 @@ func (reg *ModuleRegistry) ModuleNames() []string {
 func (reg *ModuleRegistry) ModuleFilesets(module string) ([]string, error) {
 	modulesPath := paths.Resolve(paths.Home, "module")
 	return getModuleFilesets(modulesPath, module)
+}
+
+// ModuleConfiguredFilesets return the map of configured filesets for the given module
+// it returns an empty map if the module doesn't exist
+func (reg *ModuleRegistry) ModuleConfiguredFilesets(module string) map[string]struct{} {
+	if _, ok := reg.configuredFilesets[module]; ok {
+		return reg.configuredFilesets[module]
+	}
+
+	return map[string]struct{}{}
 }

@@ -2,11 +2,13 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build windows
 // +build windows
 
 package install
 
 import (
+	"errors"
 	"io/fs"
 	"path/filepath"
 
@@ -30,6 +32,8 @@ func recursiveSystemAdminPermissions(path string) error {
 				inherit = false
 			}
 			err = systemAdministratorsOnly(name, inherit)
+		} else if errors.Is(err, fs.ErrNotExist) {
+			return nil
 		}
 		return err
 	})

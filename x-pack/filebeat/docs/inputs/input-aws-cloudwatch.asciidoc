@@ -11,8 +11,6 @@
 <titleabbrev>AWS CloudWatch</titleabbrev>
 ++++
 
-beta[]
-
 `aws-cloudwatch` input can be used to retrieve all logs from all log streams in a
 specific log group. `filterLogEvents` AWS API is used to list log events from
 the specified log group. Amazon CloudWatch Logs can be used to store log files
@@ -105,6 +103,13 @@ collection period. `FilterLogEvents` API has a quota of 5 transactions per
 second (TPS)/account/Region. By default, `api_sleep` is 200 ms. This value should
 only be adjusted when there are multiple Filebeats or multiple Filebeat inputs
 collecting logs from the same region and AWS account.
+
+[float]
+==== `latency`
+Some AWS services send logs to CloudWatch with a latency to process larger than
+`aws-cloudwatch` input `scan_frequency`. This case, please specify a `latency`
+parameter so collection start time and end time will be shifted by the given
+latency amount.
 
 [float]
 ==== `aws credentials`

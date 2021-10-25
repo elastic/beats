@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build mage
 // +build mage
 
 package main
@@ -39,21 +40,6 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
-// declare journald dependencies for cross build target
-var (
-	journaldPlatforms = []devtools.PlatformDescription{
-		devtools.Linux386, devtools.LinuxAMD64,
-		devtools.LinuxARM64, devtools.LinuxARM5, devtools.LinuxARM6, devtools.LinuxARM7,
-		devtools.LinuxMIPS, devtools.LinuxMIPSLE, devtools.LinuxMIPS64LE,
-		devtools.LinuxPPC64LE,
-		devtools.LinuxS390x,
-	}
-
-	journaldDeps = devtools.NewPackageInstaller().
-			AddEach(journaldPlatforms, "libsystemd-dev").
-			Add(devtools.Linux386, "libsystemd0", "libgcrypt20")
-)
-
 func init() {
 	common.RegisterCheckDeps(Update)
 	test.RegisterDeps(IntegTest)
@@ -66,13 +52,10 @@ func Build() error {
 	return devtools.Build(devtools.DefaultBuildArgs())
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild builds the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	// XXX: enable once we have systemd available in the cross build image
-	// mg.Deps(journaldDeps.Installer(devtools.Platform.Name))
-
-	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
+	return filebeat.GolangCrossBuild()
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -82,7 +65,7 @@ func BuildGoDaemon() error {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
-	return devtools.CrossBuild()
+	return filebeat.CrossBuild()
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
@@ -213,7 +196,7 @@ func GoIntegTest(ctx context.Context) error {
 // PythonIntegTest executes the python system tests in the integration environment (Docker).
 func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
-		mg.Deps(Fields)
+		mg.Deps(Fields, Dashboards)
 	}
 	runner, err := devtools.NewDockerIntegrationRunner(append(devtools.ListMatchingEnvVars("TESTING_FILEBEAT_", "PYTEST_"), "GENERATE")...)
 	if err != nil {

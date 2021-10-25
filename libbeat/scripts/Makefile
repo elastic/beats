@@ -364,8 +364,6 @@ endif
 	if [ -d $(PWD)/_meta/kibana ]; then \
 		cp -pr $(PWD)/_meta/kibana/* $(PWD)/_meta/kibana.generated ; \
 	fi
-	@# Convert all dashboards to string
-	@${PYTHON_ENV_EXE} ${ES_BEATS}/libbeat/scripts/unpack_dashboards.py --glob="./_meta/kibana.generated/7/dashboard/*.json"
 endif
 
 .PHONY: docs

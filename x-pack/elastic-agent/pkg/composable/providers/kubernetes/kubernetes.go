@@ -46,25 +46,26 @@ func DynamicProviderBuilder(logger *logger.Logger, c *config.Config) (composable
 	if err != nil {
 		return nil, errors.New(err, "failed to unpack configuration")
 	}
+
 	return &dynamicProvider{logger, &cfg}, nil
 }
 
 // Run runs the kubernetes context provider.
 func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 	if p.config.Resources.Pod.Enabled {
-		err := p.watchResource(comm, "pod", p.config)
+		err := p.watchResource(comm, "pod")
 		if err != nil {
 			return err
 		}
 	}
 	if p.config.Resources.Node.Enabled {
-		err := p.watchResource(comm, "node", p.config)
+		err := p.watchResource(comm, "node")
 		if err != nil {
 			return err
 		}
 	}
 	if p.config.Resources.Service.Enabled {
-		err := p.watchResource(comm, "service", p.config)
+		err := p.watchResource(comm, "service")
 		if err != nil {
 			return err
 		}
@@ -76,9 +77,8 @@ func (p *dynamicProvider) Run(comm composable.DynamicProviderComm) error {
 // and starts watching for such resource's events.
 func (p *dynamicProvider) watchResource(
 	comm composable.DynamicProviderComm,
-	resourceType string,
-	config *Config) error {
-	client, err := kubernetes.GetKubernetesClient(config.KubeConfig)
+	resourceType string) error {
+	client, err := kubernetes.GetKubernetesClient(p.config.KubeConfig)
 	if err != nil {
 		// info only; return nil (do nothing)
 		p.logger.Debugf("Kubernetes provider for resource %s skipped, unable to connect: %s", resourceType, err)
@@ -93,60 +93,67 @@ func (p *dynamicProvider) watchResource(
 		p.logger.Debugf(
 			"Initializing Kubernetes watcher for resource %s using node: %v",
 			resourceType,
-			config.Node)
+			p.config.Node)
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
-			ConfigHost:  config.Node,
+			ConfigHost:  p.config.Node,
 			Client:      client,
-			IsInCluster: kubernetes.IsInCluster(config.KubeConfig),
+			IsInCluster: kubernetes.IsInCluster(p.config.KubeConfig),
 			HostUtils:   &kubernetes.DefaultDiscoveryUtils{},
 		}
-		config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
+		p.config.Node, err = kubernetes.DiscoverKubernetesNode(p.logger, nd)
 		if err != nil {
 			p.logger.Debugf("Kubernetes provider skipped, unable to discover node: %w", err)
 			return nil
 		}
 
 	} else {
-		config.Node = ""
+		p.config.Node = ""
 	}
 
-	watcher, err := p.newWatcher(resourceType, comm, client, config)
+	eventer, err := p.newEventer(resourceType, comm, client)
 	if err != nil {
 		return errors.New(err, "couldn't create kubernetes watcher for resource %s", resourceType)
 	}
 
-	err = watcher.Start()
+	err = eventer.Start()
 	if err != nil {
-		return errors.New(err, "couldn't start kubernetes watcher for resource %s", resourceType)
+		return errors.New(err, "couldn't start kubernetes eventer for resource %s", resourceType)
 	}
+
 	return nil
 }
 
-// newWatcher initializes the proper watcher according to the given resource (pod, node, service).
-func (p *dynamicProvider) newWatcher(
+// Eventer allows defining ways in which kubernetes resource events are observed and processed
+type Eventer interface {
+	kubernetes.ResourceEventHandler
+	Start() error
+	Stop()
+}
+
+// newEventer initializes the proper eventer according to the given resource (pod, node, service).
+func (p *dynamicProvider) newEventer(
 	resourceType string,
 	comm composable.DynamicProviderComm,
-	client k8s.Interface,
-	config *Config) (kubernetes.Watcher, error) {
+	client k8s.Interface) (Eventer, error) {
 	switch resourceType {
 	case "pod":
-		watcher, err := NewPodWatcher(comm, config, p.logger, client, p.config.Scope)
+		eventer, err := NewPodEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	case "node":
-		watcher, err := NewNodeWatcher(comm, config, p.logger, client, p.config.Scope)
+		eventer, err := NewNodeEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	case "service":
-		watcher, err := NewServiceWatcher(comm, config, p.logger, client, p.config.Scope)
+		eventer, err := NewServiceEventer(comm, p.config, p.logger, client, p.config.Scope)
 		if err != nil {
 			return nil, err
 		}
-		return watcher, nil
+		return eventer, nil
 	default:
 		return nil, fmt.Errorf("unsupported autodiscover resource %s", resourceType)
 	}

@@ -12,6 +12,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -28,6 +29,7 @@ type config struct {
 	QueueURL            string               `config:"queue_url"`
 	BucketARN           string               `config:"bucket_arn"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
+	BucketListPrefix    string               `config:"bucket_list_prefix"`
 	NumberOfWorkers     int                  `config:"number_of_workers"`
 	AWSConfig           awscommon.ConfigAWS  `config:",inline"`
 	FileSelectors       []fileSelectorConfig `config:"file_selectors"`
@@ -39,6 +41,7 @@ func defaultConfig() config {
 		APITimeout:          120 * time.Second,
 		VisibilityTimeout:   300 * time.Second,
 		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
 		SQSWaitTime:         20 * time.Second,
 		SQSMaxReceiveCount:  5,
 		FIPSEnabled:         false,
@@ -50,7 +53,8 @@ func defaultConfig() config {
 
 func (c *config) Validate() error {
 	if c.QueueURL == "" && c.BucketARN == "" {
-		return fmt.Errorf("queue_url or bucket_arn must provided")
+		logp.NewLogger(inputName).Warnf("neither queue_url nor bucket_arn were provided, input %s will stop", inputName)
+		return nil
 	}
 
 	if c.QueueURL != "" && c.BucketARN != "" {

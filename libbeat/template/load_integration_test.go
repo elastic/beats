@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package template
@@ -222,7 +223,7 @@ func TestESLoader_Load(t *testing.T) {
 				// Fetch properties
 				tmpl := getTemplate(t, setup.client, setup.config.Name, setup.config.Type)
 				val, err := tmpl.GetValue("mappings.properties")
-				if data.properties == nil {
+				if data.properties == nil && setup.config.Type != IndexTemplateLegacy {
 					assert.Error(t, err)
 				} else {
 					require.NoError(t, err)

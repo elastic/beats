@@ -110,8 +110,8 @@ When set to `false`, disables the check for an existing lifecycle policy. The
 default is `true`. You need to disable this check if the {beatname_uc}
 user connecting to a secured cluster doesn't have the `read_ilm` privilege.
 
-If you set this option to `false`, set `setup.ilm.overwrite: true` so the
-lifecycle policy can be installed.
+If you set this option to `false`, lifecycle policy will not be installed, even if
+`setup.ilm.overwrite` is set to `true`.
 
 [float]
 [[setup-ilm-overwrite-option]]

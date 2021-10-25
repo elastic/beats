@@ -94,7 +94,7 @@ func genSetupCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Co
 			}
 
 			//create the struct to pass on
-			var s = instance.SetupSettings{}
+			var s = instance.SetupSettings{SetupAll: setupAll}
 			for k, v := range registeredFlags {
 				if setupAll || v {
 					switch k {

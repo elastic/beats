@@ -15,6 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build integration
 // +build integration
 
 package filestream
@@ -196,6 +197,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 
 // test_empty_lines from test_harvester.py
 func TestFilestreamEmptyLine(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/27585")
 	env := newInputTestingEnvironment(t)
 
 	testlogName := "test.log"
@@ -693,6 +695,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 }
 
 func TestFilestreamTruncateBlockedOutput(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/27085")
 	env := newInputTestingEnvironment(t)
 	env.pipeline = &mockPipelineConnector{blocking: true}
 

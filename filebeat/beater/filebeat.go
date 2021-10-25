@@ -44,6 +44,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
+	mlimporter "github.com/elastic/beats/v7/libbeat/ml-importer"
 	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
@@ -60,9 +61,9 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/autodiscover"
 )
 
-const pipelinesWarning = "Filebeat is unable to load the Ingest Node pipelines for the configured" +
+const pipelinesWarning = "Filebeat is unable to load the ingest pipelines for the configured" +
 	" modules because the Elasticsearch output is not configured/enabled. If you have" +
-	" already loaded the Ingest Node pipelines or are using Logstash pipelines, you" +
+	" already loaded the ingest pipelines or are using Logstash pipelines, you" +
 	" can ignore this warning."
 
 var (
@@ -115,6 +116,29 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 	if !moduleRegistry.Empty() {
 		logp.Info("Enabled modules/filesets: %s", moduleRegistry.InfoString())
+
+		// Deprecation warning logic for v8.0 (https://github.com/elastic/beats/pull/27526)
+		for _, mod := range moduleRegistry.ModuleNames() {
+			if mod == "" {
+				continue
+			}
+
+			loadedFilesets, err := moduleRegistry.ModuleFilesets(mod)
+			if err != nil {
+				logp.Err("Error retrieving module filesets: %+v", err)
+				return nil, err
+			}
+
+			configuredFilesets := moduleRegistry.ModuleConfiguredFilesets(mod)
+			if len(configuredFilesets) != len(loadedFilesets) {
+				for _, loadedFileset := range loadedFilesets {
+					if _, ok := configuredFilesets[loadedFileset]; !ok {
+						logp.Warn("Fileset `%s` for module `%s` is loaded but was not explicitly defined in the config. "+
+							"Starting from v8.0 this fileset won't be loaded unless explicitly defined.", loadedFileset, mod)
+					}
+				}
+			}
+		}
 	}
 
 	moduleInputs, err := moduleRegistry.GetInputConfigs()
@@ -160,8 +184,8 @@ func newBeater(b *beat.Beat, plugins PluginFactory, rawConfig *common.Config) (b
 	}
 
 	// register `setup` callback for ML jobs
-	b.SetupMLCallback = func(b *beat.Beat, kibanaConfig *common.Config) error {
-		return fb.loadModulesML(b, kibanaConfig)
+	b.SetupMLCallback = func(b *beat.Beat, fromFlag bool, kibanaConfig *common.Config) error {
+		return fb.loadModulesML(b, fromFlag, kibanaConfig)
 	}
 
 	err = fb.setupPipelineLoaderCallback(b)
@@ -181,7 +205,7 @@ func (fb *Filebeat) setupPipelineLoaderCallback(b *beat.Beat) error {
 
 	overwritePipelines := true
 	b.OverwritePipelinesCallback = func(esConfig *common.Config) error {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return err
 		}
@@ -223,7 +247,7 @@ func (fb *Filebeat) loadModulesPipelines(b *beat.Beat) error {
 	return err
 }
 
-func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) error {
+func (fb *Filebeat) loadModulesML(b *beat.Beat, fromFlag bool, kibanaConfig *common.Config) error {
 	var errs multierror.Errors
 
 	logp.Debug("machine-learning", "Setting up ML jobs for modules")
@@ -235,7 +259,7 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 	}
 
 	esConfig := b.Config.Output.Config()
-	esClient, err := eslegclient.NewConnectedClient(esConfig)
+	esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Elasticsearch client: %v", err)
 	}
@@ -256,12 +280,12 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 		}
 	}
 
-	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig)
+	kibanaClient, err := kibana.NewKibanaClient(kibanaConfig, "Filebeat")
 	if err != nil {
 		return errors.Errorf("Error creating Kibana client: %v", err)
 	}
 
-	if err := setupMLBasedOnVersion(fb.moduleRegistry, esClient, kibanaClient); err != nil {
+	if err := setupMLBasedOnVersion(fb.moduleRegistry, fromFlag, esClient, kibanaClient); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -287,17 +311,23 @@ func (fb *Filebeat) loadModulesML(b *beat.Beat, kibanaConfig *common.Config) err
 				continue
 			}
 
-			if err := setupMLBasedOnVersion(set, esClient, kibanaClient); err != nil {
+			if err := setupMLBasedOnVersion(set, fromFlag, esClient, kibanaClient); err != nil {
 				errs = append(errs, err)
 			}
 
 		}
 	}
+	if len(errs) == 0 {
+		fmt.Println("Loaded machine learning job configurations")
+	}
 
 	return errs.Err()
 }
 
-func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
+func setupMLBasedOnVersion(reg *fileset.ModuleRegistry, fromFlag bool, esClient *eslegclient.Connection, kibanaClient *kibana.Client) error {
+	if !mlimporter.IsCompatible(esClient) && fromFlag {
+		return fmt.Errorf("Machine learning jobs are not loaded because Elasticsearch version is too new. It must be 7.x for setting up ML using Beats. Use the Machine learning UI in Kibana.")
+	}
 	if isElasticsearchLoads(kibanaClient.GetVersion()) {
 		return reg.LoadML(esClient)
 	}
@@ -521,7 +551,7 @@ func (fb *Filebeat) Stop() {
 // Create a new pipeline loader (es client) factory
 func newPipelineLoaderFactory(esConfig *common.Config) fileset.PipelineLoaderFactory {
 	pipelineLoaderFactory := func() (fileset.PipelineLoader, error) {
-		esClient, err := eslegclient.NewConnectedClient(esConfig)
+		esClient, err := eslegclient.NewConnectedClient(esConfig, "Filebeat")
 		if err != nil {
 			return nil, errors.Wrap(err, "Error creating Elasticsearch client")
 		}

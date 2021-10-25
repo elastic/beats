@@ -28,13 +28,15 @@ func TestConfig(t *testing.T) {
 		parserConf := parser.Config{}
 		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
 		return config{
-			QueueURL:            quequeURL,
-			BucketARN:           s3Bucket,
-			APITimeout:          120 * time.Second,
-			VisibilityTimeout:   300 * time.Second,
-			SQSMaxReceiveCount:  5,
-			SQSWaitTime:         20 * time.Second,
-			BucketListInterval:  120 * time.Second,
+			QueueURL:           quequeURL,
+			BucketARN:          s3Bucket,
+			APITimeout:         120 * time.Second,
+			VisibilityTimeout:  300 * time.Second,
+			SQSMaxReceiveCount: 5,
+			SQSWaitTime:        20 * time.Second,
+			BucketListInterval: 120 * time.Second,
+			BucketListPrefix:   "",
+
 			FIPSEnabled:         false,
 			MaxNumberOfMessages: 5,
 			ReaderConfig: readerConfig{
@@ -92,7 +94,7 @@ func TestConfig(t *testing.T) {
 				},
 			},
 			"",
-			func(queueURL, s3Bucketr string) config {
+			func(queueURL, s3Bucket string) config {
 				c := makeConfig(queueURL, "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
@@ -112,8 +114,10 @@ func TestConfig(t *testing.T) {
 				"queue_url":  "",
 				"bucket_arn": "",
 			},
-			"queue_url or bucket_arn must provided",
-			nil,
+			"",
+			func(queueURL, s3Bucket string) config {
+				return makeConfig("", "")
+			},
 		},
 		{
 			"error on both queueURL and s3Bucket",

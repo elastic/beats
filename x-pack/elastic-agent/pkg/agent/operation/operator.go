@@ -135,6 +135,21 @@ func (o *Operator) State() map[string]state.State {
 	return result
 }
 
+// Specs returns all program specifications
+func (o *Operator) Specs() map[string]program.Spec {
+	r := make(map[string]program.Spec)
+
+	o.appsLock.Lock()
+	defer o.appsLock.Unlock()
+
+	for _, app := range o.apps {
+		// use app.Name() instead of the (map) key so we can easy find the "_monitoring" processes
+		r[app.Name()] = app.Spec()
+	}
+
+	return r
+}
+
 // Close stops all programs handled by operator and clears state
 func (o *Operator) Close() error {
 	o.monitor.Close()
@@ -305,9 +320,11 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 	var err error
 
 	monitor := o.monitor
+	appName := p.BinaryName()
 	if app.IsSidecar(p) {
 		// make watchers unmonitorable
 		monitor = noop.NewMonitor()
+		appName += "_monitoring"
 	}
 
 	if p.ServicePort() == 0 {
@@ -315,7 +332,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = process.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			desc,
@@ -331,7 +348,7 @@ func (o *Operator) getApp(p Descriptor) (Application, error) {
 		a, err = service.NewApplication(
 			o.bgContext,
 			p.ID(),
-			p.BinaryName(),
+			appName,
 			o.pipelineID,
 			o.config.LoggingConfig.Level.String(),
 			p.ServicePort(),

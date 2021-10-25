@@ -194,7 +194,6 @@ func (r *requester) createHTTPRequest(ctx context.Context, ri *requestInfo) (*ht
 	req = req.WithContext(ctx)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("User-Agent", userAgent)
 	if r.apiKey != "" {
 		if r.authScheme != "" {
 			req.Header.Set("Authorization", r.authScheme+" "+r.apiKey)
