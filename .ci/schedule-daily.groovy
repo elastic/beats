@@ -21,8 +21,8 @@ pipeline {
     stage('Nighly beats builds') {
       steps {
         runBuild(quietPeriod: 0, job: 'Beats/beats/master')
-        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.x')
-        runBuild(quietPeriod: 4000, job: 'Beats/beats/7.<minor>')
+        runBuild(quietPeriod: 2000, job: 'Beats/beats/7.16')
+        runBuild(quietPeriod: 4000, job: 'Beats/beats/7.15')
       }
     }
   }
@@ -35,9 +35,5 @@ pipeline {
 
 def runBuild(Map args = [:]) {
   def jobName = args.job
-  if (jobName.contains('7.<minor>')) {
-    def parts = stackVersions.release().split('\\.')
-    jobName = args.job.replaceAll('<minor>', parts[1])
-  }
   build(quietPeriod: args.quietPeriod, job: jobName, parameters: [booleanParam(name: 'macosTest', value: true)], wait: false, propagate: false)
 }
