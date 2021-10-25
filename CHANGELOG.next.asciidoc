@@ -28,6 +28,10 @@ to `legacy`. {pull}28538[28538]
 
 - File integrity dataset (macOS): Replace unnecessary `file.origin.raw` (type keyword) with `file.origin.text` (type `text`). {issue}12423[12423] {pull}15630[15630]
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
+- File integrity dataset: Remove non-ECS `hash.*` fields. Hashes are under `file.hash.*`. {issue}19039[19039] {pull}28378[28378]
+- Auditd dataset: Removes the authentication_success and authentication_failure event.type values for user logins. {issue}19039[19039] {pull}28378[28378]
+- Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
+- System/socket dataset: Fix uninstallation of return kprobes. {issue}28608[28608] {pull}28609[28609]
 
 *Filebeat*
 
