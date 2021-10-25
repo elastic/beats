@@ -122,7 +122,7 @@ func PythonTest(params PythonTestArgs) error {
 	pytestEnv := map[string]string{
 		// activate sets this. Not sure if it's ever needed.
 		"VIRTUAL_ENV": ve,
-		"ES_PASS":     "changeme",
+		// "ES_PASS":     "changeme",
 	}
 	if IsInIntegTestEnv() {
 		pytestEnv["INTEGRATION_TESTS"] = "1"

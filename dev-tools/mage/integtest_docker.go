@@ -112,8 +112,10 @@ func (d *DockerIntegrationTester) Test(_ string, mageTarget string, env map[stri
 		// Use the host machine's pkg cache to minimize external downloads.
 		"-v", goPkgCache + ":" + dockerGoPkgCache + ":ro",
 		"-e", "GOPROXY=file://" + dockerGoPkgCache + ",direct",
-		"-e", "ES_USER=admin",
-		"-e", "ES_PASS=testing",
+		// Do not set ES_USER or ES_PATH in this file unless you intend to override
+		// values set in all individual docker-compose files
+		//		"-e", "ES_USER=admin",
+		//		"-e", "ES_PASS=testing",
 	}
 	args, err = addUidGidEnvArgs(args)
 	if err != nil {

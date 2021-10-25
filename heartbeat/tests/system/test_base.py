@@ -200,7 +200,13 @@ class Test(BaseTest, common_tests.TestExportsMixin):
         es_url = self.get_elasticsearch_url()
         es_user = os.getenv('ES_USER')
         es_pass = os.getenv('ES_PASS')
-        es = self.get_elasticsearch_instance(url=es_url, user=es_user)
+        #es_user = 'heartbeat_user'
+        #es_pass = 'testing'
+        print('ES USER: {}'.format(es_user))
+        print('ES PASS: {}'.format(es_pass))
+        print('ES OS USER: {}'.format(os.getenv('ES_USER')))
+        print('ES OS PASS: {}'.format(os.getenv('ES_PASS')))
+        es = self.get_elasticsearch_instance(url=es_url, user='beats')
         self.render_config_template(
             monitors=[{
                 "type": "http",

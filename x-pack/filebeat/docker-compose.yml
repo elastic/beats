@@ -9,6 +9,8 @@ services:
       - BEAT_STRICT_PERMS=false
       - ES_HOST=elasticsearch
       - ES_PORT=9200
+      - ES_USER=beats
+      - ES_PASS=testing
     working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat
     volumes:
       - ${PWD}/../..:/go/src/github.com/elastic/beats/
