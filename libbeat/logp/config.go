@@ -76,6 +76,7 @@ const (
 func DefaultConfig(environment Environment) Config {
 	return Config{
 		Level: defaultLevel,
+		JSON:  true,
 		Files: FileConfig{
 			Suffix:          file.SuffixCount,
 			MaxSize:         10 * 1024 * 1024,
