@@ -39,6 +39,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 
+	_ "github.com/elastic/beats/v7/heartbeat/security"
 	_ "github.com/elastic/beats/v7/libbeat/processors/script"
 )
 
@@ -88,7 +89,7 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 	groups, _ := syscall.Getgroups()
 	logp.Info("Effective user/group ids: %d/%d, with groups: %v", syscall.Geteuid(), syscall.Getegid(), groups)
 
-	if bt.config.RunOnce != nil {
+	if bt.config.RunOnce {
 		err := bt.runRunOnce(b)
 		if err != nil {
 			return err
@@ -140,7 +141,6 @@ func (bt *Heartbeat) Run(b *beat.Beat) error {
 // runRunOnce runs the given config then exits immediately after any queued events have been sent to ES
 func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 	logp.Info("Starting run_once run. This is an experimental feature and may be changed or removed in the future!")
-	cfgs := bt.config.RunOnce
 
 	publishClient, err := core.NewSyncClient(logp.NewLogger("run_once mode"), b.Publisher, beat.ClientConfig{})
 	if err != nil {
@@ -149,7 +149,7 @@ func (bt *Heartbeat) runRunOnce(b *beat.Beat) error {
 	defer publishClient.Close()
 
 	wg := &sync.WaitGroup{}
-	for _, cfg := range cfgs {
+	for _, cfg := range bt.config.Monitors {
 		err := runRunOnceSingleConfig(cfg, publishClient, wg)
 		if err != nil {
 			logp.Warn("error running run_once config: %s", err)

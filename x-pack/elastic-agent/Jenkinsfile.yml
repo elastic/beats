@@ -95,7 +95,11 @@ stages:
     packaging-linux:
         packaging-linux: "mage package"
         e2e:
-            enabled: false
+            enabled: true
+            testMatrixFile: '.ci/.e2e-tests-for-elastic-agent.yaml'
+            when:                  ## Customise when to run this subtask in the packaging stage.
+                branches: false    ## Only on a PR basis for the time being
+                tags: false        ## e2e on branches/tags is already in place with the downstream build.
         stage: packaging
     packaging-arm:
         packaging-arm: "mage package"

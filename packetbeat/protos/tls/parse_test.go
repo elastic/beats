@@ -310,7 +310,6 @@ func TestCertificates(t *testing.T) {
 		"public_key_size":             "2048",
 		"serial_number":               "19132437207909210467858529073412672688",
 		"signature_algorithm":         "SHA256-RSA",
-		"version":                     "3",
 		"issuer.common_name":          "DigiCert SHA2 High Assurance Server CA",
 		"issuer.country":              "US",
 		"issuer.organization":         "DigiCert Inc",
@@ -320,7 +319,6 @@ func TestCertificates(t *testing.T) {
 		"subject.locality":            "Los Angeles",
 		"subject.organization":        "Internet Corporation for Assigned Names and Numbers",
 		"subject.organizational_unit": "Technology",
-		"subject.province":            "California",
 	}
 
 	certMap := certToMap(c[0])
