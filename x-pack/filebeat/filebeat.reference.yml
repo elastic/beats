@@ -2405,8 +2405,8 @@ filebeat.inputs:
 # The different types cannot be mixed in one input
 #
 # Possible options are:
-# * log: Reads every line of the log file (default)
-# * filestream: Improved version of log input
+# * filestream: Reads every line of the log file
+# * log: Reads every line of the log file (deprecated)
 # * stdin: Reads the standard in
 
 #------------------------------ Log input --------------------------------
