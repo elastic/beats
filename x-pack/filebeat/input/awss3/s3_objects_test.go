@@ -9,6 +9,8 @@ import (
 	"context"
 	"errors"
 	"io/ioutil"
+	"net/http"
+	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -36,12 +38,25 @@ func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.Get
 func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectResponse {
 	r := bytes.NewReader(data)
 	contentLen := int64(r.Len())
-	resp := &s3.GetObjectResponse{
-		GetObjectOutput: &s3.GetObjectOutput{
-			Body:          ioutil.NopCloser(r),
-			ContentLength: &contentLen,
+
+	req := &s3.GetObjectRequest{
+		Request: &awssdk.Request{
+			HTTPRequest: &http.Request{
+				URL: &url.URL{Path: filename},
+			},
+			Retryer: awssdk.NoOpRetryer{},
+			Data: &s3.GetObjectOutput{
+				Body:          ioutil.NopCloser(r),
+				ContentLength: &contentLen,
+			},
+		},
+		Input: &s3.GetObjectInput{
+			Bucket: awssdk.String("dummy_bucket"),
+			Key:    awssdk.String(filename),
 		},
 	}
+
+	resp, _ := req.Send(context.Background())
 
 	if contentType != "" {
 		resp.ContentType = &contentType
