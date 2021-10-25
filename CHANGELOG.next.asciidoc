@@ -27,6 +27,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Enable IMDSv2 support for `add_cloud_metadata` processor on AWS. {issue}22101[22101] {pull}28285[28285]
 - Update kubernetes.namespace from keyword to group field and add name, labels, annotations, uuid as its fields {pull}27917[27917]
 - Libbeat: logp package forces ECS compliant logs. Logs are also JSON formatted by default. {issue}15544[15544] {pull}28573[28573]
+- Previously, RE2 and thus Golang had a bug where `(|a)*` matched more characters than `(|a)+`. To stay consistent with PCRE, the bug was fixed. Configurations that rely on the old, buggy behaviour has to be adjusted. See more about Golang bug: https://github.com/golang/go/issues/46123 {pull}27543[27543]
 
 *Auditbeat*
 
@@ -34,6 +35,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 - Change event.kind=error to event.kind=event to comply with ECS. {issue}18870[18870] {pull}20685[20685]
 - File integrity dataset: Remove non-ECS `hash.*` fields. Hashes are under `file.hash.*`. {issue}19039[19039] {pull}28378[28378]
 - Auditd dataset: Removes the authentication_success and authentication_failure event.type values for user logins. {issue}19039[19039] {pull}28378[28378]
+- Fix handling of long file names on Windows. {issue}25334[25334] {pull}28517[28517]
 
 *Filebeat*
 
