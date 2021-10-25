@@ -101,6 +101,9 @@ stages:
         when:
             branches: false    ## Only on a PR basis for the time being
             tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^x-pack/packetbeat/.*"
+              - "@xpack"             ## special token regarding the changeset for the xpack
     packaging-arm:
         packaging-arm: "mage package"
         e2e:
@@ -111,3 +114,6 @@ stages:
         when:
             branches: false    ## Only on a PR basis for the time being
             tags: false        ## packaging on branches/tags is already in place with the downstream build.
+            changeset:         ## when PR contains any of those entries in the changeset
+              - "^x-pack/packetbeat/.*"
+              - "@xpack"             ## special token regarding the changeset for the xpack
