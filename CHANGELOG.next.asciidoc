@@ -550,6 +550,7 @@ to `legacy`. {pull}28538[28538]
 
 *Affecting all Beats*
 
+- Deprecate `setup.template.type`. In the future Beats will load data streams instead of regular indices.
 
 *Filebeat*
 
