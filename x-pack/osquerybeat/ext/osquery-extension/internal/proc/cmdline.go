@@ -5,6 +5,7 @@
 package proc
 
 import (
+	"bytes"
 	"io/ioutil"
 	"strings"
 )
@@ -16,6 +17,8 @@ func ReadCmdLine(root string, pid string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
+	b = bytes.ReplaceAll(b, []byte{0}, []byte{' '})
 
 	return strings.TrimSpace(string(b)), nil
 }

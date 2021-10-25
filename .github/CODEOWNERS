@@ -42,6 +42,11 @@
 # Winlogbeat
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
+# Beats Build Specific
+/dev-tools/mage/ @elastic/beats
+/dev-tools/make/ @elastic/beats 
+/dev-tools/packaging/ @elastic/beats 
+
 # CI Specific
 /.ci/ @elastic/observablt-robots
 /Jenkinsfile @elastic/observablt-robots
