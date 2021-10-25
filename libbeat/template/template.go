@@ -219,6 +219,7 @@ func (t *Template) GetPattern() string {
 // The default values are taken from the default variable.
 func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.MapStr) common.MapStr {
 	tmpl := t.generateComponent(properties, dynamicTemplates)
+	tmpl["data_stream"] = struct{}{}
 	tmpl["priority"] = t.priority
 	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	tmpl[keyPattern] = patterns
