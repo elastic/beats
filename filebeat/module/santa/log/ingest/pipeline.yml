@@ -12,7 +12,7 @@ processors:
       NOT_SEPARATOR: '[^\|]+'
 - rename:
     field: message
-    target_field: log.original
+    target_field: event.original
 - date:
     field: process.start
     target_field: process.start
