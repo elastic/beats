@@ -40,8 +40,12 @@ class TestCommandSetupIndexManagement(BaseTest):
                             policies=[self.policy_name, self.custom_policy])
 
     def render_config(self, **kwargs):
+        print('OS ES USER: {}'.format(os.getenv('ES_USER')))
+        print('OS ES pass: {}'.format(os.getenv('ES_PASS')))
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            # Note that the template is such that we need to pass in 'username' as opposed to 'user' and
+            # 'password' instead of 'pass'.
+            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
             es_template_name=self.index_name,
             **kwargs
         )

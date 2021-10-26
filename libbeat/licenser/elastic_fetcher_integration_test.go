@@ -43,8 +43,8 @@ func getTestClient() *eslegclient.Connection {
 	host := "http://" + cli.GetEnvOr("ES_HOST", elasticsearchHost) + ":" + cli.GetEnvOr("ES_POST", elasticsearchPort)
 	client, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
 		URL:              host,
-		Username:         "elastic",
-		Password:         "changeme",
+		Username:         "admin",
+		Password:         "testing",
 		CompressionLevel: 3,
 		Transport:        transport,
 	})

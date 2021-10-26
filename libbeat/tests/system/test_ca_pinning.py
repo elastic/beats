@@ -35,7 +35,7 @@ class TestCAPinning(BaseTest):
             elasticsearch={
                 "hosts": self.get_elasticsearch_url_ssl(),
                 "username": "admin",
-                "password": "changeme",
+                "password": "testing",
                 "ssl.certificate_authorities": [ca],
                 "ssl.ca_sha256": "8hZS8gpciuzlu+7Xi0sdv8T7RKRRxG1TWKumUQsDam0=",
             },
@@ -67,7 +67,7 @@ class TestCAPinning(BaseTest):
             elasticsearch={
                 "hosts": self.get_elasticsearch_url_ssl(),
                 "username": "admin",
-                "password": "changeme",
+                "password": "testing",
                 "ssl.certificate_authorities": [ca],
                 "ssl.ca_sha256": "not-good-sha",
             },
