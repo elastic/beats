@@ -185,7 +185,6 @@ func (t *Template) LoadBytes(data []byte) (common.MapStr, error) {
 
 // LoadMinimal loads the template only with the given configuration
 func (t *Template) LoadMinimal() common.MapStr {
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
 	templ := common.MapStr{}
 	if t.config.Settings.Source != nil {
 		templ["mappings"] = buildMappings(
@@ -196,13 +195,11 @@ func (t *Template) LoadMinimal() common.MapStr {
 	templ["settings"] = common.MapStr{
 		"index": t.config.Settings.Index,
 	}
-	m := common.MapStr{
-		"template": templ,
+	return common.MapStr{
+		"template":       templ,
+		"priority":       t.priority,
+		"index_patterns": t.GetPattern(),
 	}
-	m["priority"] = t.priority
-	m[keyPattern] = patterns
-
-	return m
 }
 
 // GetName returns the name of the template
@@ -221,8 +218,7 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 	tmpl := t.generateComponent(properties, dynamicTemplates)
 	tmpl["data_stream"] = struct{}{}
 	tmpl["priority"] = t.priority
-	keyPattern, patterns := buildPatternSettings(t.esVersion, t.GetPattern())
-	tmpl[keyPattern] = patterns
+	tmpl["index_patterns"] = t.GetPattern()
 	return tmpl
 }
 
@@ -242,10 +238,6 @@ func (t *Template) generateComponent(properties common.MapStr, dynamicTemplates 
 			},
 		},
 	}
-}
-
-func buildPatternSettings(ver common.Version, pattern string) (string, interface{}) {
-	return "index_patterns", []string{pattern}
 }
 
 func buildMappings(
@@ -273,16 +265,14 @@ func buildMappings(
 }
 
 func buildDynTmpl(ver common.Version) common.MapStr {
-	strMapping := common.MapStr{
-		"ignore_above": 1024,
-		"type":         "keyword",
-	}
-
 	return common.MapStr{
 		"strings_as_keyword": common.MapStr{
-			"mapping":            strMapping,
-			"match_mapping_type": "string",
+			"mapping": common.MapStr{
+				"ignore_above": 1024,
+				"type":         "keyword",
+			},
 		},
+		"match_mapping_type": "string",
 	}
 }
 
