@@ -297,7 +297,7 @@ ARN of the AWS S3 bucket that will be polled for list operation. (Required when 
 [float]
 ==== `non_aws_bucket_name`
 
-Name of the S3 bucket that will be polled for list operation. Required for 3rd party S3 compatible services but can also be used for AWS hosted buckets instead of `bucket_arn`. (Required when `queue_url` and `bucket_arn` are not set).
+Name of the S3 bucket that will be polled for list operation. Required for 3rd party S3 compatible services. (Required when `queue_url` and `bucket_arn` are not set).
 
 [float]
 ==== `bucket_list_interval`

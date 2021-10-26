@@ -170,7 +170,6 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 // close the returned reader.
 func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]interface{}, body io.ReadCloser, err error) {
 	resp, err := p.s3.GetObject(p.ctx, p.s3Obj.S3.Bucket.Name, p.s3Obj.S3.Object.Key)
-	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
 
 	if err != nil {
 		return "", nil, nil, err
@@ -179,6 +178,7 @@ func (p *s3ObjectProcessor) download() (contentType string, metadata map[string]
 	if resp == nil {
 		return "", nil, nil, errors.New("empty response from s3 get object")
 	}
+	p.s3RequestURL = resp.SDKResponseMetdata().Request.HTTPRequest.URL.String()
 
 	meta := s3Metadata(resp, p.readerConfig.IncludeS3Metadata...)
 	if resp.ContentType == nil {
