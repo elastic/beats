@@ -74,7 +74,9 @@
         "executable": "/bin/uname",
         "name": "uname",
         "pid": 10043,
-        "ppid": 10027,
+        "parent": {
+            "pid": 10027
+        },
         "title": "uname -a",
         "working_directory": "/home/andrew_kroh"
     },

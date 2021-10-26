@@ -87,7 +87,7 @@
       "pid": 9494,
       "parent": {
          "pid": 9492
-      }
+      },
       "title": "chown -R alice test",
       "working_directory": "/home/vagrant"
     },
