@@ -35,7 +35,6 @@ type TemplateConfig struct {
 	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
 	Settings     TemplateSettings `config:"settings"`
-	Order        int              `config:"order"`
 	Priority     int              `config:"priority"`
 }
 
@@ -50,7 +49,6 @@ func DefaultConfig() TemplateConfig {
 	return TemplateConfig{
 		Enabled:  true,
 		Fields:   "",
-		Order:    1,
 		Priority: 150,
 	}
 }
