@@ -450,6 +450,20 @@ shared:
       from: 'arm64v8/centos:7'
       buildFrom: 'arm64v8/centos:7'
 
+<<<<<<< HEAD
+=======
+  - &agent_docker_cloud_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-cloud'
+      repository: 'docker.elastic.co/beats-ci'
+
+  - &agent_docker_complete_spec
+    <<: *agent_docker_spec
+    extra_vars:
+      image_name: '{{.BeatName}}-complete'
+
+>>>>>>> 554399aa1e (fix: use declarative style for complete variant of the elastic-agent (#28526))
   # Deb/RPM spec for community beats.
   - &deb_rpm_spec
     <<: *common
@@ -1001,9 +1015,26 @@ specs:
         <<: *agent_docker_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
+<<<<<<< HEAD
         # This image gets an 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
+=======
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: amd64
+      types: [docker]
+      spec:
+        <<: *agent_docker_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+>>>>>>> 554399aa1e (fix: use declarative style for complete variant of the elastic-agent (#28526))
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
@@ -1027,9 +1058,26 @@ specs:
         <<: *agent_docker_arm_spec
         <<: *elastic_docker_spec
         <<: *elastic_license_for_binaries
+<<<<<<< HEAD
         # This image gets an 'complete' variant for synthetics and other large
         # packages too big to fit in the main image
         variants: ["complete"]
+=======
+        files:
+          '{{.BeatName}}{{.BinaryExt}}':
+            source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+
+    # Complete image gets a 'complete' variant for synthetics and other large
+    # packages too big to fit in the main image
+    - os: linux
+      arch: arm64
+      types: [docker]
+      spec:
+        <<: *agent_docker_arm_spec
+        <<: *agent_docker_complete_spec
+        <<: *elastic_docker_spec
+        <<: *elastic_license_for_binaries
+>>>>>>> 554399aa1e (fix: use declarative style for complete variant of the elastic-agent (#28526))
         files:
           '{{.BeatName}}{{.BinaryExt}}':
             source: ./build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
