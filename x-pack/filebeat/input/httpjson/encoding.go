@@ -146,7 +146,7 @@ func decodeAsCSV(p []byte, dst *response) error {
 
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
-		o := map[string]interface{}{}
+		o := make(map[string]interface{}, len(header))
 		if len(header) != len(event) {
 			// sanity check, csv.Reader should fail on this scenario
 			// and this code path should be unreachable
