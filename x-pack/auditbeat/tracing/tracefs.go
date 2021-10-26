@@ -25,7 +25,10 @@ const (
 )
 
 var (
-	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr]):(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+	// p[:[GRP/]EVENT] [MOD:]SYM[+offs]|MEMADDR [FETCHARGS] : Set a probe
+	// r[MAXACTIVE][:[GRP/]EVENT] [MOD:]SYM[+0] [FETCHARGS] : Set a return probe
+	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr])[0-9]*:(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+
 	formatRegexp *regexp.Regexp = regexp.MustCompile("\\s+([^:]+):([^;]*);")
 )
 

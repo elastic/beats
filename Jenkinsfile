@@ -203,8 +203,22 @@ def runLinting() {
     }
   }
   mapParallelTasks['default'] = { cmd(label: 'make check-default', script: 'make check-default') }
-
+  mapParallelTasks['pre-commit'] = runPreCommit()
   parallel(mapParallelTasks)
+}
+
+def runPreCommit() {
+  return {
+    withNode(labels: 'ubuntu-18 && immutable', forceWorkspace: true){
+      withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
+        deleteDir()
+        unstashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
+        }
+      }
+    }
+  }
 }
 
 def runBuildAndTest(Map args = [:]) {
@@ -519,10 +533,19 @@ def getBeatsName(baseDir) {
 */
 def e2e(Map args = [:]) {
   if (!args.e2e?.get('enabled', false)) { return }
+  // Skip running the tests on branches or tags if configured.
+  if (!isPR() && args.e2e?.get('when', false)) {
+    if (isBranch() && !args.e2e.when.get('branches', true)) { return }
+    if (isTag() && !args.e2e.when.get('tags', true)) { return }
+  }
   if (args.e2e.get('entrypoint', '')?.trim()) {
     e2e_with_entrypoint(args)
   } else {
-    e2e_with_job(args)
+    runE2E(testMatrixFile: args.e2e?.get('testMatrixFile', ''),
+           beatVersion: "${env.VERSION}-SNAPSHOT",
+           gitHubCheckName: "e2e-${args.context}",
+           gitHubCheckRepo: env.REPO,
+           gitHubCheckSha1: env.GIT_BASE_COMMIT)
   }
 }
 
@@ -555,35 +578,6 @@ def e2e_with_entrypoint(Map args = [:]) {
       }
     }
   }
-}
-
-/**
-* This method triggers the end 2 end testing job.
-*/
-def e2e_with_job(Map args = [:]) {
-  def jobName = args.e2e?.get('job')
-  def testMatrixFile = args.e2e?.get('testMatrixFile', '')
-  def notifyContext = "e2e-${args.context}"
-  def e2eTestsPipeline = "${jobName}/${isPR() ? "${env.CHANGE_TARGET}" : "${env.JOB_BASE_NAME}"}"
-
-  def parameters = [
-    booleanParam(name: 'forceSkipGitChecks', value: true),
-    booleanParam(name: 'forceSkipPresubmit', value: true),
-    booleanParam(name: 'notifyOnGreenBuilds', value: !isPR()),
-    string(name: 'BEAT_VERSION', value: "${env.VERSION}-SNAPSHOT"),
-    string(name: 'testMatrixFile', value: testMatrixFile),
-    string(name: 'GITHUB_CHECK_NAME', value: notifyContext),
-    string(name: 'GITHUB_CHECK_REPO', value: env.REPO),
-    string(name: 'GITHUB_CHECK_SHA1', value: env.GIT_BASE_COMMIT),
-  ]
-
-  build(job: "${e2eTestsPipeline}",
-    parameters: parameters,
-    propagate: false,
-    wait: false
-  )
-
-  githubNotify(context: "${notifyContext}", description: "${notifyContext} ...", status: 'PENDING', targetUrl: "${env.JENKINS_URL}search/?q=${e2eTestsPipeline.replaceAll('/','+')}")
 }
 
 /**
