@@ -1,7 +1,8 @@
 import datetime
 import unittest
 import pytest
-from elasticsearch import NotFoundError
+import semver
+from elasticsearch import NotFoundError, RequestError
 
 
 class IdxMgmt(unittest.TestCase):
@@ -27,23 +28,29 @@ class IdxMgmt(unittest.TestCase):
         if self.needs_init(index):
             index = self._index
 
+        es_version = self.get_es_version()
+        if es_version["major"] <= 8:
+            try:
+                index_with_pattern = index+"-"+self.default_pattern()
+                self._client.indices.delete(index_with_pattern)
+                self._client.indices.delete_alias(index, index_with_pattern)
+            except NotFoundError:
+                pass
+            return
+
         try:
-            self._client.transport.perform_request('DELETE', "/" + index + "*")
+            self._client.transport.perform_request('DELETE', "/" + self._index_name_to_delete(index))
         except NotFoundError:
             pass
-        except RequestError:
-            self._client.transport.perform_request('DELETE', "/" + index)
 
     def delete_template(self, template=""):
         if self.needs_init(template):
             template = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/_index_template/" + template + "*")
+            self._client.transport.perform_request('DELETE', "/_index_template/" + self._index_name_to_delete(template))
         except NotFoundError:
             pass
-        except RequestError:
-            self._client.transport.perform_request('DELETE', "/_index_template/" + template)
 
     def delete_policy(self, policy):
         # Delete any existing policy starting with given policy
@@ -55,6 +62,17 @@ class IdxMgmt(unittest.TestCase):
                 self._client.transport.perform_request('DELETE', "/_ilm/policy/" + p)
             except NotFoundError:
                 pass
+
+    # from ES 8.0 users should write the full name of the index to delete
+    def _index_name_to_delete(self, index):
+        es_version = self.get_es_version()
+        if es_version["major"] < 8:
+            return index_name+"*"
+        return index
+
+    def get_es_version(self):
+        es_info = self._client.info()
+        return semver.parse(es_info["version"]["number"])
 
     def assert_index_template_not_loaded(self, template):
         with pytest.raises(NotFoundError):
@@ -117,6 +135,7 @@ class IdxMgmt(unittest.TestCase):
             pattern = self.default_pattern()
         name = alias + "-" + pattern
         resp = self._client.transport.perform_request('GET', '/_alias/' + alias)
+        print(name)
         assert name in resp
         assert resp[name]["aliases"][alias]["is_write_index"] == True
 
