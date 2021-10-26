@@ -107,7 +107,8 @@ class Test(BaseTest):
             file3 = os.path.join(subdir, "other_file.txt")
             self.create_file(file3, "not reported.")
 
-            self.wait_log_contains("\\\"deleted\\\"") # log entries are JSON formatted, this value shows up as an escaped json string.
+            # log entries are JSON formatted, this value shows up as an escaped json string.
+            self.wait_log_contains("\\\"deleted\\\"")
             self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(subdir)), ignore_case=True)
             self.wait_output(3)
             self.wait_until(lambda: any(
