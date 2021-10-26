@@ -483,6 +483,8 @@ Set the location of the marker file the following way:
 file_identity.inode_marker.path: /logs/.filebeat-marker
 ----
 
+[[filestream-log-rotation-support]]
+[float]
 === Log rotation
 
 As log files are constantly written, they must be rotated and purged to prevent
