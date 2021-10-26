@@ -154,8 +154,7 @@ class TestRunTemplate(BaseTest):
         proc.check_kill_and_wait()
 
         self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.beat_name, self.index_name)
-        self.idxmgmt.assert_alias_created(self.index_name)
-        self.idxmgmt.assert_docs_written_to_alias(self.index_name)
+        self.idxmgmt.assert_docs_written_to_data_stream(self.index_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
@@ -183,17 +182,16 @@ class TestCommandSetupTemplate(BaseTest):
         # auto-derived default settings, if nothing else is set
         self.setupCmd = "--template"
         self.index_name = self.beat_name + "-9.9.9"
-        self.custom_alias = self.beat_name + "_foo"
         self.policy_name = self.beat_name
 
         self.es = self.es_client()
         self.idxmgmt = IdxMgmt(self.es, self.index_name)
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name], policies=[self.policy_name])
+        self.idxmgmt.delete(indices=[self.index_name], policies=[self.policy_name])
         logging.getLogger("urllib3").setLevel(logging.WARNING)
         logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 
     def tearDown(self):
-        self.idxmgmt.delete(indices=[self.custom_alias, self.index_name], policies=[self.policy_name])
+        self.idxmgmt.delete(indices=[self.index_name], policies=[self.policy_name])
 
     def render_config(self, **kwargs):
         self.render_config_template(
@@ -213,7 +211,6 @@ class TestCommandSetupTemplate(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
-        self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -228,11 +225,10 @@ class TestCommandSetupTemplate(BaseTest):
 
         assert exit_code == 0
         self.idxmgmt.assert_ilm_index_template_loaded(self.index_name, self.policy_name, self.index_name)
-        self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "-*"])
+        self.idxmgmt.assert_index_template_index_pattern(self.index_name, [self.index_name + "*"])
 
         # when running `setup --template`
         # write_alias and rollover_policy related to ILM are also created
-        self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -251,7 +247,6 @@ class TestCommandSetupTemplate(BaseTest):
 
         # when running `setup --template` and `setup.template.enabled=false`
         # write_alias and rollover_policy related to ILM are still created
-        self.idxmgmt.assert_alias_created(self.index_name)
         self.idxmgmt.assert_policy_created(self.policy_name)
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
@@ -281,21 +276,6 @@ class TestCommandSetupTemplate(BaseTest):
 
     @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
     @pytest.mark.tag('integration')
-    def test_setup_template_with_ilm_changed_pattern(self):
-        """
-        Test template setup with changed ilm.rollover_alias config
-        """
-        self.render_config()
-        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
-
-        assert exit_code == 0
-        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
-        self.idxmgmt.assert_index_template_index_pattern(self.custom_alias, [self.custom_alias + "-*"])
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
     def test_template_created_on_ilm_policy_created(self):
         """
         Test template setup overwrites template when new ilm policy is created
@@ -305,58 +285,17 @@ class TestCommandSetupTemplate(BaseTest):
         self.render_config()
         exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
                                   extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.ilm.enabled=false",
-                                              "-E", "setup.template.name=" + self.custom_alias,
-                                              "-E", "setup.template.pattern=" + self.custom_alias + "*"])
+                                              "-E", "setup.ilm.enabled=false"])
         assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.custom_alias)
+        self.idxmgmt.assert_index_template_loaded(self.index_name)
         self.idxmgmt.assert_policy_not_created(self.policy_name)
 
         # ensure ilm policy is created, triggering overwriting existing template
         exit_code = self.run_beat(extra_args=["setup", self.setupCmd,
                                               "-E", "setup.template.overwrite=false",
-                                              "-E", "setup.template.settings.index.number_of_shards=2",
-                                              "-E", "setup.ilm.rollover_alias=" + self.custom_alias])
+                                              "-E", "setup.template.settings.index.number_of_shards=2"])
         assert exit_code == 0
-        self.idxmgmt.assert_ilm_index_template_loaded(self.custom_alias, self.policy_name, self.custom_alias)
         self.idxmgmt.assert_policy_created(self.policy_name)
-        # check that template was overwritten
-        resp = self.es.transport.perform_request('GET', '/_index_template/' + self.custom_alias)
-        found = False
-        for index_template in resp["index_templates"]:
-            if index_template["name"] == self.custom_alias:
-                found = True
-                index = index_template["index_template"]["template"]["settings"]["index"]
-                assert index["number_of_shards"] == "2", index["number_of_shards"]
-        assert found
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_setup_template_index(self):
-        """
-        Test template setup of new index templates
-        """
-        self.render_config()
-        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.template.type=index"])
-
-        assert exit_code == 0
-        self.idxmgmt.assert_index_template_loaded(self.index_name)
-
-    @unittest.skipUnless(INTEGRATION_TESTS, "integration test")
-    @pytest.mark.tag('integration')
-    def test_setup_template_component(self):
-        """
-        Test template setup of component index templates
-        """
-        self.render_config()
-        exit_code = self.run_beat(logging_args=["-v", "-d", "*"],
-                                  extra_args=["setup", self.setupCmd,
-                                              "-E", "setup.template.type=component"])
-
-        assert exit_code == 0
-        self.idxmgmt.assert_component_template_loaded(self.index_name)
 
 
 class TestCommandExportTemplate(BaseTest):
@@ -387,7 +326,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name + "-*")
+        self.assert_log_contains_template(self.template_name + "*")
 
     def test_changed_index_pattern(self):
         """
@@ -403,7 +342,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(alias_name + "-*")
+        self.assert_log_contains_template(alias_name + "*")
 
     def test_load_disabled(self):
         """
@@ -416,7 +355,7 @@ class TestCommandExportTemplate(BaseTest):
             config=self.config)
 
         assert exit_code == 0
-        self.assert_log_contains_template(self.template_name + "-*")
+        self.assert_log_contains_template(self.template_name + "*")
 
     def test_export_to_file_absolute_path(self):
         """
@@ -436,7 +375,7 @@ class TestCommandExportTemplate(BaseTest):
         with open(file) as f:
             template = json.load(f)
         assert 'index_patterns' in template
-        assert template['index_patterns'] == [self.template_name + '-*'], template
+        assert template['index_patterns'] == [self.template_name + '*'], template
 
         os.remove(file)
 
@@ -459,6 +398,6 @@ class TestCommandExportTemplate(BaseTest):
         with open(file) as f:
             template = json.load(f)
         assert 'index_patterns' in template
-        assert template['index_patterns'] == [self.template_name + '-*'], template
+        assert template['index_patterns'] == [self.template_name + '*'], template
 
         os.remove(file)

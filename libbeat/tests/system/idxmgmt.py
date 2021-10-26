@@ -28,7 +28,7 @@ class IdxMgmt(unittest.TestCase):
             index = self._index
 
         try:
-            concrete_index = index+"-"+self.default_pattern()
+            concrete_index = index+"-1"
             self._client.indices.delete_alias(concrete_index, index)
             self._client.indices.delete(concrete_index)
         except NotFoundError:
@@ -71,6 +71,12 @@ class IdxMgmt(unittest.TestCase):
                 found = True
         assert found
 
+    def assert_data_stream_created(self, data_stream):
+        try:
+            resp = self._client.transport.perform_request('GET', '/_data_stream/' + data_stream)
+        except NotFoundError:
+            assert False
+
     def assert_ilm_index_template_loaded(self, template, policy, alias):
         resp = self._client.transport.perform_request('GET', '/_index_template/' + template)
         found = False
@@ -84,7 +90,6 @@ class IdxMgmt(unittest.TestCase):
     def assert_component_template_loaded(self, template):
         resp = self._client.transport.perform_request('GET', '/_component_template/' + template)
         found = False
-        print(resp)
         for index_template in resp['component_templates']:
             if index_template['name'] == template:
                 found = True
@@ -127,6 +132,14 @@ class IdxMgmt(unittest.TestCase):
         assert policy in resp
         assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_size"] == "50gb"
         assert resp[policy]["policy"]["phases"]["hot"]["actions"]["rollover"]["max_age"] == "30d"
+
+    def assert_docs_written_to_data_stream(self, data_stream):
+        # Refresh the indices to guarantee all documents are available
+        # through the _search API.
+        self._client.transport.perform_request('POST', '/_refresh')
+
+        data = self._client.transport.perform_request('GET', '/' + data_stream + '/_search')
+        self.assertGreater(data["hits"]["total"]["value"], 0)
 
     def assert_docs_written_to_alias(self, alias, pattern=None):
         # Refresh the indices to guarantee all documents are available

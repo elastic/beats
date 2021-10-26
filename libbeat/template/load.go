@@ -24,7 +24,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -152,18 +151,15 @@ func (l *ESLoader) loadTemplate(templateName string, template map[string]interfa
 // An error is returned if the loader failed to execute the request, or a
 // status code indicating some problems is encountered.
 func (l *ESLoader) checkExistsTemplate(name string) (bool, error) {
-	status, body, err := l.client.Request("GET", "/_index_template/"+name, "", nil, nil)
+	status, _, err := l.client.Request("GET", "/_index_template/"+name, "", nil, nil)
+	if status == http.StatusNotFound {
+		return false, nil
+	}
 	if err != nil {
 		return false, err
 	}
 
-	// Elasticsearch API returns 200, even if the template does not exists. We
-	// need to validate the body to be sure the template is actually known. Any
-	// status code other than 200 will be treated as error.
-	if status != http.StatusOK {
-		return false, &StatusError{status: status}
-	}
-	return strings.Contains(string(body), name), nil
+	return true, nil
 }
 
 // Load reads the template from the config, creates the template body and prints it to the configured file.

@@ -283,13 +283,6 @@ func (m *indexManager) Setup(loadTemplate, loadILM LoadMode) error {
 		log.Info("Loaded index template.")
 	}
 
-	if ilmComponent.load {
-		err := m.ilm.EnsureAlias()
-		if err != nil {
-			return err
-		}
-	}
-
 	return nil
 }
 
@@ -387,7 +380,7 @@ func applyILMSettings(
 		log.Infof("Set setup.template.name to '%s' as ILM is enabled.", alias)
 	}
 
-	tmpl.Pattern = fmt.Sprintf("%s-*", alias.Name)
+	tmpl.Pattern = fmt.Sprintf("%s*", alias.Name)
 	if log != nil {
 		log.Infof("Set setup.template.pattern to '%s' as ILM is enabled.", tmpl.Pattern)
 	}

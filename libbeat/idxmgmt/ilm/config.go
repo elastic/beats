@@ -42,8 +42,6 @@ type Config struct {
 	Overwrite bool `config:"overwrite"`
 }
 
-const ilmDefaultPattern = "{now/d}-000001"
-
 // DefaultPolicy defines the default policy to be used if no custom policy is
 // configured.
 // By default the policy contains not warm, cold, or delete phase.

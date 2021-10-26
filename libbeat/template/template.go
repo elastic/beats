@@ -271,8 +271,8 @@ func buildDynTmpl(ver common.Version) common.MapStr {
 				"ignore_above": 1024,
 				"type":         "keyword",
 			},
+			"match_mapping_type": "string",
 		},
-		"match_mapping_type": "string",
 	}
 }
 
