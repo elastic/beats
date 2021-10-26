@@ -11,7 +11,7 @@
         "message": "[gc worker] starts the whole job",
         "service.type": "tidb",
         "tidb.log.concurrency": "1",
-        "tidb.log.safePoint": "427440234486300672",
+        "tidb.log.safepoint": "427440234486300672",
         "tidb.log.uuid": "5ec149b2c34000a"
     },
     {
@@ -26,7 +26,7 @@
         "message": "[gc worker] start resolve locks",
         "service.type": "tidb",
         "tidb.log.concurrency": "1",
-        "tidb.log.safePoint": "427440234486300672",
+        "tidb.log.safepoint": "427440234486300672",
         "tidb.log.uuid": "5ec149b2c34000a"
     },
     {
@@ -69,7 +69,7 @@
         "message": "[gc worker] finish resolve locks",
         "service.type": "tidb",
         "tidb.log.regions": "75",
-        "tidb.log.safePoint": "427440234486300672",
+        "tidb.log.safepoint": "427440234486300672",
         "tidb.log.uuid": "5ec149b2c34000a"
     },
     {
@@ -84,7 +84,7 @@
         "message": "new connection",
         "service.type": "tidb",
         "tidb.log.conn": "426830",
-        "tidb.log.remoteAddr": "10.0.162.87:55860"
+        "tidb.log.remoteaddr": "10.0.162.87:55860"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.536Z",
@@ -98,7 +98,7 @@
         "message": "new connection",
         "service.type": "tidb",
         "tidb.log.conn": "426832",
-        "tidb.log.remoteAddr": "10.0.170.58:45258"
+        "tidb.log.remoteaddr": "10.0.170.58:45258"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.536Z",
@@ -112,7 +112,7 @@
         "message": "new connection",
         "service.type": "tidb",
         "tidb.log.conn": "426831",
-        "tidb.log.remoteAddr": "10.0.170.58:45260"
+        "tidb.log.remoteaddr": "10.0.170.58:45260"
     },
     {
         "@timestamp": "2021-09-02T04:08:27.541Z",
@@ -151,6 +151,6 @@
         "log.offset": 1372,
         "message": "[gc worker] there's already a gc job running, skipped",
         "service.type": "tidb",
-        "tidb.log.leaderTick on": "5ec149b2c34000a"
+        "tidb.log.leadertick on": "5ec149b2c34000a"
     }
 ]

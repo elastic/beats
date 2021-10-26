@@ -83,7 +83,7 @@ processors:
                 if (v.lastIndexOf("\"", 0) === 0 && v.lastIndexOf("\"") === v.length - 1) {
                     v = v.substring(1, v.length - 1)
                 }
-                event.Put(keyPrefix + k, v)
+                event.Put(keyPrefix + k.toLowerCase(), v)
             }
 
             event.Delete("tidb.body")
