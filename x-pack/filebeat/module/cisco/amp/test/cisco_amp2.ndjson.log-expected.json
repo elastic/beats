@@ -182,7 +182,6 @@
         "host.name": "Demo_Upatre",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 12480,
         "process.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
@@ -209,7 +208,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T11:20:06.000Z",
@@ -255,7 +255,6 @@
         "host.name": "Demo_Upatre",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 14126,
         "process.hash.md5": "b3581f426dc500a51091cdd5bacf0454",
@@ -282,7 +281,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:45:07.000Z",
@@ -382,7 +382,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 17101,
         "network.direction": "egress",
@@ -410,7 +409,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:37:43.000Z",
@@ -447,7 +447,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 18559,
         "network.direction": "egress",
@@ -475,7 +474,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:37:43.000Z",
@@ -512,7 +512,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 20017,
         "network.direction": "egress",
@@ -540,7 +539,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:37:43.000Z",
@@ -577,7 +577,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 21475,
         "network.direction": "egress",
@@ -605,7 +604,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:37:43.000Z",
@@ -642,7 +642,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 22933,
         "network.direction": "egress",
@@ -670,7 +669,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:37:43.000Z",
@@ -707,7 +707,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_Upatre",
         "host.name": "Demo_Upatre",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 24391,
         "network.direction": "egress",
@@ -735,7 +734,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:32:58.000Z",
@@ -839,7 +839,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 27486,
         "related.hash": [
@@ -861,7 +860,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:24:58.000Z",
@@ -962,7 +962,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 30120,
         "related.hash": [
@@ -984,7 +983,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:23:01.000Z",
@@ -1027,7 +1027,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 31451,
         "related.hash": [
@@ -1049,7 +1048,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:23:01.000Z",
@@ -1092,7 +1092,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 32775,
         "related.hash": [
@@ -1114,7 +1113,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:22:29.000Z",
@@ -1218,7 +1218,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 35460,
         "related.hash": [
@@ -1240,7 +1239,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:22:00.000Z",
@@ -1283,7 +1283,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 36791,
         "related.hash": [
@@ -1305,7 +1304,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:22:00.000Z",
@@ -1348,7 +1348,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 38115,
         "related.hash": [
@@ -1370,7 +1369,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:21:00.000Z",
@@ -1415,7 +1415,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 39439,
         "related.hash": [
@@ -1437,7 +1436,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:21:00.000Z",
@@ -1482,7 +1482,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 40770,
         "related.hash": [
@@ -1504,7 +1503,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:21:00.000Z",
@@ -1547,7 +1547,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 42101,
         "related.hash": [
@@ -1569,7 +1568,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:20:59.000Z",
@@ -1612,7 +1612,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 43425,
         "related.hash": [
@@ -1634,7 +1633,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:20:00.000Z",
@@ -1747,7 +1747,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 46212,
         "related.hash": [
@@ -1769,7 +1768,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:19:59.000Z",
@@ -1812,7 +1812,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 47543,
         "related.hash": [
@@ -1834,7 +1833,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:19:58.000Z",
@@ -1877,7 +1877,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 48867,
         "related.hash": [
@@ -1899,7 +1898,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:18:58.000Z",
@@ -1944,7 +1944,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 50191,
         "related.hash": [
@@ -1966,7 +1965,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:18:58.000Z",
@@ -2009,7 +2009,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 51522,
         "related.hash": [
@@ -2031,7 +2030,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:18:57.000Z",
@@ -2074,7 +2074,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 52846,
         "related.hash": [
@@ -2096,7 +2095,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:18:25.000Z",
@@ -2325,7 +2325,6 @@
         "host.name": "Demo_Upatre",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 58142,
         "process.hash.md5": "8b88ebbb05a0e56b7dcc708498c02b3e",
@@ -2352,7 +2351,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:17:57.000Z",
@@ -2397,7 +2397,6 @@
         "host.name": "Demo_AMP_Threat_Audit",
         "host.os.family": "windows",
         "host.os.platform": "windows",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 59745,
         "related.hash": [
@@ -2419,7 +2418,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:17:57.000Z",
@@ -2462,7 +2462,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 61076,
         "related.hash": [
@@ -2484,7 +2483,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:17:57.000Z",
@@ -2527,7 +2527,6 @@
         "fileset.name": "amp",
         "host.hostname": "Demo_AMP_Threat_Audit",
         "host.name": "Demo_AMP_Threat_Audit",
-        "host.user.name": "user@testdomain.com",
         "input.type": "log",
         "log.offset": 62400,
         "related.hash": [
@@ -2549,7 +2548,8 @@
         "tags": [
             "cisco-amp",
             "forwarded"
-        ]
+        ],
+        "user.name": "user@testdomain.com"
     },
     {
         "@timestamp": "2021-01-15T10:17:50.000Z",
