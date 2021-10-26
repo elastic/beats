@@ -198,7 +198,7 @@ func (t *Template) LoadMinimal() common.MapStr {
 	return common.MapStr{
 		"template":       templ,
 		"priority":       t.priority,
-		"index_patterns": t.GetPattern(),
+		"index_patterns": []string{t.GetPattern()},
 	}
 }
 
@@ -218,7 +218,7 @@ func (t *Template) Generate(properties common.MapStr, dynamicTemplates []common.
 	tmpl := t.generateComponent(properties, dynamicTemplates)
 	tmpl["data_stream"] = struct{}{}
 	tmpl["priority"] = t.priority
-	tmpl["index_patterns"] = t.GetPattern()
+	tmpl["index_patterns"] = []string{t.GetPattern()}
 	return tmpl
 }
 

@@ -28,7 +28,9 @@ class IdxMgmt(unittest.TestCase):
             index = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/" + index + "*")
+            concrete_index = index+"-"+self.default_pattern()
+            self._client.indices.delete_alias(concrete_index, index)
+            self._client.indices.delete(concrete_index)
         except NotFoundError:
             pass
 
@@ -37,7 +39,7 @@ class IdxMgmt(unittest.TestCase):
             template = self._index
 
         try:
-            self._client.transport.perform_request('DELETE', "/_index_template/" + template + "*")
+            self._client.transport.perform_request('DELETE', "/_index_template/" + template)
         except NotFoundError:
             pass
 
