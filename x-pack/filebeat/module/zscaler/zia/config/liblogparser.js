@@ -1066,7 +1066,7 @@ var ecs_mappings = {
     "macaddr": {convert: to_mac, to:[{field: "host.mac", setter: fld_prio, prio: 2}]},
     "messageid": {to:[{field: "event.code", setter: fld_prio, prio: 1}]},
     "method": {to:[{field: "http.request.method", setter: fld_set}]},
-    "msg": {to:[{field: "log.original", setter: fld_set}]},
+    "msg": {to:[{field: "message", setter: fld_set}]},
     "orig_ip": {convert: to_ip, to:[{field: "network.forwarded_ip", setter: fld_prio, prio: 1},{field: "related.ip", setter: fld_append}]},
     "owner": {to:[{field: "related.user", setter: fld_append},{field: "user.name", setter: fld_prio, prio: 6}]},
     "packets": {convert: to_long, to:[{field: "network.packets", setter: fld_set}]},
