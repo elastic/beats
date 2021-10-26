@@ -135,7 +135,7 @@ class Test(metricbeat.BaseTest):
             }
         }])
         proc = self.start_beat()
-        self.wait_log_contains('"dataset": "elasticsearch.cluster.stats"')
+        self.wait_log_contains('"dataset":"elasticsearch.cluster.stats"')
 
         proc.check_kill_and_wait()
         self.assert_no_logged_warnings()
