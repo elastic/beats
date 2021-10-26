@@ -2,7 +2,7 @@
 @Library('apm@current') _
 
 pipeline {
-  agent none
+  agent { label 'master' }
   environment {
     REPO = 'apm-server'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
@@ -31,7 +31,7 @@ pipeline {
   }
   stages {
     stage('Filter build') {
-      agent { label 'ubuntu && immutable' }
+      agent { label 'ubuntu-18 && immutable' }
       when {
         beforeAgent true
         anyOf {
@@ -53,6 +53,7 @@ pipeline {
         Checkout the code and stash it, to use it on other stages.
         */
         stage('Checkout') {
+          options { skipDefaultCheckout() }
           steps {
             deleteDir()
             gitCheckout(basedir: "${BEATS_DIR}", githubNotifyFirstTimeContributor: false)
