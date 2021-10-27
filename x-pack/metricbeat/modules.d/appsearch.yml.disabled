@@ -1,5 +1,5 @@
 # Module: appsearch
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.0/metricbeat-module-appsearch.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-appsearch.html
 
 - module: appsearch
   metricsets: ["stats"]
