@@ -13,7 +13,6 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
@@ -65,8 +64,7 @@ func (c *config) Validate() error {
 		}
 	}
 	if len(enabled) == 0 {
-		logp.NewLogger(inputName).Warnf("neither queue_url, bucket_arn, non_aws_bucket_name were provided, input %s will stop", inputName)
-		return nil
+		return fmt.Errorf("neither queue_url, bucket_arn nor non_aws_bucket_name were provided, input %s will stop", inputName)
 	} else if len(enabled) > 1 {
 		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
 			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
