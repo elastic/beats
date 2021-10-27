@@ -360,7 +360,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9-*",
+				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
@@ -375,7 +375,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"overwrite":                     "true",
 				"name":                          "mocktest",
-				"pattern":                       "mocktest-*",
+				"pattern":                       "mocktest*",
 				"settings.index.lifecycle.name": "policy-keep",
 				"settings.index.lifecycle.rollover_alias": "mocktest",
 			}),
@@ -446,7 +446,7 @@ func TestIndexManager_Setup(t *testing.T) {
 			loadILM: LoadModeDisabled,
 			tmplCfg: cfgWith(template.DefaultConfig(), map[string]interface{}{
 				"name":                          "test-9.9.9",
-				"pattern":                       "test-9.9.9-*",
+				"pattern":                       "test-9.9.9*",
 				"settings.index.lifecycle.name": "test",
 				"settings.index.lifecycle.rollover_alias": "test-9.9.9",
 			}),
@@ -477,7 +477,6 @@ func TestIndexManager_Setup(t *testing.T) {
 				} else {
 					assert.Equal(t, test.tmplCfg, clientHandler.tmplCfg)
 				}
-				assert.Equal(t, test.alias, clientHandler.alias)
 				assert.Equal(t, test.policy, clientHandler.policy)
 			}
 		})
