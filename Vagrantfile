@@ -30,7 +30,6 @@ GO_VERSION = File.read(File.join(File.dirname(__FILE__), ".go-version")).strip
 
 # Provisioning for Windows PowerShell
 $winPsProvision = <<SCRIPT
-<<<<<<< HEAD
 echo 'Creating github.com\elastic in the GOPATH'
 New-Item -itemtype directory -path "C:\\Gopath\\src\\github.com\\elastic" -force
 echo "Symlinking C:\\Vagrant to C:\\Gopath\\src\\github.com\\elastic"
