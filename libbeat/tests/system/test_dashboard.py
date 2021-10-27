@@ -58,10 +58,13 @@ class Test(BaseTest):
                         "-E", "setup.kibana.protocol=http",
                         "-E", "setup.kibana.host=" + self.get_kibana_host(),
                         "-E", "setup.kibana.port=" + self.get_kibana_port(),
+                        "-E", "setup.kibana.username=beats",
+                        "-E", "setup.kibana.password=testing",
                         "-E", "output.elasticsearch.hosts=['" + self.get_host() + "']",
+                        "-E", "output.elasticsearch.username=admin",
+                        "-E", "output.elasticsearch.password=testing",
                         "-E", "output.file.enabled=false"]
         )
-
         beat.check_wait(exit_code=0)
 
         assert self.log_contains("Kibana dashboards successfully loaded") is True
