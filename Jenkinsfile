@@ -141,11 +141,9 @@ pipeline {
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
-        // Always when running builds on branches/tags
         // On a PR basis, skip if changes are only related to docs.
         // Always when forcing the input parameter
         anyOf {
-          not { changeRequest() }                           // If no PR
           allOf {                                           // If PR and no docs changes
             expression { return env.ONLY_DOCS == "false" }
             changeRequest()
