@@ -221,14 +221,11 @@ func TestGetRateLimitWhenMissingLimit(t *testing.T) {
 	t.Cleanup(func() { timeNow = time.Now })
 
 	header := make(http.Header)
-	//header.Add("X-Rate-Limit-Limit", "120")
 	header.Add("X-Rate-Limit-Remaining", "1")
 	header.Add("X-Rate-Limit-Reset", strconv.FormatInt(resetEpoch, 10))
-	//tplLimit := nil
 	tplReset := &valueTpl{}
 	tplRemaining := &valueTpl{}
 	earlyLimit := func(i float64) *float64 { return &i }(0.9)
-	//assert.NoError(t, tplLimit.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Limit"]]`))
 	assert.NoError(t, tplReset.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Reset"]]`))
 	assert.NoError(t, tplRemaining.Unpack(`[[.last_response.header.Get "X-Rate-Limit-Remaining"]]`))
 	rateLimit := &rateLimiter{
