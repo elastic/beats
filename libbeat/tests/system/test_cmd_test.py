@@ -52,7 +52,7 @@ class TestCommandTest(BaseTest):
 
         self.render_config_template("mockbeat",
                                     os.path.join(self.working_dir, "mockbeat.yml"),
-                                    elasticsearch={"hosts": self.get_elasticsearch_url()})
+                                    elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"})
         exit_code = self.run_beat(
             extra_args=["test", "output"],
             config="mockbeat.yml")
