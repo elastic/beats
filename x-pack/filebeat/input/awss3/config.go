@@ -64,7 +64,7 @@ func (c *config) Validate() error {
 		}
 	}
 	if len(enabled) == 0 {
-		return fmt.Errorf("neither queue_url, bucket_arn nor non_aws_bucket_name were provided, input %s will stop", inputName)
+		return errors.New("neither queue_url, bucket_arn nor non_aws_bucket_name were provided")
 	} else if len(enabled) > 1 {
 		return fmt.Errorf("queue_url <%v>, bucket_arn <%v>, non_aws_bucket_name <%v> "+
 			"cannot be set at the same time", c.QueueURL, c.BucketARN, c.NonAWSBucketName)
