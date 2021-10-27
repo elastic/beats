@@ -268,7 +268,7 @@
         "gcp.audit.method_name": "v1.compute.images.insert",
         "gcp.audit.request.name": "windows-server-2016-v20200805",
         "gcp.audit.request.proto_name": "type.googleapis.com/compute.images.insert",
-        "gcp.audit.request_metadata.caller_ip": "1.2.3.4",
+        "gcp.audit.request_metadata.caller_ip": "1.128.3.4",
         "gcp.audit.request_metadata.caller_supplied_user_agent": "google-cloud-sdk gcloud/290.0.1 command/gcloud.compute.images.create invocation-id/032752ad0fa44b4ea951951d2deef6a3 environment/None environment-version/None interactive/True from-script/False python/2.7.17 term/xterm-256color (Macintosh; Intel Mac OS X 19.6.0),gzip(gfe)",
         "gcp.audit.resource_location.current_locations": [
             "eu"
@@ -291,7 +291,7 @@
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.ip": "1.128.3.4",
         "tags": [
             "forwarded"
         ],

@@ -119,7 +119,7 @@
     },
     {
         "@timestamp": "2014-05-01T06:26:51.179-02:00",
-        "client.ip": "1.2.3.4",
+        "client.ip": "1.128.3.4",
         "client.port": 56639,
         "destination.as.number": 6805,
         "destination.as.organization.name": "Telefonica Germany",
@@ -137,7 +137,7 @@
         "event.dataset": "juniper.srx",
         "event.kind": "event",
         "event.module": "juniper",
-        "event.original": "source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No \"",
+        "event.original": "source-address=\"1.128.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No \"",
         "event.outcome": "success",
         "event.severity": 14,
         "event.timezone": "-02:00",
@@ -162,7 +162,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "1.2.3.4",
+            "1.128.3.4",
             "5.6.7.8"
         ],
         "rule.name": "log-all-else",
@@ -177,7 +177,7 @@
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.ip": "1.128.3.4",
         "source.port": 56639,
         "tags": [
             "forwarded",
@@ -187,7 +187,7 @@
     {
         "@timestamp": "2014-05-01T06:28:10.933-02:00",
         "client.bytes": 94,
-        "client.ip": "1.2.3.4",
+        "client.ip": "1.128.3.4",
         "client.nat.port": 63456,
         "client.packets": 1,
         "client.port": 63456,
@@ -213,7 +213,7 @@
         "event.end": "2014-05-01T06:29:10.933-02:00",
         "event.kind": "event",
         "event.module": "juniper",
-        "event.original": "reason=\"unset\" source-address=\"1.2.3.4\" source-port=\"63456\" destination-address=\"5.6.7.8\" destination-port=\"902\" service-name=\"None\" nat-source-address=\"1.2.3.4\" nat-source-port=\"63456\" nat-destination-address=\"5.6.7.8\" nat-destination-port=\"902\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"17\" policy-name=\"mngmt-to-vcenter\" source-zone-name=\"mngmt\" destination-zone-name=\"intra\" session-id-32=\"15353\" packets-from-client=\"1\" bytes-from-client=\"94\" packets-from-server=\"0\" bytes-from-server=\"0\" elapsed-time=\"60\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth3.5\" encrypted=\"No \"",
+        "event.original": "reason=\"unset\" source-address=\"1.128.3.4\" source-port=\"63456\" destination-address=\"5.6.7.8\" destination-port=\"902\" service-name=\"None\" nat-source-address=\"1.128.3.4\" nat-source-port=\"63456\" nat-destination-address=\"5.6.7.8\" nat-destination-port=\"902\" src-nat-rule-name=\"None\" dst-nat-rule-name=\"None\" protocol-id=\"17\" policy-name=\"mngmt-to-vcenter\" source-zone-name=\"mngmt\" destination-zone-name=\"intra\" session-id-32=\"15353\" packets-from-client=\"1\" bytes-from-client=\"94\" packets-from-server=\"0\" bytes-from-server=\"0\" elapsed-time=\"60\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth3.5\" encrypted=\"No \"",
         "event.outcome": "success",
         "event.severity": 14,
         "event.start": "2014-05-01T06:28:10.933-02:00",
@@ -243,7 +243,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Juniper",
         "related.ip": [
-            "1.2.3.4",
+            "1.128.3.4",
             "5.6.7.8"
         ],
         "rule.name": "mngmt-to-vcenter",
@@ -262,8 +262,8 @@
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
-        "source.nat.ip": "1.2.3.4",
+        "source.ip": "1.128.3.4",
+        "source.nat.ip": "1.128.3.4",
         "source.nat.port": 63456,
         "source.packets": 1,
         "source.port": 63456,

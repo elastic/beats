@@ -62,7 +62,7 @@
         "cef.device.product": "Vaporware",
         "cef.device.vendor": "Elastic",
         "cef.device.version": "1.0.0-alpha",
-        "cef.extensions.destinationAddress": "1.2.3.4",
+        "cef.extensions.destinationAddress": "1.128.3.4",
         "cef.extensions.destinationPort": 443,
         "cef.extensions.destinationTranslatedAddress": "10.10.10.10",
         "cef.extensions.destinationUserName": "alice",
@@ -83,7 +83,7 @@
         "destination.geo.location.lon": 37.6172,
         "destination.geo.region_iso_code": "RU-MOW",
         "destination.geo.region_name": "Moscow",
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "destination.nat.ip": "10.10.10.10",
         "destination.port": 443,
         "destination.user.name": "alice",
@@ -91,7 +91,7 @@
         "event.dataset": "cef.log",
         "event.id": 123,
         "event.module": "cef",
-        "event.original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|eventId=123 src=6.7.8.9 spt=33876 dst=1.2.3.4 dpt=443 duser=alice suser=bob destinationTranslatedAddress=10.10.10.10 fileHash=bc8bbe52f041fd17318f08a0f73762ce oldFileHash=a9796280592f86b74b27e370662d41eb",
+        "event.original": "CEF:0|Elastic|Vaporware|1.0.0-alpha|18|Authentication|low|eventId=123 src=6.7.8.9 spt=33876 dst=1.128.3.4 dpt=443 duser=alice suser=bob destinationTranslatedAddress=10.10.10.10 fileHash=bc8bbe52f041fd17318f08a0f73762ce oldFileHash=a9796280592f86b74b27e370662d41eb",
         "event.severity": 0,
         "fileset.name": "log",
         "input.type": "log",
@@ -105,7 +105,7 @@
             "bc8bbe52f041fd17318f08a0f73762ce"
         ],
         "related.ip": [
-            "1.2.3.4",
+            "1.128.3.4",
             "10.10.10.10",
             "6.7.8.9"
         ],

@@ -231,7 +231,7 @@
         "source.geo.region_iso_code": "CN-BJ",
         "source.geo.region_name": "Beijing",
         "source.ip": "192.168.10.10",
-        "source.nat.ip": "123.123.123.123",
+        "source.nat.ip": "67.43.156.12",
         "source.nat.port": 60964,
         "source.packets": 723417,
         "source.port": 6000,

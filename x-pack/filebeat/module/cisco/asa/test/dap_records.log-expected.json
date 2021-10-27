@@ -14,7 +14,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-734001: DAP: User firsname.lastname@domain.net, Addr 1.2.3.4, Connection AnyConnect: The following DAP records were selected for this connection: dap_1, dap_2",
+        "event.original": "%ASA-6-734001: DAP: User firsname.lastname@domain.net, Addr 1.128.3.4, Connection AnyConnect: The following DAP records were selected for this connection: dap_1, dap_2",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -28,10 +28,10 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "1.2.3.4"
+            "1.128.3.4"
         ],
         "service.type": "cisco",
-        "source.address": "1.2.3.4",
+        "source.address": "1.128.3.4",
         "source.geo.city_name": "Moscow",
         "source.geo.continent_name": "Europe",
         "source.geo.country_iso_code": "RU",
@@ -40,7 +40,7 @@
         "source.geo.location.lon": 37.6172,
         "source.geo.region_iso_code": "RU-MOW",
         "source.geo.region_name": "Moscow",
-        "source.ip": "1.2.3.4",
+        "source.ip": "1.128.3.4",
         "tags": [
             "cisco-asa",
             "forwarded"

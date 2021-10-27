@@ -3680,15 +3680,15 @@
         "@timestamp": "2021-01-13T19:12:37.000-02:00",
         "cisco.asa.connection_id": "27215708",
         "cisco.asa.destination_interface": "vlan-42",
-        "cisco.asa.mapped_destination_ip": "1.2.3.4",
+        "cisco.asa.mapped_destination_ip": "1.128.3.4",
         "cisco.asa.mapped_destination_port": 80,
-        "cisco.asa.mapped_source_ip": "1.2.3.4",
+        "cisco.asa.mapped_source_ip": "1.128.3.4",
         "cisco.asa.mapped_source_port": 49926,
         "cisco.asa.message_id": "302013",
         "cisco.asa.source_interface": "internet",
         "cisco.asa.source_username": "LOCAL\\username",
         "cisco.asa.termination_user": "username",
-        "destination.address": "1.2.3.4",
+        "destination.address": "1.128.3.4",
         "destination.geo.city_name": "Moscow",
         "destination.geo.continent_name": "Europe",
         "destination.geo.country_iso_code": "RU",
@@ -3697,7 +3697,7 @@
         "destination.geo.location.lon": 37.6172,
         "destination.geo.region_iso_code": "RU-MOW",
         "destination.geo.region_name": "Moscow",
-        "destination.ip": "1.2.3.4",
+        "destination.ip": "1.128.3.4",
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
@@ -3707,7 +3707,7 @@
         "event.dataset": "cisco.asa",
         "event.kind": "event",
         "event.module": "cisco",
-        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.2.3.4/49926)(LOCAL\\username) to vlan-42:1.2.3.4/80 (1.2.3.4/80) (username)",
+        "event.original": "%ASA-6-302013: Built inbound TCP connection 27215708 for internet:10.2.3.4/49926 (1.128.3.4/49926)(LOCAL\\username) to vlan-42:1.128.3.4/80 (1.128.3.4/80) (username)",
         "event.severity": 6,
         "event.timezone": "-02:00",
         "event.type": [
@@ -3728,7 +3728,7 @@
         "observer.type": "firewall",
         "observer.vendor": "Cisco",
         "related.ip": [
-            "1.2.3.4",
+            "1.128.3.4",
             "10.2.3.4"
         ],
         "related.user": [
@@ -3737,7 +3737,7 @@
         "service.type": "cisco",
         "source.address": "10.2.3.4",
         "source.ip": "10.2.3.4",
-        "source.nat.ip": "1.2.3.4",
+        "source.nat.ip": "1.128.3.4",
         "source.port": 49926,
         "source.user.name": "username",
         "tags": [

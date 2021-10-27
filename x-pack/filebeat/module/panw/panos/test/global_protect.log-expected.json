@@ -377,7 +377,7 @@
         "@timestamp": "2021-03-02T11:01:02.000-02:00",
         "client.address": "10.20.30.40",
         "client.ip": "10.20.30.40",
-        "client.nat.ip": "123.123.123.123",
+        "client.nat.ip": "67.43.156.12",
         "event.code": "gateway-setup-ipsec",
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -392,7 +392,7 @@
         "host.os.full": "Microsoft Windows 10 Enterprise, 64-bit",
         "input.type": "log",
         "log.offset": 2059,
-        "log.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner123,123.123.123.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
+        "log.original": "1,2021/03/02 11:01:03,123456789999,GLOBALPROTECT,0,2305,2021/03/02 11:01:02,vsys1,gateway-setup-ipsec,tunnel,,IPSec,domain\\musterman,DE,Rechner67.43.156.12.123,0.0.0.0,10.20.30.40,0.0.0.0,96c43d47-8bb5-4f78-8dfc-413a189a29e0,SERIALNR,5.1.1,Windows,\"Microsoft Windows 10 Enterprise, 64-bit\",1,,,,success,,0,,0,GPGateway,6894571632887761989,0x8000000000000000,1970-01-01T01:00:00.000+01:00,,0,manual only,,",
         "network.type": "ipv4",
         "observer.hostname": "GPGateway",
         "observer.product": "PAN-OS",
@@ -407,7 +407,7 @@
         "panw.panos.response_time": "0",
         "panw.panos.sequence_number": 6894571632887761989,
         "panw.panos.serial_number": "SERIALNR",
-        "panw.panos.source.nat.ip": "123.123.123.123",
+        "panw.panos.source.nat.ip": "67.43.156.12",
         "panw.panos.stage": "tunnel",
         "panw.panos.sub_type": "0",
         "panw.panos.tunnel_type": "IPSec",
@@ -419,7 +419,7 @@
         ],
         "related.ip": [
             "10.20.30.40",
-            "123.123.123.123"
+            "67.43.156.12"
         ],
         "related.user": [
             "musterman"
@@ -428,7 +428,7 @@
         "source.address": "10.20.30.40",
         "source.geo.name": "DE",
         "source.ip": "10.20.30.40",
-        "source.nat.ip": "123.123.123.123",
+        "source.nat.ip": "67.43.156.12",
         "source.user.domain": "domain",
         "source.user.name": "musterman",
         "tags": [
