@@ -7,10 +7,6 @@ IF ERRORLEVEL 1 (
  choco install curl -y --no-progress --skipdownloadcache
 )
 mkdir %WORKSPACE%\bin
-<<<<<<< HEAD
-where /q gvm
-=======
-
 IF EXIST "%PROGRAMFILES(X86)%" (
     REM Force the gvm installation.
     SET GVM_BIN=gvm.exe
@@ -39,10 +35,6 @@ REM Configure the given go version
 FOR /f "tokens=*" %%i IN ('"%GVM_BIN%" use %GO_VERSION% --format=batch') DO %%i
 
 go env
->>>>>>> 34e5c09bd ([CI] bump gvm version and use the binary (#24571))
-IF ERRORLEVEL 1 (
- curl -sL -o %WORKSPACE%\bin\gvm.exe https://github.com/andrewkroh/gvm/releases/download/v0.2.1/gvm-windows-amd64.exe
-)
 FOR /f "tokens=*" %%i IN ('"gvm.exe" use %GO_VERSION% --format=batch') DO %%i
 
 go install github.com/elastic/beats/vendor/github.com/magefile/mage

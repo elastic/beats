@@ -146,11 +146,7 @@ def linuxGvmProvision(arch="amd64")
   return <<SCRIPT
 mkdir -p ~/bin
 if [ ! -e "~/bin/gvm" ]; then
-<<<<<<< HEAD
-  curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.1.0/gvm-linux-#{arch}
-=======
   curl -sL -o ~/bin/gvm https://github.com/andrewkroh/gvm/releases/download/v0.3.0/gvm-linux-#{arch}
->>>>>>> 34e5c09bd ([CI] bump gvm version and use the binary (#24571))
   chmod +x ~/bin/gvm
   ~/bin/gvm #{GO_VERSION}
   echo 'export GOPATH=$HOME/go' >> ~/.bash_profile
