@@ -58,6 +58,26 @@ func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
 				EndpointResolver: awssdk.ResolveWithEndpointURL("https://cloudwatch.us-west-1.amazonaws.com"),
 			},
 		},
+		{
+			"full URI endpoint",
+			"https://s3.test.com:9000",
+			"s3",
+			"",
+			awssdk.Config{},
+			awssdk.Config{
+				EndpointResolver: awssdk.ResolveWithEndpointURL("https://s3.test.com:9000"),
+			},
+		},
+		{
+			"full non HTTPS URI endpoint",
+			"http://testobjects.com:9000",
+			"s3",
+			"",
+			awssdk.Config{},
+			awssdk.Config{
+				EndpointResolver: awssdk.ResolveWithEndpointURL("http://testobjects.com:9000"),
+			},
+		},
 	}
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
