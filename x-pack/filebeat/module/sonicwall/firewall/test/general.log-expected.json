@@ -22,13 +22,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:06.000Z",
         "service.type": "sonicwall",
-        "source.as.number": 3215,
-        "source.as.organization.name": "Orange",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8582,
-        "source.geo.location.lon": 2.3387,
         "source.ip": [
             "2.2.2.2"
         ],
@@ -88,13 +81,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:07.000Z",
         "service.type": "sonicwall",
-        "source.as.number": 3215,
-        "source.as.organization.name": "Orange",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8582,
-        "source.geo.location.lon": 2.3387,
         "source.ip": [
             "2.2.2.2"
         ],
@@ -239,13 +225,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:10.000Z",
         "service.type": "sonicwall",
-        "source.as.number": 3215,
-        "source.as.organization.name": "Orange",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8582,
-        "source.geo.location.lon": 2.3387,
         "source.ip": [
             "2.2.2.2"
         ],
@@ -305,13 +284,6 @@
         "rsa.network.sinterface": "WAN dst=1.1.1.1:50000:WAN proto=tcp/50000",
         "rsa.time.event_time": "2007-01-03T16:48:11.000Z",
         "service.type": "sonicwall",
-        "source.as.number": 3215,
-        "source.as.organization.name": "Orange",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8582,
-        "source.geo.location.lon": 2.3387,
         "source.ip": [
             "2.2.2.2"
         ],
@@ -345,11 +317,6 @@
         "rsa.network.sinterface": "WAN",
         "rsa.time.event_time": "2007-01-03T16:48:14.000Z",
         "service.type": "sonicwall",
-        "source.geo.continent_name": "Oceania",
-        "source.geo.country_iso_code": "NZ",
-        "source.geo.country_name": "New Zealand",
-        "source.geo.location.lat": -41.0,
-        "source.geo.location.lon": 174.0,
         "source.ip": [
             "219.89.19.223"
         ],
@@ -432,13 +399,6 @@
         "rsa.network.sinterface": "WAN dst=2.2.2.2:500:WAN proto=udp/500",
         "rsa.time.event_time": "2007-01-03T16:48:15.000Z",
         "service.type": "sonicwall",
-        "source.as.number": 13335,
-        "source.as.organization.name": "Cloudflare, Inc.",
-        "source.geo.continent_name": "Oceania",
-        "source.geo.country_iso_code": "AU",
-        "source.geo.country_name": "Australia",
-        "source.geo.location.lat": -33.494,
-        "source.geo.location.lon": 143.2104,
         "source.ip": [
             "1.1.1.1"
         ],

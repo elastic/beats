@@ -193,11 +193,6 @@
         ],
         "service.type": "azure",
         "source.address": "11.22.33.44",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8582,
-        "source.geo.location.lon": 2.3387,
         "source.ip": "11.22.33.44",
         "tags": [
             "forwarded"

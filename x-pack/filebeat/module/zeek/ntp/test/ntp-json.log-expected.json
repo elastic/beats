@@ -2,13 +2,6 @@
     {
         "@timestamp": "2020-10-08T00:29:07.977Z",
         "destination.address": "208.79.89.249",
-        "destination.as.number": 25795,
-        "destination.as.organization.name": "ARP NETWORKS, INC.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "208.79.89.249",
         "destination.port": 123,
         "event.category": [
@@ -37,11 +30,6 @@
         ],
         "service.type": "zeek",
         "source.address": "130.118.205.62",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
         "source.ip": "130.118.205.62",
         "source.port": 38461,
         "tags": [
@@ -65,13 +53,6 @@
     {
         "@timestamp": "2020-10-08T00:29:08.081Z",
         "destination.address": "208.79.89.249",
-        "destination.as.number": 25795,
-        "destination.as.organization.name": "ARP NETWORKS, INC.",
-        "destination.geo.continent_name": "North America",
-        "destination.geo.country_iso_code": "US",
-        "destination.geo.country_name": "United States",
-        "destination.geo.location.lat": 37.751,
-        "destination.geo.location.lon": -97.822,
         "destination.ip": "208.79.89.249",
         "destination.port": 123,
         "event.category": [
@@ -100,11 +81,6 @@
         ],
         "service.type": "zeek",
         "source.address": "130.118.205.62",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 37.751,
-        "source.geo.location.lon": -97.822,
         "source.ip": "130.118.205.62",
         "source.port": 38461,
         "tags": [

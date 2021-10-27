@@ -109,16 +109,6 @@
         "related.ip": "79.159.11.115",
         "related.user": "root",
         "service.type": "o365",
-        "source.as.number": 3352,
-        "source.as.organization.name": "Telefonica De Espana",
-        "source.geo.city_name": "Barcelona",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "ES",
-        "source.geo.country_name": "Spain",
-        "source.geo.location.lat": 41.3891,
-        "source.geo.location.lon": 2.1611,
-        "source.geo.region_iso_code": "ES-B",
-        "source.geo.region_name": "Barcelona",
         "source.ip": "79.159.11.115",
         "tags": [
             "forwarded"

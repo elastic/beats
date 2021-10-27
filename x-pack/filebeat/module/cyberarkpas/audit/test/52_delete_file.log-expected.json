@@ -179,13 +179,6 @@
         ],
         "service.type": "cyberarkpas",
         "source.address": "35.192.121.42",
-        "source.geo.continent_name": "North America",
-        "source.geo.country_iso_code": "US",
-        "source.geo.country_name": "United States",
-        "source.geo.location.lat": 38.6583,
-        "source.geo.location.lon": -77.2481,
-        "source.geo.region_iso_code": "US-VA",
-        "source.geo.region_name": "Virginia",
         "source.ip": "35.192.121.42",
         "tags": [
             "cyberarkpas.audit",

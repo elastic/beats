@@ -427,16 +427,6 @@
         "related.ip": "20.190.129.100",
         "related.user": "root",
         "service.type": "o365",
-        "source.as.number": 8075,
-        "source.as.organization.name": "Microsoft Corporation",
-        "source.geo.city_name": "Dublin",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "IE",
-        "source.geo.country_name": "Ireland",
-        "source.geo.location.lat": 53.3338,
-        "source.geo.location.lon": -6.2488,
-        "source.geo.region_iso_code": "IE-L",
-        "source.geo.region_name": "Leinster",
         "source.ip": "20.190.129.100",
         "tags": [
             "forwarded"
@@ -736,16 +726,6 @@
         "related.ip": "20.190.129.100",
         "related.user": "root",
         "service.type": "o365",
-        "source.as.number": 8075,
-        "source.as.organization.name": "Microsoft Corporation",
-        "source.geo.city_name": "Dublin",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "IE",
-        "source.geo.country_name": "Ireland",
-        "source.geo.location.lat": 53.3338,
-        "source.geo.location.lon": -6.2488,
-        "source.geo.region_iso_code": "IE-L",
-        "source.geo.region_name": "Leinster",
         "source.ip": "20.190.129.100",
         "tags": [
             "forwarded"
@@ -867,16 +847,6 @@
             "root"
         ],
         "service.type": "o365",
-        "source.as.number": 8075,
-        "source.as.organization.name": "Microsoft Corporation",
-        "source.geo.city_name": "Paris",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8607,
-        "source.geo.location.lon": 2.3281,
-        "source.geo.region_iso_code": "FR-75",
-        "source.geo.region_name": "Paris",
         "source.ip": "52.109.68.40",
         "tags": [
             "forwarded"
@@ -994,16 +964,6 @@
         "related.ip": "52.109.68.40",
         "related.user": "root",
         "service.type": "o365",
-        "source.as.number": 8075,
-        "source.as.organization.name": "Microsoft Corporation",
-        "source.geo.city_name": "Paris",
-        "source.geo.continent_name": "Europe",
-        "source.geo.country_iso_code": "FR",
-        "source.geo.country_name": "France",
-        "source.geo.location.lat": 48.8607,
-        "source.geo.location.lon": 2.3281,
-        "source.geo.region_iso_code": "FR-75",
-        "source.geo.region_name": "Paris",
         "source.ip": "52.109.68.40",
         "tags": [
             "forwarded"
