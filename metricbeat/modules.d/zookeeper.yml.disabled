@@ -1,5 +1,5 @@
 # Module: zookeeper
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-zookeeper.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.0/metricbeat-module-zookeeper.html
 
 - module: zookeeper
   #metricsets:

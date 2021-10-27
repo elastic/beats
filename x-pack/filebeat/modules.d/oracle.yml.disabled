@@ -1,5 +1,5 @@
 # Module: oracle
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-oracle.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.0/filebeat-module-oracle.html
 
 - module: oracle
   database_audit:

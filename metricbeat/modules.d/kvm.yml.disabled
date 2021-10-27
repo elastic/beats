@@ -1,5 +1,5 @@
 # Module: kvm
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-kvm.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.0/metricbeat-module-kvm.html
 
 - module: kvm
   #metricsets:
