@@ -928,6 +928,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Add support for parallelization factor for kinesis. {pull}20727[20727]
 - Provide more ways to set AWS credentials. {issue}12464[12464] {pull}23344[23344]
 - Add support for multiple regions {pull}21065[21065]
+- Add support for AWS Kinesis record deaggregation {pull}28241[28241]
 
 *Winlogbeat*
 
