@@ -8,8 +8,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-01-01/consumption"
 	"github.com/Azure/go-autorest/autorest/date"
+
+	"github.com/Azure/azure-sdk-for-go/services/consumption/mgmt/2019-10-01/consumption"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,6 +18,7 @@ import (
 func TestEventMapping(t *testing.T) {
 	usageDate := "2020-08-08"
 	name := "test"
+	billingAccountId := "123"
 	startDate := date.Time{}
 
 	var charge decimal.Decimal = decimal.NewFromFloat(8.123456)
@@ -36,26 +38,19 @@ func TestEventMapping(t *testing.T) {
 		ChargeType:       "Actual",
 		ConfidenceLevels: nil,
 	}
-	var prop1 = consumption.UsageDetailProperties{
-		InstanceName:     &name,
-		SubscriptionName: &name,
-		AccountName:      &name,
-		DepartmentName:   &name,
-		Product:          &name,
-		InstanceID:       &name,
-		UsageStart:       &startDate,
-		UsageEnd:         &startDate,
+	var pros = consumption.LegacyUsageDetailProperties{
+		BillingAccountID:       &billingAccountId,
+		BillingAccountName:     &name,
+		BillingPeriodStartDate: &startDate,
+		BillingPeriodEndDate:   &startDate,
+		Cost:                   &charge,
+		InvoiceSection:         &name,
+		Product:                &name,
 	}
-	usage := Usage{
-		UsageDetails: []consumption.UsageDetail{
-			{
-				UsageDetailProperties: &prop1,
-				ID:                    nil,
-				Name:                  nil,
-				Type:                  nil,
-				Tags:                  nil,
-			},
-		},
+	var legacy = consumption.LegacyUsageDetail{
+		LegacyUsageDetailProperties: &pros,
+	}
+	var usage = Usage{UsageDetails: []consumption.BasicUsageDetail{legacy},
 		ActualCosts: []consumption.Forecast{
 			{
 				ForecastProperties: &prop2,
@@ -63,17 +58,17 @@ func TestEventMapping(t *testing.T) {
 				Name:               nil,
 				Type:               nil,
 				Tags:               nil,
-			}},
-		ForecastCosts: []consumption.Forecast{
+			}}, ForecastCosts: []consumption.Forecast{
 			{
 				ForecastProperties: &prop,
 				ID:                 nil,
 				Name:               nil,
 				Type:               nil,
 				Tags:               nil,
-			}},
-	}
-	events := EventsMapping(usage)
+			}}}
+	startTime := time.Now().UTC().Truncate(24 * time.Hour).Add((-48) * time.Hour)
+	endTime := startTime.Add(time.Hour * 24).Add(time.Second * (-1))
+	events := EventsMapping(usage, startTime, endTime, "sub")
 	assert.Equal(t, len(events), 2)
 	for _, event := range events {
 

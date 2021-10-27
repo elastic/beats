@@ -24,6 +24,7 @@ type config struct {
 	ScanFrequency             time.Duration       `config:"scan_frequency" validate:"min=0,nonzero"`
 	APITimeout                time.Duration       `config:"api_timeout" validate:"min=0,nonzero"`
 	APISleep                  time.Duration       `config:"api_sleep" validate:"min=0,nonzero"`
+	Latency                   time.Duration       `config:"latency"`
 	AwsConfig                 awscommon.ConfigAWS `config:",inline"`
 }
 

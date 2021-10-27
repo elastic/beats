@@ -2,7 +2,7 @@ pull_request_rules:
   - name: forward-port patches to master branch
     conditions:
       - merged
-      - label=backport-v8.0.0
+      - label=backport-v8.1.0
     actions:
       backport:
         assignees:
@@ -26,9 +26,9 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
-  - name: automatic approval for mergify pull requests with bump updates
+  - name: automatic approval for automated pull requests with bump updates
     conditions:
-      - author=mergify[bot]
+      - author=apmmachine
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
@@ -41,10 +41,11 @@ pull_request_rules:
       - check-success=beats-ci/pr-merge
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
+      - "#approved-reviews-by>=1"
     actions:
       merge:
         method: squash
-        strict: smart+fasttrack
+        strict: false
   - name: delete upstream branch after merging changes on testing/environments/snapshot* or it's closed
     conditions:
       - or:
@@ -84,10 +85,11 @@ pull_request_rules:
       - label=automation
       - files~=^\.mergify\.yml$
       - head~=^add-backport-next.*
+      - "#approved-reviews-by>=1"
     actions:
       merge:
         method: squash
-        strict: smart+fasttrack
+        strict: false
   - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
     conditions:
       - or:
@@ -122,19 +124,6 @@ pull_request_rules:
       label:
         remove:
           - backport-skip
-  - name: backport patches to 7.x branch
-    conditions:
-      - merged
-      - label=backport-v7.16.0
-    actions:
-      backport:
-        assignees:
-          - "{{ author }}"
-        branches:
-          - "7.x"
-        labels:
-          - "backport"
-        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
   - name: backport patches to 7.14 branch
     conditions:
       - merged
@@ -158,6 +147,32 @@ pull_request_rules:
           - "{{ author }}"
         branches:
           - "7.15"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 7.16 branch
+    conditions:
+      - merged
+      - label=backport-v7.16.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.16"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.0 branch
+    conditions:
+      - merged
+      - label=backport-v8.0.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.0"
         labels:
           - "backport"
         title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
