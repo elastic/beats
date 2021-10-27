@@ -97,7 +97,7 @@ class Test(BaseTest):
         print(path)
 
         self.render_config_template(
-            elasticsearch={"hosts": self.get_host()},
+            elasticsearch={"hosts": self.get_host(), "username": "admin", "password": "testing"},
             template_overwrite="true",
             template_json_enabled="true",
             template_json_path=path,
@@ -136,7 +136,7 @@ class TestRunTemplate(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
             **kwargs
         )
 
@@ -197,7 +197,7 @@ class TestCommandSetupTemplate(BaseTest):
 
     def render_config(self, **kwargs):
         self.render_config_template(
-            elasticsearch={"hosts": self.get_elasticsearch_url()},
+            elasticsearch={"hosts": self.get_elasticsearch_url(), "username": "admin", "password": "testing"},
             **kwargs
         )
 
