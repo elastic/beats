@@ -76,7 +76,7 @@ func New(
 
 	pattern := config.Pattern
 	if pattern == "" {
-		pattern = name + "-*"
+		pattern = name + "*"
 	}
 
 	event := &beat.Event{

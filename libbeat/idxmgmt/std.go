@@ -122,7 +122,7 @@ func newIndexSupport(
 		info:         info,
 		templateCfg:  tmplCfg,
 		migration:    migration,
-		defaultIndex: fmt.Sprintf("%v-%v-%%{+yyyy.MM.dd}", info.IndexPrefix, info.Version),
+		defaultIndex: fmt.Sprintf("%v-%v", info.IndexPrefix, info.Version),
 	}, nil
 }
 
