@@ -45,7 +45,7 @@ func NewPodMetadataGenerator(
 	node MetaGen,
 	namespace MetaGen,
 	metaCfg *AddResourceMetadataConfig) MetaGen {
-	var addDeploymentMeta bool
+	addDeploymentMeta := true
 	if metaCfg != nil {
 		addDeploymentMeta = metaCfg.Deployment
 	}
