@@ -115,12 +115,7 @@ require (
 	github.com/josephspurrier/goversioninfo v0.0.0-20190209210621-63e6d1acd3dd
 	github.com/jpillora/backoff v1.0.0 // indirect
 	github.com/kardianos/service v1.2.1-0.20210728001519-a323c3813bc7
-<<<<<<< HEAD
-	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.1.2-0.20190507191818-2ff3cb3adc01
-=======
-	github.com/lib/pq v1.10.3
->>>>>>> 97818c3c26 (Update containerd (#28621))
 	github.com/magefile/mage v1.11.0
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/mattn/go-colorable v0.1.6
@@ -175,13 +170,8 @@ require (
 	golang.org/x/net v0.0.0-20211020060615-d418f374d309
 	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
-<<<<<<< HEAD
-	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e
-	golang.org/x/text v0.3.6
-=======
 	golang.org/x/sys v0.0.0-20211025112917-711f33c9992c
 	golang.org/x/text v0.3.7
->>>>>>> 97818c3c26 (Update containerd (#28621))
 	golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba
 	golang.org/x/tools v0.1.6
 	google.golang.org/api v0.47.0
