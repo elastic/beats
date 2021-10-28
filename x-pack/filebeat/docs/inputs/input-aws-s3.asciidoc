@@ -61,6 +61,28 @@ Listing of the S3 bucket will be polled according the time interval defined by
   expand_event_list_from_field: Records
 ----
 
+
+The `aws-s3` input can also poll 3rd party S3 compatible services such as the self hosted Minio.
+Using non-AWS S3 compatible buckets requires the use of `access_key_id` and `secret_access_key` for authentication.
+To specify the S3 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
+`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>`, that will be used as the API endpoint of the service, or a single domain.
+If a domain is provided, the full endpoint URI will be constructed with the region name in the standard form of `https://s3.<region>.<domain>` supported by AWS and several 3rd party providers.
+No `endpoint` is needed if using the native AWS S3 service hosted at `amazonaws.com`.
+Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS domains that require a different endpoint.
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: aws-s3
+  non_aws_bucket_name: test-s3-bucket
+  number_of_workers: 5
+  bucket_list_interval: 300s
+  access_key_id: xxxxxxx
+  secret_access_key: xxxxxxx
+  endpoint: https://s3.example.com:9000
+  expand_event_list_from_field: Records
+----
+
 The `aws-s3` input supports the following configuration options plus the
 <<{beatname_lc}-input-{type}-common-options>> described later.
 
@@ -236,7 +258,7 @@ configuring multiline options.
 [float]
 ==== `queue_url`
 
-URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` is not set).
+URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
 
 [float]
 ==== `visibility_timeout`
@@ -270,19 +292,62 @@ value is `20s`.
 [float]
 ==== `bucket_arn`
 
-ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` is not set).
+ARN of the AWS S3 bucket that will be polled for list operation. (Required when `queue_url` and `non_aws_bucket_name` are not set).
+
+[float]
+==== `non_aws_bucket_name`
+
+Name of the S3 bucket that will be polled for list operation. Required for 3rd party S3 compatible services. (Required when `queue_url` and `bucket_arn` are not set).
 
 [float]
 ==== `bucket_list_interval`
 
 Time interval for polling listing of the S3 bucket: default to `120s`.
 
+[float]
+==== `bucket_list_prefix`
+
+Prefix to apply for the list request to the S3 bucket. Default empty.
 
 [float]
 ==== `number_of_workers`
 
 Number of workers that will process the S3 objects listed. (Required when `bucket_arn` is set).
 
+
+[float]
+==== `provider`
+
+Name of the 3rd party S3 bucket provider like backblaze or GCP.
+The following endpoints/providers will be detected automatically:
+|===
+|Domain |Provider
+|amazonaws.com, amazonaws.com.cn, c2s.sgov.gov, c2s.ic.gov |aws
+|backblazeb2.com |backblaze
+|wasabisys.com |wasabi
+|digitaloceanspaces.com |digitalocean
+|dream.io |dreamhost
+|scw.cloud |scaleway
+|googleapis.com |gcp
+|cloud.it |arubacloud
+|linodeobjects.com |linode
+|vultrobjects.com |vultr
+|appdomain.cloud |ibm
+|aliyuncs.com |alibaba
+|oraclecloud.com |oracle
+|exo.io |exoscale
+|upcloudobjects.com |upcloud
+|ilandcloud.com |iland
+|zadarazios.com |zadara
+|===
+
+
+[float]
+==== `path_style`
+
+Enabling this option sets the bucket name as a path in the API call instead of a subdomain. When enabled
+https://<bucket-name>.s3.<region>.<provider>.com becomes https://s3.<region>.<provider>.com/<bucket-name>.
+This is only supported with 3rd party S3 providers.  AWS does not support path style.
 
 
 [float]
