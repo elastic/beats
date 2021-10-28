@@ -55,9 +55,18 @@ func (c retryConfig) getWaitMax() time.Duration {
 }
 
 type rateLimitConfig struct {
-	Limit     *valueTpl `config:"limit"`
-	Reset     *valueTpl `config:"reset"`
-	Remaining *valueTpl `config:"remaining"`
+	Limit      *valueTpl `config:"limit"`
+	Reset      *valueTpl `config:"reset"`
+	Remaining  *valueTpl `config:"remaining"`
+	EarlyLimit *float64  `config:"early_limit"`
+}
+
+func (c rateLimitConfig) Validate() error {
+	switch {
+	case c.EarlyLimit != nil && *c.EarlyLimit < 0:
+		return errors.New("early_limit must be greater than or equal to 0")
+	}
+	return nil
 }
 
 type urlConfig struct {
