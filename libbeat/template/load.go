@@ -132,10 +132,8 @@ func (l *ESLoader) Load(config TemplateConfig, info beat.Info, fields []byte, mi
 // then use CheckTemplate prior to calling this method.
 func (l *ESLoader) loadTemplate(templateName string, template map[string]interface{}) error {
 	l.log.Infof("Try loading template %s to Elasticsearch", templateName)
-	clientVersion := l.client.GetVersion()
 	path := "/_index_template/" + templateName
-	params := esVersionParams(clientVersion)
-	status, body, err := l.client.Request("PUT", path, "", params, template)
+	status, body, err := l.client.Request("PUT", path, "", nil, template)
 	if err != nil {
 		return fmt.Errorf("couldn't load template: %v. Response body: %s", err, body)
 	}
@@ -253,14 +251,4 @@ func (b *templateBuilder) buildBodyFromFields(tmpl *Template, fields []byte) (co
 
 func (e *StatusError) Error() string {
 	return fmt.Sprintf("request failed with http status code %v", e.status)
-}
-
-func esVersionParams(ver common.Version) map[string]string {
-	if ver.Major == 6 && ver.Minor == 7 {
-		return map[string]string{
-			"include_type_name": "true",
-		}
-	}
-
-	return nil
 }

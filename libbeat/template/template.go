@@ -70,6 +70,10 @@ func New(
 	}
 
 	name := config.Name
+	if config.JSON.Enabled {
+		name = config.JSON.Name
+	}
+
 	if name == "" {
 		name = fmt.Sprintf("%s-%s", beatName, bV.String())
 	}

@@ -188,26 +188,17 @@ func TestESLoader_Load(t *testing.T) {
 				fields:     fields,
 				properties: []string{"foo", "bar"},
 			},
-			"default config with fields and component": {
-				cfg:        TemplateConfig{Enabled: true},
-				fields:     fields,
-				properties: []string{"foo", "bar"},
-			},
 			"minimal template": {
-				cfg:    TemplateConfig{Enabled: true},
-				fields: nil,
-			},
-			"minimal template component": {
 				cfg:    TemplateConfig{Enabled: true},
 				fields: nil,
 			},
 			"fields from file": {
 				cfg:        TemplateConfig{Enabled: true, Fields: path(t, []string{"testdata", "fields.yml"})},
 				fields:     fields,
-				properties: []string{"object", "keyword", "alias", "migration_alias_false", "object_disabled"},
+				properties: []string{"object", "keyword", "alias", "migration_alias_false", "object_disabled", "@timestamp"},
 			},
 			"fields from json": {
-				cfg: TemplateConfig{Enabled: true, Name: "json-template", JSON: struct {
+				cfg: TemplateConfig{Enabled: true, JSON: struct {
 					Enabled bool   `config:"enabled"`
 					Path    string `config:"path"`
 					Name    string `config:"name"`
@@ -222,7 +213,7 @@ func TestESLoader_Load(t *testing.T) {
 
 				// Fetch properties
 				tmpl := getTemplate(t, setup.client, setup.config.Name)
-				val, err := tmpl.GetValue("mappings.properties")
+				val, err := tmpl.GetValue("template.mappings.properties")
 				if data.properties == nil {
 					assert.Error(t, err)
 				} else {
@@ -287,8 +278,9 @@ var dataTests = []struct {
 }{
 	{
 		data: common.MapStr{
-			"keyword": "test keyword",
-			"array":   [...]int{1, 2, 3},
+			"@timestamp": time.Now(),
+			"keyword":    "test keyword",
+			"array":      [...]int{1, 2, 3},
 			"object": common.MapStr{
 				"hello": "world",
 			},
@@ -314,6 +306,7 @@ var dataTests = []struct {
 	{
 		// tests enabled: false values
 		data: common.MapStr{
+			"@timestamp":     time.Now(),
 			"array_disabled": [...]int{1, 2, 3},
 			"object_disabled": common.MapStr{
 				"hello": "world",
@@ -350,10 +343,14 @@ func getTemplate(t *testing.T, client ESClient, templateName string) testTemplat
 	require.NoError(t, err)
 	require.NotNil(t, response)
 
+	templates, _ := response.GetValue("index_templates")
+	templatesList, _ := templates.([]interface{})
+	templateElem := templatesList[0].(map[string]interface{})
+
 	return testTemplate{
 		t:      t,
 		client: client,
-		MapStr: common.MapStr(response[templateName].(map[string]interface{})),
+		MapStr: common.MapStr(templateElem["index_template"].(map[string]interface{})),
 	}
 }
 

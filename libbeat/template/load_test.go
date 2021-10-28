@@ -40,7 +40,7 @@ func TestFileLoader_Load(t *testing.T) {
 	}{
 		"load minimal config info": {
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
+				"index_patterns": []string{"mock-7.0.0*"},
 				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": nil}},
@@ -49,7 +49,7 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config with index settings": {
 			settings: TemplateSettings{Index: common.MapStr{"code": "best_compression"}},
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
+				"index_patterns": []string{"mock-7.0.0*"},
 				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": common.MapStr{"code": "best_compression"}}},
@@ -58,7 +58,7 @@ func TestFileLoader_Load(t *testing.T) {
 		"load minimal config with source settings": {
 			settings: TemplateSettings{Source: common.MapStr{"enabled": false}},
 			body: common.MapStr{
-				"index_patterns": []string{"mock-7.0.0-*"},
+				"index_patterns": []string{"mock-7.0.0*"},
 				"priority":       150,
 				"template": common.MapStr{
 					"settings": common.MapStr{"index": nil},
