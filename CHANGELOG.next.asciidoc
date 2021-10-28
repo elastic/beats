@@ -334,7 +334,6 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Fix initialization of http client in Cloudfoundry input. {issue}28271[28271] {pull}28277[28277]
 - Fix aws-s3 input by checking if GetObject API call response content type exists. {pull}28457[28457]
 
-
 *Heartbeat*
 
 - Fixed excessive memory usage introduced in 7.5 due to over-allocating memory for HTTP checks. {pull}15639[15639]
