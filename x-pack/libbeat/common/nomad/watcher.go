@@ -132,7 +132,7 @@ func (w *watcher) sync() error {
 		// the allocation has not changed since last seen, ignore
 		if w.waitIndex > alloc.ModifyIndex {
 			w.logger.Debugf(
-				"Skip allocation:%s ClientStatus:%s because w.waitIndex=%v > alloc.ModifyIndex=%v",
+				"Skip allocation.id=%s ClientStatus=%s because w.waitIndex=%v > alloc.ModifyIndex=%v",
 				alloc.ID,
 				alloc.ClientStatus,
 				fmt.Sprint(w.waitIndex),
