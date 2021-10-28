@@ -550,6 +550,7 @@ for a few releases. Please use other tools provided by Elastic to fetch data fro
 - Update cloud.google.com/go library. {pull}28229[28229]
 - Add additional metadata to the root HTTP endpoint. {pull}28265[28265]
 - Upgrade k8s.io/client-go library. {pull}28228[28228]
+- Name all k8s workqueue. {pull}28085[28085]
 
 *Auditbeat*
 
